@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { guideOverviewForEditor, guideDraftReadiness, guideRoundLabel } from "../lib/guide-editor-presentation.js";
+import { normalizeLocalGuideSection } from "../lib/tournament-guide-local.js";
 
 import {
   normalizeProductionGuideAuthoring,
@@ -27,6 +29,57 @@ function canonicalCourseContext() {
     })),
   }];
 }
+
+test("incremental private drafts accept every partial domain but remain unpublishable", () => {
+  const empty = Object.fromEntries(Object.keys(content()).map((key) => [key, key === "tournament" ? {} : []]));
+  const variants = [empty, { ...empty, tournament: { "Tournament Name": "Working guide" } },
+    { ...empty, overview: [{ "Section ID": "intro", "Section Slug": "intro" }] },
+    { ...empty, schedule: [{ "Event ID": "arrival", Title: "Arrival" }] },
+    { ...empty, timelineRows: [{ Title: "Arrival" }] },
+    { ...empty, ruleBook: [{ "Rule ID": "rule-one", Title: "Review later" }] },
+    { ...empty, dining: [{ Meal: "Dinner" }] },
+    { ...empty, localGuide: [{ Title: "Golf Genius" }] },
+    { ...empty, importantContacts: [{ Name: "Tournament contact" }] }];
+  const normalize = (value, level) => normalizeProductionGuideAuthoring({ content: value, targetTournamentId: "2026", canonicalCourseContext: canonicalCourseContext(), validationLevel: level });
+  for (const value of variants) {
+    const saved = normalize(value, "DRAFT");
+    assert.equal(saved.validation.validated, false);
+    assert.deepEqual(normalize(saved.authoringContent, "DRAFT"), saved, "return/reload preserves exact private draft");
+    assert.throws(() => normalize(saved.authoringContent, "PUBLICATION"));
+    assert.equal(guideDraftReadiness(saved.authoringContent).complete, false);
+  }
+  for (const bad of [
+    { schedule: [{ "Event ID": "x", "Event Date": "2026-02-30" }] },
+    { schedule: [{ "Event ID": "x", "Start Time": "25:70" }] },
+    { schedule: [{ "Event ID": "x", "Course ID": "UNKNOWN" }] },
+    { localGuide: [{ Title: "x", Website: "javascript:alert(1)" }] },
+    { ruleBook: [{ "Rule ID": "x", Status: "SECRET" }] },
+    { dining: [{ Meal: "A", "Sort Order": 1 }, { Meal: "B", "Sort Order": 1 }] },
+    { schedule: [{ "Event ID": "x" }, { "Event ID": "x" }] },
+    { importantContacts: [{ Name: "x", Sensitive: true }] },
+  ]) assert.throws(() => normalize({ ...empty, ...bad }, "DRAFT"));
+  assert.equal(normalize(content(), "PUBLICATION").validation.valid, true);
+  const imported = content();
+  imported.tournament = { Annual: "10th Annual", Dates: "September 25 - 26, 2026" };
+  for (const key of ["overview", "schedule", "timelineRows", "ruleBook", "dining", "localGuide", "importantContacts"]) imported[key] = [];
+  imported.courses[0].Round = "Round 1";
+  imported.tournamentRules[0].Round = "Round 1";
+  assert.equal(normalize(imported, "DRAFT").validation.valid, true, "retained imported round labels save without canonical data edits");
+});
+
+test("Guide aliases, readiness, round labels, and Golf Genius are presentation-only", () => {
+  const imported = { Annual: "10th Annual", Dates: "September 25–26", Destination: "Kiawah" };
+  const original = structuredClone(imported);
+  const result = guideOverviewForEditor(imported);
+  assert.equal(result["Tournament Edition"], imported.Annual);
+  assert.equal(result["Tournament Dates"], imported.Dates);
+  assert.equal(result["Tournament Name"], "");
+  assert.equal(result["Start Date"], undefined);
+  assert.deepEqual(imported, original);
+  assert.equal(guideDraftReadiness(content()).complete, true);
+  for (const value of [1, "1", "Round 1", "ROUND 1"]) assert.equal(guideRoundLabel(value), "Round 1");
+  assert.equal(normalizeLocalGuideSection("Golf Genius"), "Golf Genius");
+});
 
 function content(year = 2026) {
   const scope = String(year);
@@ -501,7 +554,7 @@ test("validate, Preview, and publish fail closed on stored-content or canonical 
     } catch (error) { failures.validate = error.code; }
     try {
       await previewProductionGuideDraft(actor, { env: {}, getActivation: activation,
-        rpc: async () => snapshot({ state: "DRAFT" }) });
+        rpc: async () => snapshot({ state: "DRAFT", authoringContentFingerprint: "0".repeat(64) }) });
     } catch (error) { failures.preview = error.code; }
     try {
       await publishProductionGuideDraft({ ...actor,
@@ -520,7 +573,7 @@ test("validate, Preview, and publish fail closed on stored-content or canonical 
   assert.equal(child.status, 0, child.stderr);
   assert.deepEqual(JSON.parse(child.stdout), {
     validate: "GUIDE_DRAFT_FINGERPRINT_MISMATCH",
-    preview: "GUIDE_DRAFT_NOT_VALIDATED",
+    preview: "GUIDE_DRAFT_FINGERPRINT_MISMATCH",
     publish: "GUIDE_VALIDATION_STALE",
   });
 });

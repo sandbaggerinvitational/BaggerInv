@@ -566,6 +566,7 @@ test("migration 082 installs inertly and enforces the complete annual Guide life
       where scope_key='BAGGER_INV_PRODUCTION'))`);
 
   sqlFile(cluster, database, path.join(migrationsDirectory, migration082));
+  sqlFile(cluster, database, path.join(migrationsDirectory, "202609070093_production_guide_incremental_drafts_v1.sql"));
   assert.equal(sql(cluster, database, `select concat_ws('|',
     (select count(*) from production_control.projection_revisions
       where domain='GUIDE'),
@@ -637,6 +638,43 @@ test("migration 082 installs inertly and enforces the complete annual Guide life
   const canonical2026 = sql(cluster, database,
     "select production_control.guide_canonical_reference_fingerprint_v1('2026')");
   const createdGuide = normalizeGuide(2026, "Director staged");
+  // Private incomplete saves + previews never switch either published pointer.
+  const partialBase = Object.fromEntries(Object.keys(guideContent(2026, "")).map((key) => [key, key === "tournament" ? {} : []]));
+  const partials = [partialBase, { ...partialBase, tournament: { "Tournament Name": "Private overview" } },
+    { ...partialBase, schedule: [{ "Event ID": "arrival", Title: "Arrival" }] },
+    { ...partialBase, ruleBook: [{ "Rule ID": "one", Title: "Pending body" }] },
+    { ...partialBase, dining: [{ Meal: "Dinner" }] },
+    { ...partialBase, importantContacts: [{ Name: "Director" }] }];
+  let partialDraft;
+  for (const [index, partial] of partials.entries()) {
+    const normalized = normalizeProductionGuideAuthoring({ content: partial, targetTournamentId: "2026", canonicalCourseContext: canonicalCourseContext(), validationLevel: "DRAFT" });
+    const input = { ...actorScope(), operation: index ? "UPDATE_PRODUCTION_GUIDE_DRAFT_V1" : "CREATE_PRODUCTION_GUIDE_DRAFT_V1",
+      operation_request_id: requestId(100 + index), request_payload_hash: requestHash(100 + index),
+      expected_published_revision: 1, expected_published_revision_id: initialProjectionRevision,
+      ...(index ? { draft_id: partialDraft.draftId, expected_draft_version: partialDraft.draftVersion } : {}),
+      reason: "Isolated partial draft fixture", ...mutationPayload(normalized, canonical2026) };
+    const name = index ? "update_production_guide_draft_v1" : "create_production_guide_draft_v1";
+    partialDraft = rpc(cluster, database, name, input);
+    assert.equal(partialDraft.ok, true, JSON.stringify(partialDraft));
+    assert.equal(partialDraft.draftVersion, index + 1);
+    assert.equal(rpc(cluster, database, name, input).idempotent, true);
+    const beforePreview = sql(cluster, database, "select count(*) from production_control.guide_authoring_operation_receipts_v1");
+    const previewArgs = { ...actorScope(), operation: "PREVIEW_PRODUCTION_GUIDE_DRAFT_V1", draft_id: partialDraft.draftId, expected_draft_version: partialDraft.draftVersion, ...mutationPayload(normalized, canonical2026) };
+    const preview = rpc(cluster, database, "preview_production_guide_draft_v1", previewArgs);
+    assert.equal(preview.ok, true, JSON.stringify(preview));
+    assert.equal(preview.public, false);
+    assert.equal(sql(cluster, database, "select count(*) from production_control.guide_authoring_operation_receipts_v1"), beforePreview);
+    const validation = rpc(cluster, database, "validate_production_guide_draft_v1", { ...previewArgs, operation: "VALIDATE_PRODUCTION_GUIDE_DRAFT_V1", operation_request_id: requestId(200 + index), request_payload_hash: requestHash(200 + index) });
+    assert.equal(validation.ok, false);
+    assert.match(JSON.stringify(validation), /GUIDE_PUBLICATION_INCOMPLETE/);
+    const reload = rpc(cluster, database, "read_production_guide_authoring_v1", { ...actorScope(), operation: "READ_PRODUCTION_GUIDE_AUTHORING_V1" });
+    assert.equal(reload.data.openDraft.draftVersion, partialDraft.draftVersion);
+    assert.deepEqual(reload.data.openDraft.authoringContent, normalized.authoringContent);
+    assert.equal(reload.data.current.revisionId, initialProjectionRevision);
+    assert.equal(sql(cluster, database, `select payload_fingerprint from production_control.projection_revisions where revision_id='${initialProjectionRevision}'`), initial.projectionPayloadHash);
+  }
+  const discardedPartial = rpc(cluster, database, "discard_production_guide_draft_v1", { ...actorScope(), operation: "DISCARD_PRODUCTION_GUIDE_DRAFT_V1", operation_request_id: requestId(300), request_payload_hash: requestHash(300), draft_id: partialDraft.draftId, expected_draft_version: partialDraft.draftVersion, reason: "Discard isolated partial fixture" });
+  assert.equal(discardedPartial.ok, true, JSON.stringify(discardedPartial));
   const createInput = {
     ...actorScope(),
     operation: "CREATE_PRODUCTION_GUIDE_DRAFT_V1",

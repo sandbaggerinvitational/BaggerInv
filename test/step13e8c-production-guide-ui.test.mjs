@@ -2,6 +2,18 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+test("empty rule bodies have no disclosure while built-in format summaries remain", async () => {
+  const publicRules = await readFile(new URL("../app/tournament-guide/PublicTournamentGuide.js", import.meta.url), "utf8");
+  const participantRules = await readFile(new URL("../app/tournament-guide/GuideDetailPage.js", import.meta.url), "utf8");
+  assert.match(publicRules, /guideRoundLabel\(configuration.Round\)/);
+  assert.doesNotMatch(publicRules, /`Round \$\{configuration.Round\}`/);
+  assert.match(publicRules, /if \(!body.length\) return <article/);
+  assert.match(publicRules, /!clean\(rule.Body\) \? <article/);
+  assert.match(participantRules, /if \(!hasBody\) return <article/);
+  assert.match(participantRules, /formatRuleSummary\(formatCode, sources, points\)/);
+  assert.match(participantRules, /if \(!String\(rule.Body \|\| ""\).trim\(\)\) return <article/);
+});
+
 import {
   PRODUCTION_GUIDE_AUTHORING_DOMAINS,
   PRODUCTION_GUIDE_ITEM_STATUSES,
@@ -80,7 +92,7 @@ test("Guide lifecycle keeps unsaved edits out of validation, preview, and public
     "hidden stable IDs are not exposed as Director form fields");
 });
 
-test("DRAFT PREVIEW is a private, validated, accessible Director modal", async () => {
+test("DRAFT PREVIEW is private, structurally saved, accessible, and separate from publication", async () => {
   const [editor, route] = await Promise.all([
     read("../app/admin/director/ProductionGuideEditor.js"),
     read("../app/api/director/guide/route.js"),
@@ -94,6 +106,15 @@ test("DRAFT PREVIEW is a private, validated, accessible Director modal", async (
   assert.match(editor, /event\.key === "Tab"/);
   assert.match(editor, /visible only to the authenticated Director/);
   assert.match(editor, /state !== "VALIDATED"/);
+  assert.match(editor, /!\["DRAFT", "VALIDATED"\]\.includes\(state\)/);
+  assert.match(editor, /Save Draft/);
+  assert.match(editor, /Validate for Publication/);
+  assert.match(editor, /Preview Saved Draft/);
+  assert.match(editor, /Working draft — not visible to participants/);
+  assert.match(editor, /aria-invalid/);
+  assert.match(editor, /guide-field-errors/);
+  assert.match(editor, /returnFocusRef\?\.current \|\| document.activeElement/);
+  assert.match(editor, /onClose=\{closePreview\} returnFocusRef=\{previewTrigger\}/);
   assert.match(editor, /It does not change the public website or participant\/PWA Guide until Publish Revision succeeds/);
 
   assert.match(route, /Preview is deliberately POST-only/);

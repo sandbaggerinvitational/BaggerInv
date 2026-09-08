@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { createClientMutationOperationIdentityRegistry } from "../../../lib/client-mutation-operation-identity.js";
+import { guideOverviewForEditor, guideDraftReadiness } from "../../../lib/guide-editor-presentation.js";
 import styles from "./production-guide-editor.module.css";
 
 const ENDPOINT = "/api/director/guide";
@@ -119,7 +120,7 @@ function contentFrom(value) {
   return Object.fromEntries(Object.entries(EMPTY_CONTENT).map(([key, fallback]) => {
     const selected = source?.[key];
     if (Array.isArray(fallback)) return [key, Array.isArray(selected) ? selected.map((row) => ({ ...row })) : []];
-    return [key, selected && typeof selected === "object" && !Array.isArray(selected) ? { ...selected } : {}];
+    return [key, key === "tournament" ? guideOverviewForEditor(selected) : selected && typeof selected === "object" && !Array.isArray(selected) ? { ...selected } : {}];
   }));
 }
 
@@ -153,29 +154,31 @@ function itemStatus(row) {
   return clean(row?.Status) || (booleanValue(row?.Published) ? "Published" : "Draft");
 }
 
-function FieldControl({ definition, value, disabled, references, onChange, controlId }) {
+function FieldControl({ definition, value, disabled, references, onChange, controlId, issues = [] }) {
   const safeControlId = clean(controlId).replace(/[^a-z0-9]+/gi, "-").toLowerCase();
   const id = `guide-${safeControlId}-${definition.key.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
-  if (definition.type === "textarea") return <label htmlFor={id}><span>{definition.label}</span><textarea id={id} rows={4} value={value ?? ""} disabled={disabled} onChange={(event) => onChange(event.target.value)} /></label>;
-  if (definition.type === "boolean") return <label className={styles.check} htmlFor={id}><input id={id} type="checkbox" checked={booleanValue(value)} disabled={disabled} onChange={(event) => onChange(event.target.checked ? "TRUE" : "FALSE")} /><span>{definition.label}</span></label>;
-  if (definition.type === "select") return <label htmlFor={id}><span>{definition.label}</span><select id={id} value={value || definition.options?.[0] || ""} disabled={disabled} onChange={(event) => onChange(event.target.value)}>{definition.options.map((option) => <option key={option || "derived"} value={option}>{option || "Automatic / derived"}</option>)}</select></label>;
+  const errors = issues.filter((issue) => clean(issue.field).split(" or ").includes(definition.key));
+  const accessibility = { "aria-invalid": errors.length ? true : undefined, "aria-describedby": errors.length ? "guide-field-errors" : undefined };
+  if (definition.type === "textarea") return <label htmlFor={id}><span>{definition.label}</span><textarea id={id} {...accessibility} rows={4} value={value ?? ""} disabled={disabled} onChange={(event) => onChange(event.target.value)} /></label>;
+  if (definition.type === "boolean") return <label className={styles.check} htmlFor={id}><input id={id} {...accessibility} type="checkbox" checked={booleanValue(value)} disabled={disabled} onChange={(event) => onChange(event.target.checked ? "TRUE" : "FALSE")} /><span>{definition.label}</span></label>;
+  if (definition.type === "select") return <label htmlFor={id}><span>{definition.label}</span><select id={id} {...accessibility} value={value || definition.options?.[0] || ""} disabled={disabled} onChange={(event) => onChange(event.target.value)}>{definition.options.map((option) => <option key={option || "derived"} value={option}>{option || "Automatic / derived"}</option>)}</select></label>;
   const referenceOptions = definition.type === "course" ? references.courses : definition.type === "round" ? references.rounds : [];
   if (referenceOptions.length) {
     const selectedReference = clean(value);
     const options = selectedReference && !referenceOptions.some((option) => option.id === selectedReference)
       ? [{ id: selectedReference, label: `${selectedReference} · Current value` }, ...referenceOptions]
       : referenceOptions;
-    return <label htmlFor={id}><span>{definition.label}</span><select id={id} value={selectedReference} disabled={disabled} onChange={(event) => onChange(event.target.value)}><option value="">Select {definition.type}</option>{options.map((option) => <option key={option.id} value={option.id}>{option.label || option.name || option.id}</option>)}</select></label>;
+    return <label htmlFor={id}><span>{definition.label}</span><select id={id} {...accessibility} value={selectedReference} disabled={disabled} onChange={(event) => onChange(event.target.value)}><option value="">Select {definition.type}</option>{options.map((option) => <option key={option.id} value={option.id}>{option.label || option.name || option.id}</option>)}</select></label>;
   }
   const inputType = definition.type === "phone" ? "tel" : ["date", "number", "email", "url"].includes(definition.type) ? definition.type : "text";
-  return <label htmlFor={id}><span>{definition.label}</span><input id={id} type={inputType} value={value ?? ""} disabled={disabled} readOnly={definition.type === "readonly"} aria-readonly={definition.type === "readonly" || undefined} onChange={(event) => onChange(event.target.value)} /></label>;
+  return <label htmlFor={id}><span>{definition.label}</span><input id={id} {...accessibility} type={inputType} value={value ?? ""} disabled={disabled} readOnly={definition.type === "readonly"} aria-readonly={definition.type === "readonly" || undefined} onChange={(event) => onChange(event.target.value)} /></label>;
 }
 
-function Preview({ content, onClose }) {
+function Preview({ content, onClose, returnFocusRef }) {
   const closeButton = useRef(null);
   const tournament = content.tournament || {};
   useEffect(() => {
-    const previouslyFocused = document.activeElement;
+    const previouslyFocused = returnFocusRef?.current || document.activeElement;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     closeButton.current?.focus();
@@ -192,14 +195,14 @@ function Preview({ content, onClose }) {
       window.removeEventListener("keydown", keepPrivatePreviewModal);
       previouslyFocused?.focus?.();
     };
-  }, [onClose]);
+  }, [onClose, returnFocusRef]);
   return <div className={styles.previewBackdrop} role="presentation" data-preview-visibility="director-only">
     <section className={styles.preview} role="dialog" aria-modal="true" aria-labelledby="guide-preview-title" aria-describedby="guide-preview-description">
       <header><div><span>DRAFT PREVIEW</span><h2 id="guide-preview-title">{tournament["Tournament Name"] || "Tournament Guide"}</h2><p>{[tournament["Tournament Dates"] || tournament.Dates, tournament.Destination || tournament.Location].filter(Boolean).join(" · ")}</p></div><button ref={closeButton} type="button" onClick={onClose}>Close Preview</button></header>
       <div className={styles.previewBody}>
         {DOMAINS.filter((domain) => !domain.singleton).map((domain) => {
           const rows = content[domain.key] || [];
-          return <section key={domain.key}><h3>{domain.label}</h3>{rows.length ? rows.map((row, index) => <article key={`${domain.key}-${row.itemId || row.item_id || index}`}><strong>{row.Title || row.Name || row[domain.id] || row.Course || row.Meal || row.Category || `${domain.singular} ${index + 1}`}</strong><p>{row.Description || row.Details || row.Body || row.Location || row.Role || "Configured content"}</p></article>) : <p>No content in this section.</p>}</section>;
+          return <section key={domain.key}><h3>{domain.label}</h3>{rows.length ? rows.map((row, index) => <article key={`${domain.key}-${row.itemId || row.item_id || index}`}><strong>{row.Title || row.Name || row[domain.id] || row.Course || row.Meal || row.Category || `${domain.singular} ${index + 1}`}</strong><dl>{domain.fields.filter((definition) => clean(row[definition.key])).map((definition) => <div key={definition.key}><dt>{definition.label}</dt><dd>{String(row[definition.key])}</dd></div>)}</dl>{![row.Description, row.Details, row.Body, row.Rules, row.Location, row.Role].some(clean) ? <p>Incomplete draft item — no body entered.</p> : null}</article>) : <p>No content in this section.</p>}</section>;
         })}
       </div>
       <footer id="guide-preview-description">This sanitized preview is visible only to the authenticated Director. It does not change the public website or participant/PWA Guide until Publish Revision succeeds.</footer>
@@ -219,6 +222,10 @@ export default function ProductionGuideEditor({ onChanged }) {
   const [busy, setBusy] = useState("");
   const [message, setMessage] = useState("");
   const [preview, setPreview] = useState(null);
+  const previewTrigger = useRef(null);
+  const closePreview = useCallback(() => setPreview(null), []);
+  const [fieldIssues, setFieldIssues] = useState([]);
+  const readiness = guideDraftReadiness(content);
   const identities = useRef(null);
   const loadSequence = useRef(0);
   if (!identities.current) identities.current = createClientMutationOperationIdentityRegistry();
@@ -294,7 +301,7 @@ export default function ProductionGuideEditor({ onChanged }) {
   const markDirty = () => {
     setDirty(true);
     setPreview(null);
-    setMessage("Guide draft changes are unsaved. Save Draft Changes before validating or publishing.");
+    setMessage("Guide draft changes are unsaved. Save Draft before validating or publishing.");
   };
   const setRow = (next) => {
     markDirty();
@@ -338,7 +345,7 @@ export default function ProductionGuideEditor({ onChanged }) {
       ...extra,
     };
     const operation = identities.current.acquire(intent);
-    setBusy(action); setMessage("");
+    setBusy(action); setMessage(""); setFieldIssues([]);
     try {
       const result = await jsonRequest({ ...intent, operationRequestId: operation.operationRequestId });
       identities.current.confirm(operation);
@@ -351,6 +358,7 @@ export default function ProductionGuideEditor({ onChanged }) {
       setMessage({ stage: "Guide draft saved in Supabase. Published content is unchanged.", validate: "Validation passed. Preview the exact draft before publishing.", publish: "The reviewed Guide revision is now current. No Google synchronization is required.", discard: "The open Guide draft was discarded. Published content is unchanged.", "copy-previous": "The prior Guide was copied as an unpublished review draft. Dates, contacts, links, and publication state require review." }[action] || "Guide operation completed.");
       return result;
     } catch (error) {
+      setFieldIssues(error.issues || []);
       setMessage(error.issues?.length ? `${error.message} ${error.issues.map(issueText).join(" · ")}` : error.message);
       return null;
     } finally { setBusy(""); }
@@ -391,27 +399,41 @@ export default function ProductionGuideEditor({ onChanged }) {
 
     <nav className={styles.domainTabs} aria-label="Tournament Guide authoring sections">{DOMAINS.map((item) => <button type="button" key={item.key} disabled={Boolean(busy)} aria-current={activeDomain === item.key ? "page" : undefined} onClick={() => { setActiveDomain(item.key); setSelectedIndex(0); }}>{item.label}<small>{item.singleton ? 1 : (content[item.key] || []).length}</small></button>)}</nav>
     <p className={styles.statusScope}>Item publication status is available only for Sections, Schedule / Itinerary, and Rule Book. All other areas publish atomically with the validated Guide revision.</p>
+    <section className={styles.readiness} aria-label="Guide draft and publication readiness" aria-live="polite">
+      <strong>{openDraft ? "Working draft — not visible to participants" : "Published Guide loaded — edits will be saved to a private draft"}</strong>
+      <p>{dirty ? "Unsaved changes — Save Draft to keep your work." : openDraft ? "Private draft saved." : `Published revision ${currentRevision} remains live.`} {readiness.complete ? "Ready to request publication validation." : "Publication incomplete — you can still save and preview this draft."}</p>
+      <ul><li>Overview name: {readiness.overviewComplete ? "Complete" : "Incomplete"}</li>{readiness.domains.map((item) => <li key={item.key}>{item.label}: {item.state}</li>)}</ul>
+      <small>Readiness is a checklist. Validate for Publication checks the full saved document before publishing.</small>
+    </section>
+    <p className={styles.statusScope}>Guide edits are participant-facing presentation and do not change scoring.</p>
+    {domain.key === "tournament" ? <p className={styles.privacyNote}>These are Guide display fields. They do not fill or change Tournament Setup operational dates or timezone. A missing tournament name may be saved privately, but must be completed before publication.</p> : null}
+    {domain.key === "schedule" ? <p className={styles.privacyNote}><strong>Guide Itinerary</strong>Shown inside the Tournament Guide. This does not create Home Timeline events or change match tee times.</p> : null}
+    {domain.key === "timelineRows" ? <p className={styles.privacyNote}><strong>Home Timeline</strong>Shown on Home. Add separately when you want a Guide event surfaced there. No automatic event copying.</p> : null}
+    {domain.order ? <p className={styles.statusScope}>Use Move up / Move down to order items, or distinct order numbers. Itinerary dates and times determine chronological order; section order does not rearrange navigation.</p> : null}
+    {domain.key === "localGuide" ? <p className={styles.privacyNote}><strong>Golf Genius information</strong>Use Section “Golf Genius”, a Title, instructions and an intentionally public event code in Description, and the event URL in Website. The link says Website. This is information only, not scoring configuration.</p> : null}
+    {["localGuide", "importantContacts"].includes(domain.key) ? <p className={styles.privacyNote}>Published Guide information is visible to participants and public website visitors. Enter only intended public information. There is no private or Sensitive setting; do not enter restricted access codes or private contact details.</p> : null}
 
     <div className={styles.workspace}>
       {!domain.singleton ? <aside><header><div><small>{domain.label}</small><strong>{rows.length} items</strong></div><button type="button" disabled={Boolean(busy)} onClick={addRow}>Add</button></header>{rows.length ? rows.map((row, index) => <button type="button" disabled={Boolean(busy)} key={`${domain.key}-${row.itemId || row.item_id || row[domain.id] || row.Title || row.Name || index}`} aria-current={selectedIndex === index ? "true" : undefined} onClick={() => setSelectedIndex(index)}><strong>{row.Title || row.Name || row[domain.id] || row.Course || row.Meal || row.Category || `${domain.singular} ${index + 1}`}</strong><span>{domain.order ? `Order ${row[domain.order] || index + 1}` : domain.status ? itemStatus(row) : domain.singular}</span></button>) : <p>No {domain.label.toLowerCase()} content is in this draft.</p>}</aside> : null}
       <section className={styles.formPanel}>
         <header><div><small>{domain.singleton ? "Guide presentation" : domain.singular}</small><h3>{domain.label}</h3></div>{!domain.singleton && rows.length ? <div className={styles.orderActions}>{domain.order ? <><button type="button" disabled={Boolean(busy) || selectedIndex === 0} aria-label={`Move ${domain.singular} up`} onClick={() => moveRow(-1)}>↑</button><button type="button" disabled={Boolean(busy) || selectedIndex >= rows.length - 1} aria-label={`Move ${domain.singular} down`} onClick={() => moveRow(1)}>↓</button></> : null}<button type="button" disabled={Boolean(busy)} data-impact="high" onClick={removeRow}>Remove</button></div> : null}</header>
-        {domain.singleton || rows.length ? <div className={styles.formGrid}>{domain.fields.map((definition) => <FieldControl key={definition.key} definition={definition} value={definition.key === "Status" ? itemStatus(selected) : selected[definition.key]} disabled={Boolean(busy)} references={references} controlId={`${activeDomain}-${selected.itemId || selected.item_id || selectedIndex}`} onChange={(value) => changeField(definition.key, value)} />)}</div> : <div className={styles.empty}><strong>No item selected</strong><p>Add the first {domain.singular.toLowerCase()} to this draft.</p></div>}
+        {domain.singleton || rows.length ? <div className={styles.formGrid}>{domain.fields.map((definition) => <FieldControl key={definition.key} definition={definition} value={definition.key === "Status" ? itemStatus(selected) : selected[definition.key]} disabled={Boolean(busy)} references={references} issues={fieldIssues} controlId={`${activeDomain}-${selected.itemId || selected.item_id || selectedIndex}`} onChange={(value) => changeField(definition.key, value)} />)}</div> : <div className={styles.empty}><strong>No item selected</strong><p>Add the first {domain.singular.toLowerCase()} to this draft.</p></div>}
         {domain.key === "importantContacts" ? <div className={styles.privacyNote}><strong>Participant-visible contact</strong><span>Only intentionally public tournament contacts belong here. Player enrollment email, phone, and Auth identity data are never sourced automatically.</span></div> : null}
-        {["tournamentRules", "rounds", "courses"].includes(domain.key) ? <div className={styles.privacyNote}><strong>Presentation only</strong><span>Canonical scoring rounds, courses, tees, ratings, slopes, pars, and holes remain read-only Tournament Setup facts.</span></div> : null}
+        {["tournamentRules", "rounds", "courses"].includes(domain.key) ? <div className={styles.privacyNote}><strong>Presentation only</strong><span>Course, tee, rating, slope, par and hole data are managed in Tournament Setup and are not changed here.</span></div> : null}
       </section>
     </div>
 
     <label className={styles.reason}><span>Draft note</span><textarea value={reason} maxLength={500} onChange={(event) => setReason(event.target.value)} placeholder="Describe this Guide revision for the Director audit." /></label>
     {dirty ? <div className={styles.dirtyNotice} role="status"><strong>Draft changes are not validated</strong><span>Save this draft before Validate, Preview, or Publish Revision. The current public and participant/PWA Guide remains unchanged.</span></div> : null}
     {issues.length ? <div className={styles.validation} role="alert"><strong>Validation needs attention</strong><ul>{issues.map((issue, index) => <li key={`${issueText(issue)}-${index}`}>{issueText(issue)}</li>)}</ul></div> : null}
+    {fieldIssues.length ? <div className={styles.validation} role="alert" id="guide-field-errors"><strong>Check these fields</strong><ul>{fieldIssues.map((issue, index) => <li key={index}>{[issue.source, issue.entity, issue.field].filter(Boolean).join(" · ")}: {issueText(issue)}</li>)}</ul></div> : null}
     <div className={styles.actions}>
-      <button type="button" disabled={Boolean(busy)} onClick={stage}>{busy === "stage" ? "Saving draft…" : openDraft ? "Save Draft Changes" : "Create Guide Draft"}</button>
-      {openDraft ? <><button type="button" disabled={Boolean(busy) || dirty} onClick={validate}>{busy === "validate" ? "Validating…" : "Validate"}</button><button type="button" disabled={Boolean(busy) || dirty || state !== "VALIDATED"} onClick={showPreview}>{busy === "preview" ? "Preparing preview…" : "Preview"}</button><button type="button" className={styles.publish} disabled={Boolean(busy) || dirty || state !== "VALIDATED"} onClick={publish}>{busy === "publish" ? "Publishing…" : "Publish Revision"}</button><button type="button" className={styles.discard} disabled={Boolean(busy)} onClick={discard}>Discard Draft</button></> : null}
+      <button type="button" disabled={Boolean(busy)} onClick={stage}>{busy === "stage" ? "Saving draft…" : "Save Draft"}</button>
+      {openDraft ? <><button type="button" disabled={Boolean(busy) || dirty} onClick={validate}>{busy === "validate" ? "Validating…" : "Validate for Publication"}</button><button ref={previewTrigger} type="button" disabled={Boolean(busy) || dirty || !["DRAFT", "VALIDATED"].includes(state)} onClick={showPreview}>{busy === "preview" ? "Preparing preview…" : "Preview Saved Draft"}</button><button type="button" className={styles.publish} disabled={Boolean(busy) || dirty || state !== "VALIDATED"} onClick={publish}>{busy === "publish" ? "Publishing…" : "Publish Revision"}</button><button type="button" className={styles.discard} disabled={Boolean(busy)} onClick={discard}>Discard Draft</button></> : null}
       {!openDraft && isFuture ? <button type="button" disabled={Boolean(busy)} onClick={copyPrevious}>{busy === "copy-previous" ? "Creating draft…" : "Copy Previous Guide as Draft"}</button> : null}
     </div>
     {message ? <p className={styles.message} role="status">{message}</p> : null}
     {history.length ? <details className={styles.history}><summary>Guide revision history · {history.length}</summary><ul>{history.map((item, index) => <li key={`${revisionNumber(item)}-${index}`}><span><strong>Guide Revision {revisionNumber(item) || index + 1}</strong><small>{first(item, "provenance", "authoringAuthority", "authoring_authority") || "Google import"} · {timestamp(first(item, "effectiveAt", "effective_at", "publishedAt", "published_at", "createdAt", "created_at", "importedAt", "imported_at"))}</small></span>{item.current ? <State value="CURRENT" /> : null}</li>)}</ul></details> : null}
-    {preview ? <Preview content={preview} onClose={() => setPreview(null)} /> : null}
+    {preview ? <Preview content={preview} onClose={closePreview} returnFocusRef={previewTrigger} /> : null}
   </div>;
 }

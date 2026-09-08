@@ -1,3 +1,4 @@
+import { guideRoundLabel } from "../../lib/guide-editor-presentation.js";
 import Link from "next/link";
 import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
@@ -116,15 +117,17 @@ function Rules({ content, description }) {
           const format = formatCatalog.get(code) || {};
           const title = clean(format.Name) || GUIDE_FORMAT_NAMES[code] || clean(configuration.Format) || "Round Format";
           const points = clean(configuration["Points Available"]);
+          const body = configurationText(configuration, format);
+          if (!body.length) return <article className={styles.staticRule} key={`${configuration.Round}-${code}`}><p>{guideRoundLabel(configuration.Round)}{points ? ` • ${points} points available` : ""}</p><h4>{title}</h4></article>;
           return <details key={`${configuration.Round}-${code}`}>
-            <summary><span>{[`Round ${configuration.Round}`, points ? `${points} points available` : ""].filter(Boolean).join(" • ")}</span>{title}</summary>
+            <summary><span>{[guideRoundLabel(configuration.Round), points ? `${points} points available` : ""].filter(Boolean).join(" • ")}</span>{title}</summary>
             <div>{configurationText(configuration, format).map((value) => <Text value={value} key={value} />)}</div>
           </details>;
         })}
       </section> : null}
       {Object.entries(categories).map(([category, rules]) => <section key={category}>
         <h3>{category}</h3>
-        {rules.map((rule) => <details
+        {rules.map((rule) => !clean(rule.Body) ? <article className={styles.staticRule} key={rule["Rule ID"]}><h4>{rule.Title}</h4></article> : <details
           className={isTruthy(rule.Important) ? styles.important : ""}
           key={rule["Rule ID"]}
           open={isTruthy(rule.Important)}

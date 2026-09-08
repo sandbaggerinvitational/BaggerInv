@@ -38,6 +38,7 @@ function Dining({ records }) {
 function RuleCard({ rule }) {
   const subtitle = rule.Subcategory && rule.Subcategory !== rule.Title ? rule.Subcategory : "";
   const title = rule.Title || subtitle || "Rule";
+  if (!String(rule.Body || "").trim()) return <article className={`${styles.formatCard} ${styles.staticRule}`}><h3>{title}</h3>{subtitle ? <p>{subtitle}</p> : null}</article>;
   return <details className={`${styles.formatCard} ${styles.ruleCard} ${isTruthy(rule.Important) ? styles.ruleCardImportant : ""}`}><summary><div><h3>{title}</h3>{subtitle && subtitle !== title ? <p>{subtitle}</p> : null}</div><b aria-hidden="true">⌄</b></summary><div className={styles.formatDetails}><Text value={rule.Body} />{rule["Effective Year"] ? <small>Effective {rule["Effective Year"]}</small> : null}</div></details>;
 }
 function FormatCard({ format, configuration, rules }) {
@@ -47,6 +48,8 @@ function FormatCard({ format, configuration, rules }) {
   const sources = [configuration, format, ...rules].filter(Boolean);
   const points = configuration?.["Points Available"];
   const summary = formatRuleSummary(formatCode, sources, points);
+  const hasBody = [description, ...formatRules, ...rules.map((rule) => rule.Body)].some((value) => String(value || "").trim());
+  if (!hasBody) return <article className={`${styles.formatCard} ${styles.formatOverviewCard} ${styles.staticRule}`}><h3>{format.Name || getFormatName(formatCode)}</h3>{summary.length ? <ul>{summary.map((item) => <li key={item}>{item}</li>)}</ul> : null}</article>;
   return <details className={`${styles.formatCard} ${styles.formatOverviewCard}`}><summary><div><h3>{format.Name || getFormatName(formatCode)}</h3>{summary.length ? <ul>{summary.map((item) => <li key={item}>{item}</li>)}</ul> : null}</div><b aria-hidden="true">⌄</b></summary><div className={styles.formatDetails}>{description ? <Text value={description} /> : null}{formatRules.map((value, index) => <Text value={value} key={`${formatCode}-${index}`} />)}{rules.length ? <div className={styles.formatRules}>{rules.map((rule) => <div key={rule["Rule ID"]}><b>{formatRuleHeading(rule.Title)}</b><Text value={rule.Body} /></div>)}</div> : null}</div></details>;
 }
 
