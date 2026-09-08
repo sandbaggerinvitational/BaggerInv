@@ -200,9 +200,9 @@ function Preview({ content, onClose, returnFocusRef }) {
     <section className={styles.preview} role="dialog" aria-modal="true" aria-labelledby="guide-preview-title" aria-describedby="guide-preview-description">
       <header><div><span>DRAFT PREVIEW</span><h2 id="guide-preview-title">{tournament["Tournament Name"] || "Tournament Guide"}</h2><p>{[tournament["Tournament Dates"] || tournament.Dates, tournament.Destination || tournament.Location].filter(Boolean).join(" · ")}</p></div><button ref={closeButton} type="button" onClick={onClose}>Close Preview</button></header>
       <div className={styles.previewBody}>
-        {DOMAINS.filter((domain) => !domain.singleton).map((domain) => {
+        {DOMAINS.filter((domain) => !domain.singleton && content[domain.key]?.length).map((domain) => {
           const rows = content[domain.key] || [];
-          return <section key={domain.key}><h3>{domain.label}</h3>{rows.length ? rows.map((row, index) => <article key={`${domain.key}-${row.itemId || row.item_id || index}`}><strong>{row.Title || row.Name || row[domain.id] || row.Course || row.Meal || row.Category || `${domain.singular} ${index + 1}`}</strong><dl>{domain.fields.filter((definition) => clean(row[definition.key])).map((definition) => <div key={definition.key}><dt>{definition.label}</dt><dd>{String(row[definition.key])}</dd></div>)}</dl>{![row.Description, row.Details, row.Body, row.Rules, row.Location, row.Role].some(clean) ? <p>Incomplete draft item — no body entered.</p> : null}</article>) : <p>No content in this section.</p>}</section>;
+          return <section key={domain.key}><h3>{domain.label}</h3>{rows.map((row, index) => <article key={`${domain.key}-${row.itemId || row.item_id || index}`}><strong>{row.Title || row.Name || row[domain.id] || row.Course || row.Meal || row.Category || `${domain.singular} ${index + 1}`}</strong><dl>{domain.fields.filter((definition) => clean(row[definition.key])).map((definition) => <div key={definition.key}><dt>{definition.label}</dt><dd>{String(row[definition.key])}</dd></div>)}</dl></article>)}</section>;
         })}
       </div>
       <footer id="guide-preview-description">This sanitized preview is visible only to the authenticated Director. It does not change the public website or participant/PWA Guide until Publish Revision succeeds.</footer>
@@ -402,7 +402,12 @@ export default function ProductionGuideEditor({ onChanged }) {
     <section className={styles.readiness} aria-label="Guide draft and publication readiness" aria-live="polite">
       <strong>{openDraft ? "Working draft — not visible to participants" : "Published Guide loaded — edits will be saved to a private draft"}</strong>
       <p>{dirty ? "Unsaved changes — Save Draft to keep your work." : openDraft ? "Private draft saved." : `Published revision ${currentRevision} remains live.`} {readiness.complete ? "Ready to request publication validation." : "Publication incomplete — you can still save and preview this draft."}</p>
-      <ul><li>Overview name: {readiness.overviewComplete ? "Complete" : "Incomplete"}</li>{readiness.domains.map((item) => <li key={item.key}>{item.label}: {item.state}</li>)}</ul>
+      <h3>Required</h3>
+      <p>Overview needs a tournament name, annual label, display dates, location, and timezone. Images are optional; structured start/end dates may both be blank.</p>
+      <ul><li>Overview: {readiness.overviewComplete ? "Complete" : "Needs attention"}</li>{readiness.domains.filter((item) => item.required).map((item) => <li key={item.key}>{item.label}: {item.state}</li>)}</ul>
+      <h3>Optional</h3>
+      <ul>{readiness.domains.filter((item) => !item.required).map((item) => <li key={item.key}>{item.label}: {item.state}</li>)}</ul>
+      <p>Unused optional areas do not block publication. Every supplied item and canonical course/round reference must still pass server validation.</p>
       <small>Readiness is a checklist. Validate for Publication checks the full saved document before publishing.</small>
     </section>
     <p className={styles.statusScope}>Guide edits are participant-facing presentation and do not change scoring.</p>

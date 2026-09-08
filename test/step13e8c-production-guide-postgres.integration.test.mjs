@@ -518,7 +518,7 @@ function seedGuideFixture(cluster, database, initial) {
   `);
 }
 
-test("migration 082 installs inertly and enforces the complete annual Guide lifecycle", async (t) => {
+test("Guide migrations 082/093/094 install inertly and enforce the annual Guide lifecycle", async (t) => {
   if (!(await available())) return t.skip("PostgreSQL 17 binaries unavailable");
   const cluster = await createCluster();
   t.after(() => destroyCluster(cluster));
@@ -567,6 +567,7 @@ test("migration 082 installs inertly and enforces the complete annual Guide life
 
   sqlFile(cluster, database, path.join(migrationsDirectory, migration082));
   sqlFile(cluster, database, path.join(migrationsDirectory, "202609070093_production_guide_incremental_drafts_v1.sql"));
+  sqlFile(cluster, database, path.join(migrationsDirectory, "202609080094_production_guide_optional_content_v1.sql"));
   assert.equal(sql(cluster, database, `select concat_ws('|',
     (select count(*) from production_control.projection_revisions
       where domain='GUIDE'),
@@ -638,6 +639,56 @@ test("migration 082 installs inertly and enforces the complete annual Guide life
   const canonical2026 = sql(cluster, database,
     "select production_control.guide_canonical_reference_fingerprint_v1('2026')");
   const createdGuide = normalizeGuide(2026, "Director staged");
+  // Direct SQL certification cannot rely on the application's validation gate.
+  const optionalKeys = ["overview", "timelineRows", "ruleBook", "dining", "localGuide", "importantContacts"];
+  const minimalContent = guideContent(2026, "Minimal published Guide");
+  for (const key of optionalKeys) minimalContent[key] = [];
+  const minimalGuide = normalizeProductionGuideAuthoring({ content: minimalContent, targetTournamentId: "2026", canonicalCourseContext: canonicalCourseContext() });
+  const directValidate = (normalized) => JSON.parse(sql(cluster, database,
+    `select production_control.validate_guide_authoring_v1('2026',2026,${json(normalized.authoringContent)},${json(normalized.projectionPayload)})`));
+  assert.equal(directValidate(minimalGuide).pass, true);
+  for (const key of optionalKeys) {
+    const candidate = structuredClone(minimalContent); candidate[key] = guideContent()[key];
+    const normalized = structuredClone(normalizeProductionGuideAuthoring({ content: candidate, targetTournamentId: "2026", canonicalCourseContext: canonicalCourseContext() }));
+    assert.equal(directValidate(normalized).pass, true, key);
+    const field = { overview: "Description", timelineRows: "Title", ruleBook: "Body", dining: "Location", localGuide: "Title", importantContacts: "Name" }[key];
+    normalized.authoringContent = structuredClone(normalized.authoringContent);
+    normalized.authoringContent[key][0][field] = "";
+    assert.equal(directValidate(normalized).pass, false, `${key} SQL required field`);
+    normalized.authoringContent[key] = [minimalGuide.authoringContent.schedule[0], minimalGuide.authoringContent.schedule[0]];
+    assert.equal(directValidate(normalized).pass, false, `${key} SQL duplicate/wrong shape`);
+  }
+  for (const field of ["Tournament Name", "Tournament Edition", "Tournament Dates", "Destination", "Time Zone"]) {
+    const candidate = structuredClone(minimalGuide); candidate.authoringContent.tournament[field] = "";
+    assert.equal(directValidate(candidate).pass, false, field);
+  }
+  const noItinerary = structuredClone(minimalGuide); noItinerary.authoringContent.schedule = []; noItinerary.projectionPayload.content.schedule = [];
+  assert.equal(directValidate(noItinerary).pass, false);
+  const privateItinerary = structuredClone(minimalGuide); privateItinerary.projectionPayload.content.schedule[0].Status = "Draft";
+  assert.equal(directValidate(privateItinerary).pass, false);
+  for (const change of [{ "Time Zone": "Not/AZone" }, { "Start Date": "2026-02-30" },
+    { "End Date": "2026-09-20" }, { "End Date": "" }]) {
+    const candidate = structuredClone(minimalGuide); Object.assign(candidate.authoringContent.tournament, change);
+    assert.equal(directValidate(candidate).pass, false, JSON.stringify(change));
+  }
+  const undatedOverview = structuredClone(minimalGuide);
+  undatedOverview.authoringContent.tournament["Start Date"] = "";
+  undatedOverview.authoringContent.tournament["End Date"] = "";
+  assert.equal(directValidate(undatedOverview).pass, true);
+  // Exercise real minimum-content publication in an isolated rollback branch,
+  // keeping the full-content/copy-forward assertions below unchanged.
+  const minimumScope = { ...actorScope(), ...mutationPayload(minimalGuide, canonical2026),
+    expected_published_revision: 1, expected_published_revision_id: initialProjectionRevision,
+    reason: "Isolated minimum-content publication" };
+  sql(cluster, database, `begin; do $minimum$ declare r jsonb; draft uuid; begin
+    r:=public.create_production_guide_draft_v1(${json({ ...minimumScope, operation: "CREATE_PRODUCTION_GUIDE_DRAFT_V1", operation_request_id: requestId(400), request_payload_hash: requestHash(400) })});
+    if r->>'code' <> 'GUIDE_DRAFT_CREATED' then raise exception 'Minimum create: %',r; end if;
+    draft:=(r->>'draftId')::uuid;
+    r:=public.validate_production_guide_draft_v1(${json({ ...minimumScope, operation: "VALIDATE_PRODUCTION_GUIDE_DRAFT_V1", operation_request_id: requestId(401), request_payload_hash: requestHash(401) })} || jsonb_build_object('draft_id',draft,'expected_draft_version',1));
+    if r->>'code' <> 'GUIDE_DRAFT_VALIDATED' then raise exception 'Minimum validation: %',r; end if;
+    r:=public.publish_production_guide_draft_v1(${json({ ...minimumScope, operation: "PUBLISH_PRODUCTION_GUIDE_DRAFT_V1", operation_request_id: requestId(402), request_payload_hash: requestHash(402), confirmation: "PUBLISH TOURNAMENT GUIDE", expected_content_fingerprint: minimalGuide.contentFingerprint })} || jsonb_build_object('draft_id',draft,'expected_draft_version',2));
+    if r->>'code' <> 'GUIDE_REVISION_PUBLISHED' or r->>'revision' <> '2' then raise exception 'Minimum publication: %',r; end if;
+  end $minimum$; rollback;`);
   // Private incomplete saves + previews never switch either published pointer.
   const partialBase = Object.fromEntries(Object.keys(guideContent(2026, "")).map((key) => [key, key === "tournament" ? {} : []]));
   const partials = [partialBase, { ...partialBase, tournament: { "Tournament Name": "Private overview" } },
@@ -657,6 +708,15 @@ test("migration 082 installs inertly and enforces the complete annual Guide life
     partialDraft = rpc(cluster, database, name, input);
     assert.equal(partialDraft.ok, true, JSON.stringify(partialDraft));
     assert.equal(partialDraft.draftVersion, index + 1);
+    if (index === 0) {
+      const draftEvidenceSql = `select md5(jsonb_build_object(
+        'drafts',(select jsonb_agg(to_jsonb(d) order by draft_id) from production_control.guide_authoring_drafts_v1 d),
+        'receipts',(select jsonb_agg(to_jsonb(r) order by operation_request_id) from production_control.guide_authoring_operation_receipts_v1 r),
+        'public',(select jsonb_agg(to_jsonb(p) order by tournament_id) from production_control.projection_current p where domain='GUIDE'))::text)`;
+      const retainedDraft = sql(cluster, database, draftEvidenceSql);
+      sqlFile(cluster, database, path.join(migrationsDirectory, "202609080094_production_guide_optional_content_v1.sql"));
+      assert.equal(sql(cluster, database, draftEvidenceSql), retainedDraft, "installation preserves an already-existing private draft, receipts and public pointer byte-for-byte");
+    }
     assert.equal(rpc(cluster, database, name, input).idempotent, true);
     const beforePreview = sql(cluster, database, "select count(*) from production_control.guide_authoring_operation_receipts_v1");
     const previewArgs = { ...actorScope(), operation: "PREVIEW_PRODUCTION_GUIDE_DRAFT_V1", draft_id: partialDraft.draftId, expected_draft_version: partialDraft.draftVersion, ...mutationPayload(normalized, canonical2026) };

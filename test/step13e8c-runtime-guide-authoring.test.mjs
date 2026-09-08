@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { guideOverviewForEditor, guideDraftReadiness, guideRoundLabel } from "../lib/guide-editor-presentation.js";
 import { normalizeLocalGuideSection } from "../lib/tournament-guide-local.js";
+import { OPTIONAL_GUIDE_DOMAINS, guideDestinationAvailable } from "../lib/guide-publication-policy.js";
 
 import {
   normalizeProductionGuideAuthoring,
@@ -29,6 +30,85 @@ function canonicalCourseContext() {
     })),
   }];
 }
+
+const publishGuide = (value) => normalizeProductionGuideAuthoring({ content: value,
+  targetTournamentId: "2026", canonicalCourseContext: canonicalCourseContext() });
+function minimumGuide() {
+  const value = content();
+  for (const key of OPTIONAL_GUIDE_DOMAINS) value[key] = [];
+  for (const key of ["Annual Image", "Hero Image", "Mobile Hero Image"]) value.tournament[key] = "";
+  return value;
+}
+
+test("valid Overview and one published itinerary permit zero optional domains without filler", () => {
+  const value = minimumGuide(), before = structuredClone(value);
+  const result = publishGuide(value);
+  assert.equal(result.validation.valid, true);
+  assert.equal(result.projectionPayload.content.schedule.length, 1);
+  for (const key of OPTIONAL_GUIDE_DOMAINS) assert.deepEqual(result.projectionPayload.content[key], []);
+  assert.deepEqual(value, before);
+  const readiness = guideDraftReadiness(value);
+  assert.equal(readiness.complete, true);
+  for (const row of readiness.domains.filter(r => !r.required)) assert.equal(row.state, "Not used");
+  for (const icon of ["dining", "local", "contacts"]) assert.equal(guideDestinationAvailable(result.projectionPayload.content, icon), false);
+  for (const icon of ["schedule", "courses", "rules"]) assert.equal(guideDestinationAvailable(result.projectionPayload.content, icon), true);
+  const empty = minimumGuide(); empty.schedule = [];
+  assert.throws(() => publishGuide(empty), /needs review/);
+  empty.schedule = [{ ...content().schedule[0], Status: "Draft" }];
+  assert.throws(() => publishGuide(empty), /needs review/);
+});
+
+test("every optional domain permits valid content but rejects invalid, duplicate and private malformed content", () => {
+  const requiredField = { overview: "Description", timelineRows: "Title", ruleBook: "Body", dining: "Location", localGuide: "Title", importantContacts: "Name" };
+  for (const key of OPTIONAL_GUIDE_DOMAINS) {
+    const value = minimumGuide(); value[key] = structuredClone(content()[key]);
+    assert.equal(publishGuide(value).validation.valid, true, key);
+    value[key][0][requiredField[key]] = "";
+    assert.throws(() => publishGuide(value), undefined, `${key} incomplete cannot publish`);
+    if (["overview", "ruleBook"].includes(key)) {
+      value[key][0].Status = "Draft";
+      assert.throws(() => publishGuide(value), undefined, `${key} private malformed row is not silently ignored`);
+    }
+    value[key] = [structuredClone(content()[key][0]), structuredClone(content()[key][0])];
+    assert.throws(() => publishGuide(value), undefined, `${key} duplicate remains rejected`);
+  }
+  for (const [key, field, value] of [["overview", "Section Name", ""], ["timelineRows", "Event Date", "2026-02-30"],
+    ["timelineRows", "Start Time", "25:00"], ["ruleBook", "Important", "maybe"], ["ruleBook", "Status", "SECRET"],
+    ["dining", "Reservations Required", "maybe"], ["dining", "End Time", "29:00"],
+    ["localGuide", "Website", "javascript:alert(1)"], ["importantContacts", "Email", "invalid"]]) {
+    const candidate = minimumGuide(); candidate[key] = structuredClone(content()[key]); candidate[key][0][field] = value;
+    assert.throws(() => publishGuide(candidate), undefined, `${key} ${field}`);
+  }
+  const badReference = minimumGuide(); badReference.schedule[0]["Course ID"] = "UNKNOWN";
+  assert.throws(() => publishGuide(badReference));
+});
+
+test("Overview publication requires real presentation identity and timezone, not imagery or invented structured dates", () => {
+  for (const field of ["Tournament Name", "Tournament Edition", "Tournament Dates", "Destination", "Time Zone"]) {
+    const value = minimumGuide(); value.tournament[field] = "";
+    assert.throws(() => publishGuide(value), undefined, field);
+  }
+  for (const change of [{ "Time Zone": "Not/AZone" }, { "End Date": "2026-09-20" }, { "Start Date": "2026-02-30" }, { "End Date": "" }]) {
+    const value = minimumGuide(); Object.assign(value.tournament, change); assert.throws(() => publishGuide(value));
+  }
+  const value = minimumGuide(); value.tournament["Start Date"] = ""; value.tournament["End Date"] = "";
+  assert.equal(publishGuide(value).validation.valid, true);
+  for (const [primary, alias] of [["Tournament Edition", "Annual"], ["Tournament Dates", "Dates"], ["Destination", "Location"], ["Time Zone", "Timezone"]]) {
+    value.tournament[alias] = value.tournament[primary]; value.tournament[primary] = "";
+  }
+  assert.equal(publishGuide(value).validation.valid, true);
+});
+
+test("three canonical Courses, Round and Format presentations survive without optional prose", () => {
+  const value = minimumGuide();
+  const contexts = ["BB", "SC", "SI"].map((format, index) => ({ ...canonicalCourseContext()[0], course_id: `COURSE0${index + 1}`,
+    rounds: [{ round_number: index + 1, format, status: "UPCOMING" }] }));
+  value.courses = contexts.map((ctx, index) => ({ "Course ID": ctx.course_id, Round: String(index + 1), Format: ctx.rounds[0].format, Course: `Course ${index + 1}` }));
+  value.tournamentRules = contexts.map((ctx, index) => ({ Round: String(index + 1), Format: ctx.rounds[0].format, "Points Available": index === 2 ? "1" : "3" }));
+  value.rounds = contexts.map(ctx => ({ "Format ID": ctx.rounds[0].format, Name: ctx.rounds[0].format, "Team Size": ctx.rounds[0].format === "SI" ? "1" : "2" }));
+  const result = normalizeProductionGuideAuthoring({ content: value, targetTournamentId: "2026", canonicalCourseContext: contexts });
+  for (const key of ["courses", "tournamentRules", "rounds"]) assert.equal(result.projectionPayload.content[key].length, 3);
+});
 
 test("incremental private drafts accept every partial domain but remain unpublishable", () => {
   const empty = Object.fromEntries(Object.keys(content()).map((key) => [key, key === "tournament" ? {} : []]));

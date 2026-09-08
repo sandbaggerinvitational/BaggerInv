@@ -8,6 +8,7 @@ import styles from "./tournament-guide.module.css";
 import { pageMetadata } from "../../lib/seo";
 import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
 import PublicTournamentGuide from "./PublicTournamentGuide";
+import { guideDestinationAvailable } from "../../lib/guide-publication-policy.js";
 
 export const dynamic = "force-dynamic";
 export const metadata = pageMetadata({
@@ -44,12 +45,14 @@ export default async function TournamentGuidePage({ searchParams, participantPre
     if (["schedule", "rules", "dining", "getting-around", "contacts"].includes(destination)) redirect(`${participantPresentation ? "/app/guide" : "/tournament-guide"}/${destination}`);
   }
 
-  const { tournamentIdentity, courses } = await resolveTournamentGuideContent({ env });
+  const content = await resolveTournamentGuideContent({ env });
+  const { tournamentIdentity, courses } = content;
+  const availableDestinations = destinations.filter((item) => guideDestinationAvailable(content, item.icon));
 
   return <main>{participantPresentation ? null : <Header />}
     <TournamentGuideHero tournament={tournamentIdentity} courses={courses} />
     <div className={styles.shell}>
-      <section className={styles.directory} aria-labelledby="guide-directory-title"><header><p className={styles.eyebrow}>Tournament Weekend</p><h2 id="guide-directory-title">Find what you need</h2><span>Quick access to the information golfers use most.</span></header><div>{destinations.map((item) => <Link href={guidePresentationHref(item.href, participantPresentation)} prefetch={false} key={item.href}><i><GuideDirectoryIcon name={item.icon} /></i><span><strong>{item.title}</strong><small>{item.detail}</small></span><b aria-hidden="true">›</b></Link>)}</div></section>
+      {availableDestinations.length ? <section className={styles.directory} aria-labelledby="guide-directory-title"><header><p className={styles.eyebrow}>Tournament Weekend</p><h2 id="guide-directory-title">Find what you need</h2><span>Quick access to the information golfers use most.</span></header><div>{availableDestinations.map((item) => <Link href={guidePresentationHref(item.href, participantPresentation)} prefetch={false} key={item.href}><i><GuideDirectoryIcon name={item.icon} /></i><span><strong>{item.title}</strong><small>{item.detail}</small></span><b aria-hidden="true">›</b></Link>)}</div></section> : null}
     </div>{participantPresentation ? null : <Footer />}
   </main>;
 }
