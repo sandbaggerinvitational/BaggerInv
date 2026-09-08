@@ -145,11 +145,10 @@ test("health route succeeds in compatible Preview and intentionally fails in Pro
   await withEnvironment({ ...previewEnv, VERCEL_ENV: "production" }, async () => {
     const response = await healthGET();
     assert.equal(response.status, 503);
-    assert.deepEqual(await response.json(), {
-      ok: false,
-      apiVersion: "v1",
-      error: { code: "MOBILE_API_UNAVAILABLE", message: "The mobile API is unavailable in this environment." },
-    });
+    const body = await response.json();
+    assert.equal(body.compatibility, "AUTHORITY_INCOMPATIBLE");
+    assert.equal(body.contractVersion, "bagger-production-native-v1");
+    assert.deepEqual(body.capabilities, { reads: false, auth: false, certification: false, scoring: false });
   });
 });
 

@@ -15,6 +15,13 @@
       "properties": {
         "code": {
           "enum": [
+            "NATIVE_READS_DISABLED",
+            "NATIVE_AUTH_DISABLED",
+            "NATIVE_CERTIFICATION_DISABLED",
+            "NATIVE_SCORING_DISABLED",
+            "AUTHORITY_INCOMPATIBLE",
+            "CLIENT_UPDATE_REQUIRED",
+            "MAINTENANCE",
             "UNAUTHORIZED",
             "INVALID_TOKEN",
             "PARTICIPANT_NOT_FOUND",

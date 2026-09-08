@@ -75,10 +75,10 @@ test("matches preserves canonical ordering, lifecycle, relationships, and exclud
       rounds: [{ number: 2, label: "Round 2", format: "BB", matches: rows }] }),
     applyGuideCoursesToTournament: (value) => value,
   } });
-  assert.deepEqual(result.body.data.matches.map((row) => row.matchId), ["M1", "M2", "M3"]);
-  assert.deepEqual(result.body.data.matches.map((row) => row.status), ["scheduled", "inProgress", "completed"]);
-  assert.equal(result.body.data.matches[1].progress.currentHole, 7);
-  assert.equal(result.body.data.matches[2].result.teamOnePoints, 2);
+  assert.deepEqual(result.body.data.matches.map((row) => row.matchId), ["M3", "M1", "M2"]);
+  assert.deepEqual(result.body.data.matches.map((row) => row.status), ["completed", "scheduled", "inProgress"]);
+  assert.equal(result.body.data.matches[2].progress.currentHole, 7);
+  assert.equal(result.body.data.matches[0].result.teamOnePoints, 2);
   const serialized = JSON.stringify(result.body);
   for (const forbidden of ["scoringEnabled", "scoringLocked", "permission", "revision", "canScore", "Director"]) {
     if (forbidden === "revision") continue;

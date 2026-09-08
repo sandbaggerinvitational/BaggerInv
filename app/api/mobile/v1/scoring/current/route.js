@@ -5,4 +5,4 @@ export const dynamic = "force-dynamic";
 
 export const GET = (request) => mobileV1ScoringResponse(request, (identity) => mobileScoringCurrentResult(identity, {
   matchId: mobileScoringMatchIdFromRequest(request),
-}));
+}), "reads");

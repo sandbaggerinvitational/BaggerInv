@@ -1,0 +1,155 @@
+{
+  "fixtureVersion": 1,
+  "synthetic": true,
+  "contractFamily": "mobile-v1-match-detail",
+  "description": "Deterministic inputs used to construct strict participant-safe Match Detail responses. All names and identifiers are synthetic.",
+  "tournament": {
+    "tournamentId": "fx-2026",
+    "name": "Synthetic Invitational",
+    "year": 2026,
+    "status": "Live",
+    "timeZone": "America/New_York",
+    "location": "Synthetic Island"
+  },
+  "teams": [
+    {
+      "side": 1,
+      "teamId": "fx-team-1",
+      "name": "Synthetic Pickles",
+      "participants": [
+        { "playerId": "fx-player-1", "displayName": "Synthetic Player One", "teamSide": 1, "isAuthenticatedPlayer": true, "playingHandicap": 7.5, "strokesReceived": 0 },
+        { "playerId": "fx-player-2", "displayName": "Synthetic Player Two", "teamSide": 1, "isAuthenticatedPlayer": false, "playingHandicap": 11.25, "strokesReceived": 4 }
+      ]
+    },
+    {
+      "side": 2,
+      "teamId": "fx-team-2",
+      "name": "Synthetic Rippers",
+      "participants": [
+        { "playerId": "fx-player-3", "displayName": "Synthetic Player Three", "teamSide": 2, "isAuthenticatedPlayer": false, "playingHandicap": 8.0, "strokesReceived": 1 },
+        { "playerId": "fx-player-4", "displayName": "Synthetic Player Four", "teamSide": 2, "isAuthenticatedPlayer": false, "playingHandicap": null, "strokesReceived": null }
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "scenarioId": "best-ball-upcoming-non-owned-missing-course",
+      "format": "BB",
+      "formatName": "Best Ball",
+      "scoreScope": "players",
+      "status": "scheduled",
+      "scorecardState": "unavailable",
+      "holesPlayed": 0,
+      "authenticatedPlayerInvolved": false,
+      "expectedPlayersPerSide": 2,
+      "missingCourse": true,
+      "strokeCase": "zero"
+    },
+    {
+      "scenarioId": "best-ball-live-owned-multiple-lead-changes",
+      "format": "BB",
+      "formatName": "Best Ball",
+      "scoreScope": "players",
+      "status": "inProgress",
+      "scorecardState": "inProgress",
+      "holesPlayed": 12,
+      "authenticatedPlayerInvolved": true,
+      "expectedPlayersPerSide": 2,
+      "leadChangeCase": "multiple",
+      "strokeCase": "positive",
+      "negativePlayingHandicap": true,
+      "longIdentityNames": true
+    },
+    {
+      "scenarioId": "best-ball-final-halved",
+      "format": "BB",
+      "formatName": "Best Ball",
+      "scoreScope": "players",
+      "status": "completed",
+      "scorecardState": "confirmed",
+      "holesPlayed": 18,
+      "authenticatedPlayerInvolved": false,
+      "expectedPlayersPerSide": 2,
+      "resultCase": "halved",
+      "strokeCase": "positive"
+    },
+    {
+      "scenarioId": "scramble-upcoming-owned",
+      "format": "SC",
+      "formatName": "Scramble",
+      "scoreScope": "team",
+      "status": "scheduled",
+      "scorecardState": "unavailable",
+      "holesPlayed": 0,
+      "authenticatedPlayerInvolved": true,
+      "expectedPlayersPerSide": 2,
+      "strokeCase": "zero"
+    },
+    {
+      "scenarioId": "scramble-live-non-owned-no-lead-changes",
+      "format": "SC",
+      "formatName": "Scramble",
+      "scoreScope": "team",
+      "status": "inProgress",
+      "scorecardState": "inProgress",
+      "holesPlayed": 9,
+      "authenticatedPlayerInvolved": false,
+      "expectedPlayersPerSide": 2,
+      "leadChangeCase": "none",
+      "strokeCase": "positive",
+      "missingOptionalCourseMetrics": true
+    },
+    {
+      "scenarioId": "scramble-final-owned-early-clinch",
+      "format": "SC",
+      "formatName": "Scramble",
+      "scoreScope": "team",
+      "status": "completed",
+      "scorecardState": "confirmed",
+      "holesPlayed": 13,
+      "authenticatedPlayerInvolved": true,
+      "expectedPlayersPerSide": 2,
+      "resultCase": "earlyClinch",
+      "strokeCase": "positive"
+    },
+    {
+      "scenarioId": "singles-upcoming-non-owned",
+      "format": "SI",
+      "formatName": "Singles",
+      "scoreScope": "players",
+      "status": "scheduled",
+      "scorecardState": "unavailable",
+      "holesPlayed": 0,
+      "authenticatedPlayerInvolved": false,
+      "expectedPlayersPerSide": 1,
+      "strokeCase": "zero"
+    },
+    {
+      "scenarioId": "singles-live-owned-incomplete",
+      "format": "SI",
+      "formatName": "Singles",
+      "scoreScope": "players",
+      "status": "inProgress",
+      "scorecardState": "inProgress",
+      "holesPlayed": 7,
+      "authenticatedPlayerInvolved": true,
+      "expectedPlayersPerSide": 1,
+      "leadChangeCase": "multiple",
+      "strokeCase": "positive",
+      "largeStrokes": true
+    },
+    {
+      "scenarioId": "singles-final-owned-official",
+      "format": "SI",
+      "formatName": "Singles",
+      "scoreScope": "players",
+      "status": "completed",
+      "scorecardState": "confirmed",
+      "holesPlayed": 18,
+      "authenticatedPlayerInvolved": true,
+      "expectedPlayersPerSide": 1,
+      "leadChangeCase": "none",
+      "strokeCase": "positive"
+    }
+  ]
+}

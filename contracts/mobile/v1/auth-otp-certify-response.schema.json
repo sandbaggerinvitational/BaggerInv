@@ -16,7 +16,7 @@
         "certified": { "const": true },
         "certificationToken": {
           "type": "string",
-          "pattern": "^v1\\.[0-9]{10}\\.[0-9]{10}\\.[A-Za-z0-9_-]{22}\\.[A-Za-z0-9_-]{43}$"
+          "pattern": "^(?:v1|v2p)\\.[0-9]{10}\\.[0-9]{10}\\.[A-Za-z0-9_-]{22}\\.[A-Za-z0-9_-]{43}$"
         },
         "expiresInSeconds": { "const": 43200 }
       }

@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:production:health:v1",
+  "title": "Production native compatibility; grants no participant authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ok",
+    "apiVersion",
+    "service",
+    "environment",
+    "contractVersion",
+    "compatibility",
+    "authority",
+    "capabilities",
+    "scoringStatus"
+  ],
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "apiVersion": {
+      "const": "v1"
+    },
+    "service": {
+      "const": "bagger-mobile-api"
+    },
+    "environment": {
+      "const": "production"
+    },
+    "contractVersion": {
+      "const": "bagger-production-native-v1"
+    },
+    "compatibility": {
+      "enum": [
+        "COMPATIBLE",
+        "AUTHORITY_INCOMPATIBLE",
+        "CLIENT_UPDATE_REQUIRED"
+      ]
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "currentTournament"
+      ],
+      "properties": {
+        "identity": {
+          "enum": [
+            "supabase",
+            "unavailable"
+          ]
+        },
+        "currentTournament": {
+          "enum": [
+            "server-current-active",
+            "unavailable"
+          ]
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reads",
+        "auth",
+        "certification",
+        "scoring"
+      ],
+      "properties": {
+        "reads": {
+          "type": "boolean"
+        },
+        "auth": {
+          "type": "boolean"
+        },
+        "certification": {
+          "type": "boolean"
+        },
+        "scoring": {
+          "type": "boolean"
+        }
+      }
+    },
+    "scoringStatus": {
+      "enum": [
+        "AVAILABLE",
+        "SUSPENDED",
+        "MAINTENANCE"
+      ]
+    }
+  }
+}

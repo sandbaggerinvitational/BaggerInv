@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server.js";
 import { mobileApiErrorResult, mobileSessionResult } from "../../../../../lib/mobile-api-v1.js";
 import { resolveMobileBearerIdentity } from "../../../../../lib/mobile-bearer-identity.js";
+import { recheckMobileNativeIdentity } from "../../../../../lib/mobile-native-admission.js";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +10,7 @@ export async function GET(request) {
   try {
     const identity = await resolveMobileBearerIdentity({ request });
     result = mobileSessionResult(identity);
+    await recheckMobileNativeIdentity(identity, "reads");
   } catch (error) {
     result = mobileApiErrorResult(error);
   }
