@@ -284,7 +284,8 @@ test("all War Room routes use the shared boundary and no page calls the broad lo
     assert.doesNotMatch(text, /loadPredictionSheets|refreshHistoricalData/);
   }
   assert.match(source("app/war-room/WarRoom.js"), /predict\(\{/);
-  assert.match(source("app/war-room/WarRoom.js"), /simulateMatch\(\{/);
+  assert.match(source("app/war-room/WarRoom.js"), /simulateAdvisoryMatch\(\{/);
+  assert.match(source("lib/advisory-match-simulation.js"), /simulateMatch\(\{/);
   assert.match(source("app/war-room/lineup-optimizer/LineupOptimizer.js"), /optimizeLineups\(\{/);
 });
 

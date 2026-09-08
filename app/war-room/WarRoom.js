@@ -21,7 +21,7 @@ import {
   scorecardForTee,
 } from "../../lib/tournament-context";
 import { teamVibesTier } from "../../lib/prediction-engine";
-import { simulateMatch } from "../../lib/match-simulator";
+import { advisoryStrokeMaps, selectAdvisoryHoles, simulateAdvisoryMatch } from "../../lib/advisory-match-simulation";
 import SimulationResults from "./SimulationResults";
 import MatchAnalyst from "./MatchAnalyst";
 import RecordedScoringIntelligence from "./RecordedScoringIntelligence";
@@ -127,22 +127,25 @@ export default function WarRoom({ initialData, loadError, initialSelection = {} 
   const prediction = ready
     ? predict({ format, players: details, historical, partnership: partnerships, headToHead, handicap: play, settings, teamNames: [teams.team1.name, teams.team2.name], pointsAvailable })
     : null;
-  const simulationStrokeMaps = effectiveStrokeMaps
-    ? { teamA: effectiveStrokeMaps.team1, teamB: effectiveStrokeMaps.team2 }
-    : null;
-  const simulationSeed = `${year}|${courseId}|${tee}|${formatCode(format)}|${chosen.join("|")}|v1`;
+  // Separate advisory hole derivation: do not change the certified prediction
+  // or optimizer handicap inputs, or create official scoring context.
+  const simulationHoles = selectAdvisoryHoles(initialData?.advisoryCourses, { year, course, tee, scorecard }, holes);
+  const simulationStrokeMaps = advisoryStrokeMaps(format, basePlay, simulationHoles);
+  const simulationSeed = `${year}|${courseId}|${tee}|${formatCode(format)}|advisory-v1`;
   const simulation = useMemo(
     () => simulationRun > 0 && ready && simulationStrokeMaps
-      ? simulateMatch({
+      ? simulateAdvisoryMatch({
+          playerIds: chosen,
           format: formatCode(format),
           prediction,
           strokeMaps: simulationStrokeMaps,
           teamNames: [teams.team1.name, teams.team2.name],
           iterations: 10_000,
+          pointsAvailable,
           seed: simulationSeed,
         })
       : null,
-    [simulationRun, ready, format, prediction, simulationStrokeMaps, teams.team1.name, teams.team2.name, simulationSeed]
+    [simulationRun, ready, format, prediction, simulationStrokeMaps, teams.team1.name, teams.team2.name, simulationSeed, chosen, pointsAvailable]
   );
 
   useEffect(() => {
@@ -330,13 +333,13 @@ export default function WarRoom({ initialData, loadError, initialSelection = {} 
             {activeSection === "simulation" ? (
               <div className={styles.labSection}>
                 <div className={styles.simRun}>
-                  <button type="button" disabled={holes.length !== 18} onClick={() => setSimulationRun((run) => run + 1)}>
+                  <button type="button" disabled={!simulationStrokeMaps} onClick={() => setSimulationRun((run) => run + 1)}>
                     {simulation ? "Run another 10,000 simulations" : "Run 10,000 simulations"}
                   </button>
-                  <small>{holes.length === 18 ? "The simulation uses the matchup selected above. Results remain stable until an input changes." : "A complete 18-hole scorecard is required for simulation."}</small>
+                  <small>{simulationStrokeMaps ? "Advisory Analytics only · Uses existing course holes. No pairing or official scoring context is saved. Results remain stable until an input changes." : "Simulation needs a complete, consistent 18-hole course definition for this tee. Official pairings and scoring preparation are not required."}</small>
                 </div>
                 {simulation ? <SimulationResults simulation={simulation} format={formatCode(format)} teamNames={[teams.team1.name, teams.team2.name]} /> : (
-                  <div className={styles.simulationEmpty}><span>Monte Carlo Simulation</span><h2>Ready for 10,000 outcomes</h2><p>Run the selected matchup to see segment probabilities, expected points, likely results, and match-closing risk.</p></div>
+                  <div className={styles.simulationEmpty}><span>Advisory Monte Carlo Simulation</span><h2>{simulationStrokeMaps ? "Ready for 10,000 outcomes" : "Simulation unavailable"}</h2><p>Run the selected matchup to see segment probabilities, expected points, likely results, and match-closing risk.</p></div>
                 )}
               </div>
             ) : null}

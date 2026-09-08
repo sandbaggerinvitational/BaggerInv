@@ -1,6 +1,7 @@
 "use client";
 
 import styles from "./war-room.module.css";
+import { courseFitPresentation } from "../../lib/scorecard-intelligence-presentation";
 
 const value = (number, suffix = "") => Number.isFinite(number) ? `${number.toFixed(1)}${suffix}` : "—";
 const sample = (profile) => `Based on ${profile.holes} recorded holes · ${profile.rounds} complete round${profile.rounds === 1 ? "" : "s"} · ${profile.yearsLabel}`;
@@ -49,13 +50,14 @@ function ProfileCard({ player, data }) {
 }
 
 function CourseFitCard({ player, fit }) {
+  const view = courseFitPresentation(fit);
   return (
-    <article className={styles.courseFitCard} data-signal={fit.signal}>
-      <header><span>{player.name}</span><b>{fit.signal}</b></header>
-      <strong>{fit.signal === "Insufficient Data" ? "Recorded profile unavailable" : `${fit.signal} Course Profile`}</strong>
-      {fit.reasons.length ? <ul>{fit.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul> : <p>More recorded hole data is needed for a responsible course-fit signal.</p>}
-      {fit.versusRecordedField !== null ? <p><b>Versus Recorded Field:</b> {Math.abs(fit.versusRecordedField).toFixed(2)} {fit.versusRecordedField <= 0 ? "better" : "worse"} per recorded hole on comparable course-and-tee scorecards.</p> : null}
-      <small>Confidence: {fit.confidence} · {fit.courseTeeRounds} round{fit.courseTeeRounds === 1 ? "" : "s"} on this course and tee</small>
+    <article className={styles.courseFitCard} data-signal={view.signal}>
+      <header><span>{player.name}</span><b>{view.signal}</b></header>
+      <strong>{view.signal === "Insufficient Data" ? "Recorded profile unavailable" : `${view.signal} Course Profile`}</strong>
+      {view.reasons.length ? <ul>{view.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul> : <p>More recorded hole data is needed for a responsible course-fit signal.</p>}
+      {view.comparison !== null ? <p><b>Versus Recorded Field:</b> {view.comparison} per recorded hole on comparable course-and-tee scorecards.</p> : null}
+      <small>Confidence: {view.confidence}{view.rounds !== null ? ` · ${view.rounds} round${view.rounds === 1 ? "" : "s"} on this course and tee` : ""}</small>
     </article>
   );
 }
