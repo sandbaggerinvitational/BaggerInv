@@ -10,6 +10,7 @@ import styles from "./live/live.module.css";
 import scoreStyles from "./score-typography.module.css";
 import ScorecardTable from "./ScorecardTable";
 import { formatMatchConfirmationTime, matchState } from "../lib/live-match-ux";
+import { formatHomeTime } from "../lib/home-dashboard";
 import MatchProgressionSummary from "./MatchProgressionSummary";
 import { reconstructMatchProgression } from "../lib/match-progression";
 import {
@@ -245,11 +246,12 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
   const hasPairing = [...(match.team1Players || []), ...(match.team2Players || [])].some((player) => player?.name);
   const hasSegments = Boolean(match.frontWinner || match.backWinner || overallWinner);
   const winnerName = halved ? "Match halved" : winningSide === 1 ? tournament.teamOne.name : winningSide === 2 ? tournament.teamTwo.name : "";
+  const displayTeeTime = formatHomeTime(match.teeTime);
   const statusText = state === "final"
     ? (formatOfficialMatchResult(match.finalResult) || reconstructedResult(scorecards) || winnerName || "Final")
     : state === "live"
       ? (match.liveStatusText || (liveLeader ? `${liveLeader === 1 ? tournament.teamOne.name : tournament.teamTwo.name} ${Math.abs(Number(match.team1HolesWon) - Number(match.team2HolesWon))} UP` : "All square"))
-      : (match.teeTime ? `Tee time ${match.teeTime}` : "Scheduled");
+      : (displayTeeTime ? `Tee time ${displayTeeTime}` : "Scheduled");
   const confirmedTime = formatMatchConfirmationTime(match.updatedAt, {
     timeZone: tournament.timeZone,
     now,
@@ -335,7 +337,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
   }
 
   return <article className={styles.matchCard} id={match.id ? `match-${match.id}` : undefined} style={cardStyle} data-match-state={state} aria-label={`Match ${match.match}: ${statusText}`} tabIndex="0">
-    <div className={styles.matchTop}><span>{topLabel}</span><span>{state === "upcoming" ? match.teeTime || match.status : match.status}</span></div>
+    <div className={styles.matchTop}><span>{topLabel}</span><span>{state === "upcoming" ? displayTeeTime || match.status : match.status}</span></div>
     <div className={styles.matchMeta}>
       <span>Match {match.match} · {match.formatName || round?.format}</span>
       <MatchStatusBlock
@@ -350,7 +352,7 @@ export default function PublicMatchCard({ match, round, tournament, variant = "l
         <span>Selected player results are excluded from official records.</span>
       </div>
     ) : null}
-    {hasPairing ? <MatchupRoster tournament={tournament} match={match} showStrokeCopy={!historyScorecardParity} participantPresentation={participantPresentation} /> : <div className={styles.pairingPending}><strong>Pairing announcement coming soon</strong><span>{match.teeTime ? `${match.teeTime} · ` : ""}{match.course?.name || round?.course?.name || "Course to be announced"}</span></div>}
+    {hasPairing ? <MatchupRoster tournament={tournament} match={match} showStrokeCopy={!historyScorecardParity} participantPresentation={participantPresentation} /> : <div className={styles.pairingPending}><strong>Pairing announcement coming soon</strong><span>{displayTeeTime ? `${displayTeeTime} · ` : ""}{match.course?.name || round?.course?.name || "Course to be announced"}</span></div>}
     {variant === "live" && (match.currentHole || match.liveStatusText) ? <div className={styles.liveTracker}>
       <span>Through {match.currentHole || "—"}</span>
       <div data-leading={liveLeader === 1 ? "true" : undefined}><strong>{tournament.teamOne.name}</strong><b>{match.team1HolesWon}</b></div>

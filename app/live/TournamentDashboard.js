@@ -10,6 +10,7 @@ import MatchFilterEmptyState from "./MatchFilterEmptyState";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
 import { formatHandicap, formatStatusLabel, formatTeamPoints, playerDisplayHandicap } from "../../lib/formatters";
 import { formatStoredMatchResult } from "../../lib/match-result";
+import { formatHomeTime } from "../../lib/home-dashboard";
 import { filterMatches, matchState, relativeUpdatedLabel, resolveMatchFilterEmptyState } from "../../lib/live-match-ux";
 import { fetchWithTransientRetry } from "../../lib/transient-fetch";
 import { calcuttaDestinationAvailable } from "../../lib/calcutta-presentation-availability";
@@ -107,7 +108,7 @@ function TournamentMatchCard({ match, round, tournament }) {
     </div>
     <div className={styles.course}>
       <Logo filename={match.course?.logo} name={match.course?.name || "Course"} type="course" size="course" />
-      <span><strong>{match.course?.name || "Course TBA"}</strong><small>{[tee, match.teeTime].filter(Boolean).join(" • ") || "Details to be announced"}</small></span>
+      <span><strong>{match.course?.name || "Course TBA"}</strong><small>{[tee, formatHomeTime(match.teeTime)].filter(Boolean).join(" • ") || "Details to be announced"}</small></span>
     </div>
     <div className={styles.versus}>
       <Team team={tournament.teamOne} players={match.team1Players} format={match.format} playingHcp={match.team1PlayingHcp} stroke={match.team1Stroke} />
