@@ -73,7 +73,7 @@ async function createCluster() {
   await mkdir(socket, { mode: 0o700 });
   run(bin.initdb, ["-D", data, "--username=postgres", "--auth=trust", "--no-locale", "--encoding=UTF8"]);
   const port = 55436;
-  run(bin.pg_ctl, ["-D", data, "-l", log, "-o", `-F -k ${socket} -h '' -p ${port}`, "-w", "start"]);
+  run(bin.pg_ctl, ["-D", data, "-l", log, "-o", `-F -k ${socket} -h '' -p ${port} -c shared_buffers=16MB -c max_connections=12`, "-w", "start"]);
   return { directory, data, socket, log, port, started: true };
 }
 
@@ -516,6 +516,94 @@ function fixture(cluster, database) {
       ('2026','CB01','${actor.authUserId}','ACTIVE');
   `);
 }
+
+test("095 atomic full-round pairings, unchanged matches, exchanges, rollback and grants", async (context) => {
+  assert.ok(await available(), 'PostgreSQL 17 required for round certification');
+  const cluster=await createCluster();context.after(()=>destroyCluster(cluster));
+  const database='round_pairings_v1';run(bin.createdb,[database],{env:environment(cluster)});
+  fixture(cluster,database);
+  for(const file of [migration,emptyPairingsMigration,startingHoleRetirementMigration])sqlFile(cluster,database,file);
+  const fingerprint=()=>sql(cluster,database,`select md5(jsonb_build_object(
+    'participants',(select jsonb_agg(to_jsonb(p) order by match_id,player_id) from scoring_authority.match_participants p),
+    'matches',(select jsonb_agg(to_jsonb(m) order by match_id) from scoring_authority.matches m),
+    'permissions',(select jsonb_agg(to_jsonb(p) order by match_id,player_id) from scoring_authority.scoring_permissions p),
+    'details',(select jsonb_agg(to_jsonb(d) order by match_id) from scoring_authority.tournament_setup_match_details_v1 d),
+    'context',(select jsonb_agg(to_jsonb(c)) from production_control.tournament_setup_context_v1 c),
+    'receipts',(select count(*) from production_control.tournament_setup_operation_receipts_v1),
+    'audits',(select count(*) from production_control.tournament_setup_audit_events_v1))::text);`);
+  const before=fingerprint();
+  sqlFile(cluster,database,path.join(root,'supabase/production_migrations/202609090095_production_round_pairings_v1.sql'));
+  assert.equal(fingerprint(),before,'installation inert');
+  assert.equal(sql(cluster,database,`select has_function_privilege('anon','public.mutate_production_round_pairings_v1(jsonb)','EXECUTE')||'|'||has_function_privilege('authenticated','public.mutate_production_round_pairings_v1(jsonb)','EXECUTE')||'|'||has_function_privilege('service_role','public.mutate_production_round_pairings_v1(jsonb)','EXECUTE');`),'false|false|true');
+  // Full 24-player / six-match BB fixture, preserving the existing helpers.
+  sql(cluster,database,`delete from scoring_authority.scoring_permissions; delete from scoring_authority.match_participants;
+    insert into scoring_authority.players select prefix||lpad(n::text,2,'0'),prefix||n,'{}'::jsonb from unnest(array['P','Q']) prefix cross join generate_series(1,8)n;
+    insert into scoring_authority.tournament_players(tournament_id,player_id,team_id,team_side,participation_status,source_roster_key,source_payload,tournament_handicap,handicap_revision_id)
+      select '2026',player_id,case when player_id like 'P%' then 'CB' else 'WD' end,case when player_id like 'P%' then 1 else 2 end,'ACTIVE','2026:'||player_id,'{}',5,'10000000-0000-4000-8000-000000000001' from scoring_authority.players where player_id ~ '^[PQ]';
+    insert into scoring_authority.handicap_revision_entries select '10000000-0000-4000-8000-000000000001','2026',player_id,5 from scoring_authority.players where player_id ~ '^[PQ]';
+    insert into scoring_authority.scoring_snapshots select '2026-R1-'||n||':S1',tournament_id,'2026-R1-'||n,snapshot_revision,scoring_rules_version,format,handicap_allowance,course_id,tee,rating,slope,par,match_netting_baseline,hole_definitions,participant_configuration,team_configuration,effective_at,imported_at,canonical_hash,handicap_revision_id from scoring_authority.scoring_snapshots cross join unnest(array[3,5,6])n where snapshot_id='2026-R1-2:S1';
+    insert into scoring_authority.matches(match_id,tournament_id,round_number,format,scoring_snapshot_id,status) select '2026-R1-'||n,'2026',1,'BB','2026-R1-'||n||':S1','UPCOMING' from unnest(array[3,5,6])n;
+    insert into scoring_authority.tournament_setup_course_tees_v1(tournament_id,course_id,tee_id,display_name,rating,slope,par,setup_revision,updated_by_player_id) values('2026','COURSE-1','Tournament','Course One',72,120,72,10,'CB01');
+    insert into scoring_authority.tournament_setup_course_holes_v1 select '2026','COURSE-1','Tournament',n,4,n,400,10 from generate_series(1,18)n;
+    insert into scoring_authority.tournament_setup_round_courses_v1(tournament_id,round_number,course_id,tee_id,setup_revision,updated_by_player_id) values('2026',1,'COURSE-1','Tournament',10,'CB01');
+    insert into scoring_authority.tournament_setup_match_details_v1(match_id,tournament_id,round_number,match_number,course_id,tee_id,tee_time,setup_revision,updated_by_player_id)
+      select match_id,'2026',1,right(match_id,1)::integer,'COURSE-1','Tournament','07:30',10,'CB01' from scoring_authority.matches where round_number=1;
+    insert into production_control.tournament_setup_context_v1(tournament_id,contract_version,revision,updated_by_player_id,updated_by_auth_user_id) values('2026','production-tournament-setup-v1',10,'CB01','${actor.authUserId}');`);
+  const side1=['CB01','CB02','CB03','CB04',...Array.from({length:8},(_,i)=>`P0${i+1}`)];
+  const side2=['WD01','WD02','WD03','WD04',...Array.from({length:8},(_,i)=>`Q0${i+1}`)];
+  const rows=Array.from({length:6},(_,i)=>({match_id:`2026-R1-${i+1}`,format:'BB',participants:[1,2].flatMap(side=>[1,2].map(slot=>({player_id:(side===1?side1:side2)[i*2+slot-1],team_side:side,player_slot:slot})))}));
+  let seq=100;
+  const request=(matches=rows,revision=10)=>scope('REPLACE_ROUND_PAIRINGS',{round_number:1,matches,expected_handicap_revision_id:'10000000-0000-4000-8000-000000000001',expected_revision:revision,operation_request_id:`20000000-0000-4000-8000-${String(seq++).padStart(12,'0')}`,request_payload_hash:'a'.repeat(64)});
+  const call=input=>rpc(cluster,database,'mutate_production_round_pairings_v1',input);
+  const reject=(input,pattern)=>{const baseline=fingerprint();const result=call(input);assert.equal(result.ok,false,JSON.stringify(result));assert.match(result.code,pattern);assert.equal(fingerprint(),baseline,'failed round has zero writes');return result;};
+  const duplicate=structuredClone(rows);duplicate[5].participants[0].player_id='CB01';
+  assert.equal(reject(request(duplicate),/DUPLICATE/).matchId,'2026-R1-6');
+  const missing=structuredClone(rows);missing[5].participants.pop();reject(request(missing),/COUNT/);
+  const wrongTeam=structuredClone(rows);wrongTeam[5].participants[0].player_id='WD01';reject(request(wrongTeam),/DUPLICATE|MEMBERSHIP/);
+  reject(request(rows,9),/REVISION_STALE/);
+  reject({...request(),expected_handicap_revision_id:'10000000-0000-4000-8000-000000000099'},/HANDICAP_REVISION_STALE/);
+  // The fixture's private authorization exception is intentionally sanitized;
+  // cross-year denial must still be explicit and leave the complete state intact.
+  reject({...request(),tournament_id:'2025'},/^TOURNAMENT_SETUP_ROUND_OPERATION_FAILED$/);
+  reject(request(rows.slice(1)),/MATCH_SET/);
+  for(const change of ["update scoring_authority.matches set status='LIVE' where match_id='2026-R1-6'", "delete from scoring_authority.handicap_revision_entries where player_id='Q08'"]) {
+    sql(cluster,database,change);
+    reject(request(),/STARTED|FROZEN|HANDICAP/);
+    if(change.startsWith('update'))sql(cluster,database,"update scoring_authority.matches set status='UPCOMING' where match_id='2026-R1-6'");
+    else sql(cluster,database,"insert into scoring_authority.handicap_revision_entries values('10000000-0000-4000-8000-000000000001','2026','Q08',5)");
+  }
+  // Fault after earlier matches wrote proves subtransaction rollback, not just validation.
+  sql(cluster,database,`create function scoring_authority.fail_last_pairing() returns trigger language plpgsql as $$begin if new.match_id='2026-R1-6' then raise exception 'TOURNAMENT_SETUP_TEST_CONTEXT_FAILURE';end if;return new;end;$$;
+    create trigger fail_last before insert on scoring_authority.match_participants for each row execute function scoring_authority.fail_last_pairing();`);
+  reject(request(),/TEST_CONTEXT_FAILURE/);
+  sql(cluster,database,'drop trigger fail_last on scoring_authority.match_participants; drop function scoring_authority.fail_last_pairing();');
+  const initial=request();const success=call(initial);assert.equal(success.ok,true,JSON.stringify(success));assert.equal(success.revision,11);assert.equal(success.changedMatches.length,6);
+  const after=fingerprint();assert.equal(call(initial).idempotent,true);assert.equal(fingerprint(),after);
+  reject({...initial,matches:duplicate},/IDEMPOTENCY_CONFLICT/);
+  assert.equal(sql(cluster,database,"select count(*) from scoring_authority.match_participants where match_id like '2026-R1-%'"),'24');
+  const unchanged=call(request(rows,11));assert.equal(unchanged.revision,11);assert.deepEqual(unchanged.changedMatches,[]);
+  // Swap between matches 3 and 4: unchanged matches 1/2 remain byte-for-byte.
+  const preserved=sql(cluster,database,"select md5(jsonb_agg(to_jsonb(p) order by match_id,player_id)::text) from scoring_authority.match_participants p where match_id in ('2026-R1-1','2026-R1-2')");
+  const swap=structuredClone(rows);[swap[2].participants[0],swap[3].participants[0]]=[swap[3].participants[0],swap[2].participants[0]];
+  const swapped=call(request(swap,11));assert.equal(swapped.ok,true,JSON.stringify(swapped));assert.equal(swapped.revision,12);assert.equal(swapped.changedMatches.length,2);
+  assert.equal(sql(cluster,database,"select md5(jsonb_agg(to_jsonb(p) order by match_id,player_id)::text) from scoring_authority.match_participants p where match_id in ('2026-R1-1','2026-R1-2')"),preserved);
+  assert.equal(sql(cluster,database,"select count(*) from scoring_authority.scoring_permissions where can_score"),'0');
+  assert.equal(sql(cluster,database,"select count(*) from scoring_authority.hole_scores"),'0');
+  assert.equal(sql(cluster,database,"select count(*) from scoring_authority.tournament_setup_match_details_v1 where prepared_setup_revision is not null"),'0');
+  const read=rpc(cluster,database,'read_production_tournament_setup_v1',scope('READ_PRODUCTION_TOURNAMENT_SETUP_V1'));
+  assert.ok(read.matches.filter(m=>m.roundNumber===1).every(m=>m.detailsManaged&&m.contextFingerprint.length===64));
+  // Installed formats: six SC matches (four slots) and twelve SI matches (two).
+  for(const [round,format,count] of [[2,'SC',6],[3,'SI',12]]) {
+    sql(cluster,database,`insert into scoring_authority.scoring_snapshots select '2026-R${round}-'||n||':S1',tournament_id,'2026-R${round}-'||n,snapshot_revision,scoring_rules_version,'${format}',handicap_allowance,course_id,tee,rating,slope,par,match_netting_baseline,hole_definitions,participant_configuration,team_configuration,effective_at,imported_at,canonical_hash,handicap_revision_id from scoring_authority.scoring_snapshots cross join generate_series(1,${count})n where snapshot_id='2026-R1-2:S1' on conflict(snapshot_id) do nothing;
+      insert into scoring_authority.matches(match_id,tournament_id,round_number,format,scoring_snapshot_id,status) select '2026-R${round}-'||n,'2026',${round},'${format}','2026-R${round}-'||n||':S1','UPCOMING' from generate_series(1,${count})n on conflict(match_id) do nothing;
+      insert into scoring_authority.tournament_setup_round_courses_v1(tournament_id,round_number,course_id,tee_id,setup_revision,updated_by_player_id) values('2026',${round},'COURSE-1','Tournament',12,'CB01');
+      insert into scoring_authority.tournament_setup_match_details_v1(match_id,tournament_id,round_number,match_number,course_id,tee_id,tee_time,setup_revision,updated_by_player_id) select '2026-R${round}-'||n,'2026',${round},n,'COURSE-1','Tournament','10:00',12,'CB01' from generate_series(1,${count})n;`);
+    const slots=format==='SI'?1:2;
+    const roundRows=Array.from({length:count},(_,i)=>({match_id:`2026-R${round}-${i+1}`,format,participants:[1,2].flatMap(side=>Array.from({length:slots},(_,s)=>({player_id:(side===1?side1:side2)[i*slots+s],team_side:side,player_slot:s+1})))}));
+    const result=call({...request(roundRows,round+10),round_number:round});
+    assert.equal(result.ok,true,JSON.stringify(result));assert.equal(result.revision,round+11);assert.equal(result.changedMatches.length,count);
+  }
+});
 
 test("migrations 063, 083, and 084 compile and enforce starting-hole-free zero-or-complete pairing behavior on PostgreSQL 17", async (context) => {
   if (!(await available())) return context.skip("PostgreSQL 17 binaries unavailable");
