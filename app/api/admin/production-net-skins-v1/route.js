@@ -109,8 +109,9 @@ export async function POST(request) {
         return configureProductionNetSkinsV1({
           ...options,
           ...actor(access.identity),
-          // V1 is intentionally fixed to all three approved tournament rounds.
-          eligibleRoundNumbers: [1, 2, 3],
+          // Revisions are CAS expectations only. SQL reads consent from 098.
+          eligibleRoundNumbers: input.eligibleRoundNumbers,
+          entryRevisions: input.entryRevisions,
         });
       }
       if (action === "enqueue") {

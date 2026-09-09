@@ -135,6 +135,15 @@ test('Release A: real finalized pairing/prepare bodies and Calcutta source/trigg
   assert.equal(save(rows[0]).ok,false,'baseline auction guard rejects first R3 setup');
   const before095=sql(c,db,`select md5(prosrc) from pg_proc where oid='public.mutate_production_round_pairings_v1(jsonb)'::regprocedure`);
   sqlFile(c,db,file('202609090097_production_late_r3_initialization_v1.sql'));
+  // Certify Release A unchanged with the inert entry-only successor installed.
+  sqlFile(c,db,file('202609090098_production_net_skins_entries_v1.sql'));
+  // Reduced lifecycle fixture: install the exact 099 shared projection and
+  // Calcutta source wrapper. Full 001–099 installation is separately tested.
+  sql(c,db,await functionSQL('202608300071_production_annual_reads_workers_v1.sql','create function production_control.calcutta_v1_completed_rounds('));
+  for(const name of ['full_net_match_v1','full_net_tournament_v1'])
+    sql(c,db,await functionSQL('202609090099_production_full_net_consumers_v3.sql',`create function production_control.${name}(`));
+  sql(c,db,'alter function production_control.calcutta_v1_source_revision(text) rename to calcutta_source_before_full_net_v3');
+  sql(c,db,await functionSQL('202609090099_production_full_net_consumers_v3.sql','create function production_control.calcutta_v1_source_revision('));
   run(bin.createdb,['-T',db,'release_a_template'],{env:environment(c)});
   assert.equal(sql(c,db,`select md5(prosrc) from pg_proc where oid='production_control.mutate_round_pairings_before_late_r3_v1(jsonb)'::regprocedure`),before095,'095 body preserved byte-for-byte');
   assert.equal(sql(c,db,'select count(*) from production_control.late_r3_initialization_receipts_v1'),'0','installation creates no receipts');
@@ -203,6 +212,25 @@ test('Release A: real finalized pairing/prepare bodies and Calcutta source/trigg
     const saved=read().matches.find(m=>m.matchId===rows[0].match_id);
     assert.equal(saved.locked,false);assert.equal(saved.detailsManaged,true);assert.equal(saved.participantCount,2);
     assert.equal(x.call('PREPARE_SCORING_CONTEXT',{scoring_context:{match_id:rows[0].match_id}}).ok,true);
+  });
+
+  await t.test('098 explicit Singles consent follows actual Release A initialization and preparation without financial changes',()=>{
+    const x=scenario();
+    x.s('create table scoring_authority.net_skins_configuration_entries(tournament_id text,round_number integer)');
+    assert.equal(x.pair(rows[0]).ok,true);
+    assert.equal(x.call('PREPARE_SCORING_CONTEXT',{scoring_context:{match_id:rows[0].match_id}}).ok,true);
+    const preserved=x.fingerprint();
+    const read=()=>rpc(c,x.database,'read_production_net_skins_entries_v1',scope('READ')).data.rounds.find(r=>r.roundNumber===3);
+    const r=read();assert.equal(r.entrants.length,2);assert.equal(r.enteredCount,0);
+    const request=scope('SAVE',{round_number:3,expected_revision:r.revision,field_fingerprint:r.fieldFingerprint,
+      operation_request_id:randomUUID(),configured:true,
+      entries:r.entrants.map((e,i)=>({key:e.key,bindingFingerprint:e.bindingFingerprint,entered:i===0}))});
+    assert.equal(rpc(c,x.database,'save_production_net_skins_entries_v1',request).revision,1);
+    assert.equal(read().enteredCount,1);assert.equal(read().scope,'PLAYER');
+    assert.equal(x.fingerprint(),preserved,'only the explicit consent revision changed');
+    const full=JSON.parse(x.s("select production_control.full_net_match_v1('2026','2026-R3-1')"));
+    assert.equal(full.authorityAvailable,true);assert.equal(full.entries.length,2);
+    assert.ok(full.entries.every(e=>e.scope==='PLAYER'&&!e.complete&&e.totalFullNet===null));
   });
 
   await t.test('095 mixed existing/new Round Save-All, pre-delete evidence and atomic changed retry',()=>{

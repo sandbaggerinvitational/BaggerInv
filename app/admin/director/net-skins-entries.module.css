@@ -1,0 +1,16 @@
+.workspace { display: grid; gap: 1rem; min-width: 0; margin-top: 1.25rem; }
+.workspace h3, .workspace h4, .workspace p { margin: 0; }
+.workspace p { line-height: 1.5; }
+.round { border: 1px solid #b7bdb3; border-radius: 14px; padding: 1rem; display: grid; gap: 1rem; min-width: 0; }
+.round header { display: flex; flex-wrap: wrap; gap: .5rem 1rem; justify-content: space-between; }
+.round header p { margin-top: .35rem; }
+.field { display: grid; }
+.entrant { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .7rem 0; border-top: 1px solid #ccd0c7; }
+.entrant > div { min-width: 0; display: grid; gap: .3rem; overflow-wrap: anywhere; }
+.toggle { display: flex; align-items: center; gap: .65rem; min-height: 44px; cursor: pointer; }
+.toggle input { width: 22px; height: 22px; flex-shrink: 0; accent-color: #164b3b; }
+.workspace button { min-height: 44px; justify-self: start; padding: .6rem 1rem; background: #164b3b; color: white; border-radius: 8px; border: 1px solid transparent; font: inherit; }
+.workspace button:disabled { background: #e1e3de; color: #50584e; }
+.workspace :focus-visible { outline: 3px solid #806325; outline-offset: 3px; }
+.warning { border-left: 4px solid #806325; background: #faf3e4; color: #3e3421; padding: .8rem; display: grid; gap: .6rem; }
+@media(max-width: 400px) { .entrant { align-items: flex-start; flex-wrap: wrap; } .round { padding: .75rem; } }

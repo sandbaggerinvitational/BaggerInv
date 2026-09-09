@@ -16,6 +16,8 @@ const providerInventory = "202608260038_production_provider_preview_target_inven
 const pgBin = "/opt/homebrew/opt/postgresql@17/bin";
 const bin = Object.fromEntries(["createdb", "initdb", "pg_ctl", "psql"]
   .map((name) => [name, path.join(pgBin, name)]));
+export { available, createCluster, destroyCluster, run, bin, environment, sql,
+  sqlFile, installSupabaseCompatibility, installAnnualPlatformFixture, migrationNames };
 
 const frozenMutations = [
   "public.configure_production_calcutta_v1(jsonb)",

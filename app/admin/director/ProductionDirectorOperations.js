@@ -6,6 +6,7 @@ import { createClientMutationOperationIdentityRegistry } from "../../../lib/clie
 import ProductionDraftEditor from "./ProductionDraftEditor.js";
 import ProductionGuideEditor from "./ProductionGuideEditor.js";
 import ProductionPredictionSettingsEditor from "./ProductionPredictionSettingsEditor.js";
+import ProductionNetSkinsEntries from "./ProductionNetSkinsEntries.js";
 import styles from "./production-director.module.css";
 
 const clean = (value) => String(value ?? "").trim();
@@ -358,15 +359,27 @@ function NetSkinsCard({ data, refresh }) {
   const [queued, setQueued] = useState(false);
   const [message, setMessage] = useState("");
   const run = async (action) => {
-    if (action === "configure" && !globalThis.confirm?.("Configure Production Net Skins from the current canonical pairings and handicap inputs? No facts will be invented.")) return;
+    if (action === "configure" && !globalThis.confirm?.("Configure Net Skins using the saved explicit Round entries? Only saved In entries participate. This does not publish results.")) return;
     const intent = { domain: "NET_SKINS", action, revision: state.configurationRevision };
     setBusy(action); setMessage("");
     try {
+      let entrySelection = {};
+      if (action === "configure") {
+        const saved = await jsonRequest("/api/director/net-skins-entries");
+        const rounds = (saved.data?.rounds || []).filter(round => round.configured);
+        if (!rounds.length || rounds.some(round => round.state !== "ENTRIES_SAVED" || !round.enteredCount)) {
+          throw new Error("Save and review explicit In entries for each configured Round first.");
+        }
+        entrySelection = { eligibleRoundNumbers: rounds.map(round => round.roundNumber),
+          entryRevisions: Object.fromEntries(rounds.map(round => [round.roundNumber, round.revision])) };
+        intent.entryRevisions = entrySelection.entryRevisions;
+      }
       const requestFingerprint = await fingerprint(intent);
       const result = await jsonRequest("/api/admin/production-net-skins-v1", {
         action,
         expectedConfigurationRevision: state.configurationRevision,
         requestFingerprint,
+        ...entrySelection,
       });
       await fingerprint(intent, true);
       setQueued(action === "enqueue");
@@ -374,9 +387,7 @@ function NetSkinsCard({ data, refresh }) {
       await refresh();
       return result;
     } catch (error) {
-      setMessage(upper(state.state) === "NOT_CONFIGURED"
-        ? "Net Skins will become configurable once tournament pairings and handicap inputs are complete."
-        : error.message);
+      setMessage(error.message);
     } finally { setBusy(""); }
   };
   return <article className={styles.operationCard}>
@@ -401,10 +412,12 @@ function NetSkinsCard({ data, refresh }) {
       </article>)}</div> : <div className={styles.allReady}><strong>Canonical inputs are ready</strong><span>All certified Net Skins V1 prerequisites are complete.</span></div>}
     </details> : <div className={styles.inlineNotice}>Actionable Net Skins readiness is temporarily unavailable. No configuration action is offered.</div>}
     <div className={styles.actionRow}>
-      {upper(state.state) === "NOT_CONFIGURED" ? <button type="button" disabled={Boolean(busy) || !readiness?.canConfigure} onClick={() => run("configure")}>{busy ? "Checking readiness…" : readiness?.canConfigure ? "Configure from Canonical Inputs" : "Complete Canonical Setup First"}</button> : <button type="button" disabled={Boolean(busy)} onClick={() => run("enqueue")}>Queue Recalculation</button>}
+      <button type="button" disabled={Boolean(busy)} onClick={() => run("configure")}>Configure from Saved Entries</button>
+      {upper(state.state) !== "NOT_CONFIGURED" ? <button type="button" disabled={Boolean(busy)} onClick={() => run("enqueue")}>Queue Recalculation</button> : null}
       {queued ? <button type="button" disabled={Boolean(busy)} onClick={() => run("process")}>Process Queued Calculation</button> : null}
     </div>
     <PrivateJobList title="Net Skins calculations" jobs={privateState?.jobs || []} />
+    <ProductionNetSkinsEntries />
     {message ? <p className={styles.operationMessage} role="status">{message}</p> : null}
   </article>;
 }

@@ -155,6 +155,7 @@ async function importTournamentSetupServer() {
   const contractUrl = new URL("../lib/production-tournament-setup-contract.js", import.meta.url).href;
   const transformed = serverSource
     .replace('import "server-only";\n', "")
+    .replace('from "./net-skins-entry-workspace.js";', `from "${new URL('../lib/net-skins-entry-workspace.js',import.meta.url).href}";`)
     .replace(
       /import \{\s*assertProductionCutoverActivation,?\s*\} from "\.\/production-cutover-activation-contract\.js";/,
       'function assertProductionCutoverActivation() { return { state: "SCORING_COMMITTED", readCutoverPhase: "OBSERVATION" }; }',

@@ -60,8 +60,8 @@ test("admin route forwards both exact revision fingerprints", () => {
 });
 
 test("bounded worker reuses the existing Calcutta engine and binds both current revisions", () => {
-  assert.match(server, /calculateCalcuttaFromSupabaseViews/);
-  assert.match(server, /CALCUTTA_ENGINE_VERSION/);
+  assert.match(server, /calculateProductionFullNetCalcutta/);
+  assert.match(server, /FULL_NET_CALCUTTA_ENGINE/);
   assert.match(server, /claimedConfigurationFingerprint !== configurationFingerprint/);
   assert.match(server, /claimedAuctionFingerprint !== auctionFingerprint/);
   assert.match(server, /\["PROVISIONAL", "OFFICIAL"\]\)\.has\(state\)/);

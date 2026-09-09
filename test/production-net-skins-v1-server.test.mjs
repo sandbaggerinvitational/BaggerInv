@@ -33,9 +33,11 @@ test("Production Net Skins server exposes only the exact reviewed RPC allowlist"
   assert.doesNotMatch(server, /google-sheets|sheets\.googleapis|docs\.google\.com/);
 });
 
-test("Director configuration is fixed to the approved V1 rules and optimistic revision", () => {
-  assert.match(server, /eligibleRoundNumbers = EXACT_ROUNDS/);
-  assert.match(server, /rounds\.length !== EXACT_ROUNDS\.length/);
+test("Director configuration requires explicit opt-ins and configured Round selection under unchanged rules", () => {
+  assert.match(server, /Array\.isArray\(entryRevisions\)/);
+  assert.match(server, /entry_revisions: entryRevisions/);
+  assert.doesNotMatch(server, /opt_in_entries/);
+  assert.match(server, /rounds\.some\(round => !EXACT_ROUNDS\.includes\(round\)\)/);
   assert.match(server, /publication_policy: "OFFICIAL_ONLY"/);
   assert.match(server, /expected_configuration_revision: exactInteger/);
   assert.match(server, /authorization: \{[\s\S]*auth_user_id: authUserId[\s\S]*player_id: playerId[\s\S]*role: "DIRECTOR"/);
@@ -43,10 +45,10 @@ test("Director configuration is fixed to the approved V1 rules and optimistic re
 });
 
 test("Production worker reuses the shared JS engine and has claim, complete, and safe failure paths", () => {
-  assert.match(server, /calculateNetSkinsFromSupabaseView/);
+  assert.match(server, /calculateProductionFullNetSkins/);
   assert.match(server, /established display-number compatibility adapter/);
   assert.match(server, /result_state: resultPayload\.finalized === true \? "OFFICIAL" : "PROVISIONAL"/);
-  assert.match(server, /engine_version: NET_SKINS_ENGINE_VERSION/);
+  assert.match(server, /engine_version: FULL_NET_SKINS_ENGINE/);
   assert.match(server, /complete_production_net_skins_v1_recalculation/);
   assert.match(server, /fail_production_net_skins_v1_recalculation/);
   assert.match(server, /Net Skins recalculation is temporarily unavailable\./);
@@ -74,7 +76,9 @@ test("Director route is Production-only, same-origin, entitlement-bound, and has
   assert.match(route, /assertProductionCutoverRequest\(request, process\.env, \{ requireOrigin: true \}\)/);
   assert.match(route, /authorizePreviewDirector\(\{[\s\S]*allowBootstrap: false/);
   assert.match(route, /new Set\(\["configure", "enqueue", "process"\]\)/);
-  assert.match(route, /eligibleRoundNumbers: \[1, 2, 3\]/);
+  assert.match(route, /eligibleRoundNumbers: input\.eligibleRoundNumbers/);
+  assert.match(route, /entryRevisions: input\.entryRevisions/);
+  assert.doesNotMatch(route, /optInEntries/);
   assert.doesNotMatch(route, /export async function GET|export const GET/);
   assert.doesNotMatch(route, /Google|google-sheets|Passport|Calcutta/);
 });
