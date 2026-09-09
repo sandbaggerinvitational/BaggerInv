@@ -4,6 +4,8 @@ import { access, mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
+import { scrambleView, expectedScramble } from "./fixtures/match-center-handicaps.mjs";
+import { matchCenterScrambleHandicaps } from "../lib/match-center-handicap-presentation.js";
 
 import {
   courseHandicap,
@@ -144,4 +146,31 @@ test("JavaScript handicap previews match PostgreSQL numeric formulas and final r
   const turtleCourse = [12.1, 3.5, 8.2, -0.8].map((handicap) => courseHandicap(handicap, 71.9, 136, 72));
   assert.ok(turtleCourse.every((value, index) => Math.abs(value - Number(postgres.turtleCourse[index])) < 1e-12));
   assert.deepEqual(playingHandicaps("BB", turtleCourse).playerStrokes, postgres.turtleBb);
+
+  // Install the actual, unmodified canonical function (not a mocked formula)
+  // against disposable tables, then certify all six Production-shaped pairings.
+  const canonical = migration.match(/create or replace function production_control\.handicap_v1_match_context\([\s\S]*?\n\$\$;/)?.[0];
+  assert.ok(canonical);
+  sql(cluster, `create schema production_control; create schema scoring_authority;
+    create table scoring_authority.matches(match_id text,tournament_id text,scoring_snapshot_id text,format text);
+    create table scoring_authority.scoring_snapshots(snapshot_id text,match_id text,tournament_id text,
+      slope numeric,rating numeric,par numeric,participant_configuration jsonb,team_configuration jsonb);
+    create table scoring_authority.match_participants(match_id text,player_id text,team_side integer,player_slot integer);
+    create table scoring_authority.handicap_revision_entries(revision_id uuid,tournament_id text,player_id text,tournament_handicap numeric);
+    ${canonical}`);
+  const fixture = scrambleView();
+  const revision = '00000000-0000-4000-8000-000000000007';
+  const quote = value => `'${String(value).replaceAll("'", "''")}'`;
+  for (const [i, entry] of fixture.matches.entries()) {
+    const id = quote(entry.match.match_id), snapshot = quote(entry.snapshot.snapshot_id);
+    sql(cluster, `insert into scoring_authority.matches values (${id},'2026',${snapshot},'SC');
+      insert into scoring_authority.scoring_snapshots values (${snapshot},${id},'2026',138,72.7,72,'{}','{}');
+      ${entry.participants.map(p => `insert into scoring_authority.match_participants values (${id},${quote(p.player_id)},${p.team_side},${p.player_slot});
+        insert into scoring_authority.handicap_revision_entries values ('${revision}','2026',${quote(p.player_id)},${p.handicap_index});`).join('\n')}`);
+    const actual = JSON.parse(sql(cluster, `select production_control.handicap_v1_match_context(${id},'${revision}');`));
+    const expected = [actual.team_1_playing_handicap,actual.team_2_playing_handicap,actual.team_1_strokes,actual.team_2_strokes];
+    assert.deepEqual(expected,expectedScramble[i]);
+    const display = matchCenterScrambleHandicaps(fixture).get(entry.match.match_id);
+    assert.deepEqual([display.team1PlayingHcp,display.team2PlayingHcp,display.team1Stroke,display.team2Stroke],expected);
+  }
 });
