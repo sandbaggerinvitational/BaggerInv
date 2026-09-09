@@ -89,6 +89,10 @@ const actor = {
   authUserId: "00000000-0000-4000-8000-000000000001",
 };
 
+// Shared only by isolated successor-migration PostgreSQL certification.
+export { createCluster, destroyCluster, available, fixture, sql, sqlFile, rpc,
+  scope, json, run, environment, bin, actor };
+
 function scope(operation, overrides = {}) {
   return {
     contract_version: "production-tournament-setup-v1",
