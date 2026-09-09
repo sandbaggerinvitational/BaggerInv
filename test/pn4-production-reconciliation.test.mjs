@@ -82,26 +82,40 @@ test("release 71 preserved Production and the exact certified pairing workspace"
   }
 });
 
-test("Match Center combination preserves every release-72 file and the exact certified runtime payload", async () => {
+test("immutable release73 preserved every release-72 file and the exact certified runtime payload", async () => {
   const baseline = "a51dab2de096cd6576f027afb28324559f705217";
   const certified = "8e2fe3597a505d05cd9f0a1e5f5890f267bc637b";
-  assert.equal(git("merge-base", baseline, "HEAD").trim(), baseline);
+  const release73 = "a792f2a058ccec42d0ce2eaf9e8046cc6b370c06";
+  assert.equal(git("merge-base", baseline, release73).trim(), baseline);
   const payload = new Set(git("diff", "--name-only", `${certified}^`, certified).trim().split("\n"));
   assert.equal(payload.size, 9);
   // Only this lineage certification and the release report are reconciled.
   const certification = new Set(["test/pn4-production-reconciliation.test.mjs",
     "docs/match-center-handicap-presentation-certification.md"]);
-  const changed = git("diff", "--name-only", baseline).trim().split("\n").filter(Boolean);
+  const changed = git("diff", "--name-only", baseline, release73).trim().split("\n").filter(Boolean);
   assert.ok(changed.every(path => payload.has(path) || certification.has(path)), "unexpected release-72 combination change");
-  const baselineBlobs = blobs(baseline), payloadBlobs = blobs(certified);
+  const baselineBlobs = blobs(baseline), payloadBlobs = blobs(certified), releaseBlobs = blobs(release73);
   const paths = new Set([...baselineBlobs.keys(), ...payload]);
   for (const path of paths) {
     if (certification.has(path)) continue;
     const expected = (payload.has(path) ? payloadBlobs : baselineBlobs).get(path);
-    const actual = await readFile(new URL(path, root));
-    assert.equal(createHash("sha1").update(`blob ${actual.length}\0`).update(actual).digest("hex"), expected, path);
+    assert.equal(releaseBlobs.get(path), expected, path);
   }
-  assert.equal(git("diff", baseline, "--", "supabase/production_migrations").trim(), "", "all installed migration sources preserved");
+  assert.equal(git("diff", baseline, release73, "--", "supabase/production_migrations").trim(), "", "all installed migration sources preserved");
+});
+
+test("decimal-display correction preserves all release73 runtime outside the exact presentation allowlist",async()=>{
+  const baseline='a792f2a058ccec42d0ce2eaf9e8046cc6b370c06';
+  assert.equal(git('merge-base',baseline,'HEAD').trim(),baseline);
+  const allowed=new Set(['app/PublicMatchCard.js','app/live/TournamentDashboard.js','lib/formatters.js','lib/tournament-live-supabase.js',
+    'lib/match-center-player-handicap-display.js']);
+  for(const [path,expected] of blobs(baseline)) {
+    if(allowed.has(path)||path.startsWith('test/')||path.startsWith('docs/'))continue;
+    const actual=await readFile(new URL(path,root));
+    assert.equal(createHash('sha1').update(`blob ${actual.length}\0`).update(actual).digest('hex'),expected,path);
+  }
+  const changed=git('diff','--name-only',baseline).trim().split('\n').filter(Boolean);
+  assert.ok(changed.every(p=>allowed.has(p)||p.startsWith('test/')||p.startsWith('docs/')));
 });
 
 test("PN-4 shared web/PWA projection retains exact Production ordering, identity and explicit null semantics", async () => {

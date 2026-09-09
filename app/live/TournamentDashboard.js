@@ -8,7 +8,7 @@ import MatchStatusBlock from "../MatchStatusBlock";
 import TournamentIdentityHeader from "../TournamentIdentityHeader";
 import MatchFilterEmptyState from "./MatchFilterEmptyState";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
-import { formatHandicap, formatStatusLabel, formatTeamPoints } from "../../lib/formatters";
+import { formatHandicap, formatStatusLabel, formatTeamPoints, playerDisplayHandicap } from "../../lib/formatters";
 import { formatStoredMatchResult } from "../../lib/match-result";
 import { filterMatches, matchState, relativeUpdatedLabel, resolveMatchFilterEmptyState } from "../../lib/live-match-ux";
 import { fetchWithTransientRetry } from "../../lib/transient-fetch";
@@ -68,7 +68,7 @@ function finalResultParts(match, tournament) {
 function playerMeta(player, format) {
   if (!player) return "";
   const values = [];
-  if (hasValue(player.playingHcp)) values.push(`HCP ${formatHandicap(player.playingHcp)}`);
+  if (hasValue(playerDisplayHandicap(player))) values.push(`HCP ${formatHandicap(playerDisplayHandicap(player))}`);
   if (format !== "SC" && hasValue(player.stroke)) values.push(Number(player.stroke) === 0 ? "No strokes" : `+${player.stroke} stroke${Number(player.stroke) === 1 ? "" : "s"}`);
   return values.join(" • ");
 }

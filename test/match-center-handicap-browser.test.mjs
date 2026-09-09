@@ -6,6 +6,7 @@ import {createServer} from 'node:http';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {scrambleView} from './fixtures/match-center-handicaps.mjs';
+import {bestBallView} from './fixtures/best-ball-decimal-handicaps.mjs';
 import {tournamentLiveDataFromSupabaseView} from '../lib/tournament-live-supabase.js';
 const require=createRequire(import.meta.url),root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 test('real Match Center cards preserve one-decimal semantics and layout at all five widths',{timeout:120000},async t=>{
@@ -30,6 +31,9 @@ test('real Match Center cards preserve one-decimal semantics and layout at all f
     const si=structuredClone(bb);si.id='certification-SI';si.format='SI';si.formatName='Singles';si.team1Players=si.team1Players.slice(0,1);si.team2Players=si.team2Players.slice(0,1);
     data.rounds[0].matches.push(bb,si);
   }
+  const bbView=bestBallView();
+  current.rounds.push(...tournamentLiveDataFromSupabaseView(bbView,{matchCenterHandicapPresentation:true}).rounds);
+  previous.rounds.push(...tournamentLiveDataFromSupabaseView(bbView).rounds);
   const html='<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;font:16px Arial}*{box-sizing:border-box}#root{max-width:1400px;margin:auto;padding:12px}#previous{margin-top:40px}</style><div id="root"></div><script>window.__fixture='+JSON.stringify({current,previous}).replaceAll('<','\\u003c')+'</script><script src="/bundle.js"></script>';
   const server=createServer(async(req,res)=>{res.setHeader('Content-Type',req.url==='/bundle.js'?'text/javascript':'text/html');res.end(req.url==='/bundle.js'?await readFile(path.join(directory,'bundle.js')):html);});
   await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>{server.closeAllConnections();server.close(r);}));
@@ -45,6 +49,11 @@ test('real Match Center cards preserve one-decimal semantics and layout at all f
   for(const text of ['HCP 7.0','HCP (0.8)','HCP 0.0','HCP 7.8'])assert.equal(await bb.getByText(text,{exact:true}).count(),1);
   assert.equal(await bb.getByText('3 strokes received',{exact:false}).count(),1);
   assert.equal(await page.locator('#current').getByText('0 strokes received',{exact:false}).count(),0);
+  const clay=page.locator('#current #match-2026-R1-4');
+  assert.equal(await clay.getByText('HCP 14.6',{exact:true}).count(),1);
+  assert.equal(await clay.getByText('HCP 15.0',{exact:true}).count(),0);
+  assert.equal(await clay.getByText('14 strokes received',{exact:false}).count(),1);
+  assert.equal(await page.locator('#previous #match-2026-R1-4').getByText('HCP 15.0',{exact:true}).count(),1);
   for(const width of [390,430,820,1280,1440]) {
     await page.setViewportSize({width,height:1000});
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`document overflow ${width}`);
@@ -58,6 +67,7 @@ test('real Match Center cards preserve one-decimal semantics and layout at all f
       assert.ok(layout.labels.every(r=>r.x>=layout.current.x&&r.right<=layout.current.right&&r.bottom<=layout.current.bottom),`contained labels ${width}`);
     }
     await page.locator('#current').screenshot({path:path.join(directory,`match-handicaps-${width}.png`)});
+    await clay.screenshot({path:path.join(directory,`best-ball-decimal-${width}.png`)});
   }
   assert.deepEqual(errors,[]);
 });

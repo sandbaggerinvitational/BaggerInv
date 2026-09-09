@@ -6,6 +6,9 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 import { scrambleView, expectedScramble } from "./fixtures/match-center-handicaps.mjs";
 import { matchCenterScrambleHandicaps } from "../lib/match-center-handicap-presentation.js";
+import { bestBallView, bestBallRows } from "./fixtures/best-ball-decimal-handicaps.mjs";
+import { matchCenterPlayerHandicapDisplays } from "../lib/match-center-player-handicap-display.js";
+import { formatHandicap } from "../lib/formatters.js";
 
 import {
   courseHandicap,
@@ -172,5 +175,23 @@ test("JavaScript handicap previews match PostgreSQL numeric formulas and final r
     assert.deepEqual(expected,expectedScramble[i]);
     const display = matchCenterScrambleHandicaps(fixture).get(entry.match.match_id);
     assert.deepEqual([display.team1PlayingHcp,display.team2PlayingHcp,display.team1Stroke,display.team2Stroke],expected);
+  }
+  // Existing approved entries are shared with R2. Exercise the actual installed
+  // context function for every current R1 pairing, not another JS scoring formula.
+  const bb = bestBallView();
+  for (const [i, entry] of bb.matches.entries()) {
+    const id=quote(entry.match.match_id), snapshot=quote(entry.snapshot.snapshot_id);
+    sql(cluster, `insert into scoring_authority.matches values (${id},'2026',${snapshot},'BB');
+      insert into scoring_authority.scoring_snapshots values (${snapshot},${id},'2026',136,71.9,72,'{}','{}');
+      ${entry.participants.map(p=>`insert into scoring_authority.match_participants values (${id},${quote(p.player_id)},${p.team_side},${p.player_slot});`).join('\n')}`);
+    const actual=JSON.parse(sql(cluster,`select production_control.handicap_v1_match_context(${id},'${revision}');`));
+    const participants=[...actual.participant_configuration.team_1,...actual.participant_configuration.team_2];
+    const labels=matchCenterPlayerHandicapDisplays(bb).get(entry.match.match_id);
+    participants.forEach((p,j)=>{
+      assert.equal(p.playing_handicap,bestBallRows[i][j][2]);
+      assert.equal(p.final_strokes,bestBallRows[i][j][3]);
+      assert.ok(Math.abs(labels.get(p.id)-p.course_handicap)<1e-12);
+      assert.equal(formatHandicap(p.course_handicap),bestBallRows[i][j][4]);
+    });
   }
 });

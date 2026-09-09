@@ -4,7 +4,7 @@ import { formatOfficialMatchResult } from "../lib/match-result";
 import { Fragment } from "react";
 import AssetImage from "./AssetImage";
 import { teamLogo } from "../lib/asset-paths";
-import { formatHandicap, formatTeamPoints } from "../lib/formatters";
+import { formatHandicap, formatTeamPoints, playerDisplayHandicap } from "../lib/formatters";
 import { scorecardPresentationData } from "../lib/scorecard-presentation";
 import styles from "./live/live.module.css";
 import scoreStyles from "./score-typography.module.css";
@@ -47,7 +47,7 @@ function PlayerSlot({ player, showHandicap = true, showStroke = true, reserveStr
   return <div className={`${styles.playerSlot} ${reserveStrokeRow ? "" : styles.playerSlotWithoutStroke}`}>
     <strong><PlayerName player={player} participantPresentation={participantPresentation} /></strong>
     <span className={styles.playerHandicapSlot}>
-      {showHandicap && hasValue(player.playingHcp) ? <small>HCP {formatHandicap(player.playingHcp)}</small> : null}
+      {showHandicap && hasValue(playerDisplayHandicap(player)) ? <small>HCP {formatHandicap(playerDisplayHandicap(player))}</small> : null}
     </span>
     {reserveStrokeRow ? <span className={styles.playerStrokeSlot}>
       {showStroke && strokeText(player.stroke) ? <em className={styles.strokeBadge}>{strokeText(player.stroke)}</em> : null}

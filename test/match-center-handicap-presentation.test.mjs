@@ -75,11 +75,12 @@ test("BB and Singles semantic PH and official integer strokes are untouched", as
     view.matches[0].participants[0].playing_handicap=-1;view.matches[0].participants[0].final_strokes=0;
     view.matches[0].participants[1].playing_handicap=7;view.matches[0].participants[1].final_strokes=3;
     const normal=tournamentLiveDataFromSupabaseView(view).rounds[0].matches[0];
-    assert.deepEqual(tournamentLiveDataFromSupabaseView(view,{matchCenterHandicapPresentation:true}).rounds[0].matches[0],normal);
+    const displayed=tournamentLiveDataFromSupabaseView(view,{matchCenterHandicapPresentation:true}).rounds[0].matches[0];
+    assert.deepEqual(JSON.parse(JSON.stringify(displayed,(key,value)=>key==='displayHandicap'?undefined:value)),normal);
     assert.equal(normal.team1Players[0].playingHcp,-1);assert.equal(normal.team1Players[1].stroke,3);
   }
   for(const [value,expected] of [[7,'7.0'],[7.8,'7.8'],[0,'0.0'],[-.8,'(0.8)'],[null,'—']]) assert.equal(formatHandicap(value),expected);
-  for(const file of ['app/PublicMatchCard.js','app/live/TournamentDashboard.js','app/game-center/GameCenter.js']) {
+  for(const file of ['app/game-center/GameCenter.js']) {
     const source=await readFile(new URL(`../${file}`,import.meta.url),'utf8');
     assert.match(source,/formatHandicap\(player\.playingHcp\)/);
   }
