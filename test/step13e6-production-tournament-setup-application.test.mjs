@@ -600,6 +600,8 @@ test("Director route is Production-only, same-origin, Supabase-only, and fail-cl
 });
 
 test("guided Tournament Setup UI reviews every mutation and never reuses legacy Google editors", async () => {
+  const workspace = await source("app/admin/director/RoundPairingWorkspace.js");
+  const draftModel = await source("lib/round-pairing-workspace.js");
   const [panel, consoleSource, consoleModel] = await Promise.all([
     source("app/admin/director/ProductionTournamentSetupPanel.js"),
     source("app/admin/director/ProductionDirectorConsole.js"),
@@ -610,21 +612,21 @@ test("guided Tournament Setup UI reviews every mutation and never reuses legacy 
   ]) assert.match(panel, new RegExp(`\\[?"[a-z-]+", "${label.replace(/[&]/g, "&")}"\\]?|title="${label.replace("Roster", "Roster → Team Assignment")}"`), label);
 
   assert.match(panel, /const ENDPOINT = "\/api\/director\/tournament-setup"/);
-  assert.match(panel, /buildTournamentSetupMutation\(action,[\s\S]*setReview\(\{ action, values, description, expectedRevision/);
+  assert.match(panel, /buildTournamentSetupMutation\(action,[\s\S]*setReview\(\{ action, values, description, summary, expectedRevision/);
   assert.match(panel, /Review before commit/);
   assert.match(panel, /I reviewed the target, current state, downstream consequences, and immutable audit effect/);
   assert.match(panel, /disabled=\{!confirmed \|\| phase === "submitting"\}[\s\S]*Confirm Production Change/);
   assert.match(panel, /method: "POST",[\s\S]*credentials: "same-origin"/);
-  assert.match(panel, /Pairing incomplete\./);
-  assert.match(panel, /Clear Pairings/);
-  assert.match(panel, /buildTournamentSetupParticipantSlots\(match\.participants, match\.format\)/);
-  assert.match(panel, /Clearing is limited to strictly unstarted matches and preserves prior snapshots as audit evidence\./);
+  assert.match(workspace, /Canonical saved pairings/);
+  assert.match(workspace, /Clear Pairings/);
+  assert.match(draftModel, /buildTournamentSetupParticipantSlots\(match\.participants,match\.format\)/);
+  assert.match(workspace, /!match.canClearPairings/);
   assert.match(panel, /Creating a brand-new global course is deferred/);
   assert.match(panel, /Existing global course/);
   assert.match(panel, /Selecting an identity does not copy or invent a tee, rating, slope, par, or hole facts/);
-  assert.match(panel, /Review Match Details/);
-  assert.match(panel, /Existing matches only/);
-  assert.match(panel, /New match creation is deferred/);
+  assert.match(workspace, /Review Match Details/);
+  assert.match(workspace, /data.matches.filter/);
+  assert.doesNotMatch(workspace, /create-match/);
   assert.doesNotMatch(panel, /Create or update Round/);
   assert.doesNotMatch(panel, /Review Match<\/button>/);
   assert.match(panel, /Course ID<\/span><input value=\{draft\.courseId\} disabled/);

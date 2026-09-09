@@ -93,6 +93,16 @@
 .awardCard h4 { margin: .1rem 0; color: #143d33; font-family: Georgia, serif; font-size: 1.1rem; }
 .awardCard small { color: #66736d; }
 .dangerButton { border-color: #8b3328 !important; background: #8b3328 !important; }
+.roundTabs { display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:1rem; }
+.roundTabs button[aria-selected="true"] { outline:3px solid #bb9758; outline-offset:2px; }
+.roundActions { padding:1rem; border:1px solid #d3dfd5; border-radius:.8rem; background:#f1f6f0; }
+.roundActions h4, .pairingHeading h4 { margin:.25rem 0; }
+.pairingHeading { padding:1rem; }
+.roundReview { display:grid; gap:.75rem; overflow-wrap:anywhere; }
+.roundReview article { border:1px solid #d8d0c1; border-radius:.6rem; padding:.75rem; }
+.matchCard, .matchList, .roundActions, .roundReview, .card { min-width:0; overflow-wrap:anywhere; }
+.buttonRow button, .roundActions button, .roundTabs button { max-width:100%; min-height:44px; white-space:normal; }
+.card :focus-visible, .review :focus-visible { outline:3px solid #b88124; outline-offset:3px; }
 
 @media (max-width: 760px) {
   .hero, .sectionHeader { flex-direction: column; }
