@@ -55,4 +55,5 @@ export function request(path = "session", { method = "GET", headers = {}, body }
     headers: { host: "baggerinv.com", "x-bagger-mobile-contract": PRODUCTION_NATIVE_CONTRACT, ...headers },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
 }
-export const productionContext = () => ({ runtime: { ...runtime }, revocationGeneration: "synthetic-generation-1" });
+export const productionContext = () => ({ runtime: { ...runtime }, revocationGeneration: "synthetic-generation-1",
+  participant: { ...actor, tournament: { id: actor.tournamentId }, membership: { active: true }, contextRevision: 1 } });

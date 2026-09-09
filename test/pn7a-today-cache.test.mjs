@@ -10,7 +10,7 @@ import { issueMobileNativeCertification } from "../lib/mobile-native-certificati
 import { environment, authorityFixtures, actor, productionContext, request } from "./fixtures/pn2-native.mjs";
 
 const at = new Date("2026-09-24T12:00:00.000Z");
-const identity = { ...actor, context: { ...actor, membership: { active: true },
+const identity = { ...actor, context: { ...actor, membership: { active: true }, contextRevision: 1,
   tournament: { id: "2026" }, team: { id: "T1", name: "Synthetic team" } } };
 const rpc = (data) => ({ payload: { ok: true, data } });
 function home() {

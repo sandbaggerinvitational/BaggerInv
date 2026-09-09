@@ -20,7 +20,7 @@ const code = (k) => `NATIVE_${k.toUpperCase()}_DISABLED`;
 function issue(env, extra = {}) { return issueMobileNativeCertification({ ...actor, env, productionContext: productionContext(), ...extra }); }
 function identityDependencies(env, fixtures) {
   return { nativeAdmission: fixtures.dependencies, verifyAccessToken: async () => ({ status: "active", authUserId: actor.authUserId }),
-    readForAuth: async () => ({ payload: { ok: true, data: { ...actor, tournament: { id: "2026" }, membership: { active: true },
+    readForAuth: async () => ({ payload: { ok: true, data: { ...actor, tournament: { id: "2026" }, membership: { active: true }, contextRevision: 1,
       matches: [{ matchId: "SYNTHETIC-M1", format: "SI" }] } } }),
     readCurrentTournamentRuntime: async () => fixtures.current };
 }
@@ -264,7 +264,7 @@ test("PN-2 certification-only requires a verified canonical challenge and rechec
       readIdentity: async () => {
         identityReads++;
         if (closeDuringIdentity && identityReads === 2) env.PRODUCTION_NATIVE_CAPABILITIES = JSON.stringify(controls());
-        return { payload: { ok: true, data: { ...actor, tournament: { id: "2026" }, membership: { active: true } } } };
+        return { payload: { ok: true, data: { ...actor, tournament: { id: "2026" }, membership: { active: true }, contextRevision: 1 } } };
       },
       issueCertification: (input) => { issued++; return issueMobileNativeCertification(input); },
     };
@@ -285,7 +285,7 @@ test("PN-2 auth rechecks before provider delivery after asynchronous eligibility
       ...actor, email: "synthetic@example.test", verificationType: "email" } } }),
     readIdentityForRequest: async () => {
       env.PRODUCTION_NATIVE_CAPABILITIES = JSON.stringify(controls());
-      return { payload: { ok: true, data: { ...actor, tournament: { id: "2026" }, membership: { active: true } } } };
+      return { payload: { ok: true, data: { ...actor, tournament: { id: "2026" }, membership: { active: true }, contextRevision: 1 } } };
     },
     authClient: {}, sendOtp: async () => { deliveries++; return {}; }, recordDelivery: async () => ({}),
   };
