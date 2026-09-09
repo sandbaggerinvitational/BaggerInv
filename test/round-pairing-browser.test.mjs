@@ -52,5 +52,26 @@ test('real Director client preserves drafts across saves/tabs and is responsive 
   }
   await page.getByRole('checkbox').check();await page.getByRole('button',{name:'Confirm Round Pairings',exact:true}).click();await page.getByText('Setup revision 14',{exact:true}).first().waitFor();
   const requests=await page.evaluate(()=>window.__requests);assert.equal(requests.filter(r=>r.action==='replace-round-pairings').length,1);assert.equal(requests.at(-1).matches.length,6);
+  // Actual client acceptance from the canonical nested release-70-shaped reader.
+  await page.goto(`http://127.0.0.1:${server.address().port}/?release70`);
+  await page.getByRole('button',{name:'Matches & Pairings',exact:true}).click();
+  assert.equal(await page.getByRole('article').count(),6);
+  const pairs=[['JP01','MH01','MS01','JS01'],['DT01','AM01','CP01','JK01'],['HM01','BA01','MM01','NJ01'],['CL01','BC01','CM01','CS01']];
+  for(let n=1;n<=4;n++)assert.deepEqual(await card(n).locator('.pairingBoard select').evaluateAll(nodes=>nodes.map(n=>n.value)),pairs[n-1]);
+  for(let n=5;n<=6;n++)assert.deepEqual(await card(n).locator('.pairingBoard select').evaluateAll(nodes=>nodes.map(n=>n.value)),['','','','']);
+  const remaining=[['CB01','JK02','PN01','RM01'],['MS02','MB01','TL01','WO01']];
+  for(let n=5;n<=6;n++)for(let s=0;s<4;s++)await card(n).locator('.pairingBoard select').nth(s).selectOption(remaining[n-5][s]);
+  await card(5).getByRole('button',{name:'Review Match 5 Pairings',exact:true}).click();
+  assert.equal(await page.evaluate(()=>document.activeElement.id),'tournament-setup-review-title');
+  await page.locator('.review').getByText('Approved handicap revision: 7 · a19f4f10-28f7-46a9-8434-159cd07cc4b6',{exact:true}).waitFor();
+  assert.equal(await page.locator('.review dl').first().locator('dd').nth(1).innerText(),'12');
+  await page.getByRole('button',{name:'Return to Editing'}).click();
+  await page.getByRole('button',{name:'Review All Round 1 Pairings',exact:true}).click();
+  await page.getByText('This will update 2 matches and 8 Player assignments.',{exact:false}).waitFor();
+  for(const width of [390,430,820,1280,1440]){
+    await page.setViewportSize({width,height:1000});
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`canonical review no overflow ${width}`);
+  }
+  assert.deepEqual(await page.evaluate(()=>window.__requests),[],'canonical review acceptance submits no writes');
   assert.deepEqual(errors,[]);
 });

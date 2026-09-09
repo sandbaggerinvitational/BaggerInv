@@ -52,9 +52,19 @@ test("combined lineage preserves current Production and the exact certified pair
   const payload = new Set(git("diff", "--name-only", `${workspace}^`, workspace).trim().split("\n"));
   assert.equal(payload.size, 16);
   // Only these two release-scope tests are reconciled; no runtime exceptions.
-  const certification = new Set(["test/pn2-native-admission.test.mjs", "test/pn4-production-reconciliation.test.mjs"]);
+  const certification = new Set(["test/pn2-native-admission.test.mjs", "test/pn4-production-reconciliation.test.mjs",
+    "test/step13e6-production-tournament-setup-postgres.integration.test.mjs",
+    "test/round-pairing-browser.test.mjs", "test/fixtures/round-workspace-browser.js"]);
+  const readCorrection = new Set([
+    "supabase/production_migrations/202609090096_production_round_pairing_read_envelope_v1.sql",
+    "test/round-pairing-read-envelope.test.mjs", "test/fixtures/round-read-envelope.mjs",
+    "docs/round-pairing-read-envelope-certification.md"]);
   const changed = git("diff", "--name-only", currentProduction).trim().split("\n").filter(Boolean);
-  assert.ok(changed.every(path => payload.has(path) || certification.has(path)), "unexpected combined-release change");
+  assert.ok(changed.every(path => payload.has(path) || certification.has(path) || readCorrection.has(path)), "unexpected combined-release change");
+  const release70='4da1d472b2ad27b8c05e6fb80ddb1903bfd73536';
+  assert.equal(git('merge-base',release70,'HEAD').trim(),release70);
+  assert.ok(git('diff','--name-only',release70).trim().split('\n').filter(Boolean)
+    .every(path=>certification.has(path)||readCorrection.has(path)), 'only reader migration and certification may change after release70');
   const blobs = revision => new Map(git("ls-tree", "-rz", revision).split("\0").filter(Boolean).map(row => {
     const [metadata, path] = row.split("\t");
     return [path, metadata.split(" ")[2]];
