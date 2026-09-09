@@ -188,6 +188,10 @@ test("overview model marks legacy Production controls and Preview tooling unavai
   assert.equal(model.capabilities.legacyProductionEditors, false);
   assert.equal(model.capabilities.previewTools, false);
   assert.equal(model.capabilities.productionOverview, true);
-  assert.equal(model.capabilities.handicapManagement, true);
+  // Installed overview contract fails closed when its handicap read is absent.
+  assert.equal(model.capabilities.handicapManagement, false);
   assert.deepEqual(model.handicaps, { available: false, currentRevision: null });
+  const withHandicaps = buildProductionDirectorOverview({ view, live, readState, handicaps: { current_revision: 7 } });
+  assert.equal(withHandicaps.capabilities.handicapManagement, true);
+  assert.deepEqual(withHandicaps.handicaps, { available: true, currentRevision: 7 });
 });

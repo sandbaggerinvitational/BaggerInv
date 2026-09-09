@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { tournamentLiveDataFromSupabaseView } from "../lib/tournament-live-supabase.js";
 import { mobileMatchesResult } from "../lib/mobile-v1-tournament-reads.js";
@@ -39,14 +40,33 @@ function view(format = "BB", status = "LIVE", withNulls = true) {
       tournament: { configuredStatus: "Live", currentRound: 1, timeZone: "America/Chicago" } } } };
 }
 
-test("PN-4 preserves all newer Production files and every non-mobile baseline implementation", async () => {
+test("combined lineage preserves current Production and the exact certified pairing workspace", async () => {
   assert.equal(git("merge-base", production, "HEAD").trim(), production);
   const newer = git("diff", "--name-only", shared, production).trim().split("\n");
   const imports = new Set(git("diff", "--name-only", shared, pn2).trim().split("\n"));
   assert.equal(newer.filter((path) => imports.has(path)).length, 0);
-  for (const path of git("ls-tree", "-r", "--name-only", production).trim().split("\n")) {
-    if (imports.has(path)) continue;
-    assert.equal(await readFile(new URL(path, root), "utf8"), git("show", `${production}:${path}`), path);
+
+  const currentProduction = "eeaa51bb5323fc34c3394ba12278e1731261d8d6";
+  const workspace = "169aac8017a862c4fe9c90e6d1a1fbd223ed3caa";
+  assert.equal(git("merge-base", currentProduction, "HEAD").trim(), currentProduction);
+  const payload = new Set(git("diff", "--name-only", `${workspace}^`, workspace).trim().split("\n"));
+  assert.equal(payload.size, 16);
+  // Only these two release-scope tests are reconciled; no runtime exceptions.
+  const certification = new Set(["test/pn2-native-admission.test.mjs", "test/pn4-production-reconciliation.test.mjs"]);
+  const changed = git("diff", "--name-only", currentProduction).trim().split("\n").filter(Boolean);
+  assert.ok(changed.every(path => payload.has(path) || certification.has(path)), "unexpected combined-release change");
+  const blobs = revision => new Map(git("ls-tree", "-rz", revision).split("\0").filter(Boolean).map(row => {
+    const [metadata, path] = row.split("\t");
+    return [path, metadata.split(" ")[2]];
+  }));
+  const baselineBlobs = blobs(currentProduction), workspaceBlobs = blobs(workspace);
+  const paths = new Set([...baselineBlobs.keys(), ...payload]);
+  for (const path of paths) {
+    if (certification.has(path)) continue;
+    const expected = (payload.has(path) ? workspaceBlobs : baselineBlobs).get(path);
+    const actual = await readFile(new URL(path, root));
+    const actualBlob = createHash("sha1").update(`blob ${actual.length}\0`).update(actual).digest("hex");
+    assert.equal(actualBlob, expected, path);
   }
 });
 

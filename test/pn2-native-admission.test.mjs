@@ -330,7 +330,11 @@ test("PN-2 all 21 compiled routes are classified and default-off denies before a
 });
 
 test("PN-2 web/PWA, Production authority, Preview safeguards and canonical persistence are unchanged", async () => {
-  const diff = execFileSync("git", ["diff", "--name-only", base], { cwd: root, encoding: "utf8" }).trim().split("\n");
+  // Certify the immutable PN-2 release scope, not unrelated later releases.
+  // Current authority implementations below still have to match byte-for-byte;
+  // the combined-lineage guard separately checks the entire current release.
+  const pn2Release = "614c0fbe4fb336fb8f5be8d9c9d92c4600d511d9";
+  const diff = execFileSync("git", ["diff", "--name-only", `${pn2Release}^`, pn2Release], { cwd: root, encoding: "utf8" }).trim().split("\n");
   assert.ok(diff.every((path) => !path.startsWith("app/") || path.startsWith("app/api/mobile/v1/")));
   assert.ok(diff.every((path) => !path.startsWith("supabase/") && !path.startsWith("ios/")));
   for (const path of ["lib/mobile-native-development-authority.js", "lib/production-cutover-activation-contract.js", "lib/production-cutover-read-control.js",

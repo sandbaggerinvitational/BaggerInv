@@ -68,6 +68,12 @@ function safeFailure(error) {
     ? candidate.replace(/^PRODUCTION_TOURNAMENT_SETUP_/, "TOURNAMENT_SETUP_")
     : "TOURNAMENT_SETUP_OPERATION_FAILED";
   const messages = {
+    TOURNAMENT_SETUP_HANDICAP_REVISION_STALE: "Approved handicaps changed. Refresh saved state and review the round again; your selections are retained.",
+    TOURNAMENT_SETUP_MATCH_DETAILS_REQUIRED: "Save Match Details before committing pairings. Your Player selections will be preserved.",
+    TOURNAMENT_SETUP_ROUND_MATCH_SET_INVALID: "Review the complete current round match set.",
+    TOURNAMENT_SETUP_ROUND_COVERAGE_INCOMPLETE: "Assign every active roster Player exactly once in this round.",
+    TOURNAMENT_SETUP_PAIRING_FORMAT_MISMATCH: "The match format changed. Reload and review your selections.",
+    TOURNAMENT_SETUP_IDEMPOTENCY_CONFLICT: "This request identity belongs to a different change. Review again.",
     TOURNAMENT_SETUP_REVISION_STALE: "Tournament Setup changed since this page loaded. Refresh and review again.",
     TOURNAMENT_SETUP_MATCH_STARTED: "This match has started and its competition facts are locked.",
     TOURNAMENT_SETUP_MATCH_FROZEN: "This match has scoring or finalization dependencies and cannot be changed in Setup.",
@@ -103,7 +109,7 @@ function safeFailure(error) {
     TOURNAMENT_SETUP_OPERATION_REQUEST_CONFLICT: "That operation identity was already used for a different change.",
   };
   return {
-    error: messages[code] || "The Tournament Setup operation did not complete.",
+    error: [error?.matchId, error?.playerId, messages[code] || `The Tournament Setup operation did not complete (${code}).`].filter(Boolean).join(" — "),
     code,
   };
 }

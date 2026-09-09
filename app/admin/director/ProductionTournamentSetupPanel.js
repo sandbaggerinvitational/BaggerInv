@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
-  buildTournamentSetupParticipantSlots,
   buildTournamentSetupMutation,
-  productionTournamentFormatParticipantCount,
 } from "../../../lib/production-tournament-setup-contract.js";
 import ProductionTournamentAwardsPanel from "./ProductionTournamentAwardsPanel.js";
+import RoundPairingWorkspace, { PairingReview } from "./RoundPairingWorkspace.js";
+import { mergePairingDrafts, pairingDirty, detailsDirty } from "../../../lib/round-pairing-workspace.js";
 import styles from "./ProductionTournamentSetupPanel.module.css";
 
 const ENDPOINT = "/api/director/tournament-setup";
@@ -212,42 +212,6 @@ function CourseCard({ course, disabled, stage, newConfiguration = false }) {
   </details>;
 }
 
-function MatchesEditor({ data, disabled, stage }) {
-  return <section className={styles.card}>
-    <SectionHeader eyebrow="Canonical competition structure" title="Matches & Pairings" description="Configure the existing Production match set, assign valid roster Players, then prepare the scoring snapshot the existing engine consumes." state={data.readiness.sections.find((item) => item.id === "matches")?.state} />
-    <div className={styles.notices}><p data-kind="warning"><strong>Existing matches only</strong>New match creation is deferred until the certified Google mirror/archive provisioning path supports it.</p></div>
-    <div className={styles.matchList}>{data.matches.map((match) => <MatchCard key={match.matchId} match={match} roster={data.roster} teams={data.teams} courses={data.courses} disabled={disabled || match.locked} stage={stage} />)}</div>
-  </section>;
-}
-
-function MatchCard({ match, roster, teams, courses, disabled, stage }) {
-  const expected = productionTournamentFormatParticipantCount(match.format);
-  const [participants, setParticipants] = useState(() => buildTournamentSetupParticipantSlots(match.participants, match.format));
-  const [metadata, setMetadata] = useState({ courseId: match.courseId, tee: match.tee, teeTime: match.teeTime });
-  useEffect(() => setParticipants(buildTournamentSetupParticipantSlots(match.participants, match.format)), [match]);
-  useEffect(() => setMetadata({ courseId: match.courseId, tee: match.tee, teeTime: match.teeTime }), [match]);
-  const choose = (index) => (event) => setParticipants((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, playerId: event.target.value } : item));
-  const chooseCourse = (event) => {
-    const selected = courses.find((course) => `${course.courseId}::${course.tee}` === event.target.value);
-    if (selected) setMetadata((current) => ({ ...current, courseId: selected.courseId, tee: selected.tee }));
-  };
-  const matchCourses = courses.filter((course) => course.roundNumber === match.roundNumber);
-  const scoringBlockers = match.scoringReady ? [] : match.scoringReadinessReasons;
-  const pairingIncomplete = match.participantCount !== expected;
-  return <details className={styles.matchCard} open={!match.scoringReady || match.blockers.length > 0}>
-    <summary><div><span>Round {match.roundNumber} · {match.format}</span><strong>Match {match.matchNumber}</strong><small>{match.courseName || match.courseId} · {match.teeTime || "Tee time required"}</small></div><StateBadge value={match.locked ? "LOCKED" : match.scoringReady ? "READY" : "NEEDS_ATTENTION"} /></summary>
-    <Blockers blockers={[...match.blockers, ...scoringBlockers.filter((item) => !match.blockers.includes(item))]} warnings={match.warnings} />
-    <div className={styles.addRow}><label><span>Course & tee</span><select value={`${metadata.courseId}::${metadata.tee}`} disabled={disabled} onChange={chooseCourse}>{matchCourses.map((course) => <option key={`${course.courseId}:${course.tee}`} value={`${course.courseId}::${course.tee}`}>{course.name || course.courseId} · {course.tee}</option>)}</select></label><label><span>Tee time</span><input type="time" value={metadata.teeTime || ""} disabled={disabled} onChange={(event) => setMetadata((current) => ({ ...current, teeTime: event.target.value }))} /></label><button type="button" disabled={disabled || !metadata.courseId || !metadata.tee || !metadata.teeTime} onClick={() => stage("upsert-match", { matchId: match.matchId, roundNumber: match.roundNumber, matchNumber: match.matchNumber, ...metadata }, `Update ${match.matchId} course and tee time`)}>Review Match Details</button></div>
-    <div className={styles.pairingBoard}>{participants.map((participant, index) => {
-      const team = teams.find((item) => item.side === participant.teamSide);
-      const eligible = roster.filter((player) => player.membershipStatus === "ACTIVE" && player.teamSide === participant.teamSide);
-      return <label key={`${participant.teamSide}:${participant.playerSlot}`}><span>{team?.name || `Team ${participant.teamSide}`} · Slot {participant.playerSlot}</span><select value={participant.playerId} disabled={disabled} onChange={choose(index)}><option value="">Select Player</option>{eligible.map((player) => <option key={player.playerId} value={player.playerId}>{player.displayName} · {player.tournamentHandicap || "handicap required"}</option>)}</select></label>;
-    })}</div>
-    {pairingIncomplete ? <p className={styles.help} role="status"><strong>Pairing incomplete.</strong> The assigned slots above are canonical. Complete every slot or safely clear the unstarted pairing.</p> : null}
-    <div className={styles.buttonRow}><button type="button" disabled={disabled || participants.some((item) => !item.playerId)} onClick={() => stage("replace-pairings", { matchId: match.matchId, format: match.format, participants }, `Replace ${match.matchId} pairings and rebuild its unstarted context`)}>Review Pairings</button>{match.participants.length > 0 ? <button className={styles.secondaryButton} type="button" disabled={disabled || !match.canClearPairings} onClick={() => stage("replace-pairings", { matchId: match.matchId, format: match.format, participants: [] }, `Clear all participants from strictly unstarted ${match.matchId}`)}>Clear Pairings</button> : null}<button className={styles.secondaryButton} type="button" disabled={disabled || pairingIncomplete || participants.some((item) => !item.playerId)} onClick={() => stage("prepare-scoring-context", { matchId: match.matchId }, `Prepare immutable scoring context for ${match.matchId}`)}>{match.snapshot.prepared && !match.scoringReady ? "Prepare Current Scoring Context" : "Prepare Scoring Context"}</button></div>
-    <p className={styles.help}>Pairing changes never activate scoring access. Clearing is limited to strictly unstarted matches and preserves prior snapshots as audit evidence. Tournament Day retains the separate certified access operation.</p>
-  </details>;
-}
 
 function Readiness({ data }) {
   return <section className={styles.card}>
@@ -265,15 +229,32 @@ export default function ProductionTournamentSetupPanel() {
   const [message, setMessage] = useState("");
   const [section, setSection] = useState("readiness");
   const [review, setReview] = useState(null);
+  useEffect(() => {
+    if (!review) return;
+    const heading = document.getElementById('tournament-setup-review-title');
+    heading?.focus({ preventScroll: true });
+    heading?.scrollIntoView({ block: 'start' });
+  }, [review?.operationRequestId]);
+  const [pairingDrafts, setPairingDrafts] = useState({});
+  const [selectedRound, setSelectedRound] = useState(1);
+  const hasPendingPairings = Object.values(pairingDrafts).some(d=>pairingDirty(d)||detailsDirty(d));
+  useEffect(()=>{
+    if(!hasPendingPairings) return;
+    const warn=e=>{e.preventDefault();e.returnValue='';};
+    const navigation=e=>{const link=e.target.closest?.('a[href]'); if(link && !link.getAttribute('href').startsWith('#') && !window.confirm('Leave with unsaved pairing changes? They are not stored outside this page.')) {e.preventDefault();e.stopPropagation();}};
+    window.addEventListener('beforeunload',warn); document.addEventListener('click',navigation,true);
+    return ()=>{window.removeEventListener('beforeunload',warn);document.removeEventListener('click',navigation,true);};
+  },[hasPendingPairings]);
   const [confirmed, setConfirmed] = useState(false);
   const [receipt, setReceipt] = useState(null);
 
-  const load = useCallback(async ({ quiet = false } = {}) => {
+  const load = useCallback(async ({ quiet = false, ownDetailsId } = {}) => {
     if (!quiet) setPhase("loading");
     try {
       const response = await fetch(ENDPOINT, { cache: "no-store", credentials: "same-origin" });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw Object.assign(new Error(payload.error || "Tournament Setup is temporarily unavailable."), { code: payload.code });
+      setPairingDrafts(current=>mergePairingDrafts(current,payload.data.matches,{ownDetailsId}));
       setData(payload.data);
       setPhase("ready");
       return payload.data;
@@ -285,12 +266,12 @@ export default function ProductionTournamentSetupPanel() {
   }, []);
   useEffect(() => { load(); }, [load]);
 
-  const stage = useCallback((action, values, description) => {
+  const stage = useCallback((action, values, description, summary) => {
     if (!data) return;
     try {
       const operationRequestId = uuid();
       buildTournamentSetupMutation(action, { ...values, expectedRevision: data.revision, operationRequestId });
-      setReview({ action, values, description, expectedRevision: data.revision, operationRequestId });
+      setReview({ action, values, description, summary, expectedRevision: data.revision, operationRequestId });
       setConfirmed(false);
       setMessage("");
       setReceipt(null);
@@ -318,11 +299,12 @@ export default function ProductionTournamentSetupPanel() {
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw Object.assign(new Error(payload.error || "Tournament Setup did not complete."), { code: payload.code });
+      if(!payload.data?.ok || !Number.isSafeInteger(payload.data?.revision) || payload.data.action!==review.action.toUpperCase().replaceAll('-','_')) throw new Error('The response is uncertain. Your selections and operation identity are retained; retry this same review.');
       setReceipt(payload.data);
       setReview(null);
       setConfirmed(false);
       setMessage(payload.data?.idempotent ? "The safe retry returned the existing authoritative result." : "Production confirmed the Tournament Setup change.");
-      await load({ quiet: true });
+      await load({ quiet: true, ownDetailsId:review.action==='upsert-match'?review.values.matchId:undefined });
     } catch (error) {
       setMessage(error?.message || "Tournament Setup did not complete.");
       setPhase("failure");
@@ -345,10 +327,10 @@ export default function ProductionTournamentSetupPanel() {
     {section === "roster" ? <RosterEditor data={data} disabled={disabled || !data.capabilities["assign-roster-team"].allowed} stage={stage} /> : null}
     {section === "rounds" ? <RoundsEditor data={data} disabled={disabled || !data.capabilities["update-round"].allowed} stage={stage} /> : null}
     {section === "courses" ? <CoursesEditor data={data} disabled={disabled || !data.capabilities["upsert-course"].allowed} stage={stage} /> : null}
-    {section === "matches" ? <MatchesEditor data={data} disabled={disabled || (!data.capabilities["upsert-match"].allowed && !data.capabilities["replace-pairings"].allowed)} stage={stage} /> : null}
+    {section === "matches" ? <RoundPairingWorkspace data={data} drafts={pairingDrafts} setDrafts={setPairingDrafts} round={selectedRound} setRound={setSelectedRound} reload={()=>load({quiet:true})} disabled={disabled || (!data.capabilities["upsert-match"].allowed && !data.capabilities["replace-pairings"].allowed)} stage={stage} /> : null}
     {section === "awards" ? <ProductionTournamentAwardsPanel disabled={disabled} /> : null}
     {section === "readiness" ? <Readiness data={data} /> : null}
-    {review ? <section className={styles.review} aria-labelledby="tournament-setup-review-title"><header><span>Review before commit</span><h3 id="tournament-setup-review-title">{pretty(review.action)}</h3><p>No Production change has been made.</p></header><dl><div><dt>Requested change</dt><dd>{review.description}</dd></div><div><dt>Expected setup revision</dt><dd>{review.expectedRevision}</dd></div><div><dt>Operation identity</dt><dd>Prepared for one safe, idempotent Production operation</dd></div></dl><p>The server will revalidate exact resources, Director entitlement, revision, dependencies, and frozen competition facts atomically.</p><label className={styles.confirmation}><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>I reviewed the target, current state, downstream consequences, and immutable audit effect.</span></label><div className={styles.buttonRow}><button type="button" className={styles.secondaryButton} disabled={phase === "submitting"} onClick={() => { setReview(null); setConfirmed(false); setPhase("ready"); }}>Return to Editing</button><button type="button" disabled={!confirmed || phase === "submitting"} onClick={commit}>{phase === "submitting" ? "Confirming…" : "Confirm Production Change"}</button></div></section> : null}
+    {review ? <section className={styles.review} aria-labelledby="tournament-setup-review-title"><header><span>Review before commit</span><h3 id="tournament-setup-review-title" tabIndex={-1}>{pretty(review.action)}</h3><p>No Production change has been made.</p></header><dl><div><dt>Requested change</dt><dd>{review.description}</dd></div><div><dt>Expected setup revision</dt><dd>{review.expectedRevision}</dd></div><div><dt>Operation identity</dt><dd>Prepared for one safe, idempotent Production operation</dd></div></dl><PairingReview review={review} data={data} /><p>The server will revalidate exact resources, Director entitlement, revision, dependencies, and frozen competition facts atomically.</p><label className={styles.confirmation}><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>I reviewed the target, current state, downstream consequences, and immutable audit effect.</span></label><div className={styles.buttonRow}><button type="button" className={styles.secondaryButton} disabled={phase === "submitting"} onClick={() => { setReview(null); setConfirmed(false); setPhase("ready"); document.getElementById(`pairing-round-tab-${selectedRound}`)?.focus(); }}>Return to Editing</button><button type="button" disabled={!confirmed || phase === "submitting"} onClick={commit}>{phase === "submitting" ? "Confirming…" : (review.action==="replace-round-pairings" ? "Confirm Round Pairings" : review.action==="replace-pairings" ? "Save This Match’s Pairings" : "Confirm Production Change")}</button></div></section> : null}
     {message ? <p className={styles.message} data-error={phase === "failure" ? "true" : undefined} role={phase === "failure" ? "alert" : "status"}>{message}</p> : null}
     {receipt ? <p className={styles.receipt}><strong>{pretty(receipt.action)} confirmed</strong><span>Setup revision {receipt.revision}{receipt.idempotent ? " · safe retry" : ""}</span></p> : null}
     {receipt ? <Blockers warnings={receipt.warnings} /> : null}
