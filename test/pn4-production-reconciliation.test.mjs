@@ -14,6 +14,10 @@ const production = "6d0b2ad5cab61f50e6d2a269bb2d02e036ccae05";
 const shared = "bffd4a621c2d8bca88153c7bb6c6f2206ce8e62d";
 const pn2 = "614c0fbe4fb336fb8f5be8d9c9d92c4600d511d9";
 const git = (...args) => execFileSync("git", args, { cwd: root, encoding: "utf8" });
+const blobs = revision => new Map(git("ls-tree", "-rz", revision).split("\0").filter(Boolean).map(row => {
+  const [metadata, path] = row.split("\t");
+  return [path, metadata.split(" ")[2]];
+}));
 
 async function historicalProjection(revision) {
   // Compare stored source in memory; imports resolve to preserved dependencies.
@@ -40,15 +44,18 @@ function view(format = "BB", status = "LIVE", withNulls = true) {
       tournament: { configuredStatus: "Live", currentRound: 1, timeZone: "America/Chicago" } } } };
 }
 
-test("combined lineage preserves current Production and the exact certified pairing workspace", async () => {
-  assert.equal(git("merge-base", production, "HEAD").trim(), production);
+test("release 71 preserved Production and the exact certified pairing workspace", async () => {
+  // This immutable historical release has an exact file allowlist. Later
+  // authorized releases are checked against their own baseline below.
+  const certifiedRelease = "41775822baa0131cf8d74be775c69b06169b2746";
+  assert.equal(git("merge-base", production, certifiedRelease).trim(), production);
   const newer = git("diff", "--name-only", shared, production).trim().split("\n");
   const imports = new Set(git("diff", "--name-only", shared, pn2).trim().split("\n"));
   assert.equal(newer.filter((path) => imports.has(path)).length, 0);
 
   const currentProduction = "eeaa51bb5323fc34c3394ba12278e1731261d8d6";
   const workspace = "169aac8017a862c4fe9c90e6d1a1fbd223ed3caa";
-  assert.equal(git("merge-base", currentProduction, "HEAD").trim(), currentProduction);
+  assert.equal(git("merge-base", currentProduction, certifiedRelease).trim(), currentProduction);
   const payload = new Set(git("diff", "--name-only", `${workspace}^`, workspace).trim().split("\n"));
   assert.equal(payload.size, 16);
   // Only these two release-scope tests are reconciled; no runtime exceptions.
@@ -59,25 +66,42 @@ test("combined lineage preserves current Production and the exact certified pair
     "supabase/production_migrations/202609090096_production_round_pairing_read_envelope_v1.sql",
     "test/round-pairing-read-envelope.test.mjs", "test/fixtures/round-read-envelope.mjs",
     "docs/round-pairing-read-envelope-certification.md"]);
-  const changed = git("diff", "--name-only", currentProduction).trim().split("\n").filter(Boolean);
+  const changed = git("diff", "--name-only", currentProduction, certifiedRelease).trim().split("\n").filter(Boolean);
   assert.ok(changed.every(path => payload.has(path) || certification.has(path) || readCorrection.has(path)), "unexpected combined-release change");
   const release70='4da1d472b2ad27b8c05e6fb80ddb1903bfd73536';
-  assert.equal(git('merge-base',release70,'HEAD').trim(),release70);
-  assert.ok(git('diff','--name-only',release70).trim().split('\n').filter(Boolean)
+  assert.equal(git('merge-base',release70,certifiedRelease).trim(),release70);
+  assert.ok(git('diff','--name-only',release70,certifiedRelease).trim().split('\n').filter(Boolean)
     .every(path=>certification.has(path)||readCorrection.has(path)), 'only reader migration and certification may change after release70');
-  const blobs = revision => new Map(git("ls-tree", "-rz", revision).split("\0").filter(Boolean).map(row => {
-    const [metadata, path] = row.split("\t");
-    return [path, metadata.split(" ")[2]];
-  }));
   const baselineBlobs = blobs(currentProduction), workspaceBlobs = blobs(workspace);
+  const certifiedBlobs = blobs(certifiedRelease);
   const paths = new Set([...baselineBlobs.keys(), ...payload]);
   for (const path of paths) {
     if (certification.has(path)) continue;
     const expected = (payload.has(path) ? workspaceBlobs : baselineBlobs).get(path);
-    const actual = await readFile(new URL(path, root));
-    const actualBlob = createHash("sha1").update(`blob ${actual.length}\0`).update(actual).digest("hex");
-    assert.equal(actualBlob, expected, path);
+    assert.equal(certifiedBlobs.get(path), expected, path);
   }
+});
+
+test("Match Center combination preserves every release-72 file and the exact certified runtime payload", async () => {
+  const baseline = "a51dab2de096cd6576f027afb28324559f705217";
+  const certified = "8e2fe3597a505d05cd9f0a1e5f5890f267bc637b";
+  assert.equal(git("merge-base", baseline, "HEAD").trim(), baseline);
+  const payload = new Set(git("diff", "--name-only", `${certified}^`, certified).trim().split("\n"));
+  assert.equal(payload.size, 9);
+  // Only this lineage certification and the release report are reconciled.
+  const certification = new Set(["test/pn4-production-reconciliation.test.mjs",
+    "docs/match-center-handicap-presentation-certification.md"]);
+  const changed = git("diff", "--name-only", baseline).trim().split("\n").filter(Boolean);
+  assert.ok(changed.every(path => payload.has(path) || certification.has(path)), "unexpected release-72 combination change");
+  const baselineBlobs = blobs(baseline), payloadBlobs = blobs(certified);
+  const paths = new Set([...baselineBlobs.keys(), ...payload]);
+  for (const path of paths) {
+    if (certification.has(path)) continue;
+    const expected = (payload.has(path) ? payloadBlobs : baselineBlobs).get(path);
+    const actual = await readFile(new URL(path, root));
+    assert.equal(createHash("sha1").update(`blob ${actual.length}\0`).update(actual).digest("hex"), expected, path);
+  }
+  assert.equal(git("diff", baseline, "--", "supabase/production_migrations").trim(), "", "all installed migration sources preserved");
 });
 
 test("PN-4 shared web/PWA projection retains exact Production ordering, identity and explicit null semantics", async () => {

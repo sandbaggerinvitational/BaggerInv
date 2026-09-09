@@ -41,7 +41,7 @@ export async function GET(request) {
     ]);
     const serviceMs = performance.now() - serviceStarted;
     if (!read.payload?.ok) throw Object.assign(new Error("Tournament live state is unavailable."), { code: read.payload?.code });
-    let data = tournamentLiveDataFromSupabaseView(read.payload.data);
+    let data = tournamentLiveDataFromSupabaseView(read.payload.data, { matchCenterHandicapPresentation: true });
     if (currentTournamentContext) {
       assertProductionCurrentTournamentRuntimeMatch(currentTournamentContext, data.tournament?.id, {
         code: "CURRENT_RUNTIME_READ_TRANSPORT_NOT_POINTER_AWARE",
