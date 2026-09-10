@@ -9,6 +9,9 @@ import test from "node:test";
 
 import { normalizeProductionGuideAuthoring } from "../lib/production-guide-authoring-contract.js";
 import { canonicalGuideJson, guideProjectionHash } from "../lib/tournament-guide-projection.js";
+import { adaptProductionShadowCandidatePayload, productionShadowCandidateRpcTranslation } from "../lib/production-shadow-read-adapters.js";
+import { mobileGuideResult } from "../lib/mobile-v1-guide.js";
+import { assertMobileV1Schema } from "./support/mobile-v1-schema-validator.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const migrationsDirectory = path.join(root, "supabase", "production_migrations");
@@ -568,6 +571,7 @@ test("Guide migrations 082/093/094 install inertly and enforce the annual Guide 
   sqlFile(cluster, database, path.join(migrationsDirectory, migration082));
   sqlFile(cluster, database, path.join(migrationsDirectory, "202609070093_production_guide_incremental_drafts_v1.sql"));
   sqlFile(cluster, database, path.join(migrationsDirectory, "202609080094_production_guide_optional_content_v1.sql"));
+  sqlFile(cluster, database, path.join(migrationsDirectory, "202609100100_production_native_guide_delivery_context.sql"));
   assert.equal(sql(cluster, database, `select concat_ws('|',
     (select count(*) from production_control.projection_revisions
       where domain='GUIDE'),
@@ -890,7 +894,7 @@ test("Guide migrations 082/093/094 install inertly and enforce the annual Guide 
   assert.equal(sql(cluster, database, `select payload_fingerprint
     from production_control.projection_revisions
     where revision_id='${initialProjectionRevision}'`), initial.projectionPayloadHash);
-  const publicGuide = rpc(cluster, database, "read_production_guide_projection", {
+  const publicGuideInput = {
     environment: "PRODUCTION",
     project_ref: projectRef,
     project_url: projectUrl,
@@ -900,10 +904,41 @@ test("Guide migrations 082/093/094 install inertly and enforce the annual Guide 
     domain: "GUIDE",
     contract_version: "guide-projection-v1",
     source_tabs: sourceTabs,
-  });
+  };
+  const publicGuide = rpc(cluster, database, "read_production_guide_projection", publicGuideInput);
   assert.equal(publicGuide.data.revision_number, 2);
   assert.equal(publicGuide.data.payload.content.tournament["Tournament Name"],
     "Director updated Sandbagger Invitational");
+  assert.equal(publicGuide.data.tournament.tournament_id, '2026');
+  assert.equal(publicGuide.data.course_context[0].holes.length, 18);
+  assert.equal(publicGuide.data.course_context[0].configuration_consistent, true);
+  assert.match(publicGuide.data.delivery_fingerprint, /^[a-f0-9]{64}$/);
+  const translated = adaptProductionShadowCandidatePayload(publicGuide,
+    productionShadowCandidateRpcTranslation('read_current_guide_projection', { target_tournament_id: '2026' }));
+  assert.equal(translated.data.delivery_fingerprint, publicGuide.data.delivery_fingerprint);
+  const nativeGuide = await mobileGuideResult({ playerId: 'P01', tournamentId: '2026',
+    context: { membership: { active: true }, tournament: { year: 2026 } } }, {
+    dependencies: { readGuideProjection: async () => ({ payload: translated }) },
+  });
+  assertMobileV1Schema('guide', nativeGuide.body);
+  // Synthetic local database only: changed canonical yardage must invalidate
+  // delivery without rewriting the published CMS revision. Roll back the test.
+  const changedGuide = JSON.parse(sql(cluster, database, `begin;
+    update scoring_authority.tournament_setup_course_holes_v1 set yardage=yardage+1
+    where tournament_id='2026' and course_id='COURSE01' and hole_number=1;
+    select public.read_production_guide_projection(${json(publicGuideInput)})::text;
+    rollback;`));
+  assert.equal(changedGuide.data.payload_fingerprint, publicGuide.data.payload_fingerprint);
+  assert.notEqual(changedGuide.data.delivery_fingerprint, publicGuide.data.delivery_fingerprint);
+  assert.equal(rpc(cluster, database, 'read_production_guide_projection', publicGuideInput).data.delivery_fingerprint,
+    publicGuide.data.delivery_fingerprint);
+  assert.throws(() => rpc(cluster, database, 'read_production_guide_projection',
+    { ...publicGuideInput, project_ref: 'unapproved' }));
+  // Exercise the actual SQL role/ACL, not just a claim while connected as the
+  // local test superuser. No Production role or claim is changed by this test.
+  assert.equal(sql(cluster, database, "select has_function_privilege('authenticated', 'public.read_production_guide_projection(jsonb)', 'execute')"), 'f');
+  assert.throws(() => sql(cluster, database, `begin; set local role authenticated;
+    select public.read_production_guide_projection(${json(publicGuideInput)}); rollback;`, 'authenticated'));
 
   const discardGuide = normalizeGuide(2026, "Discarded");
   const discardCreate = rpc(cluster, database,

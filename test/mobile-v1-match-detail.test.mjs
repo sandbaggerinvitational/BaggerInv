@@ -234,10 +234,14 @@ test("Singles still fails closed when canonical clinched state has no decided re
   assert.throws(() => map(raw), /mobile API is unavailable/i);
 });
 
-test("scheduled Match Detail keeps a bounded unplayed official record without inventing a result", () => {
+test("scheduled Match Detail keeps a bounded unplayed official record without inventing a result", async () => {
   const raw = rawFixture({ status: "UPCOMING", winners: [] });
   raw.match.running_result = "Scheduled";
-  const match = map(raw).match;
+  const data = map(raw);
+  const match = data.match;
+  await assertMobileV1Schema("match-detail", { ok: true, apiVersion: "v1", data,
+    meta: { generatedAt: "2026-09-03T15:00:00.000Z", revision: "scheduled" } });
+  assert.equal(match.progress.statusText, null);
   assert.equal(match.status, "scheduled");
   assert.equal(match.result, null);
   assert.equal(match.scorecard.state, "unavailable");

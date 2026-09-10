@@ -21,8 +21,15 @@ test("PN-1 preserves Production authority, dispatch, fencing, scoring and post-c
   ];
   for (const name of files) {
     const path = `lib/${name}.js`;
-    assert.equal(await readFile(new URL(path, root), "utf8"),
-      execFileSync("git", ["show", `${base}:${path}`], { cwd: root, encoding: "utf8" }), path);
+    const actual = await readFile(new URL(path, root), "utf8");
+    const original = execFileSync("git", ["show", `${base}:${path}`], { cwd: root, encoding: "utf8" });
+    // Read closure changes only Guide delivery-fingerprint preservation.
+    // Continue pinning every other byte of dispatch and authority code.
+    const expected = name === 'production-shadow-read-adapters'
+      ? original.replace('delivery_fingerprint: clean(data.payload_fingerprint),',
+        'delivery_fingerprint: clean(data.delivery_fingerprint || data.payload_fingerprint),')
+      : original;
+    assert.equal(actual, expected, path);
   }
   for (const path of ["app/api/mobile/v1/scoring/hole/route.js", "app/api/mobile/v1/scoring/finalize/route.js"]) {
     assert.equal(await readFile(new URL(path, root), "utf8"),

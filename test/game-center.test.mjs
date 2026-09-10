@@ -34,7 +34,8 @@ function completedWinners(teamOne = 10, teamTwo = 8) {
 test("Game Center removes duplicated tournament masthead and uses a compact match identity", async () => {
   const [page, source] = await Promise.all([readFile(pageUrl, "utf8"), readFile(componentUrl, "utf8")]);
   assert.doesNotMatch(page, /TournamentIdentityHeader/);
-  assert.match(page, /<Header homeHref="\/home" \/>/);
+  assert.doesNotMatch(page, /<Header\b/);
+  assert.match(page, /<GameCenter initialData=/);
   assert.match(page, /safeReturnContext/);
   assert.match(source, /const matchContext = `Round \$\{roundNumber\}/);
   assert.match(source, /Match \$\{matchNumber\}/);
@@ -286,7 +287,15 @@ test("Home result and details destinations use same-origin Game Center with Home
   assert.match(page, /\["home", "my-match", "tournament"\]\.includes\(context\)/);
   assert.match(page, /context\.startsWith\("\/live\?view=leaderboards"\)/);
   assert.match(center, /backTo === "home"[\s\S]*\? "\/home"/);
-  assert.match(center, /leaderboardReturn \? backTo : "\/my-match"/);
+  const navigationSource = center.slice(center.indexOf("  const leaderboardReturn ="), center.indexOf("  const backLabel ="));
+  const destination = new Function("backTo", "clean", `${navigationSource}; return backHref;`);
+  const clean = value => String(value || "").trim();
+  for (const [from, expected] of [
+    ["home", "/home"], ["tournament", "/app/tournament"], ["my-match", "/my-match"],
+    ["/live?view=leaderboards", "/app/leaderboards"],
+    ["/live?view=leaderboards&round=2", "/app/leaderboards?round=2"],
+    ["/app/leaderboards?round=2", "/app/leaderboards?round=2"],
+  ]) assert.equal(destination(from, clean), expected);
   assert.doesNotMatch(scoring, /`\/game-center\/\$\{encodeURIComponent\(matchId\)\}\?from=my-match`/);
   assert.doesNotMatch(scoring, /view=matchups/);
 });

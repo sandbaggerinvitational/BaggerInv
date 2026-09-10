@@ -246,3 +246,51 @@ test("all read products fail closed when their Supabase source or RPC is unavail
     readLeaderboardsCoreView: async () => rpc({}), leaderboardsCoreDataFromSupabaseView: () => ({ slotVerification: { pass: false } }) } }),
   (error) => error.code === "MOBILE_API_UNAVAILABLE");
 });
+
+
+test("Today and Matches use the published Guide timezone consistently with Schedule", async () => {
+  const legacy = { ...tournament("Upcoming"), timeZone: "America/Chicago" };
+  const live = { tournament: legacy, rounds: [{ number: 2, label: "Round 2", format: "Best Ball",
+    matches: [match("M1", "Upcoming")] }] };
+  let published = guide();
+  const dependencies = {
+    requireHomeReadSource: source, requireTournamentReadSource: source,
+    readGuideProjection: async () => published,
+    readParticipantHomeView: async () => rpc({}),
+    participantHomeDataFromSupabaseView: () => ({ player: { id: "P1", name: "Player One" }, liveData: live }),
+    applyGuideProjectionToHome: value => value,
+    readTournamentLiveView: async () => rpc({}),
+    tournamentLiveDataFromSupabaseView: () => live,
+    applyGuideCoursesToTournament: value => value,
+  };
+  const today = await mobileTodayResult(identity, { now, dependencies });
+  const matches = await mobileMatchesResult(identity, { now, dependencies });
+  const schedule = await mobileScheduleResult(identity, { now, dependencies });
+  assert.equal(today.body.data.tournament.timeZone, schedule.body.data.timeZone);
+  assert.equal(matches.body.data.tournament.timeZone, schedule.body.data.timeZone);
+  assert.equal(today.body.data.currentMatch.teeTime.timeZone, "America/New_York");
+  assert.equal(matches.body.data.matches[0].teeTime.timeZone, "America/New_York");
+  assert.equal(today.body.data.currentMatch.teeTime.localTime, "08:10:00");
+  assert.equal(legacy.timeZone, "America/Chicago", "shared web presentation must not be mutated");
+  published = guide();
+  published.payload.data.content.content.tournamentIdentity.timeZone = "America/Denver";
+  assert.notEqual((await mobileTodayResult(identity, { now, dependencies })).revision, today.revision);
+  assert.notEqual((await mobileMatchesResult(identity, { now, dependencies })).revision, matches.revision);
+});
+
+test("Schedule revision covers timezone-derived representation and ignores unchanged publication metadata", async () => {
+  const published = guide();
+  delete published.payload.data.content.content.tournamentIdentity.timeZone;
+  const dependencies = { readGuideProjection: async () => published };
+  const east = { ...identity, context: { ...identity.context, tournament: { timeZone: "America/New_York" } } };
+  const central = { ...identity, context: { ...identity.context, tournament: { timeZone: "America/Chicago" } } };
+  const first = await mobileScheduleResult(east, { now, dependencies });
+  const changed = await mobileScheduleResult(central, { now, dependencies });
+  assert.notDeepEqual(first.body.data, changed.body.data);
+  assert.notEqual(first.revision, changed.revision, "changed event instants must invalidate a cached response");
+  published.payload.data.delivery_fingerprint = "metadata-only-change";
+  published.payload.data.projection_revision++;
+  const same = await mobileScheduleResult(east, { now: new Date(now.getTime() + 1000), dependencies });
+  assert.deepEqual(same.body.data, first.body.data);
+  assert.equal(same.revision, first.revision);
+});
