@@ -2,3 +2,14 @@
 @media(max-width:800px){.hero{min-height:300px;padding:50px 6vw}.logoPlate{width:110px;height:110px;flex-basis:110px}.sectionNav{top:72px;justify-content:flex-start}.overview dl{grid-template-columns:1fr 1fr}.infoGrid{grid-template-columns:1fr}.shell{width:min(92vw,680px);padding-top:45px}}
 @media(max-width:560px){.hero{align-items:flex-start;flex-direction:column-reverse;gap:24px}.hero h1{font-size:3.4rem}.logoPlate{width:92px;height:92px;flex-basis:92px}.overview{padding:28px 22px}.overview dl{grid-template-columns:1fr}.timeline{grid-template-columns:1fr}.day{padding:22px 18px}.event{grid-template-columns:1fr;gap:7px}.guideSection{padding-top:66px}.rules>section{padding:22px 16px}}
 .staticRule{padding:18px 0;border-bottom:1px solid #ddd6c8}.staticRule h4{margin:5px 0;color:#14251e;font:700 1.2rem Georgia,serif}.staticRule p{color:#68716d;font-size:.8rem}
+.sectionNav a:focus-visible,.rules summary:focus-visible,.event a:focus-visible,.infoCard a:focus-visible{outline:3px solid #ac812c;outline-offset:-3px}
+@media(max-width:800px){
+  .sectionNav{position:relative;top:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible;padding:8px 4vw;gap:4px}
+  .sectionNav a{justify-content:center;min-height:44px;padding:8px 5px;white-space:normal;text-align:center;border-radius:9px;background:#f8f4ec;font-size:.76rem}
+  .sectionNav a[href="#overview"]{display:none}
+  .shell{padding-top:24px}.overview,.guideSection{scroll-margin-top:90px}.guideSection{padding-top:38px}.guideSection>header{margin-bottom:18px}
+  .rules{gap:16px}.rules>section{padding:18px 16px}.rules section>h3{font-size:1.4rem;margin-bottom:12px}.rules summary{padding:14px 6px;min-height:48px;line-height:1.4}
+  .event{padding:16px 0;gap:8px}.event.featured{padding-top:16px;padding-bottom:16px}.event p{margin:8px 0}.event a,.infoCard a{min-height:44px;align-content:center;margin-top:4px}
+  .day{min-width:0}.event>div{min-width:0}.event h4,.infoCard h3{overflow-wrap:anywhere}.overview>p:not(.eyebrow),.guideSection header>p:not(.eyebrow){line-height:1.6}
+}
+@media(max-width:560px){.hero{padding:28px 5vw;gap:16px;min-height:0}.hero h1{font-size:2.7rem}.hero strong{margin-top:14px;font-size:1.2rem}.hero span{line-height:1.5}.logoPlate{width:72px;height:72px;flex-basis:72px}.overview{padding:22px 18px}.overview dl{grid-template-columns:1fr 1fr;margin-top:20px}.overview dl div{padding:14px;min-width:0}.overview dd{font-size:.95rem;overflow-wrap:anywhere}.guideSection h2,.overview h2{font-size:2rem}}

@@ -1,5 +1,5 @@
 export const dynamic="force-dynamic";
-import { Header,Footer } from "../components"; import OddsCenter from "./OddsCenter"; import { readOddsSnapshots } from "../../lib/google-sheets-write"; import { loadOddsInputs } from "../../lib/odds-data"; import { currentTournamentYear } from "../../lib/tournament-context"; import { validateOpeningMatchups } from "../../lib/tournament-odds";
+import { Header,Footer } from "../components"; import OddsCenter from "./OddsCenterPresentation"; import { readOddsSnapshots } from "../../lib/google-sheets-write"; import { loadOddsInputs } from "../../lib/odds-data"; import { currentTournamentYear } from "../../lib/tournament-context"; import { validateOpeningMatchups } from "../../lib/tournament-odds";
 import { publishedOddsFreshness, publishedOddsSnapshotsFromView, readPublishedOddsView } from "../../lib/published-odds-supabase.js";
 import { requirePublishedOddsReadSource } from "../../lib/published-odds-read-source.js";
 import { pageMetadata } from "../../lib/seo";

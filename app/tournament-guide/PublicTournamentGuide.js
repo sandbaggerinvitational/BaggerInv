@@ -2,6 +2,7 @@ import { guideRoundLabel } from "../../lib/guide-editor-presentation.js";
 import Link from "next/link";
 import { Header, Footer } from "../components";
 import AssetImage from "../AssetImage";
+import ResponsiveDisclosure from "../ResponsiveDisclosure";
 import { annualGuideHeroModel } from "../../lib/tournament-guide-hero";
 import { groupBy, isTruthy, paragraphs } from "../../lib/tournament-guide";
 import { itineraryGroups, itineraryViewModel } from "../../lib/tournament-guide-schedule";
@@ -127,14 +128,14 @@ function Rules({ content, description }) {
       </section> : null}
       {Object.entries(categories).map(([category, rules]) => <section key={category}>
         <h3>{category}</h3>
-        {rules.map((rule) => !clean(rule.Body) ? <article className={styles.staticRule} key={rule["Rule ID"]}><h4>{rule.Title}</h4></article> : <details
+        {rules.map((rule) => !clean(rule.Body) ? <article className={styles.staticRule} key={rule["Rule ID"]}><h4>{rule.Title}</h4></article> : <ResponsiveDisclosure
           className={isTruthy(rule.Important) ? styles.important : ""}
           key={rule["Rule ID"]}
-          open={isTruthy(rule.Important)}
+          desktopOpen={isTruthy(rule.Important)}
         >
           <summary><span>{rule.Subcategory || "Rule"}</span>{rule.Title}</summary>
           <div><Text value={rule.Body} />{rule["Effective Year"] ? <small>Effective {rule["Effective Year"]}</small> : null}</div>
-        </details>)}
+        </ResponsiveDisclosure>)}
       </section>)}
     </div>
   </section>;
@@ -200,6 +201,7 @@ export default function PublicTournamentGuide({ content }) {
     ["overview", "Overview", true],
     ["schedule", "Schedule", content.schedule.length],
     ["rules", "Rules", content.ruleBook.length || content.tournamentRules.length],
+    ["courses", "Courses →", content.courses.length],
     ["dining", "Dining", content.dining.length],
     ["local-guide", "Local Guide", content.localGuide.length],
     ["contacts", "Important Contacts", content.importantContacts.length],
@@ -228,7 +230,7 @@ export default function PublicTournamentGuide({ content }) {
     </section>
 
     <nav className={styles.sectionNav} aria-label="Tournament Guide sections">
-      {sections.map(([slug, label]) => <a href={`#${slug}`} key={slug}>{label}</a>)}
+      {sections.map(([slug, label]) => <a href={slug === "courses" ? "/courses" : `#${slug}`} key={slug}>{label}</a>)}
     </nav>
 
     <div className={styles.shell}>
