@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Header, Footer } from "./components";
 import { getTournaments } from "../lib/stats";
 import { homePageHero } from "../lib/asset-paths";
-import { SITE_ESTABLISHED_YEAR, SITE_FORMAT_LABEL } from "../lib/site-config";
+import { SITE_ESTABLISHED_YEAR, SITE_FORMAT_LABEL, TOURNAMENT_2026_TAGLINE } from "../lib/site-config";
 import { tournamentStartTimestamp } from "../lib/tournament-countdown";
 import AssetImage from "./AssetImage";
 import TournamentStatusHero from "./TournamentStatusHero";
@@ -172,7 +172,7 @@ export default async function Home() {
           <h1>{destination}</h1>
           {dates ? <p className="heroDate">{dates}</p> : null}
           <p className="heroIntro">
-            {playerCount ? `${playerCount} players. ` : ""}Two teams. {roundCount ? `${roundCount} rounds. ` : ""}One trophy.
+            {Number(currentTournament.year) === 2026 ? TOURNAMENT_2026_TAGLINE : `${playerCount ? `${playerCount} players. ` : ""}Two teams. ${roundCount ? `${roundCount} rounds. ` : ""}One trophy.`}
           </p>
 
         </div>

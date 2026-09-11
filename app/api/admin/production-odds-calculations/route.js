@@ -22,6 +22,7 @@ import { authorizePreviewDirector } from "../../../../lib/preview-director-autho
 import { assertProductionCutoverRequest } from "../../../../lib/production-cutover-activation-contract.js";
 import { assertProductionShadowCandidateRequest } from "../../../../lib/production-shadow-candidate.js";
 import { ODDS_PHASES, ODDS_SUPPORTED_ITERATION_COUNTS } from "../../../../lib/tournament-odds.js";
+import { readProductionOddsSnapshotReview } from "../../../../lib/production-odds-snapshot-review-server.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 800;
@@ -170,6 +171,15 @@ export async function GET(request) {
   });
   const jobId = clean(new URL(request.url).searchParams.get("job"));
   try {
+    if (new URL(request.url).searchParams.get("review") === "1") {
+      const review = await readProductionOddsSnapshotReview(jobId, {
+        actorAuthUserId: clean(director.identity?.authUserId),
+        actorPlayerId: clean(director.identity?.actor?.id || director.identity?.player?.id),
+      });
+      return NextResponse.json({ ok: true, review, publicationCreated: false, mirrorCreated: false }, {
+        headers: { "Cache-Control": "private, no-store" },
+      });
+    }
     const result = await readProductionOddsCalculationJobs(jobId);
     if (!result.payload?.ok) throw Object.assign(new Error("Calculation state is unavailable."), {
       code: result.payload?.code,
@@ -185,7 +195,9 @@ export async function GET(request) {
     }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
     return NextResponse.json({
-      error: "Championship calculation status is unavailable.",
+      error: error?.code === "PRODUCTION_ODDS_CALCULATION_STALE"
+        ? "This calculation's inputs changed. Publication is blocked. Review did not change the calculation or any publication."
+        : "Championship calculation status is unavailable.",
       code: clean(error?.code || "PRODUCTION_ODDS_CALCULATION_STATUS_FAILED"),
     }, { status: Number(error?.status || 503), headers: { "Cache-Control": "private, no-store" } });
   }

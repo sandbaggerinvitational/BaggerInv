@@ -7,6 +7,7 @@ import ProductionDraftEditor from "./ProductionDraftEditor.js";
 import ProductionGuideEditor from "./ProductionGuideEditor.js";
 import ProductionPredictionSettingsEditor from "./ProductionPredictionSettingsEditor.js";
 import ProductionNetSkinsEntries from "./ProductionNetSkinsEntries.js";
+import ProductionOddsSnapshotReview from "./ProductionOddsSnapshotReview.js";
 import styles from "./production-director.module.css";
 
 const clean = (value) => String(value ?? "").trim();
@@ -339,7 +340,7 @@ function OddsPanel({ data, refresh }) {
         <Status value={job.status} />
         <div className={styles.actionRow}>
           {upper(job.status) === "RETRYABLE" ? <button type="button" disabled={Boolean(busy)} onClick={() => operate("retry", job)}>Retry</button> : null}
-          {upper(job.status) === "SUCCEEDED" && job.publicationEligible === true ? <button type="button" disabled={Boolean(busy)} data-impact="high" onClick={() => operate("publish", job)}>Publish Certified Snapshot</button> : null}
+          {upper(job.status) === "SUCCEEDED" && job.publicationEligible === true ? <ProductionOddsSnapshotReview job={job} busy={Boolean(busy)} onPublish={(reviewedJob) => operate("publish", reviewedJob)} /> : null}
         </div>
       </article>)}</div> : <p className={styles.empty}>No retained calculation jobs are available.</p>}
     </section>

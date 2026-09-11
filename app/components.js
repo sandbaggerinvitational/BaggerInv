@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Menu from "./Menu";
-import { SITE_ESTABLISHED_YEAR } from "../lib/site-config";
+import { SITE_ESTABLISHED_YEAR, TOURNAMENT_2026_TAGLINE } from "../lib/site-config";
 import { optimizedAssetUrl } from "../lib/asset-paths";
 
 export function Header({ activeNavigationHref = "", homeHref = "/" } = {}) {
@@ -29,7 +29,7 @@ export function Footer({ variant = "event" } = {}) {
     <footer data-app-footer={appIdentity ? "true" : undefined}>
       <div>
         <strong>{appIdentity ? "The Bagger" : "Sandbagger Invitational"}</strong>
-        <span>24 Players • Two Teams • One Trophy</span>
+        <span>{TOURNAMENT_2026_TAGLINE}</span>
       </div>
 
       {appIdentity ? null : <span>Official Tournament Website</span>}
