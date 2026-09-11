@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./live-match-control.module.css";
 import pairingStyles from "./pairing-editor.module.css";
+import accessStyles from "./participant-access.module.css";
 import { getTournamentState } from "../../../lib/live-tournament";
+import { finalizationReview, hasUnsavedMatchChanges } from "../../../lib/live-admin-ux";
 
 const EDITABLE = ["Matchup Winner", "Front 9 Winner", "Back 9 Winner", "18-Hole Winner", "Team 1 Points", "Team 2 Points", "Match Status", "Notes"];
 const PAIRING_FIELDS = ["Team 1 Player 1", "Team 1 Player 2", "Team 2 Player 1", "Team 2 Player 2"];
@@ -43,15 +45,48 @@ function PairingSide({ side, team, match, draft, players, rosters, singles, disa
   </div>;
 }
 
-function MatchEditor({ match, players, rosters, teams, onAction, busy }) {
+function FinalizationDialog({ review, busy, onCancel, onConfirm }) {
+  return <div className={styles.dialogBackdrop} role="presentation">
+    <section className={styles.reviewDialog} role="dialog" aria-modal="true" aria-labelledby="finalization-title">
+      <span>Official result review</span>
+      <h2 id="finalization-title">Finalize {review.match}?</h2>
+      <dl><div><dt>Pairing</dt><dd>{review.pairing}</dd></div>{review.segments.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}<div><dt>Final winner</dt><dd>{review.winner}</dd></div><div><dt>Team points</dt><dd>{review.points}</dd></div></dl>
+      <p>This publishes the official result and tournament points. You can reopen the match later to make a documented correction.</p>
+      <div><button type="button" onClick={onCancel} disabled={busy}>Keep editing</button><button type="button" className={styles.finalize} onClick={onConfirm} disabled={busy}>{busy ? "Finalizing…" : "Confirm final result"}</button></div>
+    </section>
+  </div>;
+}
+
+function MatchEditor({ match, players, rosters, teams, onAction, busy, onDirtyChange, access }) {
   const [draft, setDraft] = useState(() => Object.fromEntries([...EDITABLE, ...PAIRING_FIELDS].map((field) => [field, match[field] || ""])));
+  const [feedback, setFeedback] = useState("");
+  const [reviewOpen, setReviewOpen] = useState(false);
   const sideOne = teamName(teams, match.Year, 1);
   const sideTwo = teamName(teams, match.Year, 2);
   const isSingles = String(match.Format).toUpperCase() === "SI";
   const isFinal = match["Match Status"] === "Final";
-  const change = (field, value) => setDraft((current) => ({ ...current, [field]: value }));
+  const dirty = hasUnsavedMatchChanges(match, draft, [...EDITABLE, ...PAIRING_FIELDS]);
+  const playerNames = Object.fromEntries(players.map((player) => [player.id, player.name]));
+  const review = finalizationReview({ match, draft, teamOne: sideOne, teamTwo: sideTwo, playerNames });
+  const change = (field, value) => { setFeedback(""); setDraft((current) => ({ ...current, [field]: value })); };
+  useEffect(() => { onDirtyChange(match["Match ID"], dirty); return () => onDirtyChange(match["Match ID"], false); }, [dirty, match, onDirtyChange]);
+  useEffect(() => {
+    if (!dirty) return undefined;
+    const warn = (event) => { event.preventDefault(); event.returnValue = ""; };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
+  const run = async (action, updates = draft) => {
+    setFeedback("");
+    try {
+      const result = await onAction(action, match, updates);
+      if (result === null) return;
+      setFeedback(action === "reopen" ? "Match reopened. Corrections are now enabled." : action === "finalize" ? "Official result finalized successfully." : "Changes saved successfully.");
+      setReviewOpen(false);
+    } catch (error) { setFeedback(error.message); }
+  };
 
-  return <article className={styles.matchCard} data-status={match["Match Status"] || "Scheduled"}>
+  return <article className={styles.matchCard} data-status={match["Match Status"] || "Scheduled"} data-live-match-dirty={dirty ? "true" : undefined}>
     <header>
       <div><span>Match {match.Match}</span><h2>{match["Match ID"]}</h2><p>Round {match.Round} · {match.Format} · {match["Course ID"] || "Course TBA"}{match["Tee Time"] ? ` · ${match["Tee Time"]}` : ""}</p></div>
       <strong>{match["Match Status"] || "Scheduled"}</strong>
@@ -61,7 +96,7 @@ function MatchEditor({ match, players, rosters, teams, onAction, busy }) {
       <em>VS</em>
       <PairingSide side={2} team={sideTwo} match={match} draft={draft} players={players} rosters={rosters} singles={isSingles} disabled={isFinal || busy} onChange={change} />
     </div>
-    {!isFinal ? <div className={pairingStyles.action}><button type="button" disabled={busy} onClick={() => onAction("pairing", match, Object.fromEntries(PAIRING_FIELDS.map((field) => [field, draft[field] || ""])))}>Save Pairing</button></div> : <p className={pairingStyles.locked}>Reopen this match before changing its pairing.</p>}
+    {!isFinal ? <div className={pairingStyles.action}><button type="button" disabled={busy} onClick={() => run("pairing", Object.fromEntries(PAIRING_FIELDS.map((field) => [field, draft[field] || ""])))}>Save Pairing</button></div> : <p className={pairingStyles.locked}>This official result is locked. Reopen it to make a documented correction.</p>}
     <div className={styles.fields}>
       {!isSingles ? <>
         <WinnerField label="Front 9 Winner" field="Front 9 Winner" value={draft["Front 9 Winner"]} onChange={change} />
@@ -76,11 +111,29 @@ function MatchEditor({ match, players, rosters, teams, onAction, busy }) {
     </div>
     <div className={styles.actions}>
       {!isFinal ? <>
-        <button type="button" disabled={busy} onClick={() => onAction("update", match, draft)}>Save Changes</button>
-        <button className={styles.finalize} type="button" disabled={busy} onClick={() => onAction("finalize", match, draft)}>Finalize Match</button>
-      </> : <button className={styles.reopen} type="button" disabled={busy} onClick={() => onAction("reopen", match, draft)}>Reopen Match</button>}
+        <button type="button" disabled={busy || !dirty} onClick={() => run("update")}>{busy ? "Saving…" : "Save Changes"}</button>
+        <button className={styles.finalize} type="button" disabled={busy} onClick={() => setReviewOpen(true)}>Review &amp; Finalize</button>
+      </> : <button className={styles.reopen} type="button" disabled={busy} onClick={() => run("reopen")}>{busy ? "Reopening…" : "Reopen for correction"}</button>}
     </div>
+    <div className={styles.saveState} data-dirty={dirty ? "true" : undefined} role="status" aria-live="polite">{feedback || (dirty ? "Unsaved changes" : "All changes saved")}</div>
     {match["Updated At"] ? <small>Last updated {match["Updated At"]}{match["Updated By"] ? ` by ${match["Updated By"]}` : ""}</small> : null}
+    <section className={accessStyles.panel}>
+      <div className={accessStyles.summary}><span>Participant scorekeeping</span><strong>{String(match["Access Active"]).toUpperCase() === "TRUE" ? "Access active" : "Access inactive"}</strong><small>{match["Access Expires At"] ? `Expires ${new Date(match["Access Expires At"]).toLocaleString()}` : "Generate credentials before sharing access."}</small></div>
+      <div className={accessStyles.actions}>
+        <button type="button" disabled={busy} onClick={() => {
+          if (match["Access Version"] && !window.confirm("Regenerating credentials immediately invalidates the previous code, QR link, and participant sessions. Continue?")) return;
+          run("access-generate", {});
+        }}>{match["Access Version"] ? "Regenerate access" : "Generate access"}</button>
+        {String(match["Access Active"]).toUpperCase() === "TRUE" ? <button type="button" disabled={busy} onClick={() => run("access-disable", {})}>Disable access</button> : null}
+      </div>
+      {access ? <div className={accessStyles.reveal}>
+        <p>Shown once. Save these before leaving this page.</p>
+        <strong>Participant code: {access.code}</strong>
+        <div><button type="button" onClick={() => navigator.clipboard.writeText(access.code)}>Copy code</button><button type="button" onClick={() => navigator.clipboard.writeText(access.accessUrl)}>Copy secure link</button><a href={access.qrDataUrl} download={`${match["Match ID"]}-participant-qr.png`}>Download QR</a></div>
+        <img src={access.qrDataUrl} alt={`QR code for Match ${match.Match} participant scoring`} />
+      </div> : match["Access Version"] ? <p className={accessStyles.note}>For security, the code and QR token are not stored in readable form. Regenerate access to receive new shareable credentials.</p> : null}
+    </section>
+    {reviewOpen ? <FinalizationDialog review={review} busy={busy} onCancel={() => setReviewOpen(false)} onConfirm={() => run("finalize")} /> : null}
   </article>;
 }
 
@@ -90,8 +143,17 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
   const [data, setData] = useState(null);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
+  const [busyMatchId, setBusyMatchId] = useState("");
+  const [accessByMatch, setAccessByMatch] = useState({});
+  const [dirtyMatches, setDirtyMatches] = useState(() => new Set());
   const [year, setYear] = useState("");
   const [round, setRound] = useState("");
+  const updateDirty = useCallback((matchId, dirty) => setDirtyMatches((current) => {
+    const next = new Set(current);
+    if (dirty) next.add(matchId); else next.delete(matchId);
+    return next;
+  }), []);
+  const confirmSwitch = () => !dirtyMatches.size || window.confirm("You have unsaved match changes. Leave them behind?");
 
   useEffect(() => { if (sharedSecret) setSecret(sharedSecret); }, [sharedSecret]);
   useEffect(() => { if (sharedUpdatedBy) setUpdatedBy(sharedUpdatedBy); }, [sharedUpdatedBy]);
@@ -130,16 +192,23 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
   }, [data, year]);
 
   const act = async (action, match, updates) => {
-    if (!updatedBy.trim()) { setStatus("Enter your name before updating a match."); return; }
-    const verb = action === "finalize" ? "finalize" : action === "reopen" ? "reopen" : action === "pairing" ? "save the new pairing for" : "save changes to";
-    if (["finalize", "reopen"].includes(action) && !window.confirm(`Are you sure you want to ${verb} ${match["Match ID"]}?`)) return;
-    setBusy(true); setStatus(`${action === "update" || action === "pairing" ? "Saving" : action === "finalize" ? "Finalizing" : "Reopening"} ${match["Match ID"]}…`);
+    if (!updatedBy.trim()) throw new Error("Enter your name before updating a match.");
+    if (action === "reopen" && !window.confirm(`Reopen ${match["Match ID"]} for a documented correction?`)) return null;
+    setBusyMatchId(match["Match ID"]);
     try {
       const payload = await request({ action, matchId: match["Match ID"], updates, updatedBy });
+      if (payload.access) {
+        setAccessByMatch((current) => ({ ...current, [match["Match ID"]]: payload.access }));
+      } else if (action === "access-disable") {
+        setAccessByMatch((current) => {
+          const next = { ...current };
+          delete next[match["Match ID"]];
+          return next;
+        });
+      }
       setData((current) => ({ ...current, matches: current.matches.map((row) => row["Match ID"] === payload.match["Match ID"] ? payload.match : row) }));
-      setStatus(`${match["Match ID"]} ${action === "pairing" ? "pairing updated" : action === "update" ? "updated" : action === "finalize" ? "finalized" : "reopened"} successfully.`);
-    } catch (error) { setStatus(error.message); }
-    finally { setBusy(false); }
+      return payload;
+    } finally { setBusyMatchId(""); }
   };
 
   return <section className={`${styles.shell} ${embedded ? "liveControlEmbedded" : ""}`}>
@@ -151,8 +220,8 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
       {status ? <p>{status}</p> : null}
     </div> : <>
       <div className={styles.toolbar}>
-        {!embedded ? <label>Tournament<select value={year} onChange={(event) => { setYear(event.target.value); setRound(""); }}>{years.map((item) => <option key={item}>{item}</option>)}</select></label> : null}
-        <label>Round<select value={round} onChange={(event) => setRound(event.target.value)}><option value="">All rounds</option>{rounds.map((item) => <option key={item} value={item}>Round {item}</option>)}</select></label>
+        {!embedded ? <label>Tournament<select value={year} onChange={(event) => { if (confirmSwitch()) { setYear(event.target.value); setRound(""); } }}>{years.map((item) => <option key={item}>{item}</option>)}</select></label> : null}
+        <label>Round<select value={round} onChange={(event) => { if (confirmSwitch()) setRound(event.target.value); }}><option value="">All rounds</option>{rounds.map((item) => <option key={item} value={item}>Round {item}</option>)}</select></label>
         <label>Updated By<input value={updatedBy} onChange={(event) => setUpdatedBy(event.target.value)} /></label>
         <strong>{matches.length} matches</strong>
       </div>
@@ -162,7 +231,7 @@ export default function LiveMatchControl({ embedded = false, sharedSecret = "", 
         <p>{tournamentState.remainingMatches} matches · {tournamentState.remainingPoints} points remaining</p>
         <div><span>{teamName(data.teams, year, 2)}</span><strong>{tournamentState.teamTwo.score}</strong><small>{tournamentState.teamTwo.pointsToClinch > 0 ? `Need ${tournamentState.teamTwo.pointsToClinch.toFixed(1)} to clinch` : "At clinching target"}</small></div>
       </div>
-      <div className={styles.grid}>{matches.map((match) => <MatchEditor key={`${match["Match ID"]}-${match["Updated At"]}-${match["Match Status"]}`} match={match} players={data.players || []} rosters={data.rosters || []} teams={data.teams} onAction={act} busy={busy} />)}</div>
+      {busy ? <div className={styles.loadingState} role="status">Loading live matches…</div> : matches.length ? <div className={styles.grid}>{matches.map((match) => <MatchEditor key={match["Match ID"]} match={match} players={data.players || []} rosters={data.rosters || []} teams={data.teams} onAction={act} onDirtyChange={updateDirty} busy={busyMatchId === match["Match ID"]} access={accessByMatch[match["Match ID"]] || null} />)}</div> : <div className={styles.empty}>No matches are configured for this selection.</div>}
     </>}
   </section>;
 }

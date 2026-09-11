@@ -9,6 +9,8 @@ import { SITE_ESTABLISHED_YEAR, SITE_FORMAT_LABEL } from "../lib/site-config";
 import { tournamentStartTimestamp } from "../lib/tournament-countdown";
 import AssetImage from "./AssetImage";
 import TournamentStatusHero from "./TournamentStatusHero";
+import TournamentCommandCenter from "./TournamentCommandCenter";
+import { liveTournamentV2Enabled } from "../lib/spreadsheet-environment";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -113,6 +115,16 @@ export default async function Home() {
       score: liveTournament.teamTwo?.score ?? 0,
     },
   };
+
+  if (liveTournamentV2Enabled() && normalizedStatus === "LIVE") {
+    return (
+      <main>
+        <Header activeNavigationHref="/live" />
+        <TournamentCommandCenter tournament={statusHeroTournament} liveData={liveData} />
+        <Footer />
+      </main>
+    );
+  }
 
   return (
     <main>

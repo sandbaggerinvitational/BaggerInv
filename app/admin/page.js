@@ -2,6 +2,7 @@ import { Footer, Header } from "../components";
 import { getTournaments, refreshHistoricalData } from "../../lib/stats";
 import AdminCenter from "./AdminCenter";
 import { privatePageMetadata } from "../../lib/seo";
+import { liveTournamentV2Enabled } from "../../lib/spreadsheet-environment";
 
 export const dynamic = "force-dynamic";
 export const metadata = privatePageMetadata("Admin Center | Sandbagger Invitational");
@@ -24,5 +25,5 @@ export default async function AdminPage() {
     captainOne: item.team1?.captain?.["Display Name"] || "",
     captainTwo: item.team2?.captain?.["Display Name"] || "",
   }));
-  return <main><Header /><AdminCenter tournaments={tournaments} /><Footer /></main>;
+  return <main><Header /><AdminCenter tournaments={tournaments} previewMode={process.env.VERCEL_ENV === "preview"} liveTournamentV2={liveTournamentV2Enabled()} /><Footer /></main>;
 }

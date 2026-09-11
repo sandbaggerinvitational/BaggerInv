@@ -7,12 +7,12 @@ import {
 
 export default function manifest() {
   return {
-    id: SITE_URL,
+    id: "/",
     name: SITE_NAME,
     short_name: "SBI",
     description: DEFAULT_DESCRIPTION,
-    start_url: SITE_URL,
-    scope: `${SITE_URL}/`,
+    start_url: "/",
+    scope: "/",
     display: "standalone",
     background_color: "#f7f3ea",
     theme_color: "#0b3529",
@@ -28,6 +28,12 @@ export default function manifest() {
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
+      },
+      {
+        src: absoluteUrl("/icon-512.png"),
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
       },
     ],
   };

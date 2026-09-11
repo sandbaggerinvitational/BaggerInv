@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { navigationSections } from "./navigation";
 import { SITE_ESTABLISHED_YEAR } from "../lib/site-config";
 
-function activeNavigationHref(pathname, hash) {
+function activeNavigationHrefForPath(pathname, hash) {
   const links = navigationSections.flatMap((section) => section.links);
   const hashMatch = links.find(({ href }) => {
     if (!href.includes("#")) return false;
@@ -26,11 +26,11 @@ function activeNavigationHref(pathname, hash) {
     .sort((a, b) => b.href.length - a.href.length)[0]?.href || "";
 }
 
-export default function Menu() {
+export default function Menu({ activeNavigationHref = "" }) {
   const [isOpen, setIsOpen] = useState(false);
   const [hash, setHash] = useState("");
   const pathname = usePathname();
-  const activeHref = activeNavigationHref(pathname, hash);
+  const activeHref = activeNavigationHref || activeNavigationHrefForPath(pathname, hash);
 
   useEffect(() => {
     const updateHash = () => setHash(window.location.hash);

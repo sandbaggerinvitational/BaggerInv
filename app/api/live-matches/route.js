@@ -1,7 +1,10 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
+import QRCode from "qrcode";
 import {
+  disableLiveMatchAccess,
   finalizeLiveMatch,
+  generateLiveMatchAccess,
   readLiveMatchAdminData,
   reopenLiveMatch,
   updateLiveMatch,
@@ -31,7 +34,13 @@ function refreshMatchData() {
 export async function GET(request) {
   if (!authorized(request)) return deny();
   try {
-    return NextResponse.json({ data: await readLiveMatchAdminData() });
+    const data = await readLiveMatchAdminData();
+    return NextResponse.json({ data: {
+      ...data,
+      matches: data.matches.map((match) => Object.fromEntries(
+        Object.entries(match).filter(([key]) => !["Access Code Hash", "Access Token Hash"].includes(key))
+      )),
+    } });
   } catch (error) {
     console.error("Live Match Control load failed", { sheet: "Live Matches", reason: error?.message || String(error), stack: error?.stack });
     return NextResponse.json({ error: error?.message || "Unable to load live matches." }, { status: 500 });
@@ -43,13 +52,24 @@ export async function POST(request) {
   try {
     const { action, matchId, updates, updatedBy } = await request.json();
     let match;
+    let access;
     if (action === "update") match = await updateLiveMatch(matchId, updates, updatedBy);
     else if (action === "pairing") match = await updateLiveMatchPairing(matchId, updates, updatedBy);
     else if (action === "finalize") match = await finalizeLiveMatch(matchId, updates, updatedBy);
     else if (action === "reopen") match = await reopenLiveMatch(matchId, updatedBy);
+    else if (action === "access-generate") {
+      access = await generateLiveMatchAccess(matchId, updatedBy);
+      const accessUrl = `${new URL(request.url).origin}/score/access/${encodeURIComponent(access.token)}`;
+      const qrDataUrl = await QRCode.toDataURL(accessUrl, { width: 420, margin: 2, color: { dark: "#0b4938", light: "#fffdf8" } });
+      match = Object.fromEntries(Object.entries(access.match).filter(([key]) => !["Access Code Hash", "Access Token Hash"].includes(key)));
+      refreshMatchData();
+      return NextResponse.json({ match, access: { code: access.code, accessUrl, qrDataUrl, expiresAt: access.expiresAt } });
+    }
+    else if (action === "access-disable") match = await disableLiveMatchAccess(matchId, updatedBy);
     else throw new Error("Unknown live-match action.");
     refreshMatchData();
-    return NextResponse.json({ match });
+    const safeMatch = Object.fromEntries(Object.entries(match).filter(([key]) => !["Access Code Hash", "Access Token Hash"].includes(key)));
+    return NextResponse.json({ match: safeMatch });
   } catch (error) {
     console.error("Live Match Control action failed", { sheet: "Live Matches / Matches / Match Update Log", reason: error?.message || String(error), stack: error?.stack });
     return NextResponse.json({ error: error?.message || "Unable to update the match." }, { status: 400 });
