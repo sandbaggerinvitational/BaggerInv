@@ -13,6 +13,8 @@ export function playerAvatarPhoto(player, filename = "") {
 
 export default function PlayerAvatar({ player, filename = "", src = "", name = "", alt = "", className, fallbackClassName, ...imageProps }) {
   const playerName = name || player?.name || player?.["Display Name"] || "Player";
-  const resolvedSrc = src || playerPhoto(playerAvatarPhoto(player, filename));
+  const resolvedSrc = src
+    ? (src.startsWith("/images/players/") ? playerPhoto(src) : src)
+    : playerPhoto(playerAvatarPhoto(player, filename));
   return <AssetImage {...imageProps} src={resolvedSrc} alt={alt} className={className} fallbackClassName={fallbackClassName} fallback={playerAvatarInitials(playerName)} inferFallback={false} />;
 }

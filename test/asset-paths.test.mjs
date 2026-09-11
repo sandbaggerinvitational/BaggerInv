@@ -6,7 +6,7 @@ import { courseLogo, playerPhoto, teamLogo, tournamentHero, tournamentLogo } fro
 test("asset helpers match the public directory layout", () => {
   assert.equal(courseLogo("bandon-dunes-logo.png"), "/images/courses/logos/bandon-dunes-logo.png");
   assert.equal(teamLogo("blue-team.webp"), "/images/teams/logos/blue-team.webp");
-  assert.equal(playerPhoto("ada.jpg"), "/images/players/ada.webp");
+  assert.equal(playerPhoto("ada.jpg"), null, "unknown optional portrait must not produce a doomed URL");
   assert.equal(playerPhoto("connor-o'reilly-pic"), "/images/players/connor-oreilly-pic.webp");
   assert.equal(playerPhoto("connor-o’reilly-pic"), "/images/players/connor-oreilly-pic.webp");
   assert.equal(tournamentHero("pinehurst-no4.webp"), "/images/tournaments/hero/pinehurst-no4.webp");

@@ -62,6 +62,15 @@ test("canonical portrait and genuine missing-image fallback are retained",()=>{
   assert.match(render(MobilePlayerProjection,{players:[player],portraits:{[player.id]:"holman-moores-pic"}}),/src="\/images\/players\/holman-moores-pic.webp"/);
   assert.match(render(MobilePlayerProjection,{players:[player]}),/image unavailable/);
 });
+test("known missing portrait filenames and explicit bundled paths render initials without img requests",()=>{
+  for(const [name,key] of [['Chris Micheal','chris-micheal-pic'],['Jack Keffler','jack-keffler-pic'],['Patrick Noonan','patrick-noonan-pic']]){
+    for(const props of [{filename:key},{src:`/images/players/${key}.webp`}]){
+      const html=render(PlayerAvatar,{...props,name,alt:name});
+      assert.doesNotMatch(html,/<img\b/);assert.match(html,/role="img"/);
+      assert.ok(html.includes(name.split(' ').map(x=>x[0]).join('')));
+    }
+  }
+});
 test("Guide rendered copy, Golf Genius references, event sequence and participant links are unchanged",()=>{
   const oldSource=execFileSync("git",["show","4096f972:app/tournament-guide/PublicTournamentGuide.js"],{encoding:"utf8"});
   return component("app/tournament-guide/PublicTournamentGuide.js","PublicTournamentGuide",{AssetImage},oldSource).then(OldGuide=>{

@@ -28,7 +28,7 @@ test("zero and plus teams retain signed full team PH, with nonnegative relative 
 });
 test("incomplete/conflicting course, pairing, roster and handicap inputs fail closed", () => {
   const cases = [
-    v=>v.matches[0].holes.pop(), v=>v.matches[0].holes=[],
+    v=>v.matches[0].holes.pop(), v=>v.matches.forEach(e=>e.holes=[]),
     v=>v.matches[0].holes[0].stroke_index=0,
     v=>v.matches[1].holes[0].stroke_index=11,
     v=>v.matches[1].snapshot.rating=72.8,
@@ -47,6 +47,18 @@ test("incomplete/conflicting course, pairing, roster and handicap inputs fail cl
     v=>v.matches[0].match.tournament_id="2025",
   ];
   for(const change of cases) { const view=scrambleView();change(view);assert.equal(first(view).handicapPresentation,"UNAVAILABLE",change.toString()); }
+});
+test("cleared then repopulated R2-1/R2-4 reuse complete agreeing course evidence without preparing holes", () => {
+  const view = scrambleView();
+  [view.matches[0].participants,view.matches[3].participants] = [view.matches[3].participants,view.matches[0].participants];
+  view.matches[0].holes=[]; view.matches[3].holes=[];
+  const before=structuredClone(view);
+  assert.deepEqual([...matchCenterScrambleHandicaps(view).values()].map(values),
+    [[3,2,1,0],[2,4,0,2],[3,3,0,0],[6,3,3,0],[1,3,0,2],[6,6,0,0]]);
+  assert.deepEqual(view,before);
+  // A partially populated target is not an empty pre-start target.
+  view.matches[0].holes=[view.matches[1].holes[0]];
+  assert.equal(first(view).handicapPresentation,'UNAVAILABLE');
 });
 test("started or otherwise evidenced matches cannot recompute from current handicap", () => {
   for(const patch of [{status:'LIVE'},{status:'FINAL'},{scoring_locked:true},{scored_holes:1},
