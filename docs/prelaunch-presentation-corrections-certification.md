@@ -1,5 +1,58 @@
 # Pre-launch presentation corrections — release 93 candidate
 
+## Final combined candidate — owner portrait additions (2026-09-11)
+
+This addendum supersedes the original no-portrait classification for CM01,
+JK02 and PN01 below. The original audit remains as historical evidence.
+Production release 93 was restored separately through an authorized rollback;
+this candidate does not deploy or remove its automatic-promotion suspension.
+The candidate retains `ab868a99` in full and imports only the three portrait
+blobs from owner upload `0fda36d950923b24a828fc8f19620067943ed40e`, not main's
+older runtime. Canonical filenames and player authority are unchanged.
+
+| Player | Asset | Git blob |
+|---|---|---|
+| Chris Micheal / CM01 | chris-micheal-pic.webp | 8608efcd7273fd209c048b18a1b42a5fec56fa17 |
+| Jack Keffler / JK02 | jack-keffler-pic.webp | 55d77500802dfbb778f6c06b8610069263a72cd9 |
+| Patrick Noonan / PN01 | patrick-noonan-pic.webp | 0c4bb49e79b587f93f9fb9084b2f8617e11dead0 |
+
+The 41-player retained presentation inventory now resolves 30 bundled portraits,
+zero remote portraits, and 11 clean fallbacks. The remaining fallback players
+are the eleven other players in the original table. No duplicate blob among
+the three additions; images visually render distinctly and use owner-provided
+identity mappings. No independent facial-identity inference is used.
+All 153 prior participant asset requests resolve to 142 existing local targets
+and 11 direct fallbacks, with zero missing targets. No image generation,
+placeholder files, historical restoration or player-data changes.
+
+Final certification: 117 application tests, 12 PostgreSQL/native/scoring tests,
+and 3 browser suites passed; Production build and git diff --check passed.
+An obsolete test expecting the three added portraits to be absent now tests
+three genuinely absent players. Explicit tests cover all three new mappings.
+Initial sandbox loopback/shared-memory errors required local permissions;
+one unattached 56-byte orphaned local PostgreSQL test segment was removed after
+verifying its creator was gone. Unchanged SQL assertions then passed.
+
+Browser fixtures use freshly captured public release-93 Odds/Guide data with
+the certified current R2 pairing fixtures. At 390, 430, 820, 1280 and 1440px:
+all six Scrambles pass; positive badges render, zero badges are absent; four
+canonical sample portraits load, eleven fallbacks issue no image request;
+UTC SSR/Chicago hydration has no runtime or hydration errors; no overflow,
+asset 404s or mutation transports. Actual 390/430 captures inspected.
+Artifacts: `/tmp/bagger-prelaunch-browser-WTzocE`, plus preservation suites.
+
+The targeted 15-route read-only smoke passed HTTP 200 on release 93 for Home,
+Tournament, Match Center, Odds, Guide and its five destinations, Courses,
+Players, History, Privacy and Support. No broad recrawl or runtime redesign.
+Existing public/Director and native-boundary tests pass. Authorized legal/app
+references remain isolated; Guide content and Golf Genius references unchanged.
+Analytics HTML size remains P3; no new P0/P1 finding. Release requires separate
+exact-SHA authorization and short live acceptance before group distribution.
+
+No Production mutation, release, registry/environment edit, cron change,
+automatic-promotion change, migration, Guide/Odds publication, scoring or
+handicap operation occurred during this final-candidate continuation.
+
 ## Baseline / safety
 
 Read-only Production inspection on 2026-09-11 found release 93 at

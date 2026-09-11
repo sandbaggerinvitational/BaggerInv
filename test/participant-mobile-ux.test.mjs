@@ -63,7 +63,7 @@ test("canonical portrait and genuine missing-image fallback are retained",()=>{
   assert.match(render(MobilePlayerProjection,{players:[player]}),/image unavailable/);
 });
 test("known missing portrait filenames and explicit bundled paths render initials without img requests",()=>{
-  for(const [name,key] of [['Chris Micheal','chris-micheal-pic'],['Jack Keffler','jack-keffler-pic'],['Patrick Noonan','patrick-noonan-pic']]){
+  for(const [name,key] of [['Blake Jumonville','blake-jumonville-pic'],['John Geibel','john-geibel-pic'],['Tim Gregg','tim-gregg-pic']]){
     for(const props of [{filename:key},{src:`/images/players/${key}.webp`}]){
       const html=render(PlayerAvatar,{...props,name,alt:name});
       assert.doesNotMatch(html,/<img\b/);assert.match(html,/role="img"/);

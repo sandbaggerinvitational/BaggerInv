@@ -47,7 +47,8 @@ test('prelaunch SSR hydration, six Scrambles, optional portraits and Guide at fi
   await page.goto('http://127.0.0.1:'+server.address().port);
   await page.waitForFunction(()=>document.querySelector('#portrait-HM01 img')?.naturalWidth>0);
   assert.deepEqual(errors,[],'initial hydration/runtime errors '+width);
-  for(const p of fixture.players.slice(1)){assert.equal(await page.locator('#portrait-'+p.id+' img').count(),0);assert.equal(await page.locator('#portrait-'+p.id+' [role="img"]').count(),1);}
+  for(const p of fixture.players.slice(0,4))await page.waitForFunction(id=>document.querySelector('#portrait-'+id+' img')?.naturalWidth>0,p.id);
+  for(const p of fixture.players.slice(4)){assert.equal(await page.locator('#portrait-'+p.id+' img').count(),0);assert.equal(await page.locator('#portrait-'+p.id+' [role="img"]').count(),1);}
   const expected=[[3,2,1,0],[2,4,0,2],[3,3,0,0],[6,3,3,0],[1,3,0,2],[6,6,0,0]];
   for(let i=0;i<6;i++){const card=page.locator('#match-2026-R2-'+(i+1));assert.deepEqual(await card.locator('[class$="_teamHandicap"] b').allTextContents(),expected[i].slice(0,2).map(x=>x.toFixed(1)));assert.equal(await card.getByText('0 strokes received',{exact:false}).count(),0);for(const n of expected[i].slice(2).filter(Boolean))assert.ok(await card.getByText(n+' stroke',{exact:false}).count());}
   if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)){
@@ -55,7 +56,7 @@ test('prelaunch SSR hydration, six Scrambles, optional portraits and Guide at fi
     await page.screenshot({path:path.join(dir,'overflow-'+width+'.png')});
   }
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'overflow '+width);
-  for(const id of ['match-2026-R2-1','match-2026-R2-4','portraits','odds','guide'])await page.locator('#'+id).screenshot({path:path.join(dir,id+'-'+width+'.png')});
+  for(const id of ['match-2026-R2-1','match-2026-R2-2','match-2026-R2-4','portraits','odds','guide'])await page.locator('#'+id).screenshot({path:path.join(dir,id+'-'+width+'.png')});
   assert.deepEqual(errors,[],'hydration/runtime errors '+width);await page.close();
  }
  assert.deepEqual(missing,[],'no asset 404 requests');assert.deepEqual(writes,[],'no mutation transports');

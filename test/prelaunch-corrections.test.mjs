@@ -6,11 +6,18 @@ import {playerPhoto} from '../lib/asset-paths.js';
 import {playerPortraitAssets} from '../lib/player-portrait-assets.js';
 import {oddsPublicationDate} from '../lib/odds-publication-date.js';
 
-export const noPortraitIds=['CM01','JK02','PN01','BJ01','CO02','CF01','JS02','JG01','KW01','MO01','PC01','SL01','TG01','WD01'];
-test('all 14 audited missing portraits and future missing players resolve without an image request',async()=>{
+export const noPortraitIds=['BJ01','CO02','CF01','JS02','JG01','KW01','MO01','PC01','SL01','TG01','WD01'];
+test('remaining 11 missing portraits and future missing players resolve without an image request',async()=>{
   const history=JSON.parse(await readFile(new URL('../lib/historical-data.json',import.meta.url),'utf8'));
   for(const id of noPortraitIds){const p=history.players.find(p=>p['Player ID']===id);assert.ok(p,id);assert.equal(playerPhoto(p['Photo Filename']),null,id);}
   for(const file of ['',null,'future-new-player-pic','../private','javascript:alert(1)'])assert.equal(playerPhoto(file),null);
+});
+test('three owner-added portraits resolve from unchanged canonical player authority',async()=>{
+  const history=JSON.parse(await readFile(new URL('../lib/historical-data.json',import.meta.url),'utf8'));
+  for(const [id,file] of [['CM01','chris-micheal-pic'],['JK02','jack-keffler-pic'],['PN01','patrick-noonan-pic']]){
+    const p=history.players.find(p=>p['Player ID']===id);
+    assert.equal(playerPhoto(p['Photo Filename']),'/images/players/'+file+'.webp');
+  }
 });
 test('bundled inventory exactly matches assets, and existing canonical/remote portraits remain usable',async()=>{
   const files=(await readdir(new URL('../public/images/players/',import.meta.url))).filter(f=>f.endsWith('.webp')).sort();
