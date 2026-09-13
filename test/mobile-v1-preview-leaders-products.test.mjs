@@ -298,8 +298,9 @@ async function assertTopLevelSchemaShape(product, body) {
   assert.deepEqual(Object.keys(body).sort(), Object.keys(schema.properties).sort());
   assert.deepEqual(
     Object.keys(body.data).sort(),
-    Object.keys(schema.properties.data.properties).sort(),
+    Object.keys(schema.properties.data.properties).filter(key => key !== "observer").sort(),
   );
+  assert.equal(Object.hasOwn(body.data, "observer"), false, "Preview must never carry observer admission");
   assert.equal(body.ok, true);
   assert.equal(body.apiVersion, "v1");
   assert.match(body.meta.generatedAt, /^2026-08-30T18:00:00\.000Z$/);

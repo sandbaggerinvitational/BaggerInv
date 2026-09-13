@@ -19,7 +19,7 @@ const all = NATIVE_CAPABILITIES;
 const code = (k) => `NATIVE_${k.toUpperCase()}_DISABLED`;
 function issue(env, extra = {}) { return issueMobileNativeCertification({ ...actor, env, productionContext: productionContext(), ...extra }); }
 function identityDependencies(env, fixtures) {
-  return { nativeAdmission: fixtures.dependencies, verifyAccessToken: async () => ({ status: "active", authUserId: actor.authUserId }),
+  return { readReviewer: async () => null, reviewerOtp: async () => ({handled:false}), nativeAdmission: fixtures.dependencies, verifyAccessToken: async () => ({ status: "active", authUserId: actor.authUserId }),
     readForAuth: async () => ({ payload: { ok: true, data: { ...actor, tournament: { id: "2026" }, membership: { active: true }, contextRevision: 1,
       matches: [{ matchId: "SYNTHETIC-M1", format: "SI" }] } } }),
     readCurrentTournamentRuntime: async () => fixtures.current };
@@ -28,7 +28,7 @@ async function authenticated(env, fixtures, capability = "reads", dependencies =
   const proof = issue(env);
   return resolveMobileBearerIdentity({ env, capability,
     request: request("session", { headers: { authorization: "Bearer synthetic", "x-bagger-certification": proof.token } }),
-    dependencies: { ...identityDependencies(env, fixtures), ...dependencies } });
+    dependencies: { readReviewer: async () => null, reviewerOtp: async () => ({handled:false}), ...identityDependencies(env, fixtures), ...dependencies } });
 }
 
 test("PN-2 every independent capability and all 16 combinations require explicit booleans", async () => {
@@ -207,9 +207,9 @@ test("PN-2 disabled auth/certification executes no provider, challenge, audit or
   assert.equal(calls, 0);
   // Enabling AUTH alone reaches ordinary input/anti-abuse validation, not reads.
   const on = environment(["auth"]), f = authorityFixtures(on);
-  await assert.rejects(() => requestMobileNativeOtp({ env: on, request: request("auth/otp/request"), input: { method: "phone" }, dependencies: { nativeAdmission: f.dependencies } }), { code: "AUTH_METHOD_UNAVAILABLE" });
+  await assert.rejects(() => requestMobileNativeOtp({ env: on, request: request("auth/otp/request"), input: { method: "phone" }, dependencies: { readReviewer: async () => null, reviewerOtp: async () => ({handled:false}), nativeAdmission: f.dependencies } }), { code: "AUTH_METHOD_UNAVAILABLE" });
   const cert = environment(["certification"]), cf = authorityFixtures(cert);
-  await assert.rejects(() => certifyMobileNativeOtp({ env: cert, request: request("auth/otp/certify"), input: { challengeId: actor.authUserId }, dependencies: { nativeAdmission: cf.dependencies } }), { code: "UNAUTHORIZED" });
+  await assert.rejects(() => certifyMobileNativeOtp({ env: cert, request: request("auth/otp/certify"), input: { challengeId: actor.authUserId }, dependencies: { readReviewer: async () => null, reviewerOtp: async () => ({handled:false}), nativeAdmission: cf.dependencies } }), { code: "UNAUTHORIZED" });
 });
 
 test("PN-2 disabled scoring denies direct domain calls and authenticated queued intents before any persistence", async () => {
@@ -256,6 +256,7 @@ test("PN-2 certification-only requires a verified canonical challenge and rechec
     const env = environment(["certification"]), f = authorityFixtures(env);
     let issued = 0, identityReads = 0;
     const dependencies = {
+      reviewerOtp: async () => ({handled:false}),
       nativeAdmission: f.dependencies,
       verifyUser: async () => ({ status: "active", authUserId: actor.authUserId, email: "synthetic@example.test", emailVerified: true }),
       consumeCertificationRateLimit: () => ({ allowed: true }),
@@ -296,12 +297,12 @@ test("PN-2 auth rechecks before provider delivery after asynchronous eligibility
 });
 
 export const routeCapabilities = {
-  health: "health", "auth/captcha": "auth", "auth/otp/request": "auth", "auth/otp/certify": "certification",
+  "account/deletion": "auth", health: "health", "auth/captcha": "auth", "auth/otp/request": "auth", "auth/otp/certify": "certification",
   session: "reads", today: "reads", matches: "reads", "matches/[matchId]": "reads", leaders: "reads", schedule: "reads",
   guide: "reads", passport: "reads", history: "reads", "history/[year]": "reads", records: "reads", odds: "reads",
   "net-skins": "reads", calcutta: "reads", "scoring/current": "reads", "scoring/hole": "scoring", "scoring/finalize": "scoring",
 };
-test("PN-2 all 21 compiled routes are classified and default-off denies before any external transport", async () => {
+test("PN-2 all 22 compiled routes are classified and default-off denies before any external transport", async () => {
   const paths = (await readdir(new URL("app/api/mobile/v1/", root), { recursive: true })).filter((p) => p.endsWith("/route.js")).map((p) => p.replace("/route.js", "")).sort();
   assert.deepEqual(paths, Object.keys(routeCapabilities).sort());
   const saved = { ...process.env }, oldFetch = globalThis.fetch;

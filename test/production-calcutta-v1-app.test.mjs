@@ -421,3 +421,14 @@ test("participant PWA uses authenticated V1 while the public secondary route sta
     presentation: { secondaryModules: [] },
   }), true);
 });
+
+import {reviewerIdentity} from './fixtures/reviewer-context.mjs';
+test('observer Calcutta projection changes only viewer binding, never ownership or financial population',()=>{
+ const raw=view();const before=structuredClone(raw);const observer=reviewerIdentity();
+ const data=mobileCalcuttaDataFromProductionView(raw,observer);
+ const participant=mobileCalcuttaDataFromProductionView(raw,{tournamentId:'2026',playerId:'P1'});
+ assert.equal(data.viewer.playerId,null);assert.equal(data.observer.subjectId,observer.authUserId);
+ assert.deepEqual(data.market,participant.market);assert.deepEqual(data.result,participant.result);
+ assert.deepEqual(raw,before);assert.equal(JSON.stringify(data.market).includes(observer.authUserId),false);
+ assert.throws(()=>mobileCalcuttaDataFromProductionView(raw,{...observer,context:{...observer.context}}));
+});

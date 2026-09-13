@@ -298,3 +298,15 @@ test("route, schema, and documentation preserve the mobile v1 boundary without c
     "Production activation", "X-Bagger-Certification", "ETag", "Player ID",
   ]) assert.match(docs, new RegExp(term));
 });
+
+import {reviewerIdentity} from './fixtures/reviewer-context.mjs';
+test('observer Skins projection has no competitor identity or entries and preserves canonical field population',()=>{
+ const raw=view(); const before=structuredClone(raw);const observer=reviewerIdentity();
+ const data=mobileNetSkinsDataFromProductionView(raw,observer);
+ assert.equal(data.player,null);assert.equal(data.observer.subjectId,observer.authUserId);
+ assert.deepEqual(data.rounds,mobileNetSkinsDataFromProductionView(raw,identity).rounds);
+ assert.deepEqual(raw,before);
+ assert.equal(data.published,false);assert.equal(data.presentation,null);
+ assert.equal(JSON.stringify(data.rounds).includes(observer.authUserId),false);
+ assert.throws(()=>mobileNetSkinsDataFromProductionView(raw,{...observer,context:{...observer.context}}));
+});

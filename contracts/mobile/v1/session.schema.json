@@ -4,32 +4,63 @@
   "title": "Bagger Mobile API v1 session response",
   "type": "object",
   "additionalProperties": false,
-  "required": ["ok", "apiVersion", "data"],
+  "required": [
+    "ok",
+    "apiVersion",
+    "data"
+  ],
   "properties": {
-    "ok": { "const": true },
-    "apiVersion": { "const": "v1" },
+    "ok": {
+      "const": true
+    },
+    "apiVersion": {
+      "const": "v1"
+    },
     "data": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["player", "tournament"],
+      "required": [
+        "tournament"
+      ],
       "properties": {
         "player": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["playerId", "displayName", "team"],
+          "required": [
+            "playerId",
+            "displayName",
+            "team"
+          ],
           "properties": {
-            "playerId": { "type": "string", "minLength": 1 },
-            "displayName": { "type": "string", "minLength": 1 },
+            "playerId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "displayName": {
+              "type": "string",
+              "minLength": 1
+            },
             "team": {
               "oneOf": [
-                { "type": "null" },
+                {
+                  "type": "null"
+                },
                 {
                   "type": "object",
                   "additionalProperties": false,
-                  "required": ["teamId", "name"],
+                  "required": [
+                    "teamId",
+                    "name"
+                  ],
                   "properties": {
-                    "teamId": { "type": "string", "minLength": 1 },
-                    "name": { "type": "string", "minLength": 1 }
+                    "teamId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    }
                   }
                 }
               ]
@@ -39,14 +70,119 @@
         "tournament": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["tournamentId", "name", "year"],
+          "required": [
+            "tournamentId",
+            "name",
+            "year"
+          ],
           "properties": {
-            "tournamentId": { "type": "string", "minLength": 1 },
-            "name": { "type": "string", "minLength": 1 },
-            "year": { "type": ["integer", "null"] }
+            "tournamentId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "year": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          }
+        },
+        "observer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "subjectId",
+            "historicalFixture"
+          ],
+          "properties": {
+            "subjectId": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            },
+            "historicalFixture": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "tournamentId",
+                    "year",
+                    "revisionId",
+                    "matchId",
+                    "bindingRevision"
+                  ],
+                  "properties": {
+                    "tournamentId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "year": {
+                      "type": "integer",
+                      "minimum": 2017,
+                      "maximum": 2025
+                    },
+                    "revisionId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "matchId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "bindingRevision": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  }
+                }
+              ]
+            }
           }
         }
-      }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "player"
+          ],
+          "not": {
+            "required": [
+              "observer"
+            ],
+            "properties": {
+              "observer": {}
+            }
+          },
+          "properties": {
+            "player": {}
+          }
+        },
+        {
+          "required": [
+            "observer"
+          ],
+          "not": {
+            "required": [
+              "player"
+            ],
+            "properties": {
+              "player": {}
+            }
+          },
+          "properties": {
+            "observer": {}
+          }
+        }
+      ]
     }
   }
 }

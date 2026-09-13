@@ -37,7 +37,7 @@ test("PN-8A AUTH OFF and malformed/client-selected enrollment input stop before 
     if (mode === "client-mode") input.verificationType = "signup";
     if (mode === "client-player") input.playerId = "arbitrary";
     await assert.rejects(() => requestMobileNativeOtp({ env, request: request("auth/otp/request"), input,
-      dependencies: { nativeAdmission: f.dependencies, minimumDurationMs: 0,
+      dependencies: { readReviewer: async () => null, reviewerOtp: async () => ({handled:false}), nativeAdmission: f.dependencies, minimumDurationMs: 0,
         authorizeOptions: { rpc: async () => { calls++; throw new Error("must not reach adapter"); } } } }));
     assert.equal(calls, 0);
   }
@@ -68,7 +68,7 @@ test("PN-8A canonical revision or revocation during a read rejects response/304 
   const token = issueMobileNativeCertification({ ...actor, env, productionContext: signedContext() }).token;
   const identity = await resolveMobileBearerIdentity({ env,
     request: request("today", { headers: { authorization: "Bearer synthetic", "x-bagger-certification": token } }),
-    dependencies: { nativeAdmission: f.dependencies, verifyAccessToken: async () => ({ status: "active", authUserId: actor.authUserId }),
+    dependencies: { readReviewer: async () => null, reviewerOtp: async () => ({handled:false}), nativeAdmission: f.dependencies, verifyAccessToken: async () => ({ status: "active", authUserId: actor.authUserId }),
       readForAuth: async () => ({ payload: { ok: active, data: context } }), readCurrentTournamentRuntime: async () => f.current } });
   await recheckMobileNativeIdentity(identity, "reads", env);
   context = participant(2);
@@ -89,7 +89,7 @@ test("PN-8A default Production path reuses existing enrollment adapter and prese
   };
   const result = await requestMobileNativeOtp({ env, request: request("auth/otp/request"),
     input: { method: "email", identifier: "synthetic@example.invalid", captchaToken: "synthetic-captcha-token-at-least-twenty-characters" },
-    dependencies: { nativeAdmission: f.dependencies, minimumDurationMs: 0, consumeClientRateLimit: () => ({ allowed: true }),
+    dependencies: { readReviewer: async () => null, reviewerOtp: async () => ({handled:false}), nativeAdmission: f.dependencies, minimumDurationMs: 0, consumeClientRateLimit: () => ({ allowed: true }),
       authorizeOptions: { rpc, adminClient: { auth: { admin: { createUser: async input => {
         assert.equal(input.email_confirm, false); calls.push("controlled-create"); return { data: { user: { id: actor.authUserId } } };
       } } } } },
@@ -106,7 +106,7 @@ test("PN-8A first-login certification completes canonical verification before re
   const env = environment(["certification"]), f = authorityFixtures(env), calls = [];
   let verified = false;
   const result = await certifyMobileNativeOtp({ env, request: request("auth/otp/certify", { headers: { authorization: "Bearer synthetic" } }),
-    input: { challengeId: actor.authUserId }, dependencies: {
+    input: { challengeId: actor.authUserId }, dependencies: { readReviewer: async () => null, reviewerOtp: async () => ({handled:false}),
       nativeAdmission: f.dependencies, consumeCertificationRateLimit: () => ({ allowed: true }),
       verifyUser: async () => ({ status: "active", authUserId: actor.authUserId, email: "synthetic@example.invalid", emailVerified: true }),
       authorizeVerification: async () => ({ payload: { allowed: true, ...actor, verificationType: "signup" } }),
@@ -124,7 +124,7 @@ for (const outcome of ["unknown", "collision", "cleanup", "provider-failure", "a
     const first = outcome === "cleanup";
     const result = await requestMobileNativeOtp({ env, request: request("auth/otp/request"),
       input: { method: "email", identifier: "synthetic@example.invalid", captchaToken: "synthetic-captcha-token-at-least-twenty-characters" },
-      dependencies: { nativeAdmission: f.dependencies, minimumDurationMs: 0, consumeClientRateLimit: () => ({ allowed: true }),
+      dependencies: { readReviewer: async () => null, reviewerOtp: async () => ({handled:false}), nativeAdmission: f.dependencies, minimumDurationMs: 0, consumeClientRateLimit: () => ({ allowed: true }),
         authorizeOptions: { rpc: async name => {
           if (name === "complete_production_participant_first_login") throw new Error("synthetic completion failure");
           if (name === "record_production_participant_first_login_cleanup") return { payload: { ok: true } };
@@ -150,7 +150,7 @@ test("PN-8A approved first-login request uses canonical signup delivery without 
   let sent = 0;
   const result = await requestMobileNativeOtp({ env, request: request("auth/otp/request"),
     input: { method: "email", identifier: "synthetic@example.invalid", captchaToken: "synthetic-captcha-token-at-least-twenty-characters" },
-    dependencies: { nativeAdmission: f.dependencies, minimumDurationMs: 0, consumeClientRateLimit: () => ({ allowed: true }),
+    dependencies: { readReviewer: async () => null, reviewerOtp: async () => ({handled:false}), nativeAdmission: f.dependencies, minimumDurationMs: 0, consumeClientRateLimit: () => ({ allowed: true }),
       authorizeEligibility: async () => ({ ok: true, authorization: { payload: {
         allowed: true, requestId: actor.authUserId, authUserId: actor.authUserId, playerId: actor.playerId,
         email: "synthetic@example.invalid", verificationType: "signup",

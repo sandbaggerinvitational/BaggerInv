@@ -1,5 +1,106 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "urn:bagger:mobile:v1:today",
-  "type": "object", "additionalProperties": false, "required": ["ok", "apiVersion", "data", "meta"],
-  "properties": { "ok": { "const": true }, "apiVersion": { "const": "v1" }, "data": { "type": "object", "additionalProperties": false, "required": ["tournament", "player", "currentMatch", "immediateSchedule"], "properties": { "tournament": { "$ref": "shared.schema.json#/$defs/tournament" }, "player": { "$ref": "shared.schema.json#/$defs/player" }, "currentMatch": { "oneOf": [{ "type": "null" }, { "$ref": "shared.schema.json#/$defs/match" }] }, "immediateSchedule": { "type": "array", "maxItems": 3, "items": { "$ref": "shared.schema.json#/$defs/event" } } } }, "meta": { "$ref": "shared.schema.json#/$defs/meta" } }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bagger:mobile:v1:today",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ok",
+    "apiVersion",
+    "data",
+    "meta"
+  ],
+  "properties": {
+    "ok": {
+      "const": true
+    },
+    "apiVersion": {
+      "const": "v1"
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tournament",
+        "player",
+        "currentMatch",
+        "immediateSchedule"
+      ],
+      "properties": {
+        "tournament": {
+          "$ref": "shared.schema.json#/$defs/tournament"
+        },
+        "player": {
+          "oneOf": [
+            {
+              "$ref": "shared.schema.json#/$defs/player"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "currentMatch": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "shared.schema.json#/$defs/match"
+            }
+          ]
+        },
+        "immediateSchedule": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "$ref": "shared.schema.json#/$defs/event"
+          }
+        },
+        "observer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "subjectId"
+          ],
+          "properties": {
+            "subjectId": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            }
+          }
+        }
+      },
+      "oneOf": [
+        {
+          "not": {
+            "required": [
+              "observer"
+            ],
+            "properties": {
+              "observer": {}
+            }
+          },
+          "properties": {
+            "player": {
+              "$ref": "shared.schema.json#/$defs/player"
+            }
+          }
+        },
+        {
+          "required": [
+            "observer"
+          ],
+          "properties": {
+            "player": {
+              "type": "null"
+            },
+            "observer": {}
+          }
+        }
+      ]
+    },
+    "meta": {
+      "$ref": "shared.schema.json#/$defs/meta"
+    }
+  }
 }

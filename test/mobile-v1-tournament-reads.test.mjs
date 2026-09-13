@@ -294,3 +294,21 @@ test("Schedule revision covers timezone-derived representation and ignores uncha
   assert.deepEqual(same.body.data, first.body.data);
   assert.equal(same.revision, first.revision);
 });
+
+import {reviewerIdentity} from './fixtures/reviewer-context.mjs';
+import {assertMobileV1Schema} from './support/mobile-v1-schema-validator.mjs';
+test('observer Today and Matches preserve published tournament facts without personal golfer data',async()=>{
+ const observer=reviewerIdentity();
+ const dependencies={requireHomeReadSource:source,requireTournamentReadSource:source,
+  readTournamentLiveView:async()=>rpc({marker:true}),readGuideProjection:async()=>guide(),
+  tournamentLiveDataFromSupabaseView:()=>({revision:'live-r2',tournament:tournament(),rounds:[{number:2,label:'Round 2',format:'BB',matches:[match('M3','Final')]}]}),
+  applyGuideCoursesToTournament:v=>v};
+ const matches=await mobileMatchesResult(observer,{now,dependencies});
+ assert.equal(matches.body.data.matches[0].authenticatedPlayer.involved,false);
+ assert.equal(JSON.stringify(matches.body.data.matches).includes(observer.authUserId),false);
+ const home=await mobileTodayResult(observer,{now,dependencies});
+ assert.equal(home.body.data.player,null);assert.equal(home.body.data.currentMatch,null);
+ assert.equal(home.body.data.observer.subjectId,observer.authUserId);
+ assert.equal(home.body.data.immediateSchedule.length,1);
+ await assertMobileV1Schema('today',home.body);
+});

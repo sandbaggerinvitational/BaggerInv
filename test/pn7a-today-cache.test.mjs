@@ -176,6 +176,7 @@ async function withReadRoute(run, { enabled = true } = {}) {
     if (path.endsWith("/inspect_production_cutover_read_state")) return Response.json(fixtures.read);
     if (path.endsWith("/inspect_production_scoring_admission")) return Response.json(fixtures.admission);
     if (path.endsWith("/read_production_current_tournament_runtime_v1")) return Response.json(fixtures.current);
+    if (path.endsWith("/read_native_review_context_v1")) return Response.json({ok:false,code:"REVIEW_ACCESS_UNAVAILABLE"});
     if (path.endsWith("/read_production_participant_context_for_auth")) return Response.json({ ok: true, data: identity.context });
     assert.fail("Unexpected provider transport in local read-only test");
   };
