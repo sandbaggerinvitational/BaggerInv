@@ -25,6 +25,16 @@ test('complete deployed-source attribution topology accepts the inert deletion c
   assert.equal(q("select to_regclass('participant_identity.deletion_attribution_columns_v1') is null"),'t','failed installation rolls the entire package back');
   assert.deepEqual(functions(),before,'failed installation leaves all original guards intact');
   q(packageSql);
+  const portraitSql = (await import('node:fs')).readFileSync(new URL('../supabase/production_incremental/player-portrait-policy-v1.sql',import.meta.url),'utf8');
+  const installedDeletionFunctions=functions();
+  assert.throws(()=>q(portraitSql.replace(/commit;\s*$/i,'select 1/0;commit;')),/division by zero/);
+  assert.equal(q("select to_regclass('participant_identity.player_portrait_policy_v1') is null"),'t');
+  assert.deepEqual(functions(),installedDeletionFunctions);
+  q(portraitSql);
+  const installedPortraitFunctions=functions();
+  for (const [name,hash] of Object.entries(installedDeletionFunctions)) assert.equal(installedPortraitFunctions[name],hash,`existing deletion/authority function unchanged: ${name}`);
+  assert.equal(q('select count(*) from participant_identity.player_portrait_policy_v1'),'0');
+  assert.equal(q('select revision from participant_identity.player_portrait_policy_clock_v1'),'0');
   const after = functions();
   for (const [name, hash] of Object.entries(before)) {
     if (/require_live_authorship_v1|reject.*immutable|guard_odds_snapshot_immutability|net_skins_entry_history_immutable_v1/.test(name)) continue;

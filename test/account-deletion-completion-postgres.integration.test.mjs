@@ -25,6 +25,8 @@ test('original deletion request resumes after handoff in disposable PostgreSQL',
       create table auth.users(id uuid primary key,email_confirmed_at timestamptz,phone_confirmed_at timestamptz);
       create table auth.sessions(user_id uuid references auth.users on delete cascade);
       create table scoring_authority.tournaments(tournament_id text primary key);
+      create table scoring_authority.players(player_id text primary key);
+      insert into scoring_authority.players values('P1'),('P3');
       create table scoring_authority.matches(match_id text primary key,tournament_id text,status text);
       create table scoring_authority.tournament_players(tournament_id text,player_id text,participation_status text);
       create table scoring_authority.hole_scores(player_id text,strokes integer);
@@ -50,6 +52,7 @@ test('original deletion request resumes after handoff in disposable PostgreSQL',
     sql(readFileSync(new URL('../supabase/production_migrations/202609110101_account_deletion_review_access_v1.sql', import.meta.url), 'utf8'));
     sql(readFileSync(new URL('../supabase/production_incremental/account-deletion-completion-work-item.sql', import.meta.url), 'utf8'));
     sql(readFileSync(new URL('../supabase/production_incremental/account-deletion-completion-queue.sql', import.meta.url), 'utf8'));
+    sql(readFileSync(new URL('../supabase/production_incremental/player-portrait-policy-v1.sql', import.meta.url), 'utf8'));
     assert.equal(sql('select count(*) from participant_identity.account_deletion_requests_v1'), '0');
     for (const role of ['anon', 'authenticated']) {
       assert.equal(sql(`select has_function_privilege('${role}','public.read_account_deletion_work_item_v1(uuid)','EXECUTE')`), 'f');
@@ -97,10 +100,13 @@ test('original deletion request resumes after handoff in disposable PostgreSQL',
     assert.equal(sql('select count(*) from auth.users'), '1', 'work-item lookup never deletes Auth');
     // Simulates the provider transaction only inside this synthetic database.
     sql(`delete from auth.users where id='${user}'`);
+    assert.equal(sql("select policy from participant_identity.player_portrait_policy_v1 where player_id='P1'"),'SUPPRESSED');
+    assert.equal(sql('select revision from participant_identity.player_portrait_policy_clock_v1'),'1');
     assert.deepEqual(work(), {requestId: request, authUserId: null, status: 'COMPLETED', completed: true});
     assert.equal(finish(continued.leaseToken).completed, true);
     assert.deepEqual(finish(continued.leaseToken), {completed:true,idempotent:true});
     assert.deepEqual(claim(), {items:[]}, 'completed request cannot be requeued');
+    assert.equal(sql('select revision from participant_identity.player_portrait_policy_clock_v1'),'1','completed worker retries do not advance policy');
     assert.equal(sql('select count(*) from participant_identity.account_deletion_retry_state_v1'), '0', 'no residual retry identity retained');
     assert.deepEqual(work(), {requestId: request, authUserId: null, status: 'COMPLETED', completed: true});
     assert.equal(sql('select count(*) from auth.sessions'), '0');

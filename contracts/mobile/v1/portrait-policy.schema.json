@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Authenticated global player portrait policy v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contractVersion", "revision", "players"],
+  "properties": {
+    "contractVersion": {"const": "player-portrait-policy-v1"},
+    "revision": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+    "players": {
+      "type": "array", "maxItems": 4096,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["playerId", "policy", "revision"],
+        "properties": {
+          "playerId": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+          "policy": {"enum": ["ACTIVE", "SUPPRESSED"]},
+          "revision": {"type": "integer", "minimum": 0, "maximum": 9007199254740991}
+        }
+      }
+    }
+  }
+}

@@ -115,6 +115,18 @@ test('local attribution minimization preserves revision8 competition facts and i
     const receiptFacts = () => sql(`select jsonb_agg((to_jsonb(r)-'actor_auth_user_id') || jsonb_build_object('response',case when response->>'playerId'='P1' then response-'maskedGhinNumber' else response end) order by operation_request_id) from production_control.handicap_source_operation_receipts_v1 r`);
     const sourceReceiptBefore = receiptFacts();
     sql(candidate);
+    sql(read('../supabase/production_incremental/player-portrait-policy-v1.sql'));
+    const policy = () => JSON.parse(sql("set request.jwt.claim.role='service_role';select public.read_player_portrait_policy_v1()"));
+    await t.test('portrait installation defaults every stable player to ACTIVE without writes', () => {
+      assert.equal(sql('select count(*) from participant_identity.player_portrait_policy_v1'),'0');
+      assert.deepEqual(policy(),{contractVersion:'player-portrait-policy-v1',revision:0,players:[1,2,3,4].map(n=>({playerId:`P${n}`,policy:'ACTIVE',revision:0}))});
+      for (const role of ['anon','authenticated','service_role']) {
+        assert.equal(sql(`select has_table_privilege('${role}','participant_identity.player_portrait_policy_v1','INSERT')`),'f');
+        assert.equal(sql(`select has_table_privilege('${role}','participant_identity.player_portrait_policy_clock_v1','UPDATE')`),'f');
+      }
+      for (const role of ['anon','authenticated']) assert.equal(sql(`select has_function_privilege('${role}','public.read_player_portrait_policy_v1()','EXECUTE')`),'f');
+      assert.throws(()=>sql('select public.read_player_portrait_policy_v1()'),/service role required/);
+    });
     await t.test('installation is inert', () => assert.equal(rows(), before));
     await t.test('private capability cannot be forged by service role or session GUC', () => {
       assert.throws(() => sql(`set role service_role;insert into participant_identity.deletion_attribution_capability_v1 values(txid_current(),pg_backend_pid(),'${id(1)}','${id(2)}');`), /permission denied/);
@@ -133,6 +145,15 @@ test('local attribution minimization preserves revision8 competition facts and i
       const entries = sql('select jsonb_agg(to_jsonb(r)) from scoring_authority.handicap_revision_entries r');
       const pointer = sql('select jsonb_agg(to_jsonb(r)) from scoring_authority.handicap_revision_current r');
       initiate(1);sql(`delete from auth.users where id='${id(1)}'`);
+      assert.deepEqual(policy().players.find(p=>p.playerId==='P1'),{playerId:'P1',policy:'SUPPRESSED',revision:1});
+      assert.equal(policy().revision,1);
+      assert.equal(policy().players.filter(p=>p.policy==='ACTIVE').length,3);
+      const settledPolicy=policy();
+      sql(`delete from auth.users where id='${id(1)}'`);
+      sql(`set request.jwt.claim.role='service_role';select public.read_account_deletion_receipt_v1('${request(1)}')`);
+      assert.deepEqual(policy(),settledPolicy,'completed retry does not advance or remove suppression');
+      assert.throws(()=>sql("update participant_identity.player_portrait_policy_v1 set revision=2 where player_id='P1'"),/PORTRAIT_SUPPRESSION_IMMUTABLE/);
+      assert.throws(()=>sql("delete from participant_identity.player_portrait_policy_v1"),/PORTRAIT_SUPPRESSION_IMMUTABLE/);
       assert.equal(oddsFacts(), oddsBefore, 'Odds values, publication identity and timestamps unchanged');
       assert.equal(skinsFacts(), skinsBefore, 'Skins results, points and timestamps unchanged');
       assert.equal(receiptFacts(), sourceReceiptBefore, 'all other receipt fields including original hashes and timestamps remain unchanged');
@@ -172,6 +193,8 @@ test('local attribution minimization preserves revision8 competition facts and i
       assert.equal(oddsFacts(), prior);
       assert.equal(sql(`select count(*) from auth.users where id='${id(3)}'`), '1');
       sql('drop trigger zzz_tamper_odds on scoring_authority.odds_published_snapshots');
+      assert.equal(policy().revision,1,'failed deletion rolls back policy revision');
+      assert.equal(policy().players.find(p=>p.playerId==='P3').policy,'ACTIVE');
     });
     await t.test('protected account rolls back attribution and retains account', () => {
       sql(`insert into production_control.tournament_owner_capabilities_v1 values('${id(2)}','ACTIVE')`);
@@ -179,6 +202,7 @@ test('local attribution minimization preserves revision8 competition facts and i
       assert.throws(() => sql(`delete from auth.users where id='${id(2)}'`), /ACCOUNT_DELETION_PROTECTED/);
       assert.equal(rows(), prior);
       assert.equal(sql(`select count(*) from auth.users where id='${id(2)}'`), '1');
+      assert.equal(policy().players.find(p=>p.playerId==='P2').policy,'ACTIVE','protected accounts not prematurely suppressed');
     });
     await t.test('a later BEFORE trigger changing timestamps fails final guard and rolls everything back', () => {
       sql(`create function scoring_authority.touch_receipt() returns trigger language plpgsql as $$begin new.updated_at:=clock_timestamp();return new;end;$$;
@@ -197,6 +221,13 @@ test('local attribution minimization preserves revision8 competition facts and i
       assert.throws(() => sql(`delete from auth.users where id='${id(4)}'`), /foreign key constraint/);
       assert.equal(rows(), prior);
       assert.equal(sql(`select count(*) from auth.users where id='${id(4)}'`), '1');
+    });
+    await t.test('second successful deletion advances version and preserves earlier tombstone', () => {
+      sql(`delete from auth.users where id='${id(3)}'`);
+      assert.equal(policy().revision,2);
+      assert.deepEqual(policy().players.find(p=>p.playerId==='P3'),{playerId:'P3',policy:'SUPPRESSED',revision:2});
+      assert.equal(policy().players.find(p=>p.playerId==='P1').revision,1);
+      assert.equal(sql('select jsonb_agg(to_jsonb(r)) from scoring_authority.hole_scores r'), history);
     });
   } finally {
     run(bin + 'pg_ctl', ['-D', root + '/data', '-m', 'fast', '-w', 'stop']);
