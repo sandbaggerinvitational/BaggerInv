@@ -15,8 +15,12 @@ test("six paired Scrambles use exact approved Course Handicaps, not retained zer
   assert.deepEqual(view,before,"read-only derivation cannot prepare a snapshot or change participants");
   const web = tournamentLiveDataFromSupabaseView(view,{matchCenterHandicapPresentation:true});
   assert.deepEqual(web.rounds[0].matches.map(values),expectedScramble);
-  for (const options of [{},{mobileContract:true},{mobileContract:true,matchCenterHandicapPresentation:true}]) {
+  for (const options of [{}]) {
     assert.ok(tournamentLiveDataFromSupabaseView(view,options).rounds[0].matches.every(m=>m.team1PlayingHcp===0));
+  }
+  for (const options of [{mobileContract:true},{mobileContract:true,matchCenterHandicapPresentation:true}]) {
+    assert.ok(tournamentLiveDataFromSupabaseView(view,options).rounds[0].matches.every(m=>
+      values(m).every(value => value === null)));
   }
 });
 test("zero and plus teams retain signed full team PH, with nonnegative relative strokes", () => {

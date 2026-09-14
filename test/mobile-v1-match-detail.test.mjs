@@ -728,3 +728,11 @@ test("Match Detail route maps only tournament-scoped explicit not-found to the s
     }
   });
 });
+
+test("unprepared Scramble does not turn placeholder stroke zeros into No strokes", () => {
+  const raw = rawFixture({ format: "SC" });
+  raw.snapshot.team_configuration = { team_1_strokes: 0, team_2_strokes: 0 };
+  assert.ok(map(raw).match.teams.every(team => team.playingHandicap === null && team.strokesReceived === null));
+  raw.snapshot.team_configuration = { team_1_playing_handicap: 0, team_2_playing_handicap: 0, team_1_strokes: 0, team_2_strokes: 0 };
+  assert.ok(map(raw).match.teams.every(team => team.playingHandicap === 0 && team.strokesReceived === 0));
+});
