@@ -18,10 +18,14 @@ test("public static pages have exact App Store metadata and canonical URLs", () 
   }
 });
 test("policy matches owner-declared V1 categories, purposes and providers", () => {
-  for (const text of ["September 10, 2026", "Email address and user ID", "Device ID", "Gameplay content", "Product interaction", "Performance data and other diagnostic data", "Coarse location", "network or IP", "Supabase", "Vercel", "Resend", "Cloudflare Turnstile", "We do not sell personal information", "not designed as a child-directed service"]) assert.ok(privacy.includes(text), text);
+  for (const text of ["September 14, 2026", "Email address and user ID", "Device ID", "Gameplay content", "Product interaction", "Performance data and other diagnostic data", "Coarse location", "network or IP", "Supabase", "Vercel", "Resend", "Cloudflare Turnstile", "We do not sell personal information", "not designed as a child-directed service"]) assert.ok(privacy.includes(text), text);
   assert.match(privacy, /does not request precise GPS/);
   assert.match(privacy, /does not contain third-party advertising/);
   assert.doesNotMatch(privacy, /phone number|physical address|health\/fitness|payment card|advertising identifiers/i);
+});
+test("completed deletion disclosure distinguishes account removal from minimized competition retention", () => {
+  for (const text of ["Settings → Account → Delete Account", "When deletion completes", "authentication account", "account contact information", "account-to-player login link", "nonessential account/profile information", "revoke account access", "necessary participant attribution", "historical handicap information required to explain tournament results", "Account contact information and authentication credentials are not retained merely for that purpose", "Limited security, integrity, and deletion records", "minimized or disassociated"]) assert.ok(privacy.includes(text), text);
+  assert.doesNotMatch(privacy, /deletion requests where applicable|completion email|within \d+|SMS|erase.*binar|all.*records.*delet/i);
 });
 test("support has owner-selected contact and never asks for secrets", () => {
   assert.match(support, /mailto:SandbaggerInvitational@gmail\.com/);

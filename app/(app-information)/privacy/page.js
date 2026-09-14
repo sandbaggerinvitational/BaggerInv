@@ -10,7 +10,7 @@ export const metadata = {
 export default function PrivacyPage() {
   return <article>
     <h1>Privacy Policy — The Bagger</h1>
-    <p>Effective date: <time dateTime="2026-09-10">September 10, 2026</time></p>
+    <p>Effective date: <time dateTime="2026-09-14">September 14, 2026</time></p>
     <section><h2>Introduction</h2>
       <p>The Bagger is the official companion application for The Sandbagger Invitational. This policy applies to The Bagger iOS app and related services operated for The Sandbagger Invitational.</p>
     </section>
@@ -41,7 +41,8 @@ export default function PrivacyPage() {
       <p>We do not sell personal information. Information may be processed by service providers necessary to operate the app and may be disclosed when legally required. Tournament information may be displayed to participants or on public tournament surfaces as part of the service.</p>
     </section>
     <section><h2>Data retention</h2>
-      <p>Information is retained for as long as reasonably necessary to operate the service, maintain tournament records, provide security and audit functionality, comply with legal obligations, and resolve disputes.</p>
+      <p>Official tournament records—including necessary participant attribution, teams, pairings, scores, results, points, statistics, and the historical handicap information required to explain tournament results—may be retained to preserve the integrity of the Sandbagger Invitational&apos;s historical competition record. Account contact information and authentication credentials are not retained merely for that purpose.</p>
+      <p>Limited security, integrity, and deletion records may be retained only as necessary and are minimized or disassociated from the deleted account where appropriate.</p>
     </section>
     <section><h2>Security</h2>
       <p>We use administrative and technical safeguards, including access controls and protected connections, to help protect information. No system or method of transmission can guarantee absolute security.</p>
@@ -50,7 +51,8 @@ export default function PrivacyPage() {
       <p>The Bagger is intended for participants and users of The Sandbagger Invitational. It is not designed as a child-directed service.</p>
     </section>
     <section><h2>Your choices and requests</h2>
-      <p>Visit our <Link href="/support">support page</Link> for privacy questions, correction requests, deletion requests where applicable, or account concerns. Some information may need to be retained for tournament records, security, or legal obligations.</p>
+      <p>You can request account deletion in Settings → Account → Delete Account. When deletion completes, we remove your authentication account, account contact information, account-to-player login link, and nonessential account/profile information, and revoke account access.</p>
+      <p>Visit our <Link href="/support">support page</Link> for privacy questions, correction requests, or account concerns.</p>
     </section>
     <section><h2>Policy changes</h2>
       <p>We may update this policy as the service changes. We will revise the effective date when we do.</p>
