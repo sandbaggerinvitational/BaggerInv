@@ -91,9 +91,20 @@ test("ordinary participant navigation contains no link or redirect to legacy act
 
 test("Supabase Home does not register the legacy Trusted Devices install callback", async () => {
   const banner = await source("app/PlayerSetupBanner.js");
-  const effect = banner.slice(banner.indexOf("useEffect(() => {"), banner.indexOf("}, [onUpdated])") + 16);
-  assert.ok(effect.indexOf("if (!readiness) return undefined") < effect.indexOf('addEventListener("sbi:pwa-installed"'));
-  assert.match(effect, /saveReadiness\(\{ pwaInstalled: true \}\)/);
+  const { loadDirectorSource } = await import("./fixtures/director-behavior.mjs");
+  const { hooks } = await import("./fixtures/release-gate-behavior.mjs");
+  const saved = { window: globalThis.window, document: globalThis.document, fetch: globalThis.fetch };
+  let listeners = 0, writes = 0;
+  globalThis.window = { addEventListener: () => { listeners++; }, removeEventListener: () => {}, matchMedia: () => ({ matches: false }), navigator: {} };
+  globalThis.document = { documentElement: { dataset: { browserInstallability: "retired" } } };
+  globalThis.fetch = () => { writes++; throw new Error("no transport expected"); };
+  try {
+    const effects = [];
+    const { default: Banner } = await loadDirectorSource("app/PlayerSetupBanner.js", { react: { ...hooks, useEffect: fn => effects.push(fn) }, "./player-setup-banner.module.css": {} });
+    assert.equal(Banner({ readiness: null }), null);
+    for (const effect of effects) effect();
+    assert.equal(listeners, 0); assert.equal(writes, 0);
+  } finally { for (const [key, value] of Object.entries(saved)) { if (value === undefined) delete globalThis[key]; else globalThis[key] = value; } }
 });
 
 test("public player profile navigation is independent of Supabase identity", async () => {

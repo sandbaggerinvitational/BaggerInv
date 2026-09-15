@@ -97,7 +97,10 @@ test("Game Center return context defaults to My Match and preserves explicit saf
   assert.match(page, /return "my-match"/);
   assert.match(page, /\["home", "my-match", "tournament"\]/);
   assert.match(page, /startsWith\("\/live\?view=leaderboards"\)/);
-  assert.match(source, /leaderboardReturn \? backTo : "\/my-match"/);
+  const { between, evaluate } = await import("./fixtures/release-gate-behavior.mjs");
+  const block = between(source, "  const leaderboardReturn =", "\n  const backLabel");
+  for (const [backTo, expected] of [["", "/my-match"], ["home", "/home"], ["tournament", "/app/tournament"], ["/live?view=leaderboards&tab=players&round=2", "/app/leaderboards?tab=players&round=2"], ["/app/leaderboards?tab=teams", "/app/leaderboards?tab=teams"], ["https://evil.example", "/my-match"]])
+    assert.equal(await evaluate(`${block}\nreturn backHref;`, { backTo, clean: value => String(value || "").trim() }), expected);
   assert.match(error, /returnHref="\/my-match"/);
 });
 

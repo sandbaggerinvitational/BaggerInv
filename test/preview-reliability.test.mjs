@@ -138,7 +138,11 @@ test("participant shell uses selective idle prefetch while retaining explicit he
   assert.match(navigation, /router\.prefetch\(href\)/);
   assert.match(navigation, /requestIdleCallback/);
   assert.match(navigation, /href:\s*"\/home"/);
-  assert.match(navigation, /href:\s*"\/live"/);
+  const { participantDestination, participantAppHref } = await import("../lib/participant-shell.js");
+  const href = participantAppHref("/live");
+  assert.equal(href, "/app/tournament");
+  assert.equal(participantDestination(href), "Tournament");
+  assert.ok(navigation.includes(`href: "${href}"`));
   assert.match(navigation, /href:\s*"\/my-match"/);
 });
 

@@ -1,8 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
 import { tournamentLiveDataFromSupabaseView } from "../lib/tournament-live-supabase.js";
 import { mobileMatchesResult } from "../lib/mobile-v1-tournament-reads.js";
 import { mobileNativeHealthResult } from "../lib/mobile-native-admission.js";
@@ -104,17 +102,18 @@ test("immutable release73 preserved every release-72 file and the exact certifie
   assert.equal(git("diff", baseline, release73, "--", "supabase/production_migrations").trim(), "", "all installed migration sources preserved");
 });
 
-test("decimal-display correction preserves all release73 runtime outside the exact presentation allowlist",async()=>{
+test("immutable release74 decimal-display correction preserves all release73 runtime outside the exact presentation allowlist",async()=>{
   const baseline='a792f2a058ccec42d0ce2eaf9e8046cc6b370c06';
-  assert.equal(git('merge-base',baseline,'HEAD').trim(),baseline);
+  const release74='8e967680c98c488133a6f2c295c33e4cb3a2d807';
+  assert.equal(git('merge-base',baseline,release74).trim(),baseline);
+  const releaseBlobs=blobs(release74);
   const allowed=new Set(['app/PublicMatchCard.js','app/live/TournamentDashboard.js','lib/formatters.js','lib/tournament-live-supabase.js',
     'lib/match-center-player-handicap-display.js']);
   for(const [path,expected] of blobs(baseline)) {
     if(allowed.has(path)||path.startsWith('test/')||path.startsWith('docs/'))continue;
-    const actual=await readFile(new URL(path,root));
-    assert.equal(createHash('sha1').update(`blob ${actual.length}\0`).update(actual).digest('hex'),expected,path);
+    assert.equal(releaseBlobs.get(path),expected,path);
   }
-  const changed=git('diff','--name-only',baseline).trim().split('\n').filter(Boolean);
+  const changed=git('diff','--name-only',baseline,release74).trim().split('\n').filter(Boolean);
   assert.ok(changed.every(p=>allowed.has(p)||p.startsWith('test/')||p.startsWith('docs/')));
 });
 

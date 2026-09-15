@@ -157,14 +157,17 @@ test("the dead 2025 scorecard summary is removed while Honors remains model-back
   assert.match(page, /award\.winnerPlayer\?\.\["Display Name"\] \|\| award\.Winner/);
 });
 
-test("2025 owns one compact top year navigator while preserving canonical destinations", () => {
+test("2025 participant navigation preserves canonical destinations in its explicit namespace", async () => {
   assert.match(page, /<HistoryNavigation/);
   assert.doesNotMatch(page, /<HistoryArchiveNav/);
   assert.equal((page.match(/surface="year"/g) || []).length, 1);
   assert.doesNotMatch(page, /tournamentYearNavigationBottom/);
-  assert.match(page, /href: `\/history\/\$\{previousYear\}`/);
-  assert.match(page, /href: "\/history"/);
-  assert.match(page, /href: `\/history\/\$\{nextYear\}`/);
+  const { historyHrefContract } = await import("./fixtures/release-gate-behavior.mjs");
+  const href = await historyHrefContract("app/history/[year]/page.js");
+  assert.equal(href("/history/2024", true), "/app/history/2024");
+  assert.equal(href("/history", true), "/app/history");
+  assert.equal(href("/history/2026", true), "/app/history/2026");
+  for (const value of ["previousYear", "nextYear"]) assert.ok(page.includes(`historyPresentationHref(\`/history/\${${value}}\`, participantPresentation)`));
 });
 
 test("the 2025 presentation introduces no request, endpoint, data source, or dependency", () => {

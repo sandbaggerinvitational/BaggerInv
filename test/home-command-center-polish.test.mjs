@@ -101,9 +101,14 @@ test("Home routes, identity, facts, and accessible actions remain intact", async
   assert.match(personalized, /formatMatchResult/);
   assert.match(personalized, /href=\{detailsHref\}/);
   assert.match(personalized, /href="\/my-match"/);
-  assert.match(personalized, /href="\/live\?view=leaderboards&tab=skins"/);
-  assert.match(command, /href="\/live\?view=leaderboards"/);
-  assert.match(schedule, /href="\/tournament-guide\/schedule"/);
+  const { participantAppHref, participantDestination } = await import("../lib/participant-shell.js");
+  const skinsHref = participantAppHref("/live?view=leaderboards&tab=skins");
+  const boardHref = participantAppHref("/live?view=leaderboards");
+  assert.equal(skinsHref, "/app/leaderboards?tab=skins");
+  assert.equal(participantDestination(boardHref), "Leaderboards");
+  assert.ok(personalized.includes(`href="${skinsHref}"`));
+  assert.ok(command.includes(`href="${boardHref}"`));
+  assert.ok(schedule.includes(`href="${participantAppHref("/tournament-guide/schedule")}"`));
   assert.match(moments, /aria-label="Previous tournament moment"/);
   assert.match(moments, /aria-label="Next tournament moment"/);
   assert.match(styles, /min-height:\s*44px/);

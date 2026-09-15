@@ -13,6 +13,7 @@ async function importCurrentReadDispatch() {
   const original = await source("lib/production-current-read-dispatch.js");
   const transformed = original
     .replace('import "server-only";\n', "")
+    .replace('from "react"', `from ${JSON.stringify(import.meta.resolve("react"))}`)
     .replace(
       /import \{ PRODUCTION_TOURNAMENT_ID \} from "\.\/production-foundation-resource-contract\.js";/,
       'const PRODUCTION_TOURNAMENT_ID = "2026";',

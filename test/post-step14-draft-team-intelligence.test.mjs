@@ -42,11 +42,12 @@ function draftFixture() {
 test("Draft portraits enrich once by stable Player ID without changing the completed Draft", () => {
   const draft = draftFixture();
   const enriched = mergeCanonicalDraftPresentation(draft, [
-    { id: "P1", photo: "player-one-pic.webp" },
+    { id: "P1", photo: "clay-beltran-pic.webp" },
     { id: "P2", photo: "" },
   ]);
 
-  assert.equal(enriched.picks[0].player.image, "/images/players/player-one-pic.webp");
+  assert.equal(enriched.picks[0].player.image, "/images/players/clay-beltran-pic.webp");
+  assert.equal(mergeCanonicalDraftPresentation(draft, [{ id: "P1", photo: "nonexistent-future-player.webp" }]).picks[0].player.image, null);
   assert.equal(enriched.picks[1].player.image, null, "a Player without a portrait keeps the initials fallback");
   assert.equal(enriched.picks.length, 22);
   assert.equal(enriched.draftedCount, 22);

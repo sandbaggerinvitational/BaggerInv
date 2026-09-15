@@ -257,12 +257,12 @@ test("long Team History receives the same closing action without changing roster
   assert.doesNotMatch(teamPage, /<Footer variant="app" \/>/);
 });
 
-test("redundant app footers are scoped out of History while public event footer remains intact", () => {
+test("redundant app footers are scoped out of History while public event footer remains intact", async () => {
   for (const file of [historyPage, yearPage, roundPage, teamPage, unavailablePage])
     assert.doesNotMatch(file, /<Footer variant="app" \/>/);
   assert.match(components, /Sandbagger Invitational/);
   assert.match(components, /Official Tournament Website/);
-  assert.match(components, /24 Players • Two Teams • One Trophy/);
+  await (await import("./fixtures/release-gate-behavior.mjs")).taglineContract(components);
 });
 
 test("long pairing names wrap and no new dependency or participant request is introduced", () => {

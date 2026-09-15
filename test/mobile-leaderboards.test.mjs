@@ -337,7 +337,7 @@ test("Leaderboards use shared tournament identity, explicit app routing, URL tab
   assert.match(participantPage, /<LeaderboardsDashboard/);
   assert.match(source, /import TournamentIdentityHeader/);
   assert.match(source, /<TournamentIdentityHeader/);
-  assert.match(source, /LEADERBOARD_MODULES\.map/);
+  await (await import("./fixtures/release-gate-behavior.mjs")).leaderboardVisibilityContract(source);
   assert.doesNotMatch(source, /\["calcutta", "Calcutta"\]/);
   assert.match(source, /params\.set\("view", "leaderboards"\)/);
   assert.match(source, /placeholder="Search players"/);

@@ -35,9 +35,18 @@ test("current match mutation no longer accepts or synthesizes starting-hole inpu
   assert.doesNotMatch(replacement, /'startingHole'/);
 });
 
-test("current Director setup and Tournament Day surfaces present tee time without a starting-hole control", () => {
+test("current Director setup and Tournament Day surfaces present tee time without a starting-hole control", async () => {
   assert.doesNotMatch(setupUi, /Starting hole|startingHole|· Start /);
-  assert.match(setupUi, /Update \$\{match\.matchId\} course and tee time/);
+  const workspace = await source("app/admin/director/RoundPairingWorkspace.js");
+  const { evaluate } = await import("./fixtures/release-gate-behavior.mjs");
+  const expression = workspace.match(/onClick=\{\(\)=>stage\('upsert-match',([^]*?)\)\}>Review Match Details/);
+  assert.ok(expression);
+  let staged;
+  await evaluate(`stage('upsert-match',${expression[1]});`, { stage: (...args) => { staged = args; }, round: 2,
+    match: { matchId: "M2", matchNumber: 1 }, d: { metadata: { courseId: "C1", teeTime: "07:40:00" } } });
+  assert.equal(staged[0], "upsert-match");
+  assert.deepEqual(staged[1], { matchId: "M2", roundNumber: 2, matchNumber: 1, courseId: "C1", teeTime: "07:40:00" });
+  assert.doesNotMatch(workspace, /startingHole|Starting hole/);
   assert.doesNotMatch(tournamentDayUi, /Hole \$\{match\.startingHole\}|match\.startingHole/);
   assert.match(tournamentDayUi, /<dt>Tee time<\/dt>/);
   assert.doesNotMatch(directorModel, /startingHole:\s*clean\(display\.startingHole\)/);

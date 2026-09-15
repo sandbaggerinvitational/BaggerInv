@@ -205,7 +205,8 @@ test("Homepage completed-history composition keeps explicit 2026 history while c
         return {
           payload: {
             ok: true,
-            data: expectedYears.map((tournament_year) => ({ tournament_year })),
+            data: expectedYears.map((tournament_year) => ({ tournament_year,
+              revision_id: String(tournament_year) + "-production-homepage", payload_fingerprint: String(tournament_year).repeat(16) })),
           },
           durationMs: 1,
         };
@@ -214,7 +215,7 @@ test("Homepage completed-history composition keeps explicit 2026 history while c
         payload: {
           ok: true,
           data: {
-            revision: { revision_id: String(year) + "-production-homepage" },
+            revision: { tournament_year: Number(year), revision_id: String(year) + "-production-homepage", payload_fingerprint: String(year).repeat(16) },
             tournament: { tournament_year: Number(year) },
           },
         },

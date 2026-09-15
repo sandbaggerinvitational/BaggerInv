@@ -197,6 +197,31 @@ test("every callable mutation symbol remains on an exactly classified intent ent
       continue;
     }
     if (preview.has(relative)) {
+      if (relative === "app/api/tournament-guide/route.js") {
+        // Production is explicitly retired, including reads. Execute all
+        // handlers and prove retirement precedes auth/body parsing/writers.
+        const { loadDirectorSource } = await import("./fixtures/director-behavior.mjs");
+        let authoringCalls = 0, bodyReads = 0;
+        const route = await loadDirectorSource(relative, {
+          "next/server": { NextResponse: { json: (body, options) => ({ body, ...options }) } },
+          "../../../lib/director-transaction-error": { directorTransactionError: () => "unexpected" },
+          "../../../lib/production-google-authoring.js": { withProductionGoogleAuthoringWrite: () => { authoringCalls++; throw new Error("writer forbidden"); } },
+          "../../../lib/google-workbook-mutation-intent.js": { GOOGLE_AUTHORING_OPERATIONS: { TOURNAMENT_GUIDE: "TOURNAMENT_GUIDE" } },
+        });
+        const before = process.env.VERCEL_ENV;
+        try {
+          for (const environment of ["production", " PRODUCTION "]) {
+            process.env.VERCEL_ENV = environment;
+            for (const method of ["GET", "POST", "DELETE"]) {
+              const response = await route[method]({ headers: { get: () => { throw new Error("authorization must not be reached"); } }, json: () => { bodyReads++; throw new Error("body must not be read"); } });
+              assert.equal(response.status, 410);
+              assert.equal(response.body.code, "PRODUCTION_GUIDE_GOOGLE_AUTHORING_RETIRED");
+            }
+          }
+        } finally { if (before === undefined) delete process.env.VERCEL_ENV; else process.env.VERCEL_ENV = before; }
+        assert.equal(authoringCalls, 0); assert.equal(bodyReads, 0);
+        continue;
+      }
       assert.match(source,
         /VERCEL_ENV[^\n]{0,100}preview|process\.env\.VERCEL_ENV\s*!==\s*["']preview["']/,
         `${relative} must remain hard Preview-only`);

@@ -3,9 +3,14 @@ import { execFileSync } from "node:child_process";
 import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 import { requireMobileProductionReadContext } from "../lib/mobile-v1-production-read-context.js";
+import { withDirectorCalcuttaRead } from "./fixtures/reviewed-authority-extension.mjs";
 
 const base = "6d0b2ad5cab61f50e6d2a269bb2d02e036ccae05";
 const root = new URL("../", import.meta.url);
+// Exact certified Stage-0 reviewer/published-read implementations. No other
+// original authority pin advances with this maintenance disposition.
+const stage0 = "3985efb0c6c6cf99ffc38e92ca2b8b31f0b38971";
+const stage0Files = new Set(["mobile-v1-calcutta", "mobile-v1-net-skins", "production-cutover-read-transport"]);
 
 test("PN-1 preserves Production authority, dispatch, fencing, scoring and post-commit implementations byte-for-byte", async () => {
   const files = [
@@ -22,13 +27,13 @@ test("PN-1 preserves Production authority, dispatch, fencing, scoring and post-c
   for (const name of files) {
     const path = `lib/${name}.js`;
     const actual = await readFile(new URL(path, root), "utf8");
-    const original = execFileSync("git", ["show", `${base}:${path}`], { cwd: root, encoding: "utf8" });
+    const original = execFileSync("git", ["show", `${stage0Files.has(name) ? stage0 : base}:${path}`], { cwd: root, encoding: "utf8" });
     // Read closure changes only Guide delivery-fingerprint preservation.
     // Continue pinning every other byte of dispatch and authority code.
     const expected = name === 'production-shadow-read-adapters'
       ? original.replace('delivery_fingerprint: clean(data.payload_fingerprint),',
         'delivery_fingerprint: clean(data.delivery_fingerprint || data.payload_fingerprint),')
-      : original;
+      : name === "production-scoring-operations-server" ? withDirectorCalcuttaRead(original) : original;
     assert.equal(actual, expected, path);
   }
   for (const path of ["app/api/mobile/v1/scoring/hole/route.js", "app/api/mobile/v1/scoring/finalize/route.js"]) {

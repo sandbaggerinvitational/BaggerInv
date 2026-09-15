@@ -90,9 +90,9 @@ test("legacy /api/live is explicit rollback/Production only and cannot be a Supa
   assert.ok(handler.indexOf("tournamentReadEnvironment()") < handler.indexOf("getTournamentData"));
   assert.match(route, /selectedGoogleConsumers/);
   assert.match(route, /source\.requested === "google"/);
-  assert.match(livePage, /source\.resolved === "supabase" && \["points", "scores"\]\.includes\(view\)/);
-  assert.match(livePage, /source\.resolved === "supabase" && view && !\["leaderboards", "calcutta"\]\.includes\(view\)/);
-  assert.match(livePage, /requireNetSkinsReadSource/);
+  const { supabasePageContract } = await import("./fixtures/release-gate-behavior.mjs");
+  await supabasePageContract();
+  await supabasePageContract("app/app/leaderboards/page.js");
   assert.match(participantHome, /requireNetSkinsReadSource/);
 });
 

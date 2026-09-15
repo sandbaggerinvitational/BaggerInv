@@ -31,7 +31,7 @@ test("public desktop menu uses the original website navigation sections", async 
   const [menu, navigation] = await Promise.all([source("app/Menu.js"), source("app/navigation.js")]);
   assert.match(menu, /import \{ navigationSections \} from "\.\/navigation"/);
   assert.match(menu, /<nav className="sideNav sideNavSite" aria-label="Site navigation">[\s\S]*navigationSections\.map/);
-  assert.match(menu, /appShell[\s\S]*\? <Sheet[\s\S]*: <>[\s\S]*\{siteContent\}/);
+  await (await import("./fixtures/release-gate-behavior.mjs")).publicMenuContract(menu);
   assert.match(menu, /href=\{link\.href === "\/" \? homeHref : link\.href\}/);
   for (const label of ["Home", "Match Center", "Odds Center", "War Room", "Players", "Tournament"]) {
     assert.match(navigation, new RegExp(label));

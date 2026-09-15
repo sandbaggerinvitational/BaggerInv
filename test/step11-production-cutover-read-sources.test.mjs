@@ -199,7 +199,7 @@ test("activation disabled preserves certified live Production legacy resolution"
   assert.equal(oddsCalculationEnvironment(legacy).publicationAuthority, "google");
 });
 
-test("Net Skins reads canonical NOT_CONFIGURED state while Calcutta retains its configuration gate", () => {
+test("optional side-game reads preserve canonical empty states without an obsolete deployment-configuration gate", () => {
   const netSkins = netSkinsReadEnvironment({
     ...activeBase,
     PRODUCTION_CUTOVER_PHASE: "CURRENT_READS",
@@ -215,16 +215,23 @@ test("Net Skins reads canonical NOT_CONFIGURED state while Calcutta retains its 
     PRODUCTION_CUTOVER_PHASE: "CURRENT_READS",
     CALCUTTA_READ_SOURCE: "google",
   });
-  assert.equal(missingCalcutta.resolved, "unavailable");
-  assert.equal(missingCalcutta.blocked, true);
+  assert.equal(missingCalcutta.resolved, "google", "explicit retained rollback selection, never implicit fallback");
+  assert.equal(missingCalcutta.blocked, false);
+  assert.equal(missingCalcutta.fallbackUsed, false);
+  for (const flag of [undefined, "false", "true"]) {
+    const state = calcuttaReadEnvironment({ ...activeBase, PRODUCTION_CUTOVER_PHASE: "OBSERVATION", CALCUTTA_READ_SOURCE: "supabase", PRODUCTION_CALCUTTA_CONFIGURED: flag });
+    assert.equal(state.resolved, "supabase"); assert.equal(state.blocked, false); assert.equal(state.fallbackUsed, false);
+  }
   const enabledCalcutta = calcuttaReadEnvironment({
     ...activeBase,
-    PRODUCTION_CUTOVER_PHASE: "CURRENT_READS",
+    PRODUCTION_CUTOVER_PHASE: "OBSERVATION",
     CALCUTTA_READ_SOURCE: "supabase",
     PRODUCTION_CALCUTTA_CONFIGURED: "true",
   });
   assert.equal(enabledCalcutta.resolved, "supabase");
   assert.equal(enabledCalcutta.blocked, false);
+  assert.equal(calcuttaReadEnvironment({ ...activeBase, PRODUCTION_CUTOVER_PHASE: "CURRENT_READS", CALCUTTA_READ_SOURCE: "supabase" }).blocked, true,
+    "the actual OBSERVATION phase boundary remains enforced");
 });
 
 test("active read transport is bounded, exact-resource, and cannot be caller-overridden", () => {

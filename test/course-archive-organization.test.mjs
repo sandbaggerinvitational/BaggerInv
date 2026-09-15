@@ -118,11 +118,22 @@ test("Courses UI uses chronological groups, bounded prefetch, one AppShell, and 
   assert.match(page, /aria-labelledby=\{`course-year-/);
   assert.match(page, /aria-label=\{`View \$\{group\.year\} Round \$\{course\.round\}/);
   assert.match(page, /prefetch=\{false\}/);
-  assert.doesNotMatch(page, /<Header|<Footer|fetch\(|\/api\//);
+  assert.doesNotMatch(page, /fetch\(|\/api\//);
+  const { evaluate } = await import("./fixtures/release-gate-behavior.mjs");
+  for (const component of ["Header", "Footer"]) {
+    const expression = page.match(new RegExp(`\\{(participantPresentation \\? null : <${component} />)\\}`));
+    assert.ok(expression);
+    for (const participantPresentation of [false, true]) {
+      const result = await evaluate(`return ${expression[1]};`, { participantPresentation, [component]: component });
+      assert.equal(result?.type ?? null, participantPresentation ? null : component);
+    }
+  }
   assert.match(resolver, /courseArchiveTournaments: tournaments/);
   assert.match(detail, /courseOriginReturn/);
   assert.match(detail, /scheduleReturn \? <HistoryNavigation/);
-  assert.match(shell, /route === "\/courses"/);
+  const { participantAppShellRoute } = await import("../lib/participant-shell.js");
+  assert.equal(participantAppShellRoute("/courses"), false);
+  assert.equal(participantAppShellRoute("/app/courses"), true);
   assert.match(css, /grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/);
   assert.match(css, /@media \(max-width: 650px\)/);
 });

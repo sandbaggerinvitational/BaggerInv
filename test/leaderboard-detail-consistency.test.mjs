@@ -28,7 +28,11 @@ test("View Scorecard targets the canonical Game Center and preserves leaderboard
     read("app/live/LeaderboardRow.js"),
   ]);
   assert.match(shared, /`\/game-center\/\$\{encodeURIComponent\(matchId\)\}\?from=\$\{encodeURIComponent\(returnTo\)\}`/);
-  assert.match(dashboard, /`\/live\?view=leaderboards&tab=players&round=\$\{encodeURIComponent\(selectedRound\)\}`/);
+  const { evaluate } = await import("./fixtures/release-gate-behavior.mjs");
+  const expression = dashboard.match(/const returnTo = ([^;]+);/);
+  assert.ok(expression);
+  for (const selectedRound of ["1", "2", "3", "2&tab=other"])
+    assert.equal(await evaluate(`return ${expression[1]};`, { selectedRound }), `/app/leaderboards?tab=players&round=${encodeURIComponent(selectedRound)}`);
 });
 
 test("Overall keeps its expanded tournament summary and Net Skins keeps hole storytelling", async () => {

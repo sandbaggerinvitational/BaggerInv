@@ -88,7 +88,29 @@ test("current Course Detail uses the Guide resolver while archive transport uses
   assert.match(loader, /guideParticipantProjection\(\{ payload \}\)\.content/);
   assert.match(loader, /courseHoles: stored\.courseHoles \|\| \[\]/);
   assert.match(loader, /readGuideProjection\(\{ surface, env \}\)/);
-  assert.match(loader, /surface === "guide" \? readTournamentLiveView\(source\.tournamentId, \{[\s\S]*?env,[\s\S]*?productionCutoverSurface: "GUIDE_COURSE_CONTEXT",[\s\S]*?\}\) : Promise\.resolve\(null\)/);
+  const { declaration, evaluate } = await import("./fixtures/release-gate-behavior.mjs");
+  const fn = declaration(loader, "resolveTournamentGuideContent").replace(
+    'await import("../../lib/production-current-tournament-runtime.js")',
+    '({ readProductionCurrentTournamentRuntime })');
+  for (const environment of ["production", "preview"]) for (const surface of ["guide", "course"]) {
+    const calls = [];
+    const resolve = await evaluate(`${fn}\nreturn resolveTournamentGuideContent;`, {
+      requireGuideReadSource: () => ({ source: { resolved: "supabase" }, tournamentId: "2026" }),
+      readProductionCurrentTournamentRuntime: async () => ({ tournamentId: "2032" }),
+      readGuideProjection: async (options) => { calls.push(["guide", options]); return { payload: { ok: true } }; },
+      readTournamentLiveView: async (...args) => { calls.push(["live", ...args]); return { payload: { ok: true, data: {} } }; },
+      contentFromSupabase: (payload) => payload,
+      resolveGoogleGuideContent: () => { throw new Error("Google fallback forbidden"); },
+    });
+    await resolve({ surface, env: { VERCEL_ENV: environment } });
+    assert.equal(calls.filter(([kind]) => kind === "live").length, surface === "guide" ? 1 : 0);
+    assert.equal(calls.find(([kind]) => kind === "guide")[1].tournamentId, environment === "production" ? "2032" : undefined);
+    if (surface === "guide") {
+      const live = calls.find(([kind]) => kind === "live");
+      assert.equal(live[1], environment === "production" ? "2032" : "2026");
+      assert.equal(live[2].productionCutoverSurface, "GUIDE_COURSE_CONTEXT");
+    }
+  }
   assert.doesNotMatch(loader, /getTournamentData|refreshHistoricalData|readWorkbookSheetsByName/);
 });
 

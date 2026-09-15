@@ -10,10 +10,11 @@ test("the public site menu restores its original tournament footer without chang
   const hubContent = menu.slice(menu.indexOf("const hubContent"), menu.indexOf("return ("));
 
   assert.match(siteContent, /<nav className="sideNav sideNavSite" aria-label="Site navigation">[\s\S]*navigationSections\.map/);
-  assert.match(siteContent, /<div className="sideMenuFooter">24 players · Two teams · One trophy<\/div>/);
+  const { taglineContract, publicMenuContract } = await import("./fixtures/release-gate-behavior.mjs");
+  await taglineContract(siteContent);
   assert.match(siteContent, /directorMenuLink[\s\S]*Tournament Director/);
   assert.doesNotMatch(hubContent, /sideMenuFooter|24 players · Two teams · One trophy/);
-  assert.match(menu, /appShell[\s\S]*\? <Sheet[\s\S]*: <>[\s\S]*\{siteContent\}/);
+  await publicMenuContract(menu);
 });
 
 test("the public Match Center final-results action restores Champions while Supabase delivery stays selected", async () => {

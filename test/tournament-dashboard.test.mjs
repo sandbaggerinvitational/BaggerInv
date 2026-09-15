@@ -95,7 +95,14 @@ test("Tournament match cards remain compact and preserve official match data", a
   const [source, styles, dataSource] = await Promise.all([readFile(componentUrl, "utf8"), readFile(stylesUrl, "utf8"), readFile(dataUrl, "utf8")]);
   assert.match(source, /Round \{round\.number\}\{match\.match \? ` • Match/);
   assert.match(source, /playerMeta\(player, format\)/);
-  assert.match(source, /HCP \$\{formatHandicap\(player\.playingHcp\)\}/);
+  const { declaration, evaluate } = await import("./fixtures/release-gate-behavior.mjs");
+  const { formatHandicap, playerDisplayHandicap } = await import("../lib/formatters.js");
+  const meta = await evaluate(`${declaration(source, "playerMeta")}\nreturn playerMeta;`, { formatHandicap, playerDisplayHandicap, hasValue: value => value !== null && value !== undefined && value !== "" });
+  const player = { playingHcp: 15, displayHandicap: 14.7, stroke: 14 };
+  const before = structuredClone(player);
+  assert.match(meta(player, "BB"), /HCP 14\.7/);
+  assert.match(meta(player, "BB"), /14 stroke/);
+  assert.deepEqual(player, before);
   assert.match(source, /\+\$\{player\.stroke\} stroke/);
   assert.match(source, /matchResult\(match, tournament\)/);
   assert.match(source, /`Through \$\{match\.currentHole\}`/);

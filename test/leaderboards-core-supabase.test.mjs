@@ -420,11 +420,11 @@ test("leaderboard parity compares lifecycle and points by current official state
 
 test("Preview page and API use Supabase core with no Google fallback or Passport-named identity request", async () => {
   const [page, route, dashboard, loader, director] = await Promise.all([
-    source("app/live/page.js"), source("app/api/leaderboards/core/route.js"),
+    source("app/app/leaderboards/page.js"), source("app/api/leaderboards/core/route.js"),
     source("app/live/LeaderboardsDashboard.js"), source("app/live/LeaderboardsSupabaseRead.js"),
     source("app/api/director/scoring-authority/route.js"),
   ]);
-  assert.match(page, /supabaseLeaderboards/);
+  await (await import("./fixtures/release-gate-behavior.mjs")).supabasePageContract("app/app/leaderboards/page.js");
   assert.match(page, /<LeaderboardsSupabaseRead/);
   assert.match(route, /resolveSupabaseParticipantIdentity/);
   assert.match(route, /readLeaderboardsCoreView/);

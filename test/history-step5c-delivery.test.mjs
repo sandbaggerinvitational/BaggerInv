@@ -111,12 +111,24 @@ test("the Round client boundary receives a compact immutable scorecard presentat
   assert.equal(missingFirst[1].matchNetScoring.summary.sideAWins, 9);
 });
 
-test("deep Career detail mounts locally on first expansion and remains mounted", () => {
+test("deep Career detail defers only participant presentation and remains mounted after expansion", async () => {
   assert.match(career, /^"use client";/);
   assert.equal((career.match(/<IntelligenceSection defer /g) || []).length, 4);
   assert.match(career, /title="Career Snapshot" open/);
-  assert.match(career, /title="Records Held">/);
-  assert.match(career, /useState\(open \|\| !defer\)/);
+  assert.match(career, /title="Records Held" participantPresentation=\{participantPresentation\}/);
+  const { declaration, evaluate, css } = await import("./fixtures/release-gate-behavior.mjs");
+  for (const participantPresentation of [false, true]) {
+    const cells = []; let cursor = 0;
+    const section = await evaluate(`${declaration(career, "IntelligenceSection")}\nreturn IntelligenceSection;`, { styles: css,
+      useState: initial => { const index = cursor++; if (!(index in cells)) cells[index] = initial; return [cells[index], value => { cells[index] = value; }]; } });
+    const render = () => { cursor = 0; return section({ participantPresentation, defer: true, title: "Details", children: "retained" }); };
+    let tree = render();
+    assert.equal(tree.props["data-detail-mounted"], participantPresentation ? "false" : "true");
+    tree.props.onToggle({ currentTarget: { open: true } });
+    tree = render(); assert.equal(tree.props["data-detail-mounted"], "true");
+    tree.props.onToggle({ currentTarget: { open: false } });
+    assert.equal(render().props["data-detail-mounted"], "true");
+  }
   assert.match(career, /data-detail-mounted=\{hasRenderedContent \? "true" : "false"\}/);
   assert.match(career, /nextOpen = event\.currentTarget\.open/);
   assert.match(career, /\{hasRenderedContent \? <div className=\{styles\.playerIntelligenceBody\}>/);
@@ -130,10 +142,14 @@ test("deep Career detail mounts locally on first expansion and remains mounted",
   }
 });
 
-test("History prefetch is bounded to recent Archive, first Round, teams, and shell destinations", () => {
+test("History prefetch is bounded to recent Archive, first Round, teams, and shell destinations", async () => {
   assert.match(archive, /newestCompletedYear = tournaments\.find/);
   assert.match(archive, /prefetch=\{Number\(tournament\.year\) === Number\(newestCompletedYear\) \? undefined : false\}/);
-  assert.equal((tournament.match(/prefetch=\{index === 0 \? undefined : false\}/g) || []).length, 3);
+  const expressions = [...tournament.matchAll(/prefetch=\{(index === 0 \? undefined : false)\}/g)];
+  assert.equal(expressions.length, 4, "public overview plus three existing participant/legacy branches");
+  const { evaluate } = await import("./fixtures/release-gate-behavior.mjs");
+  for (const [, expression] of expressions) for (const index of [0, 1, 2])
+    assert.equal(await evaluate(`return ${expression};`, { index }), index === 0 ? undefined : false);
   assert.ok((tournament.match(/overviewRoundCourse[^>]*prefetch=\{false\}/g) || []).length >= 2);
   assert.match(tournament, /prefetchPlayerLinks=\{false\}/);
   assert.match(leaderboard, /prefetch=\{prefetch\}/);

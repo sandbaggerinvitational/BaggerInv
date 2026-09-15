@@ -47,7 +47,7 @@ test("Leaderboards owns exactly Players, Teams, Net Skins, and Insights", async 
   const [dashboard, wrapper, page] = await Promise.all([
     source("app/live/LeaderboardsDashboard.js"), source("app/live/LeaderboardsSupabaseRead.js"), source("app/live/page.js"),
   ]);
-  assert.match(dashboard, /LEADERBOARD_MODULES\.map/);
+  await (await import("./fixtures/release-gate-behavior.mjs")).leaderboardVisibilityContract(dashboard);
   assert.match(dashboard, /tab === "skins"/);
   assert.match(dashboard, /tab === "insights"/);
   assert.doesNotMatch(wrapper, /calcuttaReadUrl|leaderboards\/calcutta/);

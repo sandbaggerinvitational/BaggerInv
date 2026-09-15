@@ -45,5 +45,12 @@ test("player profiles preserve draft history as display-only career context", as
   );
   assert.match(profile, /getPlayerDraftHistory/);
   assert.match(profile, /className=\{styles\.profileDraftHistory\}/);
-  assert.doesNotMatch(profile, /Open Historical Draft Analytics|href=\{`\/draft\/\$\{draft\.year\}`\}/);
+  const { between, evaluate, css } = await import("./fixtures/release-gate-behavior.mjs");
+  const fragment = between(profile, "return participantPresentation ? (", "\n              })").replace(/^return /, "");
+  for (const participantPresentation of [false, true]) {
+    const tree = await evaluate(`return ${fragment}`, { participantPresentation, draft: { year: 2025, teamColor: "green" }, content: "historical-pick", styles: css, Link: "Link" });
+    assert.equal(tree.type, participantPresentation ? "article" : "Link");
+    assert.equal(tree.props.href, participantPresentation ? undefined : "/draft/2025");
+  }
+  assert.match(profile, /participantPresentation \? null : \([\s\S]*profileDraftAnalyticsLink/);
 });

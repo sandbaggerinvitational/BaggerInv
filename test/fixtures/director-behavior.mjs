@@ -8,15 +8,15 @@ export async function loadDirectorSource(path, dependencies) {
   const filename = new URL(`../../${path}`, import.meta.url);
   const { code } = await require("next/dist/build/swc").transform(await readFile(filename, "utf8"), {
     filename: filename.pathname, jsc: { parser: { syntax: "ecmascript", jsx: true },
-      transform: { react: { runtime: "classic", pragma: "__jsx" } }, target: "es2022" }, module: { type: "commonjs" },
+      transform: { react: { runtime: "classic", pragma: "__jsx", pragmaFrag: "__Fragment" } }, target: "es2022" }, module: { type: "commonjs" },
   });
   const module = { exports: {} };
   const resolve = key => {
     if (!(key in dependencies)) throw new Error(`Unstubbed dependency: ${key}`);
     return dependencies[key];
   };
-  new Function("require", "module", "exports", "__jsx", code)(resolve, module, module.exports,
-    (type, props, ...children) => ({ type, props: { ...props, children } }));
+  new Function("require", "module", "exports", "__jsx", "__Fragment", code)(resolve, module, module.exports,
+    (type, props, ...children) => ({ type, props: { ...props, children } }), "fragment");
   return module.exports;
 }
 

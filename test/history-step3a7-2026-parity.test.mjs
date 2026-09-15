@@ -74,12 +74,15 @@ test("all 2026 overview Round actions use the canonical neutral History route", 
   assert.doesNotMatch(yearPage, />View Results/);
 });
 
-test("2026 Year navigation is shared, top-placed, two-destination, and has no fabricated 2027", () => {
+test("2026 Year navigation is shared, top-placed, two-destination, and has no fabricated 2027", async () => {
   const hero = yearPage.indexOf("<section className={`${styles.tournamentHero}");
   const rail = yearPage.indexOf("<HistoryNavigation", hero);
   const content = yearPage.indexOf("<section className={styles.content}>", rail);
   assert.ok(hero >= 0 && hero < rail && rail < content);
-  assert.match(yearPage, /center=\{\{[\s\S]*href: "\/history"[\s\S]*label: "All Tournament Years"/);
+  const { historyHrefContract } = await import("./fixtures/release-gate-behavior.mjs");
+  const href = await historyHrefContract("app/history/[year]/page.js");
+  assert.equal(href("/history", true), "/app/history");
+  assert.match(yearPage, /center=\{\{[\s\S]*historyPresentationHref\("\/history", participantPresentation\)[\s\S]*label: "All Tournament Years"/);
   assert.match(yearPage, /left=\{previousYear \? \{/);
   assert.match(yearPage, /right=\{nextYear \? \{/);
   assert.doesNotMatch(yearPage, /<HistoryArchiveNav|2027|tournamentYearNavigationBottom/);
@@ -115,12 +118,15 @@ test("Round destination typography and interaction states retain approved dark-g
   assert.doesNotMatch(navigationCss, /\.destination:(?:visited|hover|active|focus-visible)[\s\S]{0,160}color:\s*var\(--tsi-gold/);
 });
 
-test("both 2026 Team pages place one Tournament parent rail below the hero", () => {
+test("both 2026 Team pages place one Tournament parent rail below the hero", async () => {
   const hero = teamPage.indexOf("<section className={`${styles.pageHero}");
   const rail = teamPage.indexOf("<HistoryNavigation", hero);
   const content = teamPage.indexOf("<section className={`${styles.content}", rail);
   assert.ok(hero >= 0 && hero < rail && rail < content);
-  assert.match(teamPage, /href: `\/history\/\$\{team\.year\}`/);
+  const { historyHrefContract } = await import("./fixtures/release-gate-behavior.mjs");
+  const href = await historyHrefContract("app/history/[year]/team/[side]/page.js");
+  assert.equal(href("/history/2026", true), "/app/history/2026");
+  assert.match(teamPage, /href: historyPresentationHref\(`\/history\/\$\{team\.year\}`, participantPresentation\)/);
   assert.match(teamPage, /label: "Tournament"[\s\S]*detail: String\(team\.year\)[\s\S]*direction: "left"/);
   for (const side of ["PICKLES", "LIPPIT"]) {
     const model = history2026TeamPageModel(view, side);
@@ -151,13 +157,16 @@ test("2026 Course links preserve explicit History context and canonical Course o
   assert.doesNotMatch(historyCourseProfileHref({ courseId: "TPGC01", year: 2026, round: 1 }), /view=archive/);
 });
 
-test("History-context Course navigation sits below the hero while direct and Guide entry stay normal", () => {
+test("History-context Course navigation sits below the hero while direct and Guide entry stay normal", async () => {
   const hero = coursePage.indexOf("<section className={styles.hero}");
   const rail = coursePage.indexOf("{tournamentReturn ? <HistoryNavigation", hero);
   const content = coursePage.indexOf("<div className={styles.shell}", rail);
   assert.ok(hero >= 0 && hero < rail && rail < content);
-  assert.match(coursePage, /left=\{\{[\s\S]*href: tournamentReturn\.href[\s\S]*direction: "left"/);
-  assert.match(coursePage, /right=\{historyReturn[\s\S]*href: historyReturn\.href[\s\S]*direction: "right"/);
+  const { historyHrefContract } = await import("./fixtures/release-gate-behavior.mjs");
+  const href = await historyHrefContract("app/courses/[courseId]/page.js", "coursePresentationHref");
+  assert.equal(href("/history/2026/round/2", true), "/app/history/2026/round/2");
+  assert.match(coursePage, /left=\{\{[\s\S]*coursePresentationHref\(tournamentReturn\.href, participantPresentation\)[\s\S]*direction: "left"/);
+  assert.match(coursePage, /right=\{historyReturn[\s\S]*coursePresentationHref\(historyReturn\.href, participantPresentation\)[\s\S]*direction: "right"/);
   assert.match(coursePage, /historyReturn && !tournamentReturn/);
   assert.match(coursePage, /!historyReturn && originReturn/);
   assert.deepEqual(historyCourseReturn({}), null);
@@ -165,13 +174,16 @@ test("History-context Course navigation sits below the hero while direct and Gui
   assert.doesNotMatch(coursePage, /history\.back|router\.back/);
 });
 
-test("full current standings disclose inline from the existing 24-row History payload", () => {
+test("full current standings disclose inline from the existing 24-row History payload", async () => {
   assert.equal(view.leaderboardRows.length, 24);
   assert.match(yearPage, /<details[\s\S]*data-current-standings-disclosure/);
   assert.match(yearPage, /View Full Standings/);
   assert.match(yearPage, /Show Top 5/);
   assert.match(yearPage, /leaderboard\.map\(\(row\) => renderStanding\(row, "full"\)\)/);
-  assert.match(yearPage, /<Link href=\{`\/players\/\$\{player\.slug\}`\} prefetch=\{false\}>/);
+  const { historyHrefContract } = await import("./fixtures/release-gate-behavior.mjs");
+  const href = await historyHrefContract("app/history/[year]/page.js");
+  assert.equal(href("/players/certified-player", true), "/app/players/certified-player");
+  assert.match(yearPage, /<Link href=\{historyPresentationHref\(`\/players\/\$\{player\.slug\}`, participantPresentation\)\} prefetch=\{false\}>/);
   assert.doesNotMatch(yearPage, /View Full Leaderboard|\/live\?view=leaderboards|router\.push|useState|fetch\(/);
 });
 
