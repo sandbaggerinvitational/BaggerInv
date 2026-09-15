@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { netSkinsHarness, savedEntryState, elements, text } from "./fixtures/director-behavior.mjs";
 
 import {
   buildProductionDirectorOverview,
@@ -172,7 +173,20 @@ test("Odds UI is Supabase-publication-only and Prediction Settings authoring nev
 
 test("side-game, Supabase-native Draft/Guide, and System panels honor operation boundaries", async () => {
   const ui = await source("app/admin/director/ProductionDirectorOperations.js");
-  assert.match(ui, /Net Skins will become configurable once tournament pairings and handicap inputs are complete/);
+  const harness = await netSkinsHarness(savedEntryState);
+  const button = elements(harness.render()).find(e => e.type === "button" && text(e) === "Configure from Saved Entries");
+  const priorFetch = globalThis.fetch, priorConfirm = globalThis.confirm;
+  const calls = [];
+  globalThis.confirm = () => true;
+  globalThis.fetch = async (url, options) => { calls.push({ url, options }); return Response.json(
+    options.method === "GET" ? { data: { rounds: savedEntryState.rounds } } : { error: "Saved entry revision changed. Reload entries." },
+    { status: options.method === "GET" ? 200 : 409 }); };
+  try {
+    await button.props.onClick();
+    assert.equal(calls.length, 2);
+    assert.match(text(harness.render()), /Saved entry revision changed\. Reload entries\./);
+    assert.equal(harness.refreshes, 0);
+  } finally { globalThis.fetch = priorFetch; globalThis.confirm = priorConfirm; }
   assert.match(ui, /No 2026 financial facts have been entered/);
   assert.match(ui, /Director-private Calcutta review/);
   assert.match(ui, /Rules & payout allocation/);

@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
+import { loadDirectorSource } from "./fixtures/director-behavior.mjs";
+import { directorAccessDiscoveryEnvironment, resolveDirectorAccessDiscovery } from "../lib/director-access-discovery.js";
 import { isTournamentDirector, normalizePlayerRole } from "../lib/player-role.js";
 import { countdownLabel, directorAutomationDue, directorRoundStatus, tournamentDirectorModel } from "../lib/tournament-director.js";
 
@@ -18,15 +20,31 @@ test("Players roles are data-driven and safely default to PLAYER", () => {
   assert.match(source("lib/admin-cms-config.js"), /field\("Role", "Tournament role", "select", \{ options: \["PLAYER", "DIRECTOR"\] \}\)/);
 });
 
-test("Director menu is exposed only after canonical Director authorization resolves", () => {
+test("Director menu is exposed only after canonical Director authorization resolves", async () => {
   const menu = source("app/Menu.js");
   const access = source("app/api/director/access/route.js");
   assert.match(menu, /fetch\("\/api\/director\/access", \{ cache: "no-store", credentials: "same-origin" \}\)/);
   assert.match(menu, /directorAccess\?\.authorized === true/);
   assert.doesNotMatch(menu, /setDirector\(player\?\.role === "DIRECTOR"\)/);
   assert.match(menu, /director \? <section[\s\S]*className="directorMenuLink" href="\/admin\/director"/);
-  assert.match(access, /authorizePreviewDirector\(\{ request, allowBootstrap: true \}\)/);
-  assert.match(access, /authorization\.status === "active"/);
+  for (const production of [true, false]) for (const status of ["active", "inactive", "forbidden", "unavailable"]) {
+    let input;
+    const route = await loadDirectorSource("app/api/director/access/route.js", {
+      "next/server": { NextResponse: { json: Response.json } },
+      "../../../../lib/preview-director-authorization.js": {
+        previewDirectorEntitlementEnabled: () => true,
+        productionDirectorEntitlementEnvironment: () => ({ production, enabled: true }),
+        authorizePreviewDirector: async options => { input = options; return { status }; },
+      },
+      "../../../../lib/director-access-discovery.js": { directorAccessDiscoveryEnvironment, resolveDirectorAccessDiscovery },
+    });
+    const request = new Request("https://example.invalid/api/director/access");
+    const response = await route.GET(request);
+    assert.equal(input.request, request);
+    assert.equal(input.allowBootstrap, !production);
+    assert.equal(response.status, status === "unavailable" ? 503 : 200);
+    assert.equal((await response.json()).authorized, status === "active");
+  }
   assert.match(access, /previewDirectorEntitlementEnabled\(\)/);
   assert.match(menu, /player-passport-changed/);
   assert.match(menu, /window\.addEventListener\("focus", refreshCapability\)/);
@@ -197,10 +215,28 @@ test("Director dashboard contains operations, health, attention, automation, and
   assert.match(dashboard, /Changes verified/);
 });
 
-test("PLAYER accounts are redirected away from the Director page", () => {
+test("PLAYER accounts are redirected away from the Director page", async () => {
   const page = source("app/admin/director/page.js");
   assert.match(page, /authorizePreviewDirector/);
-  assert.match(page, /\["inactive", "forbidden"\]\.includes\(result\.status\)\) redirect\("\/home"\)/);
+  for (const status of ["inactive", "forbidden", "active", "unavailable"]) {
+    const redirects = [];
+    const module = await loadDirectorSource("app/admin/director/page.js", {
+      "next/headers": { cookies: async () => ({}) },
+      "next/navigation": { redirect: to => { redirects.push(to); throw new Error("REDIRECT"); } },
+      "../../components.js": { Header: () => null },
+      "../../../lib/preview-director-authorization.js": { productionDirectorEntitlementEnvironment: () => ({ production: true, enabled: true }),
+        authorizePreviewDirector: async input => { assert.equal(input.allowBootstrap, false); return { status }; } },
+      "../../../lib/production-director-console.js": { productionDirectorSection: value => value },
+      "./DirectorDashboard.js": () => null, "./ProductionDirectorConsole.js": () => null,
+    });
+    if (["inactive", "forbidden"].includes(status)) {
+      await assert.rejects(() => module.default({ searchParams: Promise.resolve({}) }), /REDIRECT/);
+      assert.deepEqual(redirects, ["/"]);
+    } else {
+      await module.default({ searchParams: Promise.resolve({}) });
+      assert.deepEqual(redirects, []);
+    }
+  }
   assert.doesNotMatch(page, /result\.status !== "active"\) redirect/);
 });
 

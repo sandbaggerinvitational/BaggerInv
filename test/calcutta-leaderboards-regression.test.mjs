@@ -5,6 +5,7 @@ import {
   LEADERBOARD_MODULES,
   isLegacyCalcuttaModule,
   normalizeLeaderboardModule,
+  leaderboardModulesForNetSkinsState,
 } from "../lib/leaderboards-navigation.js";
 import { participantDestination } from "../lib/participant-shell.js";
 
@@ -21,7 +22,11 @@ test("mobile and desktop Leaderboards share the canonical four-module contract",
 
   const dashboard = await source("app/live/LeaderboardsDashboard.js");
   assert.equal((dashboard.match(/aria-label="Leaderboard category"/g) || []).length, 1);
-  assert.match(dashboard, /LEADERBOARD_MODULES\.map/);
+  for (const supabase of [false, true]) {
+    assert.deepEqual(leaderboardModulesForNetSkinsState({ state: "CONFIGURED", visible: true }, { supabase }), LEADERBOARD_MODULES);
+    assert.deepEqual(leaderboardModulesForNetSkinsState({ state: "NOT_CONFIGURED", visible: false }, { supabase }).map(m => m.value),
+      supabase ? ["players", "teams", "insights"] : ["players", "teams", "skins", "insights"]);
+  }
   assert.match(dashboard, /normalizeLeaderboardModule\(params\.get\("tab"\)\)/);
   assert.doesNotMatch(dashboard, /\["calcutta",\s*"Calcutta"\]|tab === "calcutta"|CalcuttaExperience/);
 });

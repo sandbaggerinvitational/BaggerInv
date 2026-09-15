@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { netSkinsHarness, savedEntryState, elements, text } from "./fixtures/director-behavior.mjs";
 
 import { productionCalcuttaV1ContractData } from "../lib/production-calcutta-v1.js";
 import {
@@ -521,7 +522,12 @@ test("Console renders private review, bounded status-only jobs, and sanitized au
   assert.match(ui, /privateStateAligned/);
   assert.match(ui, /Calcutta changed while this page was loading/);
   assert.match(ui, /Canonical input readiness/);
-  assert.match(ui, /Complete Canonical Setup First/);
+  for (const entryState of [{ phase: "loading" }, { phase: "failure" }, { phase: "ready", rounds: [] }, savedEntryState]) {
+    const harness = await netSkinsHarness(entryState);
+    const button = elements(harness.render()).find(e => e.type === "button");
+    assert.equal(button.props.disabled, entryState !== savedEntryState);
+    assert.equal(text(button) === "Configure from Saved Entries", entryState === savedEntryState);
+  }
   assert.match(ui, /function PrivateJobList/);
   const privateJobStart = ui.indexOf("function PrivateJobList");
   const privateJobEnd = ui.indexOf("function decimalMoney", privateJobStart);

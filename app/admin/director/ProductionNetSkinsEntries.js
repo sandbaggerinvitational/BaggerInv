@@ -45,10 +45,10 @@ export function RoundEntries({round,onSaved,transport=request}) {
     {message?<p role="status">{message}</p>:null}
   </form>;
 }
-export default function ProductionNetSkinsEntries(){
+export default function ProductionNetSkinsEntries({onStateChange} = {}){
   const [data,setData]=useState(null);const [error,setError]=useState("");
-  async function refresh(){try{setData(await request());setError("");}catch(e){setError(e.message);}}
-  useEffect(()=>{let active=true;request().then(v=>{if(active)setData(v);}).catch(e=>{if(active)setError(e.message);});return()=>{active=false;};},[]);
+  async function refresh(){onStateChange?.({phase:"loading"});try{const value=await request();setData(value);setError("");onStateChange?.({phase:"ready",rounds:value.rounds});}catch(e){setError(e.message);onStateChange?.({phase:"failure"});}}
+  useEffect(()=>{let active=true;onStateChange?.({phase:"loading"});request().then(v=>{if(active){setData(v);onStateChange?.({phase:"ready",rounds:v.rounds});}}).catch(e=>{if(active){setError(e.message);onStateChange?.({phase:"failure"});}});return()=>{active=false;};},[onStateChange]);
   return <section className={styles.workspace} aria-label="Net Skins Round entries"><h3>Round Entries</h3>
     <p>Explicit Director entry only. Saving entries does not calculate Full Net, configure awards, or publish results.</p>
     {error?<p role="alert">{error}</p>:null}

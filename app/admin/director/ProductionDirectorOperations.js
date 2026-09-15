@@ -7,6 +7,7 @@ import ProductionDraftEditor from "./ProductionDraftEditor.js";
 import ProductionGuideEditor from "./ProductionGuideEditor.js";
 import ProductionPredictionSettingsEditor from "./ProductionPredictionSettingsEditor.js";
 import ProductionNetSkinsEntries from "./ProductionNetSkinsEntries.js";
+import { netSkinsConfigurationReadiness } from "../../../lib/net-skins-configuration-readiness.js";
 import ProductionOddsSnapshotReview from "./ProductionOddsSnapshotReview.js";
 import styles from "./production-director.module.css";
 
@@ -351,28 +352,31 @@ function OddsPanel({ data, refresh }) {
   </>;
 }
 
-function NetSkinsCard({ data, refresh }) {
+export function NetSkinsCard({ data, refresh }) {
   const state = data.publications.netSkins;
   const privateState = data.privateOperations?.netSkins;
   const readiness = privateState?.readiness;
+  const [entryState, setEntryState] = useState({ phase: "loading" });
+  const configuration = netSkinsConfigurationReadiness(entryState);
   const fingerprint = useRequestFingerprints();
   const [busy, setBusy] = useState("");
   const [queued, setQueued] = useState(false);
   const [message, setMessage] = useState("");
   const run = async (action) => {
+    if (action === "configure" && !configuration.ready) return;
     if (action === "configure" && !globalThis.confirm?.("Configure Net Skins using the saved explicit Round entries? Only saved In entries participate. This does not publish results.")) return;
     const intent = { domain: "NET_SKINS", action, revision: state.configurationRevision };
     setBusy(action); setMessage("");
     try {
       let entrySelection = {};
       if (action === "configure") {
-        const saved = await jsonRequest("/api/director/net-skins-entries");
-        const rounds = (saved.data?.rounds || []).filter(round => round.configured);
-        if (!rounds.length || rounds.some(round => round.state !== "ENTRIES_SAVED" || !round.enteredCount)) {
-          throw new Error("Save and review explicit In entries for each configured Round first.");
-        }
-        entrySelection = { eligibleRoundNumbers: rounds.map(round => round.roundNumber),
-          entryRevisions: Object.fromEntries(rounds.map(round => [round.roundNumber, round.revision])) };
+        let saved;
+        try { saved = await jsonRequest("/api/director/net-skins-entries"); }
+        catch (error) { setEntryState({ phase: "failure" }); throw error; }
+        const current = netSkinsConfigurationReadiness({ phase: "ready", rounds: saved.data?.rounds });
+        setEntryState({ phase: "ready", rounds: saved.data?.rounds });
+        if (!current.ready) throw new Error(current.message);
+        entrySelection = current.selection;
         intent.entryRevisions = entrySelection.entryRevisions;
       }
       const requestFingerprint = await fingerprint(intent);
@@ -394,9 +398,7 @@ function NetSkinsCard({ data, refresh }) {
   return <article className={styles.operationCard}>
     <header><div><small>Supabase canonical contract</small><h3>Net Skins</h3></div><Status value={state.state} /></header>
     <p>{upper(state.state) === "NOT_CONFIGURED"
-      ? readiness?.canConfigure
-        ? "The canonical tournament inputs are complete and ready for Director configuration."
-        : "Net Skins is not configured. The readiness review below identifies only the canonical facts still needed."
+      ? "Net Skins is not configured. Configuration uses saved explicit Round entries; unconfigured Rounds do not block other Rounds."
       : "Official-only Net Skins results use canonical pairings, handicaps, and completed scoring."}</p>
     <dl className={styles.compactFacts}>
       <div><dt>Configuration revision</dt><dd>{state.configurationRevision ?? 0}</dd></div>
@@ -410,15 +412,16 @@ function NetSkinsCard({ data, refresh }) {
         <div><strong>{issue.label}</strong><Status value="NEEDS_SETUP">Needs setup</Status></div>
         <p>{issue.summary}</p>
         {issue.byRound.length ? <span>{issue.byRound.map((round) => `Round ${round.round}: ${round.missingCount}`).join(" · ")}</span> : null}
-      </article>)}</div> : <div className={styles.allReady}><strong>Canonical inputs are ready</strong><span>All certified Net Skins V1 prerequisites are complete.</span></div>}
-    </details> : <div className={styles.inlineNotice}>Actionable Net Skins readiness is temporarily unavailable. No configuration action is offered.</div>}
+      </article>)}</div> : <div className={styles.allReady}><strong>Canonical inputs are ready</strong><span>Saved explicit entries are checked separately before configuration.</span></div>}
+    </details> : <div className={styles.inlineNotice}>The tournament-wide readiness summary is unavailable. Configuration readiness is checked separately against saved Round entries.</div>}
+    <p role="status">{configuration.message}</p>
     <div className={styles.actionRow}>
-      <button type="button" disabled={Boolean(busy)} onClick={() => run("configure")}>Configure from Saved Entries</button>
+      <button type="button" style={{ minHeight: 44 }} disabled={Boolean(busy) || !configuration.ready} onClick={() => run("configure")}>{configuration.label}</button>
       {upper(state.state) !== "NOT_CONFIGURED" ? <button type="button" disabled={Boolean(busy)} onClick={() => run("enqueue")}>Queue Recalculation</button> : null}
       {queued ? <button type="button" disabled={Boolean(busy)} onClick={() => run("process")}>Process Queued Calculation</button> : null}
     </div>
     <PrivateJobList title="Net Skins calculations" jobs={privateState?.jobs || []} />
-    <ProductionNetSkinsEntries />
+    <ProductionNetSkinsEntries onStateChange={setEntryState} />
     {message ? <p className={styles.operationMessage} role="status">{message}</p> : null}
   </article>;
 }
