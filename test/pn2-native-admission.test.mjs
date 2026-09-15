@@ -298,11 +298,11 @@ test("PN-2 auth rechecks before provider delivery after asynchronous eligibility
 
 export const routeCapabilities = {
   "account/deletion": "auth", health: "health", "auth/captcha": "auth", "auth/otp/request": "auth", "auth/otp/certify": "certification",
-  session: "reads", today: "reads", matches: "reads", "matches/[matchId]": "reads", leaders: "reads", schedule: "reads",
+  "portrait-policy": "reads", session: "reads", today: "reads", matches: "reads", "matches/[matchId]": "reads", leaders: "reads", schedule: "reads",
   guide: "reads", passport: "reads", history: "reads", "history/[year]": "reads", records: "reads", odds: "reads",
   "net-skins": "reads", calcutta: "reads", "scoring/current": "reads", "scoring/hole": "scoring", "scoring/finalize": "scoring",
 };
-test("PN-2 all 22 compiled routes are classified and default-off denies before any external transport", async () => {
+test("PN-2 all compiled routes are classified and default-off denies before any external transport", async () => {
   const paths = (await readdir(new URL("app/api/mobile/v1/", root), { recursive: true })).filter((p) => p.endsWith("/route.js")).map((p) => p.replace("/route.js", "")).sort();
   assert.deepEqual(paths, Object.keys(routeCapabilities).sort());
   const saved = { ...process.env }, oldFetch = globalThis.fetch;
