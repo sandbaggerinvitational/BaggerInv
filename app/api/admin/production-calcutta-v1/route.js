@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { manageCalcutta } from "../../../../lib/calcutta-management-server.js";
 
 import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
 import {
@@ -91,6 +92,9 @@ export async function POST(request) {
   }
   const action = clean(input?.action).toLowerCase();
   if (!new Set([
+    "management-read",
+    "management-configure",
+    "management-entry",
     "configure",
     "replace-auction",
     "publish",
@@ -117,6 +121,9 @@ export async function POST(request) {
       label: `production-calcutta-v1-${action}`,
       source: "supabase-production-calcutta-v1",
     }, async () => {
+      if (action.startsWith("management-")) {
+        return manageCalcutta(action, input, director);
+      }
       if (action === "configure") {
         return configureProductionCalcuttaV1({
           ...revisions,

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { createClientMutationOperationIdentityRegistry } from "../../../lib/client-mutation-operation-identity.js";
 import ProductionDraftEditor from "./ProductionDraftEditor.js";
+import CalcuttaManagementEditor from "./CalcuttaManagementEditor.js";
 import ProductionGuideEditor from "./ProductionGuideEditor.js";
 import ProductionPredictionSettingsEditor from "./ProductionPredictionSettingsEditor.js";
 import ProductionNetSkinsEntries from "./ProductionNetSkinsEntries.js";
@@ -554,6 +555,7 @@ export function OddsAndSideGamesPanel({ data, refresh }) {
     <section className={styles.panel}>
       <header><span>Canonical side games</span><h2>Side Games</h2><p>Status and only the bounded actions supported by the installed Production contracts.</p></header>
       <div className={styles.operationGrid}><NetSkinsCard data={data} refresh={refresh} /><CalcuttaCard data={data} refresh={refresh} /></div>
+      <CalcuttaManagementEditor onChanged={refresh} />
     </section>
   </>;
 }

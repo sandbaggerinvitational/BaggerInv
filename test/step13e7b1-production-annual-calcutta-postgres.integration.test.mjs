@@ -372,4 +372,65 @@ test("migration 075 compiles inertly, preserves 2026 RPCs, and enforces PostgreS
     pg_catalog.has_function_privilege('service_role',
       'public.future_production_complete_calcutta_recalculation_v1(jsonb)', 'EXECUTE'));
   `), "t|f|f");
+
+  // Additive Director management read: private, year-scoped and inert.
+  const managementBefore = sql(cluster, database, `select row_to_json(c)::text from scoring_authority.calcutta_v1_current c where tournament_id='2026'`);
+  const configurationBody = functionDefinition(cluster,database,'public.configure_production_calcutta_v1(jsonb)');
+  const auctionBody = functionDefinition(cluster,database,'public.replace_production_calcutta_v1_auction_facts(jsonb)');
+  sqlFile(cluster,database,path.join(root,'supabase/production_incremental/director-calcutta-management-read-v1.sql'));
+  assert.equal(sql(cluster,database,`select row_to_json(c)::text from scoring_authority.calcutta_v1_current c where tournament_id='2026'`),managementBefore);
+  assert.equal(functionDefinition(cluster,database,'public.configure_production_calcutta_v1(jsonb)'),configurationBody);
+  assert.equal(functionDefinition(cluster,database,'public.replace_production_calcutta_v1_auction_facts(jsonb)'),auctionBody);
+  for(const role of ['anon','authenticated']) {
+    assert.throws(()=>sql(cluster,database,`set role ${role}; select public.read_production_calcutta_management_v1('{}');`),/permission denied/);
+    assert.throws(()=>sql(cluster,database,`set role ${role}; select public.future_production_read_calcutta_management_v1('{}');`),/permission denied/);
+  }
+  assert.throws(()=>sql(cluster,database,`select public.read_production_calcutta_management_v1('{}');`),/PRODUCTION_/);
+  assert.throws(()=>sql(cluster,database,`select public.future_production_read_calcutta_management_v1('{}');`),/PRODUCTION_/);
+  assert.equal(sql(cluster,database,`select production_control.director_calcutta_management_projection_v1('2099')->>'tournament_id'`),'2099');
+  assert.equal(sql(cluster,database,`select production_control.director_calcutta_management_projection_v1('2099')->>'publication_state'`),'UNPUBLISHED');
+  assert.equal(sql(cluster,database,`select has_function_privilege('service_role','production_control.director_calcutta_management_projection_v1(text,bigint)','EXECUTE')`),'f');
+  assert.equal(sql(cluster,database,`select operation_class from production_control.annual_scoring_rpc_allowlist_v1 where operation_name='read_production_calcutta_management_v1'`),'READ');
+
+  // Synthetic immutable predecessor facts exercise the exact management projection,
+  // numeric preservation and history access without changing any real participant.
+  const points=Array.from({length:24},(_,i)=>({place:i+1,round_1_award:(24-i)*4,round_2_award:i<12?(12-i)*12-3:0,round_3_award:(24-i)*5}));
+  const payouts=points.map((_,i)=>({place:i+1,round_1_fraction:['0.0125','0.01','0.0075'][i]||'0',round_2_fraction:['0.025','0.015'][i]||'0',round_3_fraction:['0.0125','0.01','0.0075'][i]||'0',overall_fraction:i===23?'0.05':['0.225','0.2','0.15','0.12','0.09','0.065'][i]||'0'}));
+  const configInput=JSON.stringify({contract_version:'production-calcutta-v1',point_structure:points,payout_structure:payouts});
+  const configured=sql(cluster,database,`select production_control.build_production_calcutta_v1_configuration('${configInput}'::jsonb)::text`);
+  assert.equal(JSON.parse(configured).payout_structure[23].overall_fraction,0.05);
+  sql(cluster,database,`
+    insert into auth.users(id,email,email_confirmed_at) values ('11000000-0000-4000-8000-000000000001','synthetic@example.invalid',now());
+    insert into scoring_authority.calcutta_v1_configuration_revisions(
+      tournament_id,configuration_revision,contract_version,state,configuration_manifest,configuration_fingerprint,resource_fingerprint,activation_revision,
+      configured_by_player_id,configured_by_auth_user_id,request_fingerprint,request_payload_hash,configured_at)
+    values ('2026',2,'production-calcutta-v1','CONFIGURED','${configured.replaceAll("'","''")}',repeat('a',64),repeat('b',64),1,
+      'C2601','11000000-0000-4000-8000-000000000001',repeat('c',64),repeat('d',64),now());
+    insert into scoring_authority.calcutta_v1_auction_fact_revisions(
+      tournament_id,auction_revision,state,auction_manifest,auction_fingerprint,resource_fingerprint,activation_revision,recorded_by_player_id,recorded_by_auth_user_id,request_fingerprint,request_payload_hash,recorded_at)
+    values ('2026',1,'AUCTION_COMPLETE',production_control.build_production_calcutta_v1_auction(
+      '{"contract_version":"production-calcutta-v1","purchases":[{"player_id":"C2601","purchase_price":"100.125"}],"ownership":[{"player_id":"C2601","owner_player_id":"C2601","ownership_fraction":"1"}]}'::jsonb),repeat('e',64),repeat('f',64),1,'C2601','11000000-0000-4000-8000-000000000001',repeat('1',64),repeat('2',64),now());
+    update scoring_authority.calcutta_v1_current set configuration_revision=2,
+      configuration_revision_id=(select configuration_revision_id from scoring_authority.calcutta_v1_configuration_revisions where tournament_id='2026' and configuration_revision=2),
+      configuration_fingerprint=repeat('a',64),auction_revision=1,
+      auction_revision_id=(select auction_revision_id from scoring_authority.calcutta_v1_auction_fact_revisions where tournament_id='2026' and auction_revision=1),
+      auction_fingerprint=repeat('e',64),state='AUCTION_COMPLETE' where tournament_id='2026';
+  `);
+  const beforeRead=sql(cluster,database,`select concat_ws('|',(select count(*) from scoring_authority.calcutta_v1_configuration_revisions),(select count(*) from scoring_authority.calcutta_v1_auction_fact_revisions),(select count(*) from scoring_authority.calcutta_v1_publication_revisions),(select count(*) from scoring_authority.calcutta_v1_result_revisions),(select count(*) from scoring_authority.hole_scores))`);
+  const projected=JSON.parse(sql(cluster,database,`select production_control.director_calcutta_management_projection_v1('2026',1)::text`));
+  assert.equal(projected.configuration_revision,2);assert.equal(projected.publication_state,'UNPUBLISHED');
+  assert.equal(projected.point_structure[0].round_2_award,'141');assert.equal(projected.payout_structure[23].overall_fraction,'0.05');
+  assert.equal(projected.purchases[0].purchase_price,'100.125');assert.deepEqual(projected.predecessor_purchases,projected.purchases);
+  assert.equal(projected.ownership[0].owner_player_id,'C2601');assert.equal(projected.predecessor_auction_fingerprint,'e'.repeat(64));
+  assert.doesNotMatch(JSON.stringify(projected),/auth_user|email|source_payload|request_payload|configured_by/);
+  assert.equal(sql(cluster,database,`select concat_ws('|',(select count(*) from scoring_authority.calcutta_v1_configuration_revisions),(select count(*) from scoring_authority.calcutta_v1_auction_fact_revisions),(select count(*) from scoring_authority.calcutta_v1_publication_revisions),(select count(*) from scoring_authority.calcutta_v1_result_revisions),(select count(*) from scoring_authority.hole_scores))`),beforeRead);
+  // These financial revision tables enforce append-only application access by
+  // grants (service_role has SELECT, not UPDATE), not a superuser-proof trigger.
+  assert.throws(()=>sql(cluster,database,`set role service_role; update scoring_authority.calcutta_v1_configuration_revisions set configuration_manifest='{}' where tournament_id='2026' and configuration_revision=2`),/permission denied/);
+  assert.throws(()=>sql(cluster,database,`set role service_role; update scoring_authority.calcutta_v1_auction_fact_revisions set auction_manifest='{}' where tournament_id='2026'`),/permission denied/);
+  assert.deepEqual(JSON.parse(sql(cluster,database,`select production_control.director_calcutta_management_projection_v1('2026',1)::text`)),projected);
+  const multi={contract_version:'production-calcutta-v1',purchases:[{player_id:'C9901',purchase_price:'2000'}],ownership:[{player_id:'C9901',owner_player_id:'C9901',ownership_fraction:'0.25'},{player_id:'C9901',owner_player_id:'C9902',ownership_fraction:'0.75'}]};
+  assert.equal(JSON.parse(sql(cluster,database,`select production_control.build_annual_calcutta_v1_auction('${JSON.stringify(multi)}','2099')::text`)).ownership.length,2);
+  multi.ownership[1].ownership_fraction='0.74';
+  assert.throws(()=>sql(cluster,database,`select production_control.build_annual_calcutta_v1_auction('${JSON.stringify(multi)}','2099')`),/PRODUCTION_CALCUTTA_/);
 });
