@@ -1,3 +1,4 @@
+import {certifyAccessReadiness} from "./fixtures/access-readiness-certification.mjs";
 import assert from "node:assert/strict";
 import { constants as fsConstants } from "node:fs";
 import { access, mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
@@ -1216,6 +1217,8 @@ test("migrations 063, 083, and 084 compile and enforce starting-hole-free zero-o
   const readyValue = JSON.parse(sql(cluster, database,
     "select production_control.assert_production_match_scoring_ready_v1('2026-R1-2')::text;"));
   assert.equal(readyValue.ready, true);
+
+  await certifyAccessReadiness({cluster,database,sql,sqlFile,rpc,json,bin,environment,markLiveInput,root});
 
   const markInput = markLiveInput(
     "2026-R1-2", "successful-mark-live-00001"

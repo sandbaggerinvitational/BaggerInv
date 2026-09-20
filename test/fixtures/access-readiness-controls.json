@@ -1,0 +1,94 @@
+[
+  {
+    "matchId": "2026-R1-1",
+    "revision": 12,
+    "ready": false,
+    "reasons": [
+      "HANDICAP_CONTEXT_NOT_CURRENT"
+    ]
+  },
+  {
+    "matchId": "2026-R1-2",
+    "revision": 12,
+    "ready": false,
+    "reasons": [
+      "HANDICAP_CONTEXT_NOT_CURRENT"
+    ]
+  },
+  {
+    "matchId": "2026-R1-3",
+    "revision": 12,
+    "ready": true,
+    "reasons": []
+  },
+  {
+    "matchId": "2026-R1-4",
+    "revision": 12,
+    "ready": false,
+    "reasons": [
+      "HANDICAP_CONTEXT_NOT_CURRENT"
+    ]
+  },
+  {
+    "matchId": "2026-R1-5",
+    "revision": 12,
+    "ready": false,
+    "reasons": [
+      "HANDICAP_CONTEXT_NOT_CURRENT"
+    ]
+  },
+  {
+    "matchId": "2026-R1-6",
+    "revision": 12,
+    "ready": false,
+    "reasons": [
+      "HANDICAP_CONTEXT_NOT_CURRENT"
+    ]
+  },
+  {
+    "matchId": "2026-R2-1",
+    "revision": 12,
+    "ready": false,
+    "reasons": [
+      "HANDICAP_CONTEXT_NOT_CURRENT"
+    ]
+  },
+  {
+    "matchId": "2026-R2-2",
+    "revision": 12,
+    "ready": false,
+    "reasons": [
+      "HANDICAP_CONTEXT_NOT_CURRENT"
+    ]
+  },
+  {
+    "matchId": "2026-R2-3",
+    "revision": 12,
+    "ready": true,
+    "reasons": []
+  },
+  {
+    "matchId": "2026-R2-4",
+    "revision": 12,
+    "ready": false,
+    "reasons": [
+      "HANDICAP_CONTEXT_NOT_CURRENT"
+    ]
+  },
+  {
+    "matchId": "2026-R2-5",
+    "revision": 12,
+    "ready": false,
+    "reasons": [
+      "HANDICAP_CONTEXT_NOT_CURRENT"
+    ]
+  },
+  {
+    "matchId": "2026-R2-6",
+    "revision": 12,
+    "ready": false,
+    "reasons": [
+      "HANDICAP_CONTEXT_NOT_CURRENT"
+    ]
+  }
+]

@@ -10,7 +10,7 @@ import { resolveMobileBearerIdentity } from "../lib/mobile-bearer-identity.js";
 import { requestMobileNativeOtp, certifyMobileNativeOtp } from "../lib/mobile-native-auth.js";
 import { mobileScoringHoleResult, mobileScoringFinalizeResult } from "../lib/mobile-v1-scoring.js";
 import { environment, controls, authorityFixtures, request, actor, productionContext, runtime, sha } from "./fixtures/pn2-native.mjs";
-import { withDirectorCalcuttaRead } from "./fixtures/reviewed-authority-extension.mjs";
+import { withDirectorCalcuttaRead, withAuthoritySpecificProviderValidation } from "./fixtures/reviewed-authority-extension.mjs";
 
 // Reconciliation must preserve the actual Production deployment, including
 // newer web changes absent from PN-1. No admission expectation is relaxed.
@@ -345,7 +345,8 @@ test("PN-2 web/PWA, Production authority, Preview safeguards and canonical persi
     "lib/mobile-v1-scoring-post-commit.js", "lib/participant-email-otp-mode.js", "lib/production-scoring-operations-server.js"]) {
     const original = execFileSync("git", ["show", `${base}:${path}`], { cwd: root, encoding: "utf8" });
     const expected = path === "lib/production-scoring-operations-server.js"
-      ? withDirectorCalcuttaRead(original) : original;
+      ? withDirectorCalcuttaRead(original) : path === "lib/production-cutover-scoring-ingress.js"
+        ? withAuthoritySpecificProviderValidation(original) : original;
     assert.equal(await readFile(new URL(path, root), "utf8"), expected, path);
   }
 });
