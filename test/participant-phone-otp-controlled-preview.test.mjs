@@ -354,7 +354,7 @@ test("successful email and phone verification navigate immediately to Home witho
   ]);
   const phoneVerifyUi = ui.slice(ui.indexOf("const verifyCode"), ui.indexOf("const resendCode"));
   const phoneVerifyRoute = route.slice(route.indexOf('if (action !== "verify")'));
-  assert.match(ui, /return [^;]*\? requestedNext : "\/home"/);
+  assert.match(ui, /participantAuthReturnPath\(searchParams\.get\("next"\)\)/);
   assert.match(ui, /router\.replace\(next\)/);
   assert.match(ui, /rememberParticipantAuthNavigation\(location\.pathname, next, navigationType\)/);
   assert.match(phoneVerifyUi, /beginNavigation\(method, payload, duration\)/);

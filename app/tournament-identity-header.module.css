@@ -65,3 +65,11 @@
   .heroTitle { font-size: 1.03rem; }
   .hero.hero .heroIdentity p { font-size: .54rem; }
 }
+
+/* Text-sized flex bases let identity/status wrap before the title is squeezed. */
+@media(max-width:640px){
+  .tokens.tokens{display:flex;flex-wrap:wrap;align-items:center}
+  .tokens.tokens>img,.tokens.tokens>[role=img]{flex:0 0 auto}
+  .tokens.tokens>div{flex:1 1 11rem;min-width:min(100%,11rem)}
+  .tokens.tokens>span:last-child{margin-left:auto}
+}

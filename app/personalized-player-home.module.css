@@ -678,7 +678,13 @@
 
   .people > div {
     grid-template-columns: 28px minmax(0, 1fr);
+    grid-template-rows: auto auto;
     column-gap: 5px;
+    row-gap: 6px;
+  }
+
+  .people > div > .playerLines {
+    grid-column: 1 / -1;
   }
 
   .teamLogo,

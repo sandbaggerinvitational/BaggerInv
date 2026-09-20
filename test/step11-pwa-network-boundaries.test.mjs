@@ -98,7 +98,7 @@ async function workerHarness({ fetchImpl = async () => new Response("network", {
         async put(request, response) { put.push({ request, response }); },
       };
     },
-    async keys() { return ["sbi-shell-v3", "sbi-shell-v4", "sbi-shell-v5", "next-runtime-cache"]; },
+    async keys() { return ["sbi-shell-v3", "sbi-shell-v4", "sbi-shell-v5", "sbi-shell-v6", "next-runtime-cache"]; },
     async delete(name) { deleted.push(name); return true; },
     async match(request) {
       const key = typeof request === "string" ? request : new URL(request.url).pathname;
@@ -146,13 +146,13 @@ function fetchEvent(request) {
   };
 }
 
-test("Step 11 worker installs v5, activates immediately, and evicts only older SBI shells", async () => {
+test("Step 11 worker installs v6, activates immediately, and evicts only older SBI shells", async () => {
   const harness = await workerHarness();
   let installWork;
   harness.listeners.install({ waitUntil(value) { installWork = value; } });
   await installWork;
   assert.equal(harness.skipWaitingCalls, 1);
-  assert.deepEqual(harness.opened, ["sbi-shell-v5"]);
+  assert.deepEqual(harness.opened, ["sbi-shell-v6"]);
   assert.deepEqual(harness.added, [
     "/offline.html", "/icon-192.png", "/icon-512.png", "/icon-maskable-512.png",
     "/apple-touch-icon.png", "/favicon.ico",
@@ -161,7 +161,7 @@ test("Step 11 worker installs v5, activates immediately, and evicts only older S
   let activateWork;
   harness.listeners.activate({ waitUntil(value) { activateWork = value; } });
   await activateWork;
-  assert.deepEqual(harness.deleted.sort(), ["sbi-shell-v3", "sbi-shell-v4"]);
+  assert.deepEqual(harness.deleted.sort(), ["sbi-shell-v3", "sbi-shell-v4", "sbi-shell-v5"]);
   assert.equal(harness.deleted.includes("next-runtime-cache"), false);
   assert.equal(harness.claimCalls, 1);
 });
@@ -234,8 +234,8 @@ test("SMS stays absent from the Production-shadow launch even when Preview phone
     source("app/participant-auth/ParticipantAuthRehearsal.js"),
   ]);
   assert.match(page, /participantAuthExperienceConfiguration\(env\)/);
-  assert.match(client, /if \(!experience\.smsEnabled\) return;/);
-  assert.match(client, /\{experience\.smsEnabled\s*\? <div className=\{styles\.switcher\}/);
+  assert.match(client, /if \(!experience\.smsEnabled\) \{ setSessionState\("signed-out"\); return; \}/);
+  assert.match(client, /step === "entry" && experience\.smsEnabled \? <div className=\{styles\.methods\}/);
   assert.match(client, /disabled=\{Boolean\(busy\) \|\| \(method === "email" && !experience\.smsEnabled\)\}/);
 });
 

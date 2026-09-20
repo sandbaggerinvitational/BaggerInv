@@ -18,7 +18,7 @@
   --safe-left: env(safe-area-inset-left, 0px);
   --app-height: 100vh;
   --participant-header-height: 58px;
-  --participant-nav-height: 68px;
+  --participant-nav-height: max(68px, 4.25rem);
   --participant-nav-total: calc(var(--participant-nav-height) + var(--safe-bottom));
   --public-site-header-height: max(84px, calc(82px + var(--safe-top)));
 }

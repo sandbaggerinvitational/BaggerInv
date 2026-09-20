@@ -11,7 +11,7 @@ import { participantDestination } from "../lib/participant-shell.js";
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("mobile and desktop Leaderboards share the canonical four-module contract", async () => {
+test("legacy module contract is preserved; current Supabase Leaderboards adds participant side games", async () => {
   assert.deepEqual(LEADERBOARD_MODULES.map(({ value, label }) => [value, label]), [
     ["players", "Players"],
     ["teams", "Teams"],
@@ -28,10 +28,13 @@ test("mobile and desktop Leaderboards share the canonical four-module contract",
       supabase ? ["players", "teams", "insights"] : ["players", "teams", "skins", "insights"]);
   }
   assert.match(dashboard, /normalizeLeaderboardModule\(params\.get\("tab"\)\)/);
-  assert.doesNotMatch(dashboard, /\["calcutta",\s*"Calcutta"\]|tab === "calcutta"|CalcuttaExperience/);
+  assert.doesNotMatch(dashboard, /CalcuttaExperience/);
+  await (await import("./fixtures/release-gate-behavior.mjs")).leaderboardVisibilityContract(dashboard);
+  assert.match(dashboard, /supabaseCore && params\.get\("tab"\) === "calcutta"/);
+  assert.match(dashboard, /<ParticipantSideGames/);
 });
 
-test("stale Leaderboards client state cannot restore Calcutta", () => {
+test("legacy normalization remains bounded; current Supabase selection is tested independently", () => {
   for (const stale of ["calcutta", "CALCUTTA", "unknown", "", null, undefined]) {
     assert.equal(normalizeLeaderboardModule(stale), "players");
   }
@@ -48,7 +51,7 @@ test("legacy Calcutta query intent redirects before Leaderboards data loads", as
   assert.match(page, /redirect\("\/live\?view=calcutta"\)/);
 });
 
-test("Tournament remains the canonical accessible Calcutta parent", async () => {
+test("existing Tournament Calcutta deep link remains compatible", async () => {
   const [tournament, shell] = await Promise.all([
     source("app/live/TournamentDashboard.js"),
     source("lib/participant-shell.js"),
@@ -66,7 +69,7 @@ test("the installed PWA rechecks and activates the corrected navigation bundle",
   ]);
   assert.match(foundation, /updateViaCache: "none"/);
   assert.match(foundation, /registration\.update\(\)/);
-  assert.match(worker, /const CACHE_VERSION = "sbi-shell-v5"/);
+  assert.match(worker, /const CACHE_VERSION = "sbi-shell-v6"/);
   assert.match(worker, /if \(url\.pathname\.startsWith\("\/_next\/"\)\) return/);
   assert.match(worker, /self\.skipWaiting\(\)/);
   assert.match(worker, /self\.clients\.claim\(\)/);

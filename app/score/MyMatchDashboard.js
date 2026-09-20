@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { formatHomeTime as formatTime } from "../../lib/home-dashboard";
 import MatchStatusBlock from "../MatchStatusBlock";
 import AssetImage from "../AssetImage";
 import { courseLogo, teamLogo, tournamentLogo } from "../../lib/asset-paths";
@@ -18,19 +19,6 @@ const initials = (value) => String(value || "SBI")
   .join("")
   .toUpperCase();
 
-function formatTime(value) {
-  const raw = String(value || "").trim();
-  if (!raw) return "";
-  const match = raw.match(/^(\d{1,2}):(\d{2})(?:\s*([AP]M))?$/i);
-  if (!match) return raw;
-  let hour = Number(match[1]);
-  const suffix = match[3]?.toUpperCase();
-  if (suffix) return `${hour}:${match[2]} ${suffix}`;
-  if (hour > 12) return `${hour - 12}:${match[2]} PM`;
-  if (hour === 12) return `12:${match[2]} PM`;
-  if (hour === 0) return `12:${match[2]} AM`;
-  return `${hour}:${match[2]} AM`;
-}
 
 function formatTee(value) {
   const tee = String(value || "").trim();

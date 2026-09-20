@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "sbi-shell-";
-const CACHE_VERSION = "sbi-shell-v5";
+const CACHE_VERSION = "sbi-shell-v6";
 const STATIC_ASSETS = [
   "/offline.html",
   "/icon-192.png",

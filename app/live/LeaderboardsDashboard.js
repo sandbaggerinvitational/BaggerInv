@@ -1,5 +1,7 @@
 "use client";
 
+import ParticipantSideGames from "./ParticipantSideGames";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import AssetImage from "../AssetImage";
@@ -509,21 +511,32 @@ export default function LeaderboardsDashboard({
   const [secondaryData, setSecondaryData] = useState(null);
   const [secondaryState, setSecondaryState] = useState("idle");
   const [refreshState, setRefreshState] = useState(initialData ? "current" : "refreshing");
+  const categoryRail = useRef(null);
   const pending = useRef(null);
   const secondaryPending = useRef(null);
   const lastConfirmedAt = useRef(Date.now());
   const navigationStartedAt = useRef(null);
   const supabaseCore = coreReadSource === "supabase";
   const netSkinsState = secondaryData?.netSkinsState || null;
-  const leaderboardModules = leaderboardModulesForNetSkinsState(netSkinsState, { supabase: productionNetSkinsV1 });
+  const leaderboardModules = supabaseCore
+    ? [...leaderboardModulesForNetSkinsState(null), { value: "calcutta", label: "Calcutta" }]
+    : leaderboardModulesForNetSkinsState(netSkinsState, { supabase: productionNetSkinsV1 });
   const roundValues = useMemo(() => new Set((data?.rounds || []).map((round) => String(round.number))), [data?.rounds]);
   const selectionFrom = useCallback((params) => ({
-    tab: normalizeLeaderboardModule(params.get("tab")),
+    tab: supabaseCore && params.get("tab") === "calcutta" ? "calcutta" : normalizeLeaderboardModule(params.get("tab")),
     round: roundValues.has(params.get("round")) ? params.get("round") : "overall",
     metric: PLAYER_METRICS.some(([key]) => key === params.get("metric")) ? params.get("metric") : "points",
-  }), [roundValues]);
+  }), [roundValues, supabaseCore]);
   const [selection, setSelection] = useState(() => selectionFrom(searchParams));
   const { tab, round: selectedRound, metric } = selection;
+  useEffect(() => {
+    const rail = categoryRail.current;
+    const selected = rail?.querySelector('[aria-pressed="true"]');
+    if (!selected) return;
+    const bounds = rail.getBoundingClientRect(), item = selected.getBoundingClientRect();
+    if (item.right > bounds.right) rail.scrollLeft += item.right - bounds.right + 2;
+    else if (item.left < bounds.left) rail.scrollLeft -= bounds.left - item.left + 2;
+  }, [tab, data?.tournament]);
   useEffect(() => {
     if (!data?.tournament?.year || oddsSnapshots !== null || !["teams", "insights"].includes(tab)) return undefined;
     const controller = new AbortController();
@@ -559,7 +572,7 @@ export default function LeaderboardsDashboard({
     window.history.pushState(null, "", `${pathname}?${params.toString()}`);
   }, [pathname, searchParams, selectedRound, selectionFrom]);
   useEffect(() => {
-    if (productionNetSkinsV1 && secondaryState === "ready" && tab === "skins" && netSkinsState?.visible !== true) {
+    if (!supabaseCore && productionNetSkinsV1 && secondaryState === "ready" && tab === "skins" && netSkinsState?.visible !== true) {
       updateQuery({ tab: "players" });
     }
   }, [netSkinsState, productionNetSkinsV1, secondaryState, tab, updateQuery]);
@@ -610,8 +623,8 @@ export default function LeaderboardsDashboard({
   }, [secondaryData, secondaryReadUrl, supabaseCore]);
 
   useEffect(() => {
-    if (productionNetSkinsV1 || tab === "skins") loadSecondary();
-  }, [loadSecondary, productionNetSkinsV1, tab]);
+    if (!supabaseCore && (productionNetSkinsV1 || tab === "skins")) loadSecondary();
+  }, [loadSecondary, productionNetSkinsV1, supabaseCore, tab]);
 
   useEffect(() => {
     if (!supabaseCore) {
@@ -633,17 +646,13 @@ export default function LeaderboardsDashboard({
   return <section className={styles.page}>
     <TournamentIdentityHeader variant="hero" year={tournament.year} name={tournament.name || "Sandbagger Invitational"} location={tournament.location || "Location TBA"} logo={tournament.logo} status={tournament.status} />
     <header className={styles.pageTitle}><span>Leaderboards</span><h1>Standings</h1><p>Player, team, round standings, and Championship projections.</p><small role="status" aria-live="polite">{refreshState === "refreshing" ? "Updating standings…" : refreshState === "error" ? "Unable to refresh • showing last confirmed data" : "Official tournament data"}</small></header>
-    <nav className={`${styles.tabs} ${skinsStyles.tabs}`} aria-label="Leaderboard category">{leaderboardModules.map(({ value, label }) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
-    {!["insights", "skins"].includes(tab) ? <Controls rounds={data.rounds || []} selectedRound={selectedRound} onRound={(round) => updateQuery({ round })} metric={metric} onMetric={tab === "players" && selectedRound === "overall" ? (value) => updateQuery({ metric: value }) : undefined} /> : null}
+    <nav ref={categoryRail} className={styles.categoryRail} aria-label="Leaderboard category">{leaderboardModules.map(({ value, label }) => <button type="button" aria-pressed={tab === value} onClick={() => updateQuery({ tab: value })} key={value}>{label}</button>)}</nav>
+    {!["insights", "skins", "calcutta"].includes(tab) ? <Controls rounds={data.rounds || []} selectedRound={selectedRound} onRound={(round) => updateQuery({ round })} metric={metric} onMetric={tab === "players" && selectedRound === "overall" ? (value) => updateQuery({ metric: value }) : undefined} /> : null}
     {tab === "players" && selectedRound === "overall" ? <OverallPlayers data={data} currentPlayer={currentPlayer} metric={metric} /> : null}
     {tab === "players" && selectedRound !== "overall" ? <RoundPlayers data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} /> : null}
     {tab === "teams" ? <Teams data={data} selectedRound={selectedRound} currentPlayer={currentPlayer} snapshots={oddsSnapshots} /> : null}
-    {tab === "skins" && (!supabaseCore || secondaryData) ? <NetSkinsBoard data={secondaryData ? { ...data, ...secondaryData } : data} currentPlayer={currentPlayer} /> : null}
-    {tab === "skins" && supabaseCore && !secondaryData ? <section className={skinsStyles.board}><div className={styles.empty} role="status">
-      <strong>{secondaryState === "error" ? "Net Skins are temporarily unavailable." : "Loading Net Skins…"}</strong>
-      <span>{secondaryState === "error" ? "Core team and player standings remain available." : "Retrieving the independently published competition module."}</span>
-      {secondaryState === "error" ? <button type="button" onClick={loadSecondary}>Try again</button> : null}
-    </div></section> : null}
+    {tab === "skins" && !supabaseCore ? <NetSkinsBoard data={secondaryData ? { ...data, ...secondaryData } : data} currentPlayer={currentPlayer} /> : null}
+    {supabaseCore && ["skins", "calcutta"].includes(tab) ? <ParticipantSideGames key={tab} product={tab === "skins" ? "net-skins" : "calcutta"} /> : null}
     {tab === "insights" ? <Insights data={data} snapshots={oddsSnapshots} derived={intelligenceDerived} previewMode={previewMode} /> : null}
   </section>;
 }

@@ -1,3 +1,5 @@
+import { readProductionCalcuttaV1 } from "../../../../lib/production-calcutta-v1.js";
+import { mobileCalcuttaDataFromProductionView } from "../../../../lib/mobile-v1-calcutta.js";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { currentCalcuttaOperationalResult } from "../../../../lib/calcutta-supabase.js";
@@ -24,6 +26,15 @@ export async function GET(request) {
     const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env });
     const identityMs = performance.now() - identityStartedAt;
     const productionV1 = source.productionCutover?.handled === true;
+    // Reuse the shipping native participant DTO with the existing web identity.
+    // This explicit representation never falls back to a provisional read/worker.
+    if (new URL(request.url).searchParams.get("presentation") === "participant") {
+      if (!productionV1) return NextResponse.json({ code: "PARTICIPANT_PRESENTATION_UNAVAILABLE" }, { status: 503, headers: headers });
+      const read = await readProductionCalcuttaV1({ playerId: identity.playerId, tournamentId: identity.tournamentId, env });
+      if (!read.payload?.ok || !read.payload.data) throw new Error("PARTICIPANT_PRESENTATION_UNAVAILABLE");
+      const data = mobileCalcuttaDataFromProductionView(read.payload.data, identity);
+      return NextResponse.json({ data }, { headers: headers });
+    }
     const operational = productionV1
       ? await currentProductionCalcuttaV1({
         playerId: identity.playerId,

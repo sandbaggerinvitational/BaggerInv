@@ -5,7 +5,7 @@ import { browserInstallabilityEnabled } from "../lib/browser-installability-poli
 
 const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("Production retires browser installability while Preview retains its explicit test policy", async () => {
+test("Production hides install promotion but publishes the standalone installation contract", async () => {
   assert.equal(browserInstallabilityEnabled({ VERCEL_ENV: "production" }), false);
   assert.equal(browserInstallabilityEnabled({ VERCEL_ENV: " PRODUCTION " }), false);
   assert.equal(browserInstallabilityEnabled({ VERCEL_ENV: "preview" }), true);
@@ -14,7 +14,8 @@ test("Production retires browser installability while Preview retains its explic
 
   const layout = await source("app/layout.js");
   assert.match(layout, /const installabilityEnabled = browserInstallabilityEnabled\(\)/);
-  assert.match(layout, /\.\.\.\(installabilityEnabled \? \{ manifest: "\/manifest\.webmanifest" \} : \{\}\)/);
+  assert.match(layout, /<head>[\s\S]*?<link rel="manifest" href="\/manifest\.webmanifest" \/>/);
+  assert.doesNotMatch(layout, /installabilityEnabled \? \{ manifest:/);
   assert.match(layout, /data-browser-installability=\{installabilityEnabled \? "enabled" : "retired"\}/);
   assert.match(layout, /<PwaFoundation installabilityEnabled=\{installabilityEnabled\} \/>/);
   assert.match(layout, /url: "\/favicon\.ico"/);
@@ -51,7 +52,7 @@ test("service-worker caching, push support, and safe existing-install launch sup
   assert.match(foundation, /serviceWorker\.register\("\/sw\.js", \{ updateViaCache: "none" \}\)/);
   assert.match(foundation, /registration\.update\(\)/);
   assert.doesNotMatch(foundation, /serviceWorker\.getRegistrations|\.unregister\(\)/);
-  assert.match(worker, /CACHE_VERSION = "sbi-shell-v5"/);
+  assert.match(worker, /CACHE_VERSION = "sbi-shell-v6"/);
   assert.match(worker, /caches\.match\("\/offline\.html"\)/);
   assert.match(worker, /addEventListener\("push"/);
   assert.match(worker, /addEventListener\("notificationclick"/);

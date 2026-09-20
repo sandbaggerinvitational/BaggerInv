@@ -71,7 +71,6 @@ export const metadata = {
       sizes: "180x180",
     },
   },
-  ...(installabilityEnabled ? { manifest: "/manifest.webmanifest" } : {}),
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -159,6 +158,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" data-browser-installability={installabilityEnabled ? "enabled" : "retired"}>
       <head>
+        {/* Keep installation scope in the initial head, independent of streamed page metadata and install prompts. */}
+        <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content="The Bagger" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />

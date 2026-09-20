@@ -21,6 +21,7 @@ const source = (file) => readFile(new URL(`../${file}`, import.meta.url), "utf8"
 async function importIdentityDispatch() {
   const moduleSource = await source("lib/production-current-participant-identity-server.js");
   const transformed = moduleSource
+    .replace('import { PRODUCTION_PHONE_IDENTITY_OPERATIONS } from "./production-phone-identity-operations.js";', `const PRODUCTION_PHONE_IDENTITY_OPERATIONS = ${(await source("lib/production-phone-identity-operations.js")).split("Object.freeze(")[1].split(");")[0]};`)
     .replace('import "server-only";\n', "")
     .replace(
       /import \{ readProductionCurrentTournamentRuntime \} from "\.\/production-current-tournament-runtime\.js";/,
@@ -379,4 +380,32 @@ test("migration 070 keeps global Owner governance separate from target-year Dire
   assert.match(migration, /contact_state = 'APPROVED'/);
   assert.match(migration, /enrollment_state = 'NOT_ENROLLED'/);
   assert.match(migration, /pg_advisory_xact_lock_shared\([\s\S]{0,120}scoring_admission_lock_key/);
+});
+
+test('phone lifecycle dispatch is individually enumerated for frozen and future Production, with no Director namespace', async () => {
+ const { productionCurrentParticipantIdentityRpcResolution: resolve } = await importIdentityDispatch();
+ const { PRODUCTION_PHONE_IDENTITY_OPERATIONS: operations } = await import('../lib/production-phone-identity-operations.js');
+ assert.equal(Object.keys(operations).length, 10);
+ for(const runtime of [frozenRuntime,futureRuntime]) for(const [operation,target] of Object.entries(operations)) {
+  const body={input:{phone_e164:'+12025550123'}};
+  const result=resolve({logicalFunctionName:operation,frozenFunctionName:operation,body,runtime});
+  assert.equal(result.functionName,target);assert.deepEqual(result.body,body);
+  assert.equal(result.tournamentId,runtime.tournamentId);
+ }
+ for(const operation of ['grant_production_director_entitlement','change_player_mapping','authorize_participant_phone_enrollment']) {
+  assert.equal(operations[operation],undefined);
+  assert.throws(()=>resolve({logicalFunctionName:operation,frozenFunctionName:operation,body:{},runtime:futureRuntime}));
+ }
+});
+
+test('phone candidate introduces no identity tables or Director mutation and keeps service-only grants', async () => {
+ const sql=await source('supabase/production_incremental/participant-phone-authority-v1.sql');
+ assert.doesNotMatch(sql,/create table|preview_director_entitlements|(?:insert into|update|delete from)\s+(?:auth\.|scoring_authority\.|production_control\.)/i);
+ const { PRODUCTION_PHONE_IDENTITY_OPERATIONS: operations } = await import('../lib/production-phone-identity-operations.js');
+ for(const target of Object.values(operations)) {
+  assert.ok(sql.includes(`revoke all on function public.${target}(jsonb) from public,anon,authenticated;`));
+  assert.ok(sql.includes(`grant execute on function public.${target}(jsonb) to service_role;`));
+ }
+ assert.match(sql,/read_production_participant_context_for_auth/);
+ assert.match(sql,/read_production_future_participant_context_for_auth_v1/);
 });

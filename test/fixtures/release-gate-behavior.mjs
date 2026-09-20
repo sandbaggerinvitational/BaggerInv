@@ -56,8 +56,10 @@ export async function leaderboardVisibilityContract(code) {
   assert.ok(expression);
   assert.match(code, /leaderboardModules\.map/);
   for (const [state, expected] of [[null, ["players", "teams", "insights"]], [{ state: "NOT_CONFIGURED", visible: false }, ["players", "teams", "insights"]], [{ state: "CONFIGURED", visible: true }, ["players", "teams", "skins", "insights"]]]) {
-    const actual = await evaluate(`return ${expression[1]};`, { leaderboardModulesForNetSkinsState, netSkinsState: state, productionNetSkinsV1: true });
+    const actual = await evaluate(`return ${expression[1]};`, { leaderboardModulesForNetSkinsState, netSkinsState: state, productionNetSkinsV1: true, supabaseCore: false });
     assert.deepEqual(actual.map(item => item.value), expected);
+    const current = await evaluate(`return ${expression[1]};`, { leaderboardModulesForNetSkinsState, netSkinsState: state, productionNetSkinsV1: true, supabaseCore: true });
+    assert.deepEqual(current.map(item => item.value), ["players", "teams", "skins", "insights", "calcutta"]);
   }
 }
 

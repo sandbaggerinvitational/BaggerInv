@@ -27,7 +27,7 @@ test("the five primary participant destinations and contextual parents remain ex
   assert.match(styles, /aria-current=page\] span\{[^}]*background:#f3e6c5/);
 });
 
-test("participant Tournament canonically owns the existing lazy Calcutta experience", async () => {
+test("existing Tournament Calcutta remains compatible alongside the new participant Leaderboards view", async () => {
   const [page, wrapper, tournament, leaderboards, publicLive] = await Promise.all([
     source("app/app/tournament/page.js"), source("app/live/TournamentSupabaseRead.js"),
     source("app/live/TournamentDashboard.js"), source("app/live/LeaderboardsDashboard.js"),
@@ -39,11 +39,12 @@ test("participant Tournament canonically owns the existing lazy Calcutta experie
   assert.match(tournament, /href="\/app\/tournament\?view=calcutta"/);
   assert.match(tournament, /secondaryReadUrl \+ "\?module=calcutta"/);
   assert.match(tournament, /<CalcuttaExperience model=\{data\.calcutta\}/);
-  assert.doesNotMatch(leaderboards, /\["calcutta", "Calcutta"\]|tab === "calcutta"|CalcuttaExperience/);
+  assert.doesNotMatch(leaderboards, /CalcuttaExperience/);
+  assert.match(leaderboards, /<ParticipantSideGames/);
   assert.match(publicLive, /presentation=\{participantPresentation \? "participant" : "public"\}/);
 });
 
-test("Leaderboards owns exactly Players, Teams, Net Skins, and Insights", async () => {
+test("Leaderboards preserves existing tabs and adds authenticated participant Calcutta", async () => {
   const [dashboard, wrapper, page] = await Promise.all([
     source("app/live/LeaderboardsDashboard.js"), source("app/live/LeaderboardsSupabaseRead.js"), source("app/live/page.js"),
   ]);

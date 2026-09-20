@@ -1,3 +1,5 @@
+import { readProductionNetSkinsV1 } from "../../../../lib/production-net-skins-v1.js";
+import { mobileNetSkinsDataFromProductionView } from "../../../../lib/mobile-v1-net-skins.js";
 import { cookies } from "next/headers";
 import { after, NextResponse } from "next/server";
 import { currentNetSkinsOperationalResult } from "../../../../lib/net-skins-supabase.js";
@@ -29,6 +31,15 @@ export async function GET(request) {
     // retains its existing isolated recalculation behavior until its dedicated
     // worker is invoked through the Preview contract.
     const productionV1 = source.productionCutover?.handled === true;
+    // Reuse the shipping native participant DTO with the existing web identity.
+    // This explicit representation never falls back to a provisional read/worker.
+    if (new URL(request.url).searchParams.get("presentation") === "participant") {
+      if (!productionV1) return NextResponse.json({ code: "PARTICIPANT_PRESENTATION_UNAVAILABLE" }, { status: 503, headers: responseHeaders });
+      const read = await readProductionNetSkinsV1({ playerId: identity.playerId, tournamentId: identity.tournamentId, env });
+      if (!read.payload?.ok || !read.payload.data) throw new Error("PARTICIPANT_PRESENTATION_UNAVAILABLE");
+      const data = mobileNetSkinsDataFromProductionView(read.payload.data, identity);
+      return NextResponse.json({ data }, { headers: responseHeaders });
+    }
     const operational = productionV1
       ? await currentProductionNetSkinsV1({
         playerId: identity.playerId,

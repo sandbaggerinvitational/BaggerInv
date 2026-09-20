@@ -32,6 +32,9 @@ import {
 import { participantAuthExperienceConfiguration } from "../../../../../lib/participant-sms-auth-feature.js";
 import { createParticipantAuthServerClient, verifyParticipantAuthClaims } from "../../../../../lib/supabase-auth-server.js";
 
+import { assertProductionCutoverRequest } from "../../../../../lib/production-cutover-activation-contract.js";
+import { createParticipantPhoneCookieTransaction } from "../../../../../lib/participant-phone-cookie-transaction.js";
+
 export const dynamic = "force-dynamic";
 
 const clean = (value) => String(value ?? "").trim();
@@ -46,6 +49,12 @@ function publicPhoneFeature() {
     ...experience,
     available: experience.smsEnabled && authority.participantAuthEnabled && authority.resolved === "supabase",
   };
+}
+
+function canonicalRequestAllowed(request, requireOrigin) {
+  if (!participantIdentityAuthorityEnvironment().productionCutoverIdentity) return true;
+  try { assertProductionCutoverRequest(request, process.env, { requireOrigin }); return true; }
+  catch { return false; }
 }
 
 function sameOriginMutation(request) {
@@ -93,15 +102,24 @@ function proofTokenForAuthorization(authorization) {
   }, proofSecret());
 }
 
+function proofCookieName() {
+  return participantIdentityAuthorityEnvironment().productionCutoverIdentity
+    ? "sbi-participant-phone-login-proof" : PARTICIPANT_PHONE_LOGIN_PROOF_COOKIE;
+}
+
+function loginProofCookie(value, age) {
+  return { ...participantPhoneLoginProofCookie(value, age), name: proofCookieName() };
+}
+
 function readProof(cookieStore) {
   return verifyParticipantPhoneLoginProof(
-    clean(cookieStore.get(PARTICIPANT_PHONE_LOGIN_PROOF_COOKIE)?.value),
+    clean(cookieStore.get(proofCookieName())?.value),
     proofSecret(),
   );
 }
 
 function clearProof(response) {
-  response.cookies.set(participantPhoneLoginProofCookie("", 0));
+  response.cookies.set(loginProofCookie("", 0));
   return response;
 }
 
@@ -187,7 +205,8 @@ async function sendLoginCode({ request, cookieStore, authorization, captchaToken
   }
 }
 
-export async function GET() {
+export async function GET(request) {
+  if (!canonicalRequestAllowed(request, false)) return NextResponse.json({ error: "Not found." }, { status: 404, headers: responseHeaders });
   const feature = publicPhoneFeature();
   if (!feature.available) return NextResponse.json({ smsEnabled: false }, { status: 404, headers: responseHeaders });
   const cookieStore = await cookies();
@@ -210,12 +229,15 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  if (!canonicalRequestAllowed(request, true)) return NextResponse.json({ error: "Not found." }, { status: 404, headers: responseHeaders });
   const feature = publicPhoneFeature();
   if (!feature.available) return errorResponse("PHONE_OTP_CONFIGURATION_REQUIRED", 503);
   if (!sameOriginMutation(request)) return errorResponse("PHONE_OTP_CAPTCHA_FAILED", 403);
   const cookieStore = await cookies();
   const input = await request.json().catch(() => ({}));
   const action = clean(input.action).toLowerCase();
+  let verificationClient = null;
+  let verificationCommitted = false;
 
   try {
     if (action === "cancel") {
@@ -280,7 +302,7 @@ export async function POST(request) {
           resendCooldownSeconds: 60,
           message: genericRequestMessage,
         }, { headers: responseHeaders });
-        response.cookies.set(participantPhoneLoginProofCookie(proofToken));
+        response.cookies.set(loginProofCookie(proofToken));
         return response;
       } catch (error) {
         const failure = classifyParticipantPhoneOtpProviderFailure(error, "send");
@@ -325,7 +347,8 @@ export async function POST(request) {
       const currentRead = await authorizeParticipantPhoneLoginProof(proofRpcInput(previousProof));
       const current = currentRead.payload || {};
       if (current.allowed !== true) return clearProof(errorResponse(current.code || "PHONE_OTP_STALE"));
-      await cancelParticipantPhoneLogin(proofRpcInput(previousProof, { attempt_id: clean(input.attemptId) })).catch(() => null);
+      const cancelled = await cancelParticipantPhoneLogin(proofRpcInput(previousProof, { attempt_id: clean(input.attemptId) }));
+      if (cancelled.payload?.ok !== true) return errorResponse("PHONE_OTP_INVALID_OR_EXPIRED");
       const sent = await sendLoginCode({
         request,
         cookieStore,
@@ -341,7 +364,7 @@ export async function POST(request) {
         resendCooldownSeconds: 60,
         message: "A new code is on its way.",
       }, { headers: responseHeaders });
-      response.cookies.set(participantPhoneLoginProofCookie(sent.proofToken));
+      response.cookies.set(loginProofCookie(sent.proofToken));
       return response;
     }
 
@@ -359,7 +382,10 @@ export async function POST(request) {
     const allowed = allowedRead.payload || {};
     if (allowed.allowed !== true) return errorResponse(allowed.code || "PHONE_OTP_INVALID_OR_EXPIRED");
 
-    const authClient = createParticipantAuthServerClient(cookieStore);
+    // Provider cookies remain private until canonical completion succeeds.
+    const cookieTransaction = createParticipantPhoneCookieTransaction(cookieStore);
+    const authClient = createParticipantAuthServerClient(cookieTransaction.store);
+    verificationClient = authClient;
     const verifyStarted = performance.now();
     const verified = await verifyExistingParticipantPhoneLogin({
       authClient,
@@ -372,7 +398,6 @@ export async function POST(request) {
       const code = verified.error
         ? classifyParticipantPhoneOtpProviderFailure(verified.error, "verify").code
         : !verified.ok ? "PHONE_OTP_AUTH_MISMATCH" : "PHONE_LOGIN_SESSION_FAILED";
-      if (verified.sessionCreated) await authClient.auth.signOut({ scope: "local" }).catch(() => null);
       await recordParticipantPhoneLoginFailure(proofRpcInput(proof, {
         attempt_id: attemptId,
         safe_reason: code,
@@ -398,19 +423,19 @@ export async function POST(request) {
         Number(completion.newDirectorEntitlements || 0) !== 0 || completion.directorPrivilegeEscalation === true ||
         completion.authMethodChangesDirectorAuthorization === true || completion.scoringAuthorizationUnchanged !== true ||
         completion.phoneIdentifierUnchanged !== true) {
-      await authClient.auth.signOut({ scope: "local" }).catch(() => null);
       console.error("Participant phone login completion gate rejected", { code: completion.code || "PHONE_LOGIN_VERIFY_FAILED", attemptId });
       return errorResponse(completion.code || "PHONE_LOGIN_VERIFY_FAILED");
     }
     const totalMs = Math.round(performance.now() - requestStarted);
-    return clearProof(NextResponse.json({
+    const response = clearProof(NextResponse.json({
       ok: true,
       session: "active",
       sameAuthUser: true,
       linkedPlayerId: completion.playerId,
       participantSessionEstablished: true,
       refreshSessionAvailable: true,
-      playerPassportResolved: true,
+      playerPassportResolved: true, // Compatibility field; authority is the canonical participant resolver.
+      participantAuthorityResolved: true,
       scoringAuthorizationUnchanged: true,
       phoneIdentifierUnchanged: true,
       directorEntitlementPreserved: true,
@@ -424,10 +449,18 @@ export async function POST(request) {
         "Server-Timing": `preflight;dur=${preflightMs}, verifyOtp;dur=${verifyOtpMs}, completion;dur=${completionMs}, total;dur=${totalMs}`,
       },
     }));
+    cookieTransaction.commit(response);
+    verificationCommitted = true;
+    return response;
   } catch (error) {
     if (error?.code === "PHONE_INVALID") return NextResponse.json({ error: "Enter a valid mobile number.", category: "INVALID_PHONE" }, { status: 400, headers: responseHeaders });
     const code = error?.code || error?.identityDiagnostics?.code || "PHONE_LOGIN_VERIFY_FAILED";
     console.error("Participant phone login failed", { code });
     return errorResponse(code, Number(error?.status) || undefined);
+  } finally {
+    // Includes completion exceptions after a successful provider verification.
+    if (verificationClient && !verificationCommitted) {
+      await verificationClient.auth.signOut({ scope: "local" }).catch(() => null);
+    }
   }
 }

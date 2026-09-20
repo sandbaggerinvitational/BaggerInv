@@ -17,19 +17,9 @@ import {
   participantAuthFieldAttributes,
 } from "../../lib/participant-auth-error-presentation.js";
 
-function participantDestination(searchParams) {
-  const requestedNext = String(searchParams.get("next") || "");
-  return /^\/(?:home|my-match|score|game-center|live|me)(?:[/?#]|$)/.test(requestedNext) ? requestedNext : "/home";
-}
+import { participantAuthReturnPath } from "../../lib/participant-auth-return-path.js";
 
-function formatUsMobile(value) {
-  let digits = String(value || "").replace(/\D/g, "");
-  if (digits.length > 10 && digits.startsWith("1")) digits = digits.slice(1);
-  digits = digits.slice(0, 10);
-  if (digits.length <= 3) return digits;
-  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
-}
+import { formatUsMobile } from "../../lib/participant-auth-phone-input.js";
 
 function maskEnteredEmail(value) {
   const [local = "", domain = ""] = String(value || "").trim().toLowerCase().split("@");
@@ -55,9 +45,9 @@ function participantAuthRequestError(payload, fallback) {
 export default function ParticipantAuthRehearsal({ experience }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = participantDestination(searchParams);
+  const next = participantAuthReturnPath(searchParams.get("next"));
   const [sessionState, setSessionState] = useState("checking");
-  const [method, setMethod] = useState(experience.defaultMethod);
+  const [method, setMethod] = useState("email");
   const [step, setStep] = useState("entry");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -72,6 +62,9 @@ export default function ParticipantAuthRehearsal({ experience }) {
   const [authTransition, setAuthTransition] = useState(false);
   const [captchaToken, setCaptchaToken] = useState("");
   const [captchaResetKey, setCaptchaResetKey] = useState(0);
+  const operationRef = useRef(false);
+  const startOperation = (name) => { operationRef.current = true; setBusy(name); };
+  const finishOperation = () => { operationRef.current = false; setBusy(""); };
   const phoneRef = useRef(null);
   const emailRef = useRef(null);
   const otpRef = useRef(null);
@@ -126,8 +119,7 @@ export default function ParticipantAuthRehearsal({ experience }) {
           router.replace(next);
           return;
         }
-        setSessionState("signed-out");
-        if (!experience.smsEnabled) return;
+        if (!experience.smsEnabled) { setSessionState("signed-out"); return; }
         const phoneState = await fetch("/api/participant/auth/phone", { cache: "no-store", credentials: "same-origin" })
           .then((result) => result.ok ? result.json() : null)
           .catch(() => null);
@@ -139,6 +131,7 @@ export default function ParticipantAuthRehearsal({ experience }) {
           setResendSeconds(Number(phoneState.resendCooldownSeconds || 0));
           setMessage("Enter the code from your text message.");
         }
+        setSessionState("signed-out");
       })
       .catch(() => {
         setSessionState("signed-out");
@@ -171,7 +164,8 @@ export default function ParticipantAuthRehearsal({ experience }) {
   }, [method, requestId, step]);
 
   const switchMethod = async (nextMethod) => {
-    if (busy || nextMethod === method) return;
+    if (operationRef.current || nextMethod === method || (nextMethod === "phone" && !experience.smsEnabled)) return;
+    startOperation("switch");
     await cancelPhoneAttempt();
     setMethod(nextMethod);
     setStep("entry");
@@ -181,11 +175,12 @@ export default function ParticipantAuthRehearsal({ experience }) {
     setResendSeconds(0);
     clearFeedback();
     resetCaptcha();
+    finishOperation();
   };
 
   const requestPhoneCode = async (event) => {
     event?.preventDefault();
-    if (busy) return;
+    if (operationRef.current) return;
     const validation = participantAuthEntryValidation("phone", phone);
     if (validation) {
       setFieldError(validation.field);
@@ -197,7 +192,7 @@ export default function ParticipantAuthRehearsal({ experience }) {
       setError("Complete the request check, then try again.");
       return;
     }
-    setBusy("phone-request");
+    startOperation("phone-request");
     clearFeedback();
     const started = performance.now();
     try {
@@ -225,12 +220,12 @@ export default function ParticipantAuthRehearsal({ experience }) {
       setFieldError(presentation.field);
       setError(presentation.message);
       resetCaptcha();
-    } finally { setBusy(""); }
+    } finally { finishOperation(); }
   };
 
   const requestEmailCode = async (event) => {
     event?.preventDefault();
-    if (busy) return;
+    if (operationRef.current) return;
     const validation = participantAuthEntryValidation("email", email);
     if (validation) {
       setFieldError(validation.field);
@@ -242,7 +237,7 @@ export default function ParticipantAuthRehearsal({ experience }) {
       setError("Complete the request check, then try again.");
       return;
     }
-    setBusy("email-request");
+    startOperation("email-request");
     clearFeedback();
     const started = performance.now();
     try {
@@ -270,13 +265,13 @@ export default function ParticipantAuthRehearsal({ experience }) {
       setFieldError(presentation.field);
       setError(presentation.message);
       resetCaptcha();
-    } finally { setBusy(""); }
+    } finally { finishOperation(); }
   };
 
   const verifyCode = async (event) => {
     event.preventDefault();
-    if (busy || token.length !== 6) return;
-    setBusy("verify");
+    if (operationRef.current || token.length !== 6) return;
+    startOperation("verify");
     clearFeedback();
     const started = performance.now();
     try {
@@ -310,19 +305,19 @@ export default function ParticipantAuthRehearsal({ experience }) {
       setError(presentation.message);
       setToken("");
       otpRef.current?.focus();
-      setBusy("");
+      finishOperation();
     }
   };
 
   const resendCode = async () => {
-    if (busy || resendSeconds > 0) return;
+    if (operationRef.current || resendSeconds > 0) return;
     if (experience.captchaRequired && !captchaToken) {
       setFieldError("");
       setError("Complete the request check, then try again.");
       return;
     }
     if (method === "email") return requestEmailCode();
-    setBusy("phone-resend");
+    startOperation("phone-resend");
     clearFeedback();
     try {
       const response = await fetch("/api/participant/auth/phone", {
@@ -343,11 +338,12 @@ export default function ParticipantAuthRehearsal({ experience }) {
       setFieldError("");
       setError(networkMessage(resendError));
       resetCaptcha();
-    } finally { setBusy(""); }
+    } finally { finishOperation(); }
   };
 
   const changeIdentifier = async () => {
-    if (busy) return;
+    if (operationRef.current) return;
+    startOperation("change");
     await cancelPhoneAttempt();
     setStep("entry");
     setToken("");
@@ -356,6 +352,7 @@ export default function ParticipantAuthRehearsal({ experience }) {
     setResendSeconds(0);
     clearFeedback();
     resetCaptcha();
+    finishOperation();
   };
 
   const captcha = experience.captchaRequired && (step === "entry" || resendSeconds === 0)
@@ -398,16 +395,20 @@ export default function ParticipantAuthRehearsal({ experience }) {
           : "Sign in to access your tournament."}</p>
       </header>
 
+      {step === "entry" && experience.smsEnabled ? <div className={styles.methods} role="group" aria-label="Sign-in method">
+        <button type="button" aria-pressed={method === "email"} disabled={Boolean(busy)} onClick={() => switchMethod("email")}>Email</button>
+        <button type="button" aria-pressed={method === "phone"} disabled={Boolean(busy)} onClick={() => switchMethod("phone")}>Text</button>
+      </div> : null}
+
       {step === "entry" ? method === "phone" ? <form className={styles.form} onSubmit={requestPhoneCode} noValidate>
         <label htmlFor="participant-mobile">Mobile Number</label>
         <input ref={phoneRef} id="participant-mobile" name="mobile" type="tel" inputMode="tel" autoComplete="tel"
           placeholder="(###) ###-####" value={phone} onChange={(event) => { setPhone(formatUsMobile(event.target.value)); setError(""); setFieldError(""); }}
           {...phoneErrorAttributes} required />
         {captcha}
-        <button className={styles.primary} disabled={Boolean(busy) || captchaPending || phone.replace(/\D/g, "").length !== 10}>
+        <button className={styles.primary} disabled={Boolean(busy) || captchaPending || !phone.trim()}>
           {busy === "phone-request" ? "Sending code…" : "Text Me a Code"}
         </button>
-        <div className={styles.switcher}><span>Prefer email?</span><button type="button" onClick={() => switchMethod("email")}>Use Email Instead</button></div>
       </form> : <form className={styles.form} onSubmit={requestEmailCode} noValidate>
         <label htmlFor="participant-email">Email</label>
         <input ref={emailRef} id="participant-email" name="email" type="email" inputMode="email" autoComplete="email"
@@ -417,9 +418,6 @@ export default function ParticipantAuthRehearsal({ experience }) {
         <button className={styles.primary} disabled={Boolean(busy) || captchaPending || !email.trim()}>
           {busy === "email-request" ? "Sending code…" : "Send Me a Code"}
         </button>
-        {experience.smsEnabled
-          ? <div className={styles.switcher}><span>Prefer text?</span><button type="button" onClick={() => switchMethod("phone")}>Use Mobile Instead</button></div>
-          : null}
       </form> : <form className={styles.form} onSubmit={verifyCode}>
         <label htmlFor="participant-code">6-digit code</label>
         <input ref={otpRef} className={styles.otp} id="participant-code" name="code" inputMode="numeric" autoComplete="one-time-code"
@@ -432,14 +430,14 @@ export default function ParticipantAuthRehearsal({ experience }) {
         <div className={styles.resend}>
           <span>Didn't get it?</span>
           {resendSeconds > 0
-            ? <span aria-label={`Resend available in ${resendSeconds} seconds`}>Resend code in 0:{String(resendSeconds).padStart(2, "0")}</span>
+            ? <span aria-label={`Resend available in ${resendSeconds} seconds`}>Resend code in {Math.floor(resendSeconds / 60)}:{String(resendSeconds % 60).padStart(2, "0")}</span>
             : <>{captcha}<button type="button" onClick={resendCode} disabled={Boolean(busy) || captchaPending}>{busy.includes("resend") ? "Sending code…" : "Resend code"}</button></>}
         </div>
         <button className={styles.secondary} type="button" onClick={changeIdentifier} disabled={Boolean(busy)}>
-          {method === "phone" ? "Use a different number" : "Use a different email"}
+          {method === "phone" ? "Change Number" : "Change Email"}
         </button>
         <button className={styles.linkButton} type="button" onClick={() => switchMethod(method === "phone" ? "email" : "phone")} disabled={Boolean(busy) || (method === "email" && !experience.smsEnabled)}>
-          {method === "phone" ? "Use Email Instead" : "Use Mobile Instead"}
+          {method === "phone" ? "Use Email Instead" : "Use Text Instead"}
         </button>
       </form>}
 

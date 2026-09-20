@@ -57,6 +57,8 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
   const [tournamentData, setTournamentData] = useState(null);
   const [attempt, setAttempt] = useState(0);
   const [confirming, setConfirming] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState("");
   const [shareMessage, setShareMessage] = useState("");
   const [preferences, setPreferences] = useState(() =>
     Object.fromEntries(NOTIFICATION_CATEGORIES.map((category) => [category.id, true]))
@@ -108,12 +110,21 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
   };
 
   const remove = async () => {
-    const response = await fetch("/api/player-passport/session", { method: "DELETE" });
-    const result = await response.json().catch(() => ({}));
-    window.localStorage.removeItem("sbi-participant-shell");
-    window.sessionStorage.removeItem("sbi-participant-initialization");
-    window.dispatchEvent(new Event("player-passport-cleared"));
-    window.location.replace(result.identityAuthority === "supabase" ? "/participant-auth" : "/activate");
+    if (signingOut) return;
+    setSigningOut(true);
+    setSignOutError("");
+    try {
+      const response = await fetch("/api/player-passport/session", { method: "DELETE" });
+      if (!response.ok) throw new Error("Sign out rejected");
+      const result = await response.json();
+      window.localStorage.removeItem("sbi-participant-shell");
+      window.sessionStorage.removeItem("sbi-participant-initialization");
+      window.dispatchEvent(new Event("player-passport-cleared"));
+      window.location.replace(result.identityAuthority === "supabase" ? "/participant-auth" : "/activate");
+    } catch {
+      setSignOutError("We couldn’t confirm sign out. Check your connection and try again.");
+      setSigningOut(false);
+    }
   };
 
   const shareApp = async () => {
@@ -200,9 +211,10 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
     {!previewMode ? <section className={styles.card}>
       <div className={styles.sectionHeading}><span>Settings</span><h2>{participantIdentityAuthority === "supabase" ? "Account & Session" : "Player Passport"}</h2></div>
       <p className={styles.note}>{participantIdentityAuthority === "supabase" ? "Signing out does not change your player record or tournament assignments." : "Removing this device does not change your player record or activation credentials."}</p>
+      {signOutError ? <p role="alert">{signOutError}</p> : null}
       {!confirming ? <button className={styles.remove} type="button" onClick={() => setConfirming(true)}>{participantIdentityAuthority === "supabase" ? "Sign Out" : "This isn’t me"}</button> : <div className={styles.confirm}>
         <strong>{participantIdentityAuthority === "supabase" ? "Sign out of this participant account?" : "Remove Player Passport from this device?"}</strong>
-        <div><button type="button" onClick={() => setConfirming(false)}>{participantIdentityAuthority === "supabase" ? "Stay Signed In" : "Keep Passport"}</button><button type="button" onClick={remove}>{participantIdentityAuthority === "supabase" ? "Sign Out" : "Remove"}</button></div>
+        <div><button type="button" onClick={() => setConfirming(false)}>{participantIdentityAuthority === "supabase" ? "Stay Signed In" : "Keep Passport"}</button><button type="button" disabled={signingOut} onClick={remove}>{signingOut ? "Signing Out…" : participantIdentityAuthority === "supabase" ? "Sign Out" : "Remove"}</button></div>
       </div>}
     </section> : null}
   </section>;

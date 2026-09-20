@@ -247,3 +247,9 @@
 @media (prefers-reduced-motion: reduce) {
   .startup i { animation-duration: 1.5s; }
 }
+
+.methods { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-top: 22px; border: 1px solid #c7d0cb; border-radius: 999px; background: #edf1ed; }
+.methods button { min-height: 44px; border: 0; border-radius: 999px; background: transparent; color: #456056; font: inherit; font-weight: 800; cursor: pointer; }
+.methods button[aria-pressed="true"] { background: #0b4435; color: #fff; }
+.methods button:focus-visible { outline: 3px solid #d4b15f; outline-offset: 2px; }
+.methods button:disabled { opacity: .52; cursor: default; }

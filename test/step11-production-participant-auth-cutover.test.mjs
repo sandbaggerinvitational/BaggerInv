@@ -147,7 +147,7 @@ test("Production participant routes require exact cutover requests and OTP verif
   assert.match(verifyRoute, /assertProductionCutoverRequest\(request/);
   assert.match(sessionRoute, /assertProductionCutoverRequest\(request/);
   assert.match(page, /participantAuthExperienceConfiguration\(env\)/);
-  assert.match(feature, /const smsRequested = preview/);
+  assert.match(feature, /const smsRequested = \(preview \|\| productionCutoverIdentity\)/);
   assert.doesNotMatch(feature, /productionCutoverIdentity[^;]+smsEnabled\s*=\s*true/);
 });
 

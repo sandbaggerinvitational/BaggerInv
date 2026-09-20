@@ -23,3 +23,9 @@
 .performanceNote{margin:0;padding:7px 12px;border-bottom:1px solid #eee8de;background:#fffaf0;color:#795d1b;font-size:.62rem;line-height:1.3}
 @media(max-width:420px){.page .tabs button{font-size:.67rem}.playerBoardTools input{width:118px}}
 @media(max-width:340px){.page .tabs button{font-size:.62rem}.playerBoardHeader{align-items:stretch!important;flex-direction:column}.playerBoardTools{justify-content:stretch}.playerBoardTools label{flex:1}.playerBoardTools input{width:100%}}
+
+/* Keep all five participant categories together without shrinking tap targets. */
+.categoryRail{display:flex;gap:6px;max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;padding:4px 2px 9px;scroll-padding-inline:2px;scrollbar-width:thin;scrollbar-color:#a89b80 transparent}
+.categoryRail button{flex:1 0 auto;min-height:44px;padding:10px 13px;border:1px solid #d8d1c3;border-radius:9px;background:#fffdf6;color:#174c3b;font:inherit;font-size:.8rem;font-weight:750;white-space:nowrap;cursor:pointer}
+.categoryRail button[aria-pressed=true]{background:#0b4938;border-color:#0b4938;color:#fffdf6}
+.categoryRail button:focus-visible{outline:3px solid #96701c;outline-offset:1px}

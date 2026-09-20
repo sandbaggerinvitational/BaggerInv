@@ -30,7 +30,7 @@ const readyPreview = {
   PARTICIPANT_SMS_PREVIEW_ROLLOUT: "DESIGNATED",
 };
 
-test("SMS is Preview-only and fails closed until Turnstile configuration is acknowledged", () => {
+test("Unconfigured SMS fails closed; historical Preview compatibility retains CAPTCHA", () => {
   assert.equal(participantSmsAuthFeatureConfigured(readyPreview), true);
   assert.equal(participantAuthCaptchaConfigured(readyPreview), true);
   assert.equal(participantSmsAuthFeatureConfigured({ ...readyPreview, VERCEL_ENV: "production" }), false);
@@ -47,16 +47,17 @@ test("SMS is Preview-only and fails closed until Turnstile configuration is ackn
     rateLimitReady: true,
     captchaSiteKey: "",
     defaultMethod: "email",
+    productionSmsAuthority: false,
     rollout: "DESIGNATED",
     productionBlocked: false,
   });
 });
 
-test("final signed-out UI is text-first, locally switchable, accessible, and free of engineering jargon", async () => {
+test("final signed-out UI is email-first, locally switchable, accessible, and free of engineering jargon", async () => {
   const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
   for (const copy of ["Welcome to The Bagger", "Sign in to access your tournament.", "Mobile Number",
-    "(###) ###-####", "Text Me a Code", "Use Email Instead", "Send Me a Code", "Use Mobile Instead",
-    "Enter your code", "Use a different number", "Opening The Bagger…"]) assert.match(ui, new RegExp(copy.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    "(###) ###-####", "Text Me a Code", "Use Email Instead", "Send Me a Code", "Use Text Instead",
+    "Enter your code", "Change Number", "Opening The Bagger…"]) assert.match(ui, new RegExp(copy.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.match(ui, /type="tel" inputMode="tel" autoComplete="tel"/);
   assert.match(ui, /type="email" inputMode="email" autoComplete="email"/);
   assert.match(ui, /inputMode="numeric" autoComplete="one-time-code"/);
@@ -79,8 +80,7 @@ test("trusted session stays behind a startup state and redirects without showing
 
 test("safe next destinations are internal participant routes only", async () => {
   const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
-  assert.match(ui, /\^\\\/(?:\(\?:)?home\|my-match\|score\|game-center\|live\|me/);
-  assert.match(ui, /\? requestedNext : "\/home"/);
+  assert.match(ui, /participantAuthReturnPath\(searchParams\.get\("next"\)\)/);
   assert.doesNotMatch(ui, /window\.location\s*=|location\.href\s*=/);
 });
 
@@ -110,7 +110,7 @@ test("Turnstile is auth-route-only and sends one-time tokens to Supabase Auth", 
 test("OTP sends stay disabled until the visible Turnstile control yields a token", async () => {
   const ui = await source("app/participant-auth/ParticipantAuthRehearsal.js");
   assert.match(ui, /const captchaPending = experience\.captchaRequired && !captchaToken/);
-  assert.match(ui, /disabled=\{Boolean\(busy\) \|\| captchaPending \|\| phone\.replace/);
+  assert.match(ui, /disabled=\{Boolean\(busy\) \|\| captchaPending \|\| !phone\.trim/);
   assert.match(ui, /disabled=\{Boolean\(busy\) \|\| captchaPending \|\| !email\.trim\(\)\}/);
   assert.match(ui, /onClick=\{resendCode\} disabled=\{Boolean\(busy\) \|\| captchaPending\}/);
 });
