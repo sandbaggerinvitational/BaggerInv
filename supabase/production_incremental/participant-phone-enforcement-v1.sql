@@ -12,9 +12,10 @@ alter table participant_identity.participant_phone_otp_attempts
  add column provider_verify_claimed_at timestamptz,
  add column provider_confirmed_at timestamptz,
  add column reservation_phone_key text;
--- Fail installation on pre-existing ambiguity; never repair data implicitly.
-create unique index production_phone_pending_unique_v1 on auth.users
- (participant_identity.canonical_auth_phone(phone_change)) where nullif(phone_change,'') is not null;
+-- Pending-phone uniqueness is owned by the active attempt reservations below.
+-- The signed pre-send claim and retained Auth-write trigger require that exact
+-- reservation and revalidate provider current/pending state. No Auth-table index.
+-- A timed-out/uncertain provider operation keeps its reservation until reviewed.
 alter table participant_identity.participant_phone_otp_attempts
  add column verify_service_sid text check(verify_service_sid ~ '^VA[0-9a-f]{32}$'),
  add column verification_sid text check(verification_sid ~ '^VE[0-9a-f]{32}$'),
