@@ -74,10 +74,27 @@ test('Build 4 and existing certificates retain exact legacy wire lifetime',async
  const x=fixture();const r=request('auth/otp/certify',{headers:{authorization:'Bearer synthetic'}});
  const c=await certifyCanonicalNativeParticipant({request:r,...actor,env:x.env,dependencies:x.deps});
  assert.equal(c.expiresInSeconds,43200);assert.match(c.certificationToken,/^v2p\./);
- x.setCert(c.certificationToken);await assert.rejects(x.renew);
+ x.setCert(c.certificationToken);assert.equal((await x.renew()).body.data.expiresInSeconds,life);
 });
 test('online provider validation rejects revoked session and does not treat 5xx as definitive',async()=>{
  for(const [status,expected] of [[401,'invalid'],[403,'invalid'],[503,'unavailable'],[429,'unavailable']]) {
   const r=await verifyMobileSupabaseAuthenticatedUser('synthetic',{client:{auth:{getUser:async()=>({error:{status},data:null})}}});assert.equal(r.status,expected);
  }
+});
+
+for (const expired of [false,true]) test(`Build4 signed v2p migrates; expired=${expired}`,async()=>{
+ const x=fixture();x.setCert(issueMobileNativeCertification({...actor,env:x.env,productionContext:productionContext(),now:()=>base}).token);x.setClock(base+(expired?43201:1)*1000);
+ if(expired)assert.throws(()=>verifyMobileNativeCertification({token:x.token(),...actor,env:x.env,productionContext:productionContext(),now:()=>base+43201000}));
+ const r=await x.renew();assert.equal(r.body.data.expiresInSeconds,life);assert.match(r.body.data.certificationToken,/^v3e\./);
+});
+for(const reason of ['invalid-session','revoked-link','wrong-uuid','wrong-player','changed-revision','inactive','tamper','missing-email','provider-timeout'])test(`legacy migration denies ${reason}`,async()=>{
+ const x=fixture();x.setCert(issueMobileNativeCertification({...actor,env:x.env,productionContext:productionContext(),now:()=>base}).token);x.setClock(base+43201000);
+ if(reason==='invalid-session')x.user.status='invalid';if(reason==='provider-timeout')x.user.status='unavailable';
+ if(reason==='revoked-link')x.revoke();if(reason==='wrong-uuid')x.user.authUserId='other';if(reason==='wrong-player')x.p.playerId='OTHER';if(reason==='changed-revision')x.p.contextRevision++;
+ if(reason==='inactive')x.p.membership={active:false};if(reason==='tamper')x.setCert(x.token().slice(0,-3)+'xyz');if(reason==='missing-email')x.user.emailVerified=false;
+ await assert.rejects(x.renew);
+});
+test('legacy migration rechecks signed authority at issuance',async()=>{
+ const x=fixture();x.setCert(issueMobileNativeCertification({...actor,env:x.env,productionContext:productionContext(),now:()=>base}).token);
+ x.deps.readIdentity=async()=>({payload:{data:{...x.p,contextRevision:x.p.contextRevision+1}}});await assert.rejects(x.renew);
 });
