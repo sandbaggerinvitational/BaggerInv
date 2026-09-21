@@ -539,26 +539,19 @@ test("Twilio trial recipient rejection is classified without exposing provider d
   }).authErrorCode, "UNKNOWN");
 });
 
-test("enrollment route records a rejected Twilio request as provider-called using safe metadata only", async () => {
+test("Production enrollment uses the separately authenticated send hook and hides provider details", async () => {
   const route = await source("app/api/participant/auth/phone-enrollment/route.js");
-  assert.match(route, /providerCalled = providerAccepted \|\| \(!localSafetyError && failure\.providerCalled === true\)/);
-  assert.match(route, /authErrorCode: failure\.authErrorCode/);
-  assert.match(route, /authStatus: failure\.authStatus/);
-  assert.match(route, /providerErrorClass: failure\.providerErrorClass/);
-  assert.doesNotMatch(route, /message:\s*error\?\.message|console\.(?:warn|error)\([^\n]+error\?\.message/);
+  const core = await source("lib/production-phone-enrollment.js");
+  assert.match(route, /productionPhoneEnrollment/);
+  assert.match(core, /PHONE_ENROLLMENT_PROVIDER_UNCERTAIN/);
+  assert.doesNotMatch(route, /console\.(?:warn|error)|TWILIO_AUTH_TOKEN|api\.twilio/);
 });
-
-test("send-stage safety failures do not claim that OTP verification occurred", async () => {
-  const route = await source("app/api/participant/auth/phone-enrollment/route.js");
-  assert.equal(participantPhoneOtpErrorMessage("PHONE_OTP_ENROLLMENT_START_FAILED"),
-    "Phone enrollment could not be started safely.");
-  assert.match(route, /localSafetyError[\s\S]*PHONE_OTP_ENROLLMENT_START_FAILED/);
-  assert.match(route, /action === "start" && code === "PHONE_OTP_AUTH_MISMATCH"/);
-  assert.equal(participantPhoneOtpErrorMessage("PHONE_OTP_AUTH_MISMATCH"),
-    "The verified Auth identity did not match the approved participant.");
-  assert.doesNotMatch(participantPhoneOtpErrorMessage("PHONE_OTP_PENDING_STATE_MISMATCH"), /verified Auth identity/i);
-  assert.doesNotMatch(participantPhoneOtpErrorMessage("PHONE_OTP_SEND_FAILED"), /verified Auth identity/i);
-  assert.doesNotMatch(participantPhoneOtpErrorMessage("PHONE_OTP_ENROLLMENT_START_FAILED"), /verified Auth identity/i);
+test("send-stage uncertainty cannot claim possession verification", async () => {
+  const core = await source("lib/production-phone-enrollment.js");
+  const failure = core.slice(core.indexOf("catch{\n"),core.indexOf("const sent="));
+  assert.match(failure, /send_failed/);
+  assert.match(failure, /PHONE_ENROLLMENT_PROVIDER_UNCERTAIN/);
+  assert.doesNotMatch(failure, /call\('complete'/);
 });
 
 test("Stage B record accepts normalized updateUser evidence without weakening UUID or collision gates", async () => {
@@ -694,12 +687,11 @@ test("Director cannot send enrollment SMS; participant email session owns Operat
   assert.doesNotMatch(directorRoute, /send-test-phone-otp|verify-test-phone-otp|updateUser\(\{ phone/);
   assert.doesNotMatch(panel, /Send Test Verification Code|send-test-phone-otp/);
   assert.match(panel, /Email-session enrollment required/);
-  assert.match(participantRoute, /verifyParticipantAuthClaims/);
-  assert.match(participantRoute, /requestExistingParticipantPhoneEnrollment/);
-  assert.match(participantRoute, /verifyExistingParticipantPhoneEnrollment/);
-  assert.match(participantRoute, /normalizeParticipantPhoneEnrollmentStageB/);
-  assert.match(participantRoute, /readParticipantPhoneEnrollmentState/);
-  assert.match(participantRoute, /signOut\(\{ scope: "local" \}\)/);
+  assert.match(participantRoute, /getUser\(accessToken\)/);
+  assert.match(participantRoute, /productionPhoneEnrollment/);
+  assert.match(participantRoute, /emailProof/);
+  assert.match(participantRoute, /production_participant_phone_enrollment_v1/);
+  assert.doesNotMatch(participantRoute, /begin_participant_phone_enrollment|normalizeParticipantPhoneEnrollmentStageB/);
   assert.doesNotMatch(participantUi, /window\.confirm/);
   assert.doesNotMatch(participantUi, /Begin phone enrollment/);
   assert.doesNotMatch(participantUi, /Six-digit phone enrollment code/);
@@ -710,7 +702,7 @@ test("Director cannot send enrollment SMS; participant email session owns Operat
 
 test("Operation A phone-change verification remains backend regression infrastructure", async () => {
   const route = await source("app/api/participant/auth/phone-enrollment/route.js");
-  assert.match(route, /verifyExistingParticipantPhoneEnrollment/);
+  assert.match(route, /type:'phone_change'/);
   assert.match(await source("lib/participant-phone-otp.js"), /verifyOtp\(\{ phone, token, type: "phone_change" \}\)/);
 });
 
@@ -750,7 +742,7 @@ test("unlinked Auth UUID B receives no participant or scoring identity", async (
   }), (error) => error.code === "ACTIVE_USER_PLAYER_LINK_REQUIRED");
 });
 
-test("no Twilio SDK, credentials, or application-side Twilio send is introduced", async () => {
+test("enrollment route never dispatches Twilio directly; approved hook owns dispatch", async () => {
   const [pkg, env, route] = await Promise.all([
     source("package.json").then(JSON.parse), source(".env.example"),
     source("app/api/participant/auth/phone-enrollment/route.js"),

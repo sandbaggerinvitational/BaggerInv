@@ -1,3 +1,4 @@
+import {issueEmailPhoneEnrollmentProof,EMAIL_ENROLLMENT_COOKIE} from "../../../../../../lib/production-phone-enrollment-proof.js";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import { participantIdentityAuthorityEnvironment } from "../../../../../../lib/participant-identity-authority.js";
@@ -121,6 +122,12 @@ export async function POST(request) {
     sessionEstablishedAt: new Date().toISOString(), timings: { verifyOtpMs, totalMs } },
     { status: 200,
       headers: { ...responseHeaders, "Server-Timing": `verifyOtp;dur=${verifyOtpMs}, total;dur=${totalMs}` } });
+  // Optional, session-bound Email proof. Disabled/missing SMS configuration never breaks Email.
+  const enrollmentProof = issueEmailPhoneEnrollmentProof({authUserId:data.user.id,
+    playerId:allowed.payload.playerId,tournamentId:allowed.payload.tournamentId,
+    accessToken:data.session?.access_token});
+  if(enrollmentProof) response.cookies.set({name:EMAIL_ENROLLMENT_COOKIE,value:enrollmentProof,
+    httpOnly:true,secure:true,sameSite:"strict",path:"/",maxAge:600});
   pendingCookies.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
   return response;
 }

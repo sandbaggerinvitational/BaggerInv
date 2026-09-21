@@ -37,6 +37,9 @@ test('every phone lifecycle operation resolves to explicit Production RPC, never
  }
 });
 for(const dest of ['/home','/my-match','/app/tournament','/app/leaderboards','/app/leaderboards?tab=skins','/app/leaderboards?tab=calcutta','/app/players/CB01'])test(`shared internal auth return: ${dest}`,()=>assert.equal(participantAuthReturnPath(dest),dest));
-test('Email request/verify source remains byte-identical to Phase 2; no native change',async()=>{
- for(const file of ['app/api/participant/auth/otp/request/route.js','app/api/participant/auth/otp/verify/route.js'])assert.equal(createHash('sha256').update(await readFile(new URL('../'+file,import.meta.url))).digest('hex'),{"app/api/participant/auth/otp/request/route.js": "b638c91b7fdb52eed1d1ce8599e699f5c792056037b8bf5039d06c254b3b4890", "app/api/participant/auth/otp/verify/route.js": "b0e7d123b741d6a22554c5ce8e647815d0ae121608013d9ef7e98af19ac38aa8"}[file]);
+test('Email provider flow remains byte-identical apart from optional enrollment proof issuance',async()=>{
+ for(const file of ['app/api/participant/auth/otp/request/route.js','app/api/participant/auth/otp/verify/route.js']) {
+ let source=await readFile(new URL('../'+file,import.meta.url),'utf8');
+ source=source.replace(/^import \{issueEmailPhoneEnrollmentProof,EMAIL_ENROLLMENT_COOKIE\}.*\n/,'').replace(/  \/\/ Optional, session-bound Email proof[\s\S]*?maxAge:600\}\);\n/,'');
+ assert.equal(createHash('sha256').update(source).digest('hex'),{"app/api/participant/auth/otp/request/route.js": "b638c91b7fdb52eed1d1ce8599e699f5c792056037b8bf5039d06c254b3b4890", "app/api/participant/auth/otp/verify/route.js": "b0e7d123b741d6a22554c5ce8e647815d0ae121608013d9ef7e98af19ac38aa8"}[file]); }
 });

@@ -1,6 +1,8 @@
 -- LOCAL CANDIDATE ONLY. No deployment or feature activation.
 -- Reuse existing phone attempts; introduce no tables or retained identifiers.
 begin;
+alter table participant_identity.participant_auth_identifiers add column approved_phone_revision bigint check (approved_phone_revision > 0);
+
 create or replace function participant_identity.production_phone_runtime_v1()
 returns jsonb language plpgsql stable security definer set search_path=pg_catalog as $$
 declare scope production_control.resource_scope%rowtype; runtime jsonb;
@@ -103,12 +105,20 @@ begin
   where identifier.player_id = requested_player
     and identifier.auth_user_id = expected_auth_user
     and identifier.source_tournament_id = target_tournament
-    and identifier.identifier_type = 'PHONE';
+    and identifier.identifier_type = 'PHONE' and identifier.status='VERIFIED';
   if not found or phone_identifier.status <> 'VERIFIED'
-     or phone_identifier.verification_source is distinct from 'SUPABASE_AUTH_TWILIO_VERIFY'
+     or phone_identifier.verification_source is distinct from 'SUPABASE_AUTH_APPROVED_SMS_HOOK'
      or (expected_identifier is not null and phone_identifier.identifier_id <> expected_identifier)
      or (expected_revision is not null and phone_identifier.revision <> expected_revision) then
     return jsonb_build_object('ok', true, 'allowed', false, 'code', 'PHONE_OTP_NOT_ELIGIBLE');
+  end if;
+  if not exists (select 1 from participant_identity.player_approved_phones_v1 approval
+    where approval.tournament_id=target_tournament and approval.player_id=requested_player
+      and approval.status='VERIFIED' and approval.revoked_at is null
+      and approval.verified_at is not null
+      and approval.phone_e164=phone_identifier.normalized_value_private
+      and approval.phone_revision=phone_identifier.approved_phone_revision) then
+    return jsonb_build_object('ok',true,'allowed',false,'code','PHONE_APPROVAL_STALE');
   end if;
   select * into email_identifier from participant_identity.participant_auth_identifiers identifier
   where identifier.player_id = requested_player
@@ -237,7 +247,7 @@ begin
   where current_identifier.identifier_type = 'PHONE'
     and current_identifier.normalized_value_private = target_phone
     and current_identifier.status = 'VERIFIED'
-    and current_identifier.verification_source = 'SUPABASE_AUTH_TWILIO_VERIFY';
+    and current_identifier.verification_source = 'SUPABASE_AUTH_APPROVED_SMS_HOOK';
   if not found or (select count(*) from participant_identity.participant_auth_identifiers i where i.identifier_type='PHONE' and i.normalized_value_private=target_phone and i.status='VERIFIED') <> 1 then
     return jsonb_build_object('ok', true, 'allowed', false, 'code', 'PHONE_OTP_NOT_ELIGIBLE');
   end if;
@@ -445,6 +455,7 @@ begin
     reason_value := coalesce(proof->>'code', 'PHONE_LOGIN_SEND_FAILED');
   end if;
   if reason_value !~ '^[A-Z0-9_]+$' then reason_value := 'PHONE_LOGIN_SEND_FAILED'; end if;
+  if (succeeded and attempt.provider_send_state is distinct from 'SENT') or (not succeeded and attempt.provider_send_state is distinct from 'FAILED') then return jsonb_build_object('ok',false,'code','PHONE_OTP_PROVIDER_UNAVAILABLE'); end if;
   update participant_identity.participant_phone_otp_attempts set
     status = case when succeeded then 'SENT' else 'SEND_FAILED' end,
     safe_reason = case when succeeded then 'PHONE_LOGIN_CODE_SENT' else reason_value end,
@@ -521,6 +532,7 @@ declare attempt participant_identity.participant_phone_otp_attempts%rowtype;
 declare proof jsonb;
 begin
   perform participant_identity.production_phone_runtime_v1();
+  perform participant_identity.production_phone_assert_attempt_v1(target_attempt);
   select * into attempt from participant_identity.participant_phone_otp_attempts current_attempt
   where current_attempt.attempt_id = target_attempt
     and current_attempt.auth_user_id = expected_auth_user for update;
@@ -538,6 +550,8 @@ begin
      or attempt.tournament_id <> proof->>'tournamentId' then
     return jsonb_build_object('ok', true, 'allowed', false, 'code', 'PHONE_OTP_STALE');
   end if;
+  if attempt.provider_send_state is distinct from 'SENT' or attempt.provider_verify_claimed_at is not null or attempt.provider_confirmed_at is not null then return jsonb_build_object('ok',true,'allowed',false,'code','PHONE_OTP_STALE'); end if;
+  update participant_identity.participant_phone_otp_attempts set provider_verify_claimed_at=clock_timestamp() where attempt_id=target_attempt;
   return proof || jsonb_build_object('ok', true, 'allowed', true,
     'code', 'PHONE_LOGIN_VERIFY_ALLOWED', 'attemptId', attempt.attempt_id,
     'expiresAt', attempt.expires_at);
@@ -571,6 +585,8 @@ begin
   if attempt.status <> 'SENT' or attempt.safe_reason <> 'PHONE_LOGIN_CODE_SENT' then
     return jsonb_build_object('ok', false, 'code', 'PHONE_OTP_STALE');
   end if;
+  if attempt.provider_confirmed_at is not null or input->>'conclusive_invalid_code' is distinct from 'true' then return jsonb_build_object('ok',false,'code','PHONE_OTP_PROVIDER_UNAVAILABLE'); end if;
+  update participant_identity.participant_phone_otp_attempts set provider_verify_claimed_at=null where attempt_id=target_attempt;
   next_failures := least(5, attempt.verify_failure_count + case when reason_value = 'PHONE_OTP_PROVIDER_UNAVAILABLE' then 0 else 1 end);
   next_status := case
     when reason_value = 'PHONE_OTP_AUTH_MISMATCH' then 'UUID_MISMATCH'
@@ -617,15 +633,23 @@ declare attempt participant_identity.participant_phone_otp_attempts%rowtype;
 declare proof jsonb;
 begin
   perform participant_identity.production_phone_runtime_v1();
+  -- Same lock order as enrollment/Director invalidation: approval, then attempt.
+  -- A revocation committed while verification was remote must be observed here.
+  perform 1 from participant_identity.player_approved_phones_v1 p
+  join participant_identity.participant_phone_otp_attempts a
+    on a.tournament_id=p.tournament_id and a.player_id=p.player_id
+  where a.attempt_id=target_attempt and a.auth_user_id=expected_auth_user
+  for share of p;
   select * into attempt from participant_identity.participant_phone_otp_attempts current_attempt
   where current_attempt.attempt_id = target_attempt
     and current_attempt.auth_user_id = expected_auth_user for update;
   if not found then return jsonb_build_object('ok', false, 'code', 'PHONE_OTP_STALE'); end if;
   if attempt.status = 'VERIFIED' then return jsonb_build_object('ok', false, 'code', 'PHONE_OTP_REPLAY'); end if;
   if attempt.status <> 'SENT' or attempt.safe_reason <> 'PHONE_LOGIN_CODE_SENT'
-     or attempt.expires_at <= now() then
+     or attempt.expires_at <= clock_timestamp() then
     return jsonb_build_object('ok', false, 'code', 'PHONE_OTP_STALE');
   end if;
+  if attempt.provider_verify_claimed_at is null or attempt.provider_confirmed_at is null then return jsonb_build_object('ok',false,'code','PHONE_OTP_PROVIDER_UNAVAILABLE'); end if;
   if returned_auth_user is null or returned_auth_user <> expected_auth_user then
     update participant_identity.participant_phone_otp_attempts set
       status = 'UUID_MISMATCH', safe_reason = 'PHONE_OTP_AUTH_MISMATCH', updated_at = now()

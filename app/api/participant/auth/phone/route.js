@@ -1,3 +1,4 @@
+import {reportCanonicalPhoneVerification} from "../../../../../lib/production-verify-feedback.js";
 import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -401,6 +402,7 @@ export async function POST(request) {
       await recordParticipantPhoneLoginFailure(proofRpcInput(proof, {
         attempt_id: attemptId,
         safe_reason: code,
+        conclusive_invalid_code: verified.error?.code === "otp_expired" && [403,422].includes(Number(verified.error?.status)),
         duration_ms: verifyOtpMs,
       })).catch(() => null);
       if (code === "PHONE_OTP_AUTH_MISMATCH") console.error("Participant phone login Auth UUID mismatch", { code, attemptId });
@@ -449,6 +451,7 @@ export async function POST(request) {
         "Server-Timing": `preflight;dur=${preflightMs}, verifyOtp;dur=${verifyOtpMs}, completion;dur=${completionMs}, total;dur=${totalMs}`,
       },
     }));
+    await reportCanonicalPhoneVerification(attemptId,verified.userId);
     cookieTransaction.commit(response);
     verificationCommitted = true;
     return response;

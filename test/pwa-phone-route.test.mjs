@@ -31,7 +31,7 @@ async function harness(options={}){
  }})};
  const imports={'node:crypto':{randomUUID},'next/headers':{cookies:async()=>cookieStore},'next/server':next};
  let code=source.replace(/import\s+\{([\s\S]*?)\}\s+from\s+"([^"]+)";/g,(_,names,path)=>{
-  let value=imports[path];if(!value){value=path.includes('participant-identity-supabase')?identity:path.includes('participant-auth-phone.js')?normalize:path.includes('participant-identity-authority')?authority:path.includes('participant-phone-otp')?phone:path.includes('participant-sms-auth-feature')?feature:path.includes('supabase-auth-server')?supabase:path.includes('production-cutover-activation-contract')?host:transaction;imports[path]=value;}
+  let value=imports[path];if(!value){value=path.includes('production-verify-feedback')?{reportCanonicalPhoneVerification:async()=>({status:'ACKNOWLEDGED'})}:path.includes('participant-identity-supabase')?identity:path.includes('participant-auth-phone.js')?normalize:path.includes('participant-identity-authority')?authority:path.includes('participant-phone-otp')?phone:path.includes('participant-sms-auth-feature')?feature:path.includes('supabase-auth-server')?supabase:path.includes('production-cutover-activation-contract')?host:transaction;imports[path]=value;}
   return `const {${names}}=imports[${JSON.stringify(path)}];`;
  }).replaceAll('export ','');
  const routes=new Function('imports',code+'\nreturn {GET,POST};')(imports);

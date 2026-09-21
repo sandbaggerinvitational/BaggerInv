@@ -1,3 +1,4 @@
+import {phoneEnrollmentEnabled} from "../../lib/production-phone-enrollment-proof.js";
 import { privatePageMetadata } from "../../lib/seo";
 import PreviewModeBadge from "../PreviewModeBadge";
 import ParticipantProfile from "./ParticipantProfile";
@@ -12,6 +13,6 @@ export default async function MePage() {
   const participantIdentityAuthority = requireParticipantIdentityAuthority(env).resolved;
   return <main>
     <PreviewModeBadge visible={process.env.VERCEL_ENV === "preview"} compact />
-    <ParticipantProfile participantIdentityAuthority={participantIdentityAuthority} />
+    <ParticipantProfile participantIdentityAuthority={participantIdentityAuthority} phoneEnrollmentAvailable={phoneEnrollmentEnabled(env)} />
   </main>;
 }

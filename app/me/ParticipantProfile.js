@@ -48,7 +48,7 @@ function RoundPerformance({ rounds, summary, year }) {
   </section>;
 }
 
-export default function ParticipantProfile({ participantIdentityAuthority = "passport" }) {
+export default function ParticipantProfile({ phoneEnrollmentAvailable = false, participantIdentityAuthority = "passport" }) {
   const router = useRouter();
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -211,6 +211,7 @@ export default function ParticipantProfile({ participantIdentityAuthority = "pas
     {!previewMode ? <section className={styles.card}>
       <div className={styles.sectionHeading}><span>Settings</span><h2>{participantIdentityAuthority === "supabase" ? "Account & Session" : "Player Passport"}</h2></div>
       <p className={styles.note}>{participantIdentityAuthority === "supabase" ? "Signing out does not change your player record or tournament assignments." : "Removing this device does not change your player record or activation credentials."}</p>
+      {phoneEnrollmentAvailable ? <p><Link href="/me/verify-mobile">Verify approved mobile</Link></p> : null}
       {signOutError ? <p role="alert">{signOutError}</p> : null}
       {!confirming ? <button className={styles.remove} type="button" onClick={() => setConfirming(true)}>{participantIdentityAuthority === "supabase" ? "Sign Out" : "This isn’t me"}</button> : <div className={styles.confirm}>
         <strong>{participantIdentityAuthority === "supabase" ? "Sign out of this participant account?" : "Remove Player Passport from this device?"}</strong>

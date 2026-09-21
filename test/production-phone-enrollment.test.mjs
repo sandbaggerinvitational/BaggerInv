@@ -1,0 +1,42 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {productionPhoneEnrollment} from '../lib/production-phone-enrollment.js';
+import {issueEmailPhoneEnrollmentProof,verifyEmailPhoneEnrollmentProof} from '../lib/production-phone-enrollment-proof.js';
+import {readFileSync} from 'node:fs';
+const user={id:'00000000-0000-4000-8000-000000000001',email_confirmed_at:'2026-01-01'};
+const env={VERCEL_ENV:'production',PARTICIPANT_PHONE_ENROLLMENT_ENABLED:'true',PARTICIPANT_PHONE_OTP_RATE_LIMIT_SECRET:'synthetic-local-proof-key-only-123456789'};
+const token='synthetic-email-session-not-a-live-token';
+const body={authUserId:user.id,playerId:'CB01',tournamentId:'2026',accessToken:token};
+const proof=()=>issueEmailPhoneEnrollmentProof(body,env);
+const cid='10000000-0000-4000-8000-000000000001';
+function harness(options={}){
+ const calls=[],providerCalls=[];
+ const base={ok:true,authUserId:user.id,playerId:'CB01',tournamentId:'2026',approvalRevision:1,maskedPhone:'••• ••• 0123',phoneE164:'+12025550123'};
+ const rpc=async input=>{calls.push(input);if(options.failAt===input.action)return {ok:false,code:'PHONE_ENROLLMENT_STALE'};
+ return {...base,status:{state:'ELIGIBLE',begin:'REQUESTING',sent:'SENT',verify:'VERIFYING',complete:'VERIFIED'}[input.action],challengeId:cid,issuedAt:'2026-09-20T00:00:00Z',expiresAt:'2026-09-20T00:10:00Z',...(options.rpcOverrides||{})};};
+ const provider={request:async phone=>{providerCalls.push({method:'request',phone});if(options.requestError)throw Error('SECRET_PROVIDER_MESSAGE');return {id:options.wrongUser?'00000000-0000-4000-8000-000000000002':user.id};},verify:async(phone,code)=>{providerCalls.push({method:'verify',phone,code});if(options.verifyError)throw Object.assign(Error('SECRET_PROVIDER_MESSAGE'),{invalidCode:options.invalidCode});return {id:options.wrongUser?'00000000-0000-4000-8000-000000000002':user.id};}};
+ return {calls,providerCalls,run:(input,extra={})=>productionPhoneEnrollment({input,user,accessToken:token,emailProof:proof(),clientFingerprint:'a'.repeat(64),env,...extra},{rpc,provider})};
+}
+test('proof issued only when explicitly enabled; Email stays independent',()=>{assert.equal(issueEmailPhoneEnrollmentProof(body,{}),null);assert.equal(issueEmailPhoneEnrollmentProof(body,{...env,VERCEL_ENV:'preview'}),null);});
+test('proof binds exact Email session, UUID, Player and tournament',()=>{const p=verifyEmailPhoneEnrollmentProof(proof(),{authUserId:user.id,accessToken:token},env);assert.equal(p.playerId,'CB01');assert.equal(p.tournamentId,'2026');assert.ok(!proof().includes(token));});
+for(const [name,modify] of Object.entries({unsigned:()=>'',tampered:p=>p.slice(0,-5)+'AAAAA',wrongToken:p=>p,wrongUser:p=>p,rotatedKey:p=>p}))test('Email proof rejects '+name,()=>{
+ assert.throws(()=>verifyEmailPhoneEnrollmentProof(modify(proof()),{authUserId:name==='wrongUser'?'other':user.id,accessToken:name==='wrongToken'?'other':token},name==='rotatedKey'?{...env,PARTICIPANT_PHONE_OTP_RATE_LIMIT_SECRET:'rotated-synthetic-key-12345678901234567890'}:env));
+});
+test('expired and future-issued Email proof denied',()=>{const p=issueEmailPhoneEnrollmentProof(body,env,1000);assert.throws(()=>verifyEmailPhoneEnrollmentProof(p,{authUserId:user.id,accessToken:token},env,601000));assert.throws(()=>verifyEmailPhoneEnrollmentProof(p,{authUserId:user.id,accessToken:token},env,999));});
+test('state contains masked destination only',async()=>{const h=harness();const r=await h.run({action:'state'});assert.equal(r.maskedPhone,'••• ••• 0123');assert.equal(r.phoneE164,undefined);assert.equal(r.authUserId,undefined);assert.equal(h.providerCalls.length,0);});
+for(const key of ['phone','phoneE164','playerId','authUserId','tournamentId','status'])test('client cannot supply '+key,async()=>{const h=harness();await assert.rejects(h.run({action:'begin',approvalRevision:1,[key]:'ATTACK'}));assert.equal(h.calls.length,0);assert.equal(h.providerCalls.length,0);});
+test('unconfirmed email and missing authenticated user denied',async()=>{const h=harness();for(const u of [null,{id:user.id}])await assert.rejects(h.run({action:'state'},{user:u}));assert.equal(h.calls.length,0);});
+test('CB01 request sends only stored approved destination',async()=>{const h=harness();const r=await h.run({action:'begin',approvalRevision:1});assert.deepEqual(h.providerCalls,[{method:'request',phone:'+12025550123'}]);assert.equal(r.status,'SENT');assert.equal(r.resendAfterSeconds,60);assert.ok(!JSON.stringify(r).includes('+1202'));});
+test('noncanonical or invalid stored phone denied before provider',async()=>{for(const phoneE164 of ['2025550123','+19999999999']){const h=harness({rpcOverrides:{phoneE164}});await assert.rejects(h.run({action:'begin',approvalRevision:1}));assert.equal(h.providerCalls.length,0);assert.equal(h.calls.length,1);}});
+test('replayed/mismatched approval denied before send',async()=>{const h=harness({failAt:'begin'});await assert.rejects(h.run({action:'begin',approvalRevision:1}));assert.equal(h.providerCalls.length,0);});
+test('uncertain send retains reservation without exposing provider error',async()=>{const h=harness({requestError:true});await assert.rejects(h.run({action:'begin',approvalRevision:1}),/PHONE_ENROLLMENT_PROVIDER_UNCERTAIN/);assert.equal(h.calls.at(-1).action,'send_failed');});
+test('provider wrong UUID cannot complete',async()=>{const h=harness({wrongUser:true});await assert.rejects(h.run({action:'verify',challengeId:cid,token:'123456'}),/PROVIDER_MISMATCH/);assert.ok(!h.calls.some(x=>x.action==='complete'));});
+test('possession proof completes against same UUID; no full destination output',async()=>{const h=harness();const r=await h.run({action:'verify',challengeId:cid,token:'123456'});assert.equal(h.providerCalls[0].phone,'+12025550123');assert.equal(h.calls.at(-1).returned_auth_user_id,user.id);assert.equal(r.status,'VERIFIED');assert.equal(r.phoneE164,undefined);});
+test('stale approval after provider success denies completion',async()=>{const h=harness({failAt:'complete'});await assert.rejects(h.run({action:'verify',challengeId:cid,token:'123456'}));assert.equal(h.providerCalls.length,1);});
+test('conclusive invalid code increments bounded failure counter',async()=>{const h=harness({verifyError:true,invalidCode:true});await assert.rejects(h.run({action:'verify',challengeId:cid,token:'123456'}),/INVALID_CODE/);assert.equal(h.calls.at(-1).action,'verify_failed');});
+test('uncertain provider verification is not retried or released',async()=>{const h=harness({verifyError:true});await assert.rejects(h.run({action:'verify',challengeId:cid,token:'123456'}),/PROVIDER_UNCERTAIN/);assert.equal(h.calls.length,1);assert.equal(h.providerCalls.length,1);});
+test('already verified enrollment is idempotent without SMS',async()=>{const h=harness({rpcOverrides:{status:'VERIFIED',idempotent:true}});assert.equal((await h.run({action:'begin',approvalRevision:1})).idempotent,true);assert.equal(h.providerCalls.length,0);});
+test('no Auth creation/admin merge or client-specific authority in shared service',()=>{const s=readFileSync(new URL('../lib/production-phone-enrollment.js',import.meta.url),'utf8');assert.doesNotMatch(s,/createUser|signUp|admin\.|preview_director/);});
+test('resend retains exact challenge and delegates destination selection to authority',async()=>{const h=harness();await h.run({action:'resend',approvalRevision:1,challengeId:cid});assert.equal(h.calls[1].action,'resend');assert.equal(h.calls[1].challenge_id,cid);assert.equal(h.providerCalls.length,1);assert.equal(h.providerCalls[0].phone,'+12025550123');});
+test('resend of stale challenge never contacts provider',async()=>{const h=harness({failAt:'resend'});await assert.rejects(h.run({action:'resend',approvalRevision:1,challengeId:cid}));assert.equal(h.providerCalls.length,0);});
+test('explicit expiry delegates to database without contacting provider',async()=>{const h=harness({rpcOverrides:{status:'EXPIRED'}});const v=await h.run({action:'expire',challengeId:cid});assert.equal(v.status,'EXPIRED');assert.equal(h.calls[0].action,'expire');assert.equal(h.providerCalls.length,0);});
