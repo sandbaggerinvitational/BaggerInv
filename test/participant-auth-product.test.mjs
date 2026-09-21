@@ -87,7 +87,7 @@ test("safe next destinations are internal participant routes only", async () => 
 test("Turnstile is auth-route-only and sends one-time tokens to Supabase Auth", async () => {
   const [widget, phoneRoute, emailRoute, emailMode, helper, env] = await Promise.all([
     source("app/participant-auth/ParticipantAuthTurnstile.js"),
-    source("app/api/participant/auth/phone/route.js"),
+    source("lib/participant-phone-login-handler.js"),
     source("app/api/participant/auth/otp/request/route.js"),
     source("lib/participant-email-otp-mode.js"),
     source("lib/participant-phone-otp.js"),
@@ -221,7 +221,7 @@ test("CAPTCHA tokens and identifier fingerprints are bounded without exposing ra
 });
 
 test("public phone send normalizes server-side, is CAPTCHA-gated, and never trusts ownership from the client", async () => {
-  const route = await source("app/api/participant/auth/phone/route.js");
+  const route = await source("lib/participant-phone-login-handler.js");
   assert.match(route, /normalizeParticipantAuthPhone\(input\.phone\)/);
   assert.match(route, /rollout_mode: feature\.rollout/);
   assert.match(route, /authorizeParticipantPhoneLoginRequest/);
@@ -233,7 +233,7 @@ test("public phone send normalizes server-side, is CAPTCHA-gated, and never trus
 });
 
 test("unknown phone receives a generic pending response without reaching provider send", async () => {
-  const route = await source("app/api/participant/auth/phone/route.js");
+  const route = await source("lib/participant-phone-login-handler.js");
   const unknown = route.slice(route.indexOf("if (authorization.allowed !== true)"), route.indexOf("// The shared send helper"));
   assert.match(unknown, /status: "VERIFICATION_PENDING"/);
   assert.match(unknown, /randomUUID\(\)/);
@@ -247,7 +247,7 @@ test("unknown phone receives a generic pending response without reaching provide
 
 test("verification rechecks current ownership, hard-gates Auth UUID, and creates no ownership or scoring revision", async () => {
   const [route, migration] = await Promise.all([
-    source("app/api/participant/auth/phone/route.js"),
+    source("lib/participant-phone-login-handler.js"),
     source("supabase/migrations/202608220001_preview_participant_sms_login_product.sql"),
   ]);
   assert.match(route, /authorizeParticipantPhoneLoginVerification/);
@@ -268,7 +268,7 @@ test("verification rechecks current ownership, hard-gates Auth UUID, and creates
 test("resend, method change, stale ownership, and replay remain bounded", async () => {
   const [ui, route, migration] = await Promise.all([
     source("app/participant-auth/ParticipantAuthRehearsal.js"),
-    source("app/api/participant/auth/phone/route.js"),
+    source("lib/participant-phone-login-handler.js"),
     source("supabase/migrations/202608220001_preview_participant_sms_login_product.sql"),
   ]);
   assert.match(ui, /resendSeconds/);
@@ -302,11 +302,14 @@ test("participant auth source and serialized configuration contain no phone dire
     source("app/participant-auth/ParticipantAuthRehearsal.js"),
     source("app/participant-auth/page.js"),
     source("lib/participant-sms-auth-feature.js"),
-    source("app/api/participant/auth/phone/route.js"),
+    source("lib/participant-phone-login-handler.js"),
   ]);
   assert.doesNotMatch(`${ui}\n${page}\n${config}`, /SUPABASE_SCORING_MIRROR_SECRET_KEY|service.role|TWILIO_AUTH_TOKEN|normalized_value_private/i);
   assert.doesNotMatch(route, /console\.(?:log|warn|error)\([^\n]*(?:input\.phone|phoneE164|captchaToken|token)/i);
-  assert.doesNotMatch(route, /access_token|refresh_token/);
+  // Web success remains cookie-only; only the guarded native completion emits SDK credentials.
+  assert.doesNotMatch(route.slice(route.indexOf('    const totalMs')), /access_token|refresh_token/);
+  assert.match(route,/native=false/);
+  assert.match(route,/if \(native\) \{[\s\S]*certifyParticipant/);
 });
 
 test("email request and verify retain same-origin, no-store, no-create, and CAPTCHA protections", async () => {

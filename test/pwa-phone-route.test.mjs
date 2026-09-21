@@ -9,7 +9,7 @@ import * as feature from '../lib/participant-sms-auth-feature.js';
 import * as host from '../lib/production-cutover-activation-contract.js';
 import * as transaction from '../lib/participant-phone-cookie-transaction.js';
 import {ready} from './fixtures/pwa-production-phone-env.mjs';
-const source=await readFile(new URL('../app/api/participant/auth/phone/route.js',import.meta.url),'utf8');
+const source=await readFile(new URL('../lib/participant-phone-login-handler.js',import.meta.url),'utf8');
 const id='11111111-1111-4111-8111-111111111111',attempt='22222222-2222-4222-8222-222222222222';
 const auth={allowed:true,authUserId:id,playerId:'CB01',tournamentId:'2026',identifierId:'33333333-3333-4333-8333-333333333333',identifierRevision:12,phoneE164:'+12025550123',directorEntitlementState:'NONE',directorRole:'NONE',directorScope:'NONE',directorEntitlementRevision:0,directorEntitlementSource:'NONE',directorEntitlementCount:0,directorEntitlementFingerprint:'a'.repeat(32)};
 const complete={ok:true,sameAuthUser:true,sessionEstablished:true,refreshSessionAvailable:true,playerId:'CB01',tournamentId:'2026',directorEntitlementPreserved:true,newDirectorEntitlements:0,scoringAuthorizationUnchanged:true,phoneIdentifierUnchanged:true};
@@ -29,12 +29,12 @@ async function harness(options={}){
  verifyOtp:async input=>{providerCalls++;calls.push({name:'providerVerify',input});store.set('synthetic-session','withheld',{httpOnly:true});if(options.providerError)return {error:options.providerError,data:{}};return {data:{user:{id:options.wrongUser?'44444444-4444-4444-8444-444444444444':id},session:{access_token:'fixture-only',refresh_token:'fixture-only'}},error:null};},
  signOut:async()=>{signouts++;return {error:null};}
  }})};
- const imports={'node:crypto':{randomUUID},'next/headers':{cookies:async()=>cookieStore},'next/server':next};
+ const imports={'node:crypto':{randomUUID},'next/headers.js':{cookies:async()=>cookieStore},'next/server.js':next};
  let code=source.replace(/import\s+\{([\s\S]*?)\}\s+from\s+"([^"]+)";/g,(_,names,path)=>{
   let value=imports[path];if(!value){value=path.includes('production-verify-feedback')?{reportCanonicalPhoneVerification:async()=>({status:'ACKNOWLEDGED'})}:path.includes('participant-identity-supabase')?identity:path.includes('participant-auth-phone.js')?normalize:path.includes('participant-identity-authority')?authority:path.includes('participant-phone-otp')?phone:path.includes('participant-sms-auth-feature')?feature:path.includes('supabase-auth-server')?supabase:path.includes('production-cutover-activation-contract')?host:transaction;imports[path]=value;}
-  return `const {${names}}=imports[${JSON.stringify(path)}];`;
+  return `const {${names.replaceAll(" as ", ": ")}}=imports[${JSON.stringify(path)}];`;
  }).replaceAll('export ','');
- const routes=new Function('imports',code+'\nreturn {GET,POST};')(imports);
+ const routes=new Function('imports',code+'\nreturn createParticipantPhoneLoginHandler();')(imports);
  return {...routes,calls,stored,get providerCalls(){return providerCalls},get signouts(){return signouts}};
 }
 const saved={...process.env};Object.assign(process.env,ready);

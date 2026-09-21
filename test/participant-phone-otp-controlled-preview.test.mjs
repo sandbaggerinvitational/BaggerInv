@@ -347,7 +347,7 @@ test("successful login preserves ownership/scoring and establishes a refreshable
 test("successful email and phone verification navigate immediately to Home without duplicate auth reads", async () => {
   const [ui, route, diagnostics, home, emailVerify] = await Promise.all([
     source("app/participant-auth/ParticipantAuthRehearsal.js"),
-    source("app/api/participant/auth/phone/route.js"),
+    source("lib/participant-phone-login-handler.js"),
     source("app/ParticipantAuthDiagnostics.js"),
     source("app/ParticipantSupabaseHome.js"),
     source("app/api/participant/auth/otp/verify/route.js"),
@@ -711,7 +711,7 @@ test("email sign-in remains enabled alongside CAPTCHA-gated public phone login",
     source("app/api/participant/auth/otp/request/route.js"),
     source("lib/participant-email-otp-mode.js"),
     source("app/participant-auth/ParticipantAuthRehearsal.js"),
-    source("app/api/participant/auth/phone/route.js"),
+    source("lib/participant-phone-login-handler.js"),
     source("app/api/participant/auth/phone-login-proof/route.js"),
   ]);
   assert.match(emailRequest, /requestParticipantEmailOtp\(client, \{/);
