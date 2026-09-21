@@ -2,12 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHmac} from 'node:crypto';
+import * as acceptance from '../lib/production-sms-hook-acceptance.js';
 import * as hook from '../lib/production-approved-sms-hook.js';
 const source=readFileSync(new URL('../app/api/auth/hooks/send-sms/route.js',import.meta.url),'utf8');
 const env={VERCEL_ENV:'production',PARTICIPANT_SMS_SEND_HOOK_ENABLED:'true',PARTICIPANT_SMS_AUTH_ENABLED:'true',SUPABASE_SEND_SMS_HOOK_SECRET:'whsec_'+Buffer.alloc(32,7).toString('base64'),TWILIO_ACCOUNT_SID:'AC'+'a'.repeat(32),TWILIO_VERIFY_SERVICE_SID:'VA'+'b'.repeat(32),TWILIO_AUTH_TOKEN:'synthetic-fixture-only'};
 function harness({deny=false}={}){
  const calls=[];let sends=0;
  const mods={
+ 'production-sms-hook-acceptance.js':acceptance,
  'next/server':{NextResponse:{json:(body,{status=200,headers}={})=>new Response(JSON.stringify(body),{status,headers})}},
  'production-approved-sms-hook.js':{approvedSmsHook:(input,deps)=>hook.approvedSmsHook({...input,env},{...deps,fetchImpl:async()=>{sends++;return {status:201,json:async()=>({sid:'VE'+'c'.repeat(32),account_sid:env.TWILIO_ACCOUNT_SID,service_sid:env.TWILIO_VERIFY_SERVICE_SID,channel:'sms',to:'+12025550123',status:'pending'})};}})},
  'production-cutover-activation-contract.js':{assertProductionCutoverRequest:(request)=>{if(new URL(request.url).origin!=='https://baggerinv.com')throw Error('CANONICAL_ONLY');}},
