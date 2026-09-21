@@ -15,6 +15,13 @@ function playerRoundSource() {
  }
  return s;
 }
+function unplayedR3(source) {
+ const e=source.matches.find(e=>e.match.round_number===3);
+ e.participants=[];e.scores=[];
+ Object.assign(e.match,{status:'UPCOMING',finalized_at:null,scored_holes:0,scorecard_complete:false,
+   result_winner:'',clinched:false,team_1_holes_won:0,team_2_holes_won:0,unresolved_mutations:0});
+ return e;
+}
 const projection=(source,identity={tournamentId:source.tournament.tournament_id})=>mobileLeadersResult(identity,{env:{VERCEL_ENV:'production'},dependencies:{requireLeaderboardsCoreReadSource:()=>({resolved:'supabase'}),readLeaderboardsCoreView:async()=>({payload:{ok:true,data:source}})}});
 test('Production exports approved Players scopes without Preview identity authority',async()=>{
  const source=playerRoundSource(),before=structuredClone(source),result=await projection(source);
@@ -31,7 +38,7 @@ test('Production exports approved Players scopes without Preview identity author
  assert.equal(JSON.stringify(result.body).includes('DO-NOT-EXPOSE'),false);
 });
 test('Unpaired upcoming R3 placeholder is not an invented player or result',async()=>{
- const source=playerRoundSource();for(const e of source.matches.filter(e=>e.match.round_number===3)){e.participants=[];e.scores=[];e.match.status='UPCOMING';e.match.finalized_at=null;}
+ const source=playerRoundSource();unplayedR3(source);
  const result=await projection(source),d=result.body.data;
  assert.equal(result.status,200);assert.equal(d.playerIntelligence.rounds.find(r=>r.roundNumber===3).players.length,0);
  assert.equal(d.playerIntelligence.matchReferences.some(r=>r.roundNumber===3),false);
@@ -40,8 +47,10 @@ test('Unpaired upcoming R3 placeholder is not an invented player or result',asyn
 for(const [name,mutate] of [
  ['foreign tournament',s=>s.tournament.tournament_id='wrong'],
  ['duplicate match',s=>s.matches.push(structuredClone(s.matches[0]))],
- ['scored unpaired R3',s=>{const e=s.matches.find(e=>e.match.round_number===3);e.participants=[];e.match.status='UPCOMING';e.scores=[{hole_number:1}];}],
- ['finalized unpaired R3',s=>{const e=s.matches.find(e=>e.match.round_number===3);e.participants=[];e.scores=[];e.match.status='FINAL';}],
+ ['scored unpaired R3',s=>{unplayedR3(s).scores=[{hole_number:1}];}],
+ ['finalized unpaired R3',s=>{unplayedR3(s).match.status='FINAL';}],
+ ['unpaired R3 with recorded winner',s=>{unplayedR3(s).match.result_winner='TEAM_1';}],
+ ['unpaired R3 with scored-hole authority',s=>{unplayedR3(s).match.scored_holes=1;}],
  ['unpaired R1',s=>{const e=s.matches[0];e.participants=[];e.scores=[];e.match.status='UPCOMING';}],
  ['partial assignment',s=>s.matches[0].participants.pop()],
 ])test(`${name} fails closed`,async()=>{const s=playerRoundSource(),identity={tournamentId:s.tournament.tournament_id};mutate(s);await assert.rejects(projection(s,identity));});
