@@ -89,9 +89,9 @@ test("matches preserves canonical ordering, lifecycle, relationships, and exclud
 test("leaders delegates canonical team/player ordering to the existing leaderboard helpers", async () => {
   const calls = [];
   const result = await mobileLeadersResult(identity, { now, dependencies: {
-    requireLeaderboardsCoreReadSource: source, readLeaderboardsCoreView: async () => rpc({}),
+    requireLeaderboardsCoreReadSource: source, readLeaderboardsCoreView: async () => rpc({ tournament: { tournament_id: identity.tournamentId }, matches: [] }),
     leaderboardsCoreDataFromSupabaseView: () => ({ revision: "leaders-r3", slotVerification: { pass: true },
-      tournament: tournament(), rounds: [], leaderboard: [{ id: "P1" }], scoreLeaderboard: [] }),
+      tournament: tournament(), rounds: [], leaderboard: [{ id: "P1", player: "One", team: "Pickles", teamSide: 1, points: 0, wins: 0, losses: 0, halves: 0, matchesPlayed: 0 }], scoreLeaderboard: [] }),
     teamStandings: () => { calls.push("teams"); return [
       { rank: 1, side: 2, name: "Rippers", points: 5, record: "2-0-0", remaining: 1 },
       { rank: 2, side: 1, name: "Pickles", points: 4, record: "1-1-0", remaining: 1 },
@@ -204,7 +204,7 @@ test("round standings fail closed on invalid final results and preserve canonica
 test("leaders ETag changes when the bounded round representation changes under one source revision", async () => {
   const build = async (roundLabel) => mobileLeadersResult(identity, { now, dependencies: {
     requireLeaderboardsCoreReadSource: source,
-    readLeaderboardsCoreView: async () => rpc({}),
+    readLeaderboardsCoreView: async () => rpc({ tournament: { tournament_id: identity.tournamentId }, matches: [] }),
     leaderboardsCoreDataFromSupabaseView: () => ({
       revision: "same-source-revision",
       slotVerification: { pass: true },
