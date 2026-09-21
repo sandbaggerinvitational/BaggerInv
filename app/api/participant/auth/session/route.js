@@ -65,7 +65,8 @@ export async function DELETE(request) {
   const cookieStore = await cookies();
   const verified = await verifyParticipantAuthClaims(cookieStore);
   const client = createParticipantAuthServerClient(cookieStore);
-  await client.auth.signOut({ scope: "global" });
+  const signout = await client.auth.signOut({ scope: "local" });
+    if (signout?.error) return NextResponse.json({ error: "Sign out could not be completed. Try again." }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
   if (verified.status === "active") {
     const context = await readParticipantIdentityContextForAuth({ authUserId: verified.claims.sub }).catch(() => null);
     if (context?.payload?.ok) await recordSingleParticipantAuthLogout({ authUserId: verified.claims.sub, tournamentId: context.payload.data.tournament.id }).catch(() => null);

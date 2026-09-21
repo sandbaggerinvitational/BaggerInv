@@ -298,7 +298,7 @@ test("PN-2 auth rechecks before provider delivery after asynchronous eligibility
 });
 
 export const routeCapabilities = {
-  "account/deletion": "auth", health: "health", "auth/captcha": "auth", "auth/otp/request": "auth", "auth/otp/certify": "certification",
+  "account/deletion": "auth", health: "health", "auth/captcha": "auth", "auth/otp/request": "auth", "auth/otp/certify": "certification", "auth/otp/phone": "auth", "auth/certification/renew": "certification",
   "portrait-policy": "reads", session: "reads", today: "reads", matches: "reads", "matches/[matchId]": "reads", leaders: "reads", schedule: "reads",
   guide: "reads", passport: "reads", history: "reads", "history/[year]": "reads", records: "reads", odds: "reads",
   "net-skins": "reads", calcutta: "reads", "scoring/current": "reads", "scoring/hole": "scoring", "scoring/finalize": "scoring",
@@ -318,7 +318,7 @@ test("PN-2 all compiled routes are classified and default-off denies before any 
       const method = route.POST ? "POST" : "GET";
       const req = request(path.replace("[matchId]", "SYNTHETIC-M1").replace("[year]", "2026"), { method,
         headers: { "content-type": "application/json", authorization: "Bearer synthetic", "x-bagger-certification": "synthetic" },
-        ...(method === "POST" ? { body: {} } : {}) });
+        ...(method === "POST" ? { body: path === "auth/otp/phone" ? {action:"verify",attemptId:actor.authUserId,token:"000000"} : {} } : {}) });
       const response = await route[method](req, { params: Promise.resolve({ year: "2026", matchId: "SYNTHETIC-M1" }) });
       assert.equal(response.status, 503, path);
       assert.equal((await response.json()).error.code, code(routeCapabilities[path]), path);

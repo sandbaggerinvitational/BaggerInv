@@ -77,7 +77,8 @@ export async function DELETE(request) {
   if (authority.resolved === "supabase") {
     const cookieStore = await cookies();
     const client = createParticipantAuthServerClient(cookieStore, env);
-    await client.auth.signOut({ scope: "global" });
+    const signout = await client.auth.signOut({ scope: "local" });
+    if (signout?.error) return NextResponse.json({ error: "Sign out could not be completed. Try again." }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
     const response = NextResponse.json({ cleared: true, identityAuthority: "supabase" },
       { headers: { "Cache-Control": "private, no-store" } });
     response.cookies.set({ ...scoringSessionCookie("", 0), name: SCORING_SESSION_COOKIE });

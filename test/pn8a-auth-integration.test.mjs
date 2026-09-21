@@ -163,3 +163,17 @@ test("PN-8A approved first-login request uses canonical signup delivery without 
   assert.equal(result.body.data.verificationType, "email", "public response must not disclose enrollment mode");
   assert.equal(sent, 1);
 });
+
+test('Build 5 Email OTP completes canonical challenge then issues the negotiated 14-day contract',async()=>{
+ const env=environment(['certification']),f=authorityFixtures(env);let completed=false;
+ const claims={sub:actor.authUserId,session_id:'22222222-2222-4222-8222-222222222222',aal:'aal1'};
+ const bearer=`synthetic.${Buffer.from(JSON.stringify(claims)).toString('base64url')}.local`;
+ const result=await certifyMobileNativeOtp({env,request:request('auth/otp/certify',{headers:{authorization:`Bearer ${bearer}`,'x-bagger-certification-contract':'14d-v1'}}),input:{challengeId:actor.authUserId},dependencies:{
+  readReviewer:async()=>null,reviewerOtp:async()=>({handled:false}),nativeAdmission:f.dependencies,consumeCertificationRateLimit:()=>({allowed:true}),
+  verifyUser:async()=>({status:'active',authUserId:actor.authUserId,email:'synthetic@example.invalid',emailVerified:true,security:{email:'synthetic@example.invalid',emailConfirmedAt:'2026-01-01',identities:[]}}),
+  authorizeVerification:async()=>({payload:{allowed:true,...actor,verificationType:'signup'}}),
+  recordVerification:async()=>{completed=true;return {payload:{ok:true,certified:true,authUserId:actor.authUserId,requestId:actor.authUserId}}},
+  readIdentity:async()=>{assert.equal(completed,true);return {payload:{ok:true,data:participant()}}}
+ }});
+ assert.equal(result.status,200);assert.equal(result.body.data.expiresInSeconds,1209600);assert.match(result.body.data.certificationToken,/^v3e\./);
+});

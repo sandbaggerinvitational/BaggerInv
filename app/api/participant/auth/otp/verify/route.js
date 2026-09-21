@@ -89,7 +89,7 @@ export async function POST(request) {
     });
   } catch (certificationError) {
     if (!matches) {
-      if (data?.session) await client.auth.signOut({ scope: "global" }).catch(() => null);
+      if (data?.session) await client.auth.signOut({ scope: "local" }).catch(() => null);
       console.error("Production Auth verification failure audit unavailable", {
         code: certificationError?.identityDiagnostics?.code || "PRODUCTION_AUTH_VERIFICATION_AUDIT_FAILED",
         requestId,
@@ -101,7 +101,7 @@ export async function POST(request) {
     // Supabase proved the OTP, but the application certification transaction
     // is the authority boundary. Invalidate the newly issued session and never
     // attach any pending Auth cookies until that transaction is durable.
-    await client.auth.signOut({ scope: "global" }).catch(() => null);
+    await client.auth.signOut({ scope: "local" }).catch(() => null);
     console.error("Production Auth certification write failed closed", {
       code: certificationError?.identityDiagnostics?.code || "PRODUCTION_AUTH_CERTIFICATION_WRITE_FAILED",
       requestId,
@@ -112,7 +112,7 @@ export async function POST(request) {
         category: "AUTH_CERTIFICATION_UNAVAILABLE" }, 503);
   }
   if (!matches) {
-    if (data?.session) await client.auth.signOut({ scope: "global" }).catch(() => null);
+    if (data?.session) await client.auth.signOut({ scope: "local" }).catch(() => null);
     return failClosedAuthResponse(request, pendingCookies,
       { error: "That code is invalid or expired.", category: "INVALID_OR_EXPIRED" }, 400);
   }
