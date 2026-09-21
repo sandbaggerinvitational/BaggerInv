@@ -50,6 +50,7 @@
         "teamSide": { "type": "integer", "enum": [1, 2] },
         "isAuthenticatedPlayer": { "type": "boolean" },
         "playingHandicap": { "type": ["number", "null"] },
+        "courseHandicap": { "type": ["number", "null"] },
         "strokesReceived": { "type": ["integer", "null"], "minimum": 0 }
       }
     },

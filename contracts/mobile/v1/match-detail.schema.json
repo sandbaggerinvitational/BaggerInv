@@ -373,6 +373,12 @@
             "null"
           ],
           "minimum": 0
+        },
+        "courseHandicap": {
+          "type": [
+            "number",
+            "null"
+          ]
         }
       }
     },

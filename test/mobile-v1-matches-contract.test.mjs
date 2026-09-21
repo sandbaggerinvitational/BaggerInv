@@ -72,7 +72,7 @@ test("strict matches schema requires additive identity and Match intelligence ke
   await assert.rejects(() => assertMobileV1Schema("matches", missingDisplayNumber));
 
   const forbiddenAuthority = structuredClone(response);
-  forbiddenAuthority.data.matches[0].teams[0].participants[0].courseHandicap = 8;
+  forbiddenAuthority.data.matches[0].teams[0].participants[0].handicapIndex = 8;
   await assert.rejects(() => assertMobileV1Schema("matches", forbiddenAuthority));
 });
 
@@ -94,7 +94,7 @@ test("matches authority remains a service-only Tournament Live pass-through", as
   for (const passThrough of ["playingHcp", "stroke", "team1PlayingHcp", "team1Stroke", "match.match"]) {
     assert.match(adapter, new RegExp(passThrough.replaceAll(".", "\\.")));
   }
-  for (const forbidden of ["courseHandicap", "handicapIndex", "scoring/current", "strokeIndex", "canScore"]) {
+  for (const forbidden of ["handicapIndex", "scoring/current", "strokeIndex", "canScore"]) {
     assert.doesNotMatch(adapter, new RegExp(forbidden.replace("/", "\\/")));
     assert.doesNotMatch(schema, new RegExp(forbidden.replace("/", "\\/")));
   }
