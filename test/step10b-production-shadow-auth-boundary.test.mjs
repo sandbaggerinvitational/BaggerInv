@@ -683,7 +683,8 @@ test("server credential transport and Production Auth migration are browser-inac
     productionProvisioner.lastIndexOf("record_production_auth_candidate_preprovision_cleanup"));
   assert.match(verifyRoute, /recordOtpVerificationWithRecovery/);
   assert.doesNotMatch(verifyRoute, /RECOVERY_PENDING|status:\s*202/);
-  assert.match(verifyRoute, /signOut\(\{ scope: "global" \}\)/);
+  // Current-session isolation superseded the historical global cleanup contract.
+  assert.match(verifyRoute, /signOut\(\{ scope: "local" \}\)/);
   assert.match(verifyRoute, /failClosedAuthResponse/);
   assert.match(verifyRoute, /AUTH_CERTIFICATION_UNAVAILABLE/);
   assert.doesNotMatch(sessionRoute, /recoverSingleParticipantOtpVerification|PRODUCTION_AUTH_CERTIFICATION_RECOVERY_PENDING/);
