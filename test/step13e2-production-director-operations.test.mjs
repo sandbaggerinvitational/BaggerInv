@@ -195,7 +195,7 @@ test("side-game, Supabase-native Draft/Guide, and System panels honor operation 
   assert.match(ui, /ProductionGuideEditor/);
   assert.doesNotMatch(ui, /<ProjectionSyncCard\s+domain="GUIDE"/);
   assert.match(ui, /"STALE"[\s\S]*"UNAVAILABLE"/);
-  assert.match(ui, /Publish Exact Auction Revision/);
+  assert.match(ui, /Confirm Publish Auction/);
   assert.match(ui, /ProductionPredictionSettingsEditor/);
   assert.match(ui, /No generic enable, disable, or unbounded retry is exposed/);
   assert.match(ui, /Allowlisted Director and tournament activity only/);

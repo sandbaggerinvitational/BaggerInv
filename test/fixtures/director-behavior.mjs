@@ -37,7 +37,7 @@ export async function netSkinsHarness(entryState) {
   };
   const deps = { react: hooks,
     "../../../lib/net-skins-configuration-readiness.js": { netSkinsConfigurationReadiness },
-    "../../../lib/client-mutation-operation-identity.js": {}, "./production-director.module.css": {} };
+    "../../../lib/client-mutation-operation-identity.js": {}, "./production-director.module.css": {}, "./calcutta-management.module.css": {} };
   for (const name of ["ProductionDraftEditor", "ProductionGuideEditor", "ProductionPredictionSettingsEditor", "ProductionNetSkinsEntries", "ProductionOddsSnapshotReview", "CalcuttaManagementEditor"]) deps[`./${name}.js`] = () => null;
   deps["./ProductionNetSkinsEntries.js"] = { default: () => null, SavedEntriesReview: () => null };
   const { NetSkinsCard } = await loadDirectorSource("app/admin/director/ProductionDirectorOperations.js", deps);

@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { createClientMutationOperationIdentityRegistry } from "../../../lib/client-mutation-operation-identity.js";
 import ProductionDraftEditor from "./ProductionDraftEditor.js";
-import CalcuttaManagementEditor from "./CalcuttaManagementEditor.js";
+import CalcuttaManagementEditor, { FinancialSafety, money, ownershipPercent } from "./CalcuttaManagementEditor.js";
+import calcuttaStyles from "./calcutta-management.module.css";
 import ProductionGuideEditor from "./ProductionGuideEditor.js";
 import ProductionPredictionSettingsEditor from "./ProductionPredictionSettingsEditor.js";
 import ProductionNetSkinsEntries, { SavedEntriesReview } from "./ProductionNetSkinsEntries.js";
@@ -486,7 +487,7 @@ function CalcuttaPrivateReview({ review }) {
       <summary>Auction & ownership · {review.auction?.purchaseCount || 0} purchased</summary>
       {review.auction?.purchases?.length ? <div className={styles.purchaseList}>{review.auction.purchases.map((purchase) => <article key={purchase.player.id}>
         <header><div><strong>{purchase.player.name || purchase.player.id}</strong><span>{purchase.player.id}</span></div><strong>{decimalMoney(purchase.purchasePrice, review.currencyCode)}</strong></header>
-        <ul>{purchase.owners.map((owner) => <li key={owner.player.id}><span>{owner.player.name || owner.player.id}</span><span>{owner.ownershipFraction} ownership</span></li>)}</ul>
+        <ul>{purchase.owners.map((owner) => <li key={owner.player.id}><span>{owner.player.name || owner.player.id}</span><span>{ownershipPercent(owner.ownershipFraction)} ownership</span></li>)}</ul>
       </article>)}</div> : <p className={styles.empty}>No completed auction facts have been recorded.</p>}
     </details>
     <details className={styles.disclosure}>
@@ -501,7 +502,7 @@ function CalcuttaPrivateReview({ review }) {
   </div>;
 }
 
-function CalcuttaCard({ data, refresh }) {
+export function CalcuttaCard({ data, refresh, draftPending = false }) {
   const state = data.publications.calcutta;
   const privateState = data.privateOperations?.calcutta;
   const privateStateAligned = Boolean(privateState) &&
@@ -514,9 +515,13 @@ function CalcuttaCard({ data, refresh }) {
   const [busy, setBusy] = useState("");
   const [queued, setQueued] = useState(false);
   const [message, setMessage] = useState("");
+  const [publicationReview, setPublicationReview] = useState(null);
+  const publicationIdentity = JSON.stringify([state.configurationRevision, state.configurationFingerprint, state.auctionRevision, state.auctionFingerprint, state.publicationRevision]);
   const run = async (action) => {
-    if (action === "publish" && !globalThis.confirm?.("Publish the exact current canonical Calcutta auction revision to authenticated participant clients? This does not change auction facts.")) return;
-    if (action === "unpublish" && !globalThis.confirm?.("Unpublish Calcutta for participant clients while preserving all canonical auction facts?")) return;
+    if (action === "publish" && (draftPending || !privateStateAligned || publicationReview !== publicationIdentity)) {
+      setPublicationReview(null); setMessage("Auction changed or has unsaved edits. Review the current saved revision again."); return;
+    }
+    if (action === "unpublish" && !globalThis.confirm?.("Unpublish Calcutta? This hides the auction from participants. It does not delete purchase or ownership records or remove existing financial dependencies.")) return;
     const intent = { domain: "CALCUTTA", action, configurationRevision: state.configurationRevision, auctionRevision: state.auctionRevision, publicationRevision: state.publicationRevision };
     setBusy(action); setMessage("");
     try {
@@ -536,24 +541,43 @@ function CalcuttaCard({ data, refresh }) {
       setMessage(action === "publish" ? "Calcutta was published from the exact canonical auction revision; recalculation was queued." : action === "unpublish" ? "Calcutta was unpublished without deleting auction facts." : action === "enqueue" ? "Calcutta recalculation was queued." : "The queued Calcutta recalculation was processed.");
       await refresh();
     } catch (error) { setMessage(error.message); }
-    finally { setBusy(""); }
+    finally { setBusy(""); setPublicationReview(null); }
   };
-  return <article className={styles.operationCard}>
-    <header><div><small>Supabase canonical contract</small><h3>Calcutta</h3></div><Status value={state.state} /></header>
+  return <article className={`${styles.operationCard} ${calcuttaStyles.publication}`} aria-label="Calcutta Publication">
+    <header><div><small>3 · Publish Auction</small><h3>Calcutta Publication</h3></div><Status value={state.publicationState} /></header>
     <p>{upper(state.state) === "NOT_CONFIGURED" ? "No 2026 financial facts have been entered. Nothing has been fabricated or published." : "Publication remains Director-controlled and participant-visible only after an explicit publish."}</p>
     <dl className={styles.compactFacts}>
       <div><dt>Publication</dt><dd>{pretty(state.publicationState)}</dd></div>
       <div><dt>Configuration revision</dt><dd>{state.configurationRevision ?? 0}</dd></div>
       <div><dt>Auction revision</dt><dd>{state.auctionRevision ?? 0}</dd></div>
       <div><dt>Result revision</dt><dd>{state.resultRevision ?? "None"}</dd></div>
+      <div><dt>Golfers entered</dt><dd>{privateStateAligned ? privateState.auction?.purchaseCount || 0 : "—"} / {data.tournament?.rosterCount ?? "—"}</dd></div>
+      <div><dt>Ownership complete</dt><dd>{privateStateAligned ? !privateState.auction ? 0 : privateState.auction.ownershipComplete ? privateState.auction.purchaseCount : "Review required" : "—"} / {data.tournament?.rosterCount ?? "—"}</dd></div>
+      <div><dt>Total purchase value</dt><dd>{privateStateAligned ? money(privateState.auction?.pot ?? "0", privateState.currencyCode) : "—"}</dd></div>
     </dl>
     {upper(state.state) === "NOT_CONFIGURED" ? <div className={styles.workflowSteps}><span>Rules / Payouts</span><span>Auction</span><span>Ownership</span><span>Review</span><span>Publication</span></div> : null}
     {privateState && !privateStateAligned ? <div className={styles.inlineNotice} role="alert">Calcutta changed while this page was loading. Refresh before reviewing or performing an action.</div> : <CalcuttaPrivateReview review={privateStateAligned ? privateState : null} />}
+    <FinancialSafety />
+    <p>Only saved entries are published. A partial roster auction is supported; confirm every intended purchase has been entered. Every entered purchase requires complete valid ownership. Unpublishing hides participant visibility; it does not delete facts or remove financial dependencies.</p>
+    {draftPending ? <p role="status">Finish saving or discard local edits before publishing.</p> : null}
+    <div className={styles.actionRow}>
+      {!state.published && state.configurationRevision > 0 && state.auctionRevision > 0 && state.configurationFingerprint && state.auctionFingerprint ? <button type="button" disabled={Boolean(busy) || !privateStateAligned || draftPending} data-impact="high" onClick={() => setPublicationReview(publicationIdentity)}>Publish Auction</button> : null}
+      {state.published ? <button type="button" disabled={Boolean(busy)} data-impact="high" onClick={() => run("unpublish")}>Unpublish</button> : null}
+    </div>
+    {publicationReview ? <section className={calcuttaStyles.review} role="region" aria-label="Publish Calcutta Auction confirmation" tabIndex={-1} ref={element => element?.focus({ preventScroll: true })}>
+      <h4>Publish Calcutta Auction?</h4>
+      <p>This will make the reviewed auction and ownership information available to participants. It does not collect or settle payments.</p>
+      <p>Configuration revision {state.configurationRevision} · Auction revision {state.auctionRevision} · Publication revision {state.publicationRevision}</p>
+      <p>{privateState?.auction?.purchaseCount || 0} golfers entered · Total purchase value {money(privateState?.auction?.pot, privateState?.currencyCode)}</p>
+      <p>Publishing queues the existing recalculation; entering an auction does not calculate final payouts.</p>
+      {publicationReview !== publicationIdentity ? <p role="alert">The saved revision changed. Cancel and review again.</p> : null}
+      <div className={styles.actionRow}><button disabled={Boolean(busy)} onClick={()=>setPublicationReview(null)}>Cancel</button><button disabled={Boolean(busy) || draftPending || !privateStateAligned || publicationReview !== publicationIdentity} data-impact="high" onClick={()=>run("publish")}>Confirm Publish Auction</button></div>
+    </section> : null}
+    <h4>4 · Results / Values</h4>
+    <p>Auction published → golf results occur → calculated current/projected values → official/final values when canonical golf sources are complete. Current Market, Golf Market, My Holdings and Owner Portfolios use those existing results. R2 uses pair Full Net. Payment and settlement remain outside The Bagger.</p>
     <div className={styles.actionRow}>
       {state.auctionRevision > 0 ? <button type="button" disabled={Boolean(busy) || !privateStateAligned} onClick={() => run("enqueue")}>Queue Recalculation</button> : null}
       {queued ? <button type="button" disabled={Boolean(busy) || !privateStateAligned} onClick={() => run("process")}>Process Queued Calculation</button> : null}
-      {!state.published && state.configurationRevision > 0 && state.auctionRevision > 0 && state.configurationFingerprint && state.auctionFingerprint ? <button type="button" disabled={Boolean(busy) || !privateStateAligned} data-impact="high" onClick={() => run("publish")}>Publish Exact Auction Revision</button> : null}
-      {state.published ? <button type="button" disabled={Boolean(busy)} data-impact="high" onClick={() => run("unpublish")}>Unpublish</button> : null}
     </div>
     <PrivateJobList title="Calcutta calculations" jobs={privateState?.jobs || []} />
     {message ? <p className={styles.operationMessage} role="status">{message}</p> : null}
@@ -561,12 +585,14 @@ function CalcuttaCard({ data, refresh }) {
 }
 
 export function OddsAndSideGamesPanel({ data, refresh }) {
+  const [calcuttaDraftPending, setCalcuttaDraftPending] = useState(false);
   return <>
     <OddsPanel data={data} refresh={refresh} />
-    <section className={styles.panel}>
+    <section className={`${styles.panel} ${calcuttaStyles.workspace}`}>
       <header><span>Canonical side games</span><h2>Side Games</h2><p>Status and only the bounded actions supported by the installed Production contracts.</p></header>
-      <div className={styles.operationGrid}><NetSkinsCard data={data} refresh={refresh} /><CalcuttaCard data={data} refresh={refresh} /></div>
-      <CalcuttaManagementEditor onChanged={refresh} />
+      <NetSkinsCard data={data} refresh={refresh} />
+      <CalcuttaManagementEditor onChanged={refresh} onDraftStateChange={setCalcuttaDraftPending} externalPublicationRevision={data.publications.calcutta.publicationRevision} />
+      <CalcuttaCard data={data} refresh={refresh} draftPending={calcuttaDraftPending} />
     </section>
   </>;
 }
