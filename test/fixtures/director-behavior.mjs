@@ -39,6 +39,7 @@ export async function netSkinsHarness(entryState) {
     "../../../lib/net-skins-configuration-readiness.js": { netSkinsConfigurationReadiness },
     "../../../lib/client-mutation-operation-identity.js": {}, "./production-director.module.css": {} };
   for (const name of ["ProductionDraftEditor", "ProductionGuideEditor", "ProductionPredictionSettingsEditor", "ProductionNetSkinsEntries", "ProductionOddsSnapshotReview", "CalcuttaManagementEditor"]) deps[`./${name}.js`] = () => null;
+  deps["./ProductionNetSkinsEntries.js"] = { default: () => null, SavedEntriesReview: () => null };
   const { NetSkinsCard } = await loadDirectorSource("app/admin/director/ProductionDirectorOperations.js", deps);
   let refreshes = 0;
   return { cells, render(readiness) { cursor = 0; return NetSkinsCard({ data: { publications: { netSkins: { state: "NOT_CONFIGURED", configurationRevision: 0 } },
@@ -47,6 +48,6 @@ export async function netSkinsHarness(entryState) {
 }
 
 export const savedEntryState = { phase: "ready", rounds: [
-  { roundNumber: 1, configured: true, state: "ENTRIES_SAVED", revision: 2, enteredCount: 4 },
+  { roundNumber: 1, configured: true, state: "ENTRIES_SAVED", revision: 2, enteredCount: 4, scope: "PLAYER", entrants: Array.from({length:24},(_,i)=>({key:String(i),entered:i<4,players:[{name:`Golfer ${i}`}]})) },
   { roundNumber: 3, configured: false, state: "WAITING_FOR_PAIRINGS", revision: 0, enteredCount: 0 },
 ] };

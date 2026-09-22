@@ -67,10 +67,10 @@ test("ready card cancels cleanly and stale/unavailable fresh entry reads never s
       globalThis.confirm = () => mode !== "cancel";
       globalThis.fetch = async (url, options) => { calls.push(options.method); return mode === "unavailable"
         ? Response.json({ error: "Entries unavailable" }, { status: 503 })
-        : Response.json({ data: { rounds: [{ ...savedEntryState.rounds[0], state: "REVIEW_REQUIRED" }] } }); };
+        : Response.json({ data: { rounds: [{ ...savedEntryState.rounds[0], state: mode === "cancel" ? "ENTRIES_SAVED" : "REVIEW_REQUIRED" }] } }); };
       const harness = await netSkinsHarness(savedEntryState);
       await elements(harness.render()).find(e => e.type === "button").props.onClick();
-      assert.deepEqual(calls, mode === "cancel" ? [] : ["GET"]);
+      assert.deepEqual(calls, ["GET"]);
       assert.equal(harness.refreshes, 0);
       if (mode !== "cancel") assert.equal(elements(harness.render()).find(e => e.type === "button").props.disabled, true);
     }

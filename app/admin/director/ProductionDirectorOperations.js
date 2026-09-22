@@ -7,7 +7,7 @@ import ProductionDraftEditor from "./ProductionDraftEditor.js";
 import CalcuttaManagementEditor from "./CalcuttaManagementEditor.js";
 import ProductionGuideEditor from "./ProductionGuideEditor.js";
 import ProductionPredictionSettingsEditor from "./ProductionPredictionSettingsEditor.js";
-import ProductionNetSkinsEntries from "./ProductionNetSkinsEntries.js";
+import ProductionNetSkinsEntries, { SavedEntriesReview } from "./ProductionNetSkinsEntries.js";
 import { netSkinsConfigurationReadiness } from "../../../lib/net-skins-configuration-readiness.js";
 import ProductionOddsSnapshotReview from "./ProductionOddsSnapshotReview.js";
 import styles from "./production-director.module.css";
@@ -359,13 +359,14 @@ export function NetSkinsCard({ data, refresh }) {
   const readiness = privateState?.readiness;
   const [entryState, setEntryState] = useState({ phase: "loading" });
   const configuration = netSkinsConfigurationReadiness(entryState);
+  const entriesAlreadyConfigured = configuration.ready && configuration.selection.eligibleRoundNumbers.every(round => state.configuredRounds?.includes(round));
   const fingerprint = useRequestFingerprints();
   const [busy, setBusy] = useState("");
   const [queued, setQueued] = useState(false);
   const [message, setMessage] = useState("");
   const run = async (action) => {
-    if (action === "configure" && !configuration.ready) return;
-    if (action === "configure" && !globalThis.confirm?.("Configure Net Skins using the saved explicit Round entries? Only saved In entries participate. This does not publish results.")) return;
+    if (action === "configure" && (!configuration.ready || entriesAlreadyConfigured)) return;
+
     const intent = { domain: "NET_SKINS", action, revision: state.configurationRevision };
     setBusy(action); setMessage("");
     try {
@@ -377,6 +378,9 @@ export function NetSkinsCard({ data, refresh }) {
         const current = netSkinsConfigurationReadiness({ phase: "ready", rounds: saved.data?.rounds });
         setEntryState({ phase: "ready", rounds: saved.data?.rounds });
         if (!current.ready) throw new Error(current.message);
+        const summary = saved.data.rounds.filter(round => current.selection.eligibleRoundNumbers.includes(round.roundNumber))
+          .map(round => `Round ${round.roundNumber}: ${round.enteredCount} ${round.scope === "PAIR" ? "pairs" : "golfers"} In, ${round.entrants.length-round.enteredCount} Out (Saved Revision ${round.revision})`).join("\n");
+        if (!globalThis.confirm?.(`Finalize Net Skins Configuration?\n\n${summary}\n\nOrdinary entry changes will no longer be available after configuration. Only continue when opt-outs are final. Unsaved changes are not included. This does not calculate or publish results.`)) return;
         entrySelection = current.selection;
         intent.entryRevisions = entrySelection.entryRevisions;
       }
@@ -415,14 +419,21 @@ export function NetSkinsCard({ data, refresh }) {
         {issue.byRound.length ? <span>{issue.byRound.map((round) => `Round ${round.round}: ${round.missingCount}`).join(" · ")}</span> : null}
       </article>)}</div> : <div className={styles.allReady}><strong>Canonical inputs are ready</strong><span>Saved explicit entries are checked separately before configuration.</span></div>}
     </details> : <div className={styles.inlineNotice}>The tournament-wide readiness summary is unavailable. Configuration readiness is checked separately against saved Round entries.</div>}
-    <p role="status">{configuration.message}</p>
+    <ProductionNetSkinsEntries onStateChange={setEntryState} configuredRounds={state.configuredRounds || []} />
+    <section className={styles.netSkinsFinalize} aria-label="Finalize Net Skins Configuration">
+      <h3>5 · Finalize Net Skins Configuration</h3>
+      <p>Use the saved entries above to create the official Net Skins configuration. After configuration, ordinary participant changes are no longer allowed.</p>
+      <strong>Only continue when opt-outs are final.</strong>
+      <p>Participant selections can be changed only before the Net Skins entry cutoff. Unsaved changes are not included.</p>
+      <SavedEntriesReview rounds={entryState.rounds || []}/>
+      <p role="status">{entriesAlreadyConfigured ? "Saved rounds are already configured. Entry selections are frozen." : configuration.message}</p>
+      <button type="button" style={{ minHeight: 44 }} disabled={Boolean(busy) || !configuration.ready || entriesAlreadyConfigured} onClick={() => run("configure")}>{entriesAlreadyConfigured ? "Configuration finalized" : configuration.label}</button>
+    </section>
     <div className={styles.actionRow}>
-      <button type="button" style={{ minHeight: 44 }} disabled={Boolean(busy) || !configuration.ready} onClick={() => run("configure")}>{configuration.label}</button>
       {upper(state.state) !== "NOT_CONFIGURED" ? <button type="button" disabled={Boolean(busy)} onClick={() => run("enqueue")}>Queue Recalculation</button> : null}
       {queued ? <button type="button" disabled={Boolean(busy)} onClick={() => run("process")}>Process Queued Calculation</button> : null}
     </div>
     <PrivateJobList title="Net Skins calculations" jobs={privateState?.jobs || []} />
-    <ProductionNetSkinsEntries onStateChange={setEntryState} />
     {message ? <p className={styles.operationMessage} role="status">{message}</p> : null}
   </article>;
 }

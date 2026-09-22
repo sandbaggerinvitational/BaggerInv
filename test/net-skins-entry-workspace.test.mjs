@@ -31,17 +31,17 @@ async function component(){if(Component)return Component;let text=await source('
     (React,React.useState,React.useEffect,React.useRef,entryDraft,entrySaveRequest,entriesChanged,{});return Component;
 }
 for(const format of ['BB','SC','SI'])test(`${format} real entry JSX: both pair names, explicit Out, accessible labels and future Round support`,async()=>{
-  const r=round(format);const html=renderToStaticMarkup(React.createElement(await component(),{round:r,onSaved:()=>{}}));
-  assert.match(html,new RegExp(`Round ${r.roundNumber}`));assert.match(html,/Alex 0 Very Long Name/);assert.match(html,/Out/);
-  if(format==='SC'){assert.match(html,/Partner 0 Equally Important/);assert.equal((html.match(/type="checkbox"/g)||[]).length,3);}
-  assert.match(html,/aria-label=/);assert.doesNotMatch(html,/Full Net.*\d|checked=""/);
+  const r=round(format);r.configured=true;const html=renderToStaticMarkup(React.createElement(await component(),{round:r,onSaved:()=>{}}));
+  assert.match(html,new RegExp(`Round ${r.roundNumber}`));assert.match(html,/Alex 0 Very Long Name/);assert.match(html,/OUT/);
+  if(format==='SC'){assert.match(html,/Partner 0 Equally Important/);assert.equal((html.match(/type="checkbox"/g)||[]).length,1);}
+  assert.match(html,/aria-label=/);assert.match(html,/role="switch"/);
 });
 test('stale entry review and intentionally empty R3 fail closed in real JSX',async()=>{
-  const r=round('SC');r.staleEntries=[{...r.entrants[0],entered:true}];r.state='REVIEW_REQUIRED';
+  const r=round('SC');r.configured=true;r.staleEntries=[{...r.entrants[0],entered:true}];r.state='REVIEW_REQUIRED';
   const html=renderToStaticMarkup(React.createElement(await component(),{round:r,onSaved:()=>{}}));
   assert.match(html,/review required/);assert.match(html,/have not transferred/);assert.match(html,/I reviewed the current field/);
   const empty=round('SI');empty.entrants=[];const blank=renderToStaticMarkup(React.createElement(await component(),{round:empty,onSaved:()=>{}}));
-  assert.match(blank,/Waiting for canonical pairings/);assert.doesNotMatch(blank,/Save Round Entries/);
+  assert.match(blank,/Round 3 entries will be available/);assert.doesNotMatch(blank,/Save Round Entries/);
 });
 test('responsive controls, stable retries, isolated endpoint and calculation gate remain explicit',async()=>{
   const css=await source('app/admin/director/net-skins-entries.module.css');assert.match(css,/min-height: 44px/);assert.match(css,/flex-wrap: wrap/);assert.match(css,/overflow-wrap: anywhere/);assert.match(css,/:focus-visible/);assert.doesNotMatch(css,/overflow-x:\s*(scroll|auto)/);

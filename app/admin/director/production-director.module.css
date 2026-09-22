@@ -21,3 +21,8 @@
 @media(max-width:1000px){.draftToolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.draftSetupGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.draftToolbar,.draftSetupGrid{grid-template-columns:1fr}.draftToolbar>label,.draftToolbar>div{min-height:auto}.draftSetupGrid label[data-wide=true]{grid-column:auto}.draftCorrection,.draftSection>header,.draftReview>header,.draftReceipt>header{align-items:flex-start;flex-direction:column}.draftReceipt dl{grid-template-columns:repeat(2,minmax(0,1fr))!important}.draftPickStatus{grid-template-columns:1fr}.draftHistory li{align-items:flex-start}}
 @media(max-width:420px){.draftReceipt dl{grid-template-columns:1fr!important}}
+
+.netSkinsFinalize { margin-top: 1.5rem; padding: 1rem; border: 2px solid #927129; border-radius: 12px; background: #faf6e9; display: grid; gap: .8rem; overflow-wrap: anywhere; }
+.netSkinsFinalize h3, .netSkinsFinalize p { margin: 0; }
+.netSkinsFinalize button { min-height: 44px; padding: .7rem 1rem; background: #164b3b; color: white; border: 0; border-radius: 8px; font: inherit; justify-self: start; }
+.netSkinsFinalize button:disabled { background: #e1e3de; color: #50584e; }
