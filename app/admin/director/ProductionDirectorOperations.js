@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { createClientMutationOperationIdentityRegistry } from "../../../lib/client-mutation-operation-identity.js";
+import ProductionRoundScoringControls from "./ProductionRoundScoringControls.js";
 import ProductionDraftEditor from "./ProductionDraftEditor.js";
 import CalcuttaManagementEditor, { FinancialSafety, money, ownershipPercent } from "./CalcuttaManagementEditor.js";
 import calcuttaStyles from "./calcutta-management.module.css";
@@ -116,6 +117,7 @@ function MatchCard({ match, busy, onAction }) {
 }
 
 export function TournamentDayPanel({ data, refresh }) {
+  const [roundBusy, setRoundBusy] = useState(false);
   const [pending, setPending] = useState(null);
   const [busy, setBusy] = useState(false);
   const [receipt, setReceipt] = useState(null);
@@ -216,7 +218,8 @@ export function TournamentDayPanel({ data, refresh }) {
     {refreshFailed ? <div className={styles.inlineNotice} role="alert">Controls are paused because the latest authoritative match revisions are unavailable. <button type="button" onClick={async () => setRefreshFailed(!(await refresh()))}>Refresh Authoritative State</button></div> : null}
     {rounds.map((round) => <section className={styles.panel} key={round.number}>
       <header><span>Round {round.number}</span><h2>{round.label}</h2><p>{round.format} · {pretty(round.status)}</p></header>
-      <div className={styles.matchGrid}>{round.matches.map((match) => <MatchCard key={match.id} match={match} busy={busy || refreshFailed || !data.tournamentDay.available} onAction={(action, selected) => setPending({ action, match: selected })} />)}</div>
+      <ProductionRoundScoringControls roundNumber={round.number} disabled={busy || !!pending || roundBusy || refreshFailed || !data.tournamentDay.available} refresh={refresh} onBusy={setRoundBusy} refreshKey={data} />
+      <div className={styles.matchGrid}>{round.matches.map((match) => <MatchCard key={match.id} match={match} busy={busy || roundBusy || refreshFailed || !data.tournamentDay.available} onAction={(action, selected) => setPending({ action, match: selected })} />)}</div>
     </section>)}
     <Confirmation pending={pending} busy={busy} onCancel={() => setPending(null)} onConfirm={execute} />
   </>;

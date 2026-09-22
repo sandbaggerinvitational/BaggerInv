@@ -1,0 +1,3011 @@
+{
+  "pristine": {
+    "round": 1,
+    "format": "BB",
+    "actions": {
+      "LOCK": {
+        "allowed": false,
+        "targets": [],
+        "failures": [
+          {
+            "code": "NO_APPLICABLE_MATCHES",
+            "matchId": null
+          }
+        ]
+      },
+      "OPEN": {
+        "allowed": true,
+        "targets": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "failures": []
+      },
+      "RESUME": {
+        "allowed": false,
+        "targets": [],
+        "failures": [
+          {
+            "code": "NO_APPLICABLE_MATCHES",
+            "matchId": null
+          }
+        ]
+      }
+    },
+    "history": [],
+    "matches": [
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R1-1",
+        "snapshotId": "2026-R1-1:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R1-2",
+        "snapshotId": "2026-R1-2:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R1-3",
+        "snapshotId": "2026-R1-3:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R1-4",
+        "snapshotId": "2026-R1-4:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R1-5",
+        "snapshotId": "2026-R1-5:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R1-6",
+        "snapshotId": "2026-R1-6:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      }
+    ],
+    "summary": {
+      "live": 0,
+      "final": 0,
+      "ready": 6,
+      "total": 6,
+      "locked": 0,
+      "upcoming": 6,
+      "accessActive": 0,
+      "activeLeases": 0
+    },
+    "fingerprint": "a57e5ab405009b5fb5ef47e5187d08e28850832b301a2f927130189d3e650f8d",
+    "expectedMatches": 6,
+    "handicapRevision": 13
+  },
+  "r3": {
+    "round": 3,
+    "format": "SI",
+    "actions": {
+      "LOCK": {
+        "allowed": false,
+        "targets": [],
+        "failures": [
+          {
+            "code": "NO_APPLICABLE_MATCHES",
+            "matchId": null
+          }
+        ]
+      },
+      "OPEN": {
+        "allowed": true,
+        "targets": [
+          "2026-R3-1",
+          "2026-R3-10",
+          "2026-R3-11",
+          "2026-R3-12",
+          "2026-R3-2",
+          "2026-R3-3",
+          "2026-R3-4",
+          "2026-R3-5",
+          "2026-R3-6",
+          "2026-R3-7",
+          "2026-R3-8",
+          "2026-R3-9"
+        ],
+        "failures": []
+      },
+      "RESUME": {
+        "allowed": false,
+        "targets": [],
+        "failures": [
+          {
+            "code": "NO_APPLICABLE_MATCHES",
+            "matchId": null
+          }
+        ]
+      }
+    },
+    "history": [],
+    "matches": [
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R3-1",
+        "snapshotId": "2026-R3-1:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R3-10",
+        "snapshotId": "2026-R3-10:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R3-11",
+        "snapshotId": "2026-R3-11:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R3-12",
+        "snapshotId": "2026-R3-12:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R3-2",
+        "snapshotId": "2026-R3-2:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R3-3",
+        "snapshotId": "2026-R3-3:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R3-4",
+        "snapshotId": "2026-R3-4:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R3-5",
+        "snapshotId": "2026-R3-5:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R3-6",
+        "snapshotId": "2026-R3-6:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R3-7",
+        "snapshotId": "2026-R3-7:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R3-8",
+        "snapshotId": "2026-R3-8:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R3-9",
+        "snapshotId": "2026-R3-9:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      }
+    ],
+    "summary": {
+      "live": 0,
+      "final": 0,
+      "ready": 12,
+      "total": 12,
+      "locked": 0,
+      "upcoming": 12,
+      "accessActive": 0,
+      "activeLeases": 0
+    },
+    "fingerprint": "5f2468d062306c6254c372b15d8acda3a4e125ad1825c9c2e381651a4123a8a9",
+    "expectedMatches": 12,
+    "handicapRevision": 13
+  },
+  "open": {
+    "round": 1,
+    "format": "BB",
+    "actions": {
+      "LOCK": {
+        "allowed": true,
+        "targets": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "failures": []
+      },
+      "OPEN": {
+        "allowed": false,
+        "targets": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "failures": [
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-1"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-1"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-2"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-2"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-3"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-3"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-4"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-4"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-5"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-5"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-6"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-6"
+          }
+        ]
+      },
+      "RESUME": {
+        "allowed": false,
+        "targets": [],
+        "failures": [
+          {
+            "code": "NO_APPLICABLE_MATCHES",
+            "matchId": null
+          }
+        ]
+      }
+    },
+    "history": [
+      {
+        "at": "2026-09-22T17:31:05.62141-05:00",
+        "after": [
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-1",
+            "snapshotId": "2026-R1-1:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-2",
+            "snapshotId": "2026-R1-2:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-3",
+            "snapshotId": "2026-R1-3:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-4",
+            "snapshotId": "2026-R1-4:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-5",
+            "snapshotId": "2026-R1-5:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-6",
+            "snapshotId": "2026-R1-6:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          }
+        ],
+        "round": 1,
+        "before": [
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-1",
+            "snapshotId": "2026-R1-1:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-2",
+            "snapshotId": "2026-R1-2:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-3",
+            "snapshotId": "2026-R1-3:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-4",
+            "snapshotId": "2026-R1-4:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-5",
+            "snapshotId": "2026-R1-5:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-6",
+            "snapshotId": "2026-R1-6:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          }
+        ],
+        "result": "SUCCESS",
+        "director": "CB01",
+        "failures": 0,
+        "operation": "OPEN",
+        "tournament": "2026",
+        "operationId": "20000000-0000-4000-8000-000000000025",
+        "affectedMatches": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "afterFingerprint": "6bc8b15312d244cb9dcfa08ac4a36ba93c796db6bc450fa06e10ee7ac08b9933",
+        "handicapRevision": 13,
+        "beforeFingerprint": "a57e5ab405009b5fb5ef47e5187d08e28850832b301a2f927130189d3e650f8d"
+      }
+    ],
+    "matches": [
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-1",
+        "snapshotId": "2026-R1-1:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 2,
+        "resumeReasons": [],
+        "permissionRevision": 2
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-2",
+        "snapshotId": "2026-R1-2:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 2,
+        "resumeReasons": [],
+        "permissionRevision": 2
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-3",
+        "snapshotId": "2026-R1-3:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 2,
+        "resumeReasons": [],
+        "permissionRevision": 2
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-4",
+        "snapshotId": "2026-R1-4:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 2,
+        "resumeReasons": [],
+        "permissionRevision": 2
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-5",
+        "snapshotId": "2026-R1-5:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 2,
+        "resumeReasons": [],
+        "permissionRevision": 2
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-6",
+        "snapshotId": "2026-R1-6:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 2,
+        "resumeReasons": [],
+        "permissionRevision": 2
+      }
+    ],
+    "summary": {
+      "live": 6,
+      "final": 0,
+      "ready": 6,
+      "total": 6,
+      "locked": 0,
+      "upcoming": 0,
+      "accessActive": 6,
+      "activeLeases": 0
+    },
+    "fingerprint": "6bc8b15312d244cb9dcfa08ac4a36ba93c796db6bc450fa06e10ee7ac08b9933",
+    "expectedMatches": 6,
+    "handicapRevision": 13
+  },
+  "locked": {
+    "round": 1,
+    "format": "BB",
+    "actions": {
+      "LOCK": {
+        "allowed": true,
+        "targets": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "failures": []
+      },
+      "OPEN": {
+        "allowed": false,
+        "targets": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "failures": [
+          {
+            "code": "MATCH_ALREADY_HAS_SCORING_ACTIVITY",
+            "matchId": "2026-R1-1"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-1"
+          },
+          {
+            "code": "MATCH_LOCKED",
+            "matchId": "2026-R1-1"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-2"
+          },
+          {
+            "code": "MATCH_LOCKED",
+            "matchId": "2026-R1-2"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-3"
+          },
+          {
+            "code": "MATCH_LOCKED",
+            "matchId": "2026-R1-3"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-4"
+          },
+          {
+            "code": "MATCH_LOCKED",
+            "matchId": "2026-R1-4"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-5"
+          },
+          {
+            "code": "MATCH_LOCKED",
+            "matchId": "2026-R1-5"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-6"
+          },
+          {
+            "code": "MATCH_LOCKED",
+            "matchId": "2026-R1-6"
+          }
+        ]
+      },
+      "RESUME": {
+        "allowed": true,
+        "targets": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "failures": []
+      }
+    },
+    "history": [
+      {
+        "at": "2026-09-22T17:31:05.806306-05:00",
+        "after": [
+          {
+            "ready": false,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-1",
+            "snapshotId": "2026-R1-1:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_ALREADY_HAS_SCORING_ACTIVITY",
+                "message": "The match already has scoring activity and cannot be started from setup."
+              },
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 4,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-2",
+            "snapshotId": "2026-R1-2:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-3",
+            "snapshotId": "2026-R1-3:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-4",
+            "snapshotId": "2026-R1-4:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-5",
+            "snapshotId": "2026-R1-5:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-6",
+            "snapshotId": "2026-R1-6:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          }
+        ],
+        "round": 1,
+        "before": [
+          {
+            "ready": false,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-1",
+            "snapshotId": "2026-R1-1:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_ALREADY_HAS_SCORING_ACTIVITY",
+                "message": "The match already has scoring activity and cannot be started from setup."
+              },
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-2",
+            "snapshotId": "2026-R1-2:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-3",
+            "snapshotId": "2026-R1-3:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-4",
+            "snapshotId": "2026-R1-4:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-5",
+            "snapshotId": "2026-R1-5:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-6",
+            "snapshotId": "2026-R1-6:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          }
+        ],
+        "result": "SUCCESS",
+        "director": "CB01",
+        "failures": 0,
+        "operation": "LOCK",
+        "tournament": "2026",
+        "operationId": "20000000-0000-4000-8000-000000000027",
+        "affectedMatches": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "afterFingerprint": "26fda9b5c84d509ece28e3022fba6b74031feaebe11914fb70217be7daedb1e8",
+        "handicapRevision": 13,
+        "beforeFingerprint": "0757d9b4944642c04ee995fb8f70e4d4ee7607d744b5ed126e416e56a48a2105"
+      },
+      {
+        "at": "2026-09-22T17:31:05.62141-05:00",
+        "after": [
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-1",
+            "snapshotId": "2026-R1-1:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-2",
+            "snapshotId": "2026-R1-2:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-3",
+            "snapshotId": "2026-R1-3:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-4",
+            "snapshotId": "2026-R1-4:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-5",
+            "snapshotId": "2026-R1-5:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-6",
+            "snapshotId": "2026-R1-6:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          }
+        ],
+        "round": 1,
+        "before": [
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-1",
+            "snapshotId": "2026-R1-1:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-2",
+            "snapshotId": "2026-R1-2:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-3",
+            "snapshotId": "2026-R1-3:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-4",
+            "snapshotId": "2026-R1-4:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-5",
+            "snapshotId": "2026-R1-5:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-6",
+            "snapshotId": "2026-R1-6:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          }
+        ],
+        "result": "SUCCESS",
+        "director": "CB01",
+        "failures": 0,
+        "operation": "OPEN",
+        "tournament": "2026",
+        "operationId": "20000000-0000-4000-8000-000000000025",
+        "affectedMatches": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "afterFingerprint": "6bc8b15312d244cb9dcfa08ac4a36ba93c796db6bc450fa06e10ee7ac08b9933",
+        "handicapRevision": 13,
+        "beforeFingerprint": "a57e5ab405009b5fb5ef47e5187d08e28850832b301a2f927130189d3e650f8d"
+      }
+    ],
+    "matches": [
+      {
+        "ready": false,
+        "locked": true,
+        "status": "LIVE",
+        "matchId": "2026-R1-1",
+        "snapshotId": "2026-R1-1:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_ALREADY_HAS_SCORING_ACTIVITY",
+            "message": "The match already has scoring activity and cannot be started from setup."
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "MATCH_LOCKED"
+          }
+        ],
+        "resumeReady": true,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 4,
+        "resumeReasons": [],
+        "permissionRevision": 3
+      },
+      {
+        "ready": true,
+        "locked": true,
+        "status": "LIVE",
+        "matchId": "2026-R1-2",
+        "snapshotId": "2026-R1-2:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "MATCH_LOCKED"
+          }
+        ],
+        "resumeReady": true,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 3,
+        "resumeReasons": [],
+        "permissionRevision": 3
+      },
+      {
+        "ready": true,
+        "locked": true,
+        "status": "LIVE",
+        "matchId": "2026-R1-3",
+        "snapshotId": "2026-R1-3:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "MATCH_LOCKED"
+          }
+        ],
+        "resumeReady": true,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 3,
+        "resumeReasons": [],
+        "permissionRevision": 3
+      },
+      {
+        "ready": true,
+        "locked": true,
+        "status": "LIVE",
+        "matchId": "2026-R1-4",
+        "snapshotId": "2026-R1-4:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "MATCH_LOCKED"
+          }
+        ],
+        "resumeReady": true,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 3,
+        "resumeReasons": [],
+        "permissionRevision": 3
+      },
+      {
+        "ready": true,
+        "locked": true,
+        "status": "LIVE",
+        "matchId": "2026-R1-5",
+        "snapshotId": "2026-R1-5:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "MATCH_LOCKED"
+          }
+        ],
+        "resumeReady": true,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 3,
+        "resumeReasons": [],
+        "permissionRevision": 3
+      },
+      {
+        "ready": true,
+        "locked": true,
+        "status": "LIVE",
+        "matchId": "2026-R1-6",
+        "snapshotId": "2026-R1-6:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "MATCH_LOCKED"
+          }
+        ],
+        "resumeReady": true,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 3,
+        "resumeReasons": [],
+        "permissionRevision": 3
+      }
+    ],
+    "summary": {
+      "live": 6,
+      "final": 0,
+      "ready": 5,
+      "total": 6,
+      "locked": 6,
+      "upcoming": 0,
+      "accessActive": 0,
+      "activeLeases": 0
+    },
+    "fingerprint": "26fda9b5c84d509ece28e3022fba6b74031feaebe11914fb70217be7daedb1e8",
+    "expectedMatches": 6,
+    "handicapRevision": 13
+  },
+  "resumed": {
+    "round": 1,
+    "format": "BB",
+    "actions": {
+      "LOCK": {
+        "allowed": true,
+        "targets": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "failures": []
+      },
+      "OPEN": {
+        "allowed": false,
+        "targets": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "failures": [
+          {
+            "code": "MATCH_ALREADY_HAS_SCORING_ACTIVITY",
+            "matchId": "2026-R1-1"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-1"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-1"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-2"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-2"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-3"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-3"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-4"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-4"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-5"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-5"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-6"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-6"
+          }
+        ]
+      },
+      "RESUME": {
+        "allowed": false,
+        "targets": [],
+        "failures": [
+          {
+            "code": "NO_APPLICABLE_MATCHES",
+            "matchId": null
+          }
+        ]
+      }
+    },
+    "history": [
+      {
+        "at": "2026-09-22T17:31:06.049445-05:00",
+        "after": [
+          {
+            "ready": false,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-1",
+            "snapshotId": "2026-R1-1:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_ALREADY_HAS_SCORING_ACTIVITY",
+                "message": "The match already has scoring activity and cannot be started from setup."
+              },
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 5,
+            "resumeReasons": [],
+            "permissionRevision": 4
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-2",
+            "snapshotId": "2026-R1-2:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 4,
+            "resumeReasons": [],
+            "permissionRevision": 4
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-3",
+            "snapshotId": "2026-R1-3:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 4,
+            "resumeReasons": [],
+            "permissionRevision": 4
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-4",
+            "snapshotId": "2026-R1-4:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 4,
+            "resumeReasons": [],
+            "permissionRevision": 4
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-5",
+            "snapshotId": "2026-R1-5:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 4,
+            "resumeReasons": [],
+            "permissionRevision": 4
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-6",
+            "snapshotId": "2026-R1-6:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 4,
+            "resumeReasons": [],
+            "permissionRevision": 4
+          }
+        ],
+        "round": 1,
+        "before": [
+          {
+            "ready": false,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-1",
+            "snapshotId": "2026-R1-1:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_ALREADY_HAS_SCORING_ACTIVITY",
+                "message": "The match already has scoring activity and cannot be started from setup."
+              },
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 4,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-2",
+            "snapshotId": "2026-R1-2:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-3",
+            "snapshotId": "2026-R1-3:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-4",
+            "snapshotId": "2026-R1-4:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-5",
+            "snapshotId": "2026-R1-5:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-6",
+            "snapshotId": "2026-R1-6:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          }
+        ],
+        "result": "SUCCESS",
+        "director": "CB01",
+        "failures": 0,
+        "operation": "RESUME",
+        "tournament": "2026",
+        "operationId": "20000000-0000-4000-8000-000000000029",
+        "affectedMatches": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "afterFingerprint": "c28eb16277fdbf3f86c53b80a8a3e9c0ed73bb26462bae2f0d371b3c11fab356",
+        "handicapRevision": 13,
+        "beforeFingerprint": "26fda9b5c84d509ece28e3022fba6b74031feaebe11914fb70217be7daedb1e8"
+      },
+      {
+        "at": "2026-09-22T17:31:05.806306-05:00",
+        "after": [
+          {
+            "ready": false,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-1",
+            "snapshotId": "2026-R1-1:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_ALREADY_HAS_SCORING_ACTIVITY",
+                "message": "The match already has scoring activity and cannot be started from setup."
+              },
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 4,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-2",
+            "snapshotId": "2026-R1-2:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-3",
+            "snapshotId": "2026-R1-3:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-4",
+            "snapshotId": "2026-R1-4:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-5",
+            "snapshotId": "2026-R1-5:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          },
+          {
+            "ready": true,
+            "locked": true,
+            "status": "LIVE",
+            "matchId": "2026-R1-6",
+            "snapshotId": "2026-R1-6:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "MATCH_LOCKED"
+              }
+            ],
+            "resumeReady": true,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 3
+          }
+        ],
+        "round": 1,
+        "before": [
+          {
+            "ready": false,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-1",
+            "snapshotId": "2026-R1-1:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_ALREADY_HAS_SCORING_ACTIVITY",
+                "message": "The match already has scoring activity and cannot be started from setup."
+              },
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 3,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-2",
+            "snapshotId": "2026-R1-2:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-3",
+            "snapshotId": "2026-R1-3:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-4",
+            "snapshotId": "2026-R1-4:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-5",
+            "snapshotId": "2026-R1-5:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-6",
+            "snapshotId": "2026-R1-6:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          }
+        ],
+        "result": "SUCCESS",
+        "director": "CB01",
+        "failures": 0,
+        "operation": "LOCK",
+        "tournament": "2026",
+        "operationId": "20000000-0000-4000-8000-000000000027",
+        "affectedMatches": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "afterFingerprint": "26fda9b5c84d509ece28e3022fba6b74031feaebe11914fb70217be7daedb1e8",
+        "handicapRevision": 13,
+        "beforeFingerprint": "0757d9b4944642c04ee995fb8f70e4d4ee7607d744b5ed126e416e56a48a2105"
+      },
+      {
+        "at": "2026-09-22T17:31:05.62141-05:00",
+        "after": [
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-1",
+            "snapshotId": "2026-R1-1:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-2",
+            "snapshotId": "2026-R1-2:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-3",
+            "snapshotId": "2026-R1-3:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-4",
+            "snapshotId": "2026-R1-4:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-5",
+            "snapshotId": "2026-R1-5:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "LIVE",
+            "matchId": "2026-R1-6",
+            "snapshotId": "2026-R1-6:S1",
+            "openReasons": [
+              {
+                "code": "MATCH_NOT_UPCOMING"
+              },
+              {
+                "code": "ACCESS_NOT_REVOKED"
+              }
+            ],
+            "resumeReady": false,
+            "accessActive": true,
+            "activeLeases": 0,
+            "matchRevision": 2,
+            "resumeReasons": [],
+            "permissionRevision": 2
+          }
+        ],
+        "round": 1,
+        "before": [
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-1",
+            "snapshotId": "2026-R1-1:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-2",
+            "snapshotId": "2026-R1-2:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-3",
+            "snapshotId": "2026-R1-3:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-4",
+            "snapshotId": "2026-R1-4:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-5",
+            "snapshotId": "2026-R1-5:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          },
+          {
+            "ready": true,
+            "locked": false,
+            "status": "UPCOMING",
+            "matchId": "2026-R1-6",
+            "snapshotId": "2026-R1-6:S1",
+            "openReasons": [],
+            "resumeReady": false,
+            "accessActive": false,
+            "activeLeases": 0,
+            "matchRevision": 0,
+            "resumeReasons": [],
+            "permissionRevision": 1
+          }
+        ],
+        "result": "SUCCESS",
+        "director": "CB01",
+        "failures": 0,
+        "operation": "OPEN",
+        "tournament": "2026",
+        "operationId": "20000000-0000-4000-8000-000000000025",
+        "affectedMatches": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "afterFingerprint": "6bc8b15312d244cb9dcfa08ac4a36ba93c796db6bc450fa06e10ee7ac08b9933",
+        "handicapRevision": 13,
+        "beforeFingerprint": "a57e5ab405009b5fb5ef47e5187d08e28850832b301a2f927130189d3e650f8d"
+      }
+    ],
+    "matches": [
+      {
+        "ready": false,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-1",
+        "snapshotId": "2026-R1-1:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_ALREADY_HAS_SCORING_ACTIVITY",
+            "message": "The match already has scoring activity and cannot be started from setup."
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 5,
+        "resumeReasons": [],
+        "permissionRevision": 4
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-2",
+        "snapshotId": "2026-R1-2:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 4,
+        "resumeReasons": [],
+        "permissionRevision": 4
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-3",
+        "snapshotId": "2026-R1-3:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 4,
+        "resumeReasons": [],
+        "permissionRevision": 4
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-4",
+        "snapshotId": "2026-R1-4:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 4,
+        "resumeReasons": [],
+        "permissionRevision": 4
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-5",
+        "snapshotId": "2026-R1-5:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 4,
+        "resumeReasons": [],
+        "permissionRevision": 4
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-6",
+        "snapshotId": "2026-R1-6:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 4,
+        "resumeReasons": [],
+        "permissionRevision": 4
+      }
+    ],
+    "summary": {
+      "live": 6,
+      "final": 0,
+      "ready": 5,
+      "total": 6,
+      "locked": 0,
+      "upcoming": 0,
+      "accessActive": 6,
+      "activeLeases": 0
+    },
+    "fingerprint": "c28eb16277fdbf3f86c53b80a8a3e9c0ed73bb26462bae2f0d371b3c11fab356",
+    "expectedMatches": 6,
+    "handicapRevision": 13
+  },
+  "mixed": {
+    "round": 1,
+    "format": "BB",
+    "actions": {
+      "LOCK": {
+        "allowed": true,
+        "targets": [
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5"
+        ],
+        "failures": []
+      },
+      "OPEN": {
+        "allowed": false,
+        "targets": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "failures": [
+          {
+            "code": "MATCH_ALREADY_HAS_SCORING_ACTIVITY",
+            "matchId": "2026-R1-1"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-1"
+          },
+          {
+            "code": "MATCH_LOCKED",
+            "matchId": "2026-R1-1"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-2"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-2"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-3"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-3"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-4"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-4"
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING",
+            "matchId": "2026-R1-5"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED",
+            "matchId": "2026-R1-5"
+          }
+        ]
+      },
+      "RESUME": {
+        "allowed": false,
+        "targets": [],
+        "failures": [
+          {
+            "code": "NO_APPLICABLE_MATCHES",
+            "matchId": null
+          }
+        ]
+      }
+    },
+    "history": [],
+    "matches": [
+      {
+        "ready": false,
+        "locked": true,
+        "status": "FINAL",
+        "matchId": "2026-R1-1",
+        "snapshotId": "2026-R1-1:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_ALREADY_HAS_SCORING_ACTIVITY",
+            "message": "The match already has scoring activity and cannot be started from setup."
+          },
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "MATCH_LOCKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 21,
+        "resumeReasons": [],
+        "permissionRevision": 3
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-2",
+        "snapshotId": "2026-R1-2:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 2,
+        "resumeReasons": [],
+        "permissionRevision": 2
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-3",
+        "snapshotId": "2026-R1-3:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 2,
+        "resumeReasons": [],
+        "permissionRevision": 2
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-4",
+        "snapshotId": "2026-R1-4:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 2,
+        "resumeReasons": [],
+        "permissionRevision": 2
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "LIVE",
+        "matchId": "2026-R1-5",
+        "snapshotId": "2026-R1-5:S1",
+        "openReasons": [
+          {
+            "code": "MATCH_NOT_UPCOMING"
+          },
+          {
+            "code": "ACCESS_NOT_REVOKED"
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": true,
+        "activeLeases": 0,
+        "matchRevision": 2,
+        "resumeReasons": [],
+        "permissionRevision": 2
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R1-6",
+        "snapshotId": "2026-R1-6:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      }
+    ],
+    "summary": {
+      "live": 4,
+      "final": 1,
+      "ready": 5,
+      "total": 6,
+      "locked": 1,
+      "upcoming": 1,
+      "accessActive": 4,
+      "activeLeases": 0
+    },
+    "fingerprint": "a27711987d7d75454adff30aaece9e9bfce6723a3355fd12042992517348d255",
+    "expectedMatches": 6,
+    "handicapRevision": 13
+  },
+  "failed": {
+    "round": 1,
+    "format": "BB",
+    "actions": {
+      "LOCK": {
+        "allowed": false,
+        "targets": [],
+        "failures": [
+          {
+            "code": "NO_APPLICABLE_MATCHES",
+            "matchId": null
+          }
+        ]
+      },
+      "OPEN": {
+        "allowed": false,
+        "targets": [
+          "2026-R1-1",
+          "2026-R1-2",
+          "2026-R1-3",
+          "2026-R1-4",
+          "2026-R1-5",
+          "2026-R1-6"
+        ],
+        "failures": [
+          {
+            "code": "SCORING_HOLES_NOT_CURRENT",
+            "matchId": "2026-R1-4"
+          }
+        ]
+      },
+      "RESUME": {
+        "allowed": false,
+        "targets": [],
+        "failures": [
+          {
+            "code": "NO_APPLICABLE_MATCHES",
+            "matchId": null
+          }
+        ]
+      }
+    },
+    "matches": [
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R1-1",
+        "snapshotId": "2026-R1-1:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R1-2",
+        "snapshotId": "2026-R1-2:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R1-3",
+        "snapshotId": "2026-R1-3:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": false,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R1-4",
+        "snapshotId": "2026-R1-4:S1",
+        "openReasons": [
+          {
+            "code": "SCORING_HOLES_NOT_CURRENT",
+            "message": "The match hole scoring context is not current."
+          }
+        ],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R1-5",
+        "snapshotId": "2026-R1-5:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      },
+      {
+        "ready": true,
+        "locked": false,
+        "status": "UPCOMING",
+        "matchId": "2026-R1-6",
+        "snapshotId": "2026-R1-6:S1",
+        "openReasons": [],
+        "resumeReady": false,
+        "accessActive": false,
+        "activeLeases": 0,
+        "matchRevision": 0,
+        "resumeReasons": [],
+        "permissionRevision": 1
+      }
+    ],
+    "summary": {
+      "live": 0,
+      "final": 0,
+      "ready": 5,
+      "total": 6,
+      "locked": 0,
+      "upcoming": 6,
+      "accessActive": 0,
+      "activeLeases": 0
+    },
+    "fingerprint": "56802f9c89b1dcda8ccf70aa27608fba3ef61e32c8e49a8abdf285e017ae8948",
+    "expectedMatches": 6,
+    "handicapRevision": 13
+  }
+}
