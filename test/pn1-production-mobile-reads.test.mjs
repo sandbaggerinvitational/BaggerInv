@@ -115,6 +115,8 @@ function productionOdds(state = "PUBLISHED", legacy = false) {
 
 async function readOdds(value) {
   return mobileOddsResult(identity, { env, dependencies: { readCurrentTournamentRuntime,
+    readLeaderboardsCoreView: async () => ({payload:{ok:true,data:{tournament:{tournament_id:"2026"},
+      teams:[{team_id:"PICKLES",team_side:1},{team_id:"LIPPIT",team_side:2}]}}}),
     readPublishedOddsView: async (scope) => { assert.deepEqual(scope, { tournamentId: "2026" });
       return { payload: { ok: true, data: value } }; },
     readMobilePreviewParticipantContent: async () => assert.fail("Preview bundle forbidden"),
