@@ -1,26 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { homeSchedulePreview, todaysSchedule } from "../lib/home-dashboard";
 import { isGolfTimelineEvent, timelineEventIcon, timelineOptionalText } from "../lib/tournament-timeline";
 import StatusBadge from "./StatusBadge";
+import useTournamentClock from "./useTournamentClock";
 import styles from "./tournament-command-center.module.css";
 
-function scheduleNow(initialNow, mountedAt) {
-  if (!initialNow) return new Date();
-  const initial = new Date(initialNow);
-  if (Number.isNaN(initial.getTime())) return new Date();
-  return new Date(initial.getTime() + Date.now() - mountedAt);
-}
-
 export default function TournamentSchedule({ events, timeZone, initialNow = "", compact = false }) {
-  const [mountedAt] = useState(() => Date.now());
-  const [now, setNow] = useState(() => scheduleNow(initialNow, mountedAt));
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(scheduleNow(initialNow, mountedAt)), 30_000);
-    return () => window.clearInterval(timer);
-  }, [initialNow, mountedAt]);
+  const now = useTournamentClock(initialNow);
   const items = useMemo(() => todaysSchedule(events, { now, timeZone }), [events, now, timeZone]);
   const preview = useMemo(() => homeSchedulePreview(events, { now, timeZone }), [events, now, timeZone]);
   const displayedItems = compact && preview.kind === "event" ? [preview.event] : items;
@@ -39,7 +28,7 @@ export default function TournamentSchedule({ events, timeZone, initialNow = "", 
         const golfEvent = isGolfTimelineEvent(item.type);
         const statePresentation = golfEvent && item.state === "live" ? <div className={styles.scheduleStatus}><StatusBadge status="Live" /></div>
           : golfEvent && item.state === "complete" ? <div className={styles.scheduleStatus}><StatusBadge status="Final" /></div>
-          : golfEvent && item.state === "upcoming" && item.isNext && item.minutesUntil <= 60 ? <b className={styles.countdown}>{item.countdown}</b>
+          : golfEvent && item.state === "upcoming" && item.isNext && item.minutesUntil > 0 && item.minutesUntil <= 60 ? <b className={styles.countdown}>{item.countdown}</b>
           : golfEvent && item.state === "upcoming" ? <div className={styles.scheduleStatus}><StatusBadge status="Upcoming" /></div>
           : item.state === "live" ? <b>Live</b>
           : item.state === "complete" ? <b className={styles.completed}>✓ Completed</b>

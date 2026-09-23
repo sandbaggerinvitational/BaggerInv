@@ -182,7 +182,7 @@ test("Home and Director hide operational schedule sections when Timeline is unav
   assert.match(schedule, /import StatusBadge from "\.\/StatusBadge"/);
   assert.match(schedule, /golfEvent && item\.state === "live" \? <div className=\{styles\.scheduleStatus\}><StatusBadge status="Live"/);
   assert.match(schedule, /golfEvent && item\.state === "complete" \? <div className=\{styles\.scheduleStatus\}><StatusBadge status="Final"/);
-  assert.match(schedule, /golfEvent && item\.state === "upcoming" && item\.isNext && item\.minutesUntil <= 60/);
+  assert.match(schedule, /golfEvent && item\.state === "upcoming" && item\.isNext && item\.minutesUntil > 0 && item\.minutesUntil <= 60/);
   assert.match(schedule, /golfEvent && item\.state === "upcoming" \? <div className=\{styles\.scheduleStatus\}><StatusBadge status="Upcoming"/);
   assert.match(schedule, /✓ Completed/);
   assert.match(schedule, /item\.isNext \? <b className=\{styles\.countdown\}>\{item\.countdown\}/);

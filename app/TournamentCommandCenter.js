@@ -5,9 +5,9 @@ import TournamentIdentityHeader from "./TournamentIdentityHeader";
 import TournamentMoments from "./TournamentMoments";
 import DeferredHomeContent from "./DeferredHomeContent";
 import TournamentSchedule from "./TournamentSchedule";
+import TournamentDayLabel from "./TournamentDayLabel";
 import { teamLogo } from "../lib/asset-paths";
 import {
-  tournamentDayLabel,
   tournamentStatusLabel,
 } from "../lib/home-dashboard";
 import { formatTeamPoints } from "../lib/formatters";
@@ -39,11 +39,7 @@ function TournamentPulse({ tournament, progress, roundCount }) {
         <div>
           <p>Tournament Pulse</p>
           <h2 id="tournament-pulse-title">
-            {tournamentDayLabel({
-              startDate: tournament.startDate,
-              currentRound: tournament.currentRound,
-              roundCount,
-            })}
+            <TournamentDayLabel tournament={tournament} roundCount={roundCount} />
           </h2>
         </div>
       </header>
