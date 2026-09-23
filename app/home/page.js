@@ -9,6 +9,7 @@ import { requireHomeReadSource } from "../../lib/home-read-source";
 import { requireNetSkinsReadSource } from "../../lib/net-skins-read-source";
 import { requireParticipantIdentityAuthority } from "../../lib/participant-identity-authority";
 import { applicationPageEnvironment } from "../../lib/production-shadow-request-environment";
+import ParticipantEntryGate from '../follow/ParticipantEntryGate';
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -25,11 +26,15 @@ export default async function MobileHomePage() {
   const participantIdentityAuthority = requireParticipantIdentityAuthority(env).resolved;
   const netSkinsSource = requireNetSkinsReadSource(env);
   const netSkinsReadSource = netSkinsSource.resolved;
-  if (source.resolved === "supabase") return <ParticipantSupabaseHome
+  if (source.resolved === "supabase") {
+    const home = <ParticipantSupabaseHome
     netSkinsReadSource={netSkinsReadSource}
     previewMode={process.env.VERCEL_ENV === "preview"}
     productionNetSkinsV1={netSkinsSource.productionCutover?.handled === true}
-  />;
+    />;
+    return process.env.SPECTATOR_PWA_ENABLED === 'true'
+      ? <ParticipantEntryGate>{home}</ParticipantEntryGate> : home;
+  }
 
   let liveData;
   try {
