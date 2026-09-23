@@ -95,6 +95,7 @@ export async function POST(request) {
     "management-read",
     "management-configure",
     "management-entry",
+    "management-clear-entry",
     "configure",
     "replace-auction",
     "publish",

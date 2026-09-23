@@ -95,6 +95,7 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
     [filter, setFilter] = useState("ALL"),
     [hypothetical, setHypothetical] = useState("1000");
   const [search, setSearch] = useState(""), [auctionReview, setAuctionReview] = useState(false);
+  const [clearReview, setClearReview] = useState(false);
   const pending = useRef(null);
   const editorRef = useRef(null);
   useEffect(() => { if (entry) { editorRef.current?.scrollIntoView({ block: "start", behavior: "smooth" }); editorRef.current?.focus({ preventScroll: true }); } }, [entry?.playerId]);
@@ -102,6 +103,7 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
     setModel(m);
     setRows(configurationDraft(m));
     setEntry(null);
+    setClearReview(false);
     setReview(false);
     setConfirm(false);
   };
@@ -170,6 +172,7 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
     setConfirm(false);
   };
   const changeEntry = (v) => {
+    setClearReview(false);
     setEntry(v);
     setReview(false);
     setConfirm(false);
@@ -201,7 +204,7 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
       load();
     }
   };
-  const save = async (next = false) => {
+  const save = async (next = false, clearing = false) => {
     setBusy(true);
     setMessage("");
     try {
@@ -213,13 +216,13 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
           .join("");
         pending.current = {
           action:
-            tab === "configuration"
+            clearing ? "management-clear-entry" : tab === "configuration"
               ? "management-configure"
               : "management-entry",
           payload: {
             ...predecessor(model),
             requestFingerprint,
-            ...(tab === "configuration" ? { rows } : { entry }),
+            ...(clearing ? { playerId: entry.playerId } : tab === "configuration" ? { rows } : { entry }),
           },
           next,
           playerId: entry?.playerId,
@@ -236,7 +239,7 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
         if (nextPlayer) setEntry(auctionEntry(result.data, nextPlayer.player_id));
       }
       setMessage(
-        intent.playerId ? `${name(intent.playerId)} saved · ${money(auctionEntry(result.data,intent.playerId).purchasePrice,model.currency_code)} · ${auctionEntry(result.data,intent.playerId).owners.map(o=>`${name(o.buyerId)} — ${o.percentage}%`).join(" · ")} · Ownership Complete. Still UNPUBLISHED.` : "Points & Payouts saved and verified. Still UNPUBLISHED.",
+        intent.action === "management-clear-entry" ? `${name(intent.playerId)} cleared and verified · NOT ENTERED · No purchase price · No owners · 0% ownership. Prior revision preserved. Still UNPUBLISHED.` : intent.playerId ? `${name(intent.playerId)} saved · ${money(auctionEntry(result.data,intent.playerId).purchasePrice,model.currency_code)} · ${auctionEntry(result.data,intent.playerId).owners.map(o=>`${name(o.buyerId)} — ${o.percentage}%`).join(" · ")} · Ownership Complete. Still UNPUBLISHED.` : "Points & Payouts saved and verified. Still UNPUBLISHED.",
       );
       try {
         await onChanged?.();
@@ -504,6 +507,22 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
             </section>
           )}
         </>
+      )}
+      {tab === "auction" && entry && model.purchases.some(p => p.player_id === entry.playerId) && (
+        <section className={styles.clearEntry} aria-label="Clear saved auction entry">
+          <button disabled={locked || dirty} onClick={() => { setClearReview(true); setReview(false); setConfirm(false); }}>Clear Auction Entry</button>
+          {dirty && <p>Discard or save local edits before clearing the saved entry.</p>}
+          {clearReview && <section className={styles.review} role="region" aria-label="Confirm clear auction entry">
+            <h4>Clear {name(entry.playerId)}'s auction entry?</h4>
+            <p>Current saved purchase price: {money(auctionEntry(model,entry.playerId).purchasePrice,model.currency_code)}</p>
+            <ul>{auctionEntry(model,entry.playerId).owners.map(o => <li key={o.buyerId}>{name(o.buyerId)} — {o.percentage}%</li>)}</ul>
+            <p>This will return {name(entry.playerId)} to NOT ENTERED. The prior auction revision will remain in audit history. This does not remove the golfer from the tournament or Calcutta roster.</p>
+            <div className={styles.actions}>
+              <button disabled={busy || Boolean(pending.current)} onClick={() => setClearReview(false)}>Cancel</button>
+              <button disabled={locked || dirty} onClick={() => save(false,true)}>Clear Auction Entry</button>
+            </div>
+          </section>}
+        </section>
       )}
       {invalid && <p role="alert">{invalid}</p>}
       <button

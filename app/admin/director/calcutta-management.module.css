@@ -165,3 +165,6 @@
 
 .workspace { min-width:0; max-width:100%; }
 .editor .scroll { width:100%; min-width:0; }
+
+.clearEntry { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #d9d3c4; }
+.clearEntry button { color: #812f26; background: transparent; }
