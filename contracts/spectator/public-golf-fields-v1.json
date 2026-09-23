@@ -1042,5 +1042,149 @@
         ]
       }
     ]
+  },
+  "guide": {
+    "contractVersion": true,
+    "tournamentId": true,
+    "publicationState": true,
+    "publishedAt": true,
+    "tournament": {
+      "tournamentId": true,
+      "year": true,
+      "name": true,
+      "editionTitle": true,
+      "dates": true,
+      "location": true,
+      "timeZone": true,
+      "logoAssetKey": true,
+      "heroAssetKey": true,
+      "mobileHeroAssetKey": true
+    },
+    "overview": [
+      {
+        "sectionId": true,
+        "slug": true,
+        "title": true,
+        "body": true,
+        "sortOrder": true
+      }
+    ],
+    "rules": {
+      "roundFormats": [
+        {
+          "roundNumber": true,
+          "format": true,
+          "name": true,
+          "teamSize": true,
+          "pointsAvailable": true,
+          "frontNineUsed": true,
+          "frontNinePoints": true,
+          "backNineUsed": true,
+          "backNinePoints": true,
+          "overallUsed": true,
+          "overallPoints": true,
+          "description": true,
+          "rules": true,
+          "handicapAllocation": true,
+          "handicap": true,
+          "handicapRules": true,
+          "playingHandicap": true,
+          "scoringFormat": true,
+          "scoring": true,
+          "matchFormat": true
+        }
+      ],
+      "items": [
+        {
+          "ruleId": true,
+          "category": true,
+          "subcategory": true,
+          "title": true,
+          "body": true,
+          "sortOrder": true,
+          "effectiveYear": true,
+          "important": true
+        }
+      ]
+    },
+    "courses": [
+      {
+        "courseId": true,
+        "name": true,
+        "city": true,
+        "state": true,
+        "location": true,
+        "yearOpened": true,
+        "designer": true,
+        "website": true,
+        "directionsUrl": true,
+        "logoAssetKey": true,
+        "profileAssetKey": true,
+        "overview": true,
+        "playingTips": true,
+        "signatureHoles": true,
+        "history": true,
+        "assignments": [
+          {
+            "assignmentId": true,
+            "roundNumber": true,
+            "format": true,
+            "tee": true,
+            "rating": true,
+            "slope": true,
+            "par": true,
+            "yardage": true,
+            "holes": [
+              {
+                "holeNumber": true,
+                "par": true,
+                "yardage": true,
+                "strokeIndex": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "archive": {
+    "tournaments": [
+      {
+        "tournamentId": true,
+        "year": true,
+        "name": true,
+        "editionTitle": true,
+        "destination": true,
+        "startDate": true,
+        "endDate": true,
+        "status": true,
+        "teams": [
+          {
+            "teamId": true,
+            "name": true,
+            "side": true,
+            "points": true
+          }
+        ],
+        "champion": {
+          "teamId": true,
+          "name": true,
+          "side": true,
+          "points": true
+        },
+        "runnerUp": {
+          "teamId": true,
+          "name": true,
+          "side": true,
+          "points": true
+        },
+        "finalScore": {
+          "teamOnePoints": true,
+          "teamTwoPoints": true,
+          "label": true
+        },
+        "detailAvailable": true
+      }
+    ]
   }
 }
