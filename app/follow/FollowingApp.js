@@ -18,28 +18,30 @@ function Badge({children}){return <span className={styles.badge}>{children}</spa
 export default function FollowingApp({route}){
   const router=useRouter(),query=useSearchParams();
   const [data,setData]=useState(null),[extra,setExtra]=useState(null),[error,setError]=useState(false),[now,setNow]=useState(()=>new Date());
+  const [golf,setGolf]=useState(null);
+  const golfResource=route.page==='matches'&&route.id?'match/'+encodeURIComponent(route.id):route.page==='players'&&route.id?'player/'+encodeURIComponent(route.id):route.page==='history'&&route.id?'history/'+route.id:null;
   const [reading,setReading]=useState(false);
   const pending=useRef(new Map());
   const resource=['odds','history','records'].includes(route.page)?route.page:null;
   const refresh=useCallback(async(signal)=>{
-    const key=resource||'tournament';
+    const key=golfResource||resource||'tournament';
     if(pending.current.has(key)&&!pending.current.get(key)?.aborted)return;
     pending.current.set(key,signal||null);
     setReading(true);
     try{
       const load=async name=>{const r=await fetch('/api/spectator/'+name,{credentials:'omit',cache:'no-store',signal});if(!r.ok)throw Error();return r.json();};
-      const [base,other]=await Promise.all([load('tournament'),resource?load(resource):null]);
-      setData(base);setExtra(other);setError(false);
+      const [base,other,expanded]=await Promise.all([load('tournament'),resource?load(resource):null,golfResource?load('golf/'+golfResource):null]);
+      setData(base);setExtra(other);setGolf(expanded?.data||null);setError(false);
     }catch(e){if(e.name!=='AbortError'){
       setError(true);
       // A failed publication read must not retain a previously published Odds snapshot.
-      setExtra(null);
+      setExtra(null);setGolf(null);
       // Scores may remain readable offline; unknown current portrait policy must fail closed.
       setData(previous=>previous?{...previous,players:previous.players.map(p=>({...p,portrait:null}))}:null);
     }}finally{pending.current.delete(key);if(!signal?.aborted)setReading(false);}
-  },[resource]);
+  },[resource,golfResource]);
   useEffect(()=>{
-    setExtra(null);
+    setExtra(null);setGolf(null);
     const control=new AbortController();refresh(control.signal);
     // One bounded refresh per visible minute, no per-match/player/hole polling.
     const timer=setInterval(()=>{setNow(new Date());if(document.visibilityState==='visible')refresh(control.signal);},60000);
@@ -79,7 +81,8 @@ export default function FollowingApp({route}){
   else if(route.page==='matches'){
     const m=matches.find(m=>m.id===route.id);content=m?<><button className={styles.back} onClick={()=>router.back()}>← Back</button><section className={styles.card}><div className={styles.row}><h2>Round {m.round} · Match {m.number}</h2><Badge>{m.scoreState}</Badge></div><p>{m.format} · {m.course.name} · {m.course.tee} · {formatHomeTime(m.teeTime)}</p>
       <div className={styles.grid}><div><h3>{teamName(1)}</h3>{m.team1.map(playerLink)}</div><div><h3>{teamName(2)}</h3>{m.team2.map(playerLink)}</div></div><p>{m.status==='Final'?m.finalResult:m.status==='Live'?m.liveResult:'Not started'}</p></section>
-      <section className={styles.card}><div className={styles.row}><h2>Scorecard</h2><Badge>Read-only</Badge></div>{m.holes.length?<><p>{m.scoreState==='Locked'?'Scoring is paused. Recorded scores remain visible.':'Scores appear after the server confirms them.'}</p><div className={styles.tableWrap}><table><caption className={styles.visuallyHidden}>Match scorecard · gross and net scores</caption><thead><tr><th>Hole</th><th>Par</th><th>SI</th><th>{teamName(1)}<small>Gross / Net</small></th><th>{teamName(2)}<small>Gross / Net</small></th></tr></thead><tbody>{m.holes.map(h=><tr key={h.number}><th>{h.number}</th><td>{shown(h.par)}</td><td>{shown(h.strokeIndex)}</td><td>{h.team1Gross?.join(', ')||'—'} / {shown(h.team1Net)}</td><td>{h.team2Gross?.join(', ')||'—'} / {shown(h.team2Net)}</td></tr>)}</tbody></table></div></>:<p>The scorecard is not available yet. Pairings and course preparation are still to come.</p>}</section></>:<p>This match is unavailable.</p>;
+      {golf?.match&&<GolfDetail data={golf.match} playerLink={playerLink} scoreState={m.scoreState}/>}
+      {!golf?.match&&<section className={styles.card}><div className={styles.row}><h2>Scorecard</h2><Badge>Read-only</Badge></div>{m.holes.length?<><p>{m.scoreState==='Locked'?'Scoring is paused. Recorded scores remain visible.':'Scores appear after the server confirms them.'}</p><div className={styles.tableWrap}><table><caption className={styles.visuallyHidden}>Match scorecard · gross and net scores</caption><thead><tr><th>Hole</th><th>Par</th><th>SI</th><th>{teamName(1)}<small>Gross / Net</small></th><th>{teamName(2)}<small>Gross / Net</small></th></tr></thead><tbody>{m.holes.map(h=><tr key={h.number}><th>{h.number}</th><td>{shown(h.par)}</td><td>{shown(h.strokeIndex)}</td><td>{h.team1Gross?.join(', ')||'—'} / {shown(h.team1Net)}</td><td>{h.team2Gross?.join(', ')||'—'} / {shown(h.team2Net)}</td></tr>)}</tbody></table></div></>:<p>The scorecard is not available yet. Pairings and course preparation are still to come.</p>}</section>}</>:<p>This match is unavailable.</p>;
   }else if(route.page==='leaders'){
     const tab=query.get('tab')==='players'?'players':'score',scope=['1','2','3'].includes(query.get('round'))?query.get('round'):'overall';
     const url=(t,r)=>`/follow/leaders?tab=${t}&round=${r}`;
@@ -88,16 +91,37 @@ export default function FollowingApp({route}){
     {tab==='score'?<section className={styles.card}><h2>{scope==='overall'?'Tournament Score':'Round '+scope}</h2>{(leaders.teams.find(t=>t.scope===scope)?.rows||[]).map(t=><div className={styles.standing} key={t.side}><b>{t.name}</b><strong>{shown(t.points)}</strong><small>{t.record}</small></div>)}</section>:<section className={styles.card}><h2>{scope==='overall'?'Overall':'Round '+scope} Player Leaders</h2>{scope==='3'&&!rounds.find(r=>r.number===3)?.paired?<p>Round 3 pairings have not been published.</p>:rows.length?rows.map((r,i)=><article className={styles.standing} key={r.id}><b>{r.rank??i+1}</b><div>{(r.playerIds||[r.id]).map(playerLink)}{r.entityType==='PAIRING'&&<small>Scramble pair</small>}</div><strong>{shown(r.points)} <small>pts</small></strong></article>):<p>This round has not started. Standings will appear as scores and results become available.</p>}</section>}</>;
   }else if(route.page==='players'&&!route.id)content=<section className={styles.card}>{players.map(p=>playerLink(p.id))}</section>;
   else if(route.page==='players'){
-    const p=player(route.id),stats=leaders.players.find(p=>p.id===route.id);content=p?<><button className={styles.back} onClick={()=>router.back()}>← Back</button><section className={`${styles.card} ${styles.profile}`}><Avatar player={p}/><span className={styles.eyebrow}>Player Passport</span><h2>{p.name}</h2><p>{teamName(p.teamSide)}</p><p>{shown(stats?.points)} points · {shown(stats?.wins)} wins · {shown(stats?.halves)} halves</p></section><h2>Tournament matches</h2>{matches.filter(m=>[...m.team1,...m.team2].includes(p.id)).map(matchCard)}</>:<p>This player is unavailable.</p>;
+    const p=player(route.id),stats=leaders.players.find(p=>p.id===route.id);content=p?<><button className={styles.back} onClick={()=>router.back()}>← Back</button><section className={`${styles.card} ${styles.profile}`}><Avatar player={p}/><span className={styles.eyebrow}>Player Passport</span><h2>{p.name}</h2><p>{teamName(p.teamSide)}</p><p>{shown(stats?.points)} points · {shown(stats?.wins)} wins · {shown(stats?.halves)} halves</p></section><h2>Tournament matches</h2>{matches.filter(m=>[...m.team1,...m.team2].includes(p.id)).map(matchCard)}{golf?.career&&<GolfCareer data={golf.career}/>}</>:<p>This player is unavailable.</p>;
   }else if(route.page==='more')content=<section className={styles.card}>{more.map(([id,label])=><Link className={styles.menuLink} key={id} href={'/follow/'+id}>{label}<span>›</span></Link>)}<button className={styles.signIn} onClick={signIn}>Participant Sign In</button></section>;
   else if(route.page==='schedule')content=Array.from(new Set(data.schedule.map(e=>e.date))).sort().map(date=><section className={styles.card} key={date}><h2>{formatHomeDateLabel(date)}</h2>{schedule(todaysSchedule(data.schedule,{now:new Date(date+'T16:00:00Z'),timeZone:tournament.timeZone}))}</section>);
   else if(route.page==='guide')content=<><section className={styles.hero}><h2>{tournament.edition}</h2><p>{tournament.location} · {tournament.dates}</p></section>{more.filter(([id])=>['schedule','courses','rules'].includes(id)).map(([id,label])=><Link className={`${styles.card} ${styles.menuLink}`} key={id} href={'/follow/'+id}>{label} →</Link>)}</>;
   else if(route.page==='courses')content=data.guide.courses.map(c=><section className={styles.card} key={c.id}><h2>{c.name}</h2><p>{c.location} · {c.designer}</p><p>{c.description}</p></section>);
   else if(route.page==='rules')content=<>{data.guide.formats.map(f=><section className={styles.card} key={f.id}><h2>{f.name}</h2>{f.description&&<p>{f.description}</p>}</section>)}{data.guide.rules.map(r=><section className={styles.card} key={r.title}><h3>{r.title}</h3><p>{r.body}</p></section>)}</>;
   else if(route.page==='odds')content=!extra?<p>{error?'Published Odds are temporarily unavailable.':'Loading published Odds…'}</p>:extra.publication.state!=='PUBLISHED'?<p>Odds have not been published.</p>:<><p>Published revision {extra.publication.revision}</p>{extra.snapshots.map(s=><section className={styles.card} key={s.phase}><h2>{s.label}</h2><p>{s.isCurrent?'Current publication':'Earlier publication'}</p>{s.teams.map(t=><div className={styles.standing} key={t.teamId}><AssetImage src={teams.find(a=>a.id===t.teamId)?.logo} alt="" width={48} height={48} className={styles.teamLogo} inferFallback={false} fallback={initials(t.name)}/><b>{t.name}</b><strong>{t.probability}%<small>{t.americanOdds}</small></strong></div>)}<h3>Player projections</h3>{s.players.map(p=><div className={styles.standing} key={p.playerId}>{playerLink(p.playerId)}<strong>{p.probability}%<small>{p.americanOdds}</small></strong></div>)}</section>)}</>;
-  else if(route.page==='history')content=extra?.tournaments?.map(t=><section className={styles.card} key={t.year}><span className={styles.eyebrow}>{t.year}</span><h2>{t.name}</h2><p>{t.status==='Final'?`${t.champion||'Tournament complete'} · ${t.finalScore||'Final score not recorded'}`:t.status}</p><details><summary>Player standings</summary>{t.players.map(p=><div className={styles.standing} key={p.id}><span>{p.name}</span><b>{shown(p.points)} pts</b><small>{shown(p.wins)}–{shown(p.losses)}–{shown(p.halves)}</small></div>)}</details></section>);
+  else if(route.page==='history'&&route.id)content=golf?<GolfHistory data={golf} matchId={query.get('match')}/>:<p>Loading historical scorecards…</p>;
+  else if(route.page==='history')content=extra?.tournaments?.map(t=><section className={styles.card} key={t.year}><span className={styles.eyebrow}>{t.year}</span><h2><Link href={'/follow/history/'+t.year}>{t.name} →</Link></h2><p>{t.status==='Final'?`${t.champion||'Tournament complete'} · ${t.finalScore||'Final score not recorded'}`:t.status}</p><details><summary>Player standings</summary>{t.players.map(p=><div className={styles.standing} key={p.id}><span>{p.name}</span><b>{shown(p.points)} pts</b><small>{shown(p.wins)}–{shown(p.losses)}–{shown(p.halves)}</small></div>)}</details></section>);
   else if(route.page==='records')content=extra?.categories?.map(c=><section className={styles.card} key={c.categoryId}><h2>{c.title||c.label}</h2>{c.records.map(r=><article className={styles.record} key={r.recordId}><h3>{r.title}</h3><strong>{r.valueDisplay||shown(r.value)}</strong>{r.holders?.map((h,i)=><p key={i}>{h.displayName||h.name}</p>)}</article>)}</section>);
   return <main className={styles.shell}><header className={styles.header}><Link href="/follow/today" className={styles.brand}>THE BAGGER</Link><span>FOLLOWING THE TOURNAMENT</span></header><div className={styles.content}><div className={styles.row}><h1>{heading}</h1><button className={styles.back} disabled={reading} onClick={()=>refresh()}>Refresh</button></div>
     {error&&<p className={styles.notice} role="status">Couldn’t refresh. These scores may be out of date. Check your connection and try again.</p>}{content}</div>
     <nav className={styles.bottom} aria-label="Tournament navigation">{nav.map(([id,label])=><Link href={'/follow/'+id} key={id} aria-current={route.page===id?'page':undefined}>{label}</Link>)}</nav></main>;
+}
+
+function GolfDetail({data,playerLink,scoreState}) {
+  return <section className={styles.card}><div className={styles.row}><h2>Scorecard</h2><Badge>Read-only</Badge></div><p>{scoreState==='Locked'?'Scoring is paused. Recorded scores remain visible.':'Scores appear after the server confirms them.'}</p><p>{data.course?.name} · {data.course?.tee} · Rating {shown(data.course?.rating)} / Slope {shown(data.course?.slope)}</p>
+    {data.teams.map(team=><div key={team.side}><h3>{team.name}</h3>{team.participants.map(p=><div key={p.playerId}>{playerLink(p.playerId)}<p>Course HCP {shown(p.courseHandicap)} · Playing HCP {shown(p.playingHandicap)} · Strokes {shown(p.strokesReceived)}</p></div>)}{data.round.format==='SC'&&<p>Pair Playing HCP {shown(team.playingHandicap)} · Strokes {shown(team.strokesReceived)}</p>}</div>)}
+    <p>Front: {data.flow?.front?.result || '—'} · Back: {data.flow?.back?.result || '—'} · Overall: {data.flow?.overall?.result || '—'}</p>
+    <div className={styles.tableWrap}><table><caption>Canonical hole scores and strokes</caption><thead><tr><th>Hole</th><th>SI</th><th>Side 1 gross / strokes</th><th>Side 2 gross / strokes</th><th>Result</th></tr></thead><tbody>{data.scorecard.holes.map(h=><tr key={h.holeNumber}><th>{h.holeNumber}</th><td>{shown(h.strokeIndex)}</td>{[h.sideOne,h.sideTwo].map(side=><td key={side.side}>{side.teamScore?`${shown(side.teamScore.gross)} / ${shown(side.teamScore.strokes)}`:side.playerScores.map(p=>`${shown(p.gross)} / ${shown(p.strokes)}`).join(' · ')}</td>)}<td>{h.resultLabel||'—'}</td></tr>)}</tbody></table></div>
+  </section>;
+}
+function GolfCareer({data}) {
+ return <><section className={styles.card}><h2>Career</h2><p>{data.summary.record.wins} wins · {data.summary.record.losses} losses · {data.summary.record.halves} halves</p><p>{shown(data.summary.record.points)} points · {data.summary.appearances} appearances · {data.summary.championships} championships</p></section>
+ <section className={styles.card}><h2>Tournament history</h2>{data.tournamentHistory.map((row,i)=><p key={i}>{row.year} · {row.teamName||row.team?.name} · {row.result} · {shown(row.record?.points)} points</p>)}</section>
+ <section className={styles.card}><h2>Career records</h2>{data.recordsHeld.length?data.recordsHeld.map(r=><p key={r.recordId}>{r.title}</p>):<p>No current records held.</p>}</section>
+ <section className={styles.card}><h2>Top partners</h2>{data.topPartners.map((r,i)=><p key={i}>{r.player?.displayName||r.displayName} · {shown(r.record?.points)} points</p>)}</section></>;
+}
+function GolfHistory({data,matchId}) {
+ const selected=data.matches.find(m=>m.matchId===matchId);
+ const cards=selected?data.scorecards.filter(c=>selected.scorecardIds.includes(c.scorecardId)):[];
+ return <><section className={styles.card}><h2>{data.tournament.name}</h2><p>{data.tournament.finalScore?.label||data.tournament.status}</p></section>
+ {selected?<><Link href={'/follow/history/'+data.tournament.year}>← Historical matches</Link><section className={styles.card}><h2>Historical scorecard</h2><p>{selected.format} · {selected.course?.name} · {selected.course?.tee}</p><p>{selected.result?.label||selected.result?.summary}</p><Badge>Read-only</Badge>{cards.map(c=><div key={c.scorecardId}><h3>{selected.sides.flatMap(s=>s.participants).find(p=>p.playerId===c.playerId)?.displayName||data.teams.find(t=>t.teamId===c.teamId)?.name}</h3><div className={styles.tableWrap}><table><thead><tr><th>Hole</th><th>Par</th><th>SI</th><th>Gross</th><th>Strokes</th><th>Net</th></tr></thead><tbody>{c.holes.map(h=><tr key={h.holeNumber}><th>{h.holeNumber}</th><td>{shown(h.par)}</td><td>{shown(h.strokeIndex)}</td><td>{shown(h.grossScore)}</td><td>{shown(h.strokesReceived)}</td><td>{shown(h.netScore)}</td></tr>)}</tbody></table></div></div>)}</section></>:data.matches.map(m=><Link className={styles.card} key={m.matchId} href={'/follow/history/'+data.tournament.year+'?match='+encodeURIComponent(m.matchId)}><h3>Round {data.rounds.find(r=>r.matchIds.includes(m.matchId))?.roundNumber} · Match {m.matchNumber}</h3><p>{m.course?.name} · {m.status}</p><p>View scorecard →</p></Link>)}</>;
 }

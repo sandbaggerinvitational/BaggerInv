@@ -1,0 +1,1046 @@
+{
+  "matches": {
+    "tournament": {
+      "tournamentId": true,
+      "name": true,
+      "year": true,
+      "status": true,
+      "currentRound": true,
+      "timeZone": true
+    },
+    "matches": [
+      {
+        "matchId": true,
+        "displayMatchNumber": true,
+        "round": {
+          "roundNumber": true,
+          "name": true,
+          "format": true
+        },
+        "status": true,
+        "course": {
+          "courseId": true,
+          "name": true,
+          "tee": true
+        },
+        "teeTime": {
+          "localTime": true,
+          "label": true,
+          "timeZone": true
+        },
+        "teams": [
+          {
+            "side": true,
+            "teamId": true,
+            "name": true,
+            "playingHandicap": true,
+            "strokesReceived": true,
+            "participants": [
+              {
+                "playerId": true,
+                "displayName": true,
+                "teamSide": true,
+                "playingHandicap": true,
+                "courseHandicap": true,
+                "strokesReceived": true
+              }
+            ]
+          }
+        ],
+        "progress": {
+          "currentHole": true
+        },
+        "result": {
+          "summary": true,
+          "winner": true,
+          "teamOnePoints": true,
+          "teamTwoPoints": true
+        }
+      }
+    ]
+  },
+  "match": {
+    "tournament": {
+      "status": true,
+      "year": true,
+      "timeZone": true,
+      "location": true,
+      "name": true,
+      "tournamentId": true
+    },
+    "historical": {
+      "tournamentId": true,
+      "year": true,
+      "matchId": true,
+      "finality": true,
+      "teamOnePoints": true,
+      "teamTwoPoints": true
+    },
+    "match": {
+      "status": true,
+      "displayMatchNumber": true,
+      "teams": [
+        {
+          "playingHandicap": true,
+          "participants": [
+            {
+              "playingHandicap": true,
+              "courseHandicap": true,
+              "playerId": true,
+              "strokesReceived": true,
+              "displayName": true,
+              "teamSide": true
+            }
+          ],
+          "side": true,
+          "strokesReceived": true,
+          "name": true,
+          "teamId": true
+        }
+      ],
+      "scorecard": {
+        "holes": [
+          {
+            "runningResult": true,
+            "sideOne": {
+              "netScore": true,
+              "side": true,
+              "playerScores": [
+                {
+                  "playerId": true,
+                  "strokes": true,
+                  "gross": true
+                }
+              ],
+              "teamScore": {
+                "strokes": true,
+                "gross": true
+              },
+              "scope": true
+            },
+            "holeNumber": true,
+            "resultLabel": true,
+            "official": true,
+            "updatedAt": true,
+            "yardage": true,
+            "state": true,
+            "sideTwo": {
+              "netScore": true,
+              "side": true,
+              "playerScores": [
+                {
+                  "playerId": true,
+                  "strokes": true,
+                  "gross": true
+                }
+              ],
+              "teamScore": {
+                "strokes": true,
+                "gross": true
+              },
+              "scope": true
+            },
+            "story": true,
+            "winningSide": true,
+            "par": true,
+            "strokeIndex": true
+          }
+        ],
+        "confirmedAt": true,
+        "complete": true,
+        "state": true
+      },
+      "freshness": {
+        "updatedAt": true,
+        "confirmedAt": true
+      },
+      "round": {
+        "formatName": true,
+        "roundNumber": true,
+        "name": true,
+        "format": true
+      },
+      "teeTime": {
+        "localTime": true,
+        "label": true,
+        "timeZone": true
+      },
+      "matchId": true,
+      "result": {
+        "summary": true,
+        "notation": true,
+        "winnerTeamId": true,
+        "winnerSide": true
+      },
+      "progress": {
+        "currentHole": true,
+        "holesPlayed": true,
+        "holesRemaining": true,
+        "statusText": true
+      },
+      "course": {
+        "tee": true,
+        "yardage": true,
+        "rating": true,
+        "courseId": true,
+        "name": true,
+        "par": true,
+        "slope": true
+      },
+      "stats": {
+        "holesPlayed": true,
+        "sideOneHolesWon": true,
+        "halved": true,
+        "sideTwoHolesWon": true,
+        "biggestLead": true,
+        "leadChanges": true,
+        "holesRemaining": true
+      },
+      "navigation": {
+        "nextMatchId": true,
+        "roundMatchIndex": true,
+        "previousMatchId": true,
+        "roundMatchCount": true
+      },
+      "clinch": {
+        "holeNumber": true,
+        "winnerSide": true,
+        "winnerTeamId": true,
+        "summary": true
+      },
+      "flow": {
+        "front": {
+          "status": true,
+          "winnerSide": true,
+          "result": true,
+          "holesRecorded": true
+        },
+        "back": {
+          "status": true,
+          "winnerSide": true,
+          "result": true,
+          "holesRecorded": true
+        },
+        "overall": {
+          "status": true,
+          "winnerSide": true,
+          "result": true,
+          "holesRecorded": true
+        }
+      }
+    }
+  },
+  "leaders": {
+    "tournament": {
+      "tournamentId": true,
+      "name": true,
+      "year": true,
+      "status": true,
+      "currentRound": true,
+      "timeZone": true
+    },
+    "teamStandings": [
+      {
+        "rank": true,
+        "teamId": true,
+        "name": true,
+        "points": true,
+        "record": true,
+        "remainingMatches": true
+      }
+    ],
+    "roundStandings": [
+      {
+        "format": true,
+        "formatDisplayName": true,
+        "course": {
+          "courseId": true,
+          "name": true,
+          "tee": true
+        },
+        "roundNumber": true,
+        "roundName": true,
+        "status": true,
+        "teamStandings": [
+          {
+            "rank": true,
+            "teamId": true,
+            "name": true,
+            "points": true,
+            "record": true,
+            "remainingMatches": true
+          }
+        ]
+      }
+    ],
+    "playerIntelligence": {
+      "metrics": [
+        {
+          "id": true,
+          "label": true,
+          "direction": true
+        }
+      ],
+      "overall": {
+        "players": [
+          {
+            "playerId": true,
+            "displayName": true,
+            "team": {
+              "teamId": true,
+              "name": true
+            },
+            "points": true,
+            "wins": true,
+            "losses": true,
+            "halves": true,
+            "matchesPlayed": true,
+            "record": true,
+            "winPct": true,
+            "grossAvg": true,
+            "netAvg": true,
+            "matchIds": [
+              true
+            ]
+          }
+        ],
+        "rankings": [
+          {
+            "metric": true,
+            "order": [
+              {
+                "playerId": true,
+                "rank": true,
+                "tied": true
+              }
+            ]
+          }
+        ]
+      },
+      "rounds": [
+        {
+          "roundNumber": true,
+          "players": [
+            {
+              "playerId": true,
+              "displayName": true,
+              "team": {
+                "teamId": true,
+                "name": true
+              },
+              "points": true,
+              "wins": true,
+              "losses": true,
+              "halves": true,
+              "matchesPlayed": true,
+              "record": true,
+              "winPct": true,
+              "grossAvg": true,
+              "netAvg": true,
+              "matchIds": [
+                true
+              ]
+            }
+          ],
+          "rankings": [
+            {
+              "metric": true,
+              "order": [
+                {
+                  "playerId": true,
+                  "rank": true,
+                  "tied": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "matchReferences": [
+        {
+          "matchId": true,
+          "roundNumber": true,
+          "displayMatchNumber": true,
+          "participantIds": [
+            true
+          ]
+        }
+      ]
+    },
+    "playerRoundPerformance": [
+      {
+        "playerId": true,
+        "roundNumber": true,
+        "format": true,
+        "matchId": true,
+        "displayMatchNumber": true,
+        "status": true,
+        "official": true,
+        "team": {
+          "teamId": true,
+          "name": true
+        },
+        "opponent": {
+          "teamId": true,
+          "name": true
+        },
+        "sidePlayers": [
+          {
+            "playerId": true,
+            "displayName": true,
+            "slot": true
+          }
+        ],
+        "opponents": [
+          {
+            "playerId": true,
+            "displayName": true,
+            "slot": true
+          }
+        ],
+        "partner": {
+          "playerId": true,
+          "displayName": true,
+          "slot": true
+        },
+        "segments": [
+          {
+            "id": true,
+            "label": true,
+            "state": true,
+            "display": true,
+            "descriptiveOnly": true,
+            "official": true,
+            "winnerTeamId": true
+          }
+        ],
+        "pointsEarned": true,
+        "scores": {
+          "scope": true,
+          "state": true,
+          "grossScore": true,
+          "netScore": true
+        },
+        "scorecard": {
+          "tournamentId": true,
+          "netBasis": true,
+          "matchStrokes": true,
+          "summary": {
+            "out": {
+              "par": true,
+              "gross": true,
+              "net": true
+            },
+            "in": {
+              "par": true,
+              "gross": true,
+              "net": true
+            },
+            "total": {
+              "par": true,
+              "gross": true,
+              "net": true
+            }
+          },
+          "roundNumber": true,
+          "matchId": true,
+          "format": true,
+          "scope": true,
+          "playerId": true,
+          "team": {
+            "teamId": true,
+            "name": true
+          },
+          "players": [
+            {
+              "playerId": true,
+              "displayName": true,
+              "slot": true
+            }
+          ],
+          "course": {
+            "courseId": true,
+            "name": true,
+            "tee": true
+          },
+          "state": true,
+          "official": true,
+          "complete": true,
+          "holes": [
+            {
+              "holeNumber": true,
+              "par": true,
+              "gross": true,
+              "appliedStrokes": true,
+              "net": true
+            }
+          ],
+          "totals": {
+            "frontGross": true,
+            "backGross": true,
+            "frontNet": true,
+            "backNet": true,
+            "totalGross": true,
+            "totalNet": true
+          }
+        }
+      }
+    ],
+    "r1RoundCompetition": {
+      "roundNumber": true,
+      "format": true,
+      "rows": [
+        {
+          "playerId": true,
+          "rank": true,
+          "tied": true,
+          "points": true,
+          "netScore": true,
+          "officialFinal": true
+        }
+      ]
+    },
+    "r2PairCompetition": {
+      "roundNumber": true,
+      "format": true,
+      "netBasis": true,
+      "rows": [
+        {
+          "pairId": true,
+          "matchId": true,
+          "displayMatchNumber": true,
+          "team": {
+            "teamId": true,
+            "name": true
+          },
+          "players": [
+            {
+              "playerId": true,
+              "displayName": true,
+              "slot": true
+            }
+          ],
+          "rank": true,
+          "tied": true,
+          "points": true,
+          "teamNetScore": true,
+          "status": true,
+          "officialFinal": true
+        }
+      ]
+    },
+    "r3RoundCompetition": {
+      "roundNumber": true,
+      "format": true,
+      "netBasis": true,
+      "rows": [
+        {
+          "playerId": true,
+          "displayName": true,
+          "matchId": true,
+          "roundNumber": true,
+          "displayMatchNumber": true,
+          "team": {
+            "teamId": true,
+            "name": true
+          },
+          "fieldOrder": true,
+          "status": true,
+          "officialFinal": true,
+          "rank": true,
+          "tied": true,
+          "points": true,
+          "netScore": true,
+          "availability": true
+        }
+      ]
+    },
+    "playerStandings": [
+      {
+        "rank": true,
+        "playerId": true,
+        "displayName": true,
+        "team": {
+          "teamId": true,
+          "name": true
+        },
+        "points": true,
+        "record": true
+      }
+    ]
+  },
+  "player": {
+    "contractVersion": true,
+    "player": {
+      "playerId": true,
+      "displayName": true,
+      "careerYears": {
+        "firstYear": true,
+        "lastYear": true,
+        "current": true
+      },
+      "portraitAssetKey": true,
+      "team": {
+        "teamId": true,
+        "name": true,
+        "side": true
+      }
+    },
+    "currentTournament": {
+      "tournamentId": true,
+      "name": true,
+      "year": true,
+      "status": true,
+      "currentRound": true,
+      "tournamentHandicap": true,
+      "team": {
+        "teamId": true,
+        "name": true,
+        "side": true
+      },
+      "record": {
+        "wins": true,
+        "losses": true,
+        "halves": true,
+        "points": true
+      },
+      "standing": true,
+      "teamStanding": true,
+      "rounds": [
+        {
+          "roundNumber": true,
+          "format": true,
+          "status": true,
+          "throughHole": true,
+          "holesPlayed": true,
+          "scoringEntity": true,
+          "gross": true,
+          "net": true,
+          "rank": true,
+          "tied": true,
+          "points": true
+        }
+      ]
+    },
+    "career": {
+      "summary": {
+        "record": {
+          "wins": true,
+          "losses": true,
+          "halves": true,
+          "matches": true,
+          "points": true,
+          "recordedPointMatches": true
+        },
+        "winPercentage": true,
+        "appearances": true,
+        "championships": true,
+        "runnerUpFinishes": true,
+        "averageHandicap": true
+      },
+      "honors": {
+        "championshipYears": [
+          true
+        ],
+        "sandbaggerOfYearYears": [
+          true
+        ],
+        "pointsChampionYears": [
+          true
+        ]
+      },
+      "rankings": [
+        {
+          "metric": true,
+          "rank": true
+        }
+      ],
+      "holePerformance": {
+        "sample": {
+          "completeScorecards": true,
+          "scoringHoles": true,
+          "matchPlayHoles": true
+        },
+        "totalHolesPlayed": true,
+        "holesWon": true,
+        "holesLost": true,
+        "holesHalved": true,
+        "holeDifferential": true,
+        "frontNineHolesWon": true,
+        "backNineHolesWon": true,
+        "closingHolesWon": true,
+        "birdies": true,
+        "eagles": true,
+        "pars": true,
+        "bogeys": true,
+        "doubleBogeysOrWorse": true,
+        "averageGrossScore": true,
+        "averageNetScore": true,
+        "averagePar3Score": true,
+        "averagePar4Score": true,
+        "averagePar5Score": true,
+        "averageFrontNineScore": true,
+        "averageBackNineScore": true,
+        "birdieRate": true,
+        "parRate": true,
+        "bogeyRate": true,
+        "doubleBogeyOrWorseRate": true
+      },
+      "matchProgression": {
+        "matches": true,
+        "largestLeadHeld": true,
+        "largestComebackCompleted": true,
+        "matchesWonAfterTrailing": true,
+        "largestLeadBlown": true,
+        "mostLeadChangesExperienced": true,
+        "totalLeadChangesExperienced": true,
+        "mostConsecutiveHolesWon": true,
+        "mostConsecutiveHolesLost": true,
+        "mostClosingHolesWon": true,
+        "totalClosingHolesWon": true,
+        "frontNine": {
+          "won": true,
+          "lost": true,
+          "halved": true
+        },
+        "backNine": {
+          "won": true,
+          "lost": true,
+          "halved": true
+        },
+        "closing": {
+          "won": true,
+          "lost": true,
+          "halved": true
+        }
+      },
+      "tournamentHistory": [
+        {
+          "tournamentId": true,
+          "year": true,
+          "team": {
+            "teamId": true,
+            "name": true,
+            "side": true
+          },
+          "result": true,
+          "record": {
+            "wins": true,
+            "losses": true,
+            "halves": true,
+            "matches": true,
+            "points": true,
+            "recordedPointMatches": true
+          },
+          "points": true,
+          "averageScore": true,
+          "scorecardSample": true,
+          "wasCaptain": true,
+          "honors": [
+            true
+          ]
+        }
+      ],
+      "formatPerformance": [
+        {
+          "format": true,
+          "label": true,
+          "scoringLabel": true,
+          "record": {
+            "wins": true,
+            "losses": true,
+            "halves": true,
+            "matches": true,
+            "points": true,
+            "recordedPointMatches": true
+          },
+          "winPercentage": true,
+          "scoringAverage": true,
+          "scoringSample": true,
+          "firstYear": true,
+          "latestYear": true,
+          "matches": [
+            {
+              "matchId": true,
+              "year": true,
+              "roundNumber": true,
+              "matchNumber": true,
+              "outcome": true,
+              "partner": [
+                {
+                  "playerId": true,
+                  "displayName": true
+                }
+              ],
+              "opponents": [
+                {
+                  "playerId": true,
+                  "displayName": true
+                }
+              ],
+              "team": {
+                "teamId": true,
+                "name": true,
+                "side": true
+              },
+              "opposingTeam": {
+                "teamId": true,
+                "name": true,
+                "side": true
+              },
+              "winner": true,
+              "winnerSide": true,
+              "course": {
+                "courseId": true,
+                "name": true
+              },
+              "segments": [
+                {
+                  "label": true,
+                  "winner": true,
+                  "winnerSide": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "recordsHeld": [
+        {
+          "recordId": true,
+          "title": true
+        }
+      ],
+      "captainLegacy": {
+        "record": {
+          "wins": true,
+          "losses": true,
+          "halves": true,
+          "matches": true,
+          "points": true,
+          "recordedPointMatches": true
+        },
+        "championships": true,
+        "seasons": [
+          {
+            "year": true,
+            "team": {
+              "teamId": true,
+              "name": true,
+              "side": true
+            },
+            "result": true
+          }
+        ]
+      },
+      "biggestRival": {
+        "player": {
+          "playerId": true,
+          "displayName": true
+        },
+        "record": {
+          "wins": true,
+          "losses": true,
+          "halves": true,
+          "matches": true,
+          "points": true,
+          "recordedPointMatches": true
+        }
+      },
+      "draftHistory": [
+        {
+          "year": true,
+          "pick": true,
+          "teamName": true,
+          "finish": true,
+          "draftValueScore": true
+        }
+      ],
+      "topPartners": [
+        {
+          "rank": true,
+          "tied": true,
+          "player": {
+            "playerId": true,
+            "displayName": true
+          },
+          "record": {
+            "wins": true,
+            "losses": true,
+            "halves": true,
+            "matches": true,
+            "points": true,
+            "recordedPointMatches": true
+          }
+        }
+      ]
+    }
+  },
+  "history": {
+    "tournament": {
+      "tournamentId": true,
+      "year": true,
+      "name": true,
+      "editionTitle": true,
+      "destination": true,
+      "startDate": true,
+      "endDate": true,
+      "status": true,
+      "teams": [
+        {
+          "teamId": true,
+          "name": true,
+          "side": true,
+          "points": true
+        }
+      ],
+      "champion": {
+        "teamId": true,
+        "name": true,
+        "side": true,
+        "points": true
+      },
+      "runnerUp": {
+        "teamId": true,
+        "name": true,
+        "side": true,
+        "points": true
+      },
+      "finalScore": {
+        "teamOnePoints": true,
+        "teamTwoPoints": true,
+        "label": true
+      },
+      "detailAvailable": true
+    },
+    "teams": [
+      {
+        "teamId": true,
+        "name": true,
+        "side": true,
+        "points": true,
+        "captain": {
+          "playerId": true,
+          "displayName": true
+        },
+        "averageHandicap": true,
+        "roster": [
+          {
+            "playerId": true,
+            "displayName": true,
+            "handicap": true,
+            "isCaptain": true
+          }
+        ]
+      }
+    ],
+    "rounds": [
+      {
+        "roundNumber": true,
+        "name": true,
+        "status": true,
+        "format": true,
+        "course": {
+          "courseId": true,
+          "name": true,
+          "location": true,
+          "tee": true,
+          "par": true,
+          "yardage": true
+        },
+        "teamStandings": [
+          {
+            "teamId": true,
+            "name": true,
+            "side": true,
+            "points": true
+          }
+        ],
+        "matchIds": [
+          true
+        ]
+      }
+    ],
+    "matches": [
+      {
+        "matchId": true,
+        "matchNumber": true,
+        "status": true,
+        "format": true,
+        "course": {
+          "courseId": true,
+          "name": true,
+          "location": true,
+          "tee": true,
+          "par": true,
+          "yardage": true
+        },
+        "sides": [
+          {
+            "side": true,
+            "participants": [
+              {
+                "playerId": true,
+                "displayName": true
+              }
+            ]
+          }
+        ],
+        "result": {
+          "summary": true,
+          "winner": true,
+          "teamOnePoints": true,
+          "teamTwoPoints": true
+        },
+        "scorecardIds": [
+          true
+        ]
+      }
+    ],
+    "standings": [
+      {
+        "rank": true,
+        "playerId": true,
+        "displayName": true,
+        "teamName": true,
+        "points": true,
+        "wins": true,
+        "losses": true,
+        "ties": true
+      }
+    ],
+    "awards": [
+      {
+        "awardId": true,
+        "title": true,
+        "recipient": true,
+        "playerId": true
+      }
+    ],
+    "scorecards": [
+      {
+        "scorecardId": true,
+        "matchId": true,
+        "entityType": true,
+        "playerId": true,
+        "teamId": true,
+        "participantPlayerIds": [
+          true
+        ],
+        "status": true,
+        "grossTotal": true,
+        "netTotal": true,
+        "holes": [
+          {
+            "holeNumber": true,
+            "grossScore": true,
+            "par": true,
+            "strokeIndex": true,
+            "strokesReceived": true,
+            "netScore": true
+          }
+        ]
+      }
+    ]
+  }
+}
