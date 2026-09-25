@@ -77,6 +77,25 @@ test('atomic round scoring: installed lifecycle contracts and isolated transacti
  insert into scoring_authority.tournament_setup_round_courses_v1(tournament_id,round_number,course_id,tee_id,setup_revision,updated_by_player_id)select '2026',r,'COURSE-1','Tournament',1,'CB01' from generate_series(1,3)r;`);
  // Use fresh hosted definitions verbatim, not a replacement round-specific match implementation.
  for(const f of ['production_control.match_scoring_context_readiness_v1','production_control.match_resume_context_hash_v1','production_control.assert_production_match_scoring_ready_v1','production_control.assert_production_match_resume_ready_v1','public.mutate_production_match_control'])sqlFile(c,db,root+'test/fixtures/round-scoring-installed/'+f+'.sql');
+ // Retain the installed first-write audit trigger in lifecycle tests. The
+ // earlier reduced fixture omitted it and could not detect self-invalidating
+ // activation bookkeeping. The exact full runtime guard is also exercised by
+ // the incident's isolated capture/replay (no real match operations).
+ sql(c,db,`create table production_control.cutover_activation_state(
+ scope_key text primary key,state text,current_authority text,scoring_ingress_enabled boolean,
+ authority_generation_id uuid,activation_revision bigint,first_supabase_write_observed_at timestamptz,
+ first_supabase_mutation_key text,first_supabase_match_id text,first_supabase_match_revision bigint,updated_at timestamptz);
+ insert into production_control.cutover_activation_state values('BAGGER_INV_PRODUCTION','SCORING_COMMITTED','SUPABASE',true,'30000000-0000-4000-8000-000000000001',234,null,null,null,null,now());
+ create table scoring_authority.ingress_gates(tournament_id text,state text,authority text,active_epoch_id uuid);
+ insert into scoring_authority.ingress_gates values('2026','OPEN','SUPABASE','30000000-0000-4000-8000-000000000001');
+ create table production_control.operation_audit_events(event_type text,domain text,tournament_id text,actor text,request_fingerprint text,result text,details jsonb);
+ alter function production_control.assert_production_scoring_runtime(jsonb,text) rename to fixture_scoring_scope_before_first_write;
+ create function production_control.assert_production_scoring_runtime(input jsonb,required_worker text default null) returns void language plpgsql as $$begin
+ perform production_control.fixture_scoring_scope_before_first_write(input,required_worker);
+ if (select activation_revision from production_control.cutover_activation_state where scope_key='BAGGER_INV_PRODUCTION')<>234 then
+ raise exception using errcode='55000',message='PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_REQUIRED';end if;end$$;`);
+ sqlFile(c,db,mig+'202609250118_production_first_write_audit_revision_v1.sql');
+ sql(c,db,`create trigger capture_first_production_canonical_write after insert on scoring_authority.score_mutations for each row execute function production_control.capture_first_production_canonical_write();`);
  const tables=['matches','scoring_permissions','hole_scores','score_mutations','score_revision_history','audit_events','google_outbox_events'];
  const digest=()=>sql(c,db,`select jsonb_build_array(${tables.map(n=>`(select coalesce(jsonb_agg(to_jsonb(x) order by to_jsonb(x)::text),'[]') from scoring_authority.${n} x)`).join(',')});`);
  const beforeInstall=digest();sqlFile(c,db,mig+'202609220108_atomic_round_scoring_v1.sql');assert.equal(digest(),beforeInstall);
@@ -98,6 +117,14 @@ test('atomic round scoring: installed lifecycle contracts and isolated transacti
  const preserve=()=>sql(c,db,`select jsonb_build_object('scores',(select jsonb_agg(to_jsonb(s) order by match_id,hole_number) from scoring_authority.hole_scores s),'context',(select jsonb_agg(to_jsonb(s) order by snapshot_id) from scoring_authority.scoring_snapshots s),'results',(select jsonb_agg(jsonb_build_array(match_id,running_result,result_winner,scored_holes) order by match_id)from scoring_authority.matches));`);
  const visuals={pristine:state(1),r3:state(3)};
  const pristine=digest();run(bin.createdb,['-T',db,'round_pristine'],{env:environment(c)});
+ await t.test('historical first-write trigger reproduces atomic abort without partial state',()=>{
+ const old=extract(mig+'202608240019_production_cutover_activation.sql','create or replace function production_control.capture_first_production_canonical_write()');
+ const i=input(1,'OPEN');const rows=sql(c,db,`begin;${old}${statement(i)}select activation_revision from production_control.cutover_activation_state;select count(*) from production_control.operation_audit_events;select count(*) from scoring_authority.score_mutations;rollback;`).split('\n');
+ assert.equal(JSON.parse(rows[0]).code,'ROUND_TRANSACTION_ABORTED');assert.equal(JSON.parse(rows[0]).failures[0].matchId,'2026-R1-1');assert.deepEqual(rows.slice(1),['234','0','0']);assert.equal(digest(),pristine);
+ });
+ await t.test('activation mismatch remains denied; repair does not weaken release guard',()=>{
+ assert.throws(()=>sql(c,db,`begin;update production_control.cutover_activation_state set activation_revision=235;${statement(input(1,'OPEN'))}rollback;`),/PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_REQUIRED/);assert.equal(digest(),pristine);
+ });
  for(const r of [1,2,3])await t.test(`R${r} complete canonical round is READY`,()=>assert.equal(state(r).actions.OPEN.allowed,true,JSON.stringify(state(r).actions.OPEN)));
  for(const [name,setup,r=1] of [
  ['one not ready',"delete from scoring_authority.match_holes where match_id='2026-R1-6' and hole_number=18;"],
@@ -126,6 +153,9 @@ test('atomic round scoring: installed lifecycle contracts and isolated transacti
  });
  for(const r of [1,2,3])await t.test(`R${r} atomic Open; timeout retry; Lock; Resume`,()=>{
  const i=input(r,'OPEN');const opened=call(i);assert.equal(opened.ok,true,JSON.stringify(opened));assert.equal(opened.data.summary.live,r===3?12:6);assert.equal(opened.data.summary.accessActive,r===3?12:6);
+ assert.equal(sql(c,db,'select activation_revision from production_control.cutover_activation_state;'),'234');
+ assert.equal(sql(c,db,'select count(*) from production_control.operation_audit_events;'),'1','first-write evidence recorded once');
+ assert.equal(sql(c,db,"select first_supabase_write_observed_at is not null and first_supabase_mutation_key is not null from production_control.cutover_activation_state;"),'t');
  if(r===1)visuals.open=state(1);
  const committed=digest();assert.equal(call(i).idempotent,true);assert.equal(digest(),committed);assert.equal(state(r).history.length,1);
  assert.equal(call({...i,operation:'LOCK'}).code,'ROUND_IDEMPOTENCY_CONFLICT');
