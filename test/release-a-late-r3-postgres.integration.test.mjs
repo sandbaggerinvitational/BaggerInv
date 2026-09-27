@@ -135,6 +135,7 @@ test('Release A: real finalized pairing/prepare bodies and Calcutta source/trigg
   assert.equal(save(rows[0]).ok,false,'baseline auction guard rejects first R3 setup');
   const before095=sql(c,db,`select md5(prosrc) from pg_proc where oid='public.mutate_production_round_pairings_v1(jsonb)'::regprocedure`);
   sqlFile(c,db,file('202609090097_production_late_r3_initialization_v1.sql'));
+  sqlFile(c,db,file('202609270120_bounded_late_r3_result_compatibility_v1.sql'));
   // Certify Release A unchanged with the inert entry-only successor installed.
   sqlFile(c,db,file('202609090098_production_net_skins_entries_v1.sql'));
   // Reduced lifecycle fixture: install the exact 099 shared projection and
@@ -198,6 +199,42 @@ test('Release A: real finalized pairing/prepare bodies and Calcutta source/trigg
     update scoring_authority.calcutta_v1_current set result_revision=1,state='IN_PROGRESS',publication_state='PUBLISHED',publication_revision=1,publication_revision_id='20000000-0000-4000-8000-000000000003';
   `);
 
+  await t.test('ineligible result returns before planning any historical compatibility fingerprint',()=>{
+    const x=scenario();seedResult(x);
+    const id=x.s('select result_id from scoring_authority.calcutta_v1_result_revisions where is_current');
+    x.s(`create or replace function production_control.late_r3_financial_fingerprint_v1()
+      returns text language plpgsql stable security definer set search_path='pg_catalog' as $$
+      begin raise exception 'INELIGIBLE_RESULT_MUST_NOT_EVALUATE_HISTORY';end$$;
+      create or replace function production_control.late_r3_consumed_fingerprint_v1()
+      returns text language plpgsql stable security definer set search_path='pg_catalog' as $$
+      begin raise exception 'INELIGIBLE_RESULT_MUST_NOT_EVALUATE_HISTORY';end$$;`);
+    for(const target of [`'${id}'::uuid`, `'00000000-0000-4000-8000-000000000099'::uuid`, 'null::uuid']) {
+      assert.equal(x.s(`select production_control.late_r3_result_compatible_v1(${target},repeat('a',64))`),'f');
+    }
+  });
+  await t.test('superseded result with an old receipt avoids historical fingerprint planning',()=>{
+    const x=scenario();seedResult(x);assert.equal(x.pair(rows[0]).ok,true);
+    const id=x.s('select result_id from scoring_authority.calcutta_v1_result_revisions where is_current');
+    x.s(`update scoring_authority.calcutta_v1_result_revisions set is_current=false,superseded_at=now() where result_id='${id}';
+      create or replace function production_control.late_r3_consumed_fingerprint_v1()
+      returns text language plpgsql stable security definer set search_path='pg_catalog' as $$
+      begin raise exception 'SUPERSEDED_RESULT_MUST_NOT_EVALUATE_HISTORY';end$$;`);
+    assert.equal(x.s(`select production_control.late_r3_result_compatible_v1('${id}',repeat('a',64))`),'f');
+  });
+  await t.test('multiple receipts preserve existential compatibility and null-source denial',()=>{
+    const x=scenario();seedResult(x);assert.equal(x.pair(rows[0]).ok,true);
+    x.s(`insert into production_control.late_r3_calcutta_compatibility_v1(
+      tournament_id,operation_request_id,operation,match_ids,source_before,source_after,
+      source_before_fingerprint,source_after_fingerprint,result_id,original_result_source_fingerprint,
+      consumed_fingerprint,financial_fingerprint,policy)
+      select tournament_id,gen_random_uuid(),operation,match_ids,source_before,source_after,
+      source_before_fingerprint,source_after_fingerprint,result_id,original_result_source_fingerprint,
+      repeat('0',64),repeat('0',64),policy from production_control.late_r3_calcutta_compatibility_v1 limit 1;`);
+    const call=source=>x.s(`select production_control.late_r3_result_compatible_v1(result_id,${source})
+      from scoring_authority.calcutta_v1_result_revisions where is_current`);
+    assert.equal(call("production_control.calcutta_v1_hash(production_control.calcutta_v1_source_revision('2026'))"),'t');
+    assert.equal(call('null'),'f');
+  });
   await t.test('unchanged 096 read envelope reaches Director R3 review and receipt-bound preparation with an auction',()=>{
     const x=scenario();
     const read=()=>normalizeProductionTournamentSetupPayload(rpc(c,x.database,'read_production_tournament_setup_v1',scope('READ_PRODUCTION_TOURNAMENT_SETUP_V1')));
