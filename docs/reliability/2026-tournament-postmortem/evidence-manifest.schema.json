@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proposed release evidence manifest",
+  "type": "object",
+  "required": [
+    "release",
+    "activation",
+    "backendSha",
+    "native",
+    "database",
+    "contracts",
+    "fixture",
+    "suites",
+    "physicalDevices",
+    "performance",
+    "limitations",
+    "artifacts",
+    "createdAt"
+  ],
+  "properties": {
+    "release": {
+      "type": "integer"
+    },
+    "activation": {
+      "type": "integer"
+    },
+    "backendSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "native": {
+      "type": "object",
+      "required": [
+        "version",
+        "build",
+        "sha"
+      ]
+    },
+    "database": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "functionManifest"
+      ]
+    },
+    "contracts": {
+      "type": "object"
+    },
+    "fixture": {
+      "type": "object",
+      "required": [
+        "version",
+        "seed",
+        "hash"
+      ]
+    },
+    "suites": {
+      "type": "array"
+    },
+    "physicalDevices": {
+      "type": "array"
+    },
+    "performance": {
+      "type": "object",
+      "required": [
+        "environment",
+        "compute",
+        "dataset",
+        "sampleCount",
+        "artifact"
+      ]
+    },
+    "limitations": {
+      "type": "array"
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "uri",
+          "sha256",
+          "proofLayer",
+          "result",
+          "limitations"
+        ]
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "description": "Structure only. Semantic verifier separately enforces required proof, freshness, physical scope and no secret content."
+}

@@ -1,0 +1,3107 @@
+[
+  {
+    "id": "NA-2026-001",
+    "incident_ids": [
+      "2026-INC-001"
+    ],
+    "requirement_ids": [
+      "CERT-NA-001",
+      "B11-READ-005"
+    ],
+    "old_failure": "Tournament schedule/day presentation did not consistently derive the live clock, day boundary, and schedule status from the published IANA tournament timezone. The recovered code centralizes published timezone selection, IANA conversion, and a mounted minute/focus/visibility clock.",
+    "expected_new_behavior": "Tournament-zone day, countdown and status stay correct while mounted across midnight, device-zone mismatch and focus return; lifecycle authority does not change.",
+    "layer": [
+      "UNIT",
+      "PWA_BROWSER",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-002",
+    "incident_ids": [
+      "2026-INC-002"
+    ],
+    "requirement_ids": [
+      "CERT-NA-001",
+      "B11-NAV-005"
+    ],
+    "old_failure": "The authoritative Game Center view supplied tournament-wide previous/next IDs while its index/count were round-scoped. The spectator adapter copied both into a native DTO whose endpoint invariants require no previous at round index 1 and no next at round index count.",
+    "expected_new_behavior": "First/interior/last previous-next links target the same round and correct canonical match for paired and unpaired cases.",
+    "layer": [
+      "SIMULATOR",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-003",
+    "incident_ids": [
+      "2026-INC-003"
+    ],
+    "requirement_ids": [
+      "CERT-NA-001",
+      "B11-READ-006"
+    ],
+    "old_failure": "The Release window selected dark appearance for signed-out state. A nested light preference did not override the window, and inset-grouped List rows remained system-adaptive while Bagger text/icon colors were fixed. The DEBUG gallery forced outer light appearance and masked the defect.",
+    "expected_new_behavior": "The shipping root remains legible in light/dark and large text; the fixture does not conceal the production appearance hierarchy.",
+    "layer": [
+      "SIMULATOR",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-004",
+    "incident_ids": [
+      "2026-INC-004"
+    ],
+    "requirement_ids": [
+      "CERT-NA-001",
+      "B11-READ-003",
+      "B11-READ-004",
+      "B11-READ-007"
+    ],
+    "old_failure": "Today required serial tournament and Leaders reads but had no distinct initial-loading state, so empty nonfailed state rendered unavailable. The unavailable Try Again callback refreshed only Leaders even though tournament was also required.",
+    "expected_new_behavior": "Initial reads remain Loading until resolved; failure/retry of either tournament or Leaders resource refreshes the needed resource and preserves navigation.",
+    "layer": [
+      "SIMULATOR",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Historical cause UNKNOWN: reproduce documented symptom/fault containment, not a claimed exact root cause",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-005",
+    "incident_ids": [
+      "2026-INC-005"
+    ],
+    "requirement_ids": [
+      "CERT-001",
+      "CERT-NA-001",
+      "CERT-PHY-001",
+      "B11-SCORE-007",
+      "B11-SCORE-008"
+    ],
+    "old_failure": "The scoring DTO carries per-hole strokes only inside persisted score rows. Score Entry derives badge values from officialHole(holeNumber); an unscored hole has no row, so canonicalStrokes is nil and the positive-only badge rule renders nothing. Match-level stroke totals exist, but no pre-entry 18-hole allocation matrix reaches this view.",
+    "expected_new_behavior": "Before any score exists, every displayed hole stroke badge matches the canonical server allocation across formats/handicaps; saved canonical scoring remains unchanged.",
+    "layer": [
+      "SIMULATOR",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-006",
+    "incident_ids": [
+      "2026-INC-006"
+    ],
+    "requirement_ids": [
+      "OBS-CORE-001",
+      "CERT-001",
+      "BE-CONTRACT-001",
+      "PWA-001",
+      "CERT-NA-001",
+      "CERT-PHY-001",
+      "CERT-IMPACT-001",
+      "B11-NAV-004",
+      "B11-SCORE-001",
+      "B11-SCORE-002",
+      "B11-SCORE-003",
+      "B11-SCORE-004",
+      "B11-SCORE-005",
+      "B11-SCORE-006",
+      "B11-READ-007"
+    ],
+    "old_failure": "JSON secondsSince1970 can change a fractional Swift Date by one binary tick. Queue transitions compare the decoded SQLite record with the original in-memory Equatable record exactly. The mismatch throws concurrentModification after a valid server commit/ack or during refresh completion, then a sticky persistence-failure latch stops workers and blocks new local intents.",
+    "expected_new_behavior": "Real SQLite fractional-time round trips, crash points and same-ID replay resolve matching Official intent once; mismatch stays reviewable; confirmed prior hole never blocks next entry.",
+    "layer": [
+      "SQLITE_PERSISTENCE",
+      "SQL/RPC",
+      "API",
+      "SIMULATOR",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-007",
+    "incident_ids": [
+      "2026-INC-007"
+    ],
+    "requirement_ids": [
+      "OBS-CORE-001",
+      "BE-CONTRACT-001",
+      "CERT-NA-001",
+      "CERT-PHY-001",
+      "AUTO-DEG-001",
+      "B11-NAV-001",
+      "B11-NAV-002",
+      "B11-NAV-003",
+      "B11-NAV-004",
+      "B11-READ-003",
+      "B11-READ-007"
+    ],
+    "old_failure": "MobileReadRepository treats MOBILE_API_UNAVAILABLE as a global authority-revalidation signal for nearly every feature. AppCoordinator changes authenticated state to checkingEnvironment, RootView removes BaggerAppShell, and a healthy recheck creates a new shell whose local @State defaults to Today, Leaders Score, and empty paths. The feature error need not represent invalid participant identity.",
+    "expected_new_behavior": "Each feature-error trigger preserves valid shell, selected tab and nested path; proven identity rejection still fences protected operations.",
+    "layer": [
+      "SIMULATOR",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Historical cause UNKNOWN: reproduce documented symptom/fault containment, not a claimed exact root cause",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-008",
+    "incident_ids": [
+      "2026-INC-008"
+    ],
+    "requirement_ids": [
+      "BE-CONTRACT-001",
+      "CERT-NA-001",
+      "B11-NAV-001",
+      "B11-READ-001",
+      "B11-READ-003",
+      "B11-READ-007"
+    ],
+    "old_failure": "Published MH01 odds +1666567 are legitimate but both the backend projector and native structural validator permit only one through six digits (or signed infinity). Backend returns MOBILE_API_UNAVAILABLE 503; even a synthetically intended 200 DTO decodes then fails native structural compatibility.",
+    "expected_new_behavior": "Every legitimate calculator output, including seven-digit odds and defined infinity representation, passes compatible backend/native presentation or a feature-local typed state.",
+    "layer": [
+      "SIMULATOR",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-009",
+    "incident_ids": [
+      "2026-INC-009"
+    ],
+    "requirement_ids": [
+      "BE-CONTRACT-001",
+      "CERT-NA-001",
+      "AUTO-DEG-001",
+      "B11-NAV-001",
+      "B11-READ-002",
+      "B11-READ-003",
+      "B11-READ-007"
+    ],
+    "old_failure": "A valid base side-game envelope can represent configured/in-progress/stale/unpublished state with presentation:null. Build 10's Production detailed adapters require a published compatible presentation and throw incompatibleResponse otherwise. In Net Skins, configuration 3 also marked prior current R1/R2 results noncurrent, so historical publications survived but no current presentation existed. This local semantic gap is independent from sibling 503-driven global resets.",
+    "expected_new_behavior": "R1 Official/R2 Official/R3 Configured and publication/reconfiguration transitions retain correct current/history presentation without global session reset.",
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "SIMULATOR",
+      "FULL_LIFECYCLE",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Historical cause UNKNOWN: reproduce documented symptom/fault containment, not a claimed exact root cause",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-010",
+    "incident_ids": [
+      "2026-INC-010"
+    ],
+    "requirement_ids": [
+      "CERT-001",
+      "CERT-NA-001",
+      "CERT-SYN-001",
+      "CERT-IMPACT-001",
+      "DB-PERF-002",
+      "BE-JOB-002"
+    ],
+    "old_failure": "The installed claim function used pg_catalog.greatest and pg_catalog.least as if they were catalog functions. PostgreSQL treats them as special expressions, so function initialization raised SQLSTATE 42883 before the function body, claim, attempt increment, lease, or calculation.",
+    "expected_new_behavior": "The real installed PostgreSQL claim/process/complete path executes with valid expression syntax and produces the expected presentation from a published auction.",
+    "layer": [
+      "SQL/RPC",
+      "API"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-011",
+    "incident_ids": [
+      "2026-INC-011"
+    ],
+    "requirement_ids": [
+      "AUTO-JOB-001",
+      "CERT-NA-001",
+      "REL-001",
+      "BE-JOB-002",
+      "BE-JOB-004",
+      "BE-DEP-001"
+    ],
+    "old_failure": "Claim and completion require the job activation to equal current activation, while normal rebind increments activation and had no job carry-forward transition. A code repair through the normal release path therefore made the retained job ineligible.",
+    "expected_new_behavior": "A compatible activation transition retains eligible exact job progress or produces an explicit safe supersession/carry-forward state; incompatible work is denied.",
+    "layer": [
+      "SQL/RPC",
+      "API"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-012",
+    "incident_ids": [
+      "2026-INC-012"
+    ],
+    "requirement_ids": [
+      "CERT-001",
+      "CERT-NA-001",
+      "CERT-SYN-001",
+      "CERT-IMPACT-001",
+      "DB-PERF-002",
+      "BE-JOB-002"
+    ],
+    "old_failure": "Seven pg_catalog.greatest/least qualifications across the participant read, claim initializer and official-result normalizer were invalid. The live read failed 42883/503; claim and normalization were proven latent failures.",
+    "expected_new_behavior": "Configured/no-result and calculated/published reads, plus claim/process/complete SQL, execute correctly; injected feature 503 stays local.",
+    "layer": [
+      "SQL/RPC",
+      "API"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-013",
+    "incident_ids": [
+      "2026-INC-013"
+    ],
+    "requirement_ids": [
+      "DIR-OPS-001",
+      "DIR-OPS-002",
+      "CERT-NA-001",
+      "REL-001",
+      "BE-DEP-003"
+    ],
+    "old_failure": "The first canonical mutation audit trigger incremented activation. During atomic Open, the first MARK_LIVE changed activation 234 to 235 inside the transaction; the following ACCESS_ACTIVATE still required release binding 234 and raised 55000.",
+    "expected_new_behavior": "First whole-round Open cannot alter activation unexpectedly; six or twelve transitions/access changes commit together or all roll back with exact receipt.",
+    "layer": [
+      "SQL/RPC",
+      "API"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-014",
+    "incident_ids": [
+      "2026-INC-014"
+    ],
+    "requirement_ids": [
+      "BE-CONTRACT-001",
+      "PWA-001",
+      "CERT-NA-001",
+      "CERT-PHY-001",
+      "REL-001",
+      "BE-JOB-005"
+    ],
+    "old_failure": "SCORING_SESSION_SECRET existed for Preview but was absent from Production. Authorized START_SCORING requests reached session creation, which threw before setting the match-scoped cookie.",
+    "expected_new_behavior": "Each hosted environment rejects missing signing configuration before freeze; valid configuration loads Official hole and saves one isolated new hole with confirmation/advance.",
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-015",
+    "incident_ids": [
+      "2026-INC-015"
+    ],
+    "requirement_ids": [
+      "PWA-001",
+      "CERT-NA-001",
+      "BE-JOB-005"
+    ],
+    "old_failure": "UNKNOWN. The phone's active/waiting/installing worker state was not captured. Source reload behavior and Mac worker state cannot establish the physical phone cause.",
+    "expected_new_behavior": "Physical active/waiting worker scenarios exercise Update, controller change and reload while preserving auth/intent; do not claim reproduction of the unknown 2026 phone cause.",
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Historical cause UNKNOWN: reproduce documented symptom/fault containment, not a claimed exact root cause",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-016",
+    "incident_ids": [
+      "2026-INC-016"
+    ],
+    "requirement_ids": [
+      "DIR-OPS-001",
+      "AUTO-JOB-001",
+      "DIR-NEXT-001",
+      "CERT-NA-001",
+      "CERT-SYN-001",
+      "DIR-MOB-001",
+      "BE-JOB-002",
+      "BE-JOB-003",
+      "BE-DEP-001",
+      "BE-DEP-002",
+      "BE-DEP-003",
+      "BE-DEP-004"
+    ],
+    "old_failure": "Two independent Odds records blocked setup: the current After-R2 publication and an old After-R1 SUCCEEDED/READY unpublished calculation whose canonical inputs had advanced but whose lifecycle state had not been superseded. Withdrawal itself was blocked by the orphan READY row, and the Director UI exposed no discard/supersede control.",
+    "expected_new_behavior": "An obsolete unpublished calculation is visibly stale and safely superseded only when no live/public dependency exists; legitimate publication guard remains until owner action.",
+    "layer": [
+      "SQL/RPC",
+      "API"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-017",
+    "incident_ids": [
+      "2026-INC-017"
+    ],
+    "requirement_ids": [
+      "CERT-001",
+      "DIR-OPS-001",
+      "DIR-OPS-002",
+      "DIR-CLOSE-001",
+      "DIR-NEXT-001",
+      "CERT-NA-001",
+      "CERT-SYN-001",
+      "CERT-PHY-001",
+      "DIR-MOB-001",
+      "AUTO-HEALTH-001",
+      "DB-PERF-001",
+      "DB-PERF-003",
+      "BE-DEP-001",
+      "BE-DEP-002",
+      "BE-DEP-003",
+      "BE-DEP-004"
+    ],
+    "old_failure": "REPLACE_ROUND_PAIRINGS explicitly committed snapshotPrepared:false. All twelve matches retained empty S1 snapshots with NULL prepared revision and handicap revision. Later Net Skins configuration, Odds publication, and Calcutta dependencies blocked ordinary per-match preparation; the late-R3 compatibility predicate was also invalidated by unrelated Net Skins history/pointer changes captured in its broad consumed fingerprint.",
+    "expected_new_behavior": "Pairing success reports preparation separately; whole-round Prepare proves all contexts current/READY or rolls back; post-R2 side-game chronology cannot produce hidden deadlock.",
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "FULL_LIFECYCLE"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-018",
+    "incident_ids": [
+      "2026-INC-018"
+    ],
+    "requirement_ids": [
+      "OBS-CORE-001",
+      "DIR-OPS-001",
+      "DIR-OPS-002",
+      "DIR-NEXT-001",
+      "CERT-NA-001",
+      "CERT-PHY-001",
+      "DIR-MOB-001",
+      "AUTO-HEALTH-001",
+      "BE-SCORE-003",
+      "BE-JOB-003",
+      "BE-DEP-003"
+    ],
+    "old_failure": "The client retained the operation UUID but not original creation time or HTTP error. No round receipt or any of 24 child mutation keys existed, proving no commit by that operation. Separate per-match Opens changed round state, making the original request fingerprint obsolete; replay would correctly return ROUND_STATE_CHANGED.",
+    "expected_new_behavior": "Lost Open response resolves using original receipt/ID; independent authority changes produce an explained stale review, never duplicate Open or false partial-commit claim.",
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-019",
+    "incident_ids": [
+      "2026-INC-019"
+    ],
+    "requirement_ids": [
+      "OBS-CORE-001",
+      "CERT-001",
+      "PERF-001",
+      "PWA-001",
+      "CERT-NA-001",
+      "CERT-SYN-001",
+      "OPS-DR-001",
+      "HIST-001",
+      "CERT-IMPACT-001",
+      "BE-SCORE-001",
+      "BE-SCORE-002",
+      "DB-PERF-001",
+      "DB-PERF-002",
+      "DB-PERF-003",
+      "BE-JOB-001",
+      "BE-JOB-002",
+      "BE-DEP-002"
+    ],
+    "old_failure": "Hole and match writes synchronously fired Calcutta and Net Skins enqueue triggers. Calcutta current-result selection called a SQL STABLE compatibility function whose planner evaluated whole-history financial and consumed fingerprints even though result 407 had no qualifying receipt. Both score transactions hit the 8-second statement timeout (57014) and rolled back.",
+    "expected_new_behavior": "Exact score RPC remains within approved matched-environment latency/plan budgets at accumulated history scale; history/derived failure cannot undo a committed Official score.",
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "PERFORMANCE",
+      "QUERY_PLAN"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-020",
+    "incident_ids": [
+      "2026-INC-020"
+    ],
+    "requirement_ids": [
+      "DIR-REC-001",
+      "DIR-CLOSE-001",
+      "CERT-NA-001",
+      "CERT-PHY-001",
+      "OPS-DR-001",
+      "DIR-MOB-001",
+      "BE-SCORE-001",
+      "BE-SCORE-003",
+      "BE-SCORE-004",
+      "BE-JOB-003"
+    ],
+    "old_failure": "The retained evidence proves a physical-to-canonical completion gap after timeouts and concurrent scoring. It does not prove database corruption or establish one single cause for every missing hole. One card completed independently while recovery was running.",
+    "expected_new_behavior": "Owner compares a mixed physical card, skips exact Official holes, writes only missing values under canonical guards, stops on conflict, handles concurrent filling and verifies finalization.",
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-021",
+    "incident_ids": [
+      "2026-INC-021"
+    ],
+    "requirement_ids": [
+      "DIR-FIN-001",
+      "CERT-NA-001"
+    ],
+    "old_failure": "Save-entry contract could replace an entry but did not represent clearing the final entry; missing supported product operation.",
+    "expected_new_behavior": "Draft clear-last-purchase is explicit and audited; published-state guards, total preservation and immutable prior revisions remain enforced.",
+    "layer": [
+      "SQL/RPC",
+      "API"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-022",
+    "incident_ids": [
+      "2026-INC-022"
+    ],
+    "requirement_ids": [
+      "OBS-CORE-001",
+      "BE-CONTRACT-001",
+      "CERT-NA-001",
+      "OPS-DR-001",
+      "AUTO-HEALTH-001",
+      "AUTO-DEG-001"
+    ],
+    "old_failure": "UNKNOWN: The reason for the restart; The exact outage start/end; A provider incident; Disk I/O budget reaching zero; A release binding mismatch; The historical query causing the outage",
+    "expected_new_behavior": "Injected database connection loss/restart produces truthful health, preserved client intent and bounded recovery; canonical state survives.",
+    "layer": [
+      "FAILURE-INJECTION",
+      "PERFORMANCE",
+      "API"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Historical cause UNKNOWN: reproduce documented symptom/fault containment, not a claimed exact root cause",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-023",
+    "incident_ids": [
+      "2026-INC-023"
+    ],
+    "requirement_ids": [
+      "OBS-CORE-001",
+      "PERF-001",
+      "OPS-SAFE-001",
+      "CERT-NA-001",
+      "HIST-001"
+    ],
+    "old_failure": "UNKNOWN: A live query plan or block/temp/WAL profile for the 90-second query; OOM, I/O exhaustion, lock contention, or provider failure at the exact window; The broad query causing rather than coinciding with the outage",
+    "expected_new_behavior": "Tournament diagnostic admission rejects unbounded historical work; injected shared-resource pressure cannot trigger retry storms or misleading commit claims.",
+    "layer": [
+      "FAILURE-INJECTION",
+      "PERFORMANCE",
+      "API"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Historical cause UNKNOWN: reproduce documented symptom/fault containment, not a claimed exact root cause",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-024",
+    "incident_ids": [
+      "2026-INC-024"
+    ],
+    "requirement_ids": [
+      "OBS-CORE-001",
+      "CERT-001",
+      "OPS-SAFE-001",
+      "CERT-NA-001",
+      "OPS-DR-001",
+      "AUTO-DEG-001"
+    ],
+    "old_failure": "UNKNOWN: The warning's underlying metric values and timezone; Whether the budget hit 100 percent; Whether I/O pressure caused INC-022, INC-023, or the later scoring timeouts; Current compute, storage, pool, region, or plan configuration",
+    "expected_new_behavior": "Known-capacity fixture triggers warning/no-GO at approved headroom bounds and clears only after stable measured recovery; no inference about historical exhaustion.",
+    "layer": [
+      "FAILURE-INJECTION",
+      "PERFORMANCE",
+      "API"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Historical cause UNKNOWN: reproduce documented symptom/fault containment, not a claimed exact root cause",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-025",
+    "incident_ids": [
+      "2026-INC-025"
+    ],
+    "requirement_ids": [
+      "OBS-CORE-001"
+    ],
+    "old_failure": "UNKNOWN: A single common root cause for all failures; That additional provider telemetry would by itself have prevented the incidents",
+    "expected_new_behavior": "One induced incident is traceable across client/API/RPC/receipt without secrets; missing telemetry is explicit rather than promoted to a cause.",
+    "layer": [
+      "FAILURE-INJECTION",
+      "PERFORMANCE",
+      "API"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Old incident evidence retained separately from future regression proof",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "NA-2026-026",
+    "incident_ids": [
+      "2026-INC-026"
+    ],
+    "requirement_ids": [
+      "OBS-CORE-001"
+    ],
+    "old_failure": "UNKNOWN. Candidate requests near observation were200; duration/upstream/correlation unavailable.",
+    "expected_new_behavior": "Physical slow-network and pending/error cases remain usable and attributable with timing/IDs; original unattributed event remains unknown.",
+    "layer": [
+      "FAILURE-INJECTION",
+      "PERFORMANCE",
+      "API",
+      "PHYSICAL"
+    ],
+    "environment": "Isolated/Production-shaped certification; NEVER live Production",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected PR plus every tournament candidate",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED by this audit",
+    "limitation": "Historical cause UNKNOWN: reproduce documented symptom/fault containment, not a claimed exact root cause",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation.",
+    "release_blocking_scope": "Tournament release candidate: every required Never Again assertion must pass; unknown historical causes use scoped containment tests, not invented reproduction."
+  },
+  {
+    "id": "TEST-OBS-CORE-001",
+    "incident_ids": [
+      "2026-INC-006",
+      "2026-INC-007",
+      "2026-INC-018",
+      "2026-INC-019",
+      "2026-INC-022",
+      "2026-INC-023",
+      "2026-INC-024",
+      "2026-INC-025",
+      "2026-INC-026"
+    ],
+    "requirement_ids": [
+      "OBS-CORE-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "One test mutation traces request ID → mutation ID → canonical receipt with no secrets",
+      "Report latency, timeout and unknown outcome separately; preserve release/activation and proof layer"
+    ],
+    "layer": [
+      "API",
+      "SQL/RPC",
+      "STAGED/HOSTED"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-CERT-001",
+    "incident_ids": [
+      "2026-INC-005",
+      "2026-INC-006",
+      "2026-INC-010",
+      "2026-INC-012",
+      "2026-INC-017",
+      "2026-INC-019",
+      "2026-INC-024"
+    ],
+    "requirement_ids": [
+      "CERT-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Missing or stale P0 proof produces NO-GO",
+      "Physical, SQL, chronological and performance gates cannot be substituted by unit counts"
+    ],
+    "layer": [
+      "UNIT",
+      "FULL-LIFECYCLE",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-PERF-001",
+    "incident_ids": [
+      "2026-INC-019",
+      "2026-INC-023"
+    ],
+    "requirement_ids": [
+      "PERF-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Benchmarks record compute, seed, rows, plans, sample count, cold/warm state and distribution",
+      "Current/2x/5x/10x history does not convert score path into history scan"
+    ],
+    "layer": [
+      "SQL/RPC",
+      "PERFORMANCE"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-DIR-OPS-001",
+    "incident_ids": [
+      "2026-INC-013",
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-018"
+    ],
+    "requirement_ids": [
+      "DIR-OPS-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "All pairings/context/HI/course/tee/access/lease/health dependencies checked by current pointers",
+      "Stale health or missing evidence yields NO-GO, never implicit GO"
+    ],
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "FULL-LIFECYCLE",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-DIR-OPS-002",
+    "incident_ids": [
+      "2026-INC-013",
+      "2026-INC-017",
+      "2026-INC-018"
+    ],
+    "requirement_ids": [
+      "DIR-OPS-002"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Whole-round 12-or-0 atomicity; immutable key/fingerprint and durable receipt",
+      "Lost response resolves by exact receipt; changed fingerprint explained; no blind new request"
+    ],
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "FAILURE-INJECTION",
+      "FULL-LIFECYCLE",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-DIR-REC-001",
+    "incident_ids": [
+      "2026-INC-020"
+    ],
+    "requirement_ids": [
+      "DIR-REC-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Matching Official holes skipped; missing submitted once; differences require owner review",
+      "Receipt binds physical source and resulting canonical revisions; 18-hole recovery rehearsed"
+    ],
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "PHYSICAL",
+      "FULL-LIFECYCLE"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-OPS-SAFE-001",
+    "incident_ids": [
+      "2026-INC-023",
+      "2026-INC-024"
+    ],
+    "requirement_ids": [
+      "OPS-SAFE-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Live diagnostic role cannot mutate; allowlisted indexed current reads only",
+      "Timeout/row/payload/concurrency limits enforced server-side; heavy requests denied/routed to clone"
+    ],
+    "layer": [
+      "SECURITY",
+      "SQL/RPC",
+      "PERFORMANCE"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-DIR-CLOSE-001",
+    "incident_ids": [
+      "2026-INC-017",
+      "2026-INC-020"
+    ],
+    "requirement_ids": [
+      "DIR-CLOSE-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Expected Final/Official/result totals and zero access/leases verified",
+      "Side games complete or explicitly waived separately; golf champion cannot be changed by financial publication"
+    ],
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "FULL-LIFECYCLE",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-CONTRACT-001",
+    "incident_ids": [
+      "2026-INC-006",
+      "2026-INC-007",
+      "2026-INC-008",
+      "2026-INC-009",
+      "2026-INC-014",
+      "2026-INC-022"
+    ],
+    "requirement_ids": [
+      "BE-CONTRACT-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Feature/network/DB errors cannot claim invalid identity without evidence",
+      "Installed supported native and PWA contract tests cover mixed lifecycle and degraded responses"
+    ],
+    "layer": [
+      "API",
+      "SIMULATOR",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-PWA-001",
+    "incident_ids": [
+      "2026-INC-006",
+      "2026-INC-014",
+      "2026-INC-015",
+      "2026-INC-019"
+    ],
+    "requirement_ids": [
+      "PWA-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Signing configuration absence fails release gate",
+      "No cross-client new mutation until pending native outcome resolved or exact Official hole skipped",
+      "Physical 18-hole all-format Save/Next and fallback drill pass"
+    ],
+    "layer": [
+      "API",
+      "PHYSICAL",
+      "FULL-LIFECYCLE"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-AUTO-JOB-001",
+    "incident_ids": [
+      "2026-INC-011",
+      "2026-INC-016"
+    ],
+    "requirement_ids": [
+      "AUTO-JOB-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Only terminal/unstarted, unpublished, unreferenced obsolete inputs eligible",
+      "Concurrent publication supersession race denies safely; immutable supersession receipt"
+    ],
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "FULL-LIFECYCLE"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-DIR-NEXT-001",
+    "incident_ids": [
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-018"
+    ],
+    "requirement_ids": [
+      "DIR-NEXT-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "R3 night-before order completes without SQL/Codex",
+      "Required, optional and blocked actions exposed with exact dependency and supported clearance"
+    ],
+    "layer": [
+      "API",
+      "PHYSICAL",
+      "FULL-LIFECYCLE"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-DIR-FIN-001",
+    "incident_ids": [
+      "2026-INC-021"
+    ],
+    "requirement_ids": [
+      "DIR-FIN-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Published edit denied; withdrawal consequences shown",
+      "Exact fractions total 100%; all unchanged prices and $18,500 preserved in 2026 fixture",
+      "New auction/publication/result revisions retained with reason and receipt",
+      "Supported last-draft-entry removal preserves historical revisions and requires explicit owner review."
+    ],
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "FULL-LIFECYCLE",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-CERT-NA-001",
+    "incident_ids": [
+      "2026-INC-001",
+      "2026-INC-002",
+      "2026-INC-003",
+      "2026-INC-004",
+      "2026-INC-005",
+      "2026-INC-006",
+      "2026-INC-007",
+      "2026-INC-008",
+      "2026-INC-009",
+      "2026-INC-010",
+      "2026-INC-011",
+      "2026-INC-012",
+      "2026-INC-013",
+      "2026-INC-014",
+      "2026-INC-015",
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-018",
+      "2026-INC-019",
+      "2026-INC-020",
+      "2026-INC-021",
+      "2026-INC-022",
+      "2026-INC-023",
+      "2026-INC-024"
+    ],
+    "requirement_ids": [
+      "CERT-NA-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Old behavior reproduced where evidence permits; proposed behavior asserted",
+      "Missing historical root cause remains fault-scenario test, not fabricated causal reproduction"
+    ],
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "SIMULATOR",
+      "PHYSICAL",
+      "PERFORMANCE",
+      "FULL-LIFECYCLE"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-CERT-SYN-001",
+    "incident_ids": [
+      "2026-INC-010",
+      "2026-INC-012",
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-019"
+    ],
+    "requirement_ids": [
+      "CERT-SYN-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Seeded 24-player 54-hole flow incl. all side-game transitions, R3 pairing/preparation and financial correction",
+      "Independent expected outputs; repeat reset yields identical authority and results"
+    ],
+    "layer": [
+      "FULL-LIFECYCLE",
+      "SQL/RPC",
+      "API"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-CERT-PHY-001",
+    "incident_ids": [
+      "2026-INC-005",
+      "2026-INC-006",
+      "2026-INC-007",
+      "2026-INC-014",
+      "2026-INC-017",
+      "2026-INC-018",
+      "2026-INC-020"
+    ],
+    "requirement_ids": [
+      "CERT-PHY-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Two physical iPhones and participant accounts across Wi-Fi/cellular, app kill and network switches",
+      "All three formats for 18 holes; native/PWA handoff; Director recovery without engineering"
+    ],
+    "layer": [
+      "PHYSICAL",
+      "FULL-LIFECYCLE",
+      "OWNER-ACCEPTANCE"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-OPS-DR-001",
+    "incident_ids": [
+      "2026-INC-019",
+      "2026-INC-020",
+      "2026-INC-022",
+      "2026-INC-024"
+    ],
+    "requirement_ids": [
+      "OPS-DR-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Restore non-Production backup and verify score/result authority, identities excluded or secured",
+      "Reconcile unsynced physical golf without duplicate Official holes"
+    ],
+    "layer": [
+      "INTEGRATION",
+      "PHYSICAL",
+      "FULL-LIFECYCLE"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-REL-001",
+    "incident_ids": [
+      "2026-INC-011",
+      "2026-INC-013",
+      "2026-INC-014"
+    ],
+    "requirement_ids": [
+      "REL-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Candidate cannot freeze with missing P0/physical/SQL/performance evidence",
+      "Compatible release change cannot strand job or mutate activation during score transaction",
+      "Rollback rehearsed with old clients and additive schema"
+    ],
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "FULL-LIFECYCLE"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-DIR-MOB-001",
+    "incident_ids": [
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-018",
+      "2026-INC-020"
+    ],
+    "requirement_ids": [
+      "DIR-MOB-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Owner on iPhone can review effects, confirm, inspect receipt and recover unknown status",
+      "No routine Terminal/log/SQL dependency in rehearsal"
+    ],
+    "layer": [
+      "PHYSICAL",
+      "OWNER-ACCEPTANCE"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-SEC-001",
+    "incident_ids": [],
+    "requirement_ids": [
+      "SEC-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "New recovery/automation operations retain RLS, authorization, idempotency and audit",
+      "Spectators never receive money-game/private fields; secrets absent from telemetry/evidence"
+    ],
+    "layer": [
+      "SECURITY",
+      "SQL/RPC",
+      "API"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-HIST-001",
+    "incident_ids": [
+      "2026-INC-019",
+      "2026-INC-023"
+    ],
+    "requirement_ids": [
+      "HIST-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Critical current reads never scan archive",
+      "Historical reconstruction reproduces exact authority from immutable revisions; retention policy explicit"
+    ],
+    "layer": [
+      "SQL/RPC",
+      "PERFORMANCE"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-AUTO-HEALTH-001",
+    "incident_ids": [
+      "2026-INC-017",
+      "2026-INC-018",
+      "2026-INC-022"
+    ],
+    "requirement_ids": [
+      "AUTO-HEALTH-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Health snapshot exposes source revision and observedAt, not hidden stale truth",
+      "Mutation admission rechecks canonical authority; cache cannot authorize scoring"
+    ],
+    "layer": [
+      "SQL/RPC",
+      "API",
+      "PERFORMANCE"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-AUTO-DEG-001",
+    "incident_ids": [
+      "2026-INC-007",
+      "2026-INC-009",
+      "2026-INC-022",
+      "2026-INC-024"
+    ],
+    "requirement_ids": [
+      "AUTO-DEG-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Odds/NetSkins failure cannot disable identity/scoring",
+      "Hysteresis prevents retry storm; DB outage preserves intents and offers physical cards"
+    ],
+    "layer": [
+      "API",
+      "FAILURE-INJECTION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-CERT-IMPACT-001",
+    "incident_ids": [
+      "2026-INC-006",
+      "2026-INC-010",
+      "2026-INC-012",
+      "2026-INC-019"
+    ],
+    "requirement_ids": [
+      "CERT-IMPACT-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Score RPC change invalidates all-format client/recovery/finalization proof",
+      "Odds copy-only edit does not discard unchanged scoring proof; changed lifecycle does"
+    ],
+    "layer": [
+      "UNIT",
+      "INTEGRATION"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-B11-NAV-001",
+    "incident_ids": [
+      "2026-INC-007",
+      "2026-INC-008",
+      "2026-INC-009"
+    ],
+    "requirement_ids": [
+      "B11-NAV-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Inject MOBILE_API_UNAVAILABLE from every generic read repository, scoring read, queue readback, reconnect, and finalization callback while each top-level tab is selected. Controller/shell identity, tab, subtab, and path remain unchanged; the failed feature shows typed local state; mutation transport stays fenced until authority is valid."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-NAV-002",
+    "incident_ids": [
+      "2026-INC-007"
+    ],
+    "requirement_ids": [
+      "B11-NAV-002"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "A conformance matrix proves true missing/revoked identity, Auth UUID mismatch, rejected certification, deleted participant, and explicit sign-out remove the shell; bare/scoped 403 and feature 503 retain it. Unknown security states fail writes closed without falsely signing out."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-NAV-003",
+    "incident_ids": [
+      "2026-INC-007"
+    ],
+    "requirement_ids": [
+      "B11-NAV-003"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "For all five tabs plus nested Match, Passport, History, Odds, Net Skins, and Calcutta paths, healthy/transport/compatible-release transitions preserve context. Identity replacement or sign-out clears the saved private route. Cold launch follows an explicit documented policy."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-NAV-004",
+    "incident_ids": [
+      "2026-INC-006",
+      "2026-INC-007"
+    ],
+    "requirement_ids": [
+      "B11-NAV-004"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Inject unavailable, timeout, lost ACK, finalization unknown outcome, and reconnect revalidation. The user remains on the exact match/hole/review context, cannot double-submit, and sees whether the server outcome is known, unknown, accepted, or rejected."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-NAV-005",
+    "incident_ids": [
+      "2026-INC-002"
+    ],
+    "requirement_ids": [
+      "B11-NAV-005"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "For every round with zero, one, partial, and complete pairings and mixed lifecycle states, traverse first/interior/last detail; links never cross rounds, endpoints are nil, opaque IDs work, and placeholder taps yield a local unavailable state."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-SCORE-001",
+    "incident_ids": [
+      "2026-INC-006"
+    ],
+    "requirement_ids": [
+      "B11-SCORE-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Generate fractional dates across every record transition and mutable Date field, persist/reload, and complete CAS without false conflict. Real concurrent writers still conflict. Migration/upgrade opens every supported Build 10 queue state without data loss or accidental resubmission."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-SCORE-002",
+    "incident_ids": [
+      "2026-INC-006"
+    ],
+    "requirement_ids": [
+      "B11-SCORE-002"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Reproduce both fractional failure positions, then reconcile. Matching Official data clears the record/latch and admits the next unscored hole. The server records one canonical commit. No new mutation ID or silent queue deletion occurs."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-SCORE-003",
+    "incident_ids": [
+      "2026-INC-006"
+    ],
+    "requirement_ids": [
+      "B11-SCORE-003"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "For each durable state, assert exact title/body/actions, enabled controls, mutation count, and canonical effect. Differing values never auto-resolve; matching values never offer Reapply; persistence failure offers bounded retry/reconciliation or a safe fallback instruction."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-SCORE-004",
+    "incident_ids": [
+      "2026-INC-006"
+    ],
+    "requirement_ids": [
+      "B11-SCORE-004"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Enumerate process termination before durable intent, after intent, after lease, during POST, after server commit, before/after ACK persistence, before/after canonical readback, and before compaction. Relaunch converges to one commit or an explicit unresolved state and never loses evidence."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-SCORE-005",
+    "incident_ids": [
+      "2026-INC-006"
+    ],
+    "requirement_ids": [
+      "B11-SCORE-005"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Recover a matching intent with zero, one, and multiple later holes already Official from another device. The app selects or clearly directs to the first canonical unscored hole, keeps Official inputs read-only, and blocks if round/match authority changed."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-SCORE-006",
+    "incident_ids": [
+      "2026-INC-006"
+    ],
+    "requirement_ids": [
+      "B11-SCORE-006"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Run Best Ball, Scramble, and Singles through 18 holes with two devices, response loss, timeout, 503, airplane mode, background, kill, and newer canonical revisions. One canonical score per hole, no hidden queue residue, clear conflicts, correct finalization."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-SCORE-007",
+    "incident_ids": [
+      "2026-INC-005"
+    ],
+    "requirement_ids": [
+      "B11-SCORE-007"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "For all 18 holes and Best Ball/Scramble/Singles, compare pre-entry badges with the canonical server allocation and with post-save applied strokes. Positive, zero, multiple, and negative/given policy cases follow an approved visual/semantic rule. Gross requests remain unchanged."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-SCORE-008",
+    "incident_ids": [
+      "2026-INC-005"
+    ],
+    "requirement_ids": [
+      "B11-SCORE-008"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "For Upcoming, Live with zero holes, Live partial, locked, Final, and reopened fixtures, labels remain internally consistent and never imply Scheduled for a Live match. VoiceOver announces lifecycle and save state independently."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-READ-001",
+    "incident_ids": [
+      "2026-INC-008"
+    ],
+    "requirement_ids": [
+      "B11-READ-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Shared conformance fixtures cover both sign boundaries, 1- through at least 7-digit generated values, infinity, malformed strings, and all five phases. Exact backend serializer and native model/presenter agree on every fixture."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-READ-002",
+    "incident_ids": [
+      "2026-INC-009"
+    ],
+    "requirement_ids": [
+      "B11-READ-002"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Chronologically run configure R1/R2, calculate/publish, add configured R3, withdraw/supersede, stale dependency, recalculate, and republish. Native retains the selected product, shows exact state/revision scope, and never displays stale detail as current."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-READ-003",
+    "incident_ids": [
+      "2026-INC-004",
+      "2026-INC-007",
+      "2026-INC-008",
+      "2026-INC-009"
+    ],
+    "requirement_ids": [
+      "B11-READ-003"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Run the complete 18-case Build 10 error matrix plus identity codes, scoped scoring denials, semantic 200, cancellation, timeout, offline, and coded synthetic 409. Each maps to one documented UI/security action and no unrelated shell mutation."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-READ-004",
+    "incident_ids": [
+      "2026-INC-004"
+    ],
+    "requirement_ids": [
+      "B11-READ-004"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Exercise pending, partial success, each single failure, both failures, invalid model, timeout, 503, interruption, cancellation, repeated retry, mode exit, background, and relaunch. Assert requests and visible state at every transition."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-READ-005",
+    "incident_ids": [
+      "2026-INC-001"
+    ],
+    "requirement_ids": [
+      "B11-READ-005"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Across New York/Chicago/UTC devices, three tournament date boundaries and DST transitions yield identical tournament day/schedule. Mounted views update without recreation; no scoring/lifecycle mutation or identity change occurs."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-READ-006",
+    "incident_ids": [
+      "2026-INC-003"
+    ],
+    "requirement_ids": [
+      "B11-READ-006"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Capture signed-out chooser, spectator Today/Matches/Leaders/More and participant surfaces in light/dark on small/large devices from Release-equivalent roots. Assert semantic colors/contrast without masking app content."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-B11-READ-007",
+    "incident_ids": [
+      "2026-INC-004",
+      "2026-INC-006",
+      "2026-INC-007",
+      "2026-INC-008",
+      "2026-INC-009"
+    ],
+    "requirement_ids": [
+      "B11-READ-007"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Every injected error yields one correlatable client/server event and the expected state transition. Privacy tests reject secrets and competitive payloads. Diagnostics survive long enough for incident export but obey a documented retention cap."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-SCORE-001",
+    "incident_ids": [
+      "2026-INC-019",
+      "2026-INC-020"
+    ],
+    "requirement_ids": [
+      "BE-SCORE-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Native, PWA and Director score-submit schemas accept match, hole, mutation ID, expected revisions and gross values only.",
+      "Server derives strokes, nets, hole winner and match progression from the canonical scoring snapshot in the same transaction.",
+      "Attempts to submit client-computed strokes, net, winner or points are rejected or ignored by an explicit versioned contract test.",
+      "Best Ball, Scramble and Singles exact fixtures produce the same canonical results."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-SCORE-002",
+    "incident_ids": [
+      "2026-INC-019"
+    ],
+    "requirement_ids": [
+      "BE-SCORE-002"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "A hole write performs admission, authorization, idempotency, revision checks, canonical scoring math, score/match mutation, receipt/history/audit, and minimal outbox inserts only.",
+      "No synchronous scoring trigger scans historical side-game results, financial revisions, publication history, or full Net Skins history.",
+      "A database plan/procedure inventory fails certification if an unbudgeted trigger is attached to score or match writes.",
+      "Before a latency gate is adopted, benchmark the production-shaped database at certified peak history size and record the baseline, contention envelope and statement-timeout headroom.",
+      "Use SQL/RPC transaction p95 at or below 1 second and p99 at or below 2 seconds, plus end-to-end score mutation p95 at or below 2 seconds and p99 at or below 4 seconds, as provisional targets aligned with the infrastructure-owned 2027 performance budget; they become release gates only after validation on matched tournament compute."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-SCORE-003",
+    "incident_ids": [
+      "2026-INC-018",
+      "2026-INC-020"
+    ],
+    "requirement_ids": [
+      "BE-SCORE-003"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Every round, match and hole mutation has a durable operation ID and queryable receipt endpoint.",
+      "After timeout or lost response, the client checks receipt and canonical state before enabling retry.",
+      "Same-ID replay returns the original result only when payload and predecessor state remain compatible.",
+      "If another actor changed the scope, the saved intent is marked stale and cannot be blindly resubmitted."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-SCORE-004",
+    "incident_ids": [
+      "2026-INC-020"
+    ],
+    "requirement_ids": [
+      "BE-SCORE-004"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Recovery imports or enters gross values only and requires round, match, hole and canonical player identities.",
+      "Each hole is freshly read; exact matches are skipped, differences stop for review, and absent holes use one durable mutation ID.",
+      "Finalization is unavailable until all 18 holes and all expected gross values match the physical card.",
+      "The final report counts written, skipped, conflicted, unknown and overwritten values; overwritten Official values must be zero unless a separately approved correction workflow is used."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-DB-PERF-001",
+    "incident_ids": [
+      "2026-INC-017",
+      "2026-INC-019"
+    ],
+    "requirement_ids": [
+      "DB-PERF-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "No score/match transaction calls a function whose reachable plan aggregates unbounded historical revision or payload tables.",
+      "Fingerprint inputs are enumerated by domain, scope and version; current correctness does not depend on unrelated history metadata.",
+      "CI grows result/job history by at least 100x and fails on superlinear planning/execution growth or live-path budget breach.",
+      "EXPLAIN plans and measured buffer/temp activity are retained as certification evidence."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-DB-PERF-002",
+    "incident_ids": [
+      "2026-INC-010",
+      "2026-INC-012",
+      "2026-INC-019"
+    ],
+    "requirement_ids": [
+      "DB-PERF-002"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Every created/replaced PostgreSQL function is parsed and invoked on every reachable branch in the supported PostgreSQL major version.",
+      "Static analysis rejects pg_catalog.least, pg_catalog.greatest and any other schema-qualified special SQL expression.",
+      "Read, claim, lease boundary, complete, fail, idempotency, concurrency and malformed-input cases execute in PostgreSQL, not only application mocks.",
+      "Function owner, grants, security-definer flag, search_path and definition hash are compared before/after migration."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-DB-PERF-003",
+    "incident_ids": [
+      "2026-INC-017",
+      "2026-INC-019"
+    ],
+    "requirement_ids": [
+      "DB-PERF-003"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Each domain has one authoritative current pointer referencing an immutable revision ID; duplicate scalar revision/is_current representations are removed or checked transactionally.",
+      "A failed worker cannot leave pointer state inconsistent with its referenced result lifecycle.",
+      "A read-only reconciliation query reports orphan pointers, multiple-current rows, scalar/reference mismatches, current result with incompatible state, and stale jobs that still block operations.",
+      "Current transition and history insertion occur in one transaction with compare-and-swap on expected pointer revision."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-JOB-001",
+    "incident_ids": [
+      "2026-INC-019"
+    ],
+    "requirement_ids": [
+      "BE-JOB-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "The scoring transaction inserts one deduplicated event containing event ID, tournament, match, canonical match/hole revision, mutation ID, event type and occurred_at.",
+      "The insert shares the score transaction: rollback removes both score and event; commit preserves both.",
+      "The insert performs no source snapshot construction, side-game hash, historical scan or calculation.",
+      "Separate workers consume the event for Calcutta, Net Skins, competition projections, intelligence and external mirrors with independent checkpoints."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-JOB-002",
+    "incident_ids": [
+      "2026-INC-010",
+      "2026-INC-011",
+      "2026-INC-012",
+      "2026-INC-016",
+      "2026-INC-019"
+    ],
+    "requirement_ids": [
+      "BE-JOB-002"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Claims use bounded leases, SKIP LOCKED, attempt limits and owner/token verification.",
+      "Completion compare-and-swaps source, contract version, authority generation and expected result pointer before publication/current transition.",
+      "Lost completion response, lease expiry, duplicate delivery and two-worker races have deterministic outcomes.",
+      "Every terminal and blocking state has an operator-readable reason, timestamp, source revisions and a supported supersede/retry action when safe."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-JOB-003",
+    "incident_ids": [
+      "2026-INC-016",
+      "2026-INC-018",
+      "2026-INC-020"
+    ],
+    "requirement_ids": [
+      "BE-JOB-003"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Receipts bind operation ID, actor, payload hash, predecessor revisions, resulting revisions, status and safe error.",
+      "Failed and no-op operations are recorded when the transaction boundary permits; absence has a defined meaning.",
+      "Retirement/supersession operations create immutable operation receipts in addition to mutating retained job state.",
+      "Receipts are searchable in Director by operation ID and scope."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-JOB-004",
+    "incident_ids": [
+      "2026-INC-011"
+    ],
+    "requirement_ids": [
+      "BE-JOB-004"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Every release plan inventories PENDING/RUNNING jobs and declares retain, drain, supersede or exact carry-forward behavior.",
+      "Activation advancement never silently makes a job invisible to claim while leaving it apparently actionable.",
+      "Carry-forward requires an explicit compatible contract version, exact source/payload hashes, zero disallowed attempts/activity and an immutable receipt.",
+      "Activation guards remain exact; compatibility is granted by audited transition, never by ignoring expected activation."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-DEP-001",
+    "incident_ids": [
+      "2026-INC-011",
+      "2026-INC-016",
+      "2026-INC-017"
+    ],
+    "requirement_ids": [
+      "BE-DEP-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Every producer revision declares a schema/semantic contract version and immutable scope identity.",
+      "Every consumer declares accepted contract versions and exact semantic fields consumed.",
+      "A change is compatible only through a named, tested compatibility rule; no activation, revision or dependency guard is globally disabled.",
+      "Incompatibility returns the blocking producer, exact changed fields, safe next action and whether history/public visibility will change."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-DEP-002",
+    "incident_ids": [
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-019"
+    ],
+    "requirement_ids": [
+      "BE-DEP-002"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Fingerprint manifests list field path, normalization, ordering, domain owner and reason for inclusion.",
+      "Unrelated job attempts, supersession timestamps, is_current history flags and prior payload history do not alter a current semantic fingerprint.",
+      "R1/R2 completed golf, financial auction facts and relevant side-game membership each have separate versioned fingerprints.",
+      "A changed fingerprint can be decomposed into named changed components without recomputing or exposing full historical payloads."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-BE-DEP-003",
+    "incident_ids": [
+      "2026-INC-013",
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-018"
+    ],
+    "requirement_ids": [
+      "BE-DEP-003"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Pair, prepare, validate side-game compatibility and Open are separate durable states with explicit receipts and prerequisites.",
+      "Pairing success cannot be presented as ready when snapshotPrepared is false.",
+      "The system can prepare all matches atomically or reports exactly which all-or-nothing boundary it guarantees.",
+      "Changing dependencies after preparation immediately changes readiness and supplies a supported recovery plan."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-DEP-004",
+    "incident_ids": [
+      "2026-INC-016",
+      "2026-INC-017"
+    ],
+    "requirement_ids": [
+      "BE-DEP-004"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "A current publication, unpublished READY calculation, active worker and stale retained result are separate typed blockers.",
+      "Every blocking type has a supported action or an explicit reason that no action is safe.",
+      "Stale unpublished work is automatically marked nonblocking only when a tested policy proves it has no publication/current reference; otherwise Director receives an exact supersede action.",
+      "Withdrawing visibility preserves immutable publication history and does not pretend to clear unrelated calculation/configuration dependencies."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-DEP-005",
+    "incident_ids": [],
+    "requirement_ids": [
+      "BE-DEP-005"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Starting from a published Official result, unpublish preserves auction/result history and hides participant visibility.",
+      "Changing one ownership allocation writes a complete new auction revision, preserves all purchase prices and unaffected ownership, supersedes active jobs/current result, and creates an unpublished publication revision.",
+      "Republish queues one calculation for the new auction and a successful worker creates a new current Official result without changing golf.",
+      "The acceptance verifies 24 purchases, $18,500 total, 100% ownership per golfer, unchanged configuration, all final golf, and participant payout projection against the corrected owners."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-BE-JOB-005",
+    "incident_ids": [
+      "2026-INC-014",
+      "2026-INC-015"
+    ],
+    "requirement_ids": [
+      "BE-JOB-005"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Release manifests declare required secrets by target environment without exposing values.",
+      "Staged candidate and Production rebind acceptance prove each required key is present, well-formed and usable through a nonmutating handshake.",
+      "A missing scoring-session key blocks promotion before tournament traffic.",
+      "PWA release evidence records service-worker version and exposes client-visible active/waiting state for support."
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "PHYSICAL"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": true,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED",
+    "automation_scope": "Software layers may automate; physical-device/owner evidence is a distinct required manual or device-assisted execution, not inferred from automation."
+  },
+  {
+    "id": "TEST-INFRA-001",
+    "incident_ids": [],
+    "requirement_ids": [
+      "INFRA-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "CPU, memory, I/O, WAL, connection, query, restart, and scrape-health series retained across two rehearsals",
+      "Alert evaluation remains available when the app is unavailable",
+      "Metric name changes fail visibly"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-INFRA-002",
+    "incident_ids": [],
+    "requirement_ids": [
+      "INFRA-002"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Production runtime role cannot select history schemas or execute broad history functions",
+      "CI proves forbidden imports/routes",
+      "Two rehearsals show zero history-offline query tags on primary"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-INFRA-003",
+    "incident_ids": [],
+    "requirement_ids": [
+      "INFRA-003"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "History access is denied",
+      "A deliberately expensive query is canceled inside the approved budget",
+      "Collector preserves the cancellation without retry",
+      "No write privilege exists"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-INFRA-004",
+    "incident_ids": [],
+    "requirement_ids": [
+      "INFRA-004"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Score commit correctness is unchanged",
+      "No whole-history hash/calculation executes in the score transaction",
+      "Worker failure cannot roll back a score",
+      "Queue replay produces one canonical derived result"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-INFRA-005",
+    "incident_ids": [],
+    "requirement_ids": [
+      "INFRA-005"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Exact regions are recorded",
+      "Staged and Production functions run in approved region",
+      "Cross-region drift blocks release",
+      "Network latency is measured in dress rehearsal"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-INFRA-006",
+    "incident_ids": [],
+    "requirement_ids": [
+      "INFRA-006"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Two rehearsals meet scoring/current-read budgets",
+      "Disk budget and I/O wait remain within approved headroom",
+      "Connection and memory headroom survive conflict and recovery cases",
+      "Selection and rationale are recorded without relying on HTTP 200 alone"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-INFRA-007",
+    "incident_ids": [],
+    "requirement_ids": [
+      "INFRA-007"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Primary score writes never route to replica",
+      "Historical reads do not load primary",
+      "Replica lag is monitored and shown",
+      "Failure falls back to a snapshot rather than primary history scan"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-INFRA-008",
+    "incident_ids": [],
+    "requirement_ids": [
+      "INFRA-008"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "POC uses identical schema/RPC/security/load/failure cases",
+      "Correctness and RPO/RTO meet requirements",
+      "Operational effort and cost categories are compared",
+      "Cutover and rollback are rehearsed before migration decision"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OBS-001",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OBS-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Read-control, admission, runtime, identity, and connection phases have independent result and latency",
+      "Aggregate request links component spans",
+      "Secrets and provider internals remain absent from public response"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OBS-002",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OBS-002"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "A synthetic score is traceable end to end",
+      "Same-ID replay links to original",
+      "Unknown outcome can be resolved without a new identity"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OBS-003",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OBS-003"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Injected slow trigger identifies exact phase and query",
+      "Rolled-back timeout differs from unknown outcome",
+      "No score payload or credential is logged"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OBS-004",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OBS-004"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Each dashboard shows release and authority context",
+      "2026 failure injections are diagnosable in under five minutes",
+      "Missing data is visible"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OBS-005",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OBS-005"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Packet spans pre/post incident metrics, logs, traces, query deltas, restart/change events, release/authority, backup, and queue state",
+      "Collector never runs history aggregation or writes",
+      "Packet is immutable and access-controlled"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OBS-006",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OBS-006"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Stale/missing recovery point alerts",
+      "Restore rehearsal age is visible",
+      "Tournament entry gate fails when recovery evidence is stale"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OBS-007",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OBS-007"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Cold/warm/cache state is explicit",
+      "Today dependencies are separately timed",
+      "p50/p95/p99 come from statistically valid runs",
+      "Physical-device time-to-usable is measured"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OBS-008",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OBS-008"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Two missing scrape intervals alert",
+      "Log/trace drop is independently detected",
+      "No green capacity claim is allowed with missing data"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OBS-009",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OBS-009"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Retention duration is explicit",
+      "PII/secret denylist tests pass",
+      "UTC event and ingestion time are retained",
+      "Authorized evidence export is reproducible"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OPS-001",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OPS-001"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Allowed workloads and transitions are enforced",
+      "Every transition is idempotent and attributable",
+      "Unknown transition outcome uses same-ID recovery"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OPS-002",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OPS-002"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Yellow/red injection pauses only approved classes",
+      "Scoring remains correct",
+      "Public stale snapshot shows age",
+      "Recovery resumes work without duplicate jobs"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OPS-003",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OPS-003"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Release tooling rejects out-of-policy change",
+      "Emergency exception records exact incident and rollback",
+      "No unreviewed config drift exists at entry"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OPS-004",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OPS-004"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Lost response is recoverable",
+      "No Force Promote path",
+      "Competitive diff is classified",
+      "Rollback trigger and abort criteria are explicit"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OPS-005",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OPS-005"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Restore completes within approved RTO",
+      "Recovery point meets RPO",
+      "Scores, receipts, authority, identities, side-game inputs, and migration ledger validate",
+      "No Production write occurs"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OPS-006",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OPS-006"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "All 12 matches can continue offline",
+      "Already-Official holes are never blindly replayed",
+      "One fresh mutation ID per missing hole and canonical readback are used",
+      "Discrepancies require human review"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": true,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OPS-007",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OPS-007"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "Acknowledgment drill meets target",
+      "Every alert has one owner",
+      "No production-changing action is assigned to AI or an unauthenticated operator"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED"
+  },
+  {
+    "id": "TEST-OPS-008",
+    "incident_ids": [],
+    "requirement_ids": [
+      "OPS-008"
+    ],
+    "old_failure": "See linked incident, or prospective risk",
+    "expected_new_behavior": [
+      "AI cannot deploy, migrate, resize, restart, restore, switch authority, submit/replay scores, finalize/reopen, or publish side games without the established human gate",
+      "All AI queries use bounded roles",
+      "Prompt/data injection tests pass"
+    ],
+    "layer": [
+      "AUTOMATED",
+      "INTEGRATION",
+      "LAYER-SPECIFIC"
+    ],
+    "environment": "CI/integration/staging/physical QA as applicable; Production read-only smoke separately",
+    "automated": true,
+    "physical": false,
+    "frequency": "Affected change; candidate; final physical where required",
+    "release_blocking": false,
+    "status": "DESIGNED — NOT EXECUTED"
+  }
+]

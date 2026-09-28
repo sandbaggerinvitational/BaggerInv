@@ -1,0 +1,102 @@
+[
+  {
+    "id": "RISK-001",
+    "risk": "Provider database/API outage",
+    "likelihood": "Unquantified",
+    "impact": "Scoring unavailable",
+    "mitigation": "Capacity/restore/failure drills",
+    "detection": "Provider + domain health",
+    "fallback": "Physical cards",
+    "residual_risk": "Nonzero provider/common dependency risk"
+  },
+  {
+    "id": "RISK-002",
+    "risk": "New scoring/SQL regression",
+    "likelihood": "Unquantified",
+    "impact": "Incorrect/blocked canonical operation",
+    "mitigation": "ExactSQL/property/plan/NeverAgain gates",
+    "detection": "Invariant/latency telemetry",
+    "fallback": "Fail closed + cards",
+    "residual_risk": "Tests cannot cover every input"
+  },
+  {
+    "id": "RISK-003",
+    "risk": "Device/network intent edge case",
+    "likelihood": "Unquantified",
+    "impact": "Unknown or blocked score",
+    "mitigation": "Normalized state/persistence + physical matrix",
+    "detection": "Intent/error correlation",
+    "fallback": "SafePWAhandoff/cards",
+    "residual_risk": "OS/radio variation remains"
+  },
+  {
+    "id": "RISK-004",
+    "risk": "Semantic dependency regression",
+    "likelihood": "Unquantified",
+    "impact": "Future round blocked",
+    "mitigation": "Narrow declarations + chronology",
+    "detection": "GO/NextSafeAction",
+    "fallback": "Supported audited clearance",
+    "residual_risk": "New lifecycle feature can expand graph"
+  },
+  {
+    "id": "RISK-005",
+    "risk": "Human gross/ownership mistake",
+    "likelihood": "Unquantified",
+    "impact": "Wrong reviewed input",
+    "mitigation": "Before/after review and audits",
+    "detection": "Conflict/completeness checks",
+    "fallback": "Owner correction from original record",
+    "residual_risk": "Human judgment remains necessary"
+  },
+  {
+    "id": "RISK-006",
+    "risk": "Metrics/alerts blind spot",
+    "likelihood": "Unquantified",
+    "impact": "Late diagnosis",
+    "mitigation": "Independent telemetry retention/scrapehealth",
+    "detection": "Missing-data alert",
+    "fallback": "Bounded manualhealth/cards",
+    "residual_risk": "Provider data may still be incomplete"
+  },
+  {
+    "id": "RISK-007",
+    "risk": "Restore/cutover defect",
+    "likelihood": "Unquantified",
+    "impact": "Data loss or longoutage",
+    "mitigation": "Regularisolatedrestore + reconciliation",
+    "detection": "Drill/RPO evidence",
+    "fallback": "Physicalrecords + durable receipts",
+    "residual_risk": "Nozero-lossclaimwithoutinfraguaranty"
+  },
+  {
+    "id": "RISK-008",
+    "risk": "Automation unintended mutation",
+    "likelihood": "Unquantified",
+    "impact": "Competitive/financial corruption",
+    "mitigation": "Namedoperationclass/approval/idempotency/RLS",
+    "detection": "Receipt/invariants",
+    "fallback": "Stop/rollback ifcompatible",
+    "residual_risk": "Implementation/security review required"
+  },
+  {
+    "id": "RISK-009",
+    "risk": "Prematurefreeze/overstatedPASS",
+    "likelihood": "Unquantified",
+    "impact": "Knownfailureclassships",
+    "mitigation": "Proofgeneratorandhardgates",
+    "detection": "Missinglayer dashboard",
+    "fallback": "NO-GO",
+    "residual_risk": "Owner pressure cannot remove residual uncertainty"
+  },
+  {
+    "id": "RISK-010",
+    "risk": "Singleowner operational overload",
+    "likelihood": "Observed2026, futureunquantified",
+    "impact": "Delay/recovery burden",
+    "mitigation": "MobileDirector/runbooks/alerts",
+    "detection": "Manualinterventioncount",
+    "fallback": "Delegatedpreapprovedops+cards",
+    "residual_risk": "Ownerjudgmentstillbottleneck"
+  }
+]

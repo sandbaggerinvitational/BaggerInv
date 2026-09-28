@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "candidate",
+    "domains",
+    "evidence",
+    "verdict"
+  ],
+  "properties": {
+    "candidate": {
+      "type": "object",
+      "required": [
+        "backendSha",
+        "nativeBuild",
+        "schemaVersion",
+        "contractVersions",
+        "fixtureVersion"
+      ]
+    },
+    "domains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "domain",
+          "priority",
+          "status",
+          "evidenceIds",
+          "lastVerified",
+          "limitations"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "NOT_PROVEN"
+            ]
+          },
+          "priority": {
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "evidenceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array"
+    },
+    "verdict": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ]
+    }
+  },
+  "description": "JSON schema checks structure; semantic validator must reject PASS with missing/stale/failed required evidence. Schema alone does not certify readiness."
+}

@@ -1,0 +1,873 @@
+[
+  {
+    "incident": "2026-INC-001",
+    "root_cause": "RC-TIME",
+    "requirements": [
+      "CERT-NA-001",
+      "B11-READ-005"
+    ],
+    "backlog": [
+      "BL-CERT-NA-001",
+      "BL-B11-READ-005"
+    ],
+    "tests": [
+      "NA-2026-001"
+    ],
+    "automation": [
+      "AUTO-015",
+      "AUTO-024"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-007"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-002",
+    "root_cause": "RC-NAV-CONTRACT",
+    "requirements": [
+      "CERT-NA-001",
+      "B11-NAV-005"
+    ],
+    "backlog": [
+      "BL-CERT-NA-001",
+      "BL-B11-NAV-005"
+    ],
+    "tests": [
+      "NA-2026-002"
+    ],
+    "automation": [
+      "AUTO-015"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-007"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-003",
+    "root_cause": "RC-APPEARANCE-FIXTURE",
+    "requirements": [
+      "CERT-NA-001",
+      "B11-READ-006"
+    ],
+    "backlog": [
+      "BL-CERT-NA-001",
+      "BL-B11-READ-006"
+    ],
+    "tests": [
+      "NA-2026-003"
+    ],
+    "automation": [
+      "AUTO-024"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-007"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-004",
+    "root_cause": "RC-TODAY-STATE",
+    "requirements": [
+      "CERT-NA-001",
+      "B11-READ-003",
+      "B11-READ-004",
+      "B11-READ-007"
+    ],
+    "backlog": [
+      "BL-CERT-NA-001",
+      "BL-B11-READ-003",
+      "BL-B11-READ-004",
+      "BL-B11-READ-007"
+    ],
+    "tests": [
+      "NA-2026-004"
+    ],
+    "automation": [
+      "AUTO-023",
+      "AUTO-024"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-007"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-005",
+    "root_cause": "RC-SCORE-PROJECTION",
+    "requirements": [
+      "CERT-001",
+      "CERT-NA-001",
+      "CERT-PHY-001",
+      "B11-SCORE-007",
+      "B11-SCORE-008"
+    ],
+    "backlog": [
+      "BL-CERT-001",
+      "BL-CERT-NA-001",
+      "BL-CERT-PHY-001",
+      "BL-B11-SCORE-007",
+      "BL-B11-SCORE-008"
+    ],
+    "tests": [
+      "NA-2026-005"
+    ],
+    "automation": [
+      "AUTO-024"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-007"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-006",
+    "root_cause": "RC-PERSISTENCE",
+    "requirements": [
+      "OBS-CORE-001",
+      "CERT-001",
+      "BE-CONTRACT-001",
+      "PWA-001",
+      "CERT-NA-001",
+      "CERT-PHY-001",
+      "CERT-IMPACT-001",
+      "B11-NAV-004",
+      "B11-SCORE-001",
+      "B11-SCORE-002",
+      "B11-SCORE-003",
+      "B11-SCORE-004",
+      "B11-SCORE-005",
+      "B11-SCORE-006",
+      "B11-READ-007"
+    ],
+    "backlog": [
+      "BL-OBS-CORE-001",
+      "BL-CERT-001",
+      "BL-BE-CONTRACT-001",
+      "BL-PWA-001",
+      "BL-CERT-NA-001",
+      "BL-CERT-PHY-001",
+      "BL-CERT-IMPACT-001",
+      "BL-B11-NAV-004",
+      "BL-B11-SCORE-001",
+      "BL-B11-SCORE-002",
+      "BL-B11-SCORE-003",
+      "BL-B11-SCORE-004",
+      "BL-B11-SCORE-005",
+      "BL-B11-SCORE-006",
+      "BL-B11-READ-007"
+    ],
+    "tests": [
+      "NA-2026-006"
+    ],
+    "automation": [
+      "AUTO-003",
+      "AUTO-005",
+      "AUTO-027"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-004",
+      "RUNBOOK-007"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-007",
+    "root_cause": "RC-SHELL-COUPLING",
+    "requirements": [
+      "OBS-CORE-001",
+      "BE-CONTRACT-001",
+      "CERT-NA-001",
+      "CERT-PHY-001",
+      "AUTO-DEG-001",
+      "B11-NAV-001",
+      "B11-NAV-002",
+      "B11-NAV-003",
+      "B11-NAV-004",
+      "B11-READ-003",
+      "B11-READ-007"
+    ],
+    "backlog": [
+      "BL-OBS-CORE-001",
+      "BL-BE-CONTRACT-001",
+      "BL-CERT-NA-001",
+      "BL-CERT-PHY-001",
+      "BL-AUTO-DEG-001",
+      "BL-B11-NAV-001",
+      "BL-B11-NAV-002",
+      "BL-B11-NAV-003",
+      "BL-B11-NAV-004",
+      "BL-B11-READ-003",
+      "BL-B11-READ-007"
+    ],
+    "tests": [
+      "NA-2026-007"
+    ],
+    "automation": [
+      "AUTO-023",
+      "AUTO-024"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-004",
+      "RUNBOOK-007"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-008",
+    "root_cause": "RC-SEMANTIC-BOUNDS",
+    "requirements": [
+      "BE-CONTRACT-001",
+      "CERT-NA-001",
+      "B11-NAV-001",
+      "B11-READ-001",
+      "B11-READ-003",
+      "B11-READ-007"
+    ],
+    "backlog": [
+      "BL-BE-CONTRACT-001",
+      "BL-CERT-NA-001",
+      "BL-B11-NAV-001",
+      "BL-B11-READ-001",
+      "BL-B11-READ-003",
+      "BL-B11-READ-007"
+    ],
+    "tests": [
+      "NA-2026-008"
+    ],
+    "automation": [
+      "AUTO-015",
+      "AUTO-023"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-007"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-009",
+    "root_cause": "RC-LIFECYCLE",
+    "requirements": [
+      "BE-CONTRACT-001",
+      "CERT-NA-001",
+      "AUTO-DEG-001",
+      "B11-NAV-001",
+      "B11-READ-002",
+      "B11-READ-003",
+      "B11-READ-007"
+    ],
+    "backlog": [
+      "BL-BE-CONTRACT-001",
+      "BL-CERT-NA-001",
+      "BL-AUTO-DEG-001",
+      "BL-B11-NAV-001",
+      "BL-B11-READ-002",
+      "BL-B11-READ-003",
+      "BL-B11-READ-007"
+    ],
+    "tests": [
+      "NA-2026-009"
+    ],
+    "automation": [
+      "AUTO-008",
+      "AUTO-023"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-007"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-010",
+    "root_cause": "RC-SQL-EXECUTION",
+    "requirements": [
+      "CERT-001",
+      "CERT-NA-001",
+      "CERT-SYN-001",
+      "CERT-IMPACT-001",
+      "DB-PERF-002",
+      "BE-JOB-002"
+    ],
+    "backlog": [
+      "BL-CERT-001",
+      "BL-CERT-NA-001",
+      "BL-CERT-SYN-001",
+      "BL-CERT-IMPACT-001",
+      "BL-DB-PERF-002",
+      "BL-BE-JOB-002"
+    ],
+    "tests": [
+      "NA-2026-010"
+    ],
+    "automation": [
+      "AUTO-015",
+      "AUTO-016"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-004"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-011",
+    "root_cause": "RC-ACTIVATION",
+    "requirements": [
+      "AUTO-JOB-001",
+      "CERT-NA-001",
+      "REL-001",
+      "BE-JOB-002",
+      "BE-JOB-004",
+      "BE-DEP-001"
+    ],
+    "backlog": [
+      "BL-AUTO-JOB-001",
+      "BL-CERT-NA-001",
+      "BL-REL-001",
+      "BL-BE-JOB-002",
+      "BL-BE-JOB-004",
+      "BL-BE-DEP-001"
+    ],
+    "tests": [
+      "NA-2026-011"
+    ],
+    "automation": [
+      "AUTO-006",
+      "AUTO-010",
+      "AUTO-025"
+    ],
+    "runbooks": [
+      "RUNBOOK-001"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-012",
+    "root_cause": "RC-SQL-EXECUTION",
+    "requirements": [
+      "CERT-001",
+      "CERT-NA-001",
+      "CERT-SYN-001",
+      "CERT-IMPACT-001",
+      "DB-PERF-002",
+      "BE-JOB-002"
+    ],
+    "backlog": [
+      "BL-CERT-001",
+      "BL-CERT-NA-001",
+      "BL-CERT-SYN-001",
+      "BL-CERT-IMPACT-001",
+      "BL-DB-PERF-002",
+      "BL-BE-JOB-002"
+    ],
+    "tests": [
+      "NA-2026-012"
+    ],
+    "automation": [
+      "AUTO-015",
+      "AUTO-016",
+      "AUTO-023"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-004"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-013",
+    "root_cause": "RC-ACTIVATION",
+    "requirements": [
+      "DIR-OPS-001",
+      "DIR-OPS-002",
+      "CERT-NA-001",
+      "REL-001",
+      "BE-DEP-003"
+    ],
+    "backlog": [
+      "BL-DIR-OPS-001",
+      "BL-DIR-OPS-002",
+      "BL-CERT-NA-001",
+      "BL-REL-001",
+      "BL-BE-DEP-003"
+    ],
+    "tests": [
+      "NA-2026-013"
+    ],
+    "automation": [
+      "AUTO-002",
+      "AUTO-003",
+      "AUTO-025"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-009"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-014",
+    "root_cause": "RC-CONFIG",
+    "requirements": [
+      "BE-CONTRACT-001",
+      "PWA-001",
+      "CERT-NA-001",
+      "CERT-PHY-001",
+      "REL-001",
+      "BE-JOB-005"
+    ],
+    "backlog": [
+      "BL-BE-CONTRACT-001",
+      "BL-PWA-001",
+      "BL-CERT-NA-001",
+      "BL-CERT-PHY-001",
+      "BL-REL-001",
+      "BL-BE-JOB-005"
+    ],
+    "tests": [
+      "NA-2026-014"
+    ],
+    "automation": [
+      "AUTO-025",
+      "AUTO-027"
+    ],
+    "runbooks": [
+      "RUNBOOK-001"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-015",
+    "root_cause": "RC-UNKNOWN-SW",
+    "requirements": [
+      "PWA-001",
+      "CERT-NA-001",
+      "BE-JOB-005"
+    ],
+    "backlog": [
+      "BL-PWA-001",
+      "BL-CERT-NA-001",
+      "BL-BE-JOB-005"
+    ],
+    "tests": [
+      "NA-2026-015"
+    ],
+    "automation": [
+      "AUTO-024"
+    ],
+    "runbooks": [
+      "RUNBOOK-001"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-016",
+    "root_cause": "RC-DEPENDENCY",
+    "requirements": [
+      "DIR-OPS-001",
+      "AUTO-JOB-001",
+      "DIR-NEXT-001",
+      "CERT-NA-001",
+      "CERT-SYN-001",
+      "DIR-MOB-001",
+      "BE-JOB-002",
+      "BE-JOB-003",
+      "BE-DEP-001",
+      "BE-DEP-002",
+      "BE-DEP-003",
+      "BE-DEP-004"
+    ],
+    "backlog": [
+      "BL-DIR-OPS-001",
+      "BL-AUTO-JOB-001",
+      "BL-DIR-NEXT-001",
+      "BL-CERT-NA-001",
+      "BL-CERT-SYN-001",
+      "BL-DIR-MOB-001",
+      "BL-BE-JOB-002",
+      "BL-BE-JOB-003",
+      "BL-BE-DEP-001",
+      "BL-BE-DEP-002",
+      "BL-BE-DEP-003",
+      "BL-BE-DEP-004"
+    ],
+    "tests": [
+      "NA-2026-016"
+    ],
+    "automation": [
+      "AUTO-006",
+      "AUTO-007",
+      "AUTO-009"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-009"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-017",
+    "root_cause": "RC-PREPARATION-WORKFLOW",
+    "requirements": [
+      "CERT-001",
+      "DIR-OPS-001",
+      "DIR-OPS-002",
+      "DIR-CLOSE-001",
+      "DIR-NEXT-001",
+      "CERT-NA-001",
+      "CERT-SYN-001",
+      "CERT-PHY-001",
+      "DIR-MOB-001",
+      "AUTO-HEALTH-001",
+      "DB-PERF-001",
+      "DB-PERF-003",
+      "BE-DEP-001",
+      "BE-DEP-002",
+      "BE-DEP-003",
+      "BE-DEP-004"
+    ],
+    "backlog": [
+      "BL-CERT-001",
+      "BL-DIR-OPS-001",
+      "BL-DIR-OPS-002",
+      "BL-DIR-CLOSE-001",
+      "BL-DIR-NEXT-001",
+      "BL-CERT-NA-001",
+      "BL-CERT-SYN-001",
+      "BL-CERT-PHY-001",
+      "BL-DIR-MOB-001",
+      "BL-AUTO-HEALTH-001",
+      "BL-DB-PERF-001",
+      "BL-DB-PERF-003",
+      "BL-BE-DEP-001",
+      "BL-BE-DEP-002",
+      "BL-BE-DEP-003",
+      "BL-BE-DEP-004"
+    ],
+    "tests": [
+      "NA-2026-017"
+    ],
+    "automation": [
+      "AUTO-002",
+      "AUTO-003",
+      "AUTO-012"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-004",
+      "RUNBOOK-009"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-018",
+    "root_cause": "RC-UNKNOWN-OUTCOME",
+    "requirements": [
+      "OBS-CORE-001",
+      "DIR-OPS-001",
+      "DIR-OPS-002",
+      "DIR-NEXT-001",
+      "CERT-NA-001",
+      "CERT-PHY-001",
+      "DIR-MOB-001",
+      "AUTO-HEALTH-001",
+      "BE-SCORE-003",
+      "BE-JOB-003",
+      "BE-DEP-003"
+    ],
+    "backlog": [
+      "BL-OBS-CORE-001",
+      "BL-DIR-OPS-001",
+      "BL-DIR-OPS-002",
+      "BL-DIR-NEXT-001",
+      "BL-CERT-NA-001",
+      "BL-CERT-PHY-001",
+      "BL-DIR-MOB-001",
+      "BL-AUTO-HEALTH-001",
+      "BL-BE-SCORE-003",
+      "BL-BE-JOB-003",
+      "BL-BE-DEP-003"
+    ],
+    "tests": [
+      "NA-2026-018"
+    ],
+    "automation": [
+      "AUTO-003",
+      "AUTO-005"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-004",
+      "RUNBOOK-009"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-019",
+    "root_cause": "RC-HISTORY-CRITICAL-PATH",
+    "requirements": [
+      "OBS-CORE-001",
+      "CERT-001",
+      "PERF-001",
+      "PWA-001",
+      "CERT-NA-001",
+      "CERT-SYN-001",
+      "OPS-DR-001",
+      "HIST-001",
+      "CERT-IMPACT-001",
+      "BE-SCORE-001",
+      "BE-SCORE-002",
+      "DB-PERF-001",
+      "DB-PERF-002",
+      "DB-PERF-003",
+      "BE-JOB-001",
+      "BE-JOB-002",
+      "BE-DEP-002"
+    ],
+    "backlog": [
+      "BL-OBS-CORE-001",
+      "BL-CERT-001",
+      "BL-PERF-001",
+      "BL-PWA-001",
+      "BL-CERT-NA-001",
+      "BL-CERT-SYN-001",
+      "BL-OPS-DR-001",
+      "BL-HIST-001",
+      "BL-CERT-IMPACT-001",
+      "BL-BE-SCORE-001",
+      "BL-BE-SCORE-002",
+      "BL-DB-PERF-001",
+      "BL-DB-PERF-002",
+      "BL-DB-PERF-003",
+      "BL-BE-JOB-001",
+      "BL-BE-JOB-002",
+      "BL-BE-DEP-002"
+    ],
+    "tests": [
+      "NA-2026-019"
+    ],
+    "automation": [
+      "AUTO-010",
+      "AUTO-013",
+      "AUTO-016"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-004",
+      "RUNBOOK-009"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-020",
+    "root_cause": "RC-RECOVERY-UX",
+    "requirements": [
+      "DIR-REC-001",
+      "DIR-CLOSE-001",
+      "CERT-NA-001",
+      "CERT-PHY-001",
+      "OPS-DR-001",
+      "DIR-MOB-001",
+      "BE-SCORE-001",
+      "BE-SCORE-003",
+      "BE-SCORE-004",
+      "BE-JOB-003"
+    ],
+    "backlog": [
+      "BL-DIR-REC-001",
+      "BL-DIR-CLOSE-001",
+      "BL-CERT-NA-001",
+      "BL-CERT-PHY-001",
+      "BL-OPS-DR-001",
+      "BL-DIR-MOB-001",
+      "BL-BE-SCORE-001",
+      "BL-BE-SCORE-003",
+      "BL-BE-SCORE-004",
+      "BL-BE-JOB-003"
+    ],
+    "tests": [
+      "NA-2026-020"
+    ],
+    "automation": [
+      "AUTO-003",
+      "AUTO-011"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-004",
+      "RUNBOOK-009",
+      "RUNBOOK-014"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-021",
+    "root_cause": "RC-FINANCIAL-UX",
+    "requirements": [
+      "DIR-FIN-001",
+      "CERT-NA-001"
+    ],
+    "backlog": [
+      "BL-DIR-FIN-001",
+      "BL-CERT-NA-001"
+    ],
+    "tests": [
+      "NA-2026-021"
+    ],
+    "automation": [
+      "AUTO-008"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-012"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-022",
+    "root_cause": "RC-UNKNOWN-DB",
+    "requirements": [
+      "OBS-CORE-001",
+      "BE-CONTRACT-001",
+      "CERT-NA-001",
+      "OPS-DR-001",
+      "AUTO-HEALTH-001",
+      "AUTO-DEG-001"
+    ],
+    "backlog": [
+      "BL-OBS-CORE-001",
+      "BL-BE-CONTRACT-001",
+      "BL-CERT-NA-001",
+      "BL-OPS-DR-001",
+      "BL-AUTO-HEALTH-001",
+      "BL-AUTO-DEG-001"
+    ],
+    "tests": [
+      "NA-2026-022"
+    ],
+    "automation": [
+      "AUTO-001",
+      "AUTO-013"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-004"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-023",
+    "root_cause": "RC-UNKNOWN-DB",
+    "requirements": [
+      "OBS-CORE-001",
+      "PERF-001",
+      "OPS-SAFE-001",
+      "CERT-NA-001",
+      "HIST-001"
+    ],
+    "backlog": [
+      "BL-OBS-CORE-001",
+      "BL-PERF-001",
+      "BL-OPS-SAFE-001",
+      "BL-CERT-NA-001",
+      "BL-HIST-001"
+    ],
+    "tests": [
+      "NA-2026-023"
+    ],
+    "automation": [
+      "AUTO-013",
+      "AUTO-016"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-004",
+      "RUNBOOK-009"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-024",
+    "root_cause": "RC-CAPACITY-PROOF",
+    "requirements": [
+      "OBS-CORE-001",
+      "CERT-001",
+      "OPS-SAFE-001",
+      "CERT-NA-001",
+      "OPS-DR-001",
+      "AUTO-DEG-001"
+    ],
+    "backlog": [
+      "BL-OBS-CORE-001",
+      "BL-CERT-001",
+      "BL-OPS-SAFE-001",
+      "BL-CERT-NA-001",
+      "BL-OPS-DR-001",
+      "BL-AUTO-DEG-001"
+    ],
+    "tests": [
+      "NA-2026-024"
+    ],
+    "automation": [
+      "AUTO-013",
+      "AUTO-020"
+    ],
+    "runbooks": [
+      "RUNBOOK-001",
+      "RUNBOOK-004"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-025",
+    "root_cause": "RC-OBSERVABILITY",
+    "requirements": [
+      "OBS-CORE-001"
+    ],
+    "backlog": [
+      "BL-OBS-CORE-001"
+    ],
+    "tests": [
+      "NA-2026-025"
+    ],
+    "automation": [
+      "AUTO-001",
+      "AUTO-017"
+    ],
+    "runbooks": [
+      "RUNBOOK-004"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  },
+  {
+    "incident": "2026-INC-026",
+    "root_cause": "RC-UNKNOWN-NETWORK",
+    "requirements": [
+      "OBS-CORE-001"
+    ],
+    "backlog": [
+      "BL-OBS-CORE-001"
+    ],
+    "tests": [
+      "NA-2026-026"
+    ],
+    "automation": [
+      "AUTO-023",
+      "AUTO-024"
+    ],
+    "runbooks": [
+      "RUNBOOK-004"
+    ],
+    "acceptance": "REQUIREMENTS.md acceptance_criteria; all proposed proof NOT PROVEN"
+  }
+]

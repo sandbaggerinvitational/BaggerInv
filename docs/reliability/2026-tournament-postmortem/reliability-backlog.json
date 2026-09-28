@@ -1,0 +1,3546 @@
+[
+  {
+    "id": "BL-OBS-CORE-001",
+    "requirement_id": "OBS-CORE-001",
+    "title": "Correlate score, operation, API, database and native outcome telemetry",
+    "domain": "OBS",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-006",
+      "2026-INC-007",
+      "2026-INC-018",
+      "2026-INC-019",
+      "2026-INC-022",
+      "2026-INC-023",
+      "2026-INC-024",
+      "2026-INC-025",
+      "2026-INC-026"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Correlate score, operation, API, database and native outcome telemetry",
+    "dependencies": [],
+    "test_requirements": [
+      "TEST-OBS-CORE-001",
+      "NA-2026-006",
+      "NA-2026-007",
+      "NA-2026-018",
+      "NA-2026-019",
+      "NA-2026-022",
+      "NA-2026-023",
+      "NA-2026-024",
+      "NA-2026-025",
+      "NA-2026-026"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-003"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "One test mutation traces request ID → mutation ID → canonical receipt with no secrets",
+      "Report latency, timeout and unknown outcome separately; preserve release/activation and proof layer"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Backend/Infrastructure"
+  },
+  {
+    "id": "BL-CERT-001",
+    "requirement_id": "CERT-001",
+    "title": "Require evidence by capability and proof layer before readiness claims",
+    "domain": "CERT",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-005",
+      "2026-INC-006",
+      "2026-INC-010",
+      "2026-INC-012",
+      "2026-INC-017",
+      "2026-INC-019",
+      "2026-INC-024"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Require evidence by capability and proof layer before readiness claims",
+    "dependencies": [],
+    "test_requirements": [
+      "TEST-CERT-001",
+      "NA-2026-005",
+      "NA-2026-006",
+      "NA-2026-010",
+      "NA-2026-012",
+      "NA-2026-017",
+      "NA-2026-019",
+      "NA-2026-024"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Missing or stale P0 proof produces NO-GO",
+      "Physical, SQL, chronological and performance gates cannot be substituted by unit counts"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Certification"
+  },
+  {
+    "id": "BL-PERF-001",
+    "requirement_id": "PERF-001",
+    "title": "Establish exact critical RPC performance baselines on accumulated synthetic history",
+    "domain": "PERF",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-019",
+      "2026-INC-023"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Establish exact critical RPC performance baselines on accumulated synthetic history",
+    "dependencies": [],
+    "test_requirements": [
+      "TEST-PERF-001",
+      "NA-2026-019",
+      "NA-2026-023"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Benchmarks record compute, seed, rows, plans, sample count, cold/warm state and distribution",
+      "Current/2x/5x/10x history does not convert score path into history scan"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Database"
+  },
+  {
+    "id": "BL-DIR-OPS-001",
+    "requirement_id": "DIR-OPS-001",
+    "title": "Evaluate bounded canonical Round GO and explain each blocker",
+    "domain": "DIR",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-013",
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-018"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Evaluate bounded canonical Round GO and explain each blocker",
+    "dependencies": [
+      "OBS-CORE-001"
+    ],
+    "test_requirements": [
+      "TEST-DIR-OPS-001",
+      "NA-2026-013",
+      "NA-2026-016",
+      "NA-2026-017",
+      "NA-2026-018"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "All pairings/context/HI/course/tee/access/lease/health dependencies checked by current pointers",
+      "Stale health or missing evidence yields NO-GO, never implicit GO"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Director"
+  },
+  {
+    "id": "BL-DIR-OPS-002",
+    "requirement_id": "DIR-OPS-002",
+    "title": "Make Prepare/Open/Lock/Resume/Finalize self-certifying idempotent operations",
+    "domain": "DIR",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-013",
+      "2026-INC-017",
+      "2026-INC-018"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Make Prepare/Open/Lock/Resume/Finalize self-certifying idempotent operations",
+    "dependencies": [
+      "DIR-OPS-001"
+    ],
+    "test_requirements": [
+      "TEST-DIR-OPS-002",
+      "NA-2026-013",
+      "NA-2026-017",
+      "NA-2026-018"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "L",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Whole-round 12-or-0 atomicity; immutable key/fingerprint and durable receipt",
+      "Lost response resolves by exact receipt; changed fingerprint explained; no blind new request"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Backend/Director"
+  },
+  {
+    "id": "BL-DIR-REC-001",
+    "requirement_id": "DIR-REC-001",
+    "title": "Provide audited physical scorecard recovery through canonical scoring authority",
+    "domain": "DIR",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-020"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Provide audited physical scorecard recovery through canonical scoring authority",
+    "dependencies": [
+      "DIR-OPS-002"
+    ],
+    "test_requirements": [
+      "TEST-DIR-REC-001",
+      "NA-2026-020"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Matching Official holes skipped; missing submitted once; differences require owner review",
+      "Receipt binds physical source and resulting canonical revisions; 18-hole recovery rehearsed"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Director"
+  },
+  {
+    "id": "BL-OPS-SAFE-001",
+    "requirement_id": "OPS-SAFE-001",
+    "title": "Enforce tournament diagnostic admission and workload isolation",
+    "domain": "OPS",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-023",
+      "2026-INC-024"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Enforce tournament diagnostic admission and workload isolation",
+    "dependencies": [],
+    "test_requirements": [
+      "TEST-OPS-SAFE-001",
+      "NA-2026-023",
+      "NA-2026-024"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-013"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Live diagnostic role cannot mutate; allowlisted indexed current reads only",
+      "Timeout/row/payload/concurrency limits enforced server-side; heavy requests denied/routed to clone"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Infrastructure/Backend"
+  },
+  {
+    "id": "BL-DIR-CLOSE-001",
+    "requirement_id": "DIR-CLOSE-001",
+    "title": "Certify round and tournament completeness with canonical scoped readback",
+    "domain": "DIR",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-017",
+      "2026-INC-020"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Certify round and tournament completeness with canonical scoped readback",
+    "dependencies": [
+      "DIR-OPS-001"
+    ],
+    "test_requirements": [
+      "TEST-DIR-CLOSE-001",
+      "NA-2026-017",
+      "NA-2026-020"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Expected Final/Official/result totals and zero access/leases verified",
+      "Side games complete or explicitly waived separately; golf champion cannot be changed by financial publication"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Director"
+  },
+  {
+    "id": "BL-BE-CONTRACT-001",
+    "requirement_id": "BE-CONTRACT-001",
+    "title": "Freeze typed versioned errors, semantic lifecycle and scoring contracts",
+    "domain": "BE",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-006",
+      "2026-INC-007",
+      "2026-INC-008",
+      "2026-INC-009",
+      "2026-INC-014",
+      "2026-INC-022"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Freeze typed versioned errors, semantic lifecycle and scoring contracts",
+    "dependencies": [],
+    "test_requirements": [
+      "TEST-BE-CONTRACT-001",
+      "NA-2026-006",
+      "NA-2026-007",
+      "NA-2026-008",
+      "NA-2026-009",
+      "NA-2026-014",
+      "NA-2026-022"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Feature/network/DB errors cannot claim invalid identity without evidence",
+      "Installed supported native and PWA contract tests cover mixed lifecycle and degraded responses"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Backend/Native/PWA"
+  },
+  {
+    "id": "BL-PWA-001",
+    "requirement_id": "PWA-001",
+    "title": "Maintain independently certified PWA scoring and safe client handoff",
+    "domain": "PWA",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-006",
+      "2026-INC-014",
+      "2026-INC-015",
+      "2026-INC-019"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Maintain independently certified PWA scoring and safe client handoff",
+    "dependencies": [
+      "BE-CONTRACT-001"
+    ],
+    "test_requirements": [
+      "TEST-PWA-001",
+      "NA-2026-006",
+      "NA-2026-014",
+      "NA-2026-015",
+      "NA-2026-019"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "L",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Signing configuration absence fails release gate",
+      "No cross-client new mutation until pending native outcome resolved or exact Official hole skipped",
+      "Physical 18-hole all-format Save/Next and fallback drill pass"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "PWA/Native"
+  },
+  {
+    "id": "BL-AUTO-JOB-001",
+    "requirement_id": "AUTO-JOB-001",
+    "title": "Expose and safely supersede provably stale unpublished side-game jobs",
+    "domain": "AUTO",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-011",
+      "2026-INC-016"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Expose and safely supersede provably stale unpublished side-game jobs",
+    "dependencies": [
+      "BE-CONTRACT-001"
+    ],
+    "test_requirements": [
+      "TEST-AUTO-JOB-001",
+      "NA-2026-011",
+      "NA-2026-016"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-010"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Only terminal/unstarted, unpublished, unreferenced obsolete inputs eligible",
+      "Concurrent publication supersession race denies safely; immutable supersession receipt"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Backend/Director"
+  },
+  {
+    "id": "BL-DIR-NEXT-001",
+    "requirement_id": "DIR-NEXT-001",
+    "title": "Compute next safe action from exact tournament phase",
+    "domain": "DIR",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-018"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Compute next safe action from exact tournament phase",
+    "dependencies": [
+      "DIR-OPS-001",
+      "AUTO-JOB-001"
+    ],
+    "test_requirements": [
+      "TEST-DIR-NEXT-001",
+      "NA-2026-016",
+      "NA-2026-017",
+      "NA-2026-018"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "R3 night-before order completes without SQL/Codex",
+      "Required, optional and blocked actions exposed with exact dependency and supported clearance"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Director"
+  },
+  {
+    "id": "BL-DIR-FIN-001",
+    "requirement_id": "DIR-FIN-001",
+    "title": "Make ownership correction immutable, price-preserving and reviewable",
+    "domain": "DIR",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-021"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Make ownership correction immutable, price-preserving and reviewable",
+    "dependencies": [],
+    "test_requirements": [
+      "TEST-DIR-FIN-001",
+      "NA-2026-021"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Published edit denied; withdrawal consequences shown",
+      "Exact fractions total 100%; all unchanged prices and $18,500 preserved in 2026 fixture",
+      "New auction/publication/result revisions retained with reason and receipt",
+      "Supported last-draft-entry removal preserves historical revisions and requires explicit owner review."
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Director/Side games"
+  },
+  {
+    "id": "BL-CERT-NA-001",
+    "requirement_id": "CERT-NA-001",
+    "title": "Convert every material 2026 failure into a Never Again regression",
+    "domain": "CERT",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-001",
+      "2026-INC-002",
+      "2026-INC-003",
+      "2026-INC-004",
+      "2026-INC-005",
+      "2026-INC-006",
+      "2026-INC-007",
+      "2026-INC-008",
+      "2026-INC-009",
+      "2026-INC-010",
+      "2026-INC-011",
+      "2026-INC-012",
+      "2026-INC-013",
+      "2026-INC-014",
+      "2026-INC-015",
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-018",
+      "2026-INC-019",
+      "2026-INC-020",
+      "2026-INC-021",
+      "2026-INC-022",
+      "2026-INC-023",
+      "2026-INC-024"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Convert every material 2026 failure into a Never Again regression",
+    "dependencies": [
+      "CERT-001"
+    ],
+    "test_requirements": [
+      "TEST-CERT-NA-001",
+      "NA-2026-001",
+      "NA-2026-002",
+      "NA-2026-003",
+      "NA-2026-004",
+      "NA-2026-005",
+      "NA-2026-006",
+      "NA-2026-007",
+      "NA-2026-008",
+      "NA-2026-009",
+      "NA-2026-010",
+      "NA-2026-011",
+      "NA-2026-012",
+      "NA-2026-013",
+      "NA-2026-014",
+      "NA-2026-015",
+      "NA-2026-016",
+      "NA-2026-017",
+      "NA-2026-018",
+      "NA-2026-019",
+      "NA-2026-020",
+      "NA-2026-021",
+      "NA-2026-022",
+      "NA-2026-023",
+      "NA-2026-024"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Old behavior reproduced where evidence permits; proposed behavior asserted",
+      "Missing historical root cause remains fault-scenario test, not fabricated causal reproduction"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Certification"
+  },
+  {
+    "id": "BL-CERT-SYN-001",
+    "requirement_id": "CERT-SYN-001",
+    "title": "Generate deterministic chronological synthetic tournament with accumulated history",
+    "domain": "CERT",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-010",
+      "2026-INC-012",
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-019"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Generate deterministic chronological synthetic tournament with accumulated history",
+    "dependencies": [
+      "PERF-001"
+    ],
+    "test_requirements": [
+      "TEST-CERT-SYN-001",
+      "NA-2026-010",
+      "NA-2026-012",
+      "NA-2026-016",
+      "NA-2026-017",
+      "NA-2026-019"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "XL",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Seeded 24-player 54-hole flow incl. all side-game transitions, R3 pairing/preparation and financial correction",
+      "Independent expected outputs; repeat reset yields identical authority and results"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Certification"
+  },
+  {
+    "id": "BL-CERT-PHY-001",
+    "requirement_id": "CERT-PHY-001",
+    "title": "Certify multi-user physical iPhone, PWA and owner tournament rehearsal",
+    "domain": "CERT",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-005",
+      "2026-INC-006",
+      "2026-INC-007",
+      "2026-INC-014",
+      "2026-INC-017",
+      "2026-INC-018",
+      "2026-INC-020"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Certify multi-user physical iPhone, PWA and owner tournament rehearsal",
+    "dependencies": [
+      "CERT-SYN-001"
+    ],
+    "test_requirements": [
+      "TEST-CERT-PHY-001",
+      "NA-2026-005",
+      "NA-2026-006",
+      "NA-2026-007",
+      "NA-2026-014",
+      "NA-2026-017",
+      "NA-2026-018",
+      "NA-2026-020"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "L",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Two physical iPhones and participant accounts across Wi-Fi/cellular, app kill and network switches",
+      "All three formats for 18 holes; native/PWA handoff; Director recovery without engineering"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Owner/QA"
+  },
+  {
+    "id": "BL-OPS-DR-001",
+    "requirement_id": "OPS-DR-001",
+    "title": "Test restore and physical-card disaster recovery before tournament",
+    "domain": "OPS",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-019",
+      "2026-INC-020",
+      "2026-INC-022",
+      "2026-INC-024"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Test restore and physical-card disaster recovery before tournament",
+    "dependencies": [],
+    "test_requirements": [
+      "TEST-OPS-DR-001",
+      "NA-2026-019",
+      "NA-2026-020",
+      "NA-2026-022",
+      "NA-2026-024"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Restore non-Production backup and verify score/result authority, identities excluded or secured",
+      "Reconcile unsynced physical golf without duplicate Official holes"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Infrastructure/Owner"
+  },
+  {
+    "id": "BL-REL-001",
+    "requirement_id": "REL-001",
+    "title": "Enforce tournament freeze, compatible activation and complete release evidence",
+    "domain": "REL",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-011",
+      "2026-INC-013",
+      "2026-INC-014"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Enforce tournament freeze, compatible activation and complete release evidence",
+    "dependencies": [
+      "CERT-001"
+    ],
+    "test_requirements": [
+      "TEST-REL-001",
+      "NA-2026-011",
+      "NA-2026-013",
+      "NA-2026-014"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "L",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Candidate cannot freeze with missing P0/physical/SQL/performance evidence",
+      "Compatible release change cannot strand job or mutate activation during score transaction",
+      "Rollback rehearsed with old clients and additive schema"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Release control"
+  },
+  {
+    "id": "BL-DIR-MOB-001",
+    "requirement_id": "DIR-MOB-001",
+    "title": "Make normal operations mobile-usable with receipts and human-readable blockers",
+    "domain": "DIR",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-018",
+      "2026-INC-020"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Make normal operations mobile-usable with receipts and human-readable blockers",
+    "dependencies": [
+      "DIR-OPS-002"
+    ],
+    "test_requirements": [
+      "TEST-DIR-MOB-001",
+      "NA-2026-016",
+      "NA-2026-017",
+      "NA-2026-018",
+      "NA-2026-020"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-003"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Owner on iPhone can review effects, confirm, inspect receipt and recover unknown status",
+      "No routine Terminal/log/SQL dependency in rehearsal"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Director"
+  },
+  {
+    "id": "BL-SEC-001",
+    "requirement_id": "SEC-001",
+    "title": "Preserve participant, spectator, Director and service-role boundaries",
+    "domain": "SEC",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Preserve participant, spectator, Director and service-role boundaries",
+    "dependencies": [],
+    "test_requirements": [
+      "TEST-SEC-001"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "New recovery/automation operations retain RLS, authorization, idempotency and audit",
+      "Spectators never receive money-game/private fields; secrets absent from telemetry/evidence"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Security"
+  },
+  {
+    "id": "BL-HIST-001",
+    "requirement_id": "HIST-001",
+    "title": "Archive completed operational payloads without weakening audit history",
+    "domain": "HIST",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-019",
+      "2026-INC-023"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Archive completed operational payloads without weakening audit history",
+    "dependencies": [
+      "PERF-001"
+    ],
+    "test_requirements": [
+      "TEST-HIST-001",
+      "NA-2026-019",
+      "NA-2026-023"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Critical current reads never scan archive",
+      "Historical reconstruction reproduces exact authority from immutable revisions; retention policy explicit"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Database"
+  },
+  {
+    "id": "BL-AUTO-HEALTH-001",
+    "requirement_id": "AUTO-HEALTH-001",
+    "title": "Create bounded current-state snapshot with explicit freshness and invalidation",
+    "domain": "AUTO",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-017",
+      "2026-INC-018",
+      "2026-INC-022"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Create bounded current-state snapshot with explicit freshness and invalidation",
+    "dependencies": [
+      "OBS-CORE-001"
+    ],
+    "test_requirements": [
+      "TEST-AUTO-HEALTH-001",
+      "NA-2026-017",
+      "NA-2026-018",
+      "NA-2026-022"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Health snapshot exposes source revision and observedAt, not hidden stale truth",
+      "Mutation admission rechecks canonical authority; cache cannot authorize scoring"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-AUTO-DEG-001",
+    "requirement_id": "AUTO-DEG-001",
+    "title": "Isolate capability health and reduce optional work during database degradation",
+    "domain": "AUTO",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-007",
+      "2026-INC-009",
+      "2026-INC-022",
+      "2026-INC-024"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Isolate capability health and reduce optional work during database degradation",
+    "dependencies": [
+      "OBS-CORE-001",
+      "BE-CONTRACT-001"
+    ],
+    "test_requirements": [
+      "TEST-AUTO-DEG-001",
+      "NA-2026-007",
+      "NA-2026-009",
+      "NA-2026-022",
+      "NA-2026-024"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Odds/NetSkins failure cannot disable identity/scoring",
+      "Hysteresis prevents retry storm; DB outage preserves intents and offers physical cards"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Backend/Clients"
+  },
+  {
+    "id": "BL-CERT-IMPACT-001",
+    "requirement_id": "CERT-IMPACT-001",
+    "title": "Select and expire certification through dependency-aware change graph",
+    "domain": "CERT",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-006",
+      "2026-INC-010",
+      "2026-INC-012",
+      "2026-INC-019"
+    ],
+    "root_cause": "Prevent recurrence or make bounded recovery operable; see linked incident evidence.",
+    "proposed_change": "Select and expire certification through dependency-aware change graph",
+    "dependencies": [
+      "CERT-001",
+      "CERT-NA-001"
+    ],
+    "test_requirements": [
+      "TEST-CERT-IMPACT-001",
+      "NA-2026-006",
+      "NA-2026-010",
+      "NA-2026-012",
+      "NA-2026-019"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": "Contract/migration changes require staging, security and rollback proof",
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Score RPC change invalidates all-format client/recovery/finalization proof",
+      "Odds copy-only edit does not discard unchanged scoring proof; changed lifecycle does"
+    ],
+    "confidence": "HIGH CONFIDENCE in direction; acceptance not yet proven",
+    "assumptions": "Private 24-player tournament; canonical server authority retained",
+    "owner": "Certification"
+  },
+  {
+    "id": "BL-B11-NAV-001",
+    "requirement_id": "B11-NAV-001",
+    "title": "Feature-local failures preserve the authenticated shell",
+    "domain": "B11",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-007",
+      "2026-INC-008",
+      "2026-INC-009"
+    ],
+    "root_cause": "MOBILE_API_UNAVAILABLE from one feature replaces RootView's authenticated branch and destroys all shell-local navigation.",
+    "proposed_change": "A feature read failure updates that repository/destination only. Session identity and the mounted participant shell remain alive while write authority may be independently fenced.",
+    "dependencies": [
+      "Typed error scope from B11-READ-003",
+      "A navigation owner outside AppCoordinator's authority state"
+    ],
+    "test_requirements": [
+      "TEST-B11-NAV-001",
+      "NA-2026-007",
+      "NA-2026-008",
+      "NA-2026-009"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Preserving the shell must not accidentally preserve write authority",
+      "Old private data must still obey visibility/revocation rules"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Inject MOBILE_API_UNAVAILABLE from every generic read repository, scoring read, queue readback, reconnect, and finalization callback while each top-level tab is selected. Controller/shell identity, tab, subtab, and path remain unchanged; the failed feature shows typed local state; mutation transport stays fenced until authority is valid."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Participant identity remains valid",
+      "No explicit home deep link or user sign-out"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-NAV-002",
+    "requirement_id": "B11-NAV-002",
+    "title": "Global identity failures remain explicitly fail-closed",
+    "domain": "B11",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-007"
+    ],
+    "root_cause": "Build 10 conflates some scoped 401/403/resource failures with true authentication or certification invalidation.",
+    "proposed_change": "Only explicit identity/certification/session revocation removes private UI and credentials. Resource authorization and feature availability are local; scoring match denial remains scoped.",
+    "dependencies": [
+      "Backend error codes distinguish identity, resource authorization, environment, and feature availability"
+    ],
+    "test_requirements": [
+      "TEST-B11-NAV-002",
+      "NA-2026-007"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Under-classifying a true identity failure could expose stale private presentation",
+      "Over-classifying recreates 2026 disruption"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "A conformance matrix proves true missing/revoked identity, Auth UUID mismatch, rejected certification, deleted participant, and explicit sign-out remove the shell; bare/scoped 403 and feature 503 retain it. Unknown security states fail writes closed without falsely signing out."
+    ],
+    "confidence": "STRONGLY SUPPORTED overbroad mapping; true-denial cases are source-proven",
+    "assumptions": [
+      "Backend supplies trustworthy scope codes"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-NAV-003",
+    "requirement_id": "B11-NAV-003",
+    "title": "Navigation survives normal authority and lifecycle refresh",
+    "domain": "B11",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-007"
+    ],
+    "root_cause": "Tab/subtab/path exist only as BaggerAppShell instance state and cannot survive unavoidable reconstruction.",
+    "proposed_change": "Healthy foreground, transient transport loss, compatible release/activation change, and successful reattestation retain selected destination. If an unavoidable security root replacement occurs, restoration is allowed only after the same authenticated identity is re-established and the destination remains authorized.",
+    "dependencies": [
+      "B11-NAV-001",
+      "Identity-bound route snapshot with allowlist validation"
+    ],
+    "test_requirements": [
+      "TEST-B11-NAV-003",
+      "NA-2026-007"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Persisted routes can outlive authorization unless identity-bound and validated",
+      "Restoring an obsolete route must use a local safe fallback"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "For all five tabs plus nested Match, Passport, History, Odds, Net Skins, and Calcutta paths, healthy/transport/compatible-release transitions preserve context. Identity replacement or sign-out clears the saved private route. Cold launch follows an explicit documented policy."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Restored destination is still present/authorized"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-NAV-004",
+    "requirement_id": "B11-NAV-004",
+    "title": "Preserve outcome context during scoring and finalization fences",
+    "domain": "B11",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-006",
+      "2026-INC-007"
+    ],
+    "root_cause": "Queue/finalization authority checks can destroy the screen that explains an unknown or reviewable outcome.",
+    "proposed_change": "The current score/review/finalization destination remains visible with writes disabled and an explicit outcome state until canonical reconciliation or a true identity exit.",
+    "dependencies": [
+      "B11-SCORE-002",
+      "B11-READ-003"
+    ],
+    "test_requirements": [
+      "TEST-B11-NAV-004",
+      "NA-2026-006",
+      "NA-2026-007"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-003"
+    ],
+    "complexity": "L",
+    "risk": [
+      "UI language could imply a commit before acknowledgement",
+      "User retry must never mint a new mutation identity for the same durable intent"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Inject unavailable, timeout, lost ACK, finalization unknown outcome, and reconnect revalidation. The user remains on the exact match/hole/review context, cannot double-submit, and sees whether the server outcome is known, unknown, accepted, or rejected."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Test environment can deterministically hold responses"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-NAV-005",
+    "requirement_id": "B11-NAV-005",
+    "title": "Spectator navigation remains round-scoped",
+    "domain": "B11",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-002"
+    ],
+    "root_cause": "Build 8 accepted tournament-wide links alongside round-local position/count until canonical response compatibility caught three endpoints.",
+    "proposed_change": "Previous/next IDs, index, count, and visible label derive from one canonical round scope; unpaired placeholders do not fabricate detail routes.",
+    "dependencies": [
+      "Canonical round membership/order projection"
+    ],
+    "test_requirements": [
+      "TEST-B11-NAV-005",
+      "NA-2026-002"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Regression if participant and spectator adapters diverge",
+      "Fixture IDs can accidentally encode round and mask scope bugs"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "For every round with zero, one, partial, and complete pairings and mixed lifecycle states, traverse first/interior/last detail; links never cross rounds, endpoints are nil, opaque IDs work, and placeholder taps yield a local unavailable state."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Release 132 server mapping or equivalent remains"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-SCORE-001",
+    "requirement_id": "B11-SCORE-001",
+    "title": "Canonicalize durable queue timestamps before compare-and-swap",
+    "domain": "B11",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-006"
+    ],
+    "root_cause": "Fractional Date encoding changes representation and exact record equality falsely reports concurrent modification.",
+    "proposed_change": "A record written to SQLite and returned to the coordinator is byte/semantic canonical. Optimistic concurrency compares an explicit durable revision/token or canonical fields, never noncanonical in-memory Date bits.",
+    "dependencies": [
+      "None on backend redesign; can be implemented and verified locally against exact Build 10 queue schema",
+      "Upgrade/migration policy for existing records"
+    ],
+    "test_requirements": [
+      "TEST-B11-SCORE-001",
+      "NA-2026-006"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Migration of unresolved Build 10 rows",
+      "Changing equality too broadly could hide genuine concurrent modification"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Generate fractional dates across every record transition and mutable Date field, persist/reload, and complete CAS without false conflict. Real concurrent writers still conflict. Migration/upgrade opens every supported Build 10 queue state without data loss or accidental resubmission."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Queue schema can add/use a durable revision without weakening identity partitioning"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-SCORE-002",
+    "requirement_id": "B11-SCORE-002",
+    "title": "Automatically reconcile exact matching Official intent",
+    "domain": "B11",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-006"
+    ],
+    "root_cause": "A committed matching score can remain syncing/acknowledged while a sticky latch blocks all new local entry and exposes no useful action.",
+    "proposed_change": "After fresh canonical proof of the same identity, match/hole, snapshot, mutation identity where available, nonregressed revisions, and exact gross arrays, mark the local intent resolved/receipt-backed without changing Official data. A matching stored ACK uses reads only; unknown outcome reuses the original mutation ID.",
+    "dependencies": [
+      "B11-SCORE-001",
+      "Existing idempotent server mutation contract; no broad backend redesign"
+    ],
+    "test_requirements": [
+      "TEST-B11-SCORE-002",
+      "NA-2026-006"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-003"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Gross equality alone is insufficient without identity/context/revision proof",
+      "Unknown outcome can rePOST the same ID and must remain idempotent"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Reproduce both fractional failure positions, then reconcile. Matching Official data clears the record/latch and admits the next unscored hole. The server records one canonical commit. No new mutation ID or silent queue deletion occurs."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Canonical read is fresh and context-bound"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-SCORE-003",
+    "requirement_id": "B11-SCORE-003",
+    "title": "Every blocked queue state has truthful, actionable recovery",
+    "domain": "B11",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-006"
+    ],
+    "root_cause": "Needs Review covers conflict, actionRequired, quarantine, hidden quarantine, and persistence failure, but stranded syncing/acknowledged records are absent from the action list.",
+    "proposed_change": "UI distinguishes syncing, accepted-awaiting-readback, unknown outcome, matching Official, differing Official, quarantined, and persistence fault. Only safe actions for that state appear; all destructive/local-evidence-loss actions are excluded.",
+    "dependencies": [
+      "B11-SCORE-002",
+      "Stable diagnostic reason codes"
+    ],
+    "test_requirements": [
+      "TEST-B11-SCORE-003",
+      "NA-2026-006"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "An overly broad Keep Official action could discard legitimate differing intent",
+      "Ambiguous copy can cause duplicate submissions"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "For each durable state, assert exact title/body/actions, enabled controls, mutation count, and canonical effect. Differing values never auto-resolve; matching values never offer Reapply; persistence failure offers bounded retry/reconciliation or a safe fallback instruction."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Internal reason codes can be safely mapped without exposing secrets"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-SCORE-004",
+    "requirement_id": "B11-SCORE-004",
+    "title": "Crash/relaunch and same-ID replay are deterministic",
+    "domain": "B11",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-006"
+    ],
+    "root_cause": "Build 10 has bounded safe relaunch recovery, but the timestamp fault can recur during recovery and first relaunch success is not guaranteed.",
+    "proposed_change": "Every process death boundary converges deterministically: stored ACK reads only; unknown accepted outcome replays exactly the original ID; retries never create a second commit; recurrence from local representation is eliminated.",
+    "dependencies": [
+      "B11-SCORE-001",
+      "B11-SCORE-002"
+    ],
+    "test_requirements": [
+      "TEST-B11-SCORE-004",
+      "NA-2026-006"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "OS termination timing is nondeterministic without a test hook",
+      "Testing must never target Production"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Enumerate process termination before durable intent, after intent, after lease, during POST, after server commit, before/after ACK persistence, before/after canonical readback, and before compaction. Relaunch converges to one commit or an explicit unresolved state and never loses evidence."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Server idempotency remains stable"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-SCORE-005",
+    "requirement_id": "B11-SCORE-005",
+    "title": "Recovery restores next-hole admission without guessing current hole",
+    "domain": "B11",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-006"
+    ],
+    "root_cause": "A cleared matching intent may still leave selection on the last played hole; blocked admission and navigation were conflated during the incident.",
+    "proposed_change": "After reconciliation, new-entry admission returns only if server authority permits. UI identifies the next genuinely unscored hole from canonical data while preserving access to Official holes and never overwriting them.",
+    "dependencies": [
+      "B11-SCORE-002",
+      "Fresh canonical scorecard"
+    ],
+    "test_requirements": [
+      "TEST-B11-SCORE-005",
+      "NA-2026-006"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Auto-advance can surprise a scorer if another device progressed",
+      "Must not equate progress.currentHole with next unscored"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Recover a matching intent with zero, one, and multiple later holes already Official from another device. The app selects or clearly directs to the first canonical unscored hole, keeps Official inputs read-only, and blocks if round/match authority changed."
+    ],
+    "confidence": "STRONGLY SUPPORTED",
+    "assumptions": [
+      "Product chooses explicit auto-selection versus guided selector"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-SCORE-006",
+    "requirement_id": "B11-SCORE-006",
+    "title": "Certify multi-device and poor-connectivity scoring lifecycle",
+    "domain": "B11",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-006"
+    ],
+    "root_cause": "2026 tests lacked physical multi-device, carrier/network interruption, and full-round lifecycle coverage over real SQLite.",
+    "proposed_change": "Authorized devices can progress different holes safely; same-hole contention resolves through canonical conflict/idempotency; offline/online transitions preserve intent and destination; all formats complete without queue residue.",
+    "dependencies": [
+      "B11-SCORE-001 through B11-SCORE-005",
+      "Isolated production-shaped tournament environment"
+    ],
+    "test_requirements": [
+      "TEST-B11-SCORE-006",
+      "NA-2026-006"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Large matrix can create false confidence if it skips real SQLite or process death",
+      "Never run as a Production load test"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Run Best Ball, Scramble, and Singles through 18 holes with two devices, response loss, timeout, 503, airplane mode, background, kill, and newer canonical revisions. One canonical score per hole, no hidden queue residue, clear conflicts, correct finalization."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Test environment provides deterministic network fault controls"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-SCORE-007",
+    "requirement_id": "B11-SCORE-007",
+    "title": "Show canonical pre-entry hole strokes",
+    "domain": "B11",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-005"
+    ],
+    "root_cause": "Build 10 can show strokes only after an Official score row exists, too late for scorer awareness.",
+    "proposed_change": "Before entry, each player row displays canonical hole-specific received/given strokes from server-owned context. The client never derives authoritative allocation from a displayed handicap.",
+    "dependencies": [
+      "Existing complete canonical allocation projection or a bounded read-contract expansion; no client calculation"
+    ],
+    "test_requirements": [
+      "TEST-B11-SCORE-007",
+      "NA-2026-005"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Displayed strokes could be mistaken for values users should subtract",
+      "Contract expansion must not expose private/admin fields"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "For all 18 holes and Best Ball/Scramble/Singles, compare pre-entry badges with the canonical server allocation and with post-save applied strokes. Positive, zero, multiple, and negative/given policy cases follow an approved visual/semantic rule. Gross requests remain unchanged."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Server can expose canonical per-hole allocation safely"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-SCORE-008",
+    "requirement_id": "B11-SCORE-008",
+    "title": "Separate canonical lifecycle from progress copy",
+    "domain": "B11",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-005"
+    ],
+    "root_cause": "Build 10 could display Official · Scheduled before any score even when canonical match lifecycle was LIVE.",
+    "proposed_change": "Lifecycle label derives from canonical match status; progress copy describes scored-hole state separately. Official, local, pending, and unknown-outcome markers are visually and semantically distinct.",
+    "dependencies": [
+      "Canonical status and progress fields already present"
+    ],
+    "test_requirements": [
+      "TEST-B11-SCORE-008",
+      "NA-2026-005"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Changing copy without a state map can create new ambiguity"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "For Upcoming, Live with zero holes, Live partial, locked, Final, and reopened fixtures, labels remain internally consistent and never imply Scheduled for a Live match. VoiceOver announces lifecycle and save state independently."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Product approves terminology"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-READ-001",
+    "requirement_id": "B11-READ-001",
+    "title": "Align backend/native Odds representation with the legitimate output domain",
+    "domain": "B11",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-008"
+    ],
+    "root_cause": "A valid seven-digit American odds value becomes backend 503 and also fails native semantic validation.",
+    "proposed_change": "One versioned contract represents every legitimate calculator output, including extreme finite values and signed infinity, without changing probability or clipping data. Unsupported/malformed values fail only Odds.",
+    "dependencies": [
+      "Agreed versioned display contract",
+      "Backend projector and native release deployed in a compatible sequence"
+    ],
+    "test_requirements": [
+      "TEST-B11-READ-001",
+      "NA-2026-008"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Server-first change can still break Build 10",
+      "Layout expansion and accessibility truncation"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Shared conformance fixtures cover both sign boundaries, 1- through at least 7-digit generated values, infinity, malformed strings, and all five phases. Exact backend serializer and native model/presenter agree on every fixture."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "American odds string remains product format"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-READ-002",
+    "requirement_id": "B11-READ-002",
+    "title": "Model side-game lifecycle independently from published detail",
+    "domain": "B11",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-009"
+    ],
+    "root_cause": "Valid configured/in-progress/stale/unpublished envelopes with presentation:null collapse to generic detailed-screen incompatibility.",
+    "proposed_change": "Net Skins and Calcutta screens render explicit Configured, Awaiting calculation, Stale dependency, Published, Withdrawn, and Unavailable states. Historical published rounds may be shown only when contract authority declares them valid; no result is fabricated.",
+    "dependencies": [
+      "Versioned lifecycle envelope from backend",
+      "Separate backend decisions for 009A Net Skins result currentness and 009B Calcutta dependency/read cost"
+    ],
+    "test_requirements": [
+      "TEST-B11-READ-002",
+      "NA-2026-009"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Displaying historical results as current",
+      "A broad backend dependency redesign must not block the native state-model work"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Chronologically run configure R1/R2, calculate/publish, add configured R3, withdraw/supersede, stale dependency, recalculate, and republish. Native retains the selected product, shows exact state/revision scope, and never displays stale detail as current."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Product approves which historical results remain visible"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-READ-003",
+    "requirement_id": "B11-READ-003",
+    "title": "Carry typed failure scope end to end",
+    "domain": "B11",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-004",
+      "2026-INC-007",
+      "2026-INC-008",
+      "2026-INC-009"
+    ],
+    "root_cause": "The same generic code can mean feature outage, global environment incompatibility, scoped denial, or true identity failure, and Build 10 couples it to global navigation.",
+    "proposed_change": "Transport and contract errors include stable scope: feature, match, write-authority, environment, or identity; plus retryability and outcome certainty. Navigation consumes scope, not raw HTTP status alone.",
+    "dependencies": [
+      "Backend error-code contract",
+      "B11-NAV-001 and B11-NAV-002"
+    ],
+    "test_requirements": [
+      "TEST-B11-READ-003",
+      "NA-2026-004",
+      "NA-2026-007",
+      "NA-2026-008",
+      "NA-2026-009"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Fallback mapping for unknown errors",
+      "Security codes must remain fail-closed"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Run the complete 18-case Build 10 error matrix plus identity codes, scoped scoring denials, semantic 200, cancellation, timeout, offline, and coded synthetic 409. Each maps to one documented UI/security action and no unrelated shell mutation."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Legacy servers can be version-gated or safely mapped"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-READ-004",
+    "requirement_id": "B11-READ-004",
+    "title": "Retain Build 10 spectator Today state-machine correction",
+    "domain": "B11",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-004"
+    ],
+    "root_cause": "Build 9 rendered initial pending as unavailable and retried only Leaders.",
+    "proposed_change": "Initial/partial/retrying states show loading; a completed required failure shows unavailable; Try Again retries the full required set exactly once; usable content remains during ordinary refresh; mode exit cancels the attempt safely.",
+    "dependencies": [
+      "Existing Build 10 loadToday behavior",
+      "Non-Production deterministic transport"
+    ],
+    "test_requirements": [
+      "TEST-B11-READ-004",
+      "NA-2026-004"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Duplicate-read coalescing can skip required retry",
+      "Cache clearing on background can lengthen recovery"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Exercise pending, partial success, each single failure, both failures, invalid model, timeout, 503, interruption, cancellation, repeated retry, mode exit, background, and relaunch. Assert requests and visible state at every transition."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Build 11 may refactor but retains behavior"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-READ-005",
+    "requirement_id": "B11-READ-005",
+    "title": "Retain tournament-local time across mounted sessions",
+    "domain": "B11",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-001"
+    ],
+    "root_cause": "PWA timezone correction and native mounted-midnight behavior were certified at different layers and physical long-lived proof remains incomplete.",
+    "proposed_change": "PWA and native use published tournament IANA timezone for day labels/schedule and refresh while mounted, on focus, and on foreground without changing competitive lifecycle.",
+    "dependencies": [
+      "Published tournament timezone contract"
+    ],
+    "test_requirements": [
+      "TEST-B11-READ-005",
+      "NA-2026-001"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Device clock change and DST ambiguity",
+      "Test clock must never alter authority"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Across New York/Chicago/UTC devices, three tournament date boundaries and DST transitions yield identical tournament day/schedule. Mounted views update without recreation; no scoring/lifecycle mutation or identity change occurs."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Injected clock is release-excluded"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-READ-006",
+    "requirement_id": "B11-READ-006",
+    "title": "Certify Release-root appearance, not only fixture appearance",
+    "domain": "B11",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-003"
+    ],
+    "root_cause": "DEBUG outer-light gallery masked signed-out dark window behavior in spectator More.",
+    "proposed_change": "Each product root owns a documented color-scheme policy. Shared adaptive controls and fixed palette colors remain legible in every supported system appearance and auth mode.",
+    "dependencies": [
+      "Documented appearance ownership"
+    ],
+    "test_requirements": [
+      "TEST-B11-READ-006",
+      "NA-2026-003"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Nested overrides may not beat window preference",
+      "System component behavior changes by iOS version"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Capture signed-out chooser, spectator Today/Matches/Leaders/More and participant surfaces in light/dark on small/large devices from Release-equivalent roots. Assert semantic colors/contrast without masking app content."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Spectator remains intentionally light"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-B11-READ-007",
+    "requirement_id": "B11-READ-007",
+    "title": "Emit privacy-safe per-request native diagnostics",
+    "domain": "B11",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-004",
+      "2026-INC-006",
+      "2026-INC-007",
+      "2026-INC-008",
+      "2026-INC-009"
+    ],
+    "root_cause": "Provider logs could not attribute physical resets or retries to resource, device session, client state, or navigation consequence.",
+    "proposed_change": "Native records a bounded, redacted diagnostic event with request correlation ID, resource, HTTP/error code, failure scope, duration bucket, app lifecycle, current destination category, queue state category, and resulting action. No token, gross score, phone, email, or private payload is logged.",
+    "dependencies": [
+      "Backend request ID propagation",
+      "Privacy/retention review"
+    ],
+    "test_requirements": [
+      "TEST-B11-READ-007",
+      "NA-2026-004",
+      "NA-2026-006",
+      "NA-2026-007",
+      "NA-2026-008",
+      "NA-2026-009"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-013"
+    ],
+    "complexity": "L",
+    "risk": [
+      "Sensitive data leakage",
+      "Logging overhead during tournament",
+      "Correlation IDs must not become identity tokens"
+    ],
+    "target": "Build11",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Every injected error yields one correlatable client/server event and the expected state transition. Privacy tests reject secrets and competitive payloads. Diagnostics survive long enough for incident export but obey a documented retention cap."
+    ],
+    "confidence": "HIGH CONFIDENCE direction",
+    "assumptions": [
+      "Owner-controlled diagnostic export is acceptable"
+    ],
+    "owner": "Native"
+  },
+  {
+    "id": "BL-BE-SCORE-001",
+    "requirement_id": "BE-SCORE-001",
+    "title": "Keep every writable client gross-only",
+    "domain": "BE",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-019",
+      "2026-INC-020"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Keep every writable client gross-only",
+    "dependencies": [
+      "BE-SCORE-002",
+      "BE-JOB-001"
+    ],
+    "test_requirements": [
+      "TEST-BE-SCORE-001",
+      "NA-2026-019",
+      "NA-2026-020"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "A new client endpoint could accidentally reintroduce writable derived values without shared schema enforcement."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Native, PWA and Director score-submit schemas accept match, hole, mutation ID, expected revisions and gross values only.",
+      "Server derives strokes, nets, hole winner and match progression from the canonical scoring snapshot in the same transaction.",
+      "Attempts to submit client-computed strokes, net, winner or points are rejected or ignored by an explicit versioned contract test.",
+      "Best Ball, Scramble and Singles exact fixtures produce the same canonical results."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "Canonical prepared handicap and hole stroke-index snapshots remain server-owned."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-BE-SCORE-002",
+    "requirement_id": "BE-SCORE-002",
+    "title": "Bound the synchronous scoring transaction",
+    "domain": "BE",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-019"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Bound the synchronous scoring transaction",
+    "dependencies": [
+      "BE-JOB-001",
+      "DB-PERF-001"
+    ],
+    "test_requirements": [
+      "TEST-BE-SCORE-002",
+      "NA-2026-019"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Removing synchronous work without a durable transactional event would lose invalidations; the outbox insert is mandatory.",
+      "Treating the provisional latency targets as already certified before matched-compute measurement would overstate the evidence."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "A hole write performs admission, authorization, idempotency, revision checks, canonical scoring math, score/match mutation, receipt/history/audit, and minimal outbox inserts only.",
+      "No synchronous scoring trigger scans historical side-game results, financial revisions, publication history, or full Net Skins history.",
+      "A database plan/procedure inventory fails certification if an unbudgeted trigger is attached to score or match writes.",
+      "Before a latency gate is adopted, benchmark the production-shaped database at certified peak history size and record the baseline, contention envelope and statement-timeout headroom.",
+      "Use SQL/RPC transaction p95 at or below 1 second and p99 at or below 2 seconds, plus end-to-end score mutation p95 at or below 2 seconds and p99 at or below 4 seconds, as provisional targets aligned with the infrastructure-owned 2027 performance budget; they become release gates only after validation on matched tournament compute."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "The provisional latency targets will be reconciled with the infrastructure-owned 2027 budget and measured on provisioned tournament compute, not a developer laptop."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-BE-SCORE-003",
+    "requirement_id": "BE-SCORE-003",
+    "title": "Reconcile unknown outcomes before retry",
+    "domain": "BE",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-018",
+      "2026-INC-020"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Reconcile unknown outcomes before retry",
+    "dependencies": [
+      "BE-JOB-003"
+    ],
+    "test_requirements": [
+      "TEST-BE-SCORE-003",
+      "NA-2026-018",
+      "NA-2026-020"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-003"
+    ],
+    "complexity": "M",
+    "risk": [
+      "A generic Retry button can recreate the R3 stale-fingerprint hazard."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Every round, match and hole mutation has a durable operation ID and queryable receipt endpoint.",
+      "After timeout or lost response, the client checks receipt and canonical state before enabling retry.",
+      "Same-ID replay returns the original result only when payload and predecessor state remain compatible.",
+      "If another actor changed the scope, the saved intent is marked stale and cannot be blindly resubmitted."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "Operation receipts remain readable after client restart."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-BE-SCORE-004",
+    "requirement_id": "BE-SCORE-004",
+    "title": "Provide bounded physical-card reconciliation",
+    "domain": "BE",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-020"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Provide bounded physical-card reconciliation",
+    "dependencies": [
+      "BE-SCORE-001",
+      "BE-SCORE-003",
+      "DIR-REC-001"
+    ],
+    "test_requirements": [
+      "TEST-BE-SCORE-004",
+      "NA-2026-020"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-003"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Batch writes or stale baselines can overwrite legitimate concurrent scoring."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Recovery imports or enters gross values only and requires round, match, hole and canonical player identities.",
+      "Each hole is freshly read; exact matches are skipped, differences stop for review, and absent holes use one durable mutation ID.",
+      "Finalization is unavailable until all 18 holes and all expected gross values match the physical card.",
+      "The final report counts written, skipped, conflicted, unknown and overwritten values; overwritten Official values must be zero unless a separately approved correction workflow is used."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "Paper cards identify the exact match and player order."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-DB-PERF-001",
+    "requirement_id": "DB-PERF-001",
+    "title": "Forbid whole-history fingerprints on live write paths",
+    "domain": "DB",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-017",
+      "2026-INC-019"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Forbid whole-history fingerprints on live write paths",
+    "dependencies": [
+      "DB-PERF-002"
+    ],
+    "test_requirements": [
+      "TEST-DB-PERF-001",
+      "NA-2026-017",
+      "NA-2026-019"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "A helper marked STABLE can still execute during planning; SQL volatility labels alone are not a guard."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "No score/match transaction calls a function whose reachable plan aggregates unbounded historical revision or payload tables.",
+      "Fingerprint inputs are enumerated by domain, scope and version; current correctness does not depend on unrelated history metadata.",
+      "CI grows result/job history by at least 100x and fails on superlinear planning/execution growth or live-path budget breach.",
+      "EXPLAIN plans and measured buffer/temp activity are retained as certification evidence."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "Historical data remains immutable and queryable outside the scoring critical path."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-DB-PERF-002",
+    "requirement_id": "DB-PERF-002",
+    "title": "Add database-native migration and function execution certification",
+    "domain": "DB",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-010",
+      "2026-INC-012",
+      "2026-INC-019"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Add database-native migration and function execution certification",
+    "dependencies": [],
+    "test_requirements": [
+      "TEST-DB-PERF-002",
+      "NA-2026-010",
+      "NA-2026-012",
+      "NA-2026-019"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Source grep without actual invocation will miss initializer and branch-specific failures."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Every created/replaced PostgreSQL function is parsed and invoked on every reachable branch in the supported PostgreSQL major version.",
+      "Static analysis rejects pg_catalog.least, pg_catalog.greatest and any other schema-qualified special SQL expression.",
+      "Read, claim, lease boundary, complete, fail, idempotency, concurrency and malformed-input cases execute in PostgreSQL, not only application mocks.",
+      "Function owner, grants, security-definer flag, search_path and definition hash are compared before/after migration."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "CI can run the same PostgreSQL major and required extensions as Production."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-DB-PERF-003",
+    "requirement_id": "DB-PERF-003",
+    "title": "Make current-pointer invariants database-enforced and reconcilable",
+    "domain": "DB",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-017",
+      "2026-INC-019"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Make current-pointer invariants database-enforced and reconcilable",
+    "dependencies": [
+      "DB-PERF-002"
+    ],
+    "test_requirements": [
+      "TEST-DB-PERF-003",
+      "NA-2026-017",
+      "NA-2026-019"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-003"
+    ],
+    "complexity": "M",
+    "risk": [
+      "A view-only redesign without a foreign-key pointer can preserve dual truth."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Each domain has one authoritative current pointer referencing an immutable revision ID; duplicate scalar revision/is_current representations are removed or checked transactionally.",
+      "A failed worker cannot leave pointer state inconsistent with its referenced result lifecycle.",
+      "A read-only reconciliation query reports orphan pointers, multiple-current rows, scalar/reference mismatches, current result with incompatible state, and stale jobs that still block operations.",
+      "Current transition and history insertion occur in one transaction with compare-and-swap on expected pointer revision."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "Immutable revision tables remain the source of history."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-BE-JOB-001",
+    "requirement_id": "BE-JOB-001",
+    "title": "Introduce a minimal transactional derived-state outbox",
+    "domain": "BE",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-019"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Introduce a minimal transactional derived-state outbox",
+    "dependencies": [
+      "DB-PERF-003",
+      "BE-JOB-003"
+    ],
+    "test_requirements": [
+      "TEST-BE-JOB-001",
+      "NA-2026-019"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-010"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Publishing this requirement as already implemented would overstate the current architecture."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "The scoring transaction inserts one deduplicated event containing event ID, tournament, match, canonical match/hole revision, mutation ID, event type and occurred_at.",
+      "The insert shares the score transaction: rollback removes both score and event; commit preserves both.",
+      "The insert performs no source snapshot construction, side-game hash, historical scan or calculation.",
+      "Separate workers consume the event for Calcutta, Net Skins, competition projections, intelligence and external mirrors with independent checkpoints."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "This is a proposed unified side-game/event outbox; existing Google outbox and side-game job triggers are prior art, not proof it already exists."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-BE-JOB-002",
+    "requirement_id": "BE-JOB-002",
+    "title": "Make derived workers durable, idempotent and observable",
+    "domain": "BE",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-010",
+      "2026-INC-011",
+      "2026-INC-012",
+      "2026-INC-016",
+      "2026-INC-019"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Make derived workers durable, idempotent and observable",
+    "dependencies": [
+      "BE-JOB-001",
+      "BE-DEP-001"
+    ],
+    "test_requirements": [
+      "TEST-BE-JOB-002",
+      "NA-2026-010",
+      "NA-2026-011",
+      "NA-2026-012",
+      "NA-2026-016",
+      "NA-2026-019"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-010"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Retry without source revalidation can publish stale financial results."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Claims use bounded leases, SKIP LOCKED, attempt limits and owner/token verification.",
+      "Completion compare-and-swaps source, contract version, authority generation and expected result pointer before publication/current transition.",
+      "Lost completion response, lease expiry, duplicate delivery and two-worker races have deterministic outcomes.",
+      "Every terminal and blocking state has an operator-readable reason, timestamp, source revisions and a supported supersede/retry action when safe."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "Workers may be at-least-once; completion must therefore be idempotent."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-BE-JOB-003",
+    "requirement_id": "BE-JOB-003",
+    "title": "Give every mutation and job an immutable receipt",
+    "domain": "BE",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-016",
+      "2026-INC-018",
+      "2026-INC-020"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Give every mutation and job an immutable receipt",
+    "dependencies": [
+      "DB-PERF-003"
+    ],
+    "test_requirements": [
+      "TEST-BE-JOB-003",
+      "NA-2026-016",
+      "NA-2026-018",
+      "NA-2026-020"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-003"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Sensitive payloads or credentials must never be copied into receipts."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Receipts bind operation ID, actor, payload hash, predecessor revisions, resulting revisions, status and safe error.",
+      "Failed and no-op operations are recorded when the transaction boundary permits; absence has a defined meaning.",
+      "Retirement/supersession operations create immutable operation receipts in addition to mutating retained job state.",
+      "Receipts are searchable in Director by operation ID and scope."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "Security policy permits bounded safe metadata visibility to Directors."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-BE-JOB-004",
+    "requirement_id": "BE-JOB-004",
+    "title": "Define release-to-job compatibility as a versioned transition",
+    "domain": "BE",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-011"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Define release-to-job compatibility as a versioned transition",
+    "dependencies": [
+      "BE-DEP-001",
+      "BE-JOB-003"
+    ],
+    "test_requirements": [
+      "TEST-BE-JOB-004",
+      "NA-2026-011"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-010"
+    ],
+    "complexity": "M",
+    "risk": [
+      "A broad carry-forward rule can execute old code assumptions under a new release."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Every release plan inventories PENDING/RUNNING jobs and declares retain, drain, supersede or exact carry-forward behavior.",
+      "Activation advancement never silently makes a job invisible to claim while leaving it apparently actionable.",
+      "Carry-forward requires an explicit compatible contract version, exact source/payload hashes, zero disallowed attempts/activity and an immutable receipt.",
+      "Activation guards remain exact; compatibility is granted by audited transition, never by ignoring expected activation."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "Some releases are semantically compatible with queued jobs and some are not."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-BE-DEP-001",
+    "requirement_id": "BE-DEP-001",
+    "title": "Replace implicit dependency blocking with explicit contract-version compatibility",
+    "domain": "BE",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-011",
+      "2026-INC-016",
+      "2026-INC-017"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Replace implicit dependency blocking with explicit contract-version compatibility",
+    "dependencies": [
+      "BE-DEP-002"
+    ],
+    "test_requirements": [
+      "TEST-BE-DEP-001",
+      "NA-2026-011",
+      "NA-2026-016",
+      "NA-2026-017"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Treating a new contract version as automatically compatible would recreate guard bypass by another name."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Every producer revision declares a schema/semantic contract version and immutable scope identity.",
+      "Every consumer declares accepted contract versions and exact semantic fields consumed.",
+      "A change is compatible only through a named, tested compatibility rule; no activation, revision or dependency guard is globally disabled.",
+      "Incompatibility returns the blocking producer, exact changed fields, safe next action and whether history/public visibility will change."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "Compatibility is domain-specific and cannot be inferred from equal top-level revision numbers."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-BE-DEP-002",
+    "requirement_id": "BE-DEP-002",
+    "title": "Fingerprint semantic inputs, not histories or control metadata",
+    "domain": "BE",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-019"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Fingerprint semantic inputs, not histories or control metadata",
+    "dependencies": [
+      "DB-PERF-001"
+    ],
+    "test_requirements": [
+      "TEST-BE-DEP-002",
+      "NA-2026-016",
+      "NA-2026-017",
+      "NA-2026-019"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Omitting a consumed economic input is worse than over-inclusion; every exclusion needs a semantic proof test."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Fingerprint manifests list field path, normalization, ordering, domain owner and reason for inclusion.",
+      "Unrelated job attempts, supersession timestamps, is_current history flags and prior payload history do not alter a current semantic fingerprint.",
+      "R1/R2 completed golf, financial auction facts and relevant side-game membership each have separate versioned fingerprints.",
+      "A changed fingerprint can be decomposed into named changed components without recomputing or exposing full historical payloads."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "Canonical normalization can produce stable hashes across JSON/property ordering."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-BE-DEP-003",
+    "requirement_id": "BE-DEP-003",
+    "title": "Make round setup an orchestrated state machine",
+    "domain": "BE",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-013",
+      "2026-INC-016",
+      "2026-INC-017",
+      "2026-INC-018"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Make round setup an orchestrated state machine",
+    "dependencies": [
+      "BE-DEP-001",
+      "BE-JOB-003",
+      "DB-PERF-003"
+    ],
+    "test_requirements": [
+      "TEST-BE-DEP-003",
+      "NA-2026-013",
+      "NA-2026-016",
+      "NA-2026-017",
+      "NA-2026-018"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Twelve independent preparation calls expose partial completion unless the UI and receipt model make it explicit."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Pair, prepare, validate side-game compatibility and Open are separate durable states with explicit receipts and prerequisites.",
+      "Pairing success cannot be presented as ready when snapshotPrepared is false.",
+      "The system can prepare all matches atomically or reports exactly which all-or-nothing boundary it guarantees.",
+      "Changing dependencies after preparation immediately changes readiness and supplies a supported recovery plan."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "Tournament setup remains guarded by canonical server authority."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-BE-DEP-004",
+    "requirement_id": "BE-DEP-004",
+    "title": "Model side-game publication and calculation separately",
+    "domain": "BE",
+    "severity": "P1",
+    "evidence": [
+      "2026-INC-016",
+      "2026-INC-017"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Model side-game publication and calculation separately",
+    "dependencies": [
+      "BE-JOB-002",
+      "BE-JOB-003"
+    ],
+    "test_requirements": [
+      "TEST-BE-DEP-004",
+      "NA-2026-016",
+      "NA-2026-017"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Automatic supersession must never affect a published or referenced calculation."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "A current publication, unpublished READY calculation, active worker and stale retained result are separate typed blockers.",
+      "Every blocking type has a supported action or an explicit reason that no action is safe.",
+      "Stale unpublished work is automatically marked nonblocking only when a tested policy proves it has no publication/current reference; otherwise Director receives an exact supersede action.",
+      "Withdrawing visibility preserves immutable publication history and does not pretend to clear unrelated calculation/configuration dependencies."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "Some side-game publications intentionally block setup changes."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-BE-DEP-005",
+    "requirement_id": "BE-DEP-005",
+    "title": "Certify post-completion financial corrections as revision replacement",
+    "domain": "BE",
+    "severity": "P1",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Certify post-completion financial corrections as revision replacement",
+    "dependencies": [
+      "BE-JOB-002",
+      "DB-PERF-003"
+    ],
+    "test_requirements": [
+      "TEST-BE-DEP-005"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Total-only checks can miss a changed purchase price; compare every purchase and ownership row."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Starting from a published Official result, unpublish preserves auction/result history and hides participant visibility.",
+      "Changing one ownership allocation writes a complete new auction revision, preserves all purchase prices and unaffected ownership, supersedes active jobs/current result, and creates an unpublished publication revision.",
+      "Republish queues one calculation for the new auction and a successful worker creates a new current Official result without changing golf.",
+      "The acceptance verifies 24 purchases, $18,500 total, 100% ownership per golfer, unchanged configuration, all final golf, and participant payout projection against the corrected owners."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "The September 27 snapshot at revision 424 is historical evidence, not a claim about present live state."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-BE-JOB-005",
+    "requirement_id": "BE-JOB-005",
+    "title": "Certify Production configuration dependencies before promotion",
+    "domain": "BE",
+    "severity": "P0",
+    "evidence": [
+      "2026-INC-014",
+      "2026-INC-015"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Certify Production configuration dependencies before promotion",
+    "dependencies": [
+      "BE-JOB-003"
+    ],
+    "test_requirements": [
+      "TEST-BE-JOB-005",
+      "NA-2026-014",
+      "NA-2026-015"
+    ],
+    "physical_test": true,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": [
+      "A server health 200 that omits route-specific configuration remains a false positive."
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Release manifests declare required secrets by target environment without exposing values.",
+      "Staged candidate and Production rebind acceptance prove each required key is present, well-formed and usable through a nonmutating handshake.",
+      "A missing scoring-session key blocks promotion before tournament traffic.",
+      "PWA release evidence records service-worker version and exposes client-visible active/waiting state for support."
+    ],
+    "confidence": "HIGH_CONFIDENCE_RECOMMENDATION",
+    "assumptions": [
+      "Secret presence and format can be checked without logging secret material."
+    ],
+    "owner": "Backend"
+  },
+  {
+    "id": "BL-INFRA-001",
+    "requirement_id": "INFRA-001",
+    "title": "Export Supabase metrics to an independently retained Prometheus-compatible store before Tournament Mode.",
+    "domain": "INFRA",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Export Supabase metrics to an independently retained Prometheus-compatible store before Tournament Mode.",
+    "dependencies": [
+      "Verified Supabase project",
+      "Metrics API credential",
+      "Retention destination"
+    ],
+    "test_requirements": [
+      "TEST-INFRA-001"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-013"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Metrics API is beta",
+      "Credential leakage if collector configuration is mishandled"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "CPU, memory, I/O, WAL, connection, query, restart, and scrape-health series retained across two rehearsals",
+      "Alert evaluation remains available when the app is unavailable",
+      "Metric name changes fail visibly"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Metrics API is available for the selected plan"
+    ],
+    "owner": "INFRA"
+  },
+  {
+    "id": "BL-INFRA-002",
+    "requirement_id": "INFRA-002",
+    "title": "Technically isolate historical, certification, export, and analytical queries from the tournament primary by role and target database.",
+    "domain": "INFRA",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Technically isolate historical, certification, export, and analytical queries from the tournament primary by role and target database.",
+    "dependencies": [
+      "Restored copy or read replica",
+      "History-offline credential",
+      "Route inventory"
+    ],
+    "test_requirements": [
+      "TEST-INFRA-002"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Replica lag can make analytics stale",
+      "Incomplete grant inventory could leave a bypass"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Production runtime role cannot select history schemas or execute broad history functions",
+      "CI proves forbidden imports/routes",
+      "Two rehearsals show zero history-offline query tags on primary"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "A copy or replica can be provisioned before 2027"
+    ],
+    "owner": "INFRA"
+  },
+  {
+    "id": "BL-INFRA-003",
+    "requirement_id": "INFRA-003",
+    "title": "Create a bounded diagnostic database role with read-only current-year views, one connection, one in-flight query, short timeouts, row limits, mandatory query tags, and no automatic retries.",
+    "domain": "INFRA",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Create a bounded diagnostic database role with read-only current-year views, one connection, one in-flight query, short timeouts, row limits, mandatory query tags, and no automatic retries.",
+    "dependencies": [
+      "Allowlisted diagnostic views",
+      "Role/grant migration",
+      "Diagnostic client change"
+    ],
+    "test_requirements": [
+      "TEST-INFRA-003"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-013"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Timeout too low can hide necessary evidence",
+      "Direct database tools may bypass application tags"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "History access is denied",
+      "A deliberately expensive query is canceled inside the approved budget",
+      "Collector preserves the cancellation without retry",
+      "No write privilege exists"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Role-level settings are supported in the target Postgres service"
+    ],
+    "owner": "INFRA"
+  },
+  {
+    "id": "BL-INFRA-004",
+    "requirement_id": "INFRA-004",
+    "title": "Move side-game invalidation and derived calculations off the synchronous scoring transaction, retaining only a small idempotent outbox event after canonical writes.",
+    "domain": "INFRA",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Move side-game invalidation and derived calculations off the synchronous scoring transaction, retaining only a small idempotent outbox event after canonical writes.",
+    "dependencies": [
+      "Event-driven derived-state design",
+      "Worker queue",
+      "Idempotent consumers",
+      "Parity tests"
+    ],
+    "test_requirements": [
+      "TEST-INFRA-004"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-010"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Derived state can lag",
+      "Consumer idempotency defects can create duplicates"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Score commit correctness is unchanged",
+      "No whole-history hash/calculation executes in the score transaction",
+      "Worker failure cannot roll back a score",
+      "Queue replay produces one canonical derived result"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Side games tolerate bounded eventual consistency with explicit freshness"
+    ],
+    "owner": "INFRA"
+  },
+  {
+    "id": "BL-INFRA-005",
+    "requirement_id": "INFRA-005",
+    "title": "Record and codify Vercel Function and Supabase database regions, measure the network phase, and change placement only when rehearsal evidence justifies it.",
+    "domain": "INFRA",
+    "severity": "P1",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Record and codify Vercel Function and Supabase database regions, measure the network phase, and change placement only when rehearsal evidence justifies it.",
+    "dependencies": [
+      "Provider account inventory",
+      "Vercel region configuration",
+      "Supabase region evidence"
+    ],
+    "test_requirements": [
+      "TEST-INFRA-005"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Multi-region compute can multiply database connections",
+      "Region failover may increase latency or require plan changes"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Exact regions are recorded",
+      "Staged and Production functions run in approved region",
+      "Cross-region drift blocks release",
+      "Network latency is measured in dress rehearsal"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "A suitable Vercel region exists close to the database"
+    ],
+    "owner": "INFRA"
+  },
+  {
+    "id": "BL-INFRA-006",
+    "requirement_id": "INFRA-006",
+    "title": "Select compute and disk capacity from isolated event-shaped load results with no dependence on unmeasured burst credit during rounds.",
+    "domain": "INFRA",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Select compute and disk capacity from isolated event-shaped load results with no dependence on unmeasured burst credit during rounds.",
+    "dependencies": [
+      "Metrics export",
+      "Synthetic tournament",
+      "Spectator baseline",
+      "Query isolation"
+    ],
+    "test_requirements": [
+      "TEST-INFRA-006"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-013"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Unknown spectator demand",
+      "Overprovisioning can hide inefficient queries"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Two rehearsals meet scoring/current-read budgets",
+      "Disk budget and I/O wait remain within approved headroom",
+      "Connection and memory headroom survive conflict and recovery cases",
+      "Selection and rationale are recorded without relying on HTTP 200 alone"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Tournament workload can be reproduced in isolation"
+    ],
+    "owner": "INFRA"
+  },
+  {
+    "id": "BL-INFRA-007",
+    "requirement_id": "INFRA-007",
+    "title": "Use a read replica or restored copy for historical/public archive work only after replication-lag and stale-data behavior are explicit.",
+    "domain": "INFRA",
+    "severity": "P1",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Use a read replica or restored copy for historical/public archive work only after replication-lag and stale-data behavior are explicit.",
+    "dependencies": [
+      "Provider/account capability",
+      "Read routing",
+      "Freshness labels"
+    ],
+    "test_requirements": [
+      "TEST-INFRA-007"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Replica lag",
+      "Auth/Realtime services may remain primary-bound"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Primary score writes never route to replica",
+      "Historical reads do not load primary",
+      "Replica lag is monitored and shown",
+      "Failure falls back to a snapshot rather than primary history scan"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Read replica is available and cost-acceptable"
+    ],
+    "owner": "INFRA"
+  },
+  {
+    "id": "BL-INFRA-008",
+    "requirement_id": "INFRA-008",
+    "title": "Run an AWS RDS proof of concept only if documented Supabase hardening gates fail.",
+    "domain": "INFRA",
+    "severity": "P1",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Run an AWS RDS proof of concept only if documented Supabase hardening gates fail.",
+    "dependencies": [
+      "Two Supabase rehearsals",
+      "Decision-gate evidence",
+      "Cost-category inventory"
+    ],
+    "test_requirements": [
+      "TEST-INFRA-008"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "POC becomes premature migration",
+      "Application SQL defects are mistaken for provider defects"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "POC uses identical schema/RPC/security/load/failure cases",
+      "Correctness and RPO/RTO meet requirements",
+      "Operational effort and cost categories are compared",
+      "Cutover and rollback are rehearsed before migration decision"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "No compliance mandate already requires AWS"
+    ],
+    "owner": "INFRA"
+  },
+  {
+    "id": "BL-OBS-001",
+    "requirement_id": "OBS-001",
+    "title": "Instrument each internal authority-health component separately while preserving the generic public health response.",
+    "domain": "OBS",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Instrument each internal authority-health component separately while preserving the generic public health response.",
+    "dependencies": [
+      "Trace/log schema",
+      "Health route instrumentation"
+    ],
+    "test_requirements": [
+      "TEST-OBS-001"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "High-cardinality labels",
+      "Sensitive data leakage"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Read-control, admission, runtime, identity, and connection phases have independent result and latency",
+      "Aggregate request links component spans",
+      "Secrets and provider internals remain absent from public response"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Internal telemetry sink is available"
+    ],
+    "owner": "OBS"
+  },
+  {
+    "id": "BL-OBS-002",
+    "requirement_id": "OBS-002",
+    "title": "Propagate one request/trace/operation identity across Vercel, Supabase RPC, PostgreSQL logs, receipts, workers, and client confirmation.",
+    "domain": "OBS",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Propagate one request/trace/operation identity across Vercel, Supabase RPC, PostgreSQL logs, receipts, workers, and client confirmation.",
+    "dependencies": [
+      "W3C tracing",
+      "Safe database session metadata",
+      "Receipt schema"
+    ],
+    "test_requirements": [
+      "TEST-OBS-002"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-003"
+    ],
+    "complexity": "M",
+    "risk": [
+      "PII in trace attributes",
+      "Unbounded cardinality"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "A synthetic score is traceable end to end",
+      "Same-ID replay links to original",
+      "Unknown outcome can be resolved without a new identity"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Provider logs retain safe correlation fields"
+    ],
+    "owner": "OBS"
+  },
+  {
+    "id": "BL-OBS-003",
+    "requirement_id": "OBS-003",
+    "title": "Record per-phase scoring RPC duration, query fingerprint, trigger duration, timeout, lock wait, temp/block I/O, and commit/readback result.",
+    "domain": "OBS",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Record per-phase scoring RPC duration, query fingerprint, trigger duration, timeout, lock wait, temp/block I/O, and commit/readback result.",
+    "dependencies": [
+      "Scoring tracing",
+      "pg_stat_statements deltas",
+      "Database logs"
+    ],
+    "test_requirements": [
+      "TEST-OBS-003"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Instrumentation overhead",
+      "Nested function time may need explicit spans"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Injected slow trigger identifies exact phase and query",
+      "Rolled-back timeout differs from unknown outcome",
+      "No score payload or credential is logged"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Required PostgreSQL counters are exposed"
+    ],
+    "owner": "OBS"
+  },
+  {
+    "id": "BL-OBS-004",
+    "requirement_id": "OBS-004",
+    "title": "Maintain dashboards for tournament command, database capacity, query workload, side-game workers, release/authority, and recovery.",
+    "domain": "OBS",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Maintain dashboards for tournament command, database capacity, query workload, side-game workers, release/authority, and recovery.",
+    "dependencies": [
+      "Metrics/log/trace export",
+      "Semantic event schema"
+    ],
+    "test_requirements": [
+      "TEST-OBS-004"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-013"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Dashboards without alerts create false confidence"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Each dashboard shows release and authority context",
+      "2026 failure injections are diagnosable in under five minutes",
+      "Missing data is visible"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Dashboard platform selected"
+    ],
+    "owner": "OBS"
+  },
+  {
+    "id": "BL-OBS-005",
+    "requirement_id": "OBS-005",
+    "title": "Capture an automatic read-only evidence packet for every SEV-1/SEV-2 incident.",
+    "domain": "OBS",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Capture an automatic read-only evidence packet for every SEV-1/SEV-2 incident.",
+    "dependencies": [
+      "Bounded diagnostic role",
+      "Evidence store",
+      "Incident ID"
+    ],
+    "test_requirements": [
+      "TEST-OBS-005"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Collector could add load during incident",
+      "Retention cost"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Packet spans pre/post incident metrics, logs, traces, query deltas, restart/change events, release/authority, backup, and queue state",
+      "Collector never runs history aggregation or writes",
+      "Packet is immutable and access-controlled"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Provider APIs support required read-only exports"
+    ],
+    "owner": "OBS"
+  },
+  {
+    "id": "BL-OBS-006",
+    "requirement_id": "OBS-006",
+    "title": "Monitor backup/PITR freshness, earliest/latest recovery point, replica lag, and last restore rehearsal as production signals.",
+    "domain": "OBS",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Monitor backup/PITR freshness, earliest/latest recovery point, replica lag, and last restore rehearsal as production signals.",
+    "dependencies": [
+      "Verified backup configuration",
+      "Management API or provider export"
+    ],
+    "test_requirements": [
+      "TEST-OBS-006"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Provider backup exists but semantic restore is invalid"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Stale/missing recovery point alerts",
+      "Restore rehearsal age is visible",
+      "Tournament entry gate fails when recovery evidence is stale"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Backup status can be obtained programmatically"
+    ],
+    "owner": "OBS"
+  },
+  {
+    "id": "BL-OBS-007",
+    "requirement_id": "OBS-007",
+    "title": "Instrument spectator cache, payload, TTFB, total latency, dependency timing, and concurrent demand without treating two samples as percentiles.",
+    "domain": "OBS",
+    "severity": "P1",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Instrument spectator cache, payload, TTFB, total latency, dependency timing, and concurrent demand without treating two samples as percentiles.",
+    "dependencies": [
+      "Server-Timing or tracing",
+      "Synthetic and load clients"
+    ],
+    "test_requirements": [
+      "TEST-OBS-007"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Synthetic traffic distorts capacity if misrouted"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Cold/warm/cache state is explicit",
+      "Today dependencies are separately timed",
+      "p50/p95/p99 come from statistically valid runs",
+      "Physical-device time-to-usable is measured"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Synthetic clients can run outside Production"
+    ],
+    "owner": "OBS"
+  },
+  {
+    "id": "BL-OBS-008",
+    "requirement_id": "OBS-008",
+    "title": "Alert on observability pipeline failure as a Tournament Mode service degradation.",
+    "domain": "OBS",
+    "severity": "P1",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Alert on observability pipeline failure as a Tournament Mode service degradation.",
+    "dependencies": [
+      "Scrape health",
+      "Log/trace ingestion health"
+    ],
+    "test_requirements": [
+      "TEST-OBS-008"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Alert storms during provider outage"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Two missing scrape intervals alert",
+      "Log/trace drop is independently detected",
+      "No green capacity claim is allowed with missing data"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Out-of-band alert path exists"
+    ],
+    "owner": "OBS"
+  },
+  {
+    "id": "BL-OBS-009",
+    "requirement_id": "OBS-009",
+    "title": "Establish metric/log/trace retention and privacy policy that spans the full event and postmortem window.",
+    "domain": "OBS",
+    "severity": "P1",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Establish metric/log/trace retention and privacy policy that spans the full event and postmortem window.",
+    "dependencies": [
+      "Legal/privacy review",
+      "Storage cost model"
+    ],
+    "test_requirements": [
+      "TEST-OBS-009"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-013"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Excess retention of personal data",
+      "Insufficient retention for annual review"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Retention duration is explicit",
+      "PII/secret denylist tests pass",
+      "UTC event and ingestion time are retained",
+      "Authorized evidence export is reproducible"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Retention can be funded"
+    ],
+    "owner": "OBS"
+  },
+  {
+    "id": "BL-OPS-001",
+    "requirement_id": "OPS-001",
+    "title": "Implement explicit NORMAL, PREPARE, TOURNAMENT, INCIDENT, RECOVERY, and CLOSED operational states with durable receipts.",
+    "domain": "OPS",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Implement explicit NORMAL, PREPARE, TOURNAMENT, INCIDENT, RECOVERY, and CLOSED operational states with durable receipts.",
+    "dependencies": [
+      "Tournament state contract",
+      "Director UX",
+      "Receipt storage"
+    ],
+    "test_requirements": [
+      "TEST-OPS-001"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-003"
+    ],
+    "complexity": "M",
+    "risk": [
+      "State machine can add operator friction if UX is unclear"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Allowed workloads and transitions are enforced",
+      "Every transition is idempotent and attributable",
+      "Unknown transition outcome uses same-ID recovery"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Tournament state can be represented without conflicting with scoring lifecycle"
+    ],
+    "owner": "OPS"
+  },
+  {
+    "id": "BL-OPS-002",
+    "requirement_id": "OPS-002",
+    "title": "Define and test traffic shedding that preserves scoring/authority while pausing history, analytics, side-game workers, and noncritical cron at yellow/red capacity.",
+    "domain": "OPS",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Define and test traffic shedding that preserves scoring/authority while pausing history, analytics, side-game workers, and noncritical cron at yellow/red capacity.",
+    "dependencies": [
+      "Workload classes",
+      "Worker controls",
+      "Cached public snapshots"
+    ],
+    "test_requirements": [
+      "TEST-OPS-002"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Incorrect classification pauses a critical dependency"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Yellow/red injection pauses only approved classes",
+      "Scoring remains correct",
+      "Public stale snapshot shows age",
+      "Recovery resumes work without duplicate jobs"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Workloads can be independently controlled"
+    ],
+    "owner": "OPS"
+  },
+  {
+    "id": "BL-OPS-003",
+    "requirement_id": "OPS-003",
+    "title": "Enforce T-14 schema freeze, T-7 application freeze, T-48-hour Tournament freeze, and emergency-only changes during rounds.",
+    "domain": "OPS",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Enforce T-14 schema freeze, T-7 application freeze, T-48-hour Tournament freeze, and emergency-only changes during rounds.",
+    "dependencies": [
+      "Release policy",
+      "Change impact graph",
+      "Owner/Incident Commander roles"
+    ],
+    "test_requirements": [
+      "TEST-OPS-003"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Freeze too early delays necessary reliability fixes"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Release tooling rejects out-of-policy change",
+      "Emergency exception records exact incident and rollback",
+      "No unreviewed config drift exists at entry"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Calendar is known in advance"
+    ],
+    "owner": "OPS"
+  },
+  {
+    "id": "BL-OPS-004",
+    "requirement_id": "OPS-004",
+    "title": "Use a protected emergency change protocol with exact candidate, baseline, rollback, owner authorization, health window, and post-change evidence.",
+    "domain": "OPS",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Use a protected emergency change protocol with exact candidate, baseline, rollback, owner authorization, health window, and post-change evidence.",
+    "dependencies": [
+      "Release control",
+      "Observability",
+      "Rollback candidate"
+    ],
+    "test_requirements": [
+      "TEST-OPS-004"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Emergency urgency can cause scope creep"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Lost response is recoverable",
+      "No Force Promote path",
+      "Competitive diff is classified",
+      "Rollback trigger and abort criteria are explicit"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Protected signer is available"
+    ],
+    "owner": "OPS"
+  },
+  {
+    "id": "BL-OPS-005",
+    "requirement_id": "OPS-005",
+    "title": "Approve explicit RPO/RTO targets and run quarterly plus pre-tournament restore-to-isolated-environment rehearsals.",
+    "domain": "OPS",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Approve explicit RPO/RTO targets and run quarterly plus pre-tournament restore-to-isolated-environment rehearsals.",
+    "dependencies": [
+      "Backup/PITR configuration",
+      "Isolated restore environment",
+      "Semantic validator"
+    ],
+    "test_requirements": [
+      "TEST-OPS-005"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Provider restore downtime",
+      "Backup may omit external Storage objects or secrets"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Restore completes within approved RTO",
+      "Recovery point meets RPO",
+      "Scores, receipts, authority, identities, side-game inputs, and migration ledger validate",
+      "No Production write occurs"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Provider restore or duplicate-project workflow is available"
+    ],
+    "owner": "OPS"
+  },
+  {
+    "id": "BL-OPS-006",
+    "requirement_id": "OPS-006",
+    "title": "Maintain and rehearse paper-scorecard disaster mode with exact later reconciliation rules.",
+    "domain": "OPS",
+    "severity": "P0",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Maintain and rehearse paper-scorecard disaster mode with exact later reconciliation rules.",
+    "dependencies": [
+      "Paper forms",
+      "Scorer assignments",
+      "Recovery tool",
+      "Idempotency policy"
+    ],
+    "test_requirements": [
+      "TEST-OPS-006"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-003"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Transcription error",
+      "Independent concurrent recovery activity"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "All 12 matches can continue offline",
+      "Already-Official holes are never blindly replayed",
+      "One fresh mutation ID per missing hole and canonical readback are used",
+      "Discrepancies require human review"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Physical cards remain available"
+    ],
+    "owner": "OPS"
+  },
+  {
+    "id": "BL-OPS-007",
+    "requirement_id": "OPS-007",
+    "title": "Establish named Incident Commander, database, application, owner, communications, and provider-support roles with an out-of-band contact tree.",
+    "domain": "OPS",
+    "severity": "P1",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Establish named Incident Commander, database, application, owner, communications, and provider-support roles with an out-of-band contact tree.",
+    "dependencies": [
+      "Staffing",
+      "Pager/communications tools",
+      "Provider support plan"
+    ],
+    "test_requirements": [
+      "TEST-OPS-007"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-022"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Small team concentration risk"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "Acknowledgment drill meets target",
+      "Every alert has one owner",
+      "No production-changing action is assigned to AI or an unauthenticated operator"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "At least primary and backup responders are available"
+    ],
+    "owner": "OPS"
+  },
+  {
+    "id": "BL-OPS-008",
+    "requirement_id": "OPS-008",
+    "title": "Restrict AI automation to evidence collection, classification, drafting, and recommendation; require human authorization for mutations and dangerous operations.",
+    "domain": "OPS",
+    "severity": "P1",
+    "evidence": [
+      "Explicit prospective/security/operational requirement"
+    ],
+    "root_cause": "Evidence-derived prevention or explicitly prospective control.",
+    "proposed_change": "Restrict AI automation to evidence collection, classification, drafting, and recommendation; require human authorization for mutations and dangerous operations.",
+    "dependencies": [
+      "AI tool policy",
+      "Protected production credentials",
+      "Audit logs"
+    ],
+    "test_requirements": [
+      "TEST-OPS-008"
+    ],
+    "physical_test": false,
+    "automation": [
+      "AUTO-015",
+      "AUTO-017"
+    ],
+    "complexity": "M",
+    "risk": [
+      "Tool overprivilege",
+      "AI summary mistaken for authoritative state"
+    ],
+    "target": "2027 reliability foundation",
+    "status": "PROPOSED",
+    "acceptance_criteria": [
+      "AI cannot deploy, migrate, resize, restart, restore, switch authority, submit/replay scores, finalize/reopen, or publish side games without the established human gate",
+      "All AI queries use bounded roles",
+      "Prompt/data injection tests pass"
+    ],
+    "confidence": "MODERATE CONFIDENCE",
+    "assumptions": [
+      "Credentials can be separated by role"
+    ],
+    "owner": "OPS"
+  }
+]

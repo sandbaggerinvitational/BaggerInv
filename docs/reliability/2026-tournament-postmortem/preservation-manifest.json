@@ -1,0 +1,617 @@
+{
+  "createdAt": "2026-09-28T04:18:29.523272+00:00",
+  "scope": "Preserved 2026 tournament reliability report package plus preservation metadata; manifest excludes itself.",
+  "baseRepositorySha": "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6",
+  "artifacts": [
+    {
+      "file": "00-EXECUTIVE-SUMMARY.md",
+      "bytes": 4152,
+      "sha256": "7584be6d7e5ad94ef3c8e408db2041fab3d8168c99fb17616b7f35fadc6068d2"
+    },
+    {
+      "file": "01-TOURNAMENT-TIMELINE.md",
+      "bytes": 11480,
+      "sha256": "55f750ad7694ed7902a48b2b339a06cc1032b6ed9184dbd92933cad0351ce6f2"
+    },
+    {
+      "file": "02-INCIDENT-REGISTER.md",
+      "bytes": 94873,
+      "sha256": "be5e124daddf1b2e92896b3ab02c9864a8bf3f7a48d707e4f8a184073041aa41"
+    },
+    {
+      "file": "03-ROOT-CAUSE-TREE.md",
+      "bytes": 6361,
+      "sha256": "497837db8628f20f6476da543ca0c7b26533cbaffa71fe89b14803ebeb349da9"
+    },
+    {
+      "file": "04-CERTIFICATION-GAP-AUDIT.md",
+      "bytes": 6531,
+      "sha256": "168fae69435c93f1705d98437566dcc8ea101a1641e0bca7c7750049a4ee9139"
+    },
+    {
+      "file": "05-PRIOR-CERTIFICATION-TRUST-AUDIT.md",
+      "bytes": 4030,
+      "sha256": "371a1039d8f43279256d7631fb53149d61d20bcf24b215146bb849531de6e844"
+    },
+    {
+      "file": "06-SAFEGUARDS.md",
+      "bytes": 2741,
+      "sha256": "6eee1e80667a6366b77abc7f536910c9c8179d7231cd261de89f74ffe6c1e528"
+    },
+    {
+      "file": "07-BUILD11-SPEC.md",
+      "bytes": 11149,
+      "sha256": "0553d6c9942fd938834d4ebae76f9920903967f9d11b7e1dfdb079a81d241287"
+    },
+    {
+      "file": "08-BACKEND-HARDENING.md",
+      "bytes": 5984,
+      "sha256": "100e135cf1f78fb0cad5de2f97a3e30b8f303fec7dfadc56dd1aa703b1b3b2a6"
+    },
+    {
+      "file": "09-DATABASE-SQL.md",
+      "bytes": 6458,
+      "sha256": "94c1dd9a75d985131de311bfc5588df873e8c59f628f45122575ae21c00b03a0"
+    },
+    {
+      "file": "10-INFRASTRUCTURE.md",
+      "bytes": 10489,
+      "sha256": "019a0752249c66bf4f4b7f7f33359e1a68c611b6f366e9bcf9158950ce6b61d6"
+    },
+    {
+      "file": "11-SUPABASE-VS-AWS.md",
+      "bytes": 10024,
+      "sha256": "ac764332f1c07d5a8f664ba3aff3175d1b35ae8615ac30cc3772bc6328b95e84"
+    },
+    {
+      "file": "12-TOURNAMENT-MODE.md",
+      "bytes": 7190,
+      "sha256": "e50d167df683fc0f18f9ce71c179a60b2145df10decd0422ddf5337fd6c07be8"
+    },
+    {
+      "file": "13-OBSERVABILITY.md",
+      "bytes": 10561,
+      "sha256": "0e50cb79a3298bb3adff0677ffa0fc7a67bb7fa4ee6da43b3415029263dc20bb"
+    },
+    {
+      "file": "14-ALERTING.md",
+      "bytes": 6434,
+      "sha256": "944c323fa68669c8687f7b9faea247090a6a046670e1784b9d1f3e88e94ce408"
+    },
+    {
+      "file": "15-AUTOMATION.md",
+      "bytes": 2537,
+      "sha256": "337655ed737569e810981931fc206544c58adf2737faf2b36a17859bcce31759"
+    },
+    {
+      "file": "16-TOURNAMENT-OPERATIONS-ENGINE.md",
+      "bytes": 2830,
+      "sha256": "ce320bc6d83d0c372f0a69861ad92acf5f1db1bb885d67927ac1b792e3dde9d9"
+    },
+    {
+      "file": "17-DIRECTOR-REDESIGN.md",
+      "bytes": 3202,
+      "sha256": "1af5be5207050c30067293bff35e45a0fdd1f123e1a959e52b941980b00f2cef"
+    },
+    {
+      "file": "18-SCORE-RECOVERY.md",
+      "bytes": 2494,
+      "sha256": "5f52b0468223fce9a070c06e38d84d173eadabe581f3c8c4db53a60e5eff1d1d"
+    },
+    {
+      "file": "19-SIDE-GAME-LIFECYCLE.md",
+      "bytes": 6289,
+      "sha256": "703e6568dc7de02f1d8ef016ba653239498e2a5119945705c58e3e9ccdc31915"
+    },
+    {
+      "file": "20-DEPENDENCY-GRAPH.md",
+      "bytes": 5961,
+      "sha256": "558b7149c5875959452440361fc1ab19426d735362978eb96f4f50d332c9bf57"
+    },
+    {
+      "file": "2026-INCIDENT-MAP.md",
+      "bytes": 1271,
+      "sha256": "1ef7a11e86e542f00e17dd42b6ff4c88b2da8876deefae1ff1272b47933c0ccf"
+    },
+    {
+      "file": "2027-PREVENTION-MAP.md",
+      "bytes": 13343,
+      "sha256": "ccf3cf98f7b0b9aa28c34c1fc529caaedec843579f034b2dd848738fadd6f072"
+    },
+    {
+      "file": "21-FINGERPRINT-REDESIGN.md",
+      "bytes": 9751,
+      "sha256": "7ed9281bdf208b2b500290fd7f32f7b7061d505b214c670355fa8f7718e913fe"
+    },
+    {
+      "file": "22-CURRENT-POINTER-ARCHITECTURE.md",
+      "bytes": 5050,
+      "sha256": "b5384a9d3c64e366f3b8518ff9672fa59427496ff9b762a419c2752fc9c1bc43"
+    },
+    {
+      "file": "23-EVENT-DRIVEN-DESIGN.md",
+      "bytes": 5940,
+      "sha256": "ff39595430e66eb2e5b31ff5165546012a1530138e4ec1b3d695540e757c339a"
+    },
+    {
+      "file": "24-JOB-ARCHITECTURE.md",
+      "bytes": 6075,
+      "sha256": "d6f6b75ec6638f298315f2c4d1236ee3a6d5c9b936360e04986a6ce903328ff1"
+    },
+    {
+      "file": "25-NATIVE-NAVIGATION.md",
+      "bytes": 9203,
+      "sha256": "42c61d325b1c9df0c3cf2726cd89f0ee67f562334c31fb6d2982775992a2b814"
+    },
+    {
+      "file": "26-NATIVE-SCORING.md",
+      "bytes": 11643,
+      "sha256": "91394412379c2f5e11e5702da9e74ae3b5fbc71ade33ba2d6086afa05679566c"
+    },
+    {
+      "file": "27-ERROR-TAXONOMY.md",
+      "bytes": 7980,
+      "sha256": "2b57a6ad534a029317edcfe903177077c5986e9045e7176b4ce54305169332b2"
+    },
+    {
+      "file": "28-PERFORMANCE-BUDGETS.md",
+      "bytes": 8836,
+      "sha256": "f0507d1baf2a192a5ab188ec50c28d5421699cab778e1efb5cc7f48582669854"
+    },
+    {
+      "file": "29-CAPACITY-PLAN.md",
+      "bytes": 7563,
+      "sha256": "36a7f31586f8c820a51d96f50740faa1c8d15ba42619d061e6140b5fb68215cf"
+    },
+    {
+      "file": "30-TESTING-STRATEGY.md",
+      "bytes": 5762,
+      "sha256": "5919bef8fac2592d29940c36e19a03ae6bf27574afdbf7154e3fe3a3fc560548"
+    },
+    {
+      "file": "31-NEVER-AGAIN-SUITE.md",
+      "bytes": 25393,
+      "sha256": "fa52eb5f71052bd45f0865efe15a0fafefe9af2797495db36465ec9024ebde86"
+    },
+    {
+      "file": "32-2027-DRESS-REHEARSAL.md",
+      "bytes": 4020,
+      "sha256": "708d58c18c1829f7d722d49d7ee057737ff4b477d0625f2933f724e8f69a01f2"
+    },
+    {
+      "file": "33-PHYSICAL-DEVICE-PLAN.md",
+      "bytes": 14327,
+      "sha256": "6ab6d1204f83049483393d2ebcf647dba36728dab859ce83de966cf5006e949f"
+    },
+    {
+      "file": "34-OWNER-RUNBOOK.md",
+      "bytes": 4058,
+      "sha256": "3fa234d4c6aa50b6cde780a418cf123bcd5f4db4b724f91156b0542e237af49e"
+    },
+    {
+      "file": "35-INCIDENT-RUNBOOKS.md",
+      "bytes": 16501,
+      "sha256": "6939adb46b8ad343abaf4f6d44d59a2c70feb24119162abddb0ae847b46a959d"
+    },
+    {
+      "file": "36-ROUND-GO-CHECK.md",
+      "bytes": 1962,
+      "sha256": "32b4e9f009b03d9ee51de2dd7874f1324e9c98f2d0703dd84e1c4546c12d108a"
+    },
+    {
+      "file": "37-ROUND-CLOSEOUT.md",
+      "bytes": 2037,
+      "sha256": "dcafecc647654be2e0803722730054f008cc500e917688d3dfb296ab0739ba4f"
+    },
+    {
+      "file": "38-RELEASE-FREEZE-POLICY.md",
+      "bytes": 2618,
+      "sha256": "b1cc35e3655c7b9fd52ac4356d5c54c1418d252d14cc2b09379b47bf3bff5571"
+    },
+    {
+      "file": "39-EMERGENCY-CHANGE-PROTOCOL.md",
+      "bytes": 2843,
+      "sha256": "0a1636e2872f7f0cb9fadb68952583fdeac557ff616badb256c6ca12c156a6f8"
+    },
+    {
+      "file": "40-DISASTER-RECOVERY.md",
+      "bytes": 6203,
+      "sha256": "1e50d82ce081ec1477ce2c22bf04e3ea2f4789967391481b9351e844d02cc53b"
+    },
+    {
+      "file": "41-BACKUP-RESTORE.md",
+      "bytes": 3895,
+      "sha256": "4598b8c4b6c83377dfdf58c7151e7b5b4366b86d8f784f9d20e9a1eb6e05a91c"
+    },
+    {
+      "file": "42-PHYSICAL-SCORECARD-DR.md",
+      "bytes": 1845,
+      "sha256": "270032ebaacd481b3f7bdb22849430e9fd014c7fc6f4772a241397e72762c496"
+    },
+    {
+      "file": "43-RELIABILITY-BACKLOG.md",
+      "bytes": 13561,
+      "sha256": "291ae0e8cd6ec142d8b4321f9072f3ddb50c5c4e864e12815e55f4e432f0a0e3"
+    },
+    {
+      "file": "44-30-DAY-PLAN.md",
+      "bytes": 2003,
+      "sha256": "a1a667112a6706698b207cae10de5f408e8188c328feed4aa25801de74e92565"
+    },
+    {
+      "file": "45-90-DAY-ROADMAP.md",
+      "bytes": 3076,
+      "sha256": "46a3357f10ea56e8f15c1c205d50445256ebcdae299662e8375033701482daeb"
+    },
+    {
+      "file": "46-BUILD11-ENTRY-EXIT-CRITERIA.md",
+      "bytes": 8207,
+      "sha256": "8cd538cc19212e020b57c8bca7136f65bec257dee6ba86d7568552e5d47aebc9"
+    },
+    {
+      "file": "47-BACKEND-ROADMAP.md",
+      "bytes": 8810,
+      "sha256": "0ae4efa9d673e9da4fdeb548b06b26a73973bf2618c6bca713817f4f52d3c032"
+    },
+    {
+      "file": "48-DIRECTOR-ROADMAP.md",
+      "bytes": 1475,
+      "sha256": "44dbc65ddf368c3b778180f48e2cf4a5b11ec7d21c7c5a11427f01466a327e3f"
+    },
+    {
+      "file": "49-INFRASTRUCTURE-ROADMAP.md",
+      "bytes": 3482,
+      "sha256": "f578624144c8403b2e47e813b7f6d4fdf16a328af154131346348334eddc9dcc"
+    },
+    {
+      "file": "50-OBSERVABILITY-ROADMAP.md",
+      "bytes": 2999,
+      "sha256": "efa99ef2477f25263e2d919014e4b467da42c43997627a49310d95378839d6e7"
+    },
+    {
+      "file": "51-TESTING-ROADMAP.md",
+      "bytes": 1324,
+      "sha256": "f997aff8114ccf478c52a9eaebab48fe759471e7ae43eaf4057aa453239413ef"
+    },
+    {
+      "file": "52-AUTOMATION-MASTER-LIST.md",
+      "bytes": 6447,
+      "sha256": "73e9361b672b66065e1e47fbfd0500c80854ba9dd097beadfb8ad7eaea0ac732"
+    },
+    {
+      "file": "53-MONITORING-MASTER-LIST.md",
+      "bytes": 2951,
+      "sha256": "b2b37420b2a9eef4dc77ae1465b75476f70d982c229f72a52905d01e9381f06c"
+    },
+    {
+      "file": "54-TEST-MASTER-LIST.md",
+      "bytes": 23509,
+      "sha256": "b10cafc88ec3d07cfbde95f40dafc21e4ccd70b1a32c0926e85969dd95c181a1"
+    },
+    {
+      "file": "55-RUNBOOK-MASTER-LIST.md",
+      "bytes": 3466,
+      "sha256": "065faba357235db1de4471748fc877f57b727cf09046cf8ecb7f57eac5f6b465"
+    },
+    {
+      "file": "56-EVIDENCE-LEDGER.md",
+      "bytes": 4080,
+      "sha256": "641d7e063baff97e36c9580f6e68c5ea0e939709fb368bef92c51f6aa3daf607"
+    },
+    {
+      "file": "57-CHANGE-IMPACT-GRAPH.md",
+      "bytes": 2182,
+      "sha256": "222e0245c983da539c153964ebc59161bd5cd4e75bbf1097c23fefbba3a523ff"
+    },
+    {
+      "file": "58-CERTIFICATION-ORCHESTRATOR.md",
+      "bytes": 1844,
+      "sha256": "f6158b9c88602c1acffba8a219a7ad0092f4677d0d6200ee30e4a5ed3de7ae54"
+    },
+    {
+      "file": "59-TOURNAMENT-READINESS-STANDARD.md",
+      "bytes": 1935,
+      "sha256": "b452f3b0a56d03c8cf593e9c3d3daa95189830ea3d515bdaab32fe75c9d8e4f5"
+    },
+    {
+      "file": "60-TOURNAMENT-READINESS-TEMPLATE.md",
+      "bytes": 3710,
+      "sha256": "915659215df61ac37277b5ddf3a32e12970a75800b2385fb3abc6522509f6ad0"
+    },
+    {
+      "file": "61-RISK-REGISTER.md",
+      "bytes": 2628,
+      "sha256": "2b45f78d433e4791cbb7eb0d0a8100c01c30a7429054556f91baf982645f0ac8"
+    },
+    {
+      "file": "62-GOVERNANCE.md",
+      "bytes": 6547,
+      "sha256": "1980699b56fed809608a61359e9942788766f276724af5ce1518d1d88219833e"
+    },
+    {
+      "file": "63-RESPONSIBILITY-MATRIX.md",
+      "bytes": 2057,
+      "sha256": "00852f0cf03ecd0a8dd0264b9474e345d47c4d0125a89525694d0cecb638b9a7"
+    },
+    {
+      "file": "64-ARCHITECTURE-DIAGRAMS.md",
+      "bytes": 1904,
+      "sha256": "d268eebf773a8c4413c404d0a48b8d7e4246b6f67fb2c48ff9acad7499c1a48c"
+    },
+    {
+      "file": "65-CRITICAL-PATH-DIAGRAMS.md",
+      "bytes": 7357,
+      "sha256": "1decc4e8050a53a2352785141399314bba90074f34c7a807ea4afa3252b2b469"
+    },
+    {
+      "file": "66-2027-SUCCESS-CRITERIA.md",
+      "bytes": 1713,
+      "sha256": "2837feba2d018c99e5b90407e9d828be1bfa7c254c3ee6532479dd6c9ba4ddf2"
+    },
+    {
+      "file": "67-FINAL-RECOMMENDATIONS.md",
+      "bytes": 4996,
+      "sha256": "b0f8ad517f3b823f4f967125f8dc29e4e7fd8354af9cd2b924dedc4fc9ca6a05"
+    },
+    {
+      "file": "68-UNRESOLVED-QUESTIONS.md",
+      "bytes": 2982,
+      "sha256": "46c83ead99e7967dcc130035b928011ee29bbf4a42f5c5e7b689c71755948a66"
+    },
+    {
+      "file": "69-EVIDENCE-GAPS.md",
+      "bytes": 1951,
+      "sha256": "09545b310e1f667b09a329b72f8ed65ba4ca55732784d00fccd21a65183150ad"
+    },
+    {
+      "file": "70-CONTRADICTIONS.md",
+      "bytes": 3295,
+      "sha256": "d0e44c827d99a7684117b440615602c8843d83cccf0ec4df0538908939dafb60"
+    },
+    {
+      "file": "71-CERTIFICATION-CONFIDENCE.md",
+      "bytes": 1231,
+      "sha256": "0773548d0f89e8b9c5c1324d20c3f8b74f88b18951170a05066a8c1f44b1f2f0"
+    },
+    {
+      "file": "72-PREVENTABILITY-ASSESSMENT.md",
+      "bytes": 6929,
+      "sha256": "5f13390942a02e364430298c051c50d889d72dfc3ce52591c08e4c7cbb216db0"
+    },
+    {
+      "file": "73-AUTOMATION-ROI.md",
+      "bytes": 1597,
+      "sha256": "fc09993268eaae1a9e000055325afa20688ff30ac36f995b759473ab85a7c849"
+    },
+    {
+      "file": "74-RELIABILITY-ROI.md",
+      "bytes": 1678,
+      "sha256": "6c2e258e5727ac4c6fdcd12dca1841cd95f13d19b223466a26800bccbf95c363"
+    },
+    {
+      "file": "75-FINAL-P0-P1-P2-P3.md",
+      "bytes": 4044,
+      "sha256": "9a95fc3b3cf796406f09a0fa737ee7778517aefff0b1f16941cd77396836d3b6"
+    },
+    {
+      "file": "76-IMPLEMENTATION-DAG.md",
+      "bytes": 4554,
+      "sha256": "8e2d92ddcdca796ed413b57c5bae03a04ec988324b16b74c4c68320af22fb467"
+    },
+    {
+      "file": "77-FIRST-FIVE-ACTIONS.md",
+      "bytes": 3289,
+      "sha256": "43b0dc7aeb6ad3ad2bd984d4e9f6d44bb0964d8c8d263a4227004494426ed063"
+    },
+    {
+      "file": "78-NEXT-STEPS.md",
+      "bytes": 2221,
+      "sha256": "47c911d326ddf6edb491b211093d10c9dd2a9c6337c2232ed660ac7198ccbe6c"
+    },
+    {
+      "file": "AUDIT-COMPLETENESS.md",
+      "bytes": 158348,
+      "sha256": "9444ce34cea8417137f9db8ff0c9d9ce4866a91a0b3fdd3a1f768a2052caf7a7"
+    },
+    {
+      "file": "AUTOMATION-BLUEPRINT.md",
+      "bytes": 2354,
+      "sha256": "726103772729351328f9aaf69199b6686dfd4d1650af55cad9e895bacd06cb41"
+    },
+    {
+      "file": "BUILD11-BLUEPRINT.md",
+      "bytes": 8801,
+      "sha256": "7b4a74ed4750d72625fc904a97ca717df2373fec86a9f4786d497b66893e2e7c"
+    },
+    {
+      "file": "CERTIFICATION-BLUEPRINT.md",
+      "bytes": 2469,
+      "sha256": "ad5e83b2ed9e7c7098adf755dc91c0e7ad7c4bb946b3e60a5e5627f748ca8353"
+    },
+    {
+      "file": "CROSS-DOCUMENT-CONSISTENCY.md",
+      "bytes": 1648,
+      "sha256": "5239b9a51d75def6002dfe378c566370b0069cb7c7dc8a26aed31c4f1924bb35"
+    },
+    {
+      "file": "DATABASE-BLUEPRINT.md",
+      "bytes": 14191,
+      "sha256": "cadb9f200ed3c5ea62295744b8dd7e469ecb9f3a8011cbf88d336ced509bf516"
+    },
+    {
+      "file": "DELIVERABLE-COMPLETENESS.md",
+      "bytes": 16365,
+      "sha256": "f800c7923dd6003ec9be96bbf0b8eb76ce8dc0a6266ac45fb1a7d1fe68cd1195"
+    },
+    {
+      "file": "DIRECTOR-BLUEPRINT.md",
+      "bytes": 2391,
+      "sha256": "6596ad93e35bc5787f17e2f137146a518ff7ae9c53c9b11f446a0a6072130174"
+    },
+    {
+      "file": "ENGINEERING-BLUEPRINT.md",
+      "bytes": 5670,
+      "sha256": "899d46457f2ecc8234e0d2c6096fa6edddcc90c3d7928d119f101837ae0cc86d"
+    },
+    {
+      "file": "EVIDENCE-BLUEPRINT.md",
+      "bytes": 6847,
+      "sha256": "058af8f8c33ec46a88e8b1b0fd8d569217a83000a55c745f2118bea3af80c278"
+    },
+    {
+      "file": "FINAL-VERDICT-ANSWERS.md",
+      "bytes": 9111,
+      "sha256": "d8e60812ade456bdf392c8a7b078a9504334559ec519e460edf6db359a8a61b7"
+    },
+    {
+      "file": "FINGERPRINT-INVENTORY.md",
+      "bytes": 31364,
+      "sha256": "dfd64ebfb2088faaa85cadb7c4c919a278721f4859dfc8e294a2d97c9f848f47"
+    },
+    {
+      "file": "FIVE-WHYS-AND-PATCHES.md",
+      "bytes": 6401,
+      "sha256": "252ac6f95a0cf97e19ef5b0a638fed45ab85a2f49bf0a0e40e46c8031319607e"
+    },
+    {
+      "file": "INDEX.md",
+      "bytes": 23932,
+      "sha256": "f579c50095f9756b19070d08603959aebc7dc181bc4553b000c6453fc99c8663"
+    },
+    {
+      "file": "INFRASTRUCTURE-BLUEPRINT.md",
+      "bytes": 6636,
+      "sha256": "4140ce182edb08fbc679bd6a12843188034ad16c3e0c47af8a57e15d13894b2d"
+    },
+    {
+      "file": "OPERATION-READBACK-STANDARD.md",
+      "bytes": 21334,
+      "sha256": "2054bb69495a58d43e2fffd1996157d255fdfa89266cba85b9f2f9b9357c642b"
+    },
+    {
+      "file": "OPERATIONS-BLUEPRINT.md",
+      "bytes": 2990,
+      "sha256": "a0603ae5798e6c99641aa54cf5af92111f9b80684994dc280cbf86fe9d54351c"
+    },
+    {
+      "file": "OWNER-DECISION-PACKAGE.md",
+      "bytes": 9261,
+      "sha256": "28b451b96daf0da6b69bb900e60f18e9b76d9ede99324f62e2fb35a049e20c14"
+    },
+    {
+      "file": "PRESERVATION-RECEIPT.md",
+      "bytes": 2730,
+      "sha256": "060edc2ea592c5295dbb4fe033d200959e142fd2d27041c2f22e8c34a7981f02"
+    },
+    {
+      "file": "READ-ONLY-VERIFICATION.md",
+      "bytes": 1475,
+      "sha256": "08660c643cdf89770cbe8e646638ce73fe43f583ac12ea0abcd6cae0ee13708d"
+    },
+    {
+      "file": "README.md",
+      "bytes": 4682,
+      "sha256": "a605adb2f207443b6fa134e0f384b150b14bc368fd7ebc66bec2467471ec97d9"
+    },
+    {
+      "file": "REQUIREMENTS.md",
+      "bytes": 112316,
+      "sha256": "18e9836065214818cbffa4741d0d44e86fbaf0187ee82d0e949bec6af7b7ab96"
+    },
+    {
+      "file": "REVIEW-AND-DECISION-RECORDS.md",
+      "bytes": 6503,
+      "sha256": "815d506e1e5767ccd31f6af357a7f26991d812108c9c98bd9d11972b6ae18474"
+    },
+    {
+      "file": "SECRET-SCAN-REPORT.md",
+      "bytes": 3154,
+      "sha256": "9982299e9e95ce6934f686f4dceb61873b8a66ea4ecdc1e11db1680093e4753a"
+    },
+    {
+      "file": "SYSTEM-RETROSPECTIVES.md",
+      "bytes": 18256,
+      "sha256": "2427da8d6ce98d3a0ea5f924692ea466e2a80bcd4c8999a235d3d00e50a9c8f3"
+    },
+    {
+      "file": "TEST-BLUEPRINT.md",
+      "bytes": 3058,
+      "sha256": "045e9e3421933d023c542e9371a477283e4a97d96c309307c5e1788cde83ee5d"
+    },
+    {
+      "file": "TOP-TEN-LESSONS-AND-CHANGES.md",
+      "bytes": 5084,
+      "sha256": "7c2251ea597fce772560e7fc03c5646d016cd2e02189ed41c895ffc632cafab4"
+    },
+    {
+      "file": "WORKLOAD-AND-CAPACITY-DETAILS.md",
+      "bytes": 26455,
+      "sha256": "d5394e4ae1d84297ea63d24fc414b3636e98bac91e6d779edf2d6f4d06930239"
+    },
+    {
+      "file": "automation-catalog.json",
+      "bytes": 10501,
+      "sha256": "53e8a32a44c8ca6ca3f3eae24a9f6947ea38f0fdd9b7657eddc34ecb103ba529"
+    },
+    {
+      "file": "change-impact-graph.json",
+      "bytes": 65332,
+      "sha256": "0dd89b5c71f11898f7af6fd12c195a075ed3c04f1fc43bf38f3d04ac33272c01"
+    },
+    {
+      "file": "evidence-ledger.json",
+      "bytes": 204394,
+      "sha256": "0c0c43180ad1a4b0654964f2227a8c6da4a603b77263f47d07c15b4c0fe4f3df"
+    },
+    {
+      "file": "evidence-manifest.schema.json",
+      "bytes": 1812,
+      "sha256": "3aa39515f0f0d733fd7103bba8c618d0a33064b0aaf88bf3c0d160453f5d160b"
+    },
+    {
+      "file": "external-evidence-manifest.json",
+      "bytes": 132880,
+      "sha256": "5805a787bbba0cdc74cc1e3d2b857273d96d1de0b29026b380c7729b7c5c62a1"
+    },
+    {
+      "file": "incident-register.json",
+      "bytes": 191146,
+      "sha256": "9373a001eddd515204a4c697347efd583f7e56c46c71f66a22b161edff3b0ba4"
+    },
+    {
+      "file": "monitoring-catalog.json",
+      "bytes": 42595,
+      "sha256": "6511e3032412482d4f9e216f7f06478bc7ac33a757f5cebecb4540469b685a2b"
+    },
+    {
+      "file": "package-manifest.json",
+      "bytes": 18882,
+      "sha256": "3686c93db3ce4d170d0362245d2a1f8174af99b0555ecadeec1164f28f721205"
+    },
+    {
+      "file": "reliability-backlog.json",
+      "bytes": 129403,
+      "sha256": "3c9d3aefb978eca474f913a9407b63dfeca8b80a7a98a72f0e0f36e207470b2a"
+    },
+    {
+      "file": "risk-register.json",
+      "bytes": 3569,
+      "sha256": "84077333ad6f058a357a00021e2ed65dd1181cae2d7b3bbcadfe487768d38af2"
+    },
+    {
+      "file": "test-catalog.json",
+      "bytes": 127503,
+      "sha256": "71359fad99f1201d410923c63400f6cb12e57b9fcde276d4c5afee16203ceac8"
+    },
+    {
+      "file": "tournament-readiness-schema.json",
+      "bytes": 1420,
+      "sha256": "7328a6de3c02d6a740117335d2d9ee4df2dca38b77cc660c13458182d878863b"
+    },
+    {
+      "file": "traceability.json",
+      "bytes": 18004,
+      "sha256": "97c57784e0c6c3f5b11eca2a695b03895d254e188d24f99214b086e35ccd8229"
+    }
+  ]
+}

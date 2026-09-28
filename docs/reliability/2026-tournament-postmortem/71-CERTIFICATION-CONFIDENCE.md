@@ -1,0 +1,10 @@
+# Confidence, fact and recommendation labeling
+
+
+PROVEN: direct evidence at claimed layer establishes the bounded claim. STRONGLY SUPPORTED (HIGH CONFIDENCE inference): multiple consistent observations and a mechanism, with missing direct link. PLAUSIBLE (MODERATE/LOW CONFIDENCE): reasonable mechanism but limited correlation. UNKNOWN: insufficient/conflicting evidence. These labels are not numeric probabilities.
+
+FACT describes observedsource/receipt/runtime/ownerobservationwithscope. INFERENCE describescausalinterpretation. RECOMMENDATIONdescribesfuturedesignwithconfidence,assumptions,risks. OPENQUESTIONstatesneeded evidence. Ownerphysicalobservationprovesreportedexperience, notunobservedservercause.
+
+RecommendationconfidencecanbeHIGHbecauseanexactfailureclassneedscontainment; implementationeffectivenessremainsNOTPROVENuntiltests. Numericalperformance/alerttargetsarePROVISIONALuntilmeasuredandapproved. Missingproofcannotbeupgradedbylargeunrelatedtestcounts, priorPASSlanguage,AIcertaintyorsimilarcapabilitysuccess.
+
+AllfutureP0claimsneedfreshcompleteproofchain; automatedclaimgeneratorusesartifactcoverage/environment/fixture/chronology/freshness. It must not synthesize“physicalPASS”froma simulator screenshot.

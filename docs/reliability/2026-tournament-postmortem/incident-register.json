@@ -1,0 +1,3568 @@
+[
+  {
+    "id": "2026-INC-001",
+    "title": "PWA tournament-day timezone and mounted-clock defect",
+    "date_time": {
+      "incident": "UNKNOWN",
+      "boundedEvidence": "Correction commit authored 2026-09-22T20:49:15-05:00; Release 131 deployed 2026-09-23T02:12:58.750Z"
+    },
+    "release": {
+      "affected": "<=130",
+      "recovered": 131
+    },
+    "activation": {
+      "affected": "UNKNOWN",
+      "recovered": 230
+    },
+    "sha": {
+      "affected": "bde9de21079d0a634ca5951915d9153d078918a9 (Release 130 baseline/rollback)",
+      "recovered": "0e7ec617f16e37589917f8c73c6f5e1550a1ca5b"
+    },
+    "surface": [
+      "PWA",
+      "Backend presentation",
+      "Certification"
+    ],
+    "severity": "P2",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Tournament-day labels and mounted clock could disagree with tournament timezone/date boundaries.",
+    "competitive_impact": "Presentation/workflow availability; no direct score or golf-result corruption established for this incident. Dependent failures are separate incident IDs.",
+    "data_integrity_impact": "No canonical corruption established by the cited evidence; not an exhaustive historical database comparison.",
+    "root_cause": "Tournament schedule/day presentation did not consistently derive the live clock, day boundary, and schedule status from the published IANA tournament timezone. The recovered code centralizes published timezone selection, IANA conversion, and a mounted minute/focus/visibility clock.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "Inconsistent treatment of tournament timezone and a long-mounted presentation clock.",
+      "Certification gap: retained proof did not cover every physical midnight/timezone transition; those transitions are test requirements, not proven incident observations."
+    ],
+    "detection_method": "Preserved timezone source, boundary tests and hosted certification artifacts; comprehensive physical midnight coverage was not retained.",
+    "recovery": "Release 131 carried the timezone correction. Browser refresh/focus/visibility now advances the mounted clock; this is presentation-only and does not change round authority.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes; PWA clock/timezone correction.",
+    "release_required": "Release 131 (historical correction).",
+    "native_build_required": "No native change for that PWA correction.",
+    "why_certification_missed": "Earlier presentation or fresh-render success did not prove a long-mounted page across tournament-local midnight or a device timezone different from the tournament timezone.",
+    "test_that_would_catch": "NA-2026-001",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "CERT-NA-001",
+        "B11-READ-005"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-015",
+      "AUTO-024"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "resolved in Release 131; retain regression coverage",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "UNIT_TESTED",
+      "STAGED_HOSTED_TESTED",
+      "PRODUCTION_READBACK_VERIFIED"
+    ],
+    "evidence": [
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build8-shipping/navigation-correction/PREDECESSOR-EVIDENCE.json",
+        "lines": "2-24",
+        "proves": "Release 131 exact SHA, deployment time, capability binding, and predecessor"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-pwa-time-production/FREEZE-CERTIFICATION.json",
+        "lines": "2-25",
+        "proves": "PWA time PASS, 24 final time tests, hosted readback boundary, and accepted native idle-midnight limitation"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-r1-open-incident/source/lib/tournament-timeline.js",
+        "revision": "0e7ec617f16e37589917f8c73c6f5e1550a1ca5b",
+        "lines": "85-171",
+        "proves": "IANA zoned clock, published tournament timezone, date-time conversion, and status"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-r1-open-incident/source/app/useTournamentClock.js",
+        "revision": "0e7ec617f16e37589917f8c73c6f5e1550a1ca5b",
+        "lines": "4-25",
+        "proves": "Mounted minute, focus, and visibility refresh"
+      },
+      {
+        "kind": "test",
+        "path": "/private/tmp/bagger-r1-open-incident/source/test/tournament-time-freeze.test.mjs",
+        "revision": "0e7ec617f16e37589917f8c73c6f5e1550a1ca5b",
+        "lines": "6-43",
+        "proves": "New York/Chicago/UTC boundaries, DST, countdowns, and lifecycle non-mutation"
+      }
+    ],
+    "limitations": "No retained artifact proves a physical iPhone exercised every timezone/midnight boundary. Hosted PWA readback is not physical-device proof.",
+    "original_detail": {
+      "incidentId": "2026-INC-001",
+      "title": "PWA tournament-day timezone and mounted-clock defect",
+      "surface": [
+        "PWA",
+        "Backend presentation",
+        "Certification"
+      ],
+      "time": {
+        "incident": "UNKNOWN",
+        "boundedEvidence": "Correction commit authored 2026-09-22T20:49:15-05:00; Release 131 deployed 2026-09-23T02:12:58.750Z"
+      },
+      "release": {
+        "affected": "<=130",
+        "recovered": 131
+      },
+      "activation": {
+        "affected": "UNKNOWN",
+        "recovered": 230
+      },
+      "sha": {
+        "affected": "bde9de21079d0a634ca5951915d9153d078918a9 (Release 130 baseline/rollback)",
+        "recovered": "0e7ec617f16e37589917f8c73c6f5e1550a1ca5b"
+      },
+      "rootCause": "Tournament schedule/day presentation did not consistently derive the live clock, day boundary, and schedule status from the published IANA tournament timezone. The recovered code centralizes published timezone selection, IANA conversion, and a mounted minute/focus/visibility clock.",
+      "confidence": "PROVEN",
+      "evidence": [
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build8-shipping/navigation-correction/PREDECESSOR-EVIDENCE.json",
+          "lines": "2-24",
+          "proves": "Release 131 exact SHA, deployment time, capability binding, and predecessor"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-pwa-time-production/FREEZE-CERTIFICATION.json",
+          "lines": "2-25",
+          "proves": "PWA time PASS, 24 final time tests, hosted readback boundary, and accepted native idle-midnight limitation"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-r1-open-incident/source/lib/tournament-timeline.js",
+          "revision": "0e7ec617f16e37589917f8c73c6f5e1550a1ca5b",
+          "lines": "85-171",
+          "proves": "IANA zoned clock, published tournament timezone, date-time conversion, and status"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-r1-open-incident/source/app/useTournamentClock.js",
+          "revision": "0e7ec617f16e37589917f8c73c6f5e1550a1ca5b",
+          "lines": "4-25",
+          "proves": "Mounted minute, focus, and visibility refresh"
+        },
+        {
+          "kind": "test",
+          "path": "/private/tmp/bagger-r1-open-incident/source/test/tournament-time-freeze.test.mjs",
+          "revision": "0e7ec617f16e37589917f8c73c6f5e1550a1ca5b",
+          "lines": "6-43",
+          "proves": "New York/Chicago/UTC boundaries, DST, countdowns, and lifecycle non-mutation"
+        }
+      ],
+      "proofLayersActuallyTested": [
+        "SOURCE_INSPECTED",
+        "UNIT_TESTED",
+        "STAGED_HOSTED_TESTED",
+        "PRODUCTION_READBACK_VERIFIED"
+      ],
+      "physicalEvidence": "No retained artifact proves a physical iPhone exercised every timezone/midnight boundary. Hosted PWA readback is not physical-device proof.",
+      "recovery": "Release 131 carried the timezone correction. Browser refresh/focus/visibility now advances the mounted clock; this is presentation-only and does not change round authority.",
+      "build10RelaunchRecovery": "NOT APPLICABLE",
+      "priorPassClaimsAudited": "Earlier presentation or fresh-render success did not prove a long-mounted page across tournament-local midnight or a device timezone different from the tournament timezone.",
+      "missingTests": [
+        "Physical iPhone mounted across tournament-local midnight",
+        "Long-lived PWA session across focus/background and DST boundary",
+        "Release certification that records browser/device timezone separately from tournament timezone"
+      ],
+      "status": "resolved in Release 131; retain regression coverage"
+    },
+    "missing_tests": [
+      "Physical iPhone mounted across tournament-local midnight",
+      "Long-lived PWA session across focus/background and DST boundary",
+      "Release certification that records browser/device timezone separately from tournament timezone"
+    ]
+  },
+  {
+    "id": "2026-INC-002",
+    "title": "Spectator current-match navigation mixed tournament-wide links with round-scoped position",
+    "date_time": {
+      "incident": "UNKNOWN; discovered during Build 8 shipping certification",
+      "boundedEvidence": "Correction certification recorded 2026-09-23T12:27:50.605989Z"
+    },
+    "release": {
+      "affected": 131,
+      "recovered": 132
+    },
+    "activation": {
+      "affected": 230,
+      "recovered": 231
+    },
+    "sha": {
+      "affectedBackend": "9f71ea73faa08b8e5c35e94e2bbf650b3468b511",
+      "recoveredBackend": "4f880f04e19b13f97cab5cd1b0c5a20213f55d53",
+      "nativeUnchanged": "1bcd531971ca44073c88694ea09a25c8c2a4bd3c"
+    },
+    "surface": [
+      "Backend spectator projection",
+      "Native spectator Match Detail",
+      "Certification"
+    ],
+    "severity": "P2",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Spectator current-match navigation could select the wrong match because the link set and positional scope differed.",
+    "competitive_impact": "Presentation/workflow availability; no direct score or golf-result corruption established for this incident. Dependent failures are separate incident IDs.",
+    "data_integrity_impact": "No canonical corruption established by the cited evidence; not an exhaustive historical database comparison.",
+    "root_cause": "The authoritative Game Center view supplied tournament-wide previous/next IDs while its index/count were round-scoped. The spectator adapter copied both into a native DTO whose endpoint invariants require no previous at round index 1 and no next at round index count.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "The projection combined tournament-wide navigation IDs with round-scoped position/count.",
+      "Certification gap: endpoint invariants were insufficient without same-round link membership."
+    ],
+    "detection_method": "Preserved backend spectator contract investigation and source/certification artifacts.",
+    "recovery": "Release 132 computes spectator previous/next within canonical round scope; native source did not change.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes; backend spectator projection correction.",
+    "release_required": "Release 132 (historical correction).",
+    "native_build_required": "Build 8 source unchanged for this backend correction.",
+    "why_certification_missed": "Fixture-based Build 8 navigation PASS lacked current canonical boundary responses. JSON decode and screen rendering were weaker than DTO semantic compatibility.",
+    "test_that_would_catch": "NA-2026-002",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "CERT-NA-001",
+        "B11-NAV-005"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-015"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "resolved server-side in Release 132; native invariant retained",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "UNIT_TESTED",
+      "API_RPC_TESTED",
+      "STAGED_HOSTED_TESTED",
+      "PRODUCTION_READBACK_VERIFIED"
+    ],
+    "evidence": [
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build8-shipping/navigation-correction/CORRECTION.md",
+        "lines": "3-17",
+        "proves": "Root cause, bounded backend mapping correction, 262 focused tests, and 52/52 compatibility"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build8-shipping/NAVIGATION-BLOCKER.md",
+        "lines": "3-40",
+        "proves": "49/52 initial compatibility, no physical screen claim, three boundary failures, and proposed bounded correction"
+      },
+      {
+        "kind": "fixture",
+        "path": "/private/tmp/bagger-build8-shipping/NAVIGATION-BLOCKER.json",
+        "lines": "1-61",
+        "proves": "R1-6, R2-1, and R2-6 exact cross-round link failures"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Models/MobileMatchDetailModels.swift",
+        "lines": "244-273",
+        "proves": "Native round-scoped previous/next invariants retained in Build 10"
+      },
+      {
+        "kind": "historical canonical snapshot",
+        "path": "/private/tmp/bagger-build8-shipping/navigation-correction/closure-state.json",
+        "lines": "13",
+        "proves": "Release 132 retained closure-state activation_revision is 231; not a current health claim."
+      }
+    ],
+    "limitations": "The blocker report explicitly did not claim three physical screens failed. Later live PWA captures and native compatibility proved corrected data, not a physical iPhone traversal of every round boundary.",
+    "original_detail": {
+      "incidentId": "2026-INC-002",
+      "title": "Spectator current-match navigation mixed tournament-wide links with round-scoped position",
+      "surface": [
+        "Backend spectator projection",
+        "Native spectator Match Detail",
+        "Certification"
+      ],
+      "time": {
+        "incident": "UNKNOWN; discovered during Build 8 shipping certification",
+        "boundedEvidence": "Correction certification recorded 2026-09-23T12:27:50.605989Z"
+      },
+      "release": {
+        "affected": 131,
+        "recovered": 132
+      },
+      "activation": {
+        "affected": 230,
+        "recovered": "UNKNOWN in supplied native evidence"
+      },
+      "sha": {
+        "affectedBackend": "9f71ea73faa08b8e5c35e94e2bbf650b3468b511",
+        "recoveredBackend": "4f880f04e19b13f97cab5cd1b0c5a20213f55d53",
+        "nativeUnchanged": "1bcd531971ca44073c88694ea09a25c8c2a4bd3c"
+      },
+      "rootCause": "The authoritative Game Center view supplied tournament-wide previous/next IDs while its index/count were round-scoped. The spectator adapter copied both into a native DTO whose endpoint invariants require no previous at round index 1 and no next at round index count.",
+      "confidence": "PROVEN",
+      "evidence": [
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build8-shipping/navigation-correction/CORRECTION.md",
+          "lines": "3-17",
+          "proves": "Root cause, bounded backend mapping correction, 262 focused tests, and 52/52 compatibility"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build8-shipping/NAVIGATION-BLOCKER.md",
+          "lines": "3-40",
+          "proves": "49/52 initial compatibility, no physical screen claim, three boundary failures, and proposed bounded correction"
+        },
+        {
+          "kind": "fixture",
+          "path": "/private/tmp/bagger-build8-shipping/NAVIGATION-BLOCKER.json",
+          "lines": "1-61",
+          "proves": "R1-6, R2-1, and R2-6 exact cross-round link failures"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Models/MobileMatchDetailModels.swift",
+          "lines": "244-273",
+          "proves": "Native round-scoped previous/next invariants retained in Build 10"
+        }
+      ],
+      "proofLayersActuallyTested": [
+        "SOURCE_INSPECTED",
+        "UNIT_TESTED",
+        "API_RPC_TESTED",
+        "STAGED_HOSTED_TESTED",
+        "PRODUCTION_READBACK_VERIFIED"
+      ],
+      "physicalEvidence": "The blocker report explicitly did not claim three physical screens failed. Later live PWA captures and native compatibility proved corrected data, not a physical iPhone traversal of every round boundary.",
+      "recovery": "Release 132 computes spectator previous/next within canonical round scope; native source did not change.",
+      "build10RelaunchRecovery": "NOT APPLICABLE",
+      "priorPassClaimsAudited": "Fixture-based Build 8 navigation PASS lacked current canonical boundary responses. JSON decode and screen rendering were weaker than DTO semantic compatibility.",
+      "missingTests": [
+        "Physical first/interior/last navigation for every paired round",
+        "Unpaired and partially paired round tap behavior",
+        "Contract test that asserts link IDs belong to the same round, not only endpoint nullability"
+      ],
+      "status": "resolved server-side in Release 132; native invariant retained"
+    },
+    "missing_tests": [
+      "Physical first/interior/last navigation for every paired round",
+      "Unpaired and partially paired round tap behavior",
+      "Contract test that asserts link IDs belong to the same round, not only endpoint nullability"
+    ]
+  },
+  {
+    "id": "2026-INC-003",
+    "title": "Spectator More rendered system dark grouped cards under fixed light Bagger colors",
+    "date_time": {
+      "incident": "UNKNOWN; owner observation before local Build 9 correction",
+      "boundedEvidence": "Build 9 report dated 2026-09-23"
+    },
+    "release": {
+      "backend": 132,
+      "nativeAffected": "Build 8",
+      "nativeRecovered": "Build 9 candidate and inherited by Build 10"
+    },
+    "activation": "NOT APPLICABLE to native binary; backend activation not causal",
+    "sha": {
+      "affectedNative": "1bcd531971ca44073c88694ea09a25c8c2a4bd3c",
+      "recoveredNative": "c468b0d625a64e3da9f88b1d264cfa6039c5b521",
+      "build10": "e7652b9b65595861f4f7cdf0b8326491581a27b8"
+    },
+    "surface": [
+      "Native spectator",
+      "Visual certification"
+    ],
+    "severity": "P2",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Spectator More displayed dark system rows behind fixed palette text, reducing readability.",
+    "competitive_impact": "Presentation/workflow availability; no direct score or golf-result corruption established for this incident. Dependent failures are separate incident IDs.",
+    "data_integrity_impact": "No canonical corruption established by the cited evidence; not an exhaustive historical database comparison.",
+    "root_cause": "The Release window selected dark appearance for signed-out state. A nested light preference did not override the window, and inset-grouped List rows remained system-adaptive while Bagger text/icon colors were fixed. The DEBUG gallery forced outer light appearance and masked the defect.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "The DEBUG fixture forced light appearance while the shipping root could inherit system dark appearance.",
+      "Fixed palette text and system grouped-card backgrounds could diverge."
+    ],
+    "detection_method": "Shipping source and DEBUG-fixture comparison, unit/simulator certification artifacts; not blanket physical acceptance.",
+    "recovery": "Build 9 scoped the light color environment to the existing spectator More hierarchy; Build 10 inherits it.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes; native appearance correction.",
+    "release_required": "Native Build 9; no backend release required for that correction.",
+    "native_build_required": "Build 9 (historical correction).",
+    "why_certification_missed": "Build 8's 19 participant visual comparisons did not cover spectator More under the Release signed-out window appearance. The DEBUG gallery's outer light mode produced a false-negative fixture.",
+    "test_that_would_catch": "NA-2026-003",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "CERT-NA-001",
+        "B11-READ-006"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-024"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "corrected in Build 9/10 source; physical correction evidence incomplete",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "UNIT_TESTED",
+      "SIMULATOR_TESTED"
+    ],
+    "evidence": [
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build9-more/REPORT.md",
+        "lines": "15-39",
+        "proves": "Root cause and one-line spectator More correction"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build9-more/REPORT.md",
+        "lines": "41-64",
+        "proves": "Simulator reproduction under light/dark device settings and test scope"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build9-more/DIAGNOSIS.json",
+        "lines": "2-18",
+        "proves": "28/28/30 uncorrected RGB, correction, and no physical retest"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/BaggerInvApp.swift",
+        "lines": "30-50",
+        "proves": "Window-level preferredColorScheme and signed-out dark default"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Spectator/SpectatorAppShell.swift",
+        "lines": "33-42",
+        "proves": "Build 10 retains local light environment on More and shell preference"
+      }
+    ],
+    "limitations": "Owner-reported physical symptom exists, but Build 9 correction was not physically retested in its report. Simulator shipping-appearance reproduction is strong implementation proof, not physical acceptance.",
+    "original_detail": {
+      "incidentId": "2026-INC-003",
+      "title": "Spectator More rendered system dark grouped cards under fixed light Bagger colors",
+      "surface": [
+        "Native spectator",
+        "Visual certification"
+      ],
+      "time": {
+        "incident": "UNKNOWN; owner observation before local Build 9 correction",
+        "boundedEvidence": "Build 9 report dated 2026-09-23"
+      },
+      "release": {
+        "backend": 132,
+        "nativeAffected": "Build 8",
+        "nativeRecovered": "Build 9 candidate and inherited by Build 10"
+      },
+      "activation": "NOT APPLICABLE to native binary; backend activation not causal",
+      "sha": {
+        "affectedNative": "1bcd531971ca44073c88694ea09a25c8c2a4bd3c",
+        "recoveredNative": "c468b0d625a64e3da9f88b1d264cfa6039c5b521",
+        "build10": "e7652b9b65595861f4f7cdf0b8326491581a27b8"
+      },
+      "rootCause": "The Release window selected dark appearance for signed-out state. A nested light preference did not override the window, and inset-grouped List rows remained system-adaptive while Bagger text/icon colors were fixed. The DEBUG gallery forced outer light appearance and masked the defect.",
+      "confidence": "PROVEN",
+      "evidence": [
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build9-more/REPORT.md",
+          "lines": "15-39",
+          "proves": "Root cause and one-line spectator More correction"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build9-more/REPORT.md",
+          "lines": "41-64",
+          "proves": "Simulator reproduction under light/dark device settings and test scope"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build9-more/DIAGNOSIS.json",
+          "lines": "2-18",
+          "proves": "28/28/30 uncorrected RGB, correction, and no physical retest"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/BaggerInvApp.swift",
+          "lines": "30-50",
+          "proves": "Window-level preferredColorScheme and signed-out dark default"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Spectator/SpectatorAppShell.swift",
+          "lines": "33-42",
+          "proves": "Build 10 retains local light environment on More and shell preference"
+        }
+      ],
+      "proofLayersActuallyTested": [
+        "SOURCE_INSPECTED",
+        "UNIT_TESTED",
+        "SIMULATOR_TESTED"
+      ],
+      "physicalEvidence": "Owner-reported physical symptom exists, but Build 9 correction was not physically retested in its report. Simulator shipping-appearance reproduction is strong implementation proof, not physical acceptance.",
+      "recovery": "Build 9 scoped the light color environment to the existing spectator More hierarchy; Build 10 inherits it.",
+      "build10RelaunchRecovery": "NOT APPLICABLE; relaunch of affected Build 8 preserved the signed-out dark window condition",
+      "priorPassClaimsAudited": "Build 8's 19 participant visual comparisons did not cover spectator More under the Release signed-out window appearance. The DEBUG gallery's outer light mode produced a false-negative fixture.",
+      "missingTests": [
+        "Physical iPhone light and dark system appearance on spectator More",
+        "Release-binary appearance matrix for signed-out/authenticated/spectator roots",
+        "Contrast and Dynamic Type checks on real device"
+      ],
+      "status": "corrected in Build 9/10 source; physical correction evidence incomplete"
+    },
+    "missing_tests": [
+      "Physical iPhone light and dark system appearance on spectator More",
+      "Release-binary appearance matrix for signed-out/authenticated/spectator roots",
+      "Contrast and Dynamic Type checks on real device"
+    ]
+  },
+  {
+    "id": "2026-INC-004",
+    "title": "Spectator Today showed unavailable while pending and retried only one required resource",
+    "date_time": {
+      "incident": "Reported around 2026-09-23 08:42 local; exact physical request/cause UNKNOWN",
+      "boundedEvidence": "Nearby tournament GETs at 13:42:07Z and 13:42:30Z were 200"
+    },
+    "release": {
+      "backend": 132,
+      "nativeAffected": "Build 9",
+      "nativeRecovered": "Build 10"
+    },
+    "activation": "UNKNOWN / not causal",
+    "sha": {
+      "affectedNative": "c468b0d625a64e3da9f88b1d264cfa6039c5b521",
+      "recoveredNative": "e7652b9b65595861f4f7cdf0b8326491581a27b8"
+    },
+    "surface": [
+      "Native spectator Today",
+      "Lifecycle",
+      "Certification"
+    ],
+    "severity": "P1",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Spectator Today could show unavailable while still pending and retry only one of two required resources.",
+    "competitive_impact": "Presentation/workflow availability; no direct score or golf-result corruption established for this incident. Dependent failures are separate incident IDs.",
+    "data_integrity_impact": "No canonical corruption established by the cited evidence; not an exhaustive historical database comparison.",
+    "root_cause": "Today required serial tournament and Leaders reads but had no distinct initial-loading state, so empty nonfailed state rendered unavailable. The unavailable Try Again callback refreshed only Leaders even though tournament was also required.",
+    "confidence": "PROVEN for the two code defects; UNKNOWN for which caused the reported physical event",
+    "contributing_factors": [
+      "Today depended on two resources but pending/retry handling did not treat both consistently.",
+      "Individual physical slow/unavailable events lack request-level attribution."
+    ],
+    "detection_method": "Preserved Today loading/retry source and test/simulator investigation; not attribution of every physical latency event.",
+    "recovery": "Build 10 adds pending/retrying state and retries tournament then Leaders as one coalesced Today attempt. A Build 9 full shell refresh/background-reopen could recover after connectivity returned; the old Try Again could not recover tournament failure alone.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes; native Today loading/retry correction.",
+    "release_required": "Native Build 10; no backend release required for that correction.",
+    "native_build_required": "Build 10 (historical correction); unrelated physical slowness remains unattributed.",
+    "why_certification_missed": "Build 8 public journeys and Build 9 appearance tests proved surfaces, not empty-cache pending semantics, resource-specific retry, provider attribution, or physical latency. Nearby HTTP 200s were not evidence against a transient client failure.",
+    "test_that_would_catch": "NA-2026-004",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "CERT-NA-001",
+        "B11-READ-003",
+        "B11-READ-004",
+        "B11-READ-007"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-023",
+      "AUTO-024"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "code defects corrected in Build 10; original physical trigger remains unknown",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "UNIT_TESTED",
+      "SIMULATOR_TESTED",
+      "PRODUCTION_READBACK_VERIFIED"
+    ],
+    "evidence": [
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build9-performance/REPORT.md",
+        "lines": "5-13",
+        "proves": "Physical cause unknown and two native defects independently confirmed"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build9-performance/REPORT.md",
+        "lines": "23-50",
+        "proves": "Bounded physical-window logs and limits"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build9-performance/REPORT.md",
+        "lines": "52-81",
+        "proves": "Two-resource graph, missing loading branch, and one-resource retry"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build9-performance/REPORT.md",
+        "lines": "189-211",
+        "proves": "Synthetic tournament-vs-Leaders failure matrix"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Spectator/SpectatorStore.swift",
+        "lines": "19-58",
+        "proves": "Build 10 explicit loading/success/failure state and full Today attempt"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Spectator/SpectatorAppShell.swift",
+        "lines": "81-93",
+        "proves": "Build 10 renders loading separately and retries loadToday"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build10-today/REPORT.md",
+        "lines": "11-49",
+        "proves": "Bounded correction and failure matrix"
+      }
+    ],
+    "limitations": "A physical failure and successful Try Again were reported, but logs cannot identify the physical request. The Build 10 correction was ready for owner physical acceptance; no retained report closes that exact physical Today matrix.",
+    "original_detail": {
+      "incidentId": "2026-INC-004",
+      "title": "Spectator Today showed unavailable while pending and retried only one required resource",
+      "surface": [
+        "Native spectator Today",
+        "Lifecycle",
+        "Certification"
+      ],
+      "time": {
+        "incident": "Reported around 2026-09-23 08:42 local; exact physical request/cause UNKNOWN",
+        "boundedEvidence": "Nearby tournament GETs at 13:42:07Z and 13:42:30Z were 200"
+      },
+      "release": {
+        "backend": 132,
+        "nativeAffected": "Build 9",
+        "nativeRecovered": "Build 10"
+      },
+      "activation": "UNKNOWN / not causal",
+      "sha": {
+        "affectedNative": "c468b0d625a64e3da9f88b1d264cfa6039c5b521",
+        "recoveredNative": "e7652b9b65595861f4f7cdf0b8326491581a27b8"
+      },
+      "rootCause": "Today required serial tournament and Leaders reads but had no distinct initial-loading state, so empty nonfailed state rendered unavailable. The unavailable Try Again callback refreshed only Leaders even though tournament was also required.",
+      "confidence": "PROVEN for the two code defects; UNKNOWN for which caused the reported physical event",
+      "evidence": [
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build9-performance/REPORT.md",
+          "lines": "5-13",
+          "proves": "Physical cause unknown and two native defects independently confirmed"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build9-performance/REPORT.md",
+          "lines": "23-50",
+          "proves": "Bounded physical-window logs and limits"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build9-performance/REPORT.md",
+          "lines": "52-81",
+          "proves": "Two-resource graph, missing loading branch, and one-resource retry"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build9-performance/REPORT.md",
+          "lines": "189-211",
+          "proves": "Synthetic tournament-vs-Leaders failure matrix"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Spectator/SpectatorStore.swift",
+          "lines": "19-58",
+          "proves": "Build 10 explicit loading/success/failure state and full Today attempt"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Spectator/SpectatorAppShell.swift",
+          "lines": "81-93",
+          "proves": "Build 10 renders loading separately and retries loadToday"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build10-today/REPORT.md",
+          "lines": "11-49",
+          "proves": "Bounded correction and failure matrix"
+        }
+      ],
+      "proofLayersActuallyTested": [
+        "SOURCE_INSPECTED",
+        "UNIT_TESTED",
+        "SIMULATOR_TESTED",
+        "PRODUCTION_READBACK_VERIFIED"
+      ],
+      "physicalEvidence": "A physical failure and successful Try Again were reported, but logs cannot identify the physical request. The Build 10 correction was ready for owner physical acceptance; no retained report closes that exact physical Today matrix.",
+      "recovery": "Build 10 adds pending/retrying state and retries tournament then Leaders as one coalesced Today attempt. A Build 9 full shell refresh/background-reopen could recover after connectivity returned; the old Try Again could not recover tournament failure alone.",
+      "build10RelaunchRecovery": "Build 10 relaunch starts a fresh spectator cache and can load Today; this does not prove the original physical cause or capacity",
+      "priorPassClaimsAudited": "Build 8 public journeys and Build 9 appearance tests proved surfaces, not empty-cache pending semantics, resource-specific retry, provider attribution, or physical latency. Nearby HTTP 200s were not evidence against a transient client failure.",
+      "missingTests": [
+        "Physical slow-network initial load and each-resource failure",
+        "Background cancellation followed by retry on physical device",
+        "Long-lived polling and capacity test outside Production",
+        "Per-request native telemetry identifying resource/status/duration"
+      ],
+      "status": "code defects corrected in Build 10; original physical trigger remains unknown"
+    },
+    "missing_tests": [
+      "Physical slow-network initial load and each-resource failure",
+      "Background cancellation followed by retry on physical device",
+      "Long-lived polling and capacity test outside Production",
+      "Per-request native telemetry identifying resource/status/duration"
+    ]
+  },
+  {
+    "id": "2026-INC-005",
+    "title": "Native score entry omitted canonical per-hole stroke indicators before first save",
+    "date_time": {
+      "incident": "Physical observation on 2026-09-25 before 11:54:31Z",
+      "boundedEvidence": "Read-only diagnostic during Release 136 / activation 235"
+    },
+    "release": 136,
+    "activation": 235,
+    "sha": {
+      "native": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+      "backend": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+    },
+    "surface": [
+      "Native participant scoring presentation",
+      "Mobile read contract",
+      "Workflow design"
+    ],
+    "severity": "P1",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Scorers could not see canonical per-hole stroke badges before entering the first gross score.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "No canonical corruption established by the cited evidence; not an exhaustive historical database comparison.",
+    "root_cause": "The scoring DTO carries per-hole strokes only inside persisted score rows. Score Entry derives badge values from officialHole(holeNumber); an unscored hole has no row, so canonicalStrokes is nil and the positive-only badge rule renders nothing. Match-level stroke totals exist, but no pre-entry 18-hole allocation matrix reaches this view.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "Pre-entry native presentation did not expose the canonical per-hole stroke indicators needed before the first Official score.",
+      "Correct server allocation was narrower proof than correct entry UI."
+    ],
+    "detection_method": "Owner physical observation plus retained canonical server allocation validation and native presentation source.",
+    "recovery": "Tournament-day workaround was the verified physical-match stroke matrix and continued gross entry. Server-owned strokes/net/winner remained correct; users must not subtract strokes before entry.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes for permanent native display correction; server-provided allocation contract must be verified.",
+    "release_required": "Future native release; no tournament-day backend correction established.",
+    "native_build_required": "Future Build 11 scoped presentation correction.",
+    "why_certification_missed": "Prior score queue, Best Ball, and badge tests proved saved-hole presentation and server calculations. They did not prove canonical stroke visibility before entry on all 18 holes and formats.",
+    "test_that_would_catch": "NA-2026-005",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "CERT-001",
+        "CERT-NA-001",
+        "CERT-PHY-001",
+        "B11-SCORE-007",
+        "B11-SCORE-008"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-024"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "outstanding Build 11 presentation/contract requirement",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "DATABASE_SQL_TESTED",
+      "API_RPC_TESTED",
+      "SIMULATOR_TESTED",
+      "PRODUCTION_READBACK_VERIFIED"
+    ],
+    "evidence": [
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-live-r1-strokes/REPORT.md",
+        "lines": "159-178",
+        "proves": "Gross-only mutation contract, physical-response limitation, and absent pre-score display allocation"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-live-r1-strokes/REPORT.md",
+        "lines": "182-203",
+        "proves": "Hole 1 values, nil DTO fields, affected surfaces, and presentation-vs-contrast distinction"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Presentation/ScoringPresentation.swift",
+        "lines": "519-535",
+        "proves": "Input rows read strokes from official saved hole"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Presentation/ScoreHoleStrokeBadge.swift",
+        "lines": "3-9",
+        "proves": "Nil/zero values intentionally produce no badge"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Views/Score/ScoreEntryControls.swift",
+        "lines": "165-185",
+        "proves": "Actual conditional score-entry badge rendering"
+      }
+    ],
+    "limitations": "The owner reported missing indicators on a physical match. The audit did not capture the phone's exact HTTP response or a new physical screenshot; it reproduced current canonical data through deployed projection and unchanged Build 10 models/presenter.",
+    "original_detail": {
+      "incidentId": "2026-INC-005",
+      "title": "Native score entry omitted canonical per-hole stroke indicators before first save",
+      "surface": [
+        "Native participant scoring presentation",
+        "Mobile read contract",
+        "Workflow design"
+      ],
+      "time": {
+        "incident": "Physical observation on 2026-09-25 before 11:54:31Z",
+        "boundedEvidence": "Read-only diagnostic during Release 136 / activation 235"
+      },
+      "release": 136,
+      "activation": 235,
+      "sha": {
+        "native": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "backend": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+      },
+      "rootCause": "The scoring DTO carries per-hole strokes only inside persisted score rows. Score Entry derives badge values from officialHole(holeNumber); an unscored hole has no row, so canonicalStrokes is nil and the positive-only badge rule renders nothing. Match-level stroke totals exist, but no pre-entry 18-hole allocation matrix reaches this view.",
+      "confidence": "PROVEN",
+      "evidence": [
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-live-r1-strokes/REPORT.md",
+          "lines": "159-178",
+          "proves": "Gross-only mutation contract, physical-response limitation, and absent pre-score display allocation"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-live-r1-strokes/REPORT.md",
+          "lines": "182-203",
+          "proves": "Hole 1 values, nil DTO fields, affected surfaces, and presentation-vs-contrast distinction"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Presentation/ScoringPresentation.swift",
+          "lines": "519-535",
+          "proves": "Input rows read strokes from official saved hole"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Presentation/ScoreHoleStrokeBadge.swift",
+          "lines": "3-9",
+          "proves": "Nil/zero values intentionally produce no badge"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Views/Score/ScoreEntryControls.swift",
+          "lines": "165-185",
+          "proves": "Actual conditional score-entry badge rendering"
+        }
+      ],
+      "proofLayersActuallyTested": [
+        "SOURCE_INSPECTED",
+        "DATABASE_SQL_TESTED",
+        "API_RPC_TESTED",
+        "SIMULATOR_TESTED",
+        "PRODUCTION_READBACK_VERIFIED"
+      ],
+      "physicalEvidence": "The owner reported missing indicators on a physical match. The audit did not capture the phone's exact HTTP response or a new physical screenshot; it reproduced current canonical data through deployed projection and unchanged Build 10 models/presenter.",
+      "recovery": "Tournament-day workaround was the verified physical-match stroke matrix and continued gross entry. Server-owned strokes/net/winner remained correct; users must not subtract strokes before entry.",
+      "build10RelaunchRecovery": "NO; data absent from an unscored-hole presentation remains absent after relaunch",
+      "priorPassClaimsAudited": "Prior score queue, Best Ball, and badge tests proved saved-hole presentation and server calculations. They did not prove canonical stroke visibility before entry on all 18 holes and formats.",
+      "missingTests": [
+        "Pre-entry 18-hole stroke display for Best Ball, Scramble, and Singles",
+        "Physical sunlight/contrast and large-text review",
+        "Contract assertion that display allocation is canonical/server-supplied",
+        "Cross-check display allocation against server-applied strokes after save"
+      ],
+      "priorityCalibration": "P1 before the 2027 tournament: high workflow/situational-awareness impact, but not P0 competitive-integrity remediation because canonical scoring was server-owned and correct and score requests contained gross values only.",
+      "status": "outstanding Build 11 presentation/contract requirement"
+    },
+    "missing_tests": [
+      "Pre-entry 18-hole stroke display for Best Ball, Scramble, and Singles",
+      "Physical sunlight/contrast and large-text review",
+      "Contract assertion that display allocation is canonical/server-supplied",
+      "Cross-check display allocation against server-applied strokes after save"
+    ]
+  },
+  {
+    "id": "2026-INC-006",
+    "title": "Fractional Swift Date round-trip caused false SQLite score-intent concurrency conflicts",
+    "date_time": {
+      "incident": "Physical symptoms during live R1 on 2026-09-25; exact per-phone timestamp UNKNOWN",
+      "boundedEvidence": "Accepted relevant commits 2026-09-25T11:43:05.82595Z through 12:21:36.22752Z; first focused snapshot 12:15:50Z"
+    },
+    "release": 136,
+    "activation": 235,
+    "sha": {
+      "native": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+      "backend": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+    },
+    "surface": [
+      "Native scoring queue",
+      "SQLite persistence",
+      "Lifecycle",
+      "Workflow design"
+    ],
+    "severity": "P1",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "An Official save could leave Needs Review and block subsequent local scoring despite correct server golf.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "No canonical corruption established by the cited evidence; not an exhaustive historical database comparison.",
+    "root_cause": "JSON secondsSince1970 can change a fractional Swift Date by one binary tick. Queue transitions compare the decoded SQLite record with the original in-memory Equatable record exactly. The mismatch throws concurrentModification after a valid server commit/ack or during refresh completion, then a sticky persistence-failure latch stops workers and blocks new local intents.",
+    "confidence": "PROVEN for the defect and exact state machine; STRONGLY SUPPORTED, not device-extracted proof, for attribution to every affected phone",
+    "contributing_factors": [
+      "Fractional Date precision was lost across SQLite persistence while optimistic concurrency compared timestamps.",
+      "The unresolved durable intent blocked next-hole progression even when the canonical score matched."
+    ],
+    "detection_method": "Owner physical false-review observation followed by deterministic real-SQLite persistence/reconciliation investigation in isolation.",
+    "recovery": "A full terminate/relaunch can reconcile a matching already-Official intent. A stranded syncing record replays the original mutation ID; a stored acknowledgement performs reads only. PWA remained the primary scoring path. Background/foreground, pull-to-refresh, navigation, sign-out/in, Clear Entry, and Keep Official do not clear this sticky failure state.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes for permanent native persistence/reconciliation correction.",
+    "release_required": "Future native release; bounded existing relaunch recovery does not remove defect.",
+    "native_build_required": "Build 11 required for permanent reliability correction.",
+    "why_certification_missed": "Coordinator fixtures used an in-memory queue; SQLite fixtures predominantly used whole-second clocks. Five focused recovery tests proved supported states, not real SQLite plus fractional timestamps across consecutive transitions. Broad 'score queue regression PASS' language overstated lifecycle coverage.",
+    "test_that_would_catch": "NA-2026-006",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "OBS-CORE-001",
+        "CERT-001",
+        "BE-CONTRACT-001",
+        "PWA-001",
+        "CERT-NA-001",
+        "CERT-PHY-001",
+        "CERT-IMPACT-001",
+        "B11-NAV-004",
+        "B11-SCORE-001",
+        "B11-SCORE-002",
+        "B11-SCORE-003",
+        "B11-SCORE-004",
+        "B11-SCORE-005",
+        "B11-SCORE-006",
+        "B11-READ-007"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-003",
+      "AUTO-005",
+      "AUTO-027"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "outstanding P0 Build 11 defect; bounded Build 10 recovery exists",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "UNIT_TESTED",
+      "DATABASE_SQL_TESTED",
+      "API_RPC_TESTED",
+      "SIMULATOR_TESTED",
+      "PRODUCTION_READBACK_VERIFIED"
+    ],
+    "evidence": [
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/ScoringQueue/SQLiteScoringQueueRepository.swift",
+        "lines": "104-111",
+        "proves": "secondsSince1970 encode/decode"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/ScoringQueue/SQLiteScoringQueueRepository.swift",
+        "lines": "319-337",
+        "proves": "Exact stored == current conditional replacement"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/ScoringQueue/ScoringQueueCoordinator.swift",
+        "lines": "1439-1498",
+        "proves": "Acknowledgement persistence and fail-closed catch"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/ScoringQueue/ScoringQueueCoordinator.swift",
+        "lines": "3049-3065",
+        "proves": "Sticky same-identity failure and worker cancellation"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-live-r1-multidevice/REPORT.md",
+        "lines": "80-120",
+        "proves": "Reproduced defect, actual SQLite/iOS clock evidence, and resulting block"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-live-r1-multidevice/REPORT.md",
+        "lines": "139-162",
+        "proves": "Whole-second fixture gap, initial recovery limits, and native-only classification"
+      },
+      {
+        "kind": "fixture",
+        "path": "/private/tmp/bagger-live-r1-multidevice/SQLITE-PROBE.json",
+        "lines": "1-31",
+        "proves": "Whole-second pass versus two fractional failure states"
+      },
+      {
+        "kind": "fixture",
+        "path": "/private/tmp/bagger-live-r1-multidevice/REAL-CLOCK.json",
+        "lines": "1-25",
+        "proves": "973/2000 actual Date samples changed by one tick"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-native-recovery-audit/REPORT.md",
+        "lines": "20-57",
+        "proves": "Full coordinator reproduction and exact score queue states"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-native-recovery-audit/REPORT.md",
+        "lines": "59-108",
+        "proves": "Recovery matrix, recurrence limit, separate-process proof, and exact HTTP proof"
+      }
+    ],
+    "limitations": "Official server writes and owner-visible blocked review symptoms were physical/live. No phone SQLite store was extracted. The exact local timestamp/state on each affected phone is unknown.",
+    "original_detail": {
+      "incidentId": "2026-INC-006",
+      "title": "Fractional Swift Date round-trip caused false SQLite score-intent concurrency conflicts",
+      "surface": [
+        "Native scoring queue",
+        "SQLite persistence",
+        "Lifecycle",
+        "Workflow design"
+      ],
+      "time": {
+        "incident": "Physical symptoms during live R1 on 2026-09-25; exact per-phone timestamp UNKNOWN",
+        "boundedEvidence": "Accepted relevant commits 2026-09-25T11:43:05.82595Z through 12:21:36.22752Z; first focused snapshot 12:15:50Z"
+      },
+      "release": 136,
+      "activation": 235,
+      "sha": {
+        "native": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "backend": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+      },
+      "rootCause": "JSON secondsSince1970 can change a fractional Swift Date by one binary tick. Queue transitions compare the decoded SQLite record with the original in-memory Equatable record exactly. The mismatch throws concurrentModification after a valid server commit/ack or during refresh completion, then a sticky persistence-failure latch stops workers and blocks new local intents.",
+      "confidence": "PROVEN for the defect and exact state machine; STRONGLY SUPPORTED, not device-extracted proof, for attribution to every affected phone",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/ScoringQueue/SQLiteScoringQueueRepository.swift",
+          "lines": "104-111",
+          "proves": "secondsSince1970 encode/decode"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/ScoringQueue/SQLiteScoringQueueRepository.swift",
+          "lines": "319-337",
+          "proves": "Exact stored == current conditional replacement"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/ScoringQueue/ScoringQueueCoordinator.swift",
+          "lines": "1439-1498",
+          "proves": "Acknowledgement persistence and fail-closed catch"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/ScoringQueue/ScoringQueueCoordinator.swift",
+          "lines": "3049-3065",
+          "proves": "Sticky same-identity failure and worker cancellation"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-live-r1-multidevice/REPORT.md",
+          "lines": "80-120",
+          "proves": "Reproduced defect, actual SQLite/iOS clock evidence, and resulting block"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-live-r1-multidevice/REPORT.md",
+          "lines": "139-162",
+          "proves": "Whole-second fixture gap, initial recovery limits, and native-only classification"
+        },
+        {
+          "kind": "fixture",
+          "path": "/private/tmp/bagger-live-r1-multidevice/SQLITE-PROBE.json",
+          "lines": "1-31",
+          "proves": "Whole-second pass versus two fractional failure states"
+        },
+        {
+          "kind": "fixture",
+          "path": "/private/tmp/bagger-live-r1-multidevice/REAL-CLOCK.json",
+          "lines": "1-25",
+          "proves": "973/2000 actual Date samples changed by one tick"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-native-recovery-audit/REPORT.md",
+          "lines": "20-57",
+          "proves": "Full coordinator reproduction and exact score queue states"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-native-recovery-audit/REPORT.md",
+          "lines": "59-108",
+          "proves": "Recovery matrix, recurrence limit, separate-process proof, and exact HTTP proof"
+        }
+      ],
+      "proofLayersActuallyTested": [
+        "SOURCE_INSPECTED",
+        "UNIT_TESTED",
+        "DATABASE_SQL_TESTED",
+        "API_RPC_TESTED",
+        "SIMULATOR_TESTED",
+        "PRODUCTION_READBACK_VERIFIED"
+      ],
+      "physicalEvidence": "Official server writes and owner-visible blocked review symptoms were physical/live. No phone SQLite store was extracted. The exact local timestamp/state on each affected phone is unknown.",
+      "recovery": "A full terminate/relaunch can reconcile a matching already-Official intent. A stranded syncing record replays the original mutation ID; a stored acknowledgement performs reads only. PWA remained the primary scoring path. Background/foreground, pull-to-refresh, navigation, sign-out/in, Clear Entry, and Keep Official do not clear this sticky failure state.",
+      "build10RelaunchRecovery": "PROVEN as a bounded exact-code recovery, not guaranteed. Separate simulator processes recovered the durable store and preserved one canonical commit. The 50-case deterministic relaunch matrix recovered 47 and re-triggered the defect in 3; no physical native recovery was claimed. Thus first relaunch may fail and later native saves remain uncertified.",
+      "priorPassClaimsAudited": "Coordinator fixtures used an in-memory queue; SQLite fixtures predominantly used whole-second clocks. Five focused recovery tests proved supported states, not real SQLite plus fractional timestamps across consecutive transitions. Broad 'score queue regression PASS' language overstated lifecycle coverage.",
+      "missingTests": [
+        "Fractional timestamp round-trip on every mutable Date field",
+        "Crash at each durable transition before/after commit and acknowledgement",
+        "Physical terminate/relaunch with matching Official intent",
+        "18-hole cellular/offline flow on real SQLite",
+        "Multi-device same-hole and adjacent-hole scoring",
+        "Recurrence injection during relaunch and next save",
+        "Actionable UI for syncing/acknowledged persistence failures"
+      ],
+      "status": "outstanding P0 Build 11 defect; bounded Build 10 recovery exists"
+    },
+    "missing_tests": [
+      "Fractional timestamp round-trip on every mutable Date field",
+      "Crash at each durable transition before/after commit and acknowledgement",
+      "Physical terminate/relaunch with matching Official intent",
+      "18-hole cellular/offline flow on real SQLite",
+      "Multi-device same-hole and adjacent-hole scoring",
+      "Recurrence injection during relaunch and next save",
+      "Actionable UI for syncing/acknowledged persistence failures"
+    ]
+  },
+  {
+    "id": "2026-INC-007",
+    "title": "Feature-coded unavailability globally replaced the authenticated shell and defaulted navigation to Today",
+    "date_time": {
+      "incident": "Observed on multiple tournament features; exact request-to-phone correlation UNKNOWN",
+      "boundedEvidence": "Pre-R1 Net Skins report, Sep 25 side-game observations, and Sep 26 read-only audit"
+    },
+    "release": {
+      "observedAcross": "135-137",
+      "auditBaseline": 137
+    },
+    "activation": {
+      "auditBaseline": 236
+    },
+    "sha": {
+      "native": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+      "auditBackend": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+    },
+    "surface": [
+      "Native participant navigation",
+      "Read architecture",
+      "Lifecycle",
+      "Error taxonomy"
+    ],
+    "severity": "P1",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "A feature-local error could discard selected tab/subtab/navigation and return the participant to Today.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "No canonical corruption established by the cited evidence; not an exhaustive historical database comparison.",
+    "root_cause": "MobileReadRepository treats MOBILE_API_UNAVAILABLE as a global authority-revalidation signal for nearly every feature. AppCoordinator changes authenticated state to checkingEnvironment, RootView removes BaggerAppShell, and a healthy recheck creates a new shell whose local @State defaults to Today, Leaders Score, and empty paths. The feature error need not represent invalid participant identity.",
+    "confidence": "PROVEN for the architecture and simulator reset; PLAUSIBLE/UNKNOWN for the exact request behind any unattributed physical reset",
+    "contributing_factors": [
+      "Generic feature unavailability entered global authority revalidation.",
+      "The authenticated shell was removed and a new shell initialized its default Today selection.",
+      "A write-authority fence and feature-read failure were not isolated from navigation ownership."
+    ],
+    "detection_method": "Owner repeated-return observations plus exact Build 10 source-path inventory; exact device requests remain unattributed.",
+    "recovery": "A healthy environment recheck restores the same participant but creates a new shell, usually on Today. A sticky explicit non-home destination can override that default. Full process relaunch also intentionally starts Today and is a separate trigger.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes for native navigation/error-domain isolation.",
+    "release_required": "Future native release; backend error taxonomy coordination proposed.",
+    "native_build_required": "Build 11 required for permanent reliability correction.",
+    "why_certification_missed": "The prior coordinator test asserted final authenticated state after successful reattestation. It did not observe intermediate RootView branch destruction, controller identity, selected tab/subtab, or path. Generic repository and feature tests therefore passed while navigation context was lost.",
+    "test_that_would_catch": "NA-2026-007",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "OBS-CORE-001",
+        "BE-CONTRACT-001",
+        "CERT-NA-001",
+        "CERT-PHY-001",
+        "AUTO-DEG-001",
+        "B11-NAV-001",
+        "B11-NAV-002",
+        "B11-NAV-003",
+        "B11-NAV-004",
+        "B11-READ-003",
+        "B11-READ-007"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-023",
+      "AUTO-024"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "outstanding P0 Build 11 architecture defect",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "UNIT_TESTED",
+      "SIMULATOR_TESTED",
+      "PRODUCTION_READBACK_VERIFIED"
+    ],
+    "evidence": [
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Data/MobileReadRepository.swift",
+        "lines": "576-603",
+        "proves": "Local error classification plus unconditional coded authority callback"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Data/TournamentDataCoordinator.swift",
+        "lines": "320-345",
+        "proves": "Feature callback fan-out"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/App/AppCoordinator.swift",
+        "lines": "691-717",
+        "proves": "Authenticated to checkingEnvironment transition"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Views/RootView.swift",
+        "lines": "78-145",
+        "proves": "Root switches away from and back to participant shell"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Views/AppTabShell.swift",
+        "lines": "31-36",
+        "proves": "Shell-local default tab, subtabs, and paths"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build10-today-fallback-audit/REPORT.md",
+        "lines": "5-15",
+        "proves": "Executive finding and actual unchanged SwiftUI reproduction"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build10-today-fallback-audit/REPORT.md",
+        "lines": "47-75",
+        "proves": "Exact chain and trigger categories"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build10-today-fallback-audit/FALLBACK-INVENTORY.md",
+        "lines": "5-38",
+        "proves": "Complete 16-family inventory and callback sites"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build10-today-fallback-audit/NAVIGATION-ARCHITECTURE.md",
+        "lines": "3-25",
+        "proves": "Shell lifetime and why prior final-state test passed"
+      },
+      {
+        "kind": "test",
+        "path": "/private/tmp/bagger-build10-today-fallback-audit/ERROR-MATRIX.md",
+        "lines": "58-71",
+        "proves": "18 error cases, tab reconstruction/preservation, and physical gap"
+      }
+    ],
+    "limitations": "Owners reported feature-to-Today behavior, including pre-R1 Net Skins. The Sep 26 audit did not extract the affected phone's token/request ID. Simulator reproduction used actual shipping RootView/BaggerAppShell and showed four non-Today tabs reset with zero sign-outs.",
+    "original_detail": {
+      "incidentId": "2026-INC-007",
+      "title": "Feature-coded unavailability globally replaced the authenticated shell and defaulted navigation to Today",
+      "surface": [
+        "Native participant navigation",
+        "Read architecture",
+        "Lifecycle",
+        "Error taxonomy"
+      ],
+      "time": {
+        "incident": "Observed on multiple tournament features; exact request-to-phone correlation UNKNOWN",
+        "boundedEvidence": "Pre-R1 Net Skins report, Sep 25 side-game observations, and Sep 26 read-only audit"
+      },
+      "release": {
+        "observedAcross": "135-137",
+        "auditBaseline": 137
+      },
+      "activation": {
+        "auditBaseline": 236
+      },
+      "sha": {
+        "native": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "auditBackend": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+      },
+      "rootCause": "MobileReadRepository treats MOBILE_API_UNAVAILABLE as a global authority-revalidation signal for nearly every feature. AppCoordinator changes authenticated state to checkingEnvironment, RootView removes BaggerAppShell, and a healthy recheck creates a new shell whose local @State defaults to Today, Leaders Score, and empty paths. The feature error need not represent invalid participant identity.",
+      "confidence": "PROVEN for the architecture and simulator reset; PLAUSIBLE/UNKNOWN for the exact request behind any unattributed physical reset",
+      "evidence": [
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Data/MobileReadRepository.swift",
+          "lines": "576-603",
+          "proves": "Local error classification plus unconditional coded authority callback"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Data/TournamentDataCoordinator.swift",
+          "lines": "320-345",
+          "proves": "Feature callback fan-out"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/App/AppCoordinator.swift",
+          "lines": "691-717",
+          "proves": "Authenticated to checkingEnvironment transition"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Views/RootView.swift",
+          "lines": "78-145",
+          "proves": "Root switches away from and back to participant shell"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Views/AppTabShell.swift",
+          "lines": "31-36",
+          "proves": "Shell-local default tab, subtabs, and paths"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build10-today-fallback-audit/REPORT.md",
+          "lines": "5-15",
+          "proves": "Executive finding and actual unchanged SwiftUI reproduction"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build10-today-fallback-audit/REPORT.md",
+          "lines": "47-75",
+          "proves": "Exact chain and trigger categories"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build10-today-fallback-audit/FALLBACK-INVENTORY.md",
+          "lines": "5-38",
+          "proves": "Complete 16-family inventory and callback sites"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build10-today-fallback-audit/NAVIGATION-ARCHITECTURE.md",
+          "lines": "3-25",
+          "proves": "Shell lifetime and why prior final-state test passed"
+        },
+        {
+          "kind": "test",
+          "path": "/private/tmp/bagger-build10-today-fallback-audit/ERROR-MATRIX.md",
+          "lines": "58-71",
+          "proves": "18 error cases, tab reconstruction/preservation, and physical gap"
+        }
+      ],
+      "proofLayersActuallyTested": [
+        "SOURCE_INSPECTED",
+        "UNIT_TESTED",
+        "SIMULATOR_TESTED",
+        "PRODUCTION_READBACK_VERIFIED"
+      ],
+      "physicalEvidence": "Owners reported feature-to-Today behavior, including pre-R1 Net Skins. The Sep 26 audit did not extract the affected phone's token/request ID. Simulator reproduction used actual shipping RootView/BaggerAppShell and showed four non-Today tabs reset with zero sign-outs.",
+      "recovery": "A healthy environment recheck restores the same participant but creates a new shell, usually on Today. A sticky explicit non-home destination can override that default. Full process relaunch also intentionally starts Today and is a separate trigger.",
+      "build10RelaunchRecovery": "Relaunch does not cure the architecture; it creates a fresh default shell and can repeat whenever a coded feature failure recurs",
+      "triggerInventory": {
+        "count": 16,
+        "intentional": [
+          "F01 cold/full relaunch",
+          "F02 first/restored authentication",
+          "F03 explicit home link",
+          "F04 sign-out/deletion and later sign-in",
+          "F05 true identity/certification loss",
+          "F12 genuinely incompatible environment",
+          "F15 spectator-mode entry",
+          "F16 invalid spectator tab normalization"
+        ],
+        "unnecessaryNavigationConsequences": [
+          "F07 generic feature MOBILE_API_UNAVAILABLE",
+          "F08 scoring current/match-selection unavailable",
+          "F09 queue unavailable",
+          "F10 queue reconnect health gate",
+          "F11 finalization unavailable",
+          "F14 failure inside feature-triggered recheck"
+        ],
+        "conditionalOverbroad": [
+          "F06 generic protected-read 401/403",
+          "F13 ordinary foreground health HTTP/semantic failure"
+        ]
+      },
+      "priorPassClaimsAudited": "The prior coordinator test asserted final authenticated state after successful reattestation. It did not observe intermediate RootView branch destruction, controller identity, selected tab/subtab, or path. Generic repository and feature tests therefore passed while navigation context was lost.",
+      "missingTests": [
+        "Every F07-F14 trigger against each top-level destination",
+        "Nested-path and subtab preservation",
+        "Sibling/background feature failure while another destination is active",
+        "Physical cellular interruption and transient health failure",
+        "True identity rejection remains fail-closed",
+        "Long-lived session across compatible release/activation changes"
+      ],
+      "status": "outstanding P0 Build 11 architecture defect"
+    },
+    "missing_tests": [
+      "Every F07-F14 trigger against each top-level destination",
+      "Nested-path and subtab preservation",
+      "Sibling/background feature failure while another destination is active",
+      "Physical cellular interruption and transient health failure",
+      "True identity rejection remains fail-closed",
+      "Long-lived session across compatible release/activation changes"
+    ]
+  },
+  {
+    "id": "2026-INC-008",
+    "title": "Legitimate seven-digit American odds failed backend and native six-digit semantic bounds",
+    "date_time": {
+      "incident": "Publication at 2026-09-25 22:23:43 America/New_York",
+      "boundedEvidence": "Sep 26 audit sampled 12 hosted Odds 503 records, 2 older 200, 1 304"
+    },
+    "release": 137,
+    "activation": 236,
+    "sha": {
+      "native": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+      "backend": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+    },
+    "surface": [
+      "Backend mobile projection",
+      "Native Odds model",
+      "Native navigation"
+    ],
+    "severity": "P1",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "A legitimate extreme Odds value could make the published projection unusable in backend/native semantic validation.",
+    "competitive_impact": "Presentation/workflow availability; no direct score or golf-result corruption established for this incident. Dependent failures are separate incident IDs.",
+    "data_integrity_impact": "No canonical corruption established by the cited evidence; not an exhaustive historical database comparison.",
+    "root_cause": "Published MH01 odds +1666567 are legitimate but both the backend projector and native structural validator permit only one through six digits (or signed infinity). Backend returns MOBILE_API_UNAVAILABLE 503; even a synthetically intended 200 DTO decodes then fails native structural compatibility.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "The calculator could emit legitimate values beyond the backend/native six-digit presentation bound.",
+      "Range conformance between calculator output and client/server semantic validators was missing."
+    ],
+    "detection_method": "Retained legitimate Odds values and backend/native semantic-bound source/contract analysis.",
+    "recovery": "No safe Build 10 data workaround. Do not clip, recalculate, or withdraw legitimate odds to satisfy display validation. A server-only 200 with the same string still fails Build 10; future repair must coordinate representation and keep failures feature-local.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes; backend and native semantic bounds both require compatible correction.",
+    "release_required": "Coordinated backend/native contract correction proposed; not implemented by this audit.",
+    "native_build_required": "Build 11 must consume the legitimate output domain safely.",
+    "why_certification_missed": "Prior published-Odds PASS used values within six digits and validated HTTP/decode/presentation under those fixtures. It did not exercise the full legitimate output domain. HTTP 200 from older publications did not prove the new publication's semantic usability.",
+    "test_that_would_catch": "NA-2026-008",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "BE-CONTRACT-001",
+        "CERT-NA-001",
+        "B11-NAV-001",
+        "B11-READ-001",
+        "B11-READ-003",
+        "B11-READ-007"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-015",
+      "AUTO-023"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "outstanding coordinated backend/native contract requirement",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "UNIT_TESTED",
+      "DATABASE_SQL_TESTED",
+      "API_RPC_TESTED",
+      "SIMULATOR_TESTED",
+      "PRODUCTION_READBACK_VERIFIED"
+    ],
+    "evidence": [
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build10-today-fallback-audit/ODDS.md",
+        "lines": "3-25",
+        "proves": "Current publication, exact value, backend 503, native semantic rejection, and supported phase"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Models/MobileOddsModels.swift",
+        "lines": "126-157",
+        "proves": "Native six-digit bounds for team and player odds"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build10-today-fallback-audit/REPORT.md",
+        "lines": "91-99",
+        "proves": "Server/native split and navigation consequence"
+      }
+    ],
+    "limitations": "No exact owner-phone Odds request/body was captured. Hosted 503s and current canonical publication reproduce the backend defect; native seven-digit rejection is an isolated exact-model probe.",
+    "original_detail": {
+      "incidentId": "2026-INC-008",
+      "title": "Legitimate seven-digit American odds failed backend and native six-digit semantic bounds",
+      "surface": [
+        "Backend mobile projection",
+        "Native Odds model",
+        "Native navigation"
+      ],
+      "time": {
+        "incident": "Publication at 2026-09-25 22:23:43 America/New_York",
+        "boundedEvidence": "Sep 26 audit sampled 12 hosted Odds 503 records, 2 older 200, 1 304"
+      },
+      "release": 137,
+      "activation": 236,
+      "sha": {
+        "native": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "backend": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+      },
+      "rootCause": "Published MH01 odds +1666567 are legitimate but both the backend projector and native structural validator permit only one through six digits (or signed infinity). Backend returns MOBILE_API_UNAVAILABLE 503; even a synthetically intended 200 DTO decodes then fails native structural compatibility.",
+      "confidence": "PROVEN",
+      "evidence": [
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build10-today-fallback-audit/ODDS.md",
+          "lines": "3-25",
+          "proves": "Current publication, exact value, backend 503, native semantic rejection, and supported phase"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Models/MobileOddsModels.swift",
+          "lines": "126-157",
+          "proves": "Native six-digit bounds for team and player odds"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build10-today-fallback-audit/REPORT.md",
+          "lines": "91-99",
+          "proves": "Server/native split and navigation consequence"
+        }
+      ],
+      "proofLayersActuallyTested": [
+        "SOURCE_INSPECTED",
+        "UNIT_TESTED",
+        "DATABASE_SQL_TESTED",
+        "API_RPC_TESTED",
+        "SIMULATOR_TESTED",
+        "PRODUCTION_READBACK_VERIFIED"
+      ],
+      "physicalEvidence": "No exact owner-phone Odds request/body was captured. Hosted 503s and current canonical publication reproduce the backend defect; native seven-digit rejection is an isolated exact-model probe.",
+      "recovery": "No safe Build 10 data workaround. Do not clip, recalculate, or withdraw legitimate odds to satisfy display validation. A server-only 200 with the same string still fails Build 10; future repair must coordinate representation and keep failures feature-local.",
+      "build10RelaunchRecovery": "NO; relaunch repeats the same server 503/native contract limit and may recreate the Today reset",
+      "priorPassClaimsAudited": "Prior published-Odds PASS used values within six digits and validated HTTP/decode/presentation under those fixtures. It did not exercise the full legitimate output domain. HTTP 200 from older publications did not prove the new publication's semantic usability.",
+      "missingTests": [
+        "Property/boundary tests over the calculator's entire odds output domain",
+        "Backend/native shared conformance corpus including seven digits and infinity",
+        "HTTP 200 semantic presentation test with extreme legitimate values",
+        "Feature-local unavailable behavior on physical device"
+      ],
+      "status": "outstanding coordinated backend/native contract requirement"
+    },
+    "missing_tests": [
+      "Property/boundary tests over the calculator's entire odds output domain",
+      "Backend/native shared conformance corpus including seven digits and infinity",
+      "HTTP 200 semantic presentation test with extreme legitimate values",
+      "Feature-local unavailable behavior on physical device"
+    ]
+  },
+  {
+    "id": "2026-INC-009",
+    "title": "Side-game lifecycle envelopes could be valid while Build 10 detailed screens required a published presentation",
+    "date_time": {
+      "incident": "Net Skins configuration 3 committed 2026-09-25 22:26:06 America/New_York; exact physical request time UNKNOWN",
+      "boundedEvidence": "Sep 26 current-state audit"
+    },
+    "release": 137,
+    "activation": 236,
+    "sha": {
+      "native": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+      "backend": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+    },
+    "surface": [
+      "Backend side-game lifecycle",
+      "Native Net Skins/Calcutta adapters",
+      "Product design",
+      "Certification"
+    ],
+    "severity": "P1",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Mixed current/historical side-game lifecycle could appear unavailable even when configuration or prior results existed.",
+    "competitive_impact": "Presentation/workflow availability; no direct score or golf-result corruption established for this incident. Dependent failures are separate incident IDs.",
+    "data_integrity_impact": "No canonical corruption established by the cited evidence; not an exhaustive historical database comparison.",
+    "root_cause": "A valid base side-game envelope can represent configured/in-progress/stale/unpublished state with presentation:null. Build 10's Production detailed adapters require a published compatible presentation and throw incompatibleResponse otherwise. In Net Skins, configuration 3 also marked prior current R1/R2 results noncurrent, so historical publications survived but no current presentation existed. This local semantic gap is independent from sibling 503-driven global resets.",
+    "confidence": "PROVEN for Net Skins currentness and native adapter behavior; PROVEN for Calcutta adapter's null-presentation behavior; UNKNOWN for exact physical trigger attribution",
+    "contributing_factors": [
+      "Build 10 detailed views expected a published presentation for lifecycle states that could validly have none.",
+      "Current and historical side-game scope changed across configurations; exact server causes differ by side game."
+    ],
+    "detection_method": "Retained lifecycle projections and native/backend presentation source; exact causes separated by side game.",
+    "recovery": "Build 10 correctly avoids fabricating unpublished results and shows a local unavailable state for semantic null presentation. Historical R1/R2 Net Skins results remain stored but are not current after configuration 3. Future design should render explicit configured/pending/stale/no-result states and preserve selected feature.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes for native lifecycle presentation; backend current/history contracts also require review by side game.",
+    "release_required": "Future compatible lifecycle corrections proposed; not implemented by this audit.",
+    "native_build_required": "Build 11 lifecycle support required.",
+    "why_certification_missed": "Prior side-game PASS claims used published/calculated fixtures or single-lifecycle snapshots. They did not execute the chronological transition from Official earlier rounds to a newly Configured later round, nor distinguish base-envelope compatibility from detailed-screen usability.",
+    "test_that_would_catch": "NA-2026-009",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "BE-CONTRACT-001",
+        "CERT-NA-001",
+        "AUTO-DEG-001",
+        "B11-NAV-001",
+        "B11-READ-002",
+        "B11-READ-003",
+        "B11-READ-007"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-008",
+      "AUTO-023"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "outstanding Build 11 lifecycle presentation requirement; backend 009A/009B require separate ownership",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "UNIT_TESTED",
+      "DATABASE_SQL_TESTED",
+      "API_RPC_TESTED",
+      "SIMULATOR_TESTED",
+      "PRODUCTION_READBACK_VERIFIED"
+    ],
+    "evidence": [
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build10-today-fallback-audit/R3-NET-SKINS.md",
+        "lines": "3-19",
+        "proves": "Configuration 3 state and prior-current invalidation"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build10-today-fallback-audit/R3-NET-SKINS.md",
+        "lines": "21-48",
+        "proves": "200/null trace and mixed Official/Official/Configured fixture acceptance"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Networking/MobileAPIClient.swift",
+        "lines": "428-464",
+        "proves": "Production detailed adapters require presentation and published compatibility"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Models/MobileNetSkinsQAModels.swift",
+        "lines": "152-168",
+        "proves": "Detailed Net Skins representation accepts only published/calculated rounds"
+      },
+      {
+        "kind": "source",
+        "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Models/MobileCalcuttaQAModels.swift",
+        "lines": "131-152",
+        "proves": "Detailed Calcutta representation requires canonical published compatible result"
+      },
+      {
+        "kind": "report",
+        "path": "/private/tmp/bagger-build10-today-fallback-audit/REPORT.md",
+        "lines": "77-113",
+        "proves": "Net Skins local behavior and separate Calcutta timeout/dependency path"
+      }
+    ],
+    "limitations": "Owner saw side-game unavailable/reset symptoms, but exact phone request attribution is absent. Current Net Skins 200/null cannot itself trigger global revalidation. Nearby sibling Calcutta/Odds 503s can reset the shell; that correlation is plausible, not device-proven.",
+    "original_detail": {
+      "incidentId": "2026-INC-009",
+      "title": "Side-game lifecycle envelopes could be valid while Build 10 detailed screens required a published presentation",
+      "surface": [
+        "Backend side-game lifecycle",
+        "Native Net Skins/Calcutta adapters",
+        "Product design",
+        "Certification"
+      ],
+      "time": {
+        "incident": "Net Skins configuration 3 committed 2026-09-25 22:26:06 America/New_York; exact physical request time UNKNOWN",
+        "boundedEvidence": "Sep 26 current-state audit"
+      },
+      "release": 137,
+      "activation": 236,
+      "sha": {
+        "native": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "backend": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+      },
+      "rootCause": "A valid base side-game envelope can represent configured/in-progress/stale/unpublished state with presentation:null. Build 10's Production detailed adapters require a published compatible presentation and throw incompatibleResponse otherwise. In Net Skins, configuration 3 also marked prior current R1/R2 results noncurrent, so historical publications survived but no current presentation existed. This local semantic gap is independent from sibling 503-driven global resets.",
+      "confidence": "PROVEN for Net Skins currentness and native adapter behavior; PROVEN for Calcutta adapter's null-presentation behavior; UNKNOWN for exact physical trigger attribution",
+      "evidence": [
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build10-today-fallback-audit/R3-NET-SKINS.md",
+          "lines": "3-19",
+          "proves": "Configuration 3 state and prior-current invalidation"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build10-today-fallback-audit/R3-NET-SKINS.md",
+          "lines": "21-48",
+          "proves": "200/null trace and mixed Official/Official/Configured fixture acceptance"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Networking/MobileAPIClient.swift",
+          "lines": "428-464",
+          "proves": "Production detailed adapters require presentation and published compatibility"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Models/MobileNetSkinsQAModels.swift",
+          "lines": "152-168",
+          "proves": "Detailed Net Skins representation accepts only published/calculated rounds"
+        },
+        {
+          "kind": "source",
+          "path": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Models/MobileCalcuttaQAModels.swift",
+          "lines": "131-152",
+          "proves": "Detailed Calcutta representation requires canonical published compatible result"
+        },
+        {
+          "kind": "report",
+          "path": "/private/tmp/bagger-build10-today-fallback-audit/REPORT.md",
+          "lines": "77-113",
+          "proves": "Net Skins local behavior and separate Calcutta timeout/dependency path"
+        }
+      ],
+      "proofLayersActuallyTested": [
+        "SOURCE_INSPECTED",
+        "UNIT_TESTED",
+        "DATABASE_SQL_TESTED",
+        "API_RPC_TESTED",
+        "SIMULATOR_TESTED",
+        "PRODUCTION_READBACK_VERIFIED"
+      ],
+      "physicalEvidence": "Owner saw side-game unavailable/reset symptoms, but exact phone request attribution is absent. Current Net Skins 200/null cannot itself trigger global revalidation. Nearby sibling Calcutta/Odds 503s can reset the shell; that correlation is plausible, not device-proven.",
+      "recovery": "Build 10 correctly avoids fabricating unpublished results and shows a local unavailable state for semantic null presentation. Historical R1/R2 Net Skins results remain stored but are not current after configuration 3. Future design should render explicit configured/pending/stale/no-result states and preserve selected feature.",
+      "build10RelaunchRecovery": "NO semantic recovery; relaunch does not create a published presentation and sibling failures may reset navigation again",
+      "subincidentRecommendation": "Retain stable ID 2026-INC-009 for the shared native lifecycle-response gap, but catalog backend causes separately: 009A Net Skins configure invalidates prior current results; 009B Calcutta broad dependency fingerprint/8-second timeout. They must not be presented as one root cause.",
+      "priorPassClaimsAudited": "Prior side-game PASS claims used published/calculated fixtures or single-lifecycle snapshots. They did not execute the chronological transition from Official earlier rounds to a newly Configured later round, nor distinguish base-envelope compatibility from detailed-screen usability.",
+      "missingTests": [
+        "Chronological configure/calculate/publish/withdraw/reconfigure lifecycle matrix",
+        "Mixed Official/Official/Configured and stale/null presentation UI",
+        "Historical-vs-current result visibility",
+        "Sibling side-game failure while another product is selected",
+        "Physical long-lived session across publication transitions"
+      ],
+      "status": "outstanding Build 11 lifecycle presentation requirement; backend 009A/009B require separate ownership"
+    },
+    "missing_tests": [
+      "Chronological configure/calculate/publish/withdraw/reconfigure lifecycle matrix",
+      "Mixed Official/Official/Configured and stale/null presentation UI",
+      "Historical-vs-current result visibility",
+      "Sibling side-game failure while another product is selected",
+      "Physical long-lived session across publication transitions"
+    ]
+  },
+  {
+    "id": "2026-INC-010",
+    "title": "Calcutta claim SQL failed before a job could be claimed",
+    "date_time": {
+      "observed": "2026-09-25T01:59:04.733Z",
+      "local": "2026-09-24 21:59:04.733 America/New_York",
+      "timeKnown": true
+    },
+    "release": 133,
+    "activation": 232,
+    "sha": "f6929bbe5a254ab6e938c56184f336c5fc617666",
+    "surface": [
+      "PostgreSQL",
+      "Backend",
+      "Calcutta"
+    ],
+    "severity": "P1",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Published Calcutta auction lacked participant calculated presentation because the processor could not claim work.",
+    "competitive_impact": "Presentation/workflow availability; no direct score or golf-result corruption established for this incident. Dependent failures are separate incident IDs.",
+    "data_integrity_impact": "No partial result and no stuck lease; the job remained PENDING with attempts 0. Auction 37/publication 41 remained intact.",
+    "root_cause": "The installed claim function used pg_catalog.greatest and pg_catalog.least as if they were catalog functions. PostgreSQL treats them as special expressions, so function initialization raised SQLSTATE 42883 before the function body, claim, attempt increment, lease, or calculation.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "The real PostgreSQL claim path was not covered by isolated JavaScript calculator proof.",
+      "An auction publication could exist while its calculation had never been claimed."
+    ],
+    "detection_method": "Retained PostgreSQL error and exact claim-function investigation/reproduction.",
+    "recovery": "Release 134 removed only the invalid qualifiers, preserved activation checks, carried the exact untouched job forward under a private audited contract, then claimed and completed it once.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes, bounded backend change",
+    "release_required": 134,
+    "native_build_required": "No immediate native build required",
+    "why_certification_missed": "The earlier PASS called the JavaScript calculation engine directly. It bypassed the installed PostgreSQL claim initializer, lease, receipt, and completion path.",
+    "test_that_would_catch": "NA-2026-010",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "CERT-001",
+        "CERT-NA-001",
+        "CERT-SYN-001",
+        "CERT-IMPACT-001",
+        "DB-PERF-002",
+        "BE-JOB-002"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-015",
+      "AUTO-016"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "resolved bounded patch; systemic prevention outstanding",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "DATABASE_SQL_TESTED",
+      "PRODUCTION_READBACK_VERIFIED"
+    ],
+    "evidence": [
+      "/private/tmp/bagger-calcutta-processor-incident/REPORT.md:7",
+      "/private/tmp/bagger-calcutta-processor-incident/REPORT.md:63",
+      "/private/tmp/bagger-calcutta-processor-incident/installed-claim.sql:1",
+      "/private/tmp/bagger-calcutta-processor-incident/local-reproduction.json:1",
+      "/private/tmp/bagger-r1-open-incident/candidate/supabase/production_migrations/202608290056_production_calcutta_v1.sql:2041"
+    ],
+    "limitations": [],
+    "original_detail": {
+      "id": "2026-INC-010",
+      "title": "Calcutta claim SQL failed before a job could be claimed",
+      "time": {
+        "observed": "2026-09-25T01:59:04.733Z",
+        "local": "2026-09-24 21:59:04.733 America/New_York",
+        "timeKnown": true
+      },
+      "release": 133,
+      "activation": 232,
+      "sha": "f6929bbe5a254ab6e938c56184f336c5fc617666",
+      "rootCause": "The installed claim function used pg_catalog.greatest and pg_catalog.least as if they were catalog functions. PostgreSQL treats them as special expressions, so function initialization raised SQLSTATE 42883 before the function body, claim, attempt increment, lease, or calculation.",
+      "confidence": "PROVEN",
+      "strongestEvidence": [
+        "/private/tmp/bagger-calcutta-processor-incident/REPORT.md:7",
+        "/private/tmp/bagger-calcutta-processor-incident/REPORT.md:63",
+        "/private/tmp/bagger-calcutta-processor-incident/installed-claim.sql:1",
+        "/private/tmp/bagger-calcutta-processor-incident/local-reproduction.json:1",
+        "/private/tmp/bagger-r1-open-incident/candidate/supabase/production_migrations/202608290056_production_calcutta_v1.sql:2041"
+      ],
+      "actualProofLayers": [
+        "SOURCE_INSPECTED",
+        "DATABASE_SQL_TESTED",
+        "PRODUCTION_READBACK_VERIFIED"
+      ],
+      "tests": [
+        "Exact installed claim replay on copied real auction/job inputs reproduced SQLSTATE 42883",
+        "Eight corrected lease-boundary cases later passed in isolation"
+      ],
+      "whyCertificationMissed": "The earlier PASS called the JavaScript calculation engine directly. It bypassed the installed PostgreSQL claim initializer, lease, receipt, and completion path.",
+      "recovery": "Release 134 removed only the invalid qualifiers, preserved activation checks, carried the exact untouched job forward under a private audited contract, then claimed and completed it once.",
+      "dataIntegrity": "No partial result and no stuck lease; the job remained PENDING with attempts 0. Auction 37/publication 41 remained intact."
+    }
+  },
+  {
+    "id": "2026-INC-011",
+    "title": "Normal release advancement stranded an activation-bound pending Calcutta job",
+    "date_time": {
+      "eligibleBaselineObserved": "2026-09-25T02:09:47Z",
+      "strandedByRebind": "2026-09-25T03:19:37.708551Z",
+      "carriedForward": "2026-09-25T03:23:29.828056Z",
+      "resolved": "2026-09-25T03:24:22.883037Z",
+      "timeKnown": true
+    },
+    "release": {
+      "before": 133,
+      "after": 134
+    },
+    "activation": {
+      "jobBefore": 232,
+      "releaseAfter": 233,
+      "jobAfterRecovery": 233
+    },
+    "sha": {
+      "before": "f6929bbe5a254ab6e938c56184f336c5fc617666",
+      "after": "f41a09a2b06f27147faf93721e8377878f6bdf1d"
+    },
+    "surface": [
+      "Release Control",
+      "Backend",
+      "Calcutta"
+    ],
+    "severity": "P1",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "The pending Calcutta job became ineligible when the compatible release advanced activation.",
+    "competitive_impact": "Presentation/workflow availability; no direct score or golf-result corruption established for this incident. Dependent failures are separate incident IDs.",
+    "data_integrity_impact": "Same job ID, attempts 0 before processing, immutable carry receipt; result 1 PROVISIONAL completed successfully.",
+    "root_cause": "Claim and completion require the job activation to equal current activation, while normal rebind increments activation and had no job carry-forward transition. A code repair through the normal release path therefore made the retained job ineligible.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "Pending calculation eligibility was bound to the exact activation.",
+      "A normal compatible release could strand work without an explicit exact-job carry-forward operation."
+    ],
+    "detection_method": "Retained pending-job/activation authority and exact-job carry-forward evidence.",
+    "recovery": "A private protected exact-job carry-forward changed only activation_revision after revalidating job, auction, publication, source, result and release authority. Exact activation guards stayed enabled.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes, bounded backend change",
+    "release_required": 134,
+    "native_build_required": "No immediate native build required",
+    "why_certification_missed": "Release certification tested activation exactness and processor behavior separately. It did not exercise an already-pending, activation-bound durable job across a normal activation increment.",
+    "test_that_would_catch": "NA-2026-011",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "AUTO-JOB-001",
+        "CERT-NA-001",
+        "REL-001",
+        "BE-JOB-002",
+        "BE-JOB-004",
+        "BE-DEP-001"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-006",
+      "AUTO-010",
+      "AUTO-025"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "resolved bounded patch; systemic prevention outstanding",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "DATABASE_SQL_TESTED",
+      "STAGED_HOSTED_TESTED",
+      "PRODUCTION_READBACK_VERIFIED",
+      "PHYSICAL_IPHONE_VERIFIED"
+    ],
+    "evidence": [
+      "/private/tmp/bagger-calcutta-processor-repair/REPORT.md:82",
+      "/private/tmp/bagger-calcutta-processor-repair/release-job-authority.json:1",
+      "/private/tmp/bagger-calcutta-processor-repair/release-conflict-local-proof.json:1",
+      "/private/tmp/bagger-calcutta-activation-repair/REPORT.md:62"
+    ],
+    "limitations": [],
+    "original_detail": {
+      "id": "2026-INC-011",
+      "title": "Normal release advancement stranded an activation-bound pending Calcutta job",
+      "time": {
+        "eligibleBaselineObserved": "2026-09-25T02:09:47Z",
+        "strandedByRebind": "2026-09-25T03:19:37.708551Z",
+        "carriedForward": "2026-09-25T03:23:29.828056Z",
+        "resolved": "2026-09-25T03:24:22.883037Z",
+        "timeKnown": true
+      },
+      "release": {
+        "before": 133,
+        "after": 134
+      },
+      "activation": {
+        "jobBefore": 232,
+        "releaseAfter": 233,
+        "jobAfterRecovery": 233
+      },
+      "sha": {
+        "before": "f6929bbe5a254ab6e938c56184f336c5fc617666",
+        "after": "f41a09a2b06f27147faf93721e8377878f6bdf1d"
+      },
+      "rootCause": "Claim and completion require the job activation to equal current activation, while normal rebind increments activation and had no job carry-forward transition. A code repair through the normal release path therefore made the retained job ineligible.",
+      "confidence": "PROVEN",
+      "strongestEvidence": [
+        "/private/tmp/bagger-calcutta-processor-repair/REPORT.md:82",
+        "/private/tmp/bagger-calcutta-processor-repair/release-job-authority.json:1",
+        "/private/tmp/bagger-calcutta-processor-repair/release-conflict-local-proof.json:1",
+        "/private/tmp/bagger-calcutta-activation-repair/REPORT.md:62"
+      ],
+      "actualProofLayers": [
+        "SOURCE_INSPECTED",
+        "DATABASE_SQL_TESTED",
+        "STAGED_HOSTED_TESTED",
+        "PRODUCTION_READBACK_VERIFIED",
+        "PHYSICAL_IPHONE_VERIFIED"
+      ],
+      "tests": [
+        "Job selected at activation 232 and not selected at 233 in exact predicate replay",
+        "27 recovery denial checks",
+        "17 concurrency checks",
+        "claim-calculate-complete-participant-read end to end"
+      ],
+      "whyCertificationMissed": "Release certification tested activation exactness and processor behavior separately. It did not exercise an already-pending, activation-bound durable job across a normal activation increment.",
+      "recovery": "A private protected exact-job carry-forward changed only activation_revision after revalidating job, auction, publication, source, result and release authority. Exact activation guards stayed enabled.",
+      "dataIntegrity": "Same job ID, attempts 0 before processing, immutable carry receipt; result 1 PROVISIONAL completed successfully."
+    }
+  },
+  {
+    "id": "2026-INC-012",
+    "title": "Net Skins configured read and latent worker paths contained invalid SQL expressions",
+    "date_time": {
+      "observed": "UNKNOWN",
+      "boundedContext": "Release 134 before Release 135 repair on 2026-09-25",
+      "timeKnown": false
+    },
+    "release": {
+      "incident": 134,
+      "repair": 135
+    },
+    "activation": {
+      "incident": 233,
+      "repair": 234
+    },
+    "sha": {
+      "incident": "f41a09a2b06f27147faf93721e8377878f6bdf1d",
+      "repair": "2533b98a7d0de44b6d10c7f14444c6627e70a2ee"
+    },
+    "surface": [
+      "PostgreSQL",
+      "Backend",
+      "Net Skins"
+    ],
+    "severity": "P1",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Configured Net Skins participant reads returned 503; latent worker paths also failed exact SQL execution.",
+    "competitive_impact": "Presentation/workflow availability; no direct score or golf-result corruption established for this incident. Dependent failures are separate incident IDs.",
+    "data_integrity_impact": "Zero Net Skins jobs and results at incident time; configuration remained fully committed.",
+    "root_cause": "Seven pg_catalog.greatest/least qualifications across the participant read, claim initializer and official-result normalizer were invalid. The live read failed 42883/503; claim and normalization were proven latent failures.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "Invalid SQL qualification existed in participant-read and latent worker paths.",
+      "Configured/pre-golf and processor execution required different tests from calculator-only proof."
+    ],
+    "detection_method": "Retained participant 503/SQL error and real SQL read/worker path certification.",
+    "recovery": "Release 135 removed seven qualifiers in three pinned functions. Configuration 2 and memberships were preserved; no job/result/publication was manufactured.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes, bounded backend change",
+    "release_required": 135,
+    "native_build_required": "No immediate native build required",
+    "why_certification_missed": "Pre-golf certification did not execute the installed configured-read branch or all worker SQL functions in PostgreSQL. Source and native DTO checks were incorrectly allowed to stand in for database execution.",
+    "test_that_would_catch": "NA-2026-012",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "CERT-001",
+        "CERT-NA-001",
+        "CERT-SYN-001",
+        "CERT-IMPACT-001",
+        "DB-PERF-002",
+        "BE-JOB-002"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-015",
+      "AUTO-016",
+      "AUTO-023"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "resolved bounded patch; systemic prevention outstanding",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "DATABASE_SQL_TESTED",
+      "API_RPC_TESTED",
+      "STAGED_HOSTED_TESTED",
+      "PRODUCTION_READBACK_VERIFIED",
+      "PHYSICAL_IPHONE_VERIFIED"
+    ],
+    "evidence": [
+      "/private/tmp/bagger-net-skins-incident/REPORT.md:82",
+      "/private/tmp/bagger-net-skins-incident/REPORT.md:124",
+      "/private/tmp/bagger-net-skins-sql-repair/REPORT.md:95",
+      "/private/tmp/bagger-net-skins-sql-repair/REPORT.md:111"
+    ],
+    "limitations": "Physical acceptance covered safe pre-golf/no-result behavior and staying on destination, not a populated Official Net Skins result.",
+    "original_detail": {
+      "id": "2026-INC-012",
+      "title": "Net Skins configured read and latent worker paths contained invalid SQL expressions",
+      "time": {
+        "observed": "UNKNOWN",
+        "boundedContext": "Release 134 before Release 135 repair on 2026-09-25",
+        "timeKnown": false
+      },
+      "release": {
+        "incident": 134,
+        "repair": 135
+      },
+      "activation": {
+        "incident": 233,
+        "repair": 234
+      },
+      "sha": {
+        "incident": "f41a09a2b06f27147faf93721e8377878f6bdf1d",
+        "repair": "2533b98a7d0de44b6d10c7f14444c6627e70a2ee"
+      },
+      "rootCause": "Seven pg_catalog.greatest/least qualifications across the participant read, claim initializer and official-result normalizer were invalid. The live read failed 42883/503; claim and normalization were proven latent failures.",
+      "confidence": "PROVEN",
+      "strongestEvidence": [
+        "/private/tmp/bagger-net-skins-incident/REPORT.md:82",
+        "/private/tmp/bagger-net-skins-incident/REPORT.md:124",
+        "/private/tmp/bagger-net-skins-sql-repair/REPORT.md:95",
+        "/private/tmp/bagger-net-skins-sql-repair/REPORT.md:111"
+      ],
+      "actualProofLayers": [
+        "SOURCE_INSPECTED",
+        "DATABASE_SQL_TESTED",
+        "API_RPC_TESTED",
+        "STAGED_HOSTED_TESTED",
+        "PRODUCTION_READBACK_VERIFIED",
+        "PHYSICAL_IPHONE_VERIFIED"
+      ],
+      "tests": [
+        "Exact hosted read reproduced 42883",
+        "Exact claim initializer reproduced 42883",
+        "12 lease cases",
+        "37 denial/validation cases",
+        "R1/R2 normalization and completion"
+      ],
+      "whyCertificationMissed": "Pre-golf certification did not execute the installed configured-read branch or all worker SQL functions in PostgreSQL. Source and native DTO checks were incorrectly allowed to stand in for database execution.",
+      "recovery": "Release 135 removed seven qualifiers in three pinned functions. Configuration 2 and memberships were preserved; no job/result/publication was manufactured.",
+      "dataIntegrity": "Zero Net Skins jobs and results at incident time; configuration remained fully committed."
+    }
+  },
+  {
+    "id": "2026-INC-013",
+    "title": "First-write activation mutation aborted atomic R1 Open",
+    "date_time": {
+      "observed": [
+        "2026-09-25T10:23:32.137Z",
+        "2026-09-25T10:24:12.206Z"
+      ],
+      "timeKnown": true
+    },
+    "release": {
+      "incident": 135,
+      "repair": 136
+    },
+    "activation": {
+      "incident": 234,
+      "transientInsideRolledBackTransaction": 235,
+      "repair": 235
+    },
+    "sha": {
+      "incident": "2533b98a7d0de44b6d10c7f14444c6627e70a2ee",
+      "repair": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+    },
+    "surface": [
+      "Release Control",
+      "PostgreSQL",
+      "Director"
+    ],
+    "severity": "P0",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Whole-round R1 Open failed and rolled back rather than opening six matches.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "The round wrapper rolled back all six-match changes, permissions, audit evidence and the transient activation increment.",
+    "root_cause": "The first canonical mutation audit trigger incremented activation. During atomic Open, the first MARK_LIVE changed activation 234 to 235 inside the transaction; the following ACCESS_ACTIVATE still required release binding 234 and raised 55000.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "The first-write audit advanced activation inside a batch whose remaining checks expected unchanged authority.",
+      "Atomic guards correctly rolled back the entire Open operation."
+    ],
+    "detection_method": "Retained whole-round error/SQL guard trace and canonical atomic rollback readback.",
+    "recovery": "Release 136 removed only the audit trigger's activation increment. First-write evidence and all activation guards remained.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes, bounded backend change",
+    "release_required": 136,
+    "native_build_required": "No immediate native build required",
+    "why_certification_missed": "The first-write audit path and the multi-step atomic Open path had not been tested together against exact release binding. Individual operations looked valid in isolation.",
+    "test_that_would_catch": "NA-2026-013",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "DIR-OPS-001",
+        "DIR-OPS-002",
+        "CERT-NA-001",
+        "REL-001",
+        "BE-DEP-003"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-002",
+      "AUTO-003",
+      "AUTO-025"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "resolved bounded patch; systemic prevention outstanding",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "DATABASE_SQL_TESTED",
+      "API_RPC_TESTED",
+      "STAGED_HOSTED_TESTED",
+      "PRODUCTION_READBACK_VERIFIED"
+    ],
+    "evidence": [
+      "/private/tmp/bagger-r1-open-incident/PREDEPLOY-REPORT.md:5",
+      "/private/tmp/bagger-r1-open-incident/REPORT.md:55",
+      "/private/tmp/bagger-r1-open-incident/EXACT-REPLAY-CERTIFICATION.json:1"
+    ],
+    "limitations": [],
+    "original_detail": {
+      "id": "2026-INC-013",
+      "title": "First-write activation mutation aborted atomic R1 Open",
+      "time": {
+        "observed": [
+          "2026-09-25T10:23:32.137Z",
+          "2026-09-25T10:24:12.206Z"
+        ],
+        "timeKnown": true
+      },
+      "release": {
+        "incident": 135,
+        "repair": 136
+      },
+      "activation": {
+        "incident": 234,
+        "transientInsideRolledBackTransaction": 235,
+        "repair": 235
+      },
+      "sha": {
+        "incident": "2533b98a7d0de44b6d10c7f14444c6627e70a2ee",
+        "repair": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+      },
+      "rootCause": "The first canonical mutation audit trigger incremented activation. During atomic Open, the first MARK_LIVE changed activation 234 to 235 inside the transaction; the following ACCESS_ACTIVATE still required release binding 234 and raised 55000.",
+      "confidence": "PROVEN",
+      "strongestEvidence": [
+        "/private/tmp/bagger-r1-open-incident/PREDEPLOY-REPORT.md:5",
+        "/private/tmp/bagger-r1-open-incident/REPORT.md:55",
+        "/private/tmp/bagger-r1-open-incident/EXACT-REPLAY-CERTIFICATION.json:1"
+      ],
+      "actualProofLayers": [
+        "SOURCE_INSPECTED",
+        "DATABASE_SQL_TESTED",
+        "API_RPC_TESTED",
+        "STAGED_HOSTED_TESTED",
+        "PRODUCTION_READBACK_VERIFIED"
+      ],
+      "tests": [
+        "Exact original 55000 replay",
+        "48 PostgreSQL Open/Lock/Resume/idempotency/concurrency cases",
+        "117 application tests",
+        "hosted rollback-only R1/R2 acceptance"
+      ],
+      "whyCertificationMissed": "The first-write audit path and the multi-step atomic Open path had not been tested together against exact release binding. Individual operations looked valid in isolation.",
+      "recovery": "Release 136 removed only the audit trigger's activation increment. First-write evidence and all activation guards remained.",
+      "dataIntegrity": "The round wrapper rolled back all six-match changes, permissions, audit evidence and the transient activation increment."
+    }
+  },
+  {
+    "id": "2026-INC-014",
+    "title": "PWA scoring-session signing key missing in Production",
+    "date_time": {
+      "observedWindow": "2026-09-25 08:47:32–08:51:41 America/New_York",
+      "timeKnown": true
+    },
+    "release": {
+      "incident": 136,
+      "repair": 137
+    },
+    "activation": {
+      "incident": 235,
+      "repair": 236
+    },
+    "sha": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9",
+    "surface": [
+      "PWA",
+      "Backend configuration"
+    ],
+    "severity": "P0",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "My Match Continue Scoring could not create the signed scoring session; PWA fallback was unavailable.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "No failed score write occurred; existing Official scores remained unchanged.",
+    "root_cause": "SCORING_SESSION_SECRET existed for Preview but was absent from Production. Authorized START_SCORING requests reached session creation, which threw before setting the match-scoped cookie.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "Preview configuration did not prove the equivalent Production signing-key binding.",
+      "The web shell and My Match could work while scoring-session creation failed."
+    ],
+    "detection_method": "Retained Production scoring-session 503 requests and environment binding inspection, followed by owner physical acceptance.",
+    "recovery": "Configuration-only Release 137 added a new Production key and preserved source. Physical PWA scoring then opened, saved one new hole, and advanced.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Configuration-only",
+    "release_required": 137,
+    "native_build_required": "No immediate native build required",
+    "why_certification_missed": "Staged source/UI acceptance did not assert the Production-target secret inventory or perform a real post-rebind scoring-session handshake before tournament use.",
+    "test_that_would_catch": "NA-2026-014",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "BE-CONTRACT-001",
+        "PWA-001",
+        "CERT-NA-001",
+        "CERT-PHY-001",
+        "REL-001",
+        "BE-JOB-005"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-025",
+      "AUTO-027"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "resolved bounded patch; systemic prevention outstanding",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "API_RPC_TESTED",
+      "STAGED_HOSTED_TESTED",
+      "PRODUCTION_READBACK_VERIFIED",
+      "PHYSICAL_IPHONE_VERIFIED"
+    ],
+    "evidence": [
+      "/private/tmp/bagger-live-pwa-incident/REPORT.md:96",
+      "/private/tmp/bagger-live-pwa-incident/REPORT.md:110",
+      "/private/tmp/bagger-live-pwa-incident/REPORT.md:15"
+    ],
+    "limitations": [],
+    "original_detail": {
+      "id": "2026-INC-014",
+      "title": "PWA scoring-session signing key missing in Production",
+      "time": {
+        "observedWindow": "2026-09-25 08:47:32–08:51:41 America/New_York",
+        "timeKnown": true
+      },
+      "release": {
+        "incident": 136,
+        "repair": 137
+      },
+      "activation": {
+        "incident": 235,
+        "repair": 236
+      },
+      "sha": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9",
+      "rootCause": "SCORING_SESSION_SECRET existed for Preview but was absent from Production. Authorized START_SCORING requests reached session creation, which threw before setting the match-scoped cookie.",
+      "confidence": "PROVEN",
+      "strongestEvidence": [
+        "/private/tmp/bagger-live-pwa-incident/REPORT.md:96",
+        "/private/tmp/bagger-live-pwa-incident/REPORT.md:110",
+        "/private/tmp/bagger-live-pwa-incident/REPORT.md:15"
+      ],
+      "actualProofLayers": [
+        "SOURCE_INSPECTED",
+        "API_RPC_TESTED",
+        "STAGED_HOSTED_TESTED",
+        "PRODUCTION_READBACK_VERIFIED",
+        "PHYSICAL_IPHONE_VERIFIED"
+      ],
+      "tests": [
+        "17 live 503 requests with exact signing error",
+        "absent-key local route reproduction",
+        "configured-key authorization",
+        "tampered/wrong participant denials",
+        "one physical new-hole save after repair"
+      ],
+      "whyCertificationMissed": "Staged source/UI acceptance did not assert the Production-target secret inventory or perform a real post-rebind scoring-session handshake before tournament use.",
+      "recovery": "Configuration-only Release 137 added a new Production key and preserved source. Physical PWA scoring then opened, saved one new hole, and advanced.",
+      "dataIntegrity": "No failed score write occurred; existing Official scores remained unchanged."
+    },
+    "repair_same_sha": true
+  },
+  {
+    "id": "2026-INC-015",
+    "title": "Persistent physical-phone service-worker Update banner",
+    "date_time": {
+      "observed": "2026-09-25 during the PWA scoring incident",
+      "timeKnown": false
+    },
+    "release": 136,
+    "activation": 235,
+    "sha": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9",
+    "surface": [
+      "PWA",
+      "Service Worker"
+    ],
+    "severity": "P2",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "The owner saw an Update banner remain after tapping Update; exact phone worker/handler outcome unknown.",
+    "competitive_impact": "Presentation/workflow availability; no direct score or golf-result corruption established for this incident. Dependent failures are separate incident IDs.",
+    "data_integrity_impact": "Independent of canonical score correctness.",
+    "root_cause": "UNKNOWN. The phone's active/waiting/installing worker state was not captured. Source reload behavior and Mac worker state cannot establish the physical phone cause.",
+    "confidence": "UNKNOWN",
+    "contributing_factors": [
+      "The affected phone active/waiting worker and controller-change trace was not retained.",
+      "The simultaneous PWA server signing-key defect is separately proven; no causal relationship to the banner is established."
+    ],
+    "detection_method": "Owner physical phone observation; affected worker/controller trace unavailable.",
+    "recovery": "No service-worker repair was required to fix the proven server failure. Ordinary reload was recommended after the signing-key repair; cache clearing was not justified.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "UNKNOWN until affected-phone worker flow is reproduced.",
+    "release_required": "UNKNOWN; no release justified solely by the retained banner observation.",
+    "native_build_required": "No native change inferred from a PWA worker symptom.",
+    "why_certification_missed": "Certification lacked device-visible worker version/state telemetry and a physical update lifecycle test across an already-installed PWA.",
+    "test_that_would_catch": "NA-2026-015",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "PWA-001",
+        "CERT-NA-001",
+        "BE-JOB-005"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-024"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "outstanding cause/control gap",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "STAGED_HOSTED_TESTED"
+    ],
+    "evidence": [
+      "/private/tmp/bagger-live-pwa-incident/REPORT.md:130",
+      "/private/tmp/bagger-live-pwa-incident/REPORT.md:141",
+      "/private/tmp/bagger-live-pwa-incident/REPORT.md:44"
+    ],
+    "limitations": [],
+    "original_detail": {
+      "id": "2026-INC-015",
+      "title": "Persistent physical-phone service-worker Update banner",
+      "time": {
+        "observed": "2026-09-25 during the PWA scoring incident",
+        "timeKnown": false
+      },
+      "release": 136,
+      "activation": 235,
+      "sha": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9",
+      "rootCause": "UNKNOWN. The phone's active/waiting/installing worker state was not captured. Source reload behavior and Mac worker state cannot establish the physical phone cause.",
+      "confidence": "UNKNOWN",
+      "strongestEvidence": [
+        "/private/tmp/bagger-live-pwa-incident/REPORT.md:130",
+        "/private/tmp/bagger-live-pwa-incident/REPORT.md:141",
+        "/private/tmp/bagger-live-pwa-incident/REPORT.md:44"
+      ],
+      "actualProofLayers": [
+        "SOURCE_INSPECTED",
+        "STAGED_HOSTED_TESTED"
+      ],
+      "tests": [
+        "Hosted sw.js matched source and Mac had no waiting worker",
+        "No physical phone worker-state capture"
+      ],
+      "whyCertificationMissed": "Certification lacked device-visible worker version/state telemetry and a physical update lifecycle test across an already-installed PWA.",
+      "recovery": "No service-worker repair was required to fix the proven server failure. Ordinary reload was recommended after the signing-key repair; cache clearing was not justified.",
+      "dataIntegrity": "Independent of canonical score correctness."
+    }
+  },
+  {
+    "id": "2026-INC-016",
+    "title": "Stale Odds lifecycle records blocked initial R3 pairing",
+    "date_time": {
+      "failedAttempts": "2026-09-25 20:57:25–21:00:20 America/New_York",
+      "timeKnown": true
+    },
+    "release": 137,
+    "activation": 236,
+    "sha": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9",
+    "surface": [
+      "Director",
+      "Odds lifecycle"
+    ],
+    "severity": "P1",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "R3 pairings were denied behind a generic dependency message with stale Odds work/publication hidden from normal workflow.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "Pairing RPC validation rolled back before rebuild; no partial R3 pairing committed during failures.",
+    "root_cause": "Two independent Odds records blocked setup: the current After-R2 publication and an old After-R1 SUCCEEDED/READY unpublished calculation whose canonical inputs had advanced but whose lifecycle state had not been superseded. Withdrawal itself was blocked by the orphan READY row, and the Director UI exposed no discard/supersede control.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "An obsolete calculation remained blocking alongside the current publication.",
+      "The generic setup-dependency error hid the exact job/publication and supported clearance sequence."
+    ],
+    "detection_method": "Owner failed pairing operation and retained exact dependency/guard inspection.",
+    "recovery": "The existing supported supersede RPC retired exactly one job as SUPERSEDED/STALE; the owner then had to withdraw current publication before pairing.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "No source change required for the supported historical clearance; lifecycle automation is future work.",
+    "release_required": "No release required for that supported clearance.",
+    "native_build_required": "No.",
+    "why_certification_missed": "Lifecycle certification did not simulate a completed-but-unpublished READY calculation surviving later canonical golf changes, or verify that every blocking state had a Director recovery action.",
+    "test_that_would_catch": "NA-2026-016",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "DIR-OPS-001",
+        "AUTO-JOB-001",
+        "DIR-NEXT-001",
+        "CERT-NA-001",
+        "CERT-SYN-001",
+        "DIR-MOB-001",
+        "BE-JOB-002",
+        "BE-JOB-003",
+        "BE-DEP-001",
+        "BE-DEP-002",
+        "BE-DEP-003",
+        "BE-DEP-004"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-006",
+      "AUTO-007",
+      "AUTO-009"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "resolved bounded patch; systemic prevention outstanding",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "PRODUCTION_READBACK_VERIFIED",
+      "API_RPC_TESTED"
+    ],
+    "evidence": [
+      "/private/tmp/bagger-r3-pairing-blocker/REPORT.md:5",
+      "/private/tmp/bagger-r3-pairing-blocker/REPORT.md:44",
+      "/private/tmp/bagger-r3-pairing-blocker/REPORT.md:72",
+      "/private/tmp/bagger-r3-odds-clearance/REPORT.md:3"
+    ],
+    "limitations": [],
+    "original_detail": {
+      "id": "2026-INC-016",
+      "title": "Stale Odds lifecycle records blocked initial R3 pairing",
+      "time": {
+        "failedAttempts": "2026-09-25 20:57:25–21:00:20 America/New_York",
+        "timeKnown": true
+      },
+      "release": 137,
+      "activation": 236,
+      "sha": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9",
+      "rootCause": "Two independent Odds records blocked setup: the current After-R2 publication and an old After-R1 SUCCEEDED/READY unpublished calculation whose canonical inputs had advanced but whose lifecycle state had not been superseded. Withdrawal itself was blocked by the orphan READY row, and the Director UI exposed no discard/supersede control.",
+      "confidence": "PROVEN",
+      "strongestEvidence": [
+        "/private/tmp/bagger-r3-pairing-blocker/REPORT.md:5",
+        "/private/tmp/bagger-r3-pairing-blocker/REPORT.md:44",
+        "/private/tmp/bagger-r3-pairing-blocker/REPORT.md:72",
+        "/private/tmp/bagger-r3-odds-clearance/REPORT.md:3"
+      ],
+      "actualProofLayers": [
+        "SOURCE_INSPECTED",
+        "PRODUCTION_READBACK_VERIFIED",
+        "API_RPC_TESTED"
+      ],
+      "tests": [
+        "Installed canonical comparator identified MATCHES, MATCH_SCORE_AUTHORITY and PAIRING_COURSE_AUTHORITY changes",
+        "Exact stale-job supersession preserved all retained input/result content"
+      ],
+      "whyCertificationMissed": "Lifecycle certification did not simulate a completed-but-unpublished READY calculation surviving later canonical golf changes, or verify that every blocking state had a Director recovery action.",
+      "recovery": "The existing supported supersede RPC retired exactly one job as SUPERSEDED/STALE; the owner then had to withdraw current publication before pairing.",
+      "dataIntegrity": "Pairing RPC validation rolled back before rebuild; no partial R3 pairing committed during failures."
+    }
+  },
+  {
+    "id": "2026-INC-017",
+    "title": "R3 pairings were committed without preparation, then trapped behind side-game dependencies",
+    "date_time": {
+      "pairingCommitted": "2026-09-26T02:21:23.283894Z",
+      "diagnosed": "2026-09-26T05:08:26.033907Z",
+      "timeKnown": true
+    },
+    "release": {
+      "incident": 137,
+      "recovery": 138
+    },
+    "activation": {
+      "incident": 236,
+      "recovery": 237
+    },
+    "sha": {
+      "incident": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9",
+      "recovery": "1f836836fbb547d847cda2166030da285e1cf8a9"
+    },
+    "surface": [
+      "Director",
+      "Backend",
+      "Lifecycle"
+    ],
+    "severity": "P0",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "R3 had valid pairings but no prepared current contexts; normal preparation was blocked after side-game dependencies formed.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "Pairings and handicap values were correct; missing prepared snapshots were an authority-completeness problem, not corrupted scores.",
+    "root_cause": "REPLACE_ROUND_PAIRINGS explicitly committed snapshotPrepared:false. All twelve matches retained empty S1 snapshots with NULL prepared revision and handicap revision. Later Net Skins configuration, Odds publication, and Calcutta dependencies blocked ordinary per-match preparation; the late-R3 compatibility predicate was also invalidated by unrelated Net Skins history/pointer changes captured in its broad consumed fingerprint.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "Canonical pairing confirmation did not imply preparation; its receipt stated snapshotPrepared:false.",
+      "Side-game dependencies formed before missing prepared contexts were materialized.",
+      "Broad guards blocked normal preparation even though bounded semantic preservation was later proven."
+    ],
+    "detection_method": "Retained canonical prepared-context readback and pairing receipt with snapshotPrepared:false; bounded recovery receipts.",
+    "recovery": "Release 138 added a bounded, one-transaction recovery for the exact existing pairings and compatible dependencies, producing S2 snapshots and 12/12 READY while preserving side games and golf.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes, bounded backend change",
+    "release_required": 138,
+    "native_build_required": "No immediate native build required",
+    "why_certification_missed": "Pairing success was allowed to appear operationally complete even though preparation was a separate action. The dependency graph was not tested in real operator order, and the hash represented history/control metadata unrelated to Calcutta economic correctness.",
+    "test_that_would_catch": "NA-2026-017",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "CERT-001",
+        "DIR-OPS-001",
+        "DIR-OPS-002",
+        "DIR-CLOSE-001",
+        "DIR-NEXT-001",
+        "CERT-NA-001",
+        "CERT-SYN-001",
+        "CERT-PHY-001",
+        "DIR-MOB-001",
+        "AUTO-HEALTH-001",
+        "DB-PERF-001",
+        "DB-PERF-003",
+        "BE-DEP-001",
+        "BE-DEP-002",
+        "BE-DEP-003",
+        "BE-DEP-004"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-002",
+      "AUTO-003",
+      "AUTO-012"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "resolved bounded patch; systemic prevention outstanding",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "DATABASE_SQL_TESTED",
+      "STAGED_HOSTED_TESTED",
+      "PRODUCTION_READBACK_VERIFIED",
+      "BOUNDED_RECOVERY_LIFECYCLE_VERIFIED"
+    ],
+    "evidence": [
+      "/private/tmp/bagger-r3-readiness-recovery/REPORT.md:28",
+      "/private/tmp/bagger-r3-readiness-recovery/REPORT.md:56",
+      "/private/tmp/bagger-r3-readiness-recovery/REPORT.md:74",
+      "/private/tmp/bagger-r3-dependency-recovery/REPORT.md:65",
+      "/private/tmp/bagger-r3-continuous-recovery/REPORT.md:3"
+    ],
+    "limitations": [],
+    "original_detail": {
+      "id": "2026-INC-017",
+      "title": "R3 pairings were committed without preparation, then trapped behind side-game dependencies",
+      "time": {
+        "pairingCommitted": "2026-09-26T02:21:23.283894Z",
+        "diagnosed": "2026-09-26T05:08:26.033907Z",
+        "timeKnown": true
+      },
+      "release": {
+        "incident": 137,
+        "recovery": 138
+      },
+      "activation": {
+        "incident": 236,
+        "recovery": 237
+      },
+      "sha": {
+        "incident": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9",
+        "recovery": "1f836836fbb547d847cda2166030da285e1cf8a9"
+      },
+      "rootCause": "REPLACE_ROUND_PAIRINGS explicitly committed snapshotPrepared:false. All twelve matches retained empty S1 snapshots with NULL prepared revision and handicap revision. Later Net Skins configuration, Odds publication, and Calcutta dependencies blocked ordinary per-match preparation; the late-R3 compatibility predicate was also invalidated by unrelated Net Skins history/pointer changes captured in its broad consumed fingerprint.",
+      "confidence": "PROVEN",
+      "strongestEvidence": [
+        "/private/tmp/bagger-r3-readiness-recovery/REPORT.md:28",
+        "/private/tmp/bagger-r3-readiness-recovery/REPORT.md:56",
+        "/private/tmp/bagger-r3-readiness-recovery/REPORT.md:74",
+        "/private/tmp/bagger-r3-dependency-recovery/REPORT.md:65",
+        "/private/tmp/bagger-r3-continuous-recovery/REPORT.md:3"
+      ],
+      "actualProofLayers": [
+        "SOURCE_INSPECTED",
+        "DATABASE_SQL_TESTED",
+        "STAGED_HOSTED_TESTED",
+        "PRODUCTION_READBACK_VERIFIED",
+        "BOUNDED_RECOVERY_LIFECYCLE_VERIFIED"
+      ],
+      "tests": [
+        "0/12 readiness and exact NULL snapshot evidence",
+        "Broad hash reconstruction isolated differences to Net Skins revision/current/supersession metadata",
+        "Atomic 12-context recovery with rollback injection, concurrency and lost-response tests",
+        "Production 12/12 READY readback"
+      ],
+      "whyCertificationMissed": "Pairing success was allowed to appear operationally complete even though preparation was a separate action. The dependency graph was not tested in real operator order, and the hash represented history/control metadata unrelated to Calcutta economic correctness.",
+      "recovery": "Release 138 added a bounded, one-transaction recovery for the exact existing pairings and compatible dependencies, producing S2 snapshots and 12/12 READY while preserving side games and golf.",
+      "dataIntegrity": "Pairings and handicap values were correct; missing prepared snapshots were an authority-completeness problem, not corrupted scores."
+    }
+  },
+  {
+    "id": "2026-INC-018",
+    "title": "R3 whole-round Open returned an unknown outcome, then its expected fingerprint became stale",
+    "date_time": {
+      "originalRequest": "UNKNOWN",
+      "resolvedSnapshot": "2026-09-26T14:07:42.185201Z",
+      "timeKnown": false
+    },
+    "release": 138,
+    "activation": 237,
+    "sha": "1f836836fbb547d847cda2166030da285e1cf8a9",
+    "surface": [
+      "Director",
+      "Backend operation status"
+    ],
+    "severity": "P0",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Director could not resolve its saved Open intent; separate per-match changes made the old review fingerprint stale.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "No evidence of partial whole-round commit; live matches had independent mutation keys and timestamps.",
+    "root_cause": "The client retained the operation UUID but not original creation time or HTTP error. No round receipt or any of 24 child mutation keys existed, proving no commit by that operation. Separate per-match Opens changed round state, making the original request fingerprint obsolete; replay would correctly return ROUND_STATE_CHANGED.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "The saved operation retained its original review fingerprint.",
+      "Later independent per-match operations changed authority and made that fingerprint stale.",
+      "The cause of the original HTTP outcome loss remains unknown."
+    ],
+    "detection_method": "Retained exact operation receipt/child-key lookup and canonical round-state comparison; original transport cause unknown.",
+    "recovery": "No retry. Existing Live matches were preserved; remaining Upcoming matches were opened through supported per-match operations after refresh.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "No new source change established as necessary for historical per-match fallback; status UX redesign is future work.",
+    "release_required": "No new release established for original-outcome resolution.",
+    "native_build_required": "No.",
+    "why_certification_missed": "Unknown-outcome certification covered idempotent same-state replay, but the operator UI did not first reconcile receipt/state and invalidate a stale saved intent after other actors changed the round.",
+    "test_that_would_catch": "NA-2026-018",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "OBS-CORE-001",
+        "DIR-OPS-001",
+        "DIR-OPS-002",
+        "DIR-NEXT-001",
+        "CERT-NA-001",
+        "CERT-PHY-001",
+        "DIR-MOB-001",
+        "AUTO-HEALTH-001",
+        "BE-SCORE-003",
+        "BE-JOB-003",
+        "BE-DEP-003"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-003",
+      "AUTO-005"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "outstanding cause/control gap",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "PRODUCTION_READBACK_VERIFIED"
+    ],
+    "evidence": [
+      "/private/tmp/bagger-r3-open-outcome/REPORT.md:1",
+      "/private/tmp/bagger-r3-open-outcome/OUTCOME.json:1",
+      "/private/tmp/bagger-r3-open-outcome/final-current.json:1"
+    ],
+    "limitations": "No commit by the retained operation and the later stale fingerprint are proven. The original request time, transport error, and initial failure cause remain UNKNOWN.",
+    "original_detail": {
+      "id": "2026-INC-018",
+      "title": "R3 whole-round Open returned an unknown outcome, then its expected fingerprint became stale",
+      "time": {
+        "originalRequest": "UNKNOWN",
+        "resolvedSnapshot": "2026-09-26T14:07:42.185201Z",
+        "timeKnown": false
+      },
+      "release": 138,
+      "activation": 237,
+      "sha": "1f836836fbb547d847cda2166030da285e1cf8a9",
+      "rootCause": "The client retained the operation UUID but not original creation time or HTTP error. No round receipt or any of 24 child mutation keys existed, proving no commit by that operation. Separate per-match Opens changed round state, making the original request fingerprint obsolete; replay would correctly return ROUND_STATE_CHANGED.",
+      "confidence": "PROVEN",
+      "confidenceScope": "No commit by the retained operation and the later stale fingerprint are proven. The original request time, transport error, and initial failure cause remain UNKNOWN.",
+      "strongestEvidence": [
+        "/private/tmp/bagger-r3-open-outcome/REPORT.md:1",
+        "/private/tmp/bagger-r3-open-outcome/OUTCOME.json:1",
+        "/private/tmp/bagger-r3-open-outcome/final-current.json:1"
+      ],
+      "actualProofLayers": [
+        "SOURCE_INSPECTED",
+        "PRODUCTION_READBACK_VERIFIED"
+      ],
+      "tests": [
+        "Receipt and exact child-key absence",
+        "Current state fingerprint differed after independent per-match operations"
+      ],
+      "whyCertificationMissed": "Unknown-outcome certification covered idempotent same-state replay, but the operator UI did not first reconcile receipt/state and invalidate a stale saved intent after other actors changed the round.",
+      "recovery": "No retry. Existing Live matches were preserved; remaining Upcoming matches were opened through supported per-match operations after refresh.",
+      "dataIntegrity": "No evidence of partial whole-round commit; live matches had independent mutation keys and timestamps."
+    },
+    "confidence_scope": "No commit by the retained operation and the later stale fingerprint are proven. The original request time, transport error, and initial failure cause remain UNKNOWN."
+  },
+  {
+    "id": "2026-INC-019",
+    "title": "Synchronous side-game invalidation made score writes time out",
+    "date_time": {
+      "failures": [
+        "2026-09-27T05:25:05.582Z",
+        "2026-09-27T05:26:18.776Z"
+      ],
+      "timeKnown": true
+    },
+    "release": {
+      "incident": 138,
+      "repair": 139
+    },
+    "activation": {
+      "incident": 237,
+      "repair": 238
+    },
+    "sha": {
+      "incident": "1f836836fbb547d847cda2166030da285e1cf8a9",
+      "repair": "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6"
+    },
+    "surface": [
+      "PostgreSQL",
+      "Backend performance"
+    ],
+    "severity": "P0",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "PWA/server score writes timed out with SQLSTATE 57014; digital recovery was blocked until the bounded backend correction.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "Both original mutation IDs and target holes remained absent; neither request was retried by the repair task.",
+    "root_cause": "Hole and match writes synchronously fired Calcutta and Net Skins enqueue triggers. Calcutta current-result selection called a SQL STABLE compatibility function whose planner evaluated whole-history financial and consumed fingerprints even though result 407 had no qualifying receipt. Both score transactions hit the 8-second statement timeout (57014) and rolled back.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "Score/match triggers synchronously reached Calcutta compatibility and historical fingerprint work.",
+      "Accumulated history made work exceed the statement budget; clean fixtures missed the cost."
+    ],
+    "detection_method": "Retained SQLSTATE 57014 error stack, isolated query profile and before/after correction evidence.",
+    "recovery": "Release 139 converted the compatibility function to PL/pgSQL with a cheap receipt/current-result eligibility return before planning the unchanged expensive predicate. No trigger, score RPC, guard, timeout, or side-game formula was weakened.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes, bounded backend change",
+    "release_required": 139,
+    "native_build_required": "No immediate native build required",
+    "why_certification_missed": "Score certification tested core scoring correctness and downstream results but did not budget every synchronous trigger under historical data growth. Planner-time execution of nested STABLE hashes was absent from unit fixtures and small datasets.",
+    "test_that_would_catch": "NA-2026-019",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "OBS-CORE-001",
+        "CERT-001",
+        "PERF-001",
+        "PWA-001",
+        "CERT-NA-001",
+        "CERT-SYN-001",
+        "OPS-DR-001",
+        "HIST-001",
+        "CERT-IMPACT-001",
+        "BE-SCORE-001",
+        "BE-SCORE-002",
+        "DB-PERF-001",
+        "DB-PERF-002",
+        "DB-PERF-003",
+        "BE-JOB-001",
+        "BE-JOB-002",
+        "BE-DEP-002"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-010",
+      "AUTO-013",
+      "AUTO-016"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "resolved bounded patch; systemic prevention outstanding",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "DATABASE_SQL_TESTED",
+      "API_RPC_TESTED",
+      "STAGED_HOSTED_TESTED",
+      "PRODUCTION_READBACK_VERIFIED"
+    ],
+    "evidence": [
+      "/private/tmp/bagger-r3-write-timeout/REPORT.md:41",
+      "/private/tmp/bagger-r3-write-timeout/REPORT.md:62",
+      "/private/tmp/bagger-r3-write-timeout/REPORT.md:80",
+      "/private/tmp/bagger-r1-open-incident/candidate/supabase/production_migrations/202609270120_bounded_late_r3_result_compatibility_v1.sql:3",
+      "/private/tmp/bagger-r1-open-incident/candidate/supabase/production_migrations/202608240021_production_scoring_operations.sql:1073",
+      "/private/tmp/bagger-r1-open-incident/candidate/supabase/production_migrations/202608290056_production_calcutta_v1.sql:1601"
+    ],
+    "limitations": [],
+    "original_detail": {
+      "id": "2026-INC-019",
+      "title": "Synchronous side-game invalidation made score writes time out",
+      "time": {
+        "failures": [
+          "2026-09-27T05:25:05.582Z",
+          "2026-09-27T05:26:18.776Z"
+        ],
+        "timeKnown": true
+      },
+      "release": {
+        "incident": 138,
+        "repair": 139
+      },
+      "activation": {
+        "incident": 237,
+        "repair": 238
+      },
+      "sha": {
+        "incident": "1f836836fbb547d847cda2166030da285e1cf8a9",
+        "repair": "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6"
+      },
+      "rootCause": "Hole and match writes synchronously fired Calcutta and Net Skins enqueue triggers. Calcutta current-result selection called a SQL STABLE compatibility function whose planner evaluated whole-history financial and consumed fingerprints even though result 407 had no qualifying receipt. Both score transactions hit the 8-second statement timeout (57014) and rolled back.",
+      "confidence": "PROVEN",
+      "strongestEvidence": [
+        "/private/tmp/bagger-r3-write-timeout/REPORT.md:41",
+        "/private/tmp/bagger-r3-write-timeout/REPORT.md:62",
+        "/private/tmp/bagger-r3-write-timeout/REPORT.md:80",
+        "/private/tmp/bagger-r1-open-incident/candidate/supabase/production_migrations/202609270120_bounded_late_r3_result_compatibility_v1.sql:3",
+        "/private/tmp/bagger-r1-open-incident/candidate/supabase/production_migrations/202608240021_production_scoring_operations.sql:1073",
+        "/private/tmp/bagger-r1-open-incident/candidate/supabase/production_migrations/202608290056_production_calcutta_v1.sql:1601"
+      ],
+      "actualProofLayers": [
+        "SOURCE_INSPECTED",
+        "DATABASE_SQL_TESTED",
+        "API_RPC_TESTED",
+        "STAGED_HOSTED_TESTED",
+        "PRODUCTION_READBACK_VERIFIED"
+      ],
+      "tests": [
+        "Two hosted SQLSTATE 57014 stacks",
+        "Original full RPC 2256–2360 ms local versus corrected 230–247 ms",
+        "17 timeout/replay/concurrency cases",
+        "Best Ball and Scramble full RPC regression",
+        "read-only hosted eligibility probe under 3 seconds"
+      ],
+      "whyCertificationMissed": "Score certification tested core scoring correctness and downstream results but did not budget every synchronous trigger under historical data growth. Planner-time execution of nested STABLE hashes was absent from unit fixtures and small datasets.",
+      "recovery": "Release 139 converted the compatibility function to PL/pgSQL with a cheap receipt/current-result eligibility return before planning the unchanged expensive predicate. No trigger, score RPC, guard, timeout, or side-game formula was weakened.",
+      "dataIntegrity": "Both original mutation IDs and target holes remained absent; neither request was retried by the repair task."
+    }
+  },
+  {
+    "id": "2026-INC-020",
+    "title": "Four physical R3 cards reconciled through supported authority; one was already complete at recovery",
+    "date_time": {
+      "recoveryWindow": "2026-09-27T09:12:16.559922Z–2026-09-27T09:15:12.423482Z",
+      "initialNeedTime": "UNKNOWN",
+      "timeKnown": false
+    },
+    "release": 139,
+    "activation": 238,
+    "sha": "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6",
+    "surface": [
+      "Director",
+      "Scoring recovery workflow"
+    ],
+    "severity": "P1",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Four cards required engineering-assisted comparison and finalization. Three needed 34 total missing-hole writes; the fourth completed independently and all 18 holes were exact skips. Across four cards, 38 matching Official holes were skipped.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "Zero conflicts, zero unknown outcomes, zero direct table writes, zero existing Official overwrites. Final R3 was 216/216 Official and 12/12 Final.",
+    "root_cause": "The retained evidence proves a physical-to-canonical completion gap after timeouts and concurrent scoring. It does not prove database corruption or establish one single cause for every missing hole. One card completed independently while recovery was running.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "Both participant clients depended on the same backend scoring path.",
+      "Director lacked a complete physical-card compare/skip/conflict/recover workflow available without engineering.",
+      "Fresh canonical reads were necessary because legitimate independent score activity continued."
+    ],
+    "detection_method": "Physical-card gross data compared with fresh canonical per-hole authority and recovery receipts.",
+    "recovery": "Sequential per-hole canonical read, exact gross-only submit with fresh mutation ID, immediate receipt/readback, skip exact matches, then finalize only after complete-card verification.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "No additional correction required for the supported card recovery after Release 139; productized recovery is future work.",
+    "release_required": "Release 139 addressed the separate score timeout; no further release needed for the recovery itself.",
+    "native_build_required": "No.",
+    "why_certification_missed": "Pre-tournament certification did not include an operator-grade paper-card reconciliation workflow for partial cards, concurrent writers, unknown responses, and already-Official holes.",
+    "test_that_would_catch": "NA-2026-020",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "DIR-REC-001",
+        "DIR-CLOSE-001",
+        "CERT-NA-001",
+        "CERT-PHY-001",
+        "OPS-DR-001",
+        "DIR-MOB-001",
+        "BE-SCORE-001",
+        "BE-SCORE-003",
+        "BE-SCORE-004",
+        "BE-JOB-003"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-003",
+      "AUTO-011"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "resolved bounded patch; systemic prevention outstanding",
+    "proof_layers": [
+      "API_RPC_TESTED",
+      "PRODUCTION_READBACK_VERIFIED",
+      "PHYSICAL_SCORECARD_VERIFIED",
+      "BOUNDED_RECOVERY_LIFECYCLE_VERIFIED"
+    ],
+    "evidence": [
+      "/private/tmp/bagger-r3-physical-recovery139/REPORT.md:10",
+      "/private/tmp/bagger-r3-physical-recovery139/REPORT.md:29",
+      "/private/tmp/bagger-r3-physical-recovery139/FINAL-SUMMARY.json:1"
+    ],
+    "limitations": "The bounded recovery need, recovery behavior, and absence of corruption in the compared scope are proven. No single cause for every initially missing hole is established.",
+    "original_detail": {
+      "id": "2026-INC-020",
+      "title": "Four physical R3 cards required canonical recovery; canonical corruption was not found",
+      "time": {
+        "recoveryWindow": "2026-09-27T09:12:16.559922Z–2026-09-27T09:15:12.423482Z",
+        "initialNeedTime": "UNKNOWN",
+        "timeKnown": false
+      },
+      "release": 139,
+      "activation": 238,
+      "sha": "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6",
+      "rootCause": "The retained evidence proves a physical-to-canonical completion gap after timeouts and concurrent scoring. It does not prove database corruption or establish one single cause for every missing hole. One card completed independently while recovery was running.",
+      "confidence": "PROVEN",
+      "confidenceScope": "The bounded recovery need, recovery behavior, and absence of corruption in the compared scope are proven. No single cause for every initially missing hole is established.",
+      "strongestEvidence": [
+        "/private/tmp/bagger-r3-physical-recovery139/REPORT.md:10",
+        "/private/tmp/bagger-r3-physical-recovery139/REPORT.md:29",
+        "/private/tmp/bagger-r3-physical-recovery139/FINAL-SUMMARY.json:1"
+      ],
+      "actualProofLayers": [
+        "API_RPC_TESTED",
+        "PRODUCTION_READBACK_VERIFIED",
+        "PHYSICAL_SCORECARD_VERIFIED",
+        "BOUNDED_RECOVERY_LIFECYCLE_VERIFIED"
+      ],
+      "tests": [
+        "Fresh read before every hole",
+        "72/72 physical holes and 144/144 gross values compared",
+        "34 supported writes",
+        "38 exact matches skipped",
+        "four supported finalizations",
+        "independent chronological result check"
+      ],
+      "whyCertificationMissed": "Pre-tournament certification did not include an operator-grade paper-card reconciliation workflow for partial cards, concurrent writers, unknown responses, and already-Official holes.",
+      "recovery": "Sequential per-hole canonical read, exact gross-only submit with fresh mutation ID, immediate receipt/readback, skip exact matches, then finalize only after complete-card verification.",
+      "dataIntegrity": "Zero conflicts, zero unknown outcomes, zero direct table writes, zero existing Official overwrites. Final R3 was 216/216 Official and 12/12 Final."
+    },
+    "incident_kind": "Recovery workload and product gap, not proof of prior canonical corruption",
+    "confidence_scope": "The bounded recovery need, recovery behavior, and absence of corruption in the compared scope are proven. No single cause for every initially missing hole is established."
+  },
+  {
+    "id": "2026-INC-021",
+    "title": "No supported way to clear the last draft Calcutta purchase before real auction",
+    "date_time": "2026-09-23; bounded preflight17:11:56Z / clear~17:12:20Z",
+    "release": {
+      "before": 132,
+      "after": 133
+    },
+    "activation": {
+      "after": 232
+    },
+    "sha": "f6929bbe5a254ab6e938c56184f336c5fc617666",
+    "surface": [
+      "Director",
+      "Backend",
+      "Workflow"
+    ],
+    "severity": "P1",
+    "user_impact": "Owner could not clear the last draft test purchase through the entry editor.",
+    "competitive_impact": "Presentation/workflow availability; no direct score or golf-result corruption established for this incident. Dependent failures are separate incident IDs.",
+    "data_integrity_impact": "Exact old revisions retained; one test entry removed through supported audited operation; no golf changed.",
+    "root_cause": "Save-entry contract could replace an entry but did not represent clearing the final entry; missing supported product operation.",
+    "confidence": "PROVEN",
+    "contributing_factors": [
+      "The normal entry-save workflow did not provide a supported clear-last-draft-purchase operation.",
+      "Complete test-entry cleanup was absent from the retained auction-entry lifecycle proof."
+    ],
+    "detection_method": "Retained Director last-entry cleanup report and supported bounded correction evidence.",
+    "recovery": "Release133 protected exact draft clear; auction1→2,publication2→3 unpublished, config2; immutable historical rows retained.",
+    "time_to_diagnose": "UNKNOWN",
+    "time_to_recover": "UNKNOWN",
+    "source_change_required": "Yes",
+    "release_required": 133,
+    "native_build_required": "No",
+    "why_certification_missed": "Auction entry/edit covered; final-entry removal lifecycle not represented as a supported operation.",
+    "test_that_would_catch": "NA-2026-021",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "DIR-FIN-001",
+        "CERT-NA-001"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-008"
+    ],
+    "observability_requirement": "Current auction and reviewable change receipt.",
+    "status": "bounded operation resolved; broader financial UX outstanding",
+    "proof_layers": [
+      "SOURCE_INSPECTED",
+      "DATABASE_SQL_TESTED",
+      "PRODUCTION_READBACK_VERIFIED"
+    ],
+    "evidence": [
+      "/private/tmp/bagger-calcutta-clear-production/REPORT.md"
+    ],
+    "limitations": "Not financial corruption; test cleanup preceded real auction."
+  },
+  {
+    "id": "2026-INC-022",
+    "title": "Overnight Production authority 503",
+    "date_time": "2026-09-26 01:34-01:35 EDT observed",
+    "release": 137,
+    "activation": 236,
+    "sha": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9",
+    "surface": [
+      "Infrastructure",
+      "Observability"
+    ],
+    "severity": "P0",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Identity/tournament/scoring authority became unavailable; recovery work had to stop.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "Fail-closed health suspended dependent capabilities and recovery work; canonical data corruption was not reported.",
+    "root_cause": "UNKNOWN: The reason for the restart; The exact outage start/end; A provider incident; Disk I/O budget reaching zero; A release binding mismatch; The historical query causing the outage",
+    "confidence": "PROVEN service interruption; root cause UNKNOWN",
+    "contributing_factors": [
+      "Database connection unavailability was surfaced as authority incompatibility.",
+      "Resource pressure is a primary hypothesis supported by the separate warning, but exact outage causation is unknown."
+    ],
+    "detection_method": "Preserved health/connection failure reports and later bounded read recovery; no provider root-cause proof.",
+    "recovery": "Bounded health observation and stopping unsafe work; see report. Root cause not closed by recovery.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "No source change proven to explain recovery; typed health and capacity controls proposed.",
+    "release_required": "No recovery release causally established for this outage.",
+    "native_build_required": "No native change proven to cause infrastructure recovery.",
+    "why_certification_missed": "No retained capacity/causal metric proof at relevant layer; see certification audit.",
+    "test_that_would_catch": "NA-2026-022",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "OBS-CORE-001",
+        "BE-CONTRACT-001",
+        "CERT-NA-001",
+        "OPS-DR-001",
+        "AUTO-HEALTH-001",
+        "AUTO-DEG-001"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-001",
+      "AUTO-013"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "outstanding cause/control gap",
+    "proof_layers": [
+      "RETAINED_REPORT",
+      "OWNER_OBSERVATION"
+    ],
+    "evidence": [
+      {
+        "path": "/private/tmp/bagger-r3-dependency-recovery/REPORT.md",
+        "supports": [
+          "INC-022 503",
+          "connection timeouts",
+          "90-second query timeout",
+          "same deployment and stop decision"
+        ]
+      },
+      {
+        "path": "/private/tmp/bagger-r3-morning-preflight/REPORT.md",
+        "supports": [
+          "overnight log correlation",
+          "postmaster restart time",
+          "healthy bounded window",
+          "root cause unknown"
+        ]
+      },
+      {
+        "path": "/private/tmp/bagger-r3-morning-preflight/overnight-logs-sanitized.json",
+        "supports": [
+          "two mobile health 503s",
+          "cron 503",
+          "deployment identity"
+        ]
+      }
+    ],
+    "limitations": [
+      "The reason for the restart",
+      "The exact outage start/end",
+      "A provider incident",
+      "Disk I/O budget reaching zero",
+      "A release binding mismatch",
+      "The historical query causing the outage"
+    ],
+    "original_detail": {
+      "id": "2026-INC-022",
+      "neverAgainTestId": "NA-2026-022",
+      "title": "Overnight Production authority 503",
+      "classification": "PROVEN service interruption; root cause UNKNOWN",
+      "window": "2026-09-26 01:34-01:35 EDT observed",
+      "impact": "Native health failed closed with identity/current-tournament authority unavailable and reads/auth/certification/scoring false. Root PWA HTML remained reachable but did not prove database-backed service health.",
+      "proven": [
+        "Mobile health returned HTTP 503 at 01:34:00 and 01:34:50 EDT; account-deletion cron returned 503 at 01:35.",
+        "The affected deployment was the same Release 137 deployment later observed healthy.",
+        "Supabase query-service login/connection attempts timed out.",
+        "A database postmaster start time of 02:34:52 EDT proves a later restart."
+      ],
+      "notProven": [
+        "The reason for the restart",
+        "The exact outage start/end",
+        "A provider incident",
+        "Disk I/O budget reaching zero",
+        "A release binding mismatch",
+        "The historical query causing the outage"
+      ],
+      "safeguardOutcome": "Fail-closed health suspended dependent capabilities and recovery work; canonical data corruption was not reported.",
+      "release": 137,
+      "activation": 236,
+      "sha": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+    }
+  },
+  {
+    "id": "2026-INC-023",
+    "title": "Morning authority outage recurrence and heavy live diagnostic risk",
+    "date_time": "2026-09-26 08:24 EDT observed",
+    "release": 137,
+    "activation": 236,
+    "sha": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9",
+    "surface": [
+      "Infrastructure",
+      "Observability"
+    ],
+    "severity": "P0",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Morning authority/database outage recurred while a broad diagnostic query was running; causation unproven.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "The operator stopped; no deployment, schema installation, or real recovery followed the failed health gate.",
+    "root_cause": "UNKNOWN: A live query plan or block/temp/WAL profile for the 90-second query; OOM, I/O exhaustion, lock contention, or provider failure at the exact window; The broad query causing rather than coinciding with the outage",
+    "confidence": "PROVEN recurrence; diagnostic hazard PROVEN; causal role UNKNOWN",
+    "contributing_factors": [
+      "A broad historical eligibility query ran for over 90 seconds on the shared live primary.",
+      "This created material diagnostic risk and coincided with the outage; causal attribution is unproven."
+    ],
+    "detection_method": "Preserved health/query-duration reports and owner observations; no causal query/resource time series.",
+    "recovery": "Bounded health observation and stopping unsafe work; see report. Root cause not closed by recovery.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "No source change proven to explain outage recovery; bounded diagnostic admission controls proposed.",
+    "release_required": "No recovery release causally established for this outage.",
+    "native_build_required": "No native change proven to cause infrastructure recovery.",
+    "why_certification_missed": "No retained capacity/causal metric proof at relevant layer; see certification audit.",
+    "test_that_would_catch": "NA-2026-023",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "OBS-CORE-001",
+        "PERF-001",
+        "OPS-SAFE-001",
+        "CERT-NA-001",
+        "HIST-001"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-013",
+      "AUTO-016"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "outstanding cause/control gap",
+    "proof_layers": [
+      "RETAINED_REPORT",
+      "OWNER_OBSERVATION"
+    ],
+    "evidence": [
+      {
+        "path": "/private/tmp/bagger-r3-recovery-continuation/REPORT.md",
+        "supports": [
+          "INC-023 08:24 recurrence",
+          "10.393-second health request",
+          "login timeout",
+          "historical payload sizes",
+          "causation limits"
+        ]
+      }
+    ],
+    "limitations": [
+      "A live query plan or block/temp/WAL profile for the 90-second query",
+      "OOM, I/O exhaustion, lock contention, or provider failure at the exact window",
+      "The broad query causing rather than coinciding with the outage"
+    ],
+    "original_detail": {
+      "id": "2026-INC-023",
+      "neverAgainTestId": "NA-2026-023",
+      "title": "Morning authority outage recurrence and heavy live diagnostic risk",
+      "classification": "PROVEN recurrence; diagnostic hazard PROVEN; causal role UNKNOWN",
+      "window": "2026-09-26 08:24 EDT observed",
+      "impact": "Recovery certification stopped; mobile health returned 503 after 10.393 seconds, PWA root took 10.303 seconds, and database access failed.",
+      "proven": [
+        "Three health samples and six bounded reads passed from 08:13-08:16 EDT, then health failed at 08:24:04.",
+        "A small fixture-dependency read failed during login-role initialization with a connection timeout.",
+        "A broad eligibility query did not finish within its 90-second client limit.",
+        "Offline exported fixture payloads included approximately 36.6 MB Calcutta jobs, 35.1 MB Net Skins jobs, and 13.6 MB Calcutta result history."
+      ],
+      "notProven": [
+        "A live query plan or block/temp/WAL profile for the 90-second query",
+        "OOM, I/O exhaustion, lock contention, or provider failure at the exact window",
+        "The broad query causing rather than coinciding with the outage"
+      ],
+      "safeguardOutcome": "The operator stopped; no deployment, schema installation, or real recovery followed the failed health gate.",
+      "release": 137,
+      "activation": 236,
+      "sha": "bae7d85ad72e81d42bee7a3f9d0f6c1ca0131ac9"
+    }
+  },
+  {
+    "id": "2026-INC-024",
+    "title": "Disk I/O budget warning and unproven capacity",
+    "date_time": "Approximately 2026-09-26 02:30, timezone not independently verified",
+    "release": "UNKNOWN in this source",
+    "activation": "UNKNOWN in this source",
+    "sha": "UNKNOWN in this source",
+    "surface": [
+      "Infrastructure",
+      "Observability"
+    ],
+    "severity": "P1",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Owner received a Disk I/O depletion warning; safe resource headroom was not established.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "The warning was preserved as a hypothesis and the known heavy Production aggregation was prohibited.",
+    "root_cause": "UNKNOWN: The warning's underlying metric values and timezone; Whether the budget hit 100 percent; Whether I/O pressure caused INC-022, INC-023, or the later scoring timeouts; Current compute, storage, pool, region, or plan configuration",
+    "confidence": "Owner warning PROVEN as reported; capacity gap STRONGLY SUPPORTED; outage causation UNKNOWN",
+    "contributing_factors": [
+      "No adequate retained capacity/headroom certification or numerical provider time series was located.",
+      "The owner-reported depletion warning establishes a warning, not the exact point of budget exhaustion or outage cause."
+    ],
+    "detection_method": "Owner-reported provider Disk I/O warning; numerical underlying metric series unavailable.",
+    "recovery": "Bounded health observation and stopping unsafe work; see report. Root cause not closed by recovery.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Capacity/diagnostic policy and telemetry improvements proposed; no incident-specific source fix proven.",
+    "release_required": "No application release required merely to acknowledge the provider warning.",
+    "native_build_required": "No.",
+    "why_certification_missed": "No retained capacity/causal metric proof at relevant layer; see certification audit.",
+    "test_that_would_catch": "NA-2026-024",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "OBS-CORE-001",
+        "CERT-001",
+        "OPS-SAFE-001",
+        "CERT-NA-001",
+        "OPS-DR-001",
+        "AUTO-DEG-001"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-013",
+      "AUTO-020"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "outstanding cause/control gap",
+    "proof_layers": [
+      "RETAINED_REPORT",
+      "OWNER_OBSERVATION"
+    ],
+    "evidence": [
+      {
+        "path": "/private/tmp/bagger-r3-continuous-recovery/DISK-IO-INCIDENT-ADDENDUM.md",
+        "supports": [
+          "owner-reported Disk I/O warning",
+          "primary hypothesis qualification",
+          "no causation claim",
+          "bounded-read constraint"
+        ]
+      },
+      {
+        "path": "/private/tmp/bagger-r3-write-timeout/RESOURCE-OBSERVATION.json",
+        "supports": [
+          "dated compute/storage/connection observation",
+          "missing Disk I/O and pool metrics",
+          "restart observation"
+        ]
+      }
+    ],
+    "limitations": [
+      "The warning's underlying metric values and timezone",
+      "Whether the budget hit 100 percent",
+      "Whether I/O pressure caused INC-022, INC-023, or the later scoring timeouts",
+      "Current compute, storage, pool, region, or plan configuration"
+    ],
+    "original_detail": {
+      "id": "2026-INC-024",
+      "neverAgainTestId": "NA-2026-024",
+      "title": "Disk I/O budget warning and unproven capacity",
+      "classification": "Owner warning PROVEN as reported; capacity gap STRONGLY SUPPORTED; outage causation UNKNOWN",
+      "window": "Approximately 2026-09-26 02:30, timezone not independently verified",
+      "impact": "Raised the credible risk that Production could throttle to disk baseline and become slow or unresponsive during tournament work.",
+      "proven": [
+        "Owner reported a Supabase warning that Production was depleting Disk I/O budget.",
+        "At a later Sep 27 observation the project showed Small/t3a.small, 2 GB shared compute, 8 GB gp3, 3000 provisioned IOPS and 125 MB/s.",
+        "At that later observation the Disk I/O budget, actual IOPS, actual throughput, pool metrics, and numeric I/O wait failed to load or were unavailable."
+      ],
+      "notProven": [
+        "The warning's underlying metric values and timezone",
+        "Whether the budget hit 100 percent",
+        "Whether I/O pressure caused INC-022, INC-023, or the later scoring timeouts",
+        "Current compute, storage, pool, region, or plan configuration"
+      ],
+      "safeguardOutcome": "The warning was preserved as a hypothesis and the known heavy Production aggregation was prohibited."
+    },
+    "incident_kind": "Provider warning/capacity-proof gap, not a proven causal outage"
+  },
+  {
+    "id": "2026-INC-025",
+    "title": "Insufficient observability prevented root-cause closure",
+    "date_time": "Cross-cutting across Sep 23-27 investigations",
+    "release": "UNKNOWN in this source",
+    "activation": "UNKNOWN in this source",
+    "sha": "UNKNOWN in this source",
+    "surface": [
+      "Infrastructure",
+      "Observability"
+    ],
+    "severity": "P1",
+    "severity_note": "Historical operational severity. P0 means round/scoring availability or completion blocked; no implied corruption. Native-only degradation with functioning PWA is P1.",
+    "user_impact": "Missing request/resource/phone correlation prevented complete causal diagnosis and precise operational measurement.",
+    "competitive_impact": "Availability/completion risk; no proven formula or Official corruption in examined evidence.",
+    "data_integrity_impact": "Reports consistently retained UNKNOWN rather than inventing causation.",
+    "root_cause": "UNKNOWN: A single common root cause for all failures; That additional provider telemetry would by itself have prevented the incidents",
+    "confidence": "PROVEN cross-cutting control gap; may be recorded as a contributing condition instead of a distinct outage",
+    "contributing_factors": [
+      "Missing request/resource/physical-client correlation limited causal attribution and duration measurement.",
+      "Temporary local evidence retention did not provide complete durable provider and application telemetry."
+    ],
+    "detection_method": "Audit of retained logs/reports revealed missing correlation and capacity evidence; not a separate outage trace.",
+    "recovery": "Bounded health observation and stopping unsafe work; see report. Root cause not closed by recovery.",
+    "time_to_diagnose": "UNKNOWN — exact first detection and diagnosis boundaries not fully retained",
+    "time_to_recover": "UNKNOWN — observations bound recovery, not full outage duration",
+    "source_change_required": "Yes for the proposed cross-layer telemetry and durable evidence system; not an outage patch.",
+    "release_required": "Future scoped observability releases/configuration, not a historical recovery release.",
+    "native_build_required": "Native telemetry requires a future build; not needed for past canonical data integrity.",
+    "why_certification_missed": "No retained capacity/causal metric proof at relevant layer; see certification audit.",
+    "test_that_would_catch": "NA-2026-025",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "OBS-CORE-001"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-001",
+      "AUTO-017"
+    ],
+    "observability_requirement": "Scoped request/operation/mutation correlation; domain error, latency and resource context; no secrets.",
+    "status": "outstanding cause/control gap",
+    "proof_layers": [
+      "RETAINED_REPORT",
+      "OWNER_OBSERVATION"
+    ],
+    "evidence": [
+      {
+        "path": "/private/tmp/bagger-r3-morning-preflight/REPORT.md",
+        "supports": [
+          "overnight log correlation",
+          "postmaster restart time",
+          "healthy bounded window",
+          "root cause unknown"
+        ]
+      },
+      {
+        "path": "/private/tmp/bagger-r3-write-timeout/REPORT.md",
+        "supports": [
+          "separate proven derived-trigger timeout",
+          "8-second settings",
+          "observed Small compute",
+          "unavailable I/O/pool telemetry",
+          "repair certification"
+        ]
+      },
+      {
+        "path": "/private/tmp/bagger-build9-performance/REPORT.md",
+        "supports": [
+          "spectator latency observations",
+          "payload sizes",
+          "cache/request graph",
+          "no p95 or capacity proof",
+          "physical cause unknown"
+        ]
+      }
+    ],
+    "limitations": [
+      "A single common root cause for all failures",
+      "That additional provider telemetry would by itself have prevented the incidents"
+    ],
+    "original_detail": {
+      "id": "2026-INC-025",
+      "neverAgainTestId": "NA-2026-025",
+      "title": "Insufficient observability prevented root-cause closure",
+      "classification": "PROVEN cross-cutting control gap; may be recorded as a contributing condition instead of a distinct outage",
+      "window": "Cross-cutting across Sep 23-27 investigations",
+      "impact": "The team could not correlate service failures with database I/O, wait, connection-pool, restart/change, or query metrics and could not conclusively identify the physical spectator event.",
+      "proven": [
+        "Overnight 503 records had no attached runtime exception details.",
+        "Public health intentionally reduced component errors to one AUTHORITY_INCOMPATIBLE response.",
+        "Disk budget, IOPS, throughput, pool metrics, and numeric I/O wait were unavailable in the later dashboard observation.",
+        "Build 9 spectator logs lacked server/upstream duration and could not conclusively correlate the physical request.",
+        "The Sep 27 timeout investigation only became conclusive after authenticated raw database logs exposed the trigger stack."
+      ],
+      "notProven": [
+        "A single common root cause for all failures",
+        "That additional provider telemetry would by itself have prevented the incidents"
+      ],
+      "safeguardOutcome": "Reports consistently retained UNKNOWN rather than inventing causation."
+    },
+    "incident_kind": "Cross-cutting control gap, not an additional independent outage"
+  },
+  {
+    "id": "2026-INC-026",
+    "title": "Physical spectator slow/unavailable observation without request-level causal proof",
+    "date_time": "2026-09-23 Build9 performance investigation; exact physical request UNKNOWN",
+    "release": 132,
+    "activation": "UNKNOWN for exact physical request",
+    "sha": "UNKNOWN for the exact physical event",
+    "surface": [
+      "Native",
+      "Network",
+      "Observability"
+    ],
+    "severity": "P1",
+    "user_impact": "A physical spectator slow/unavailable experience could not be correlated conclusively to a particular request.",
+    "competitive_impact": "Presentation/workflow availability; no direct score or golf-result corruption established for this incident. Dependent failures are separate incident IDs.",
+    "data_integrity_impact": "No competitive write involved.",
+    "root_cause": "UNKNOWN. Candidate requests near observation were200; duration/upstream/correlation unavailable.",
+    "confidence": "UNKNOWN",
+    "contributing_factors": [
+      "The physical observation lacked a matching request ID and retained network timings.",
+      "No specific server or native source defect can be assigned to that event from the observation alone."
+    ],
+    "detection_method": "Owner physical spectator slow/unavailable observation without matching request/network timing.",
+    "recovery": "Subsequent bounded reads healthy; this does not prove root-cause repair.",
+    "time_to_diagnose": "UNKNOWN",
+    "time_to_recover": "UNKNOWN",
+    "source_change_required": "UNKNOWN",
+    "release_required": "Not proven",
+    "native_build_required": "Not proven",
+    "why_certification_missed": "Latency snapshots and simulator response handling did not prove long-lived physical network performance.",
+    "test_that_would_catch": "NA-2026-026",
+    "architectural_prevention": {
+      "requirement_ids": [
+        "OBS-CORE-001"
+      ],
+      "note": "Proposed acceptance and systemic prevention in REQUIREMENTS.md; implementation not performed."
+    },
+    "automation_opportunity": [
+      "AUTO-023",
+      "AUTO-024"
+    ],
+    "observability_requirement": "Client trace, response phase timing, network class without PII.",
+    "status": "ROOT CAUSE UNKNOWN",
+    "proof_layers": [
+      "PHYSICAL_OWNER_OBSERVATION",
+      "RETAINED_REPORT"
+    ],
+    "evidence": [
+      "/private/tmp/bagger-build9-performance/REPORT.md"
+    ],
+    "limitations": "No deterministic reproduction of the exact physical event; test future analogous fault containment, not invented historical cause."
+  }
+]

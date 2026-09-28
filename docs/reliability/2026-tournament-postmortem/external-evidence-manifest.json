@@ -1,0 +1,4549 @@
+{
+  "$schemaVersion": 1,
+  "generatedAt": "2026-09-28T04:18:29.519960+00:00",
+  "purpose": "Portable map for machine-specific paths retained verbatim in the preserved reports.",
+  "policy": {
+    "rawExternalArtifactsCopied": false,
+    "reason": "External evidence was not copied because it requires bounded content and sensitivity review before durable archival.",
+    "consumerRule": "Resolve a report path through originalMachinePath to portableRef. PINNED_GIT_SOURCE entries may use the recorded SHA/path. Other evidence remains unresolved until a sanitized private archive records that portableRef."
+  },
+  "sourceSnapshots": [
+    {
+      "root": "/private/tmp/bagger-r1-open-incident/candidate",
+      "sha": "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6",
+      "gitObjectAvailableInDestination": true,
+      "referencedFilesMatchPinnedCommit": true
+    },
+    {
+      "root": "/private/tmp/bagger-r1-open-incident/source",
+      "sha": "2533b98a7d0de44b6d10c7f14444c6627e70a2ee",
+      "gitObjectAvailableInDestination": true,
+      "referencedFilesMatchPinnedCommit": true,
+      "note": "Snapshot had unrelated local changes; every referenced file matched the pinned commit."
+    },
+    {
+      "root": "/private/tmp/bagger-build10-today/native",
+      "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+      "gitObjectAvailableInDestination": false,
+      "referencedFilesMatchPinnedCommit": true,
+      "note": "Pinned commit belongs to the external native repository and is not present in the destination repository object database."
+    }
+  ],
+  "summary": {
+    "referenceOccurrences": 508,
+    "uniquePaths": 81,
+    "referringPackageFiles": 23,
+    "existingAtPreservation": 81,
+    "pinnedSourcePaths": 26,
+    "externalEvidencePaths": 54,
+    "packageSelfReferences": 1
+  },
+  "entries": [
+    {
+      "id": "EXT-001",
+      "portableRef": "evidence://bagger-2026/EXT-001",
+      "originalMachinePath": "/private/tmp/bagger-2026-postmortem/",
+      "objectType": "directory",
+      "observedExistsAtPreservation": true,
+      "sha256": null,
+      "bytes": null,
+      "kind": "package-self-reference",
+      "resolution": {
+        "status": "PACKAGE_RELATIVE",
+        "relativePath": "./"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "READ-ONLY-VERIFICATION.md",
+          "line": 7,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-002",
+      "portableRef": "evidence://bagger-2026/EXT-002",
+      "originalMachinePath": "/private/tmp/bagger-build10-today-fallback-audit/ERROR-MATRIX.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "4940c490981b5b0e1d76e023a7124f027c112524ece3d53d3be75790f721f250",
+      "bytes": 9729,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 243,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1786,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1285,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1374,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-003",
+      "portableRef": "evidence://bagger-2026/EXT-003",
+      "originalMachinePath": "/private/tmp/bagger-build10-today-fallback-audit/FALLBACK-INVENTORY.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "a920655ecf763addb85e8b16bbf05dd3eaf0c3d6def4e1651905e8c10297f397",
+      "bytes": 11373,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 243,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "25-NATIVE-NAVIGATION.md",
+          "line": 20,
+          "sourceLine": 5,
+          "sourceEndLine": 38
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1698,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1273,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1362,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-004",
+      "portableRef": "evidence://bagger-2026/EXT-004",
+      "originalMachinePath": "/private/tmp/bagger-build10-today-fallback-audit/NAVIGATION-ARCHITECTURE.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "47a270263caed2e0981623d81c95ecb14f6f3fe62fe65d67876fa95e229e8077",
+      "bytes": 7081,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 243,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1742,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1279,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1368,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-005",
+      "portableRef": "evidence://bagger-2026/EXT-005",
+      "originalMachinePath": "/private/tmp/bagger-build10-today-fallback-audit/ODDS.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "4da95b790f15f73d0e9552ad73d4adff57714cf7c06756ed235ff0127c9e4756",
+      "bytes": 3347,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 277,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1820,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1499,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1540,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-006",
+      "portableRef": "evidence://bagger-2026/EXT-006",
+      "originalMachinePath": "/private/tmp/bagger-build10-today-fallback-audit/R3-NET-SKINS.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "bf607e37463ce0f7a1cddf6a88e32839c3e8c3452246d1a636c569073c34f7f0",
+      "bytes": 5315,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 311,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 311,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1923,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1958,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1652,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1658,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1712,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1718,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-007",
+      "portableRef": "evidence://bagger-2026/EXT-007",
+      "originalMachinePath": "/private/tmp/bagger-build10-today-fallback-audit/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "ceb46cd2ef24514f9eea7cd8527dfda222dc971449504e994a6fb5e1ba2d7d48",
+      "bytes": 23819,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 243,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 243,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 277,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 311,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1610,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1654,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1888,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2098,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1261,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1267,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1350,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1356,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1511,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1552,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1682,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1742,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-008",
+      "portableRef": "evidence://bagger-2026/EXT-008",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "8661abebbfc426b4a811e1ad11d219d200f74c95748f410daa2a57929c9d0ea4",
+      "bytes": 9090,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 141,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "05-PRIOR-CERTIFICATION-TRUST-AUDIT.md",
+          "line": 17,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 751,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 631,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 700,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-009",
+      "portableRef": "evidence://bagger-2026/EXT-009",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native",
+      "objectType": "directory",
+      "observedExistsAtPreservation": true,
+      "sha256": null,
+      "bytes": null,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "07-BUILD11-SPEC.md",
+          "line": 5,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "READ-ONLY-VERIFICATION.md",
+          "line": 20,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-010",
+      "portableRef": "evidence://bagger-2026/EXT-010",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/App/AppCoordinator.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "a8cb5bef93c4eaaf6d222418ce3b7ad465abca5bcce7f60a12f4f994d823ce0d",
+      "bytes": 34205,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/App/AppCoordinator.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 243,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1478,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1243,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1332,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-011",
+      "portableRef": "evidence://bagger-2026/EXT-011",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/BaggerInvApp.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "97bdba6f3f47bbd29cd210e555294f1a8f0d4b88c694e11099663b3ab4643a20",
+      "bytes": 3462,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/BaggerInvApp.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 107,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 464,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 439,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 496,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-012",
+      "portableRef": "evidence://bagger-2026/EXT-012",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Data/MobileReadRepository.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "8b30af93582bc5dd01eb5ae8f273574a032418e53a6021a2dbe0f25e953ce661",
+      "bytes": 27122,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Data/MobileReadRepository.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 243,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1390,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1231,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1320,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-013",
+      "portableRef": "evidence://bagger-2026/EXT-013",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Data/TournamentDataCoordinator.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "dcc2dc8be5aa42decd38e8d2e801d4f88afbcd2d5e871fafef2853de72e5cadf",
+      "bytes": 46311,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Data/TournamentDataCoordinator.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 243,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1434,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1237,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1326,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-014",
+      "portableRef": "evidence://bagger-2026/EXT-014",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Models/MobileCalcuttaQAModels.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "fb057e10d760b05e66d63dab905d01ea7c789fd30262818812d7f50b16d129bb",
+      "bytes": 8898,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Models/MobileCalcuttaQAModels.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 311,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2063,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1676,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1736,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-015",
+      "portableRef": "evidence://bagger-2026/EXT-015",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Models/MobileMatchDetailModels.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "cbdaa786b1a30887f7ead127a984aa6db120799fc2f4d2993d25152fafa4cecb",
+      "bytes": 30967,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Models/MobileMatchDetailModels.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 71,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 324,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 270,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 330,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-016",
+      "portableRef": "evidence://bagger-2026/EXT-016",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Models/MobileNetSkinsQAModels.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "ed247f260aef7bf27aeb28d3464751fab2b46e44319ddb1a350645effb377928",
+      "bytes": 9084,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Models/MobileNetSkinsQAModels.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 311,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2028,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1670,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1730,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-017",
+      "portableRef": "evidence://bagger-2026/EXT-017",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Models/MobileOddsModels.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "3e54f4dcc81da4ae3616acd22d9fd768f4663d4cf6ba75c57b46903d574d7351",
+      "bytes": 5649,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Models/MobileOddsModels.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 277,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1854,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1505,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1546,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-018",
+      "portableRef": "evidence://bagger-2026/EXT-018",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Networking/MobileAPIClient.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "c6b7673356550ee9bdd57b59873952bcf943988c6d50ffce4e0bbf9044f1a13c",
+      "bytes": 49905,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Networking/MobileAPIClient.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 311,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1993,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1664,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1724,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-019",
+      "portableRef": "evidence://bagger-2026/EXT-019",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Presentation/ScoreHoleStrokeBadge.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "4ba6524cf7cdc97e3f86908b3b62c407b3080733d2ad85d35d2de921161e0ed9",
+      "bytes": 455,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Presentation/ScoreHoleStrokeBadge.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 175,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 883,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 811,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 864,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-020",
+      "portableRef": "evidence://bagger-2026/EXT-020",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Presentation/ScoringPresentation.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "efaca46a2ead7153bdb472ba8567e4ee0350bceb1061351e718d76fffda68158",
+      "bytes": 26274,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Presentation/ScoringPresentation.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 175,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 850,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 805,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 858,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-021",
+      "portableRef": "evidence://bagger-2026/EXT-021",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/ScoringQueue/SQLiteScoringQueueRepository.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "ce9117ba687b441bb1f0e7a0d0c9940c0cfd78ec1f1518d70515c1c6842b8fd8",
+      "bytes": 129408,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/ScoringQueue/SQLiteScoringQueueRepository.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 209,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 209,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 959,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1002,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 979,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 985,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1063,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1069,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-022",
+      "portableRef": "evidence://bagger-2026/EXT-022",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/ScoringQueue/ScoringQueueCoordinator.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "eaa5a17169498a656fbb9f86d2447ae93fc1eb0cccecedbb3b826978d25fc432",
+      "bytes": 139230,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/ScoringQueue/ScoringQueueCoordinator.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 209,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 209,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1045,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1088,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 991,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 997,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1075,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1081,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-023",
+      "portableRef": "evidence://bagger-2026/EXT-023",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Spectator/SpectatorAppShell.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "6967cffa9f772554bcbbd422aaa359682a2705548d4998ee080f5ddba97a7f3b",
+      "bytes": 12886,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Spectator/SpectatorAppShell.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 107,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 141,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 499,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 715,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 445,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 502,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 625,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 694,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-024",
+      "portableRef": "evidence://bagger-2026/EXT-024",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Spectator/SpectatorStore.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "271c10784650f334117d3b6e0c96fedd86773b8572538ac45af6fdfdaac4ce47",
+      "bytes": 7771,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Spectator/SpectatorStore.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 141,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 679,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 619,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 688,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-025",
+      "portableRef": "evidence://bagger-2026/EXT-025",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Views/AppTabShell.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "aeee686da80ab3a9db2c17a1515005003c0c8140d372f7a53eae979c0b1c4d9c",
+      "bytes": 30511,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Views/AppTabShell.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 243,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1566,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1255,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1344,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-026",
+      "portableRef": "evidence://bagger-2026/EXT-026",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Views/RootView.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "4d7b65aa7cd1abe79bd3d2bdd2e507d59e42064061d36afbaf3732b0b357c8ac",
+      "bytes": 9487,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Views/RootView.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 243,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1522,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1249,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1338,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-027",
+      "portableRef": "evidence://bagger-2026/EXT-027",
+      "originalMachinePath": "/private/tmp/bagger-build10-today/native/ios/BaggerInv/Views/Score/ScoreEntryControls.swift",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "4dba9a6be671c115a85fe411ce9ed4c95e0faba27399d9d266d36ecadf43235d",
+      "bytes": 12511,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_EXTERNAL_GIT_SOURCE",
+        "sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+        "repositoryRelativePath": "ios/BaggerInv/Views/Score/ScoreEntryControls.swift",
+        "gitObjectAvailableInDestination": false
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 175,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 916,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 817,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 870,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-028",
+      "portableRef": "evidence://bagger-2026/EXT-028",
+      "originalMachinePath": "/private/tmp/bagger-build8-shipping/DEPLOYMENT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "c509e4a6deb370e5f4dda93f724a18d5aded307d3e621c8b99669ba68ca6e6ee",
+      "bytes": 2980,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "01-TOURNAMENT-TIMELINE.md",
+          "line": 14,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-029",
+      "portableRef": "evidence://bagger-2026/EXT-029",
+      "originalMachinePath": "/private/tmp/bagger-build8-shipping/NATIVE-CERTIFICATION.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "b985a7a9ca8452eeb30de859f2df897d5ae2153aa0bc224c3ce8da191135129a",
+      "bytes": 4210,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "05-PRIOR-CERTIFICATION-TRUST-AUDIT.md",
+          "line": 17,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-030",
+      "portableRef": "evidence://bagger-2026/EXT-030",
+      "originalMachinePath": "/private/tmp/bagger-build8-shipping/NAVIGATION-BLOCKER.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "0fb8fe1a219934f2485c9d1afddad6387993debefb066764493e9459ac75881d",
+      "bytes": 1709,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 71,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 287,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 264,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 324,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-031",
+      "portableRef": "evidence://bagger-2026/EXT-031",
+      "originalMachinePath": "/private/tmp/bagger-build8-shipping/NAVIGATION-BLOCKER.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "8f2e1d4d5fe6c52b6a66cb8e4f80cded3f8dfcb769dca11a41784d6baef8cc36",
+      "bytes": 5316,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 71,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 250,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 258,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 318,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-032",
+      "portableRef": "evidence://bagger-2026/EXT-032",
+      "originalMachinePath": "/private/tmp/bagger-build8-shipping/navigation-correction/CORRECTION.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "f33f951b4f9c79853400426d669dc8ee70c0997467325877e08494c533cc3e40",
+      "bytes": 3461,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 71,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 213,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 252,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 312,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-033",
+      "portableRef": "evidence://bagger-2026/EXT-033",
+      "originalMachinePath": "/private/tmp/bagger-build8-shipping/navigation-correction/PREDECESSOR-EVIDENCE.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "1a156a196ac93818a2f25e879a18d8922daea37d8ef172c7fa3cff182e4dc201",
+      "bytes": 1342,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 37,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 32,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 68,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 130,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-034",
+      "portableRef": "evidence://bagger-2026/EXT-034",
+      "originalMachinePath": "/private/tmp/bagger-build8-shipping/navigation-correction/closure-state.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "29643e2134a412f9c8a269fa589f7e3a76f2f5ba08d0f64c5b2e2624767f5506",
+      "bytes": 4636,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 73,
+          "sourceLine": 13,
+          "sourceEndLine": null
+        },
+        {
+          "file": "56-EVIDENCE-LEDGER.md",
+          "line": 28,
+          "sourceLine": 13,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 4412,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 276,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-035",
+      "portableRef": "evidence://bagger-2026/EXT-035",
+      "originalMachinePath": "/private/tmp/bagger-build9-more/DIAGNOSIS.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "1403d63018137b1c7db044ac859ee3da343782f8a562f233f78c2fefa60239d0",
+      "bytes": 993,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 107,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 429,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 433,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 490,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-036",
+      "portableRef": "evidence://bagger-2026/EXT-036",
+      "originalMachinePath": "/private/tmp/bagger-build9-more/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "546a0f7faf272fdd2a6c32162a36750ce8794879262822996fd9119b441929ef",
+      "bytes": 7576,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 107,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 107,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "05-PRIOR-CERTIFICATION-TRUST-AUDIT.md",
+          "line": 17,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 359,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 394,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 421,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 427,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 478,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 484,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-037",
+      "portableRef": "evidence://bagger-2026/EXT-037",
+      "originalMachinePath": "/private/tmp/bagger-build9-performance/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "4b459d58085ff08b5c7634780aa3dcf8dcae8f4f17c8054027ce566a44018819",
+      "bytes": 23122,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 141,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 141,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 141,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 141,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 857,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 891,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 535,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 571,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 607,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 643,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 4356,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 4388,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 595,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 601,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 607,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 613,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 664,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 670,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 676,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 682,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3480,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3564,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-038",
+      "portableRef": "evidence://bagger-2026/EXT-038",
+      "originalMachinePath": "/private/tmp/bagger-calcutta-activation-repair/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "19e963626e4be0ecdfa35fd426b39c3e8cfea45bd058bada6d874edac9a5f479",
+      "bytes": 14970,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "01-TOURNAMENT-TIMELINE.md",
+          "line": 16,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 379,
+          "sourceLine": 62,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2458,
+          "sourceLine": 62,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1954,
+          "sourceLine": 62,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1986,
+          "sourceLine": 62,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-039",
+      "portableRef": "evidence://bagger-2026/EXT-039",
+      "originalMachinePath": "/private/tmp/bagger-calcutta-clear-production/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "46f01d9cabaa86404ba77fbadc92a42745aa50928cd029bcc8f6dc08549516b7",
+      "bytes": 7003,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "01-TOURNAMENT-TIMELINE.md",
+          "line": 15,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 721,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 4036,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3102,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-040",
+      "portableRef": "evidence://bagger-2026/EXT-040",
+      "originalMachinePath": "/private/tmp/bagger-calcutta-ownership-readonly/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "6d13e095f6b94ebcccd33f0b56f8ccd8921b7c4d840dbbeee100f35db5902c81",
+      "bytes": 3716,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "19-SIDE-GAME-LIFECYCLE.md",
+          "line": 34,
+          "sourceLine": 3,
+          "sourceEndLine": 27
+        },
+        {
+          "file": "22-CURRENT-POINTER-ARCHITECTURE.md",
+          "line": 93,
+          "sourceLine": 3,
+          "sourceEndLine": 27
+        },
+        {
+          "file": "47-BACKEND-ROADMAP.md",
+          "line": 112,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "65-CRITICAL-PATH-DIAGRAMS.md",
+          "line": 165,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-041",
+      "portableRef": "evidence://bagger-2026/EXT-041",
+      "originalMachinePath": "/private/tmp/bagger-calcutta-processor-incident/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "eb76f274d26ae5240e4385838528f15a2ac666a2544300842130f84950a6375b",
+      "bytes": 12195,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 345,
+          "sourceLine": 7,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 345,
+          "sourceLine": 63,
+          "sourceEndLine": null
+        },
+        {
+          "file": "08-BACKEND-HARDENING.md",
+          "line": 74,
+          "sourceLine": 63,
+          "sourceEndLine": 118
+        },
+        {
+          "file": "09-DATABASE-SQL.md",
+          "line": 77,
+          "sourceLine": 63,
+          "sourceEndLine": 100
+        },
+        {
+          "file": "47-BACKEND-ROADMAP.md",
+          "line": 108,
+          "sourceLine": 63,
+          "sourceEndLine": 118
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2130,
+          "sourceLine": 7,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2165,
+          "sourceLine": 63,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1836,
+          "sourceLine": 7,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1837,
+          "sourceLine": 63,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1857,
+          "sourceLine": 7,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1858,
+          "sourceLine": 63,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-042",
+      "portableRef": "evidence://bagger-2026/EXT-042",
+      "originalMachinePath": "/private/tmp/bagger-calcutta-processor-incident/installed-claim.sql",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "9957e1321550e1e4742a31ec84141b7f25f0685b0c26855fde2cdfa32e9ef3dd",
+      "bytes": 9152,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 345,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2200,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1838,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1859,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-043",
+      "portableRef": "evidence://bagger-2026/EXT-043",
+      "originalMachinePath": "/private/tmp/bagger-calcutta-processor-incident/local-reproduction.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "fceff544febc48cb6bb62d0458f06944acda13ce73561a308ebaa68f0a94b61c",
+      "bytes": 1090,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 345,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2235,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1839,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1860,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-044",
+      "portableRef": "evidence://bagger-2026/EXT-044",
+      "originalMachinePath": "/private/tmp/bagger-calcutta-processor-repair/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "a037ac5b56a66726f42a7862e67ee0f2982f192d444aaacb574b1025dfbe162b",
+      "bytes": 11549,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 379,
+          "sourceLine": 82,
+          "sourceEndLine": null
+        },
+        {
+          "file": "08-BACKEND-HARDENING.md",
+          "line": 75,
+          "sourceLine": 82,
+          "sourceEndLine": 109
+        },
+        {
+          "file": "20-DEPENDENCY-GRAPH.md",
+          "line": 135,
+          "sourceLine": 82,
+          "sourceEndLine": 109
+        },
+        {
+          "file": "24-JOB-ARCHITECTURE.md",
+          "line": 104,
+          "sourceLine": 82,
+          "sourceEndLine": 109
+        },
+        {
+          "file": "47-BACKEND-ROADMAP.md",
+          "line": 109,
+          "sourceLine": 82,
+          "sourceEndLine": 109
+        },
+        {
+          "file": "65-CRITICAL-PATH-DIAGRAMS.md",
+          "line": 165,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2317,
+          "sourceLine": 82,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1951,
+          "sourceLine": 82,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1983,
+          "sourceLine": 82,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-045",
+      "portableRef": "evidence://bagger-2026/EXT-045",
+      "originalMachinePath": "/private/tmp/bagger-calcutta-processor-repair/release-conflict-local-proof.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "32f9eb2ea55d1ab12a65d63ec6f1254f373a7b7171799ddd0798255033734782",
+      "bytes": 881,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 379,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2411,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1953,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1985,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-046",
+      "portableRef": "evidence://bagger-2026/EXT-046",
+      "originalMachinePath": "/private/tmp/bagger-calcutta-processor-repair/release-job-authority.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "1aa487768092c58afed275926334ee2de0e23184a5f7f15e48e664eb42b9ad94",
+      "bytes": 122834,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 379,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2364,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1952,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1984,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-047",
+      "portableRef": "evidence://bagger-2026/EXT-047",
+      "originalMachinePath": "/private/tmp/bagger-live-pwa-incident/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "c10651ab6491bd11e27a38e3915634d0b54c6b0eea9b5cd066a41d184ca58e52",
+      "bytes": 21766,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "01-TOURNAMENT-TIMELINE.md",
+          "line": 19,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 481,
+          "sourceLine": 96,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 481,
+          "sourceLine": 110,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 481,
+          "sourceLine": 15,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 515,
+          "sourceLine": 130,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 515,
+          "sourceLine": 141,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 515,
+          "sourceLine": 44,
+          "sourceEndLine": null
+        },
+        {
+          "file": "08-BACKEND-HARDENING.md",
+          "line": 77,
+          "sourceLine": 96,
+          "sourceEndLine": 143
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2816,
+          "sourceLine": 96,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2856,
+          "sourceLine": 110,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2896,
+          "sourceLine": 15,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2927,
+          "sourceLine": 130,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2958,
+          "sourceLine": 141,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2989,
+          "sourceLine": 44,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2323,
+          "sourceLine": 96,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2324,
+          "sourceLine": 110,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2325,
+          "sourceLine": 15,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2347,
+          "sourceLine": 96,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2348,
+          "sourceLine": 110,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2349,
+          "sourceLine": 15,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2423,
+          "sourceLine": 130,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2424,
+          "sourceLine": 141,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2425,
+          "sourceLine": 44,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2441,
+          "sourceLine": 130,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2442,
+          "sourceLine": 141,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2443,
+          "sourceLine": 44,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-048",
+      "portableRef": "evidence://bagger-2026/EXT-048",
+      "originalMachinePath": "/private/tmp/bagger-live-r1-multidevice/REAL-CLOCK.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "08b0f97bb67a3191e441dae15cf748fb623eb92c57168708b2c63067d5b9090f",
+      "bytes": 562,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 209,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1260,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1021,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1105,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-049",
+      "portableRef": "evidence://bagger-2026/EXT-049",
+      "originalMachinePath": "/private/tmp/bagger-live-r1-multidevice/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "e6fbb2df034ba4c6b82ea9debfcf1e6fc4463573d32e93e1fae667401ade3e7c",
+      "bytes": 18742,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 209,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 209,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1131,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1174,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1003,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1009,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1087,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1093,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-050",
+      "portableRef": "evidence://bagger-2026/EXT-050",
+      "originalMachinePath": "/private/tmp/bagger-live-r1-multidevice/SQLITE-PROBE.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "eec2c82f543257cec2e2715628c5c9b16fb5c0726bee3d190c506963c4fa07e4",
+      "bytes": 945,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 209,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1217,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1015,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1099,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-051",
+      "portableRef": "evidence://bagger-2026/EXT-051",
+      "originalMachinePath": "/private/tmp/bagger-live-r1-strokes/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "eb7fa0ea27ad888f92078a8f06f496790ef771fc643c7ed33f17cedc0332f521",
+      "bytes": 19384,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 175,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 175,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 784,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 817,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 793,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 799,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 846,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 852,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-052",
+      "portableRef": "evidence://bagger-2026/EXT-052",
+      "originalMachinePath": "/private/tmp/bagger-native-recovery-audit/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "cdcf6d93c41d94ba85b86ae399b7bc96ad5fc6873f3847a10c58405ef065b837",
+      "bytes": 20724,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "00-EXECUTIVE-SUMMARY.md",
+          "line": 19,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 209,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 209,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "05-PRIOR-CERTIFICATION-TRUST-AUDIT.md",
+          "line": 17,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "OWNER-DECISION-PACKAGE.md",
+          "line": 74,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1303,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 1346,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1027,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1033,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1111,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1117,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-053",
+      "portableRef": "evidence://bagger-2026/EXT-053",
+      "originalMachinePath": "/private/tmp/bagger-net-skins-incident/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "84958362e753f1cac9109fd9ffa97adeddb87d6b594d48c2c6b9b80b7fe03c3a",
+      "bytes": 27156,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 413,
+          "sourceLine": 82,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 413,
+          "sourceLine": 124,
+          "sourceEndLine": null
+        },
+        {
+          "file": "09-DATABASE-SQL.md",
+          "line": 78,
+          "sourceLine": 124,
+          "sourceEndLine": 150
+        },
+        {
+          "file": "19-SIDE-GAME-LIFECYCLE.md",
+          "line": 44,
+          "sourceLine": 60,
+          "sourceEndLine": 80
+        },
+        {
+          "file": "47-BACKEND-ROADMAP.md",
+          "line": 108,
+          "sourceLine": 52,
+          "sourceEndLine": 83
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2502,
+          "sourceLine": 82,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2547,
+          "sourceLine": 124,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2078,
+          "sourceLine": 82,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2079,
+          "sourceLine": 124,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2107,
+          "sourceLine": 82,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2108,
+          "sourceLine": 124,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-054",
+      "portableRef": "evidence://bagger-2026/EXT-054",
+      "originalMachinePath": "/private/tmp/bagger-net-skins-sql-repair/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "43c2375c1c16002216b710ac7a8bdf4ee7058dde6b7829e7e198396bf0623db0",
+      "bytes": 15329,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "01-TOURNAMENT-TIMELINE.md",
+          "line": 17,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 413,
+          "sourceLine": 95,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 413,
+          "sourceLine": 111,
+          "sourceEndLine": null
+        },
+        {
+          "file": "19-SIDE-GAME-LIFECYCLE.md",
+          "line": 44,
+          "sourceLine": 157,
+          "sourceEndLine": 169
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2592,
+          "sourceLine": 95,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2637,
+          "sourceLine": 111,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2080,
+          "sourceLine": 95,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2081,
+          "sourceLine": 111,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2109,
+          "sourceLine": 95,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2110,
+          "sourceLine": 111,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-055",
+      "portableRef": "evidence://bagger-2026/EXT-055",
+      "originalMachinePath": "/private/tmp/bagger-pwa-time-production/FREEZE-CERTIFICATION.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "fbbebfbbc783078adb70d54765ebc31aac40b69b1f4e3124432650a5c554a664",
+      "bytes": 1049,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "01-TOURNAMENT-TIMELINE.md",
+          "line": 13,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 37,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "05-PRIOR-CERTIFICATION-TRUST-AUDIT.md",
+          "line": 17,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 68,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 74,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 136,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-056",
+      "portableRef": "evidence://bagger-2026/EXT-056",
+      "originalMachinePath": "/private/tmp/bagger-r1-open-incident/EXACT-REPLAY-CERTIFICATION.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "76c6919caf6636a4b56cd2a5d705fba2c350f466b1c595cadeba8934dc4b651f",
+      "bytes": 1172,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 447,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2776,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2207,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2238,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-057",
+      "portableRef": "evidence://bagger-2026/EXT-057",
+      "originalMachinePath": "/private/tmp/bagger-r1-open-incident/PREDEPLOY-REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "4acbde761b03536bbb8cd4740a980bf9b20cbfa999e12420b3bddbf8b2d2ef38",
+      "bytes": 7089,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 447,
+          "sourceLine": 5,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2684,
+          "sourceLine": 5,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2205,
+          "sourceLine": 5,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2236,
+          "sourceLine": 5,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-058",
+      "portableRef": "evidence://bagger-2026/EXT-058",
+      "originalMachinePath": "/private/tmp/bagger-r1-open-incident/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "8282b0594c06a1e9099f7c06c7e85de755723efdd722716c2b8688a5a44a9b10",
+      "bytes": 7560,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "01-TOURNAMENT-TIMELINE.md",
+          "line": 18,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 447,
+          "sourceLine": 55,
+          "sourceEndLine": null
+        },
+        {
+          "file": "08-BACKEND-HARDENING.md",
+          "line": 76,
+          "sourceLine": 55,
+          "sourceEndLine": 61
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2730,
+          "sourceLine": 55,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2206,
+          "sourceLine": 55,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2237,
+          "sourceLine": 55,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-059",
+      "portableRef": "evidence://bagger-2026/EXT-059",
+      "originalMachinePath": "/private/tmp/bagger-r1-open-incident/candidate",
+      "objectType": "directory",
+      "observedExistsAtPreservation": true,
+      "sha256": null,
+      "bytes": null,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_GIT_SOURCE",
+        "sha": "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6",
+        "repositoryRelativePath": "",
+        "gitObjectAvailableInDestination": true
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "10-INFRASTRUCTURE.md",
+          "line": 41,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "FINGERPRINT-INVENTORY.md",
+          "line": 5,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "READ-ONLY-VERIFICATION.md",
+          "line": 13,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-060",
+      "portableRef": "evidence://bagger-2026/EXT-060",
+      "originalMachinePath": "/private/tmp/bagger-r1-open-incident/candidate/supabase/production_migrations/202608240021_production_scoring_operations.sql",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "b1c92cb8f763d28fb1923f4a8978f02d7ce01d6f13531282c7c55bfc2ba67a81",
+      "bytes": 73299,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_GIT_SOURCE",
+        "sha": "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6",
+        "repositoryRelativePath": "supabase/production_migrations/202608240021_production_scoring_operations.sql",
+        "gitObjectAvailableInDestination": true
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 652,
+          "sourceLine": 1073,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3827,
+          "sourceLine": 1073,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2884,
+          "sourceLine": 1073,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2917,
+          "sourceLine": 1073,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-061",
+      "portableRef": "evidence://bagger-2026/EXT-061",
+      "originalMachinePath": "/private/tmp/bagger-r1-open-incident/candidate/supabase/production_migrations/202608290056_production_calcutta_v1.sql",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "cf1987b7e7ad3d69d0836aed214a77c85ac1daa68c19aeab6408d82e0296399f",
+      "bytes": 135172,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_GIT_SOURCE",
+        "sha": "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6",
+        "repositoryRelativePath": "supabase/production_migrations/202608290056_production_calcutta_v1.sql",
+        "gitObjectAvailableInDestination": true
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 345,
+          "sourceLine": 2041,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 652,
+          "sourceLine": 1601,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 2270,
+          "sourceLine": 2041,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3884,
+          "sourceLine": 1601,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1840,
+          "sourceLine": 2041,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 1861,
+          "sourceLine": 2041,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2885,
+          "sourceLine": 1601,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2918,
+          "sourceLine": 1601,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-062",
+      "portableRef": "evidence://bagger-2026/EXT-062",
+      "originalMachinePath": "/private/tmp/bagger-r1-open-incident/candidate/supabase/production_migrations/202609270120_bounded_late_r3_result_compatibility_v1.sql",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "c8f25f9a15345d32655aed7dcd4f37d646d6cfd21be53224bf76bf8ce2e05b48",
+      "bytes": 1876,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_GIT_SOURCE",
+        "sha": "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6",
+        "repositoryRelativePath": "supabase/production_migrations/202609270120_bounded_late_r3_result_compatibility_v1.sql",
+        "gitObjectAvailableInDestination": true
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 652,
+          "sourceLine": 3,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3770,
+          "sourceLine": 3,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2883,
+          "sourceLine": 3,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2916,
+          "sourceLine": 3,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-063",
+      "portableRef": "evidence://bagger-2026/EXT-063",
+      "originalMachinePath": "/private/tmp/bagger-r1-open-incident/source/app/useTournamentClock.js",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "d6250331d6fa232cf526b220fc423feddb39f20847f61f0ebfff9e487167fd21",
+      "bytes": 1012,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_GIT_SOURCE",
+        "sha": "2533b98a7d0de44b6d10c7f14444c6627e70a2ee",
+        "repositoryRelativePath": "app/useTournamentClock.js",
+        "gitObjectAvailableInDestination": true
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 37,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 140,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 87,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 149,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-064",
+      "portableRef": "evidence://bagger-2026/EXT-064",
+      "originalMachinePath": "/private/tmp/bagger-r1-open-incident/source/lib/tournament-timeline.js",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "929221a8c448c9895ff154304fe0794277ff27118a380afdf55168932d46bba2",
+      "bytes": 11363,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_GIT_SOURCE",
+        "sha": "2533b98a7d0de44b6d10c7f14444c6627e70a2ee",
+        "repositoryRelativePath": "lib/tournament-timeline.js",
+        "gitObjectAvailableInDestination": true
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 37,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 104,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 80,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 142,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-065",
+      "portableRef": "evidence://bagger-2026/EXT-065",
+      "originalMachinePath": "/private/tmp/bagger-r1-open-incident/source/test/tournament-time-freeze.test.mjs",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "1346de37383161a3efda35e8ae4526518fed15d8179636341a5f7df7d0cca15e",
+      "bytes": 5311,
+      "kind": "pinned-source",
+      "resolution": {
+        "status": "PINNED_GIT_SOURCE",
+        "sha": "2533b98a7d0de44b6d10c7f14444c6627e70a2ee",
+        "repositoryRelativePath": "test/tournament-time-freeze.test.mjs",
+        "gitObjectAvailableInDestination": true
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 37,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 176,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 94,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 156,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-066",
+      "portableRef": "evidence://bagger-2026/EXT-066",
+      "originalMachinePath": "/private/tmp/bagger-r3-continuous-recovery/DISK-IO-INCIDENT-ADDENDUM.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "bc8eca9109400419ffa275f2e8b17fcca156864132a19d5bf7de5a0a1bdbfb93",
+      "bytes": 2518,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "00-EXECUTIVE-SUMMARY.md",
+          "line": 19,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 823,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "10-INFRASTRUCTURE.md",
+          "line": 17,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "OWNER-DECISION-PACKAGE.md",
+          "line": 74,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 4223,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3367,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-067",
+      "portableRef": "evidence://bagger-2026/EXT-067",
+      "originalMachinePath": "/private/tmp/bagger-r3-continuous-recovery/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "5a1fc73ef085d9fd692beaba600213e04c737e6f7a4ad05e9c4c50936ce70671",
+      "bytes": 5163,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "01-TOURNAMENT-TIMELINE.md",
+          "line": 20,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 583,
+          "sourceLine": 3,
+          "sourceEndLine": null
+        },
+        {
+          "file": "05-PRIOR-CERTIFICATION-TRUST-AUDIT.md",
+          "line": 17,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3419,
+          "sourceLine": 3,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2646,
+          "sourceLine": 3,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2676,
+          "sourceLine": 3,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-068",
+      "portableRef": "evidence://bagger-2026/EXT-068",
+      "originalMachinePath": "/private/tmp/bagger-r3-dependency-recovery/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "78fc04b4894dc5a020aaf2807e49eca9b2fd0f5e5106129eb8adf13119b794ba",
+      "bytes": 12629,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 583,
+          "sourceLine": 65,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 755,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "10-INFRASTRUCTURE.md",
+          "line": 14,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "20-DEPENDENCY-GRAPH.md",
+          "line": 134,
+          "sourceLine": 65,
+          "sourceEndLine": 77
+        },
+        {
+          "file": "21-FINGERPRINT-REDESIGN.md",
+          "line": 103,
+          "sourceLine": 65,
+          "sourceEndLine": 77
+        },
+        {
+          "file": "47-BACKEND-ROADMAP.md",
+          "line": 110,
+          "sourceLine": 41,
+          "sourceEndLine": 120
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3365,
+          "sourceLine": 65,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 4067,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2645,
+          "sourceLine": 65,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2675,
+          "sourceLine": 65,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3160,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-069",
+      "portableRef": "evidence://bagger-2026/EXT-069",
+      "originalMachinePath": "/private/tmp/bagger-r3-morning-preflight/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "050178b9a8e7f1b7eb4f60d27f02e4bc209e54966e28950c7518f34c2c8b12e0",
+      "bytes": 9370,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 755,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 857,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "10-INFRASTRUCTURE.md",
+          "line": 14,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "10-INFRASTRUCTURE.md",
+          "line": 16,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 4107,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 4293,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3169,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3461,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-070",
+      "portableRef": "evidence://bagger-2026/EXT-070",
+      "originalMachinePath": "/private/tmp/bagger-r3-morning-preflight/overnight-logs-sanitized.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "719e93654dad7a623d2066246d8f5ccd03e21cb4b6d742bfcdef4366dffab748",
+      "bytes": 840,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 755,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "10-INFRASTRUCTURE.md",
+          "line": 13,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 4147,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3178,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-071",
+      "portableRef": "evidence://bagger-2026/EXT-071",
+      "originalMachinePath": "/private/tmp/bagger-r3-odds-clearance/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "e9a8589fd957fd1a9a608879f5cdcab5637b861d945bcf8071bf116118b8dd32",
+      "bytes": 9484,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 549,
+          "sourceLine": 3,
+          "sourceEndLine": null
+        },
+        {
+          "file": "19-SIDE-GAME-LIFECYCLE.md",
+          "line": 61,
+          "sourceLine": 3,
+          "sourceEndLine": 21
+        },
+        {
+          "file": "24-JOB-ARCHITECTURE.md",
+          "line": 80,
+          "sourceLine": 17,
+          "sourceEndLine": 21
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3149,
+          "sourceLine": 3,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2525,
+          "sourceLine": 3,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2544,
+          "sourceLine": 3,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-072",
+      "portableRef": "evidence://bagger-2026/EXT-072",
+      "originalMachinePath": "/private/tmp/bagger-r3-open-outcome/OUTCOME.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "b933fa08937857330c11d0f77d8218b3a8a458744ebe2cdb3099fc75904b3d16",
+      "bytes": 847,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 618,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3500,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2760,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2780,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-073",
+      "portableRef": "evidence://bagger-2026/EXT-073",
+      "originalMachinePath": "/private/tmp/bagger-r3-open-outcome/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "03a67b33275f2b760ebf2166e4017dcde6f62a46a0301bb4ffb6258d2c6c43e5",
+      "bytes": 1774,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 618,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "24-JOB-ARCHITECTURE.md",
+          "line": 106,
+          "sourceLine": 1,
+          "sourceEndLine": 11
+        },
+        {
+          "file": "65-CRITICAL-PATH-DIAGRAMS.md",
+          "line": 165,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3459,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2759,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2779,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-074",
+      "portableRef": "evidence://bagger-2026/EXT-074",
+      "originalMachinePath": "/private/tmp/bagger-r3-open-outcome/final-current.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "5a2566752de0fbd2986937bf502a70828a842b89683bc5414cba0927eeabcd48",
+      "bytes": 2656,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 618,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3541,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2761,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2781,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-075",
+      "portableRef": "evidence://bagger-2026/EXT-075",
+      "originalMachinePath": "/private/tmp/bagger-r3-pairing-blocker/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "a4fc403f694d48c7d9fc88221a54109695662b2065618f5f6b02cefcd9c6958c",
+      "bytes": 15252,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 549,
+          "sourceLine": 5,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 549,
+          "sourceLine": 44,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 549,
+          "sourceLine": 72,
+          "sourceEndLine": null
+        },
+        {
+          "file": "19-SIDE-GAME-LIFECYCLE.md",
+          "line": 61,
+          "sourceLine": 72,
+          "sourceEndLine": 92
+        },
+        {
+          "file": "20-DEPENDENCY-GRAPH.md",
+          "line": 132,
+          "sourceLine": 60,
+          "sourceEndLine": 90
+        },
+        {
+          "file": "24-JOB-ARCHITECTURE.md",
+          "line": 105,
+          "sourceLine": 72,
+          "sourceEndLine": 92
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3029,
+          "sourceLine": 5,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3069,
+          "sourceLine": 44,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3109,
+          "sourceLine": 72,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2522,
+          "sourceLine": 5,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2523,
+          "sourceLine": 44,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2524,
+          "sourceLine": 72,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2541,
+          "sourceLine": 5,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2542,
+          "sourceLine": 44,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2543,
+          "sourceLine": 72,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-076",
+      "portableRef": "evidence://bagger-2026/EXT-076",
+      "originalMachinePath": "/private/tmp/bagger-r3-physical-recovery139/FINAL-SUMMARY.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "302d9371585cea68712ee77e13fc8bb25f1dea4908c7577872e7fd215ebd956f",
+      "bytes": 4626,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 687,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 4003,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3005,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3025,
+          "sourceLine": 1,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-077",
+      "portableRef": "evidence://bagger-2026/EXT-077",
+      "originalMachinePath": "/private/tmp/bagger-r3-physical-recovery139/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "bf4ea8f2ee582c8dc6adbecfea37512dc0da582dc35c0e52c3d8cdc5dbc1c107",
+      "bytes": 5998,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "00-EXECUTIVE-SUMMARY.md",
+          "line": 19,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 687,
+          "sourceLine": 10,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 687,
+          "sourceLine": 29,
+          "sourceEndLine": null
+        },
+        {
+          "file": "47-BACKEND-ROADMAP.md",
+          "line": 111,
+          "sourceLine": 32,
+          "sourceEndLine": 97
+        },
+        {
+          "file": "OWNER-DECISION-PACKAGE.md",
+          "line": 74,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3923,
+          "sourceLine": 10,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3963,
+          "sourceLine": 29,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3003,
+          "sourceLine": 10,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3004,
+          "sourceLine": 29,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3023,
+          "sourceLine": 10,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3024,
+          "sourceLine": 29,
+          "sourceEndLine": null
+        },
+        {
+          "file": "18-SCORE-RECOVERY.md",
+          "line": 5,
+          "sourceLine": null,
+          "sourceEndLine": null,
+          "originalReference": "../bagger-r3-physical-recovery139/REPORT.md",
+          "resolutionBasis": "Resolved relative to the original /private/tmp package location."
+        }
+      ]
+    },
+    {
+      "id": "EXT-078",
+      "portableRef": "evidence://bagger-2026/EXT-078",
+      "originalMachinePath": "/private/tmp/bagger-r3-readiness-recovery/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "b2371834eb44c4e3dc1af916a3b0a9db0bf57c0538802c788c33bdaaa70fb7d0",
+      "bytes": 16042,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 583,
+          "sourceLine": 28,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 583,
+          "sourceLine": 56,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 583,
+          "sourceLine": 74,
+          "sourceEndLine": null
+        },
+        {
+          "file": "20-DEPENDENCY-GRAPH.md",
+          "line": 133,
+          "sourceLine": 28,
+          "sourceEndLine": 115
+        },
+        {
+          "file": "47-BACKEND-ROADMAP.md",
+          "line": 110,
+          "sourceLine": 30,
+          "sourceEndLine": 106
+        },
+        {
+          "file": "65-CRITICAL-PATH-DIAGRAMS.md",
+          "line": 165,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3203,
+          "sourceLine": 28,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3257,
+          "sourceLine": 56,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3311,
+          "sourceLine": 74,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2642,
+          "sourceLine": 28,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2643,
+          "sourceLine": 56,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2644,
+          "sourceLine": 74,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2672,
+          "sourceLine": 28,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2673,
+          "sourceLine": 56,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2674,
+          "sourceLine": 74,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-079",
+      "portableRef": "evidence://bagger-2026/EXT-079",
+      "originalMachinePath": "/private/tmp/bagger-r3-recovery-continuation/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "603c3297184e2d8c146f942860847d83a64609dd79978aea0b3f0cecd9961ab8",
+      "bytes": 6632,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 789,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "10-INFRASTRUCTURE.md",
+          "line": 15,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "10-INFRASTRUCTURE.md",
+          "line": 18,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 4185,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3274,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-080",
+      "portableRef": "evidence://bagger-2026/EXT-080",
+      "originalMachinePath": "/private/tmp/bagger-r3-write-timeout/REPORT.md",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "42d76ea3e09726932d192a06d4478d491754beb864636d925cc36887ca010a3a",
+      "bytes": 15033,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "00-EXECUTIVE-SUMMARY.md",
+          "line": 19,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "01-TOURNAMENT-TIMELINE.md",
+          "line": 21,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 652,
+          "sourceLine": 41,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 652,
+          "sourceLine": 62,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 652,
+          "sourceLine": 80,
+          "sourceEndLine": null
+        },
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 857,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "05-PRIOR-CERTIFICATION-TRUST-AUDIT.md",
+          "line": 17,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "08-BACKEND-HARDENING.md",
+          "line": 78,
+          "sourceLine": 41,
+          "sourceEndLine": 119
+        },
+        {
+          "file": "09-DATABASE-SQL.md",
+          "line": 79,
+          "sourceLine": 80,
+          "sourceEndLine": 105
+        },
+        {
+          "file": "10-INFRASTRUCTURE.md",
+          "line": 19,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "21-FINGERPRINT-REDESIGN.md",
+          "line": 104,
+          "sourceLine": 80,
+          "sourceEndLine": 102
+        },
+        {
+          "file": "23-EVENT-DRIVEN-DESIGN.md",
+          "line": 100,
+          "sourceLine": 62,
+          "sourceEndLine": 105
+        },
+        {
+          "file": "47-BACKEND-ROADMAP.md",
+          "line": 107,
+          "sourceLine": 41,
+          "sourceEndLine": 119
+        },
+        {
+          "file": "65-CRITICAL-PATH-DIAGRAMS.md",
+          "line": 165,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "OWNER-DECISION-PACKAGE.md",
+          "line": 74,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3599,
+          "sourceLine": 41,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3656,
+          "sourceLine": 62,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 3713,
+          "sourceLine": 80,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 4324,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2880,
+          "sourceLine": 41,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2881,
+          "sourceLine": 62,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2882,
+          "sourceLine": 80,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2913,
+          "sourceLine": 41,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2914,
+          "sourceLine": 62,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 2915,
+          "sourceLine": 80,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3470,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    },
+    {
+      "id": "EXT-081",
+      "portableRef": "evidence://bagger-2026/EXT-081",
+      "originalMachinePath": "/private/tmp/bagger-r3-write-timeout/RESOURCE-OBSERVATION.json",
+      "objectType": "file",
+      "observedExistsAtPreservation": true,
+      "sha256": "9a28f47283f886c3948fcfff033105403d5026024ea092ed10c47a59e985e77d",
+      "bytes": 1012,
+      "kind": "external-evidence",
+      "resolution": {
+        "status": "UNRESOLVED_PENDING_PRIVATE_SANITIZED_ARCHIVE"
+      },
+      "copyDisposition": "NOT_COPIED",
+      "sensitivityReview": "NOT_REVIEWED_FOR_REPOSITORY",
+      "referencedBy": [
+        {
+          "file": "02-INCIDENT-REGISTER.md",
+          "line": 823,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "10-INFRASTRUCTURE.md",
+          "line": 20,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "evidence-ledger.json",
+          "line": 4261,
+          "sourceLine": null,
+          "sourceEndLine": null
+        },
+        {
+          "file": "incident-register.json",
+          "line": 3376,
+          "sourceLine": null,
+          "sourceEndLine": null
+        }
+      ]
+    }
+  ]
+}

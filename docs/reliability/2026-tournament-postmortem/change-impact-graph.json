@@ -1,0 +1,3368 @@
+{
+  "status": "PROPOSED seed graph; not exhaustive extracted source callgraph",
+  "nodes": [
+    {
+      "id": "OBS-CORE-001",
+      "type": "requirement"
+    },
+    {
+      "id": "CERT-001",
+      "type": "requirement"
+    },
+    {
+      "id": "PERF-001",
+      "type": "requirement"
+    },
+    {
+      "id": "DIR-OPS-001",
+      "type": "requirement"
+    },
+    {
+      "id": "DIR-OPS-002",
+      "type": "requirement"
+    },
+    {
+      "id": "DIR-REC-001",
+      "type": "requirement"
+    },
+    {
+      "id": "OPS-SAFE-001",
+      "type": "requirement"
+    },
+    {
+      "id": "DIR-CLOSE-001",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-CONTRACT-001",
+      "type": "requirement"
+    },
+    {
+      "id": "PWA-001",
+      "type": "requirement"
+    },
+    {
+      "id": "AUTO-JOB-001",
+      "type": "requirement"
+    },
+    {
+      "id": "DIR-NEXT-001",
+      "type": "requirement"
+    },
+    {
+      "id": "DIR-FIN-001",
+      "type": "requirement"
+    },
+    {
+      "id": "CERT-NA-001",
+      "type": "requirement"
+    },
+    {
+      "id": "CERT-SYN-001",
+      "type": "requirement"
+    },
+    {
+      "id": "CERT-PHY-001",
+      "type": "requirement"
+    },
+    {
+      "id": "OPS-DR-001",
+      "type": "requirement"
+    },
+    {
+      "id": "REL-001",
+      "type": "requirement"
+    },
+    {
+      "id": "DIR-MOB-001",
+      "type": "requirement"
+    },
+    {
+      "id": "SEC-001",
+      "type": "requirement"
+    },
+    {
+      "id": "HIST-001",
+      "type": "requirement"
+    },
+    {
+      "id": "AUTO-HEALTH-001",
+      "type": "requirement"
+    },
+    {
+      "id": "AUTO-DEG-001",
+      "type": "requirement"
+    },
+    {
+      "id": "CERT-IMPACT-001",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-NAV-001",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-NAV-002",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-NAV-003",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-NAV-004",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-NAV-005",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-SCORE-001",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-SCORE-002",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-SCORE-003",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-SCORE-004",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-SCORE-005",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-SCORE-006",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-SCORE-007",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-SCORE-008",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-READ-001",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-READ-002",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-READ-003",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-READ-004",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-READ-005",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-READ-006",
+      "type": "requirement"
+    },
+    {
+      "id": "B11-READ-007",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-SCORE-001",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-SCORE-002",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-SCORE-003",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-SCORE-004",
+      "type": "requirement"
+    },
+    {
+      "id": "DB-PERF-001",
+      "type": "requirement"
+    },
+    {
+      "id": "DB-PERF-002",
+      "type": "requirement"
+    },
+    {
+      "id": "DB-PERF-003",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-JOB-001",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-JOB-002",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-JOB-003",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-JOB-004",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-DEP-001",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-DEP-002",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-DEP-003",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-DEP-004",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-DEP-005",
+      "type": "requirement"
+    },
+    {
+      "id": "BE-JOB-005",
+      "type": "requirement"
+    },
+    {
+      "id": "INFRA-001",
+      "type": "requirement"
+    },
+    {
+      "id": "INFRA-002",
+      "type": "requirement"
+    },
+    {
+      "id": "INFRA-003",
+      "type": "requirement"
+    },
+    {
+      "id": "INFRA-004",
+      "type": "requirement"
+    },
+    {
+      "id": "INFRA-005",
+      "type": "requirement"
+    },
+    {
+      "id": "INFRA-006",
+      "type": "requirement"
+    },
+    {
+      "id": "INFRA-007",
+      "type": "requirement"
+    },
+    {
+      "id": "INFRA-008",
+      "type": "requirement"
+    },
+    {
+      "id": "OBS-001",
+      "type": "requirement"
+    },
+    {
+      "id": "OBS-002",
+      "type": "requirement"
+    },
+    {
+      "id": "OBS-003",
+      "type": "requirement"
+    },
+    {
+      "id": "OBS-004",
+      "type": "requirement"
+    },
+    {
+      "id": "OBS-005",
+      "type": "requirement"
+    },
+    {
+      "id": "OBS-006",
+      "type": "requirement"
+    },
+    {
+      "id": "OBS-007",
+      "type": "requirement"
+    },
+    {
+      "id": "OBS-008",
+      "type": "requirement"
+    },
+    {
+      "id": "OBS-009",
+      "type": "requirement"
+    },
+    {
+      "id": "OPS-001",
+      "type": "requirement"
+    },
+    {
+      "id": "OPS-002",
+      "type": "requirement"
+    },
+    {
+      "id": "OPS-003",
+      "type": "requirement"
+    },
+    {
+      "id": "OPS-004",
+      "type": "requirement"
+    },
+    {
+      "id": "OPS-005",
+      "type": "requirement"
+    },
+    {
+      "id": "OPS-006",
+      "type": "requirement"
+    },
+    {
+      "id": "OPS-007",
+      "type": "requirement"
+    },
+    {
+      "id": "OPS-008",
+      "type": "requirement"
+    },
+    {
+      "id": "NA-2026-001",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-002",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-003",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-004",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-005",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-006",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-007",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-008",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-009",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-010",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-011",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-012",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-013",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-014",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-015",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-016",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-017",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-018",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-019",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-020",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-021",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-022",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-023",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-024",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-025",
+      "type": "test"
+    },
+    {
+      "id": "NA-2026-026",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OBS-CORE-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-CERT-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-PERF-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-DIR-OPS-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-DIR-OPS-002",
+      "type": "test"
+    },
+    {
+      "id": "TEST-DIR-REC-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OPS-SAFE-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-DIR-CLOSE-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-CONTRACT-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-PWA-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-AUTO-JOB-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-DIR-NEXT-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-DIR-FIN-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-CERT-NA-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-CERT-SYN-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-CERT-PHY-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OPS-DR-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-REL-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-DIR-MOB-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-SEC-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-HIST-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-AUTO-HEALTH-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-AUTO-DEG-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-CERT-IMPACT-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-NAV-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-NAV-002",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-NAV-003",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-NAV-004",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-NAV-005",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-SCORE-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-SCORE-002",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-SCORE-003",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-SCORE-004",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-SCORE-005",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-SCORE-006",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-SCORE-007",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-SCORE-008",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-READ-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-READ-002",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-READ-003",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-READ-004",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-READ-005",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-READ-006",
+      "type": "test"
+    },
+    {
+      "id": "TEST-B11-READ-007",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-SCORE-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-SCORE-002",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-SCORE-003",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-SCORE-004",
+      "type": "test"
+    },
+    {
+      "id": "TEST-DB-PERF-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-DB-PERF-002",
+      "type": "test"
+    },
+    {
+      "id": "TEST-DB-PERF-003",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-JOB-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-JOB-002",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-JOB-003",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-JOB-004",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-DEP-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-DEP-002",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-DEP-003",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-DEP-004",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-DEP-005",
+      "type": "test"
+    },
+    {
+      "id": "TEST-BE-JOB-005",
+      "type": "test"
+    },
+    {
+      "id": "TEST-INFRA-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-INFRA-002",
+      "type": "test"
+    },
+    {
+      "id": "TEST-INFRA-003",
+      "type": "test"
+    },
+    {
+      "id": "TEST-INFRA-004",
+      "type": "test"
+    },
+    {
+      "id": "TEST-INFRA-005",
+      "type": "test"
+    },
+    {
+      "id": "TEST-INFRA-006",
+      "type": "test"
+    },
+    {
+      "id": "TEST-INFRA-007",
+      "type": "test"
+    },
+    {
+      "id": "TEST-INFRA-008",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OBS-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OBS-002",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OBS-003",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OBS-004",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OBS-005",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OBS-006",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OBS-007",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OBS-008",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OBS-009",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OPS-001",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OPS-002",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OPS-003",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OPS-004",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OPS-005",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OPS-006",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OPS-007",
+      "type": "test"
+    },
+    {
+      "id": "TEST-OPS-008",
+      "type": "test"
+    },
+    {
+      "id": "2026-INC-001",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-002",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-003",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-004",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-005",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-006",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-007",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-008",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-009",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-010",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-011",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-012",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-013",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-014",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-015",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-016",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-017",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-018",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-019",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-020",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-021",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-022",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-023",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-024",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-025",
+      "type": "incident"
+    },
+    {
+      "id": "2026-INC-026",
+      "type": "incident"
+    }
+  ],
+  "edges": [
+    {
+      "source": "2026-INC-006",
+      "target": "OBS-CORE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-007",
+      "target": "OBS-CORE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-018",
+      "target": "OBS-CORE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "OBS-CORE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-022",
+      "target": "OBS-CORE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-023",
+      "target": "OBS-CORE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-024",
+      "target": "OBS-CORE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-025",
+      "target": "OBS-CORE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-026",
+      "target": "OBS-CORE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-OBS-CORE-001",
+      "target": "OBS-CORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "OBS-CORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-007",
+      "target": "OBS-CORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-018",
+      "target": "OBS-CORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "OBS-CORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-022",
+      "target": "OBS-CORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-023",
+      "target": "OBS-CORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-024",
+      "target": "OBS-CORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-025",
+      "target": "OBS-CORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-026",
+      "target": "OBS-CORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-005",
+      "target": "CERT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "CERT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-010",
+      "target": "CERT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-012",
+      "target": "CERT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "CERT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "CERT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-024",
+      "target": "CERT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-CERT-001",
+      "target": "CERT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-005",
+      "target": "CERT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "CERT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-010",
+      "target": "CERT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-012",
+      "target": "CERT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "CERT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "CERT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-024",
+      "target": "CERT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "PERF-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-023",
+      "target": "PERF-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-PERF-001",
+      "target": "PERF-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "PERF-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-023",
+      "target": "PERF-001",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-013",
+      "target": "DIR-OPS-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-016",
+      "target": "DIR-OPS-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "DIR-OPS-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-018",
+      "target": "DIR-OPS-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-DIR-OPS-001",
+      "target": "DIR-OPS-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-013",
+      "target": "DIR-OPS-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-016",
+      "target": "DIR-OPS-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "DIR-OPS-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-018",
+      "target": "DIR-OPS-001",
+      "type": "verifies"
+    },
+    {
+      "source": "OBS-CORE-001",
+      "target": "DIR-OPS-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-013",
+      "target": "DIR-OPS-002",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "DIR-OPS-002",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-018",
+      "target": "DIR-OPS-002",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-DIR-OPS-002",
+      "target": "DIR-OPS-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-013",
+      "target": "DIR-OPS-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "DIR-OPS-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-018",
+      "target": "DIR-OPS-002",
+      "type": "verifies"
+    },
+    {
+      "source": "DIR-OPS-001",
+      "target": "DIR-OPS-002",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-020",
+      "target": "DIR-REC-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-DIR-REC-001",
+      "target": "DIR-REC-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-020",
+      "target": "DIR-REC-001",
+      "type": "verifies"
+    },
+    {
+      "source": "DIR-OPS-002",
+      "target": "DIR-REC-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-023",
+      "target": "OPS-SAFE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-024",
+      "target": "OPS-SAFE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-OPS-SAFE-001",
+      "target": "OPS-SAFE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-023",
+      "target": "OPS-SAFE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-024",
+      "target": "OPS-SAFE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "DIR-CLOSE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-020",
+      "target": "DIR-CLOSE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-DIR-CLOSE-001",
+      "target": "DIR-CLOSE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "DIR-CLOSE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-020",
+      "target": "DIR-CLOSE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "DIR-OPS-001",
+      "target": "DIR-CLOSE-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "BE-CONTRACT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-007",
+      "target": "BE-CONTRACT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-008",
+      "target": "BE-CONTRACT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-009",
+      "target": "BE-CONTRACT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-014",
+      "target": "BE-CONTRACT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-022",
+      "target": "BE-CONTRACT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-CONTRACT-001",
+      "target": "BE-CONTRACT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "BE-CONTRACT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-007",
+      "target": "BE-CONTRACT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-008",
+      "target": "BE-CONTRACT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-009",
+      "target": "BE-CONTRACT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-014",
+      "target": "BE-CONTRACT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-022",
+      "target": "BE-CONTRACT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "PWA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-014",
+      "target": "PWA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-015",
+      "target": "PWA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "PWA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-PWA-001",
+      "target": "PWA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "PWA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-014",
+      "target": "PWA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-015",
+      "target": "PWA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "PWA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "BE-CONTRACT-001",
+      "target": "PWA-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-011",
+      "target": "AUTO-JOB-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-016",
+      "target": "AUTO-JOB-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-AUTO-JOB-001",
+      "target": "AUTO-JOB-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-011",
+      "target": "AUTO-JOB-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-016",
+      "target": "AUTO-JOB-001",
+      "type": "verifies"
+    },
+    {
+      "source": "BE-CONTRACT-001",
+      "target": "AUTO-JOB-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-016",
+      "target": "DIR-NEXT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "DIR-NEXT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-018",
+      "target": "DIR-NEXT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-DIR-NEXT-001",
+      "target": "DIR-NEXT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-016",
+      "target": "DIR-NEXT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "DIR-NEXT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-018",
+      "target": "DIR-NEXT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "DIR-OPS-001",
+      "target": "DIR-NEXT-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "AUTO-JOB-001",
+      "target": "DIR-NEXT-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-021",
+      "target": "DIR-FIN-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-DIR-FIN-001",
+      "target": "DIR-FIN-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-021",
+      "target": "DIR-FIN-001",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-001",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-002",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-003",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-004",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-005",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-007",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-008",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-009",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-010",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-011",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-012",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-013",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-014",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-015",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-016",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-018",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-020",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-021",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-022",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-023",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-024",
+      "target": "CERT-NA-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-CERT-NA-001",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-001",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-002",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-003",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-004",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-005",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-007",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-008",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-009",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-010",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-011",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-012",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-013",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-014",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-015",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-016",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-018",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-020",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-021",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-022",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-023",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-024",
+      "target": "CERT-NA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "CERT-001",
+      "target": "CERT-NA-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-010",
+      "target": "CERT-SYN-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-012",
+      "target": "CERT-SYN-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-016",
+      "target": "CERT-SYN-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "CERT-SYN-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "CERT-SYN-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-CERT-SYN-001",
+      "target": "CERT-SYN-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-010",
+      "target": "CERT-SYN-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-012",
+      "target": "CERT-SYN-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-016",
+      "target": "CERT-SYN-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "CERT-SYN-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "CERT-SYN-001",
+      "type": "verifies"
+    },
+    {
+      "source": "PERF-001",
+      "target": "CERT-SYN-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-005",
+      "target": "CERT-PHY-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "CERT-PHY-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-007",
+      "target": "CERT-PHY-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-014",
+      "target": "CERT-PHY-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "CERT-PHY-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-018",
+      "target": "CERT-PHY-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-020",
+      "target": "CERT-PHY-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-CERT-PHY-001",
+      "target": "CERT-PHY-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-005",
+      "target": "CERT-PHY-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "CERT-PHY-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-007",
+      "target": "CERT-PHY-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-014",
+      "target": "CERT-PHY-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "CERT-PHY-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-018",
+      "target": "CERT-PHY-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-020",
+      "target": "CERT-PHY-001",
+      "type": "verifies"
+    },
+    {
+      "source": "CERT-SYN-001",
+      "target": "CERT-PHY-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "OPS-DR-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-020",
+      "target": "OPS-DR-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-022",
+      "target": "OPS-DR-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-024",
+      "target": "OPS-DR-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-OPS-DR-001",
+      "target": "OPS-DR-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "OPS-DR-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-020",
+      "target": "OPS-DR-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-022",
+      "target": "OPS-DR-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-024",
+      "target": "OPS-DR-001",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-011",
+      "target": "REL-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-013",
+      "target": "REL-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-014",
+      "target": "REL-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-REL-001",
+      "target": "REL-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-011",
+      "target": "REL-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-013",
+      "target": "REL-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-014",
+      "target": "REL-001",
+      "type": "verifies"
+    },
+    {
+      "source": "CERT-001",
+      "target": "REL-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-016",
+      "target": "DIR-MOB-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "DIR-MOB-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-018",
+      "target": "DIR-MOB-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-020",
+      "target": "DIR-MOB-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-DIR-MOB-001",
+      "target": "DIR-MOB-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-016",
+      "target": "DIR-MOB-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "DIR-MOB-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-018",
+      "target": "DIR-MOB-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-020",
+      "target": "DIR-MOB-001",
+      "type": "verifies"
+    },
+    {
+      "source": "DIR-OPS-002",
+      "target": "DIR-MOB-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "TEST-SEC-001",
+      "target": "SEC-001",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "HIST-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-023",
+      "target": "HIST-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-HIST-001",
+      "target": "HIST-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "HIST-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-023",
+      "target": "HIST-001",
+      "type": "verifies"
+    },
+    {
+      "source": "PERF-001",
+      "target": "HIST-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "AUTO-HEALTH-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-018",
+      "target": "AUTO-HEALTH-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-022",
+      "target": "AUTO-HEALTH-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-AUTO-HEALTH-001",
+      "target": "AUTO-HEALTH-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "AUTO-HEALTH-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-018",
+      "target": "AUTO-HEALTH-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-022",
+      "target": "AUTO-HEALTH-001",
+      "type": "verifies"
+    },
+    {
+      "source": "OBS-CORE-001",
+      "target": "AUTO-HEALTH-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-007",
+      "target": "AUTO-DEG-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-009",
+      "target": "AUTO-DEG-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-022",
+      "target": "AUTO-DEG-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-024",
+      "target": "AUTO-DEG-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-AUTO-DEG-001",
+      "target": "AUTO-DEG-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-007",
+      "target": "AUTO-DEG-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-009",
+      "target": "AUTO-DEG-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-022",
+      "target": "AUTO-DEG-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-024",
+      "target": "AUTO-DEG-001",
+      "type": "verifies"
+    },
+    {
+      "source": "OBS-CORE-001",
+      "target": "AUTO-DEG-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "BE-CONTRACT-001",
+      "target": "AUTO-DEG-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "CERT-IMPACT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-010",
+      "target": "CERT-IMPACT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-012",
+      "target": "CERT-IMPACT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "CERT-IMPACT-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-CERT-IMPACT-001",
+      "target": "CERT-IMPACT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "CERT-IMPACT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-010",
+      "target": "CERT-IMPACT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-012",
+      "target": "CERT-IMPACT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "CERT-IMPACT-001",
+      "type": "verifies"
+    },
+    {
+      "source": "CERT-001",
+      "target": "CERT-IMPACT-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "CERT-NA-001",
+      "target": "CERT-IMPACT-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-007",
+      "target": "B11-NAV-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-008",
+      "target": "B11-NAV-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-009",
+      "target": "B11-NAV-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-NAV-001",
+      "target": "B11-NAV-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-007",
+      "target": "B11-NAV-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-008",
+      "target": "B11-NAV-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-009",
+      "target": "B11-NAV-001",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-007",
+      "target": "B11-NAV-002",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-NAV-002",
+      "target": "B11-NAV-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-007",
+      "target": "B11-NAV-002",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-007",
+      "target": "B11-NAV-003",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-NAV-003",
+      "target": "B11-NAV-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-007",
+      "target": "B11-NAV-003",
+      "type": "verifies"
+    },
+    {
+      "source": "B11-NAV-001",
+      "target": "B11-NAV-003",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "B11-NAV-004",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-007",
+      "target": "B11-NAV-004",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-NAV-004",
+      "target": "B11-NAV-004",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "B11-NAV-004",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-007",
+      "target": "B11-NAV-004",
+      "type": "verifies"
+    },
+    {
+      "source": "B11-SCORE-002",
+      "target": "B11-NAV-004",
+      "type": "prerequisite"
+    },
+    {
+      "source": "B11-READ-003",
+      "target": "B11-NAV-004",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-002",
+      "target": "B11-NAV-005",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-NAV-005",
+      "target": "B11-NAV-005",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-002",
+      "target": "B11-NAV-005",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "B11-SCORE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-SCORE-001",
+      "target": "B11-SCORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "B11-SCORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "B11-SCORE-002",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-SCORE-002",
+      "target": "B11-SCORE-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "B11-SCORE-002",
+      "type": "verifies"
+    },
+    {
+      "source": "B11-SCORE-001",
+      "target": "B11-SCORE-002",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "B11-SCORE-003",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-SCORE-003",
+      "target": "B11-SCORE-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "B11-SCORE-003",
+      "type": "verifies"
+    },
+    {
+      "source": "B11-SCORE-002",
+      "target": "B11-SCORE-003",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "B11-SCORE-004",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-SCORE-004",
+      "target": "B11-SCORE-004",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "B11-SCORE-004",
+      "type": "verifies"
+    },
+    {
+      "source": "B11-SCORE-001",
+      "target": "B11-SCORE-004",
+      "type": "prerequisite"
+    },
+    {
+      "source": "B11-SCORE-002",
+      "target": "B11-SCORE-004",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "B11-SCORE-005",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-SCORE-005",
+      "target": "B11-SCORE-005",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "B11-SCORE-005",
+      "type": "verifies"
+    },
+    {
+      "source": "B11-SCORE-002",
+      "target": "B11-SCORE-005",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "B11-SCORE-006",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-SCORE-006",
+      "target": "B11-SCORE-006",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "B11-SCORE-006",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-005",
+      "target": "B11-SCORE-007",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-SCORE-007",
+      "target": "B11-SCORE-007",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-005",
+      "target": "B11-SCORE-007",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-005",
+      "target": "B11-SCORE-008",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-SCORE-008",
+      "target": "B11-SCORE-008",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-005",
+      "target": "B11-SCORE-008",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-008",
+      "target": "B11-READ-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-READ-001",
+      "target": "B11-READ-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-008",
+      "target": "B11-READ-001",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-009",
+      "target": "B11-READ-002",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-READ-002",
+      "target": "B11-READ-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-009",
+      "target": "B11-READ-002",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-004",
+      "target": "B11-READ-003",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-007",
+      "target": "B11-READ-003",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-008",
+      "target": "B11-READ-003",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-009",
+      "target": "B11-READ-003",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-READ-003",
+      "target": "B11-READ-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-004",
+      "target": "B11-READ-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-007",
+      "target": "B11-READ-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-008",
+      "target": "B11-READ-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-009",
+      "target": "B11-READ-003",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-004",
+      "target": "B11-READ-004",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-READ-004",
+      "target": "B11-READ-004",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-004",
+      "target": "B11-READ-004",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-001",
+      "target": "B11-READ-005",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-READ-005",
+      "target": "B11-READ-005",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-001",
+      "target": "B11-READ-005",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-003",
+      "target": "B11-READ-006",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-READ-006",
+      "target": "B11-READ-006",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-003",
+      "target": "B11-READ-006",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-004",
+      "target": "B11-READ-007",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-006",
+      "target": "B11-READ-007",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-007",
+      "target": "B11-READ-007",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-008",
+      "target": "B11-READ-007",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-009",
+      "target": "B11-READ-007",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-B11-READ-007",
+      "target": "B11-READ-007",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-004",
+      "target": "B11-READ-007",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-006",
+      "target": "B11-READ-007",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-007",
+      "target": "B11-READ-007",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-008",
+      "target": "B11-READ-007",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-009",
+      "target": "B11-READ-007",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "BE-SCORE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-020",
+      "target": "BE-SCORE-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-SCORE-001",
+      "target": "BE-SCORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "BE-SCORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-020",
+      "target": "BE-SCORE-001",
+      "type": "verifies"
+    },
+    {
+      "source": "BE-SCORE-002",
+      "target": "BE-SCORE-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "BE-JOB-001",
+      "target": "BE-SCORE-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "BE-SCORE-002",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-SCORE-002",
+      "target": "BE-SCORE-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "BE-SCORE-002",
+      "type": "verifies"
+    },
+    {
+      "source": "BE-JOB-001",
+      "target": "BE-SCORE-002",
+      "type": "prerequisite"
+    },
+    {
+      "source": "DB-PERF-001",
+      "target": "BE-SCORE-002",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-018",
+      "target": "BE-SCORE-003",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-020",
+      "target": "BE-SCORE-003",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-SCORE-003",
+      "target": "BE-SCORE-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-018",
+      "target": "BE-SCORE-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-020",
+      "target": "BE-SCORE-003",
+      "type": "verifies"
+    },
+    {
+      "source": "BE-JOB-003",
+      "target": "BE-SCORE-003",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-020",
+      "target": "BE-SCORE-004",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-SCORE-004",
+      "target": "BE-SCORE-004",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-020",
+      "target": "BE-SCORE-004",
+      "type": "verifies"
+    },
+    {
+      "source": "BE-SCORE-001",
+      "target": "BE-SCORE-004",
+      "type": "prerequisite"
+    },
+    {
+      "source": "BE-SCORE-003",
+      "target": "BE-SCORE-004",
+      "type": "prerequisite"
+    },
+    {
+      "source": "DIR-REC-001",
+      "target": "BE-SCORE-004",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "DB-PERF-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "DB-PERF-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-DB-PERF-001",
+      "target": "DB-PERF-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "DB-PERF-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "DB-PERF-001",
+      "type": "verifies"
+    },
+    {
+      "source": "DB-PERF-002",
+      "target": "DB-PERF-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-010",
+      "target": "DB-PERF-002",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-012",
+      "target": "DB-PERF-002",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "DB-PERF-002",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-DB-PERF-002",
+      "target": "DB-PERF-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-010",
+      "target": "DB-PERF-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-012",
+      "target": "DB-PERF-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "DB-PERF-002",
+      "type": "verifies"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "DB-PERF-003",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "DB-PERF-003",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-DB-PERF-003",
+      "target": "DB-PERF-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "DB-PERF-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "DB-PERF-003",
+      "type": "verifies"
+    },
+    {
+      "source": "DB-PERF-002",
+      "target": "DB-PERF-003",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "BE-JOB-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-JOB-001",
+      "target": "BE-JOB-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "BE-JOB-001",
+      "type": "verifies"
+    },
+    {
+      "source": "DB-PERF-003",
+      "target": "BE-JOB-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "BE-JOB-003",
+      "target": "BE-JOB-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-010",
+      "target": "BE-JOB-002",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-011",
+      "target": "BE-JOB-002",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-012",
+      "target": "BE-JOB-002",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-016",
+      "target": "BE-JOB-002",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "BE-JOB-002",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-JOB-002",
+      "target": "BE-JOB-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-010",
+      "target": "BE-JOB-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-011",
+      "target": "BE-JOB-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-012",
+      "target": "BE-JOB-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-016",
+      "target": "BE-JOB-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "BE-JOB-002",
+      "type": "verifies"
+    },
+    {
+      "source": "BE-JOB-001",
+      "target": "BE-JOB-002",
+      "type": "prerequisite"
+    },
+    {
+      "source": "BE-DEP-001",
+      "target": "BE-JOB-002",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-016",
+      "target": "BE-JOB-003",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-018",
+      "target": "BE-JOB-003",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-020",
+      "target": "BE-JOB-003",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-JOB-003",
+      "target": "BE-JOB-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-016",
+      "target": "BE-JOB-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-018",
+      "target": "BE-JOB-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-020",
+      "target": "BE-JOB-003",
+      "type": "verifies"
+    },
+    {
+      "source": "DB-PERF-003",
+      "target": "BE-JOB-003",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-011",
+      "target": "BE-JOB-004",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-JOB-004",
+      "target": "BE-JOB-004",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-011",
+      "target": "BE-JOB-004",
+      "type": "verifies"
+    },
+    {
+      "source": "BE-DEP-001",
+      "target": "BE-JOB-004",
+      "type": "prerequisite"
+    },
+    {
+      "source": "BE-JOB-003",
+      "target": "BE-JOB-004",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-011",
+      "target": "BE-DEP-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-016",
+      "target": "BE-DEP-001",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "BE-DEP-001",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-DEP-001",
+      "target": "BE-DEP-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-011",
+      "target": "BE-DEP-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-016",
+      "target": "BE-DEP-001",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "BE-DEP-001",
+      "type": "verifies"
+    },
+    {
+      "source": "BE-DEP-002",
+      "target": "BE-DEP-001",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-016",
+      "target": "BE-DEP-002",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "BE-DEP-002",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-019",
+      "target": "BE-DEP-002",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-DEP-002",
+      "target": "BE-DEP-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-016",
+      "target": "BE-DEP-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "BE-DEP-002",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-019",
+      "target": "BE-DEP-002",
+      "type": "verifies"
+    },
+    {
+      "source": "DB-PERF-001",
+      "target": "BE-DEP-002",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-013",
+      "target": "BE-DEP-003",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-016",
+      "target": "BE-DEP-003",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "BE-DEP-003",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-018",
+      "target": "BE-DEP-003",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-DEP-003",
+      "target": "BE-DEP-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-013",
+      "target": "BE-DEP-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-016",
+      "target": "BE-DEP-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "BE-DEP-003",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-018",
+      "target": "BE-DEP-003",
+      "type": "verifies"
+    },
+    {
+      "source": "BE-DEP-001",
+      "target": "BE-DEP-003",
+      "type": "prerequisite"
+    },
+    {
+      "source": "BE-JOB-003",
+      "target": "BE-DEP-003",
+      "type": "prerequisite"
+    },
+    {
+      "source": "DB-PERF-003",
+      "target": "BE-DEP-003",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-016",
+      "target": "BE-DEP-004",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-017",
+      "target": "BE-DEP-004",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-DEP-004",
+      "target": "BE-DEP-004",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-016",
+      "target": "BE-DEP-004",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-017",
+      "target": "BE-DEP-004",
+      "type": "verifies"
+    },
+    {
+      "source": "BE-JOB-002",
+      "target": "BE-DEP-004",
+      "type": "prerequisite"
+    },
+    {
+      "source": "BE-JOB-003",
+      "target": "BE-DEP-004",
+      "type": "prerequisite"
+    },
+    {
+      "source": "TEST-BE-DEP-005",
+      "target": "BE-DEP-005",
+      "type": "verifies"
+    },
+    {
+      "source": "BE-JOB-002",
+      "target": "BE-DEP-005",
+      "type": "prerequisite"
+    },
+    {
+      "source": "DB-PERF-003",
+      "target": "BE-DEP-005",
+      "type": "prerequisite"
+    },
+    {
+      "source": "2026-INC-014",
+      "target": "BE-JOB-005",
+      "type": "motivates"
+    },
+    {
+      "source": "2026-INC-015",
+      "target": "BE-JOB-005",
+      "type": "motivates"
+    },
+    {
+      "source": "TEST-BE-JOB-005",
+      "target": "BE-JOB-005",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-014",
+      "target": "BE-JOB-005",
+      "type": "verifies"
+    },
+    {
+      "source": "NA-2026-015",
+      "target": "BE-JOB-005",
+      "type": "verifies"
+    },
+    {
+      "source": "BE-JOB-003",
+      "target": "BE-JOB-005",
+      "type": "prerequisite"
+    },
+    {
+      "source": "TEST-INFRA-001",
+      "target": "INFRA-001",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-INFRA-002",
+      "target": "INFRA-002",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-INFRA-003",
+      "target": "INFRA-003",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-INFRA-004",
+      "target": "INFRA-004",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-INFRA-005",
+      "target": "INFRA-005",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-INFRA-006",
+      "target": "INFRA-006",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-INFRA-007",
+      "target": "INFRA-007",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-INFRA-008",
+      "target": "INFRA-008",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OBS-001",
+      "target": "OBS-001",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OBS-002",
+      "target": "OBS-002",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OBS-003",
+      "target": "OBS-003",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OBS-004",
+      "target": "OBS-004",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OBS-005",
+      "target": "OBS-005",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OBS-006",
+      "target": "OBS-006",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OBS-007",
+      "target": "OBS-007",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OBS-008",
+      "target": "OBS-008",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OBS-009",
+      "target": "OBS-009",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OPS-001",
+      "target": "OPS-001",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OPS-002",
+      "target": "OPS-002",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OPS-003",
+      "target": "OPS-003",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OPS-004",
+      "target": "OPS-004",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OPS-005",
+      "target": "OPS-005",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OPS-006",
+      "target": "OPS-006",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OPS-007",
+      "target": "OPS-007",
+      "type": "verifies"
+    },
+    {
+      "source": "TEST-OPS-008",
+      "target": "OPS-008",
+      "type": "verifies"
+    },
+    {
+      "source": "DB-PERF-002",
+      "target": "BE-SCORE-002",
+      "type": "integration_contract_coordination_not_prerequisite"
+    },
+    {
+      "source": "BE-DEP-002",
+      "target": "DB-PERF-001",
+      "type": "integration_contract_coordination_not_prerequisite"
+    },
+    {
+      "source": "BE-JOB-003",
+      "target": "DB-PERF-003",
+      "type": "integration_contract_coordination_not_prerequisite"
+    },
+    {
+      "source": "BE-JOB-002",
+      "target": "BE-JOB-001",
+      "type": "integration_contract_coordination_not_prerequisite"
+    },
+    {
+      "source": "BE-SCORE-002",
+      "target": "BE-JOB-001",
+      "type": "integration_contract_coordination_not_prerequisite"
+    },
+    {
+      "source": "BE-JOB-003",
+      "target": "BE-JOB-002",
+      "type": "integration_contract_coordination_not_prerequisite"
+    },
+    {
+      "source": "BE-JOB-004",
+      "target": "BE-DEP-001",
+      "type": "integration_contract_coordination_not_prerequisite"
+    }
+  ]
+}

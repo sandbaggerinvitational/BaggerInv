@@ -1,0 +1,34 @@
+# Preventability by incident
+
+Judgments concern avoidable failure classes, not hindsight certainty about each physical event.
+
+| Incident | Assessment | Evidence / counterfactual |
+|---|---|---|
+| 2026-INC-001 | PREVENTABLE WITH BETTER TESTING / WORKFLOW | Earlier presentation or fresh-render success did not prove a long-mounted page across tournament-local midnight or a device timezone different from the tournament timezone. |
+| 2026-INC-002 | PREVENTABLE WITH BETTER TESTING / WORKFLOW | Fixture-based Build 8 navigation PASS lacked current canonical boundary responses. JSON decode and screen rendering were weaker than DTO semantic compatibility. |
+| 2026-INC-003 | PREVENTABLE WITH BETTER TESTING / WORKFLOW | Build 8's 19 participant visual comparisons did not cover spectator More under the Release signed-out window appearance. The DEBUG gallery's outer light mode produced a false-negative fixture. |
+| 2026-INC-004 | PREVENTABLE WITH BETTER TESTING / WORKFLOW | Build 8 public journeys and Build 9 appearance tests proved surfaces, not empty-cache pending semantics, resource-specific retry, provider attribution, or physical latency. Nearby HTTP 200s were not evidence against a transient client failure. |
+| 2026-INC-005 | PREVENTABLE WITH BETTER TESTING / WORKFLOW | Prior score queue, Best Ball, and badge tests proved saved-hole presentation and server calculations. They did not prove canonical stroke visibility before entry on all 18 holes and formats. |
+| 2026-INC-006 | PREVENTABLE WITH BETTER ARCHITECTURE + TESTING | Coordinator fixtures used an in-memory queue; SQLite fixtures predominantly used whole-second clocks. Five focused recovery tests proved supported states, not real SQLite plus fractional timestamps across consecutive transitions. Broad 'score queue regression PASS' language overstated lifecycle coverage. |
+| 2026-INC-007 | PREVENTABLE WITH BETTER ARCHITECTURE + TESTING | The prior coordinator test asserted final authenticated state after successful reattestation. It did not observe intermediate RootView branch destruction, controller identity, selected tab/subtab, or path. Generic repository and feature tests therefore passed while navigation context was lost. |
+| 2026-INC-008 | PREVENTABLE WITH BETTER TESTING / WORKFLOW | Prior published-Odds PASS used values within six digits and validated HTTP/decode/presentation under those fixtures. It did not exercise the full legitimate output domain. HTTP 200 from older publications did not prove the new publication's semantic usability. |
+| 2026-INC-009 | PREVENTABLE WITH BETTER TESTING / WORKFLOW | Prior side-game PASS claims used published/calculated fixtures or single-lifecycle snapshots. They did not execute the chronological transition from Official earlier rounds to a newly Configured later round, nor distinguish base-envelope compatibility from detailed-screen usability. |
+| 2026-INC-010 | PREVENTABLE WITH BETTER TESTING / WORKFLOW | The earlier PASS called the JavaScript calculation engine directly. It bypassed the installed PostgreSQL claim initializer, lease, receipt, and completion path. |
+| 2026-INC-011 | PREVENTABLE WITH BETTER ARCHITECTURE + TESTING | Release certification tested activation exactness and processor behavior separately. It did not exercise an already-pending, activation-bound durable job across a normal activation increment. |
+| 2026-INC-012 | PREVENTABLE WITH BETTER TESTING / WORKFLOW | Pre-golf certification did not execute the installed configured-read branch or all worker SQL functions in PostgreSQL. Source and native DTO checks were incorrectly allowed to stand in for database execution. |
+| 2026-INC-013 | PREVENTABLE WITH BETTER ARCHITECTURE + TESTING | The first-write audit path and the multi-step atomic Open path had not been tested together against exact release binding. Individual operations looked valid in isolation. |
+| 2026-INC-014 | PREVENTABLE WITH BETTER TESTING / WORKFLOW | Staged source/UI acceptance did not assert the Production-target secret inventory or perform a real post-rebind scoring-session handshake before tournament use. |
+| 2026-INC-015 | ROOT CAUSE UNKNOWN; containment and detection preventable | Certification lacked device-visible worker version/state telemetry and a physical update lifecycle test across an already-installed PWA. |
+| 2026-INC-016 | PREVENTABLE WITH BETTER ARCHITECTURE + TESTING | Lifecycle certification did not simulate a completed-but-unpublished READY calculation surviving later canonical golf changes, or verify that every blocking state had a Director recovery action. |
+| 2026-INC-017 | PREVENTABLE WITH BETTER ARCHITECTURE + TESTING | Pairing success was allowed to appear operationally complete even though preparation was a separate action. The dependency graph was not tested in real operator order, and the hash represented history/control metadata unrelated to Calcutta economic correctness. |
+| 2026-INC-018 | PREVENTABLE WITH BETTER ARCHITECTURE + TESTING | Unknown-outcome certification covered idempotent same-state replay, but the operator UI did not first reconcile receipt/state and invalidate a stale saved intent after other actors changed the round. |
+| 2026-INC-019 | PREVENTABLE WITH BETTER ARCHITECTURE + TESTING | Score certification tested core scoring correctness and downstream results but did not budget every synchronous trigger under historical data growth. Planner-time execution of nested STABLE hashes was absent from unit fixtures and small datasets. |
+| 2026-INC-020 | PREVENTABLE WITH BETTER ARCHITECTURE + TESTING | Pre-tournament certification did not include an operator-grade paper-card reconciliation workflow for partial cards, concurrent writers, unknown responses, and already-Official holes. |
+| 2026-INC-021 | PREVENTABLE WITH BETTER TESTING / WORKFLOW | Auction entry/edit covered; final-entry removal lifecycle not represented as a supported operation. |
+| 2026-INC-022 | ROOT CAUSE UNKNOWN; containment and detection preventable | No retained capacity/causal metric proof at relevant layer; see certification audit. |
+| 2026-INC-023 | ROOT CAUSE UNKNOWN; containment and detection preventable | No retained capacity/causal metric proof at relevant layer; see certification audit. |
+| 2026-INC-024 | PREVENTABLE WITH BETTER OBSERVABILITY/CAPACITY | No retained capacity/causal metric proof at relevant layer; see certification audit. |
+| 2026-INC-025 | PREVENTABLE WITH BETTER OBSERVABILITY/CAPACITY | No retained capacity/causal metric proof at relevant layer; see certification audit. |
+| 2026-INC-026 | ROOT CAUSE UNKNOWN; containment and detection preventable | Latency snapshots and simulator response handling did not prove long-lived physical network performance. |
+
+No retained evidence justifies dismissing the majority as unforeseeable real-world edge cases. Exact external outage mechanism remains unknown; the safe response to resource loss is testable.
