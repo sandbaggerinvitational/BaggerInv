@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "classification": "FIXTURE_DIAGNOSTIC_NOT_PERFORMANCE_BASELINE",
+  "scope": "Local socket-only PostgreSQL 17; no Production or network target",
+  "retentionNote": "The rejected-fixture diagnoses and corrected 17/17 probe summary are retained here. The redundant one-sample task-created PROBE.json is excluded from Git; the final every-sample-validated benchmark is authoritative.",
+  "observations": [
+    {
+      "id": "FIXTURE-DEBUG-001",
+      "samples": 1,
+      "scale": 1,
+      "successfulOperations": 14,
+      "failedOperations": 3,
+      "failures": [
+        {
+          "operation": "prepare-match",
+          "code": "TOURNAMENT_SETUP_DEPENDENCY_BLOCKED",
+          "cause": "The scaled current side-game fixture had active Calcutta auction and result dependencies. The guard correctly denied PREPARE."
+        },
+        {
+          "operation": "round-open",
+          "code": "ROUND_TRANSACTION_ABORTED",
+          "cause": "Reset match revisions collided with retained synthetic Google outbox rows at the same (match_id, match_revision). Direct first-child execution proved the unique-key conflict."
+        },
+        {
+          "operation": "round-resume",
+          "code": "ROUND_PREFLIGHT_FAILED",
+          "cause": "The original fixture set matches Live without a real ACCESS_ACTIVATE authority hash; all three applicable matches returned RESUME_AUTHORITY_BINDING_MISMATCH."
+        }
+      ]
+    },
+    {
+      "id": "FIXTURE-DEBUG-002",
+      "method": "Direct first-child public.mutate_production_match_control call inside BEGIN/ROLLBACK",
+      "operation": "round-open / MARK_LIVE / 2026-R3-1",
+      "error": "duplicate key value violates unique constraint google_outbox_events_match_id_match_revision_key",
+      "detail": "Key (match_id, match_revision)=(2026-R3-1, 1) already exists."
+    },
+    {
+      "id": "FIXTURE-DEBUG-003",
+      "artifact": "excluded redundant one-sample PROBE.json",
+      "samples": 1,
+      "scale": 1,
+      "successfulOperations": 17,
+      "failedOperations": 0,
+      "corrections": [
+        "PREPARE selects a separate template cloned before scaled side-game history is seeded; the dependency guard is unchanged.",
+        "Open removes rollback-scoped synthetic outbox and audit history when resetting match revisions.",
+        "Resume performs the actual Open then Lock lifecycle before the timed Resume RPC."
+      ],
+      "artifactSha256": "465c5e26edb15cbd1916b0b23dc944649a7338a7f0fce4c88003c5809bc86a8e"
+    }
+  ]
+}

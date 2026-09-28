@@ -1,0 +1,2007 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-28T05:49:13.646Z",
+  "fixtureVersion": "bagger-r139-synthetic-history-v1",
+  "fixtureSeed": "2026-never-again-139",
+  "proofLayer": "INTEGRATION",
+  "production": false,
+  "operations": [
+    {
+      "benchmarkId": "BENCH-CALCUTTA-PROCESSOR",
+      "operation": "CALCUTTA queue→claim→calculate→complete→readback",
+      "fixtureVersion": "bagger-r139-synthetic-history-v1",
+      "fixtureSeed": "2026-never-again-139",
+      "historyScale": 1,
+      "environment": {
+        "scope": "LOCAL_SOCKET_ONLY",
+        "databaseVersion": "17.11 (Homebrew)",
+        "host": {
+          "platform": "darwin",
+          "architecture": "arm64",
+          "osRelease": "25.5.0",
+          "nodeVersion": "v26.7.0",
+          "cpuModel": "Apple M5",
+          "logicalCpus": 10,
+          "totalMemoryBytes": 17179869184
+        },
+        "databaseSettings": {
+          "jit": "on",
+          "fsync": "off",
+          "work_mem": "4MB",
+          "shared_buffers": "32MB",
+          "max_connections": "20",
+          "synchronous_commit": "on"
+        },
+        "resourceUtilization": {
+          "cpu": null,
+          "memory": null,
+          "io": null,
+          "connections": null,
+          "status": "UNAVAILABLE_NOT_SAMPLED"
+        },
+        "initialResourceSnapshot": {
+          "observedAt": "2026-09-28T05:49:15.368Z",
+          "hostLoadAverage": [
+            4.22021484375,
+            3.93994140625,
+            3.84716796875
+          ],
+          "hostFreeMemoryBytes": 170049536,
+          "database": {
+            "commits": 301,
+            "backends": 1,
+            "blocksHit": 723276,
+            "deadlocks": 0,
+            "rollbacks": 0,
+            "sizeBytes": 31798963,
+            "blocksRead": 441,
+            "statsReset": null,
+            "trackIoTiming": "off",
+            "temporaryBytes": 0,
+            "blockReadTimeMs": 0,
+            "blockWriteTimeMs": 0
+          },
+          "limitations": [
+            "Cumulative database counters can lag; no subtraction across databases.",
+            "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+            "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+            "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+          ]
+        },
+        "limitations": [
+          "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+          "This is not a Supabase compute tier or Production capacity measurement.",
+          "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+        ]
+      },
+      "requestedSampleCount": 30,
+      "sampleCount": 30,
+      "successCount": 30,
+      "failureCount": 0,
+      "result": "MEASURED",
+      "failure": null,
+      "phases": {
+        "queue": {
+          "sampleCount": 30,
+          "p50Ms": 10.455167000000074,
+          "p95Ms": 13.013584000000264,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 19.41387500000019
+        },
+        "claim": {
+          "sampleCount": 30,
+          "p50Ms": 30.032249999998385,
+          "p95Ms": 37.00250000000051,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 40.73650000000089
+        },
+        "calculate": {
+          "sampleCount": 30,
+          "p50Ms": 11.326125000001412,
+          "p95Ms": 14.758332999999766,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 33.205832999999984
+        },
+        "complete": {
+          "sampleCount": 30,
+          "p50Ms": 12.55108300000029,
+          "p95Ms": 14.874458999998751,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 18.327666999999565
+        },
+        "canonical_readback": {
+          "sampleCount": 30,
+          "p50Ms": 0.10741600000073959,
+          "p95Ms": 0.16083399999843095,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 0.17908399999942048
+        },
+        "total": {
+          "sampleCount": 30,
+          "p50Ms": 64.39650000000074,
+          "p95Ms": 78.7690419999999,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 111.89679200000137
+        }
+      },
+      "resultStates": [
+        "PROVISIONAL"
+      ],
+      "queryCount": null,
+      "queryCountStatus": "UNKNOWN_NESTED_STATEMENTS_UNMEASURED",
+      "explicitTimedSqlCalls": 4,
+      "checkpointCount": null,
+      "rowsExamined": null,
+      "rowsExaminedStatus": "UNKNOWN_NO_PLAN_OR_EXECUTOR_COUNTER",
+      "databaseTime": {
+        "serverOnlyMs": null,
+        "serverOnlyStatus": "UNKNOWN",
+        "sqlProtocolPhases": [
+          "queue",
+          "claim",
+          "complete",
+          "canonical_readback"
+        ]
+      }
+    },
+    {
+      "benchmarkId": "BENCH-NET_SKINS-PROCESSOR",
+      "operation": "NET_SKINS queue→claim→calculate→complete→readback",
+      "fixtureVersion": "bagger-r139-synthetic-history-v1",
+      "fixtureSeed": "2026-never-again-139",
+      "historyScale": 1,
+      "environment": {
+        "scope": "LOCAL_SOCKET_ONLY",
+        "databaseVersion": "17.11 (Homebrew)",
+        "host": {
+          "platform": "darwin",
+          "architecture": "arm64",
+          "osRelease": "25.5.0",
+          "nodeVersion": "v26.7.0",
+          "cpuModel": "Apple M5",
+          "logicalCpus": 10,
+          "totalMemoryBytes": 17179869184
+        },
+        "databaseSettings": {
+          "jit": "on",
+          "fsync": "off",
+          "work_mem": "4MB",
+          "shared_buffers": "32MB",
+          "max_connections": "20",
+          "synchronous_commit": "on"
+        },
+        "resourceUtilization": {
+          "cpu": null,
+          "memory": null,
+          "io": null,
+          "connections": null,
+          "status": "UNAVAILABLE_NOT_SAMPLED"
+        },
+        "initialResourceSnapshot": {
+          "observedAt": "2026-09-28T05:49:15.368Z",
+          "hostLoadAverage": [
+            4.22021484375,
+            3.93994140625,
+            3.84716796875
+          ],
+          "hostFreeMemoryBytes": 170049536,
+          "database": {
+            "commits": 301,
+            "backends": 1,
+            "blocksHit": 723276,
+            "deadlocks": 0,
+            "rollbacks": 0,
+            "sizeBytes": 31798963,
+            "blocksRead": 441,
+            "statsReset": null,
+            "trackIoTiming": "off",
+            "temporaryBytes": 0,
+            "blockReadTimeMs": 0,
+            "blockWriteTimeMs": 0
+          },
+          "limitations": [
+            "Cumulative database counters can lag; no subtraction across databases.",
+            "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+            "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+            "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+          ]
+        },
+        "limitations": [
+          "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+          "This is not a Supabase compute tier or Production capacity measurement.",
+          "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+        ]
+      },
+      "requestedSampleCount": 30,
+      "sampleCount": 30,
+      "successCount": 30,
+      "failureCount": 0,
+      "result": "MEASURED",
+      "failure": null,
+      "phases": {
+        "queue": {
+          "sampleCount": 30,
+          "p50Ms": 9.161082999999053,
+          "p95Ms": 17.59820800000125,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 19.206249999999272
+        },
+        "claim": {
+          "sampleCount": 30,
+          "p50Ms": 28.902249999999185,
+          "p95Ms": 35.92054199999984,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 40.21899999999914
+        },
+        "calculate": {
+          "sampleCount": 30,
+          "p50Ms": 0.6784160000006523,
+          "p95Ms": 0.9340420000007725,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 1.9924169999994774
+        },
+        "complete": {
+          "sampleCount": 30,
+          "p50Ms": 10.468708000000333,
+          "p95Ms": 15.412958000000799,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 15.774708000000828
+        },
+        "canonical_readback": {
+          "sampleCount": 30,
+          "p50Ms": 0.0895410000011907,
+          "p95Ms": 0.12637499999982538,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 0.14495800000076997
+        },
+        "total": {
+          "sampleCount": 30,
+          "p50Ms": 49.33137499999975,
+          "p95Ms": 67.82233300000007,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 71.7494170000009
+        }
+      },
+      "resultStates": [
+        "OFFICIAL"
+      ],
+      "queryCount": null,
+      "queryCountStatus": "UNKNOWN_NESTED_STATEMENTS_UNMEASURED",
+      "explicitTimedSqlCalls": 4,
+      "checkpointCount": null,
+      "rowsExamined": null,
+      "rowsExaminedStatus": "UNKNOWN_NO_PLAN_OR_EXECUTOR_COUNTER",
+      "databaseTime": {
+        "serverOnlyMs": null,
+        "serverOnlyStatus": "UNKNOWN",
+        "sqlProtocolPhases": [
+          "queue",
+          "claim",
+          "complete",
+          "canonical_readback"
+        ]
+      }
+    },
+    {
+      "benchmarkId": "BENCH-ODDS-PROCESSOR",
+      "operation": "ODDS request→claim→checkpointed calculation→complete→readback",
+      "fixtureVersion": "bagger-r139-synthetic-history-v1",
+      "fixtureSeed": "2026-never-again-139",
+      "historyScale": 1,
+      "environment": {
+        "scope": "LOCAL_SOCKET_ONLY",
+        "databaseVersion": "17.11 (Homebrew)",
+        "host": {
+          "platform": "darwin",
+          "architecture": "arm64",
+          "osRelease": "25.5.0",
+          "nodeVersion": "v26.7.0",
+          "cpuModel": "Apple M5",
+          "logicalCpus": 10,
+          "totalMemoryBytes": 17179869184
+        },
+        "databaseSettings": {
+          "jit": "on",
+          "fsync": "off",
+          "work_mem": "4MB",
+          "shared_buffers": "32MB",
+          "max_connections": "20",
+          "synchronous_commit": "on"
+        },
+        "resourceUtilization": {
+          "cpu": null,
+          "memory": null,
+          "io": null,
+          "connections": null,
+          "status": "UNAVAILABLE_NOT_SAMPLED"
+        },
+        "initialResourceSnapshot": {
+          "observedAt": "2026-09-28T05:49:15.368Z",
+          "hostLoadAverage": [
+            4.22021484375,
+            3.93994140625,
+            3.84716796875
+          ],
+          "hostFreeMemoryBytes": 170049536,
+          "database": {
+            "commits": 301,
+            "backends": 1,
+            "blocksHit": 723276,
+            "deadlocks": 0,
+            "rollbacks": 0,
+            "sizeBytes": 31798963,
+            "blocksRead": 441,
+            "statsReset": null,
+            "trackIoTiming": "off",
+            "temporaryBytes": 0,
+            "blockReadTimeMs": 0,
+            "blockWriteTimeMs": 0
+          },
+          "limitations": [
+            "Cumulative database counters can lag; no subtraction across databases.",
+            "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+            "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+            "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+          ]
+        },
+        "limitations": [
+          "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+          "This is not a Supabase compute tier or Production capacity measurement.",
+          "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+        ]
+      },
+      "requestedSampleCount": 30,
+      "sampleCount": 30,
+      "successCount": 30,
+      "failureCount": 0,
+      "result": "MEASURED",
+      "failure": null,
+      "phases": {
+        "prepare": {
+          "sampleCount": 30,
+          "p50Ms": 1.2866250000079162,
+          "p95Ms": 3.6867919999986043,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 4.325665999997
+        },
+        "queue": {
+          "sampleCount": 30,
+          "p50Ms": 1.3220410000067204,
+          "p95Ms": 5.256833000021288,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 5.553417000000991
+        },
+        "claim": {
+          "sampleCount": 30,
+          "p50Ms": 0.8522499999962747,
+          "p95Ms": 1.2872909999987314,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 1.7036250000019209
+        },
+        "checkpoint": {
+          "sampleCount": 30,
+          "p50Ms": 4.1948750000156,
+          "p95Ms": 7.882623999998032,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 8.674084000005678
+        },
+        "complete": {
+          "sampleCount": 30,
+          "p50Ms": 1.1082919999898877,
+          "p95Ms": 1.6855409999989206,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 2.787041000003228
+        },
+        "worker_total": {
+          "sampleCount": 30,
+          "p50Ms": 6268.1235000000015,
+          "p95Ms": 6582.033582999997,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 6690.183416000014
+        },
+        "worker_non_sql": {
+          "sampleCount": 30,
+          "p50Ms": 6262.098457999993,
+          "p95Ms": 6574.784999999989,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 6684.086249000073
+        },
+        "canonical_readback": {
+          "sampleCount": 30,
+          "p50Ms": 0.924165999997058,
+          "p95Ms": 1.5679159999999683,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 1.9917910000003758
+        },
+        "total": {
+          "sampleCount": 30,
+          "p50Ms": 6270.3548750000045,
+          "p95Ms": 6586.208415999994,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 6692.4749160000065
+        }
+      },
+      "resultStates": [
+        "REHEARSAL_ONLY"
+      ],
+      "executionMode": "STEP11_REHEARSAL",
+      "publicationStatus": "REHEARSAL_ONLY",
+      "publicationCreated": false,
+      "mirrorCreated": false,
+      "queryCount": null,
+      "queryCountStatus": "UNKNOWN_NESTED_STATEMENTS_UNMEASURED",
+      "explicitTimedSqlCalls": 8,
+      "checkpointCount": 4,
+      "rowsExamined": null,
+      "rowsExaminedStatus": "UNKNOWN_NO_PLAN_OR_EXECUTOR_COUNTER",
+      "databaseTime": {
+        "serverOnlyMs": null,
+        "serverOnlyStatus": "UNKNOWN",
+        "sqlProtocolPhases": [
+          "queue",
+          "claim",
+          "checkpoint",
+          "complete",
+          "canonical_readback"
+        ]
+      }
+    },
+    {
+      "benchmarkId": "BENCH-CALCUTTA-PROCESSOR",
+      "operation": "CALCUTTA queue→claim→calculate→complete→readback",
+      "fixtureVersion": "bagger-r139-synthetic-history-v1",
+      "fixtureSeed": "2026-never-again-139",
+      "historyScale": 2,
+      "environment": {
+        "scope": "LOCAL_SOCKET_ONLY",
+        "databaseVersion": "17.11 (Homebrew)",
+        "host": {
+          "platform": "darwin",
+          "architecture": "arm64",
+          "osRelease": "25.5.0",
+          "nodeVersion": "v26.7.0",
+          "cpuModel": "Apple M5",
+          "logicalCpus": 10,
+          "totalMemoryBytes": 17179869184
+        },
+        "databaseSettings": {
+          "jit": "on",
+          "fsync": "off",
+          "work_mem": "4MB",
+          "shared_buffers": "32MB",
+          "max_connections": "20",
+          "synchronous_commit": "on"
+        },
+        "resourceUtilization": {
+          "cpu": null,
+          "memory": null,
+          "io": null,
+          "connections": null,
+          "status": "UNAVAILABLE_NOT_SAMPLED"
+        },
+        "initialResourceSnapshot": {
+          "observedAt": "2026-09-28T05:49:15.368Z",
+          "hostLoadAverage": [
+            4.22021484375,
+            3.93994140625,
+            3.84716796875
+          ],
+          "hostFreeMemoryBytes": 170049536,
+          "database": {
+            "commits": 301,
+            "backends": 1,
+            "blocksHit": 723276,
+            "deadlocks": 0,
+            "rollbacks": 0,
+            "sizeBytes": 31798963,
+            "blocksRead": 441,
+            "statsReset": null,
+            "trackIoTiming": "off",
+            "temporaryBytes": 0,
+            "blockReadTimeMs": 0,
+            "blockWriteTimeMs": 0
+          },
+          "limitations": [
+            "Cumulative database counters can lag; no subtraction across databases.",
+            "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+            "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+            "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+          ]
+        },
+        "limitations": [
+          "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+          "This is not a Supabase compute tier or Production capacity measurement.",
+          "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+        ]
+      },
+      "requestedSampleCount": 30,
+      "sampleCount": 30,
+      "successCount": 30,
+      "failureCount": 0,
+      "result": "MEASURED",
+      "failure": null,
+      "phases": {
+        "queue": {
+          "sampleCount": 30,
+          "p50Ms": 11.892332999996142,
+          "p95Ms": 16.47291700000642,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 22.313875000021653
+        },
+        "claim": {
+          "sampleCount": 30,
+          "p50Ms": 34.126250000001164,
+          "p95Ms": 38.32375000001048,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 145.32924999998068
+        },
+        "calculate": {
+          "sampleCount": 30,
+          "p50Ms": 11.756499999988591,
+          "p95Ms": 12.99062500000582,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 13.569250000000466
+        },
+        "complete": {
+          "sampleCount": 30,
+          "p50Ms": 13.90295800002059,
+          "p95Ms": 17.38949999999022,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 18.42020799999591
+        },
+        "canonical_readback": {
+          "sampleCount": 30,
+          "p50Ms": 0.09220899999490939,
+          "p95Ms": 0.13633300000219606,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 0.13770900000235997
+        },
+        "total": {
+          "sampleCount": 30,
+          "p50Ms": 71.72483399999328,
+          "p95Ms": 89.1991670000134,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 191.06845799999428
+        }
+      },
+      "resultStates": [
+        "PROVISIONAL"
+      ],
+      "queryCount": null,
+      "queryCountStatus": "UNKNOWN_NESTED_STATEMENTS_UNMEASURED",
+      "explicitTimedSqlCalls": 4,
+      "checkpointCount": null,
+      "rowsExamined": null,
+      "rowsExaminedStatus": "UNKNOWN_NO_PLAN_OR_EXECUTOR_COUNTER",
+      "databaseTime": {
+        "serverOnlyMs": null,
+        "serverOnlyStatus": "UNKNOWN",
+        "sqlProtocolPhases": [
+          "queue",
+          "claim",
+          "complete",
+          "canonical_readback"
+        ]
+      }
+    },
+    {
+      "benchmarkId": "BENCH-NET_SKINS-PROCESSOR",
+      "operation": "NET_SKINS queue→claim→calculate→complete→readback",
+      "fixtureVersion": "bagger-r139-synthetic-history-v1",
+      "fixtureSeed": "2026-never-again-139",
+      "historyScale": 2,
+      "environment": {
+        "scope": "LOCAL_SOCKET_ONLY",
+        "databaseVersion": "17.11 (Homebrew)",
+        "host": {
+          "platform": "darwin",
+          "architecture": "arm64",
+          "osRelease": "25.5.0",
+          "nodeVersion": "v26.7.0",
+          "cpuModel": "Apple M5",
+          "logicalCpus": 10,
+          "totalMemoryBytes": 17179869184
+        },
+        "databaseSettings": {
+          "jit": "on",
+          "fsync": "off",
+          "work_mem": "4MB",
+          "shared_buffers": "32MB",
+          "max_connections": "20",
+          "synchronous_commit": "on"
+        },
+        "resourceUtilization": {
+          "cpu": null,
+          "memory": null,
+          "io": null,
+          "connections": null,
+          "status": "UNAVAILABLE_NOT_SAMPLED"
+        },
+        "initialResourceSnapshot": {
+          "observedAt": "2026-09-28T05:49:15.368Z",
+          "hostLoadAverage": [
+            4.22021484375,
+            3.93994140625,
+            3.84716796875
+          ],
+          "hostFreeMemoryBytes": 170049536,
+          "database": {
+            "commits": 301,
+            "backends": 1,
+            "blocksHit": 723276,
+            "deadlocks": 0,
+            "rollbacks": 0,
+            "sizeBytes": 31798963,
+            "blocksRead": 441,
+            "statsReset": null,
+            "trackIoTiming": "off",
+            "temporaryBytes": 0,
+            "blockReadTimeMs": 0,
+            "blockWriteTimeMs": 0
+          },
+          "limitations": [
+            "Cumulative database counters can lag; no subtraction across databases.",
+            "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+            "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+            "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+          ]
+        },
+        "limitations": [
+          "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+          "This is not a Supabase compute tier or Production capacity measurement.",
+          "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+        ]
+      },
+      "requestedSampleCount": 30,
+      "sampleCount": 30,
+      "successCount": 30,
+      "failureCount": 0,
+      "result": "MEASURED",
+      "failure": null,
+      "phases": {
+        "queue": {
+          "sampleCount": 30,
+          "p50Ms": 9.636375000001863,
+          "p95Ms": 11.485375000018394,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 18.362375000026077
+        },
+        "claim": {
+          "sampleCount": 30,
+          "p50Ms": 31.78962500000489,
+          "p95Ms": 36.36133300000802,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 36.73074999998789
+        },
+        "calculate": {
+          "sampleCount": 30,
+          "p50Ms": 0.6372919999994338,
+          "p95Ms": 0.8730839999916498,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 0.899582999991253
+        },
+        "complete": {
+          "sampleCount": 30,
+          "p50Ms": 11.091082999977516,
+          "p95Ms": 13.44383299999754,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 15.734333000000333
+        },
+        "canonical_readback": {
+          "sampleCount": 30,
+          "p50Ms": 0.08395800000289455,
+          "p95Ms": 0.09966700000222772,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 0.10666699998546392
+        },
+        "total": {
+          "sampleCount": 30,
+          "p50Ms": 53.57362499998999,
+          "p95Ms": 60.733875000005355,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 71.8294589999714
+        }
+      },
+      "resultStates": [
+        "OFFICIAL"
+      ],
+      "queryCount": null,
+      "queryCountStatus": "UNKNOWN_NESTED_STATEMENTS_UNMEASURED",
+      "explicitTimedSqlCalls": 4,
+      "checkpointCount": null,
+      "rowsExamined": null,
+      "rowsExaminedStatus": "UNKNOWN_NO_PLAN_OR_EXECUTOR_COUNTER",
+      "databaseTime": {
+        "serverOnlyMs": null,
+        "serverOnlyStatus": "UNKNOWN",
+        "sqlProtocolPhases": [
+          "queue",
+          "claim",
+          "complete",
+          "canonical_readback"
+        ]
+      }
+    },
+    {
+      "benchmarkId": "BENCH-ODDS-PROCESSOR",
+      "operation": "ODDS request→claim→checkpointed calculation→complete→readback",
+      "fixtureVersion": "bagger-r139-synthetic-history-v1",
+      "fixtureSeed": "2026-never-again-139",
+      "historyScale": 2,
+      "environment": {
+        "scope": "LOCAL_SOCKET_ONLY",
+        "databaseVersion": "17.11 (Homebrew)",
+        "host": {
+          "platform": "darwin",
+          "architecture": "arm64",
+          "osRelease": "25.5.0",
+          "nodeVersion": "v26.7.0",
+          "cpuModel": "Apple M5",
+          "logicalCpus": 10,
+          "totalMemoryBytes": 17179869184
+        },
+        "databaseSettings": {
+          "jit": "on",
+          "fsync": "off",
+          "work_mem": "4MB",
+          "shared_buffers": "32MB",
+          "max_connections": "20",
+          "synchronous_commit": "on"
+        },
+        "resourceUtilization": {
+          "cpu": null,
+          "memory": null,
+          "io": null,
+          "connections": null,
+          "status": "UNAVAILABLE_NOT_SAMPLED"
+        },
+        "initialResourceSnapshot": {
+          "observedAt": "2026-09-28T05:49:15.368Z",
+          "hostLoadAverage": [
+            4.22021484375,
+            3.93994140625,
+            3.84716796875
+          ],
+          "hostFreeMemoryBytes": 170049536,
+          "database": {
+            "commits": 301,
+            "backends": 1,
+            "blocksHit": 723276,
+            "deadlocks": 0,
+            "rollbacks": 0,
+            "sizeBytes": 31798963,
+            "blocksRead": 441,
+            "statsReset": null,
+            "trackIoTiming": "off",
+            "temporaryBytes": 0,
+            "blockReadTimeMs": 0,
+            "blockWriteTimeMs": 0
+          },
+          "limitations": [
+            "Cumulative database counters can lag; no subtraction across databases.",
+            "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+            "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+            "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+          ]
+        },
+        "limitations": [
+          "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+          "This is not a Supabase compute tier or Production capacity measurement.",
+          "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+        ]
+      },
+      "requestedSampleCount": 30,
+      "sampleCount": 30,
+      "successCount": 30,
+      "failureCount": 0,
+      "result": "MEASURED",
+      "failure": null,
+      "phases": {
+        "prepare": {
+          "sampleCount": 30,
+          "p50Ms": 1.2847920000203885,
+          "p95Ms": 1.4521250000107102,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 1.7609170000068843
+        },
+        "queue": {
+          "sampleCount": 30,
+          "p50Ms": 1.3078340000356548,
+          "p95Ms": 2.0675829999963753,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 6.14329199999338
+        },
+        "claim": {
+          "sampleCount": 30,
+          "p50Ms": 0.8665000000037253,
+          "p95Ms": 1.1714170000050217,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 1.4222500000032596
+        },
+        "checkpoint": {
+          "sampleCount": 30,
+          "p50Ms": 4.386292000010144,
+          "p95Ms": 7.984375,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 10.970751000015298
+        },
+        "complete": {
+          "sampleCount": 30,
+          "p50Ms": 1.1110830000252463,
+          "p95Ms": 1.940333999984432,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 3.283584000018891
+        },
+        "worker_total": {
+          "sampleCount": 30,
+          "p50Ms": 6377.439416000008,
+          "p95Ms": 6677.982583999983,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 6740.125375000003
+        },
+        "worker_non_sql": {
+          "sampleCount": 30,
+          "p50Ms": 6371.141999999993,
+          "p95Ms": 6670.350001999934,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 6732.309876999934
+        },
+        "canonical_readback": {
+          "sampleCount": 30,
+          "p50Ms": 0.9598339999793097,
+          "p95Ms": 1.210291999974288,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 1.7860839999921154
+        },
+        "total": {
+          "sampleCount": 30,
+          "p50Ms": 6380.109124999988,
+          "p95Ms": 6680.2349580000155,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 6742.559833000007
+        }
+      },
+      "resultStates": [
+        "REHEARSAL_ONLY"
+      ],
+      "executionMode": "STEP11_REHEARSAL",
+      "publicationStatus": "REHEARSAL_ONLY",
+      "publicationCreated": false,
+      "mirrorCreated": false,
+      "queryCount": null,
+      "queryCountStatus": "UNKNOWN_NESTED_STATEMENTS_UNMEASURED",
+      "explicitTimedSqlCalls": 8,
+      "checkpointCount": 4,
+      "rowsExamined": null,
+      "rowsExaminedStatus": "UNKNOWN_NO_PLAN_OR_EXECUTOR_COUNTER",
+      "databaseTime": {
+        "serverOnlyMs": null,
+        "serverOnlyStatus": "UNKNOWN",
+        "sqlProtocolPhases": [
+          "queue",
+          "claim",
+          "checkpoint",
+          "complete",
+          "canonical_readback"
+        ]
+      }
+    },
+    {
+      "benchmarkId": "BENCH-CALCUTTA-PROCESSOR",
+      "operation": "CALCUTTA queue→claim→calculate→complete→readback",
+      "fixtureVersion": "bagger-r139-synthetic-history-v1",
+      "fixtureSeed": "2026-never-again-139",
+      "historyScale": 5,
+      "environment": {
+        "scope": "LOCAL_SOCKET_ONLY",
+        "databaseVersion": "17.11 (Homebrew)",
+        "host": {
+          "platform": "darwin",
+          "architecture": "arm64",
+          "osRelease": "25.5.0",
+          "nodeVersion": "v26.7.0",
+          "cpuModel": "Apple M5",
+          "logicalCpus": 10,
+          "totalMemoryBytes": 17179869184
+        },
+        "databaseSettings": {
+          "jit": "on",
+          "fsync": "off",
+          "work_mem": "4MB",
+          "shared_buffers": "32MB",
+          "max_connections": "20",
+          "synchronous_commit": "on"
+        },
+        "resourceUtilization": {
+          "cpu": null,
+          "memory": null,
+          "io": null,
+          "connections": null,
+          "status": "UNAVAILABLE_NOT_SAMPLED"
+        },
+        "initialResourceSnapshot": {
+          "observedAt": "2026-09-28T05:49:15.368Z",
+          "hostLoadAverage": [
+            4.22021484375,
+            3.93994140625,
+            3.84716796875
+          ],
+          "hostFreeMemoryBytes": 170049536,
+          "database": {
+            "commits": 301,
+            "backends": 1,
+            "blocksHit": 723276,
+            "deadlocks": 0,
+            "rollbacks": 0,
+            "sizeBytes": 31798963,
+            "blocksRead": 441,
+            "statsReset": null,
+            "trackIoTiming": "off",
+            "temporaryBytes": 0,
+            "blockReadTimeMs": 0,
+            "blockWriteTimeMs": 0
+          },
+          "limitations": [
+            "Cumulative database counters can lag; no subtraction across databases.",
+            "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+            "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+            "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+          ]
+        },
+        "limitations": [
+          "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+          "This is not a Supabase compute tier or Production capacity measurement.",
+          "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+        ]
+      },
+      "requestedSampleCount": 30,
+      "sampleCount": 30,
+      "successCount": 30,
+      "failureCount": 0,
+      "result": "MEASURED",
+      "failure": null,
+      "phases": {
+        "queue": {
+          "sampleCount": 30,
+          "p50Ms": 11.451999999990221,
+          "p95Ms": 13.849417000019457,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 26.305625000037253
+        },
+        "claim": {
+          "sampleCount": 30,
+          "p50Ms": 33.46587499999441,
+          "p95Ms": 37.54550000000745,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 38.46512499998789
+        },
+        "calculate": {
+          "sampleCount": 30,
+          "p50Ms": 12.207999999984168,
+          "p95Ms": 15.037667000025976,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 23.20045800000662
+        },
+        "complete": {
+          "sampleCount": 30,
+          "p50Ms": 13.807666999986395,
+          "p95Ms": 15.28254200000083,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 19.71883299999172
+        },
+        "canonical_readback": {
+          "sampleCount": 30,
+          "p50Ms": 0.10170900000957772,
+          "p95Ms": 0.12320799997542053,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 0.1397500000311993
+        },
+        "total": {
+          "sampleCount": 30,
+          "p50Ms": 70.51729200000409,
+          "p95Ms": 77.43725000001723,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 106.88295800000196
+        }
+      },
+      "resultStates": [
+        "PROVISIONAL"
+      ],
+      "queryCount": null,
+      "queryCountStatus": "UNKNOWN_NESTED_STATEMENTS_UNMEASURED",
+      "explicitTimedSqlCalls": 4,
+      "checkpointCount": null,
+      "rowsExamined": null,
+      "rowsExaminedStatus": "UNKNOWN_NO_PLAN_OR_EXECUTOR_COUNTER",
+      "databaseTime": {
+        "serverOnlyMs": null,
+        "serverOnlyStatus": "UNKNOWN",
+        "sqlProtocolPhases": [
+          "queue",
+          "claim",
+          "complete",
+          "canonical_readback"
+        ]
+      }
+    },
+    {
+      "benchmarkId": "BENCH-NET_SKINS-PROCESSOR",
+      "operation": "NET_SKINS queue→claim→calculate→complete→readback",
+      "fixtureVersion": "bagger-r139-synthetic-history-v1",
+      "fixtureSeed": "2026-never-again-139",
+      "historyScale": 5,
+      "environment": {
+        "scope": "LOCAL_SOCKET_ONLY",
+        "databaseVersion": "17.11 (Homebrew)",
+        "host": {
+          "platform": "darwin",
+          "architecture": "arm64",
+          "osRelease": "25.5.0",
+          "nodeVersion": "v26.7.0",
+          "cpuModel": "Apple M5",
+          "logicalCpus": 10,
+          "totalMemoryBytes": 17179869184
+        },
+        "databaseSettings": {
+          "jit": "on",
+          "fsync": "off",
+          "work_mem": "4MB",
+          "shared_buffers": "32MB",
+          "max_connections": "20",
+          "synchronous_commit": "on"
+        },
+        "resourceUtilization": {
+          "cpu": null,
+          "memory": null,
+          "io": null,
+          "connections": null,
+          "status": "UNAVAILABLE_NOT_SAMPLED"
+        },
+        "initialResourceSnapshot": {
+          "observedAt": "2026-09-28T05:49:15.368Z",
+          "hostLoadAverage": [
+            4.22021484375,
+            3.93994140625,
+            3.84716796875
+          ],
+          "hostFreeMemoryBytes": 170049536,
+          "database": {
+            "commits": 301,
+            "backends": 1,
+            "blocksHit": 723276,
+            "deadlocks": 0,
+            "rollbacks": 0,
+            "sizeBytes": 31798963,
+            "blocksRead": 441,
+            "statsReset": null,
+            "trackIoTiming": "off",
+            "temporaryBytes": 0,
+            "blockReadTimeMs": 0,
+            "blockWriteTimeMs": 0
+          },
+          "limitations": [
+            "Cumulative database counters can lag; no subtraction across databases.",
+            "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+            "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+            "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+          ]
+        },
+        "limitations": [
+          "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+          "This is not a Supabase compute tier or Production capacity measurement.",
+          "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+        ]
+      },
+      "requestedSampleCount": 30,
+      "sampleCount": 30,
+      "successCount": 30,
+      "failureCount": 0,
+      "result": "MEASURED",
+      "failure": null,
+      "phases": {
+        "queue": {
+          "sampleCount": 30,
+          "p50Ms": 10.633582999987993,
+          "p95Ms": 12.978375000006054,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 21.277249999984633
+        },
+        "claim": {
+          "sampleCount": 30,
+          "p50Ms": 33.40941699995892,
+          "p95Ms": 39.14629199996125,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 40.116875000006985
+        },
+        "calculate": {
+          "sampleCount": 30,
+          "p50Ms": 0.63695800001733,
+          "p95Ms": 0.7457500000018626,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 1.003499999991618
+        },
+        "complete": {
+          "sampleCount": 30,
+          "p50Ms": 11.980374999984633,
+          "p95Ms": 13.980125000001863,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 16.368249999999534
+        },
+        "canonical_readback": {
+          "sampleCount": 30,
+          "p50Ms": 0.0962500000023283,
+          "p95Ms": 0.11824999999953434,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 0.1430829999735579
+        },
+        "total": {
+          "sampleCount": 30,
+          "p50Ms": 56.85966700001154,
+          "p95Ms": 66.86475000000792,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 76.56274999998277
+        }
+      },
+      "resultStates": [
+        "OFFICIAL"
+      ],
+      "queryCount": null,
+      "queryCountStatus": "UNKNOWN_NESTED_STATEMENTS_UNMEASURED",
+      "explicitTimedSqlCalls": 4,
+      "checkpointCount": null,
+      "rowsExamined": null,
+      "rowsExaminedStatus": "UNKNOWN_NO_PLAN_OR_EXECUTOR_COUNTER",
+      "databaseTime": {
+        "serverOnlyMs": null,
+        "serverOnlyStatus": "UNKNOWN",
+        "sqlProtocolPhases": [
+          "queue",
+          "claim",
+          "complete",
+          "canonical_readback"
+        ]
+      }
+    },
+    {
+      "benchmarkId": "BENCH-ODDS-PROCESSOR",
+      "operation": "ODDS request→claim→checkpointed calculation→complete→readback",
+      "fixtureVersion": "bagger-r139-synthetic-history-v1",
+      "fixtureSeed": "2026-never-again-139",
+      "historyScale": 5,
+      "environment": {
+        "scope": "LOCAL_SOCKET_ONLY",
+        "databaseVersion": "17.11 (Homebrew)",
+        "host": {
+          "platform": "darwin",
+          "architecture": "arm64",
+          "osRelease": "25.5.0",
+          "nodeVersion": "v26.7.0",
+          "cpuModel": "Apple M5",
+          "logicalCpus": 10,
+          "totalMemoryBytes": 17179869184
+        },
+        "databaseSettings": {
+          "jit": "on",
+          "fsync": "off",
+          "work_mem": "4MB",
+          "shared_buffers": "32MB",
+          "max_connections": "20",
+          "synchronous_commit": "on"
+        },
+        "resourceUtilization": {
+          "cpu": null,
+          "memory": null,
+          "io": null,
+          "connections": null,
+          "status": "UNAVAILABLE_NOT_SAMPLED"
+        },
+        "initialResourceSnapshot": {
+          "observedAt": "2026-09-28T05:49:15.368Z",
+          "hostLoadAverage": [
+            4.22021484375,
+            3.93994140625,
+            3.84716796875
+          ],
+          "hostFreeMemoryBytes": 170049536,
+          "database": {
+            "commits": 301,
+            "backends": 1,
+            "blocksHit": 723276,
+            "deadlocks": 0,
+            "rollbacks": 0,
+            "sizeBytes": 31798963,
+            "blocksRead": 441,
+            "statsReset": null,
+            "trackIoTiming": "off",
+            "temporaryBytes": 0,
+            "blockReadTimeMs": 0,
+            "blockWriteTimeMs": 0
+          },
+          "limitations": [
+            "Cumulative database counters can lag; no subtraction across databases.",
+            "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+            "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+            "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+          ]
+        },
+        "limitations": [
+          "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+          "This is not a Supabase compute tier or Production capacity measurement.",
+          "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+        ]
+      },
+      "requestedSampleCount": 30,
+      "sampleCount": 30,
+      "successCount": 30,
+      "failureCount": 0,
+      "result": "MEASURED",
+      "failure": null,
+      "phases": {
+        "prepare": {
+          "sampleCount": 30,
+          "p50Ms": 1.293290999950841,
+          "p95Ms": 1.4974589999765158,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 1.6370410000672564
+        },
+        "queue": {
+          "sampleCount": 30,
+          "p50Ms": 1.353000000002794,
+          "p95Ms": 3.5140409999294207,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 5.552957999985665
+        },
+        "claim": {
+          "sampleCount": 30,
+          "p50Ms": 0.8473330000415444,
+          "p95Ms": 1.457457999989856,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 1.5932079999474809
+        },
+        "checkpoint": {
+          "sampleCount": 30,
+          "p50Ms": 4.427500000223517,
+          "p95Ms": 6.661624999891501,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 8.591582999972161
+        },
+        "complete": {
+          "sampleCount": 30,
+          "p50Ms": 1.1487909999559633,
+          "p95Ms": 1.5424999999813735,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 1.688209000043571
+        },
+        "worker_total": {
+          "sampleCount": 30,
+          "p50Ms": 6372.353124999965,
+          "p95Ms": 6964.619749999954,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 6977.408749999944
+        },
+        "worker_non_sql": {
+          "sampleCount": 30,
+          "p50Ms": 6364.727876000106,
+          "p95Ms": 6955.51512399991,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 6968.085375999915
+        },
+        "canonical_readback": {
+          "sampleCount": 30,
+          "p50Ms": 1.0065409999806434,
+          "p95Ms": 1.452999999979511,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 1.5121659999713302
+        },
+        "total": {
+          "sampleCount": 30,
+          "p50Ms": 6376.655582999985,
+          "p95Ms": 6967.529959000007,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 6980.445417000097
+        }
+      },
+      "resultStates": [
+        "REHEARSAL_ONLY"
+      ],
+      "executionMode": "STEP11_REHEARSAL",
+      "publicationStatus": "REHEARSAL_ONLY",
+      "publicationCreated": false,
+      "mirrorCreated": false,
+      "queryCount": null,
+      "queryCountStatus": "UNKNOWN_NESTED_STATEMENTS_UNMEASURED",
+      "explicitTimedSqlCalls": 8,
+      "checkpointCount": 4,
+      "rowsExamined": null,
+      "rowsExaminedStatus": "UNKNOWN_NO_PLAN_OR_EXECUTOR_COUNTER",
+      "databaseTime": {
+        "serverOnlyMs": null,
+        "serverOnlyStatus": "UNKNOWN",
+        "sqlProtocolPhases": [
+          "queue",
+          "claim",
+          "checkpoint",
+          "complete",
+          "canonical_readback"
+        ]
+      }
+    },
+    {
+      "benchmarkId": "BENCH-CALCUTTA-PROCESSOR",
+      "operation": "CALCUTTA queue→claim→calculate→complete→readback",
+      "fixtureVersion": "bagger-r139-synthetic-history-v1",
+      "fixtureSeed": "2026-never-again-139",
+      "historyScale": 10,
+      "environment": {
+        "scope": "LOCAL_SOCKET_ONLY",
+        "databaseVersion": "17.11 (Homebrew)",
+        "host": {
+          "platform": "darwin",
+          "architecture": "arm64",
+          "osRelease": "25.5.0",
+          "nodeVersion": "v26.7.0",
+          "cpuModel": "Apple M5",
+          "logicalCpus": 10,
+          "totalMemoryBytes": 17179869184
+        },
+        "databaseSettings": {
+          "jit": "on",
+          "fsync": "off",
+          "work_mem": "4MB",
+          "shared_buffers": "32MB",
+          "max_connections": "20",
+          "synchronous_commit": "on"
+        },
+        "resourceUtilization": {
+          "cpu": null,
+          "memory": null,
+          "io": null,
+          "connections": null,
+          "status": "UNAVAILABLE_NOT_SAMPLED"
+        },
+        "initialResourceSnapshot": {
+          "observedAt": "2026-09-28T05:49:15.368Z",
+          "hostLoadAverage": [
+            4.22021484375,
+            3.93994140625,
+            3.84716796875
+          ],
+          "hostFreeMemoryBytes": 170049536,
+          "database": {
+            "commits": 301,
+            "backends": 1,
+            "blocksHit": 723276,
+            "deadlocks": 0,
+            "rollbacks": 0,
+            "sizeBytes": 31798963,
+            "blocksRead": 441,
+            "statsReset": null,
+            "trackIoTiming": "off",
+            "temporaryBytes": 0,
+            "blockReadTimeMs": 0,
+            "blockWriteTimeMs": 0
+          },
+          "limitations": [
+            "Cumulative database counters can lag; no subtraction across databases.",
+            "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+            "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+            "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+          ]
+        },
+        "limitations": [
+          "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+          "This is not a Supabase compute tier or Production capacity measurement.",
+          "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+        ]
+      },
+      "requestedSampleCount": 30,
+      "sampleCount": 30,
+      "successCount": 30,
+      "failureCount": 0,
+      "result": "MEASURED",
+      "failure": null,
+      "phases": {
+        "queue": {
+          "sampleCount": 30,
+          "p50Ms": 11.643374999985099,
+          "p95Ms": 15.534416000009514,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 29.6890419999836
+        },
+        "claim": {
+          "sampleCount": 30,
+          "p50Ms": 33.71525000000838,
+          "p95Ms": 39.421041000052355,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 39.80249999999069
+        },
+        "calculate": {
+          "sampleCount": 30,
+          "p50Ms": 11.74895799998194,
+          "p95Ms": 14.333417000016198,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 20.139041999937035
+        },
+        "complete": {
+          "sampleCount": 30,
+          "p50Ms": 14.367624999955297,
+          "p95Ms": 20.377500000060536,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 21.905458000022918
+        },
+        "canonical_readback": {
+          "sampleCount": 30,
+          "p50Ms": 0.10362499998882413,
+          "p95Ms": 0.16179100004956126,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 0.21566699992399663
+        },
+        "total": {
+          "sampleCount": 30,
+          "p50Ms": 71.35854100005236,
+          "p95Ms": 88.91858299996238,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 111.68058299995027
+        }
+      },
+      "resultStates": [
+        "PROVISIONAL"
+      ],
+      "queryCount": null,
+      "queryCountStatus": "UNKNOWN_NESTED_STATEMENTS_UNMEASURED",
+      "explicitTimedSqlCalls": 4,
+      "checkpointCount": null,
+      "rowsExamined": null,
+      "rowsExaminedStatus": "UNKNOWN_NO_PLAN_OR_EXECUTOR_COUNTER",
+      "databaseTime": {
+        "serverOnlyMs": null,
+        "serverOnlyStatus": "UNKNOWN",
+        "sqlProtocolPhases": [
+          "queue",
+          "claim",
+          "complete",
+          "canonical_readback"
+        ]
+      }
+    },
+    {
+      "benchmarkId": "BENCH-NET_SKINS-PROCESSOR",
+      "operation": "NET_SKINS queue→claim→calculate→complete→readback",
+      "fixtureVersion": "bagger-r139-synthetic-history-v1",
+      "fixtureSeed": "2026-never-again-139",
+      "historyScale": 10,
+      "environment": {
+        "scope": "LOCAL_SOCKET_ONLY",
+        "databaseVersion": "17.11 (Homebrew)",
+        "host": {
+          "platform": "darwin",
+          "architecture": "arm64",
+          "osRelease": "25.5.0",
+          "nodeVersion": "v26.7.0",
+          "cpuModel": "Apple M5",
+          "logicalCpus": 10,
+          "totalMemoryBytes": 17179869184
+        },
+        "databaseSettings": {
+          "jit": "on",
+          "fsync": "off",
+          "work_mem": "4MB",
+          "shared_buffers": "32MB",
+          "max_connections": "20",
+          "synchronous_commit": "on"
+        },
+        "resourceUtilization": {
+          "cpu": null,
+          "memory": null,
+          "io": null,
+          "connections": null,
+          "status": "UNAVAILABLE_NOT_SAMPLED"
+        },
+        "initialResourceSnapshot": {
+          "observedAt": "2026-09-28T05:49:15.368Z",
+          "hostLoadAverage": [
+            4.22021484375,
+            3.93994140625,
+            3.84716796875
+          ],
+          "hostFreeMemoryBytes": 170049536,
+          "database": {
+            "commits": 301,
+            "backends": 1,
+            "blocksHit": 723276,
+            "deadlocks": 0,
+            "rollbacks": 0,
+            "sizeBytes": 31798963,
+            "blocksRead": 441,
+            "statsReset": null,
+            "trackIoTiming": "off",
+            "temporaryBytes": 0,
+            "blockReadTimeMs": 0,
+            "blockWriteTimeMs": 0
+          },
+          "limitations": [
+            "Cumulative database counters can lag; no subtraction across databases.",
+            "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+            "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+            "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+          ]
+        },
+        "limitations": [
+          "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+          "This is not a Supabase compute tier or Production capacity measurement.",
+          "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+        ]
+      },
+      "requestedSampleCount": 30,
+      "sampleCount": 30,
+      "successCount": 30,
+      "failureCount": 0,
+      "result": "MEASURED",
+      "failure": null,
+      "phases": {
+        "queue": {
+          "sampleCount": 30,
+          "p50Ms": 11.099374999990687,
+          "p95Ms": 12.97366699995473,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 21.931207999936305
+        },
+        "claim": {
+          "sampleCount": 30,
+          "p50Ms": 33.156041000038385,
+          "p95Ms": 37.741082999971695,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 40.187416999950074
+        },
+        "calculate": {
+          "sampleCount": 30,
+          "p50Ms": 0.6452910000225529,
+          "p95Ms": 0.8279159999219701,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 0.9134580000536516
+        },
+        "complete": {
+          "sampleCount": 30,
+          "p50Ms": 12.374540999997407,
+          "p95Ms": 14.382375000044703,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 18.847707999986596
+        },
+        "canonical_readback": {
+          "sampleCount": 30,
+          "p50Ms": 0.08854200004134327,
+          "p95Ms": 0.11037500004749745,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 0.122334000072442
+        },
+        "total": {
+          "sampleCount": 30,
+          "p50Ms": 57.44637499994133,
+          "p95Ms": 65.77824999997392,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 81.99483300000429
+        }
+      },
+      "resultStates": [
+        "OFFICIAL"
+      ],
+      "queryCount": null,
+      "queryCountStatus": "UNKNOWN_NESTED_STATEMENTS_UNMEASURED",
+      "explicitTimedSqlCalls": 4,
+      "checkpointCount": null,
+      "rowsExamined": null,
+      "rowsExaminedStatus": "UNKNOWN_NO_PLAN_OR_EXECUTOR_COUNTER",
+      "databaseTime": {
+        "serverOnlyMs": null,
+        "serverOnlyStatus": "UNKNOWN",
+        "sqlProtocolPhases": [
+          "queue",
+          "claim",
+          "complete",
+          "canonical_readback"
+        ]
+      }
+    },
+    {
+      "benchmarkId": "BENCH-ODDS-PROCESSOR",
+      "operation": "ODDS request→claim→checkpointed calculation→complete→readback",
+      "fixtureVersion": "bagger-r139-synthetic-history-v1",
+      "fixtureSeed": "2026-never-again-139",
+      "historyScale": 10,
+      "environment": {
+        "scope": "LOCAL_SOCKET_ONLY",
+        "databaseVersion": "17.11 (Homebrew)",
+        "host": {
+          "platform": "darwin",
+          "architecture": "arm64",
+          "osRelease": "25.5.0",
+          "nodeVersion": "v26.7.0",
+          "cpuModel": "Apple M5",
+          "logicalCpus": 10,
+          "totalMemoryBytes": 17179869184
+        },
+        "databaseSettings": {
+          "jit": "on",
+          "fsync": "off",
+          "work_mem": "4MB",
+          "shared_buffers": "32MB",
+          "max_connections": "20",
+          "synchronous_commit": "on"
+        },
+        "resourceUtilization": {
+          "cpu": null,
+          "memory": null,
+          "io": null,
+          "connections": null,
+          "status": "UNAVAILABLE_NOT_SAMPLED"
+        },
+        "initialResourceSnapshot": {
+          "observedAt": "2026-09-28T05:49:15.368Z",
+          "hostLoadAverage": [
+            4.22021484375,
+            3.93994140625,
+            3.84716796875
+          ],
+          "hostFreeMemoryBytes": 170049536,
+          "database": {
+            "commits": 301,
+            "backends": 1,
+            "blocksHit": 723276,
+            "deadlocks": 0,
+            "rollbacks": 0,
+            "sizeBytes": 31798963,
+            "blocksRead": 441,
+            "statsReset": null,
+            "trackIoTiming": "off",
+            "temporaryBytes": 0,
+            "blockReadTimeMs": 0,
+            "blockWriteTimeMs": 0
+          },
+          "limitations": [
+            "Cumulative database counters can lag; no subtraction across databases.",
+            "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+            "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+            "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+          ]
+        },
+        "limitations": [
+          "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+          "This is not a Supabase compute tier or Production capacity measurement.",
+          "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+        ]
+      },
+      "requestedSampleCount": 30,
+      "sampleCount": 30,
+      "successCount": 30,
+      "failureCount": 0,
+      "result": "MEASURED",
+      "failure": null,
+      "phases": {
+        "prepare": {
+          "sampleCount": 30,
+          "p50Ms": 1.259375000023283,
+          "p95Ms": 2.1144170000916347,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 2.4608329999027774
+        },
+        "queue": {
+          "sampleCount": 30,
+          "p50Ms": 1.3543340000323951,
+          "p95Ms": 3.567583999945782,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 5.958666000049561
+        },
+        "claim": {
+          "sampleCount": 30,
+          "p50Ms": 0.8447089999681339,
+          "p95Ms": 1.6460410000290722,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 3.3546250000363216
+        },
+        "checkpoint": {
+          "sampleCount": 30,
+          "p50Ms": 4.3570830000098795,
+          "p95Ms": 7.3891249999869615,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 8.31037599989213
+        },
+        "complete": {
+          "sampleCount": 30,
+          "p50Ms": 1.140667000086978,
+          "p95Ms": 3.1601660000160336,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 30.62720799993258
+        },
+        "worker_total": {
+          "sampleCount": 30,
+          "p50Ms": 6449.839042000007,
+          "p95Ms": 6851.14287500002,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 6920.414583000005
+        },
+        "worker_non_sql": {
+          "sampleCount": 30,
+          "p50Ms": 6442.25779199996,
+          "p95Ms": 6842.1737489999505,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 6914.143331000232
+        },
+        "canonical_readback": {
+          "sampleCount": 30,
+          "p50Ms": 1.0109579999698326,
+          "p95Ms": 1.8167499999981374,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 17.132708000019193
+        },
+        "total": {
+          "sampleCount": 30,
+          "p50Ms": 6452.1086249999935,
+          "p95Ms": 6855.756666000001,
+          "p99Ms": null,
+          "p95Status": "MEASURED",
+          "p99Status": "INSUFFICIENT_SAMPLE",
+          "maxMs": 6922.765916000004
+        }
+      },
+      "resultStates": [
+        "REHEARSAL_ONLY"
+      ],
+      "executionMode": "STEP11_REHEARSAL",
+      "publicationStatus": "REHEARSAL_ONLY",
+      "publicationCreated": false,
+      "mirrorCreated": false,
+      "queryCount": null,
+      "queryCountStatus": "UNKNOWN_NESTED_STATEMENTS_UNMEASURED",
+      "explicitTimedSqlCalls": 8,
+      "checkpointCount": 4,
+      "rowsExamined": null,
+      "rowsExaminedStatus": "UNKNOWN_NO_PLAN_OR_EXECUTOR_COUNTER",
+      "databaseTime": {
+        "serverOnlyMs": null,
+        "serverOnlyStatus": "UNKNOWN",
+        "sqlProtocolPhases": [
+          "queue",
+          "claim",
+          "checkpoint",
+          "complete",
+          "canonical_readback"
+        ]
+      }
+    }
+  ],
+  "limitations": [
+    "Local SQL protocol plus unchanged JS engines; provider admission substitutions apply.",
+    "BEGIN/fixture lookup/ROLLBACK excluded from total; durable COMMIT/network/API authorization not measured.",
+    "Synthetic current financial/entry configuration is a documented processor fixture variant.",
+    "Calcutta and Net Skins use four explicit timed SQL calls per sample. Odds uses request, claim, checkpoint, completion and readback calls; the observed count is recorded per operation.",
+    "Nested function statements, rows examined and provider-side admission behavior are unmeasured."
+  ],
+  "environment": {
+    "scope": "LOCAL_SOCKET_ONLY",
+    "databaseVersion": "17.11 (Homebrew)",
+    "host": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "osRelease": "25.5.0",
+      "nodeVersion": "v26.7.0",
+      "cpuModel": "Apple M5",
+      "logicalCpus": 10,
+      "totalMemoryBytes": 17179869184
+    },
+    "databaseSettings": {
+      "jit": "on",
+      "fsync": "off",
+      "work_mem": "4MB",
+      "shared_buffers": "32MB",
+      "max_connections": "20",
+      "synchronous_commit": "on"
+    },
+    "resourceUtilization": {
+      "cpu": null,
+      "memory": null,
+      "io": null,
+      "connections": null,
+      "status": "UNAVAILABLE_NOT_SAMPLED"
+    },
+    "initialResourceSnapshot": {
+      "observedAt": "2026-09-28T05:49:15.368Z",
+      "hostLoadAverage": [
+        4.22021484375,
+        3.93994140625,
+        3.84716796875
+      ],
+      "hostFreeMemoryBytes": 170049536,
+      "database": {
+        "commits": 301,
+        "backends": 1,
+        "blocksHit": 723276,
+        "deadlocks": 0,
+        "rollbacks": 0,
+        "sizeBytes": 31798963,
+        "blocksRead": 441,
+        "statsReset": null,
+        "trackIoTiming": "off",
+        "temporaryBytes": 0,
+        "blockReadTimeMs": 0,
+        "blockWriteTimeMs": 0
+      },
+      "limitations": [
+        "Cumulative database counters can lag; no subtraction across databases.",
+        "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+        "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+        "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+      ]
+    },
+    "limitations": [
+      "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+      "This is not a Supabase compute tier or Production capacity measurement.",
+      "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+    ]
+  }
+}

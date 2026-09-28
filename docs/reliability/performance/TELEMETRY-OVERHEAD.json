@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-28T06:15:22.343Z",
+  "release": 139,
+  "sha": "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6",
+  "classification": "INTEGRATION_LOCAL_SQL_PLUS_SIMULATED_HTTP_TRANSPORT",
+  "deployedApiMeasured": false,
+  "network": false,
+  "environment": {
+    "scope": "LOCAL_SOCKET_ONLY",
+    "databaseVersion": "17.11 (Homebrew)",
+    "host": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "osRelease": "25.5.0",
+      "nodeVersion": "v26.7.0",
+      "cpuModel": "Apple M5",
+      "logicalCpus": 10,
+      "totalMemoryBytes": 17179869184
+    },
+    "databaseSettings": {
+      "jit": "on",
+      "fsync": "off",
+      "work_mem": "4MB",
+      "shared_buffers": "32MB",
+      "max_connections": "20",
+      "synchronous_commit": "on"
+    },
+    "resourceUtilization": {
+      "cpu": null,
+      "memory": null,
+      "io": null,
+      "connections": null,
+      "status": "UNAVAILABLE_NOT_SAMPLED"
+    },
+    "initialResourceSnapshot": {
+      "observedAt": "2026-09-28T06:15:18.360Z",
+      "hostLoadAverage": [
+        3.6005859375,
+        3.8955078125,
+        3.92041015625
+      ],
+      "hostFreeMemoryBytes": 369459200,
+      "database": {
+        "commits": 344,
+        "backends": 1,
+        "blocksHit": 3060798,
+        "deadlocks": 0,
+        "rollbacks": 0,
+        "sizeBytes": 40785587,
+        "blocksRead": 469,
+        "statsReset": null,
+        "trackIoTiming": "off",
+        "temporaryBytes": 0,
+        "blockReadTimeMs": 0,
+        "blockWriteTimeMs": 0
+      },
+      "limitations": [
+        "Cumulative database counters can lag; no subtraction across databases.",
+        "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+        "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+        "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+      ]
+    },
+    "limitations": [
+      "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+      "This is not a Supabase compute tier or Production capacity measurement.",
+      "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+    ]
+  },
+  "scale": 1,
+  "method": "Rotating uninstrumented/disabled/enabled order after two warmups per mode; fetch adapter runs exact score SQL under BEGIN/ROLLBACK. Uninstrumented mode omits AsyncLocalStorage/correlation/events. Enabled sink serializes events and discards bytes without disk/network I/O.",
+  "uninstrumented": {
+    "samples": 30,
+    "medianMs": 40.848667000000205,
+    "p95Ms": 43.25083300000006,
+    "p99Ms": null,
+    "p99Status": "INSUFFICIENT_SAMPLE",
+    "maxMs": 44.528417000001355
+  },
+  "disabled": {
+    "samples": 30,
+    "medianMs": 40.7596250000006,
+    "p95Ms": 43.35558300000048,
+    "p99Ms": null,
+    "p99Status": "INSUFFICIENT_SAMPLE",
+    "maxMs": 44.087625000000116
+  },
+  "enabled": {
+    "samples": 30,
+    "medianMs": 40.84704200000124,
+    "p95Ms": 44.212665999999444,
+    "p99Ms": null,
+    "p99Status": "INSUFFICIENT_SAMPLE",
+    "maxMs": 46.62095899999986
+  },
+  "medianDeltaMs": -0.001624999998966814,
+  "p95DeltaMs": 0.9618329999993875,
+  "emissionOnlyMedianDeltaMs": 0.08741700000064156,
+  "serializedEventBytes": 48058,
+  "serializedEvents": 60,
+  "interpretation": "Local wrapper plus RPC integration overhead; SQL child-process scheduling noise is included. Does not measure hosted console delivery or every route/auth/post-commit span. Negative differences are noise, not an optimization claim. No approved overhead budget yet."
+}
