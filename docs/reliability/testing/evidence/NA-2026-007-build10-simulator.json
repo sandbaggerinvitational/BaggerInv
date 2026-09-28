@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "testId": "NA-2026-007",
+  "incidentId": "2026-INC-007",
+  "observedAt": "2026-09-27T23:46:49-05:00",
+  "nativeGitSha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+  "runner": "tools/reliability/native-never-again/run-shell-harness.sh",
+  "host": {
+    "macOS": "26.5.1",
+    "xcode": "26.6 (17F113)",
+    "simulatorRuntime": "iOS 26.5",
+    "simulatorDeviceId": "3D8464DA-0755-4B7D-A48E-4F15EBF1A337"
+  },
+  "reproduction": {
+    "mode": "reproduce",
+    "result": "PASS",
+    "testsExecuted": 1,
+    "testsFailed": 0,
+    "durationMilliseconds": 53354.119208,
+    "assertedDestinations": ["Matches", "Score", "Leaders", "More"],
+    "assertedBuild10Behavior": "Authority revalidation removes the authenticated shell, creates a new shell, and returns each selected destination to Today index 0 while the participant remains authenticated and sign-out count remains zero."
+  },
+  "candidateGateAgainstBuild10": {
+    "mode": "candidate",
+    "result": "EXPECTED_RED",
+    "xcodeExitCode": 65,
+    "testsExecuted": 1,
+    "assertionFailures": 8,
+    "testDurationSeconds": 5.37,
+    "failures": [
+      "Matches shell identity",
+      "Matches selected destination 1 became 0",
+      "Score shell identity",
+      "Score selected destination 2 became 0",
+      "Leaders shell identity",
+      "Leaders selected destination 3 became 0",
+      "More shell identity",
+      "More selected destination 4 became 0"
+    ]
+  },
+  "isolation": "The runner verified the exact Git SHA and five critical source hashes, copied the caller checkout to a disposable directory, injected only the committed test fixture, disabled automatic package resolution, and used an already-cached exact package graph.",
+  "physicalEvidence": false,
+  "productionUsed": false
+}

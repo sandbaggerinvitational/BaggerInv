@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Immutable Build 10 native evidence and permanent local reliability harness",
+  "pinnedNative": {
+    "version": "1.2",
+    "build": 10,
+    "gitSha": "e7652b9b65595861f4f7cdf0b8326491581a27b8"
+  },
+  "attribution": "The vendored Swift files are byte-exact copies from the native application in this same BaggerInv repository at the pinned Git SHA. They are test evidence only and are not shipping source.",
+  "files": [
+    {
+      "path": "sqlite/Sources/Build10SQLiteHarness/Vendor/SQLiteScoringQueueRepository.swift",
+      "upstreamPath": "ios/BaggerInv/ScoringQueue/SQLiteScoringQueueRepository.swift",
+      "sha256": "ce9117ba687b441bb1f0e7a0d0c9940c0cfd78ec1f1518d70515c1c6842b8fd8",
+      "role": "byte-exact Build 10 persistence implementation"
+    },
+    {
+      "path": "sqlite/Sources/Build10SQLiteHarness/Vendor/ScoringQueueModels.swift",
+      "upstreamPath": "ios/BaggerInv/ScoringQueue/ScoringQueueModels.swift",
+      "sha256": "aceb119cce34db8ab87f62b37b2cd21456b81e567a73a95c4cab2b079f190a04",
+      "role": "byte-exact Build 10 queue model"
+    },
+    {
+      "path": "sqlite/Sources/Build10SQLiteHarness/Vendor/ScoringQueuePolicies.swift",
+      "upstreamPath": "ios/BaggerInv/ScoringQueue/ScoringQueuePolicies.swift",
+      "sha256": "55be73c366f286fa5b7b4fb165c3b4dc75ed51dc46aec8854ff165e78c067ae9",
+      "role": "byte-exact Build 10 validation and transition policy"
+    },
+    {
+      "path": "shell/Build10ShellDefectReproductionTests.swift",
+      "upstreamPath": "preserved 2026 Build 10 fallback audit test",
+      "sha256": "8c4886d674fd2b0fa2e75e9e140a801695a1312ad8697cd29d7f6775bf94525c",
+      "role": "byte-exact proven simulator reproduction"
+    },
+    {
+      "path": "shell/NativeShellPreservationExpectedRedTests.swift",
+      "sha256": "4b346b0b18afc77c33fb8208ac24d0d7aa863fc5a02ee5504698a114271020e5",
+      "role": "candidate corrected-behavior gate"
+    },
+    {
+      "path": "canonical/Build10CanonicalAcknowledgementRecoveryTests.swift",
+      "upstreamPath": "focused permanent fixture derived from the preserved Build 10 recovery audit",
+      "sha256": "33c9f2a3eeb165d6fdaba81a5df3236a6ab8ca9a669451b881ca9a4aed5a673a",
+      "role": "two-process actual coordinator matching-canonical acknowledgement recovery proof"
+    }
+  ],
+  "canonicalReconciliationPinnedFiles": [
+    {
+      "path": "ios/BaggerInv/ScoringQueue/ScoringQueueCoordinator.swift",
+      "sha256": "eaa5a17169498a656fbb9f86d2447ae93fc1eb0cccecedbb3b826978d25fc432"
+    },
+    {
+      "path": "ios/BaggerInv/ScoringQueue/SQLiteScoringQueueRepository.swift",
+      "sha256": "ce9117ba687b441bb1f0e7a0d0c9940c0cfd78ec1f1518d70515c1c6842b8fd8"
+    },
+    {
+      "path": "ios/BaggerInv/ScoringQueue/ScoringQueueModels.swift",
+      "sha256": "aceb119cce34db8ab87f62b37b2cd21456b81e567a73a95c4cab2b079f190a04"
+    },
+    {
+      "path": "ios/BaggerInv/ScoringQueue/ScoringQueuePolicies.swift",
+      "sha256": "55be73c366f286fa5b7b4fb165c3b4dc75ed51dc46aec8854ff165e78c067ae9"
+    },
+    {
+      "path": "ios/BaggerInvTests/ScoringQueueCoordinatorTestSupport.swift",
+      "sha256": "1908eadc36b20d8512f167e96a574648a559efe0ae713ffb1a1ea51e7c9860d7"
+    }
+  ],
+  "runtimeIsolation": {
+    "usesProduction": false,
+    "mutatesCallerNativeCheckout": false,
+    "requiresPrivateTmpEvidence": false,
+    "temporaryArtifactsDeleted": true
+  }
+}

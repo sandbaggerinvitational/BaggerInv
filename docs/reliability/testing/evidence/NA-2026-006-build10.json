@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "testId": "NA-2026-006",
+  "incidentId": "2026-INC-006",
+  "observedAt": "2026-09-28T01:18:40-05:00",
+  "nativeGitSha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+  "runner": "tools/reliability/native-never-again/run-sqlite-reproduction.sh defect",
+  "host": {
+    "macOS": "26.5.1",
+    "xcode": "26.6 (17F113)",
+    "swift": "Apple Swift 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)"
+  },
+  "result": "DEFECT_REPRODUCED",
+  "processes": {
+    "preparePid": 58134,
+    "reopenPid": 58135,
+    "different": true
+  },
+  "database": {
+    "header": "SQLite format 3",
+    "journalMode": "wal",
+    "schemaVersion": 1,
+    "realSQLite": true
+  },
+  "observation": {
+    "dateDeltaNanoseconds": 119.20928955078125,
+    "expectedRecordEqualsStored": false,
+    "replaceError": "concurrentModification"
+  },
+  "canonicalAcknowledgementReconciliation": {
+    "runner": "tools/reliability/native-never-again/run-canonical-reconciliation-harness.sh --native-root $BAGGER_NATIVE_BUILD10_ROOT",
+    "result": "BOUNDED_BUILD10_RELAUNCH_RECOVERY_PASS",
+    "simulatorDestination": "platform=iOS Simulator,name=iPhone 17 Pro Max,OS=latest",
+    "fixtureSha256": "33c9f2a3eeb165d6fdaba81a5df3236a6ab8ca9a669451b881ca9a4aed5a673a",
+    "executionLogSha256": "755f10d1d3da8935aa3a53f2207cabe396f983d2bc5c0d1f47a52c749ce26e1b",
+    "testsPassed": 2,
+    "testsFailed": 0,
+    "testDurationsSeconds": {
+      "prepare": 0.547,
+      "recover": 0.512
+    },
+    "prepare": {
+      "pid": 4216,
+      "state": "acknowledged",
+      "accepted": true,
+      "refreshPending": true,
+      "persistenceFailure": true,
+      "canonicalGrossMatchesIntent": true,
+      "canonicalMatchRevision": 13,
+      "canonicalHoleRevision": 1,
+      "databaseHeader": "SQLite format 3",
+      "journalMode": "wal"
+    },
+    "relaunch": {
+      "pid": 4277,
+      "differentProcess": true,
+      "canonicalGrossMatchesIntent": true,
+      "receiptAccepted": true,
+      "receiptMutationMatches": true,
+      "extraScorePostsDuringRecovery": 0,
+      "recordsAfter": 0,
+      "unresolvedAfter": 0,
+      "persistenceFailure": false
+    },
+    "proofScope": "The actual Build 10 coordinator reloaded the persisted accepted acknowledgement from the same real SQLite file, compared matching canonical Official gross and revision evidence, and compacted it to an accepted receipt without another score POST.",
+    "limits": "This uses the shipping coordinator and repository with the existing synthetic MobileAPIServing test double in an iOS simulator. It proves bounded post-relaunch recovery for matching Official evidence, not live-session recovery, physical-device behavior, hosted transport, arbitrary queue states, or correction of the timestamp defect."
+  },
+  "interpretation": "PASS retains two distinct facts: the pinned Build 10 timestamp/CAS defect is reproduced through save, process exit, reopen and the actual replace(_:expecting:) guard; and a persisted accepted acknowledgement can recover after a later full process relaunch when canonical Official gross and revisions match. The recovery result does not mean the timestamp defect is corrected or that every relaunch recovers.",
+  "physicalEvidence": false,
+  "productionUsed": false
+}

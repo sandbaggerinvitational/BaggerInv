@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 1,
+  "phase": "2026 Never Again Phase 1",
+  "scope": "Permanent Phase 1 reliability fixtures; no Build 11 implementation",
+  "tests": [
+    {
+      "id": "NA-2026-006",
+      "requestedAlias": "NA-2026-SQLITE-TIMESTAMP",
+      "incidentId": "2026-INC-006",
+      "title": "SQLite score-intent compare-and-swap survives persistence and process termination",
+      "priority": "P0",
+      "status": "REPRODUCTION_IMPLEMENTED_FIX_GATE_EXPECTED_RED",
+      "reproduction": {
+        "path": "test/reliability-native.test.mjs",
+        "runner": "tools/reliability/native-never-again/run-sqlite-reproduction.sh defect",
+        "expectedCurrentResult": "PASS means the Build 10 defect was reproduced",
+        "defaultTestDiscovery": true,
+        "environment": "macOS with Swift and SDK SQLite",
+        "canonicalReconciliationRunner": "tools/reliability/native-never-again/run-canonical-reconciliation-harness.sh --native-root $BAGGER_NATIVE_BUILD10_ROOT",
+        "canonicalReconciliationExpectedCurrentResult": "PASS means bounded Build10 full-relaunch recovery reconciled the persisted accepted acknowledgement against matching canonical Official evidence"
+      },
+      "candidateGate": {
+        "path": "tools/reliability/native-never-again/candidate-gate.mjs",
+        "runner": "tools/reliability/native-never-again/run-sqlite-reproduction.sh fixed $BAGGER_NATIVE_CANDIDATE_ROOT",
+        "expectedCurrentResult": "RED on Build 10",
+        "defaultTestDiscovery": false,
+        "tournamentGateRequired": true,
+        "missingCandidateCheckoutIsFailure": true
+      },
+      "proofLayers": [
+        "byte-exact Build 10 repository/model/policy source",
+        "real SQLite database with SQLite file header and WAL mode",
+        "writer process termination",
+        "second-process reopen",
+        "actual repository replace(_:expecting:) equality guard",
+        "actual Build10 coordinator acknowledgement and canonical comparison",
+        "accepted acknowledgement persisted before exit and reloaded in a second simulator process",
+        "matching canonical Official gross and revision evidence",
+        "refresh-only accepted receipt with same mutation ID and zero recovery score POSTs"
+      ],
+      "physicalEvidence": false,
+      "currentObservation": {
+        "observedAt": "2026-09-28T01:18:40-05:00",
+        "evidencePath": "docs/reliability/testing/evidence/NA-2026-006-build10.json",
+        "dateDeltaNanoseconds": 119.20928955078125,
+        "error": "concurrentModification",
+        "reproduction": "PASS",
+        "candidateGateAgainstBuild10": "EXPECTED_RED",
+        "canonicalAcknowledgementReconciliation": "PASS_BOUNDED_RELAUNCH",
+        "canonicalTestsPassed": 2,
+        "canonicalTestsFailed": 0,
+        "extraScorePostsDuringRecovery": 0,
+        "recordsAfterRecovery": 0,
+        "unresolvedAfterRecovery": 0
+      },
+      "limitations": [
+        "Actual coordinator/repository with synthetic API in simulator; no live-session, physical-device, hosted-transport, arbitrary-queue-state or timestamp-fix claim.",
+        "Original live-session/CAS defect and corrected-behavior candidate gate remain EXPECTED RED."
+      ]
+    },
+    {
+      "id": "NA-2026-007",
+      "requestedAlias": "NA-2026-NAV-FEATURE-FAILURE",
+      "incidentId": "2026-INC-007",
+      "title": "Feature failure does not replace the authenticated shell or reset the selected destination",
+      "priority": "P0",
+      "status": "REPRODUCTION_IMPLEMENTED_FIX_GATE_EXPECTED_RED",
+      "reproduction": {
+        "path": "test/reliability-native.test.mjs",
+        "runner": "tools/reliability/native-never-again/run-shell-harness.sh --native-root $BAGGER_NATIVE_BUILD10_ROOT --mode reproduce",
+        "expectedCurrentResult": "PASS means the Build 10 shell reset was reproduced",
+        "defaultTestDiscovery": true,
+        "defaultWithoutPinnedCheckout": "SKIP with explicit reason",
+        "environment": "macOS, Xcode, available iOS simulator, cached exact package revisions"
+      },
+      "candidateGate": {
+        "path": "tools/reliability/native-never-again/candidate-gate.mjs",
+        "runner": "tools/reliability/native-never-again/run-shell-harness.sh --native-root $BAGGER_NATIVE_CANDIDATE_ROOT --mode candidate",
+        "expectedCurrentResult": "RED on Build 10",
+        "defaultTestDiscovery": false,
+        "tournamentGateRequired": true,
+        "missingCandidateCheckoutIsFailure": true
+      },
+      "proofLayers": [
+        "exact Build 10 Git SHA and five critical source hashes",
+        "unchanged RootView and AppTabShell mounted in an iOS simulator",
+        "actual AppCoordinator authority revalidation",
+        "Matches, Score, Leaders, and More destination loop",
+        "shell object identity, selected destination, participant state, and sign-out count"
+      ],
+      "physicalEvidence": false,
+      "currentObservation": {
+        "observedAt": "2026-09-27T23:46:49-05:00",
+        "evidencePath": "docs/reliability/testing/evidence/NA-2026-007-build10-simulator.json",
+        "simulatorRuntime": "iOS 26.5",
+        "reproduction": "PASS",
+        "observedBuild10Behavior": "all four feature destinations replaced the shell and returned to Today index 0 with zero sign-outs",
+        "candidateGateAgainstBuild10": "EXPECTED_RED_WITH_8_ASSERTION_FAILURES"
+      }
+    },
+    {
+      "id": "NA-2026-017",
+      "requestedAlias": "NA-2026-R3-PREPARED-READBACK",
+      "incidentId": "2026-INC-017",
+      "title": "R3 preparation requires exact canonical current-context readback",
+      "priority": "P0",
+      "status": "IMPLEMENTED_PASSING_OFFLINE_CERTIFICATION_FIXTURE",
+      "test": {
+        "path": "test/reliability-readback.test.mjs",
+        "runner": "node --test test/reliability-readback.test.mjs",
+        "tool": "tools/reliability/preparation-readback.mjs",
+        "defaultTestDiscovery": true,
+        "tournamentGateRequired": true,
+        "network": false
+      },
+      "acceptance": {
+        "rejects": "Acknowledgement without independent canonical counts/current contexts, malformed operation/dependency identity, changed match-to-golfer/team mapping, course/tee drift, or any revision/fingerprint/readiness drift",
+        "accepts": "Exact reviewed operation and six dependency revisions; exact 12 pairings and participant/team/course/tee mapping; 12 current S2 contexts, setup 48, HI 13, 12 READY and independent canonical zero Live/access/leases/scores/results"
+      },
+      "proofLayers": [
+        "strict acknowledged operation identity and revisions",
+        "exact pairing/protected/post-state fingerprints",
+        "exact dependency revision object",
+        "exact 12-match and 24-golfer sets",
+        "exact 12 canonical current-context records",
+        "current handicap revision 13",
+        "exact 12 READY readbacks",
+        "CLI exit-code behavior",
+        "independent canonical lifecycle counts",
+        "exact per-match golfer/team/course/tee binding",
+        "offline consistency only; caller evidence provenance is not authenticated"
+      ],
+      "physicalEvidence": false,
+      "currentObservation": {
+        "observedAt": "2026-09-27T23:35:00-05:00",
+        "testsPassed": 7,
+        "testsFailed": 0,
+        "placeholderVerdict": "REJECTED",
+        "canonicalVerdict": "ACCEPTED"
+      }
+    },
+    {
+      "id": "NA-2026-010",
+      "requestedAlias": "NA-2026-CALCUTTA-SQL",
+      "incidentId": "2026-INC-010",
+      "title": "Calcutta claim executes lease bounds without schema-qualifying built-in least/greatest",
+      "priority": "P0",
+      "status": "IMPLEMENTED_PASSING_LOCAL_POSTGRES",
+      "test": {
+        "path": "test/reliability-sql-never-again-postgres.integration.test.mjs",
+        "runner": "node --test test/reliability-sql-never-again-postgres.integration.test.mjs",
+        "defaultTestDiscovery": true,
+        "tournamentGateRequired": true,
+        "network": false,
+        "environment": "disposable socket-only PostgreSQL 17"
+      },
+      "acceptance": {
+        "reproduces": "The historical defective claim body retained in the Release139 migration chain, before the separately recorded incremental repair, fails SQLSTATE 42883 at pg_catalog.least/greatest before its runtime guard; this is not a claim about the current hosted function",
+        "accepts": "Certified installer removes only the invalid qualifiers; the same valid current-pointer-scoped empty-queue claim returns ok=true, code=PRODUCTION_CALCUTTA_V1_RECALCULATION_EMPTY, and job=null; function owner, ACL, SECURITY DEFINER and config remain byte-semantically unchanged"
+      },
+      "proofLayers": [
+        "exact Release 139 migrations through 202609270120",
+        "real PostgreSQL 17 function invocation",
+        "SQLSTATE 42883 old-path reproduction",
+        "fixed-path valid empty-queue claim success",
+        "owner/ACL/security/config invariant snapshot"
+      ],
+      "physicalEvidence": false,
+      "currentObservation": {
+        "observedAt": "2026-09-28T04:50:00Z",
+        "testsPassed": 1,
+        "testsFailed": 0,
+        "oldSqlstate": "42883",
+        "fixedQualifierFailure": false,
+        "validEmptyQueueClaim": "PASS",
+        "claimedJobCalculateComplete": "NOT_CLAIMED_BY_THIS_TEST"
+      }
+    },
+    {
+      "id": "NA-2026-012",
+      "requestedAlias": "NA-2026-NETSKINS-SQL",
+      "incidentId": "2026-INC-012",
+      "title": "Net Skins read, claim and official-result normalization use callable PostgreSQL built-ins",
+      "priority": "P0",
+      "status": "IMPLEMENTED_PASSING_LOCAL_POSTGRES",
+      "test": {
+        "path": "test/reliability-sql-never-again-postgres.integration.test.mjs",
+        "runner": "node --test test/reliability-sql-never-again-postgres.integration.test.mjs",
+        "defaultTestDiscovery": true,
+        "tournamentGateRequired": true,
+        "network": false,
+        "environment": "disposable socket-only PostgreSQL 17"
+      },
+      "acceptance": {
+        "reproduces": "Actual frozen participant read and claim fail SQLSTATE 42883 with invalid pg_catalog.least/greatest qualifiers",
+        "accepts": "Exact fixed participant read returns ok=true; the same valid current-pointer-scoped empty-queue claim returns ok=true, code=PRODUCTION_NET_SKINS_V1_RECALCULATION_EMPTY, and job=null; the malformed normalizer check still fails closed; function owner, ACL, SECURITY DEFINER and config stay unchanged"
+      },
+      "proofLayers": [
+        "exact Release 139 migrations through 202609270120",
+        "real PostgreSQL 17 frozen read and claim invocations",
+        "SQLSTATE 42883 old-path reproduction",
+        "fixed participant read success",
+        "fixed-path valid empty-queue claim success",
+        "malformed claim/normalizer fail-closed checks after expression repair",
+        "owner/ACL/security/config invariant snapshot"
+      ],
+      "physicalEvidence": false,
+      "currentObservation": {
+        "observedAt": "2026-09-28T04:50:00Z",
+        "testsPassed": 1,
+        "testsFailed": 0,
+        "fixedParticipantRead": "PASS",
+        "validEmptyQueueClaim": "PASS",
+        "claimedJobCalculateComplete": "NOT_CLAIMED_BY_THIS_TEST"
+      }
+    },
+    {
+      "id": "NA-2026-019",
+      "requestedAlias": "NA-2026-SCORE-CALCUTTA-HISTORY",
+      "incidentId": "2026-INC-019",
+      "title": "Canonical score avoids irrelevant historical Calcutta compatibility evaluation",
+      "priority": "P0",
+      "status": "IMPLEMENTED_PASSING_LOCAL_POSTGRES",
+      "test": {
+        "path": "test/reliability-score-history-postgres.integration.test.mjs",
+        "runner": "node --test test/reliability-score-history-postgres.integration.test.mjs",
+        "defaultTestDiscovery": true,
+        "tournamentGateRequired": true,
+        "network": false,
+        "environment": "disposable socket-only PostgreSQL 17"
+      },
+      "acceptance": {
+        "fixture": "7450 accumulated Calcutta jobs at 10x history; zero eligible late-R3 compatibility receipts",
+        "oldFailure": "Historical migration 97 compatibility function reaches a failure-injection sentinel in the consumed-history fingerprint function during an actual canonical score mutation",
+        "futureExpectedBehavior": "Release139 migration120 avoids that irrelevant work; a real ACCEPTED score is returned and gross/strokes/net remain identical after reinstalling the corrected function"
+      },
+      "proofLayers": [
+        "SQL",
+        "FAILURE_INJECTION",
+        "PERFORMANCE"
+      ],
+      "physicalEvidence": false,
+      "currentObservation": {
+        "observedAt": null,
+        "timestampAuthority": "docs/reliability/phase1/LOCAL-EVIDENCE.json suite SCORE_HISTORY_NEVER_AGAIN",
+        "testsPassed": 1,
+        "testsFailed": 0,
+        "oldBehavior": "EXPECTED_FAILURE_REPRODUCED",
+        "correctedBehavior": "PASS",
+        "timingEvidence": "docs/reliability/performance/BENCHMARK-RESULTS.json"
+      },
+      "limitations": [
+        "Proves the zero-eligible-receipt branch; eligible recovery receipts remain additional required coverage.",
+        "Local rollback samples do not establish hosted or durable-commit latency.",
+        "Current-tournament synchronous derived work remains; Phase1 does not redesign it."
+      ]
+    }
+  ],
+  "deferredDiscoveries": [
+    {
+      "priority": "P1",
+      "topic": "Future-year active annual dispatch lifecycle fixture",
+      "status": "DISCOVERED_NOT_IMPLEMENTED_IN_PHASE1",
+      "reason": "Archived-year volume is modeled in Phase 1; complete active future-year dispatch chronology and hosted attestation are not."
+    }
+  ],
+  "backendCatalogMerge": {
+    "status": "SIX_REQUESTED_FIXTURES_PRESENT",
+    "entries": [
+      "NA-2026-010",
+      "NA-2026-012",
+      "NA-2026-019"
+    ],
+    "instruction": "Passing historical reproductions are not passing native remediation gates. See LOCAL-EVIDENCE.json for fresh test timestamps and the separately scoped benchmark artifacts."
+  }
+}
