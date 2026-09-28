@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-28T04:59:36Z",
+  "certificationStatus": "NON_GREEN_BASELINE_MATCH_WITH_SIGNATURE_EXCEPTIONS",
+  "conclusion": "The candidate has no failure name absent from the unchanged b206 baseline in the corrected application selections, but the server suite remains non-green and six same-named failures have different diagnostics. This is regression evidence, not a clean release certificate.",
+  "candidate": {
+    "path": "/Users/claybeltran/.codex/worktrees/reliability-phase1/BaggerInv",
+    "head": "09042493d6cf6e73f7f18bc56ff19ed7f339ad60",
+    "branch": "codex/reliability-phase1",
+    "workingTreeModified": true
+  },
+  "baseline": {
+    "path": "/Users/claybeltran/.codex/worktrees/reliability-baseline/BaggerInv",
+    "head": "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6",
+    "sourceTreeModified": false,
+    "dependencyLink": "/Users/claybeltran/.codex/worktrees/reliability-phase1/BaggerInv/node_modules",
+    "dependencyLinkTracked": false
+  },
+  "selection": {
+    "classifiedBaselineApplicationFiles": 548,
+    "serverRuntimeFiles": 493,
+    "serverRuntimeCondition": "react-server",
+    "defaultReactDomSsrFiles": [
+      "test/guide-optional-content-render.test.mjs",
+      "test/matchup-lab-ancillary.test.mjs",
+      "test/net-skins-entry-workspace.test.mjs",
+      "test/participant-mobile-ux.test.mjs"
+    ],
+    "browserFiles": [
+      "test/atomic-round-scoring-browser.test.mjs",
+      "test/history-step3c-2017-2022-migration.test.mjs",
+      "test/match-center-handicap-browser.test.mjs",
+      "test/prelaunch-presentation-browser.test.mjs",
+      "test/round-pairing-browser.test.mjs",
+      "test/website-polish-browser.test.mjs"
+    ],
+    "postgresFilesExcluded": 45,
+    "selectionManifestSha256": "83b9d606f8fdf27a8efcc667b3a6e0176bc83108de5c5e2884c7f5f2e10dc684"
+  },
+  "runs": {
+    "serverRuntime": {
+      "candidate": {
+        "tests": 4153,
+        "pass": 4127,
+        "fail": 26,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "durationMs": 108029.692917,
+        "tapSha256": "5fd48799e687b0cf8ce62e45b3d8faf6592c353c442ca4b070f0f2ff70751ae9"
+      },
+      "baseline": {
+        "tests": 4153,
+        "pass": 4127,
+        "fail": 26,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "durationMs": 110581.007458,
+        "tapSha256": "798102de019b42994889a5dd045b9f48d1cddccb173416e2653b9ae70e7157c9"
+      }
+    },
+    "defaultReactDomSsr": {
+      "candidate": {
+        "tests": 30,
+        "pass": 30,
+        "fail": 0,
+        "durationMs": 1100.180917,
+        "tapSha256": "ab8e660223ca095faee53b5664c02b4a6129a34bd0a91d19bdfb9e6f9fbfaae6"
+      },
+      "baseline": {
+        "tests": 30,
+        "pass": 30,
+        "fail": 0,
+        "durationMs": 1142.933125,
+        "tapSha256": "156804527ef205fc0523eb3cb58106bcf2c58b3635148cea86af4e4197a85c22"
+      }
+    },
+    "browser": {
+      "candidate": {
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "durationMs": 4862.388541,
+        "tapSha256": "455a84704a708a8c7f363b5cce7b9c6e24f4905cc0c20ad8b0fb978108a3f673"
+      },
+      "baseline": {
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "durationMs": 4711.983459,
+        "tapSha256": "8d2000b67e2094377bc3fbd300961247bdbec6dc89ad3bbe630a82905a6a213c"
+      },
+      "networkBoundary": "Each browser harness used a loopback fixture server and blocked non-loopback browser requests. No external traffic was required."
+    }
+  },
+  "failureComparison": {
+    "candidateOnlyNames": [],
+    "baselineOnlyNames": [],
+    "commonNameCount": 26,
+    "identicalNormalizedSignatureCount": 20,
+    "differentNormalizedSignatureCount": 6,
+    "normalization": [
+      "checkout root",
+      "test ordinal",
+      "duration"
+    ],
+    "differentSignatures": [
+      {
+        "name": "current Calcutta candidate preserves every runtime blob except the exact approved analytics identity update",
+        "testFile": "test/calcutta-candidate-integrity.test.mjs",
+        "candidateDiagnostic": "unexpected runtime addition: lib/operational-rpc-contract.js",
+        "baselineDiagnostic": "local dependency target mismatch caused by the isolated baseline node_modules link"
+      },
+      {
+        "name": "Release 133 runtime is byte-preserved except the authorized additive recovery SQL",
+        "testFile": "test/calcutta-recovery-source-boundary.test.mjs",
+        "candidateDiagnostic": "app/api/admin/production-calcutta-v1/route.js content digest mismatch",
+        "baselineDiagnostic": "unrelated runtime addition: node_modules"
+      },
+      {
+        "name": "Clear scope remains limited to Calcutta; other Director and participant files unchanged from Release 132",
+        "testFile": "test/calcutta-ux-clarity.test.mjs",
+        "candidateDiagnostic": "app/api/admin/production-net-skins-v1/route.js",
+        "baselineDiagnostic": "docs/calcutta-exact-job-recovery.md"
+      },
+      {
+        "name": "Release 134 application, guards, Calcutta, Odds and participant runtime remain byte-identical",
+        "testFile": "test/net-skins-sql-source-boundary.test.mjs",
+        "candidateDiagnostic": "app/api/admin/production-calcutta-v1/route.js content digest mismatch",
+        "baselineDiagnostic": "test/atomic-round-scoring-postgres.integration.test.mjs content digest mismatch"
+      },
+      {
+        "name": "PN-1 preserves Production authority, dispatch, fencing, scoring and post-commit implementations byte-for-byte",
+        "testFile": "test/pn1-production-mobile-boundary.test.mjs",
+        "candidateDiagnostic": "lib/mobile-v1-scoring-post-commit.js differs at the operational telemetry import",
+        "baselineDiagnostic": "lib/participant-identity-authority.js differs at the phone identity operation import"
+      },
+      {
+        "name": "PN-2 web/PWA, Production authority, Preview safeguards and canonical persistence are unchanged",
+        "testFile": "test/pn2-native-admission.test.mjs",
+        "candidateDiagnostic": "lib/production-current-tournament-runtime.js differs at the observedJsonRpc instrumentation",
+        "baselineDiagnostic": "lib/production-scoring-operations-server.js differs from the retained protected digest"
+      }
+    ],
+    "commonFailureNames": [
+      "current Calcutta candidate preserves every runtime blob except the exact approved analytics identity update",
+      "Release 133 runtime is byte-preserved except the authorized additive recovery SQL",
+      "Clear scope remains limited to Calcutta; other Director and participant files unchanged from Release 132",
+      "analytics implementation digest requires an explicit version update",
+      "Google-backed secondary failures are isolated from the core route",
+      "Players uses one compact accessible Round and Rank By control surface",
+      "polish is presentation-only and does not add a leaderboard request path",
+      "Supabase verification distinguishes rejected tokens from provider outages",
+      "native certification receives only a server-verified Auth UUID and confirmed email",
+      "Release 134 application, guards, Calcutta, Odds and participant runtime remain byte-identical",
+      "OTP route is no-signup, six-digit, scoped, durably audited, and returns generic unapproved behavior",
+      "SSR session, logout, shadow comparison, and participant context stay Passport-authoritative",
+      "participant navigation uses one fixed safe-area-aware native shell",
+      "PN-1 preserves Production authority, dispatch, fencing, scoring and post-commit implementations byte-for-byte",
+      "every compiled mobile route denies Production before Auth, database, provider or worker transport",
+      "PN-2 web/PWA, Production authority, Preview safeguards and canonical persistence are unchanged",
+      "Email provider flow remains byte-identical apart from optional enrollment proof issuance",
+      "Phase 2 public pages consume the shared scorecard analytics service",
+      "CLI writes one immutable local artifact and never calls a provider",
+      "historical writer-scope evidence is generated from exact retained inputs",
+      "historical READY deployments with the safe-method Google writer are exact",
+      "the provider contract uses one exact all-method path OR group",
+      "v4 credential confinement classifies the complete provider and environment inventories",
+      "phone lifecycle dispatch is individually enumerated for frozen and future Production, with no Director namespace",
+      "phone candidate introduces no identity tables or Director mutation and keeps service-only grants",
+      "routes report feedback only after canonical completion; no client-selected receipt"
+    ]
+  },
+  "supportingLocalEvidence": [
+    {
+      "source": "/private/tmp/bagger-phase1-harness-compat.tap",
+      "tests": 79,
+      "pass": 79,
+      "fail": 0,
+      "sha256": "237e15dc2f4b5552ecf1509a4ba6811593793c273c8d2ae5c185b8d91c4e3a41",
+      "role": "pre-existing focused compatibility summary; not part of the b206 paired run"
+    },
+    {
+      "source": "/private/tmp/bagger-phase1-focused.tap",
+      "tests": 19,
+      "pass": 19,
+      "fail": 0,
+      "sha256": "c923bb807eeeb4e9a4ed178d92e885ccbe28f6d79cedaf9f6aa0f911723da173",
+      "role": "pre-existing focused application summary; not part of the b206 paired run"
+    },
+    {
+      "source": "/private/tmp/bagger-phase1-observability.tap",
+      "tests": 17,
+      "pass": 17,
+      "fail": 0,
+      "sha256": "4de7484887b2c8b921640a0a6a52ae34b608e8377eebf1468bbd348f1a757f1c",
+      "role": "pre-existing telemetry summary; not part of the b206 paired run"
+    }
+  ],
+  "limitations": [
+    "The 45 PostgreSQL integration files were excluded from this application run and are owned by the separate database certification.",
+    "The current candidate includes uncommitted Phase 1 changes; the recorded candidate identity is HEAD plus that working tree, not commit 09042493 alone.",
+    "The unchanged baseline has an untracked node_modules symlink to the candidate dependency tree. It changes no baseline source file but explains two baseline integrity diagnostics.",
+    "The raw TAP files are task-local temporary artifacts. Their hashes and the material counts, names, and diagnostic differences are preserved here.",
+    "No Production, provider account, staging service, or external network endpoint was queried."
+  ]
+}

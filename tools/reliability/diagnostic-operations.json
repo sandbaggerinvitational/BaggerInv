@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "operations": {
+    "current_match_summary": {
+      "description": "Read one current match summary by exact tournament and match IDs.",
+      "modes": ["tournament", "maintenance"],
+      "sql": "SELECT m.match_id, m.tournament_id, m.round_number, m.status, m.scoring_locked, m.match_revision, m.scored_holes, m.current_hole, m.holes_remaining, m.running_result, m.result_winner, m.clinched, m.scorecard_complete, m.unresolved_mutations, m.authority_updated_at, m.updated_at FROM scoring_authority.matches AS m WHERE m.tournament_id = $1 AND m.match_id = $2 LIMIT 1",
+      "parameters": [
+        {
+          "name": "tournamentId",
+          "position": 1,
+          "kind": "current-id",
+          "scopeColumn": "tournament_id"
+        },
+        {
+          "name": "matchId",
+          "position": 2,
+          "kind": "current-id",
+          "scopeColumn": "match_id"
+        }
+      ],
+      "allowedRelations": ["scoring_authority.matches"],
+      "budget": {
+        "timeoutMs": 1500,
+        "lockTimeoutMs": 250,
+        "maxRows": 1,
+        "maxPayloadBytes": 8192
+      }
+    },
+    "current_match_holes": {
+      "description": "Read the current hole-score projection for one exact tournament and match.",
+      "modes": ["tournament", "maintenance"],
+      "sql": "SELECT h.match_id, h.hole_number, h.hole_revision, h.team_1_net_score, h.team_2_net_score, h.hole_winner, h.updated_at FROM scoring_authority.hole_scores AS h JOIN scoring_authority.matches AS m ON m.match_id = h.match_id WHERE m.tournament_id = $1 AND h.match_id = $2 ORDER BY h.hole_number ASC LIMIT 18",
+      "parameters": [
+        {
+          "name": "tournamentId",
+          "position": 1,
+          "kind": "current-id",
+          "scopeColumn": "tournament_id"
+        },
+        {
+          "name": "matchId",
+          "position": 2,
+          "kind": "current-id",
+          "scopeColumn": "match_id"
+        }
+      ],
+      "allowedRelations": [
+        "scoring_authority.hole_scores",
+        "scoring_authority.matches"
+      ],
+      "budget": {
+        "timeoutMs": 2000,
+        "lockTimeoutMs": 250,
+        "maxRows": 18,
+        "maxPayloadBytes": 32768
+      }
+    },
+    "current_ingress_authority": {
+      "description": "Read the current ingress authority for one exact tournament.",
+      "modes": ["tournament", "maintenance"],
+      "sql": "SELECT g.tournament_id, g.state, g.authority, g.active_epoch_id, g.unresolved_client_queues, g.updated_at FROM scoring_authority.ingress_gates AS g WHERE g.tournament_id = $1 LIMIT 1",
+      "parameters": [
+        {
+          "name": "tournamentId",
+          "position": 1,
+          "kind": "current-id",
+          "scopeColumn": "tournament_id"
+        }
+      ],
+      "allowedRelations": ["scoring_authority.ingress_gates"],
+      "budget": {
+        "timeoutMs": 1000,
+        "lockTimeoutMs": 250,
+        "maxRows": 1,
+        "maxPayloadBytes": 4096
+      }
+    }
+  }
+}

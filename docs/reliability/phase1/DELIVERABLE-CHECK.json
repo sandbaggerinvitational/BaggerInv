@@ -1,0 +1,16 @@
+{
+  "generatedAt": "2026-09-28T06:29:02.509327+00:00",
+  "requiredArtifacts": 15,
+  "missingOrEmpty": [],
+  "newRelativeLinksChecked": 77,
+  "brokenLinks": [],
+  "jsonFilesParsed": 28,
+  "testedSourceFiles": 1741,
+  "sourceDrift": [],
+  "collectorArtifactDrift": [],
+  "result": "PASS",
+  "limitations": [
+    "Preserved postmortem links and manifests have their separate byte-exact preservation proof.",
+    "This is artifact/source consistency, not a runtime test."
+  ]
+}

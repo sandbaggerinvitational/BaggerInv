@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-09-28T06:20:20.691Z",
+  "endedAt": "2026-09-28T06:20:33.491Z",
+  "command": "npm run build",
+  "environment": "LOCAL_WITH_PROVIDER_CREDENTIAL_VARIABLES_OMITTED",
+  "nextTelemetryDisabled": true,
+  "exitCode": 0,
+  "result": "PASS",
+  "logSha256": "7ca1ceec436d899081277e7af7d5cda6ddf6061078bc56c106ccbe2b293ccf99",
+  "logLocation": "/private/tmp/bagger-phase1-final-build.log",
+  "deployment": false,
+  "limitations": [
+    "Compilation/build only; not hosted, physical, SQL, capacity or lifecycle certification.",
+    "Source byte identity is recorded by LOCAL-EVIDENCE.json."
+  ]
+}

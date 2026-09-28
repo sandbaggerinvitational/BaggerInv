@@ -7,7 +7,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --test"
+    "test": "node --test",
+    "test:reliability": "node tools/reliability/certify-phase1.mjs",
+    "test:reliability:sql": "node tools/reliability/certify-phase1.mjs --sql",
+    "test:reliability:native-candidate": "node --test tools/reliability/native-never-again/candidate-gate.mjs",
+    "benchmark:reliability": "node tools/reliability/benchmark-history.mjs --samples 30 --scales 1,2,5,10",
+    "benchmark:reliability:processors": "node tools/reliability/benchmark-sidegame-processors.mjs --samples 30",
+    "benchmark:reliability:telemetry": "node tools/reliability/benchmark-telemetry-overhead.mjs --samples 30",
+    "diagnostic:plan": "node tools/reliability/diagnostic-runner.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",
