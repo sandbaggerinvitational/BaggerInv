@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { readProductionNetSkinsV1 } from "../../../../lib/production-net-skins-v1.js";
 import { mobileNetSkinsDataFromProductionView } from "../../../../lib/mobile-v1-net-skins.js";
 import { cookies } from "next/headers";
@@ -15,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 const responseHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
-export async function GET(request) {
+async function telemetryGET(request) {
   const startedAt = performance.now();
   try {
     const env = applicationRequestEnvironment(request);
@@ -61,6 +62,7 @@ export async function GET(request) {
           calculatedBy: `Net Skins intelligence worker · ${identity.playerId}`,
         });
       } catch (error) {
+    recordOperationalError(error);
         console.error("Storyline recalculation after Net Skins remains pending", { code: error?.code || "STORYLINES_RECALCULATION_FAILED" });
       }
     });
@@ -95,6 +97,7 @@ export async function GET(request) {
     response.headers.set("Server-Timing", `identity;dur=${identityMs.toFixed(1)}, postgres;dur=${Number(operational.queryMs || 0).toFixed(1)}, supabase;dur=${Number(operational.serviceMs || 0).toFixed(1)}, calculation;dur=${Number(operational.recalculation?.calculated?.calculationMs || 0).toFixed(1)}, total;dur=${totalMs.toFixed(1)}`);
     return response;
   } catch (error) {
+    recordOperationalError(error);
     const safe = participantIdentityPublicError(error);
     console.error("Net Skins Supabase read failed", {
       code: error?.code || "NET_SKINS_READ_UNAVAILABLE",
@@ -109,3 +112,5 @@ export async function GET(request) {
     });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/leaderboards/net-skins", domain: "NET_SKINS" }, telemetryGET);

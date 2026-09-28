@@ -38,6 +38,7 @@ const PRODUCTION_VERCEL_PROJECT_NAME = "bagger-inv";`;
   const authorityStub = `
 function recordDataAuthorityTransport() {}`;
   const transformed = source
+    .replace(/import \{ observedJsonRpc \} from "\.\/operational-telemetry\.js";\n/, "")
     .replace('import "server-only";\n', "")
     .replace(
       /import \{[\s\S]*?\} from "\.\/production-cutover-activation-contract\.js";/,
@@ -59,7 +60,7 @@ function recordDataAuthorityTransport() {}`;
       /import \{ recordDataAuthorityTransport \} from "\.\/data-authority-request\.js";/,
       authorityStub,
     );
-  return import(`data:text/javascript;base64,${Buffer.from(transformed).toString("base64")}`);
+  return import(`data:text/javascript;base64,${Buffer.from(`import { observedJsonRpc } from "${new URL("../lib/operational-telemetry.js", import.meta.url).href}";\n` + transformed).toString("base64")}`);
 }
 
 const {

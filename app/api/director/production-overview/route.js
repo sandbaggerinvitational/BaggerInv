@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { NextResponse } from "next/server";
 
 import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
@@ -10,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 const headers = { "Cache-Control": "private, no-store" };
 
-export async function GET(request) {
+async function telemetryGET(request) {
   const authorization = await authorizePreviewDirector({
     request,
     allowBootstrap: false,
@@ -35,6 +36,7 @@ export async function GET(request) {
     });
     return NextResponse.json({ data }, { headers });
   } catch (error) {
+    recordOperationalError(error);
     console.error("Production Director overview read failed", {
       code: error?.causeCode || error?.code || "PRODUCTION_DIRECTOR_READ_FAILED",
     });
@@ -44,3 +46,5 @@ export async function GET(request) {
     }, { status: 503, headers });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/director/production-overview", domain: "DIRECTOR" }, telemetryGET);

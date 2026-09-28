@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { NextResponse } from "next/server";
 import { readTournamentLiveView, tournamentLiveDataFromSupabaseView } from "../../../../lib/tournament-live-supabase.js";
 import { requireTournamentReadSource } from "../../../../lib/tournament-read-source.js";
@@ -16,7 +17,7 @@ export const dynamic = "force-dynamic";
 
 const headers = { "Cache-Control": "public, max-age=0, s-maxage=5, stale-while-revalidate=15" };
 
-export async function GET(request) {
+async function telemetryGET(request) {
   const startedAt = performance.now();
   try {
     const env = applicationRequestEnvironment(request);
@@ -82,8 +83,11 @@ export async function GET(request) {
     response.headers.set("Server-Timing", `postgres;dur=${Number(data.queryMs || 0).toFixed(1)}, supabase;dur=${Number(read.durationMs || serviceMs).toFixed(1)}, total;dur=${totalMs.toFixed(1)}`);
     return response;
   } catch (error) {
+    recordOperationalError(error);
     console.error("Tournament Supabase live read failed", { code: error?.code || "TOURNAMENT_READ_UNAVAILABLE", message: error?.message || String(error) });
     return NextResponse.json({ error: "Tournament live state is temporarily unavailable.", code: error?.code || "TOURNAMENT_READ_UNAVAILABLE" },
       { status: 503, headers: { ...headers, "X-Tournament-Read-Source": "supabase", "X-Tournament-Google-Requests": "0" } });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/tournament/live", domain: "TOURNAMENT_READ" }, telemetryGET);

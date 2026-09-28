@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { NextResponse } from "next/server";
 import { after } from "next/server";
 import { revalidatePath } from "next/cache";
@@ -145,6 +146,7 @@ async function publishProductionProjection(request) {
       googleMirror: "RETIRED",
     }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
+    recordOperationalError(error);
     console.error("Production Championship Odds publication failed", {
       code: clean(error?.code || "PRODUCTION_ODDS_PUBLICATION_FAILED"),
     });
@@ -345,6 +347,7 @@ async function publishProjection(request) {
     return NextResponse.json({ ok: true, snapshot, source: { inputs: source.inputSource, publication: source.publicationAuthority }, nativePublication: nativePublication?.payload || null,
       ...(process.env.VERCEL_ENV === "preview" ? { diagnostics: trace.snapshot() } : {}) });
   } catch (error) {
+    recordOperationalError(error);
     trace.fail(error, {
       workbookOperation: error?.workbookOperation || diagnostic.workbookOperation,
       worksheet: error?.worksheet || diagnostic.worksheet,
@@ -372,7 +375,7 @@ async function publishProjection(request) {
   }
 }
 
-export async function POST(request) {
+async function telemetryPOST(request) {
   if (clean(process.env.VERCEL_ENV).toLowerCase() === "production") {
     return publishProjection(request);
   }
@@ -380,3 +383,5 @@ export async function POST(request) {
   console.info("Championship projection workbook access", measured.diagnostics);
   return measured.result;
 }
+
+export const POST = withOperationalRoute({ route: "/api/odds/publish", domain: "ODDS" }, telemetryPOST);

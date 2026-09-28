@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { leaderboardsCoreDataFromSupabaseView, readLeaderboardsCoreView } from "../../../../lib/leaderboards-core-supabase.js";
@@ -10,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 const headers = { "Cache-Control": "private, no-store", "Vary": "Cookie" };
 
-export async function GET(request) {
+async function telemetryGET(request) {
   const startedAt = performance.now();
   try {
     const env = applicationRequestEnvironment(request);
@@ -57,6 +58,7 @@ export async function GET(request) {
     response.headers.set("Server-Timing", `identity;dur=${identityMs.toFixed(1)}, postgres;dur=${Number(data.queryMs || 0).toFixed(1)}, supabase;dur=${Number(read.durationMs || serviceMs).toFixed(1)}, calculation;dur=${Number(data.calculationMs || 0).toFixed(1)}, total;dur=${totalMs.toFixed(1)}`);
     return response;
   } catch (error) {
+    recordOperationalError(error);
     const safe = participantIdentityPublicError(error);
     console.error("Leaderboards core Supabase read failed", {
       code: error?.code || "LEADERBOARDS_CORE_READ_UNAVAILABLE",
@@ -70,3 +72,5 @@ export async function GET(request) {
       "X-Leaderboards-Core-Read-Source": "supabase", "X-Leaderboards-Core-Google-Requests": "0" } });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/leaderboards/core", domain: "TOURNAMENT_READ" }, telemetryGET);

@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { NextResponse } from "next/server";
 import { buildOddsInputProjection, compareOddsDeterministicParity, importOddsInputProjection, loadSupabaseOddsInputs } from "../../../../lib/championship-odds-supabase.js";
 import { getAllPlayerStats } from "../../../../lib/stats.js";
@@ -12,7 +13,7 @@ export const maxDuration = 300;
 // Preview deployment health only. This intentionally returns no configuration
 // or tournament payload; it exists so a failed PostgREST schema exposure can be
 // distinguished from Director authentication and Google projection failures.
-export async function GET(request) {
+async function telemetryGET(request) {
   if (process.env.VERCEL_ENV !== "preview") return NextResponse.json({ error: "Not found." }, { status: 404 });
   try {
     const director = await directorFor(request);
@@ -32,6 +33,7 @@ export async function GET(request) {
     const result = await loadSupabaseOddsInputs(director.identity?.tournamentId || "2026");
     return NextResponse.json({ ok: true, source: "supabase", queryMs: result.diagnostics?.queryMs, serviceMs: result.diagnostics?.serviceMs });
   } catch (error) {
+    recordOperationalError(error);
     return NextResponse.json({ ok: false, status: error?.status || 503, code: error?.code || error?.shadowDiagnostics?.code || "ODDS_INPUT_HEALTH_FAILED",
       diagnostics: error?.shadowDiagnostics || null }, { status: 503 });
   }
@@ -42,7 +44,7 @@ async function directorFor(request) {
   return result?.status === "active" ? result : null;
 }
 
-export async function POST(request) {
+async function telemetryPOST(request) {
   if (process.env.VERCEL_ENV !== "preview") return NextResponse.json({ error: "Not found." }, { status: 404 });
   const director = await directorFor(request);
   if (!director) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 401 });
@@ -79,6 +81,7 @@ export async function POST(request) {
     return NextResponse.json({ ok: true, action, phase, parity, metadata: inputs.metadata,
       timings: { ...inputs.diagnostics, calculationMs: Date.now() - calculationStartedAt, iterations: Number(retained.iterations) } });
   } catch (error) {
+    recordOperationalError(error);
     const diagnostics = error?.shadowDiagnostics || null;
     console.error("Championship Odds input verification failed", { code: error?.code || diagnostics?.code || "ODDS_INPUT_VERIFICATION_FAILED",
       message: error?.message || String(error), diagnostics });
@@ -87,3 +90,7 @@ export async function POST(request) {
       ...(process.env.VERCEL_ENV === "preview" ? { diagnostics } : {}) }, { status: 503 });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/odds/inputs", domain: "ODDS" }, telemetryGET);
+
+export const POST = withOperationalRoute({ route: "/api/odds/inputs", domain: "ODDS" }, telemetryPOST);

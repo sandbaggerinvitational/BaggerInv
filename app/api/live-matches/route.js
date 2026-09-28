@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../lib/operational-telemetry.js";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { after, NextResponse } from "next/server";
 import QRCode from "qrcode";
@@ -61,10 +62,11 @@ function refreshMatchData() {
   for (const path of ["/live", "/", "/history", "/players", "/records", "/champions"]) revalidatePath(path);
 }
 
-export async function GET(request) {
+async function telemetryGET(request) {
   let authority;
   try { authority = requireScoringAuthority(); }
-  catch (error) { return NextResponse.json({ error: error.message, code: error.code }, { status: Number(error.status || 503) }); }
+  catch (error) {
+    recordOperationalError(error); return NextResponse.json({ error: error.message, code: error.code }, { status: Number(error.status || 503) }); }
   const authorization = await authorized(request, authority);
   if (authorization?.status !== "active") return deny();
   try {
@@ -100,15 +102,17 @@ export async function GET(request) {
       )),
     } });
   } catch (error) {
+    recordOperationalError(error);
     console.error("Live Match Control load failed", { sheet: "Live Matches", reason: error?.message || String(error), stack: error?.stack });
     return NextResponse.json({ error: error?.message || "Unable to load live matches." }, { status: 500 });
   }
 }
 
-export async function POST(request) {
+async function telemetryPOST(request) {
   let authority;
   try { authority = requireScoringAuthority(); }
-  catch (error) { return NextResponse.json({ error: error.message, code: error.code }, { status: Number(error.status || 503) }); }
+  catch (error) {
+    recordOperationalError(error); return NextResponse.json({ error: error.message, code: error.code }, { status: Number(error.status || 503) }); }
   const authorization = await authorized(request, authority);
   if (authorization?.status !== "active") return deny();
   try {
@@ -268,6 +272,7 @@ export async function POST(request) {
           }),
         ]);
       } catch (error) {
+    recordOperationalError(error);
         console.error("Competition derived-state Director lifecycle recalculation remains pending", {
           matchId, action, code: error?.code || "DERIVED_STATE_RECALCULATION_FAILED",
         });
@@ -278,6 +283,7 @@ export async function POST(request) {
     const safeMatch = Object.fromEntries(Object.entries(match).filter(([key]) => !["Access Code Hash", "Access Token Hash", "__calcuttaPublication"].includes(key)));
     return NextResponse.json({ match: safeMatch, ...(process.env.VERCEL_ENV === "preview" && calcuttaPublication ? { calcuttaPublication } : {}) });
   } catch (error) {
+    recordOperationalError(error);
     console.error("Live Match Control action failed", { sheet: "Live Matches / Matches / Match Update Log", reason: error?.message || String(error), stack: error?.stack });
     const authorityFailure = error?.code === "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY" || error?.code === "SCORING_AUTHORITY_UNAVAILABLE";
     return NextResponse.json({
@@ -287,3 +293,7 @@ export async function POST(request) {
     }, { status: Number(error?.status || 400) });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/live-matches", domain: "TOURNAMENT_READ" }, telemetryGET);
+
+export const POST = withOperationalRoute({ route: "/api/live-matches", domain: "TOURNAMENT_READ" }, telemetryPOST);

@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { after, NextResponse } from "next/server";
 
 import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
@@ -78,7 +79,7 @@ function safeFailure(error) {
  * accept caller-selected Production resources, authority epochs, deployments,
  * publication modes, rules, engine versions, or worker identities.
  */
-export async function POST(request) {
+async function telemetryPOST(request) {
   const access = await authorize(request);
   if (access.response) return access.response;
   let input;
@@ -146,6 +147,7 @@ export async function POST(request) {
       headers: { ...noStore, ...dataAuthorityResponseHeaders(scoped.diagnostics) },
     });
   } catch (error) {
+    recordOperationalError(error);
     console.error("Production Net Skins operation failed", {
       action,
       code: clean(error?.code || "PRODUCTION_NET_SKINS_OPERATION_FAILED"),
@@ -157,3 +159,5 @@ export async function POST(request) {
     });
   }
 }
+
+export const POST = withOperationalRoute({ route: "/api/admin/production-net-skins-v1", domain: "NET_SKINS" }, telemetryPOST);

@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { NextResponse } from "next/server";
 import { verifyScoringSession } from "../../../../lib/scoring-access.js";
 import {
@@ -7,7 +8,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request) {
+async function telemetryGET(request) {
   try {
     assertLiveScoringTestEnvironment();
     const authorization = request.headers.get("authorization") || "";
@@ -20,6 +21,9 @@ export async function GET(request) {
       ),
     });
   } catch (error) {
+    recordOperationalError(error);
     return NextResponse.json({ error: error?.message || "Unable to load matches." }, { status: 403 });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/scoring/matches", domain: "SCORING" }, telemetryGET);

@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../../../lib/operational-telemetry.js";
 import { after } from "next/server.js";
 import { mobileScoringHoleResult } from "../../../../../../lib/mobile-v1-scoring.js";
 import { runMobileScoringPostCommit } from "../../../../../../lib/mobile-v1-scoring-post-commit.js";
@@ -6,7 +7,7 @@ import { productionShadowScoringMutationResponse } from "../../../../../../lib/p
 
 export const dynamic = "force-dynamic";
 
-export const POST = (request) => productionShadowScoringMutationResponse(request) || mobileV1ScoringResponse(request, async (identity) => {
+const telemetryPOST = (request) => productionShadowScoringMutationResponse(request) || mobileV1ScoringResponse(request, async (identity) => {
   const input = await readMobileScoringJson(request);
   const result = await mobileScoringHoleResult(identity, input);
   after(() => runMobileScoringPostCommit({
@@ -15,3 +16,5 @@ export const POST = (request) => productionShadowScoringMutationResponse(request
   }));
   return result;
 });
+
+export const POST = withOperationalRoute({ route: "/api/mobile/v1/scoring/hole", domain: "SCORING" }, telemetryPOST);

@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError, emitOperationalEvent } from "../../../../lib/operational-telemetry.js";
 import { after, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { scoringTokenFromRequest, verifyScoringSession } from "../../../../lib/scoring-access.js";
@@ -26,7 +27,7 @@ function session(request) {
   return current;
 }
 
-export async function GET(request) {
+async function telemetryGET(request) {
   try {
     const current = session(request);
     const requireWritable = new URL(request.url).searchParams.get("syncRebase") === "1";
@@ -50,13 +51,14 @@ export async function GET(request) {
       ),
     }, { headers: scoringReadResponseHeaders(scoring.diagnostics) });
   } catch (error) {
+    recordOperationalError(error);
     const status = Number(error?.status) || (/temporarily unavailable/i.test(error?.message || "") ? 503 : 403);
     return NextResponse.json({ error: error?.message || "Unable to load scoring.", code: error?.code || "" },
       { status, headers: { "Cache-Control": "no-store" } });
   }
 }
 
-export async function POST(request) {
+async function telemetryPOST(request) {
   const candidateReadOnly = productionShadowScoringMutationResponse(request);
   if (candidateReadOnly) return candidateReadOnly;
   try {
@@ -65,6 +67,7 @@ export async function POST(request) {
     const verifiedAuthorization = await validateAuthoritativeParticipantSession(request, current,
       { requireWritable: true, cookieStore: await cookies() });
     const authorizationMs = Date.now() - authorizationStartedAt;
+    emitOperationalEvent({ event: "PHASE", domain: "AUTHORIZATION", phase: "authorization", latency_ms: authorizationMs, outcome: "NOT_APPLICABLE" });
     const rate = consumeRateLimit(`scoring-write:${clientAddress(request)}:${current.matchId}`, { limit: 30, windowMs: 60_000 });
     if (!rate.allowed) return NextResponse.json({ error: "Too many score updates. Wait a moment and try again." }, { status: 429 });
     const submitted = await request.json();
@@ -87,6 +90,7 @@ export async function POST(request) {
           writable: false,
         });
       } catch (error) {
+    recordOperationalError(error);
         // The Finalization transaction already committed. A follow-up read can
         // recover on the next scorecard open and must not reverse success.
         console.error("Supabase Finalization confirmation read remains pending", {
@@ -123,6 +127,7 @@ export async function POST(request) {
               mirrorDurationMs: mirror.totalDurationMs,
             });
           } catch (error) {
+    recordOperationalError(error);
             console.error("Scoring shadow delivery failed", {
               matchId: observation.match_id,
               holeNumber: observation.hole_number,
@@ -173,6 +178,7 @@ export async function POST(request) {
       } : {}),
     }, { headers: authoritativeFinal ? scoringReadResponseHeaders(authoritativeFinal.diagnostics) : { "Cache-Control": "no-store" } });
   } catch (error) {
+    recordOperationalError(error);
     const conflict = Number(error?.status) === 409 || /updated by someone else/i.test(error?.message || "");
     const diagnostics = error?.authoritativeDiagnostics || {};
     logScoringFailure(error, { route: "/api/scoring/current", conflict });
@@ -183,3 +189,7 @@ export async function POST(request) {
     }, { status: conflict ? 409 : participantScoringHttpStatus(error), headers: participantScoringPauseHeaders(error) });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/scoring/current", domain: "SCORING" }, telemetryGET);
+
+export const POST = withOperationalRoute({ route: "/api/scoring/current", domain: "SCORING" }, telemetryPOST);

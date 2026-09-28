@@ -10,6 +10,7 @@ const source = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8"
 async function importRuntime() {
   const moduleSource = await source("lib/production-current-tournament-runtime.js");
   const transformed = moduleSource
+    .replace(/import \{ observedJsonRpc \} from "\.\/operational-telemetry\.js";\n/, "")
     .replace('import "server-only";\n', "")
     .replace(
       /import \{ assertProductionCutoverActivation \} from "\.\/production-cutover-activation-contract\.js";/,
@@ -25,7 +26,7 @@ const PRODUCTION_SUPABASE_URL = "https://ymqhhtxaywtqllynrmxe.supabase.co";`,
       /import \{ recordDataAuthorityTransport \} from "\.\/data-authority-request\.js";/,
       "function recordDataAuthorityTransport() {}",
     );
-  return import(`data:text/javascript;base64,${Buffer.from(transformed).toString("base64")}`);
+  return import(`data:text/javascript;base64,${Buffer.from(`import { observedJsonRpc } from "${new URL("../lib/operational-telemetry.js", import.meta.url).href}";\n` + transformed).toString("base64")}`);
 }
 
 const generation = "11111111-1111-4111-8111-111111111111";

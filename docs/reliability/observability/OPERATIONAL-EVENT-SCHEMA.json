@@ -1,0 +1,258 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://bagger.example/schemas/operational-event-v1",
+  "title": "Bagger Phase 1 operational event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "timestamp",
+    "event",
+    "request_id",
+    "correlation_id",
+    "route",
+    "domain",
+    "feature",
+    "release_source",
+    "activation_source",
+    "sha",
+    "latency_ms",
+    "outcome",
+    "error_class",
+    "canonical_readback",
+    "dropped_events",
+    "release",
+    "activation",
+    "round",
+    "target_count",
+    "authority_revision",
+    "http_status",
+    "operation_id",
+    "mutation_id",
+    "job_id",
+    "match_id",
+    "phase",
+    "query_family",
+    "domain_error_code",
+    "authority_fingerprint",
+    "sqlstate"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "event": {
+      "enum": [
+        "REQUEST",
+        "PHASE",
+        "RPC",
+        "DOMAIN_ERROR",
+        "OUTCOME"
+      ]
+    },
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "correlation_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "route": {
+      "type": "string",
+      "maxLength": 160,
+      "pattern": "^/api/"
+    },
+    "domain": {
+      "enum": [
+        "AUTH",
+        "AUTHORIZATION",
+        "SCORING",
+        "ROUND_CONTROL",
+        "TOURNAMENT_READ",
+        "NET_SKINS",
+        "CALCUTTA",
+        "ODDS",
+        "DIRECTOR",
+        "DATABASE",
+        "RELEASE_CONTROL"
+      ]
+    },
+    "feature": {
+      "type": "string",
+      "maxLength": 96
+    },
+    "release_source": {
+      "enum": [
+        "UNAVAILABLE",
+        "DEPLOYMENT_CONFIG",
+        "AUTHORITY_READ"
+      ]
+    },
+    "activation_source": {
+      "enum": [
+        "UNAVAILABLE",
+        "DEPLOYMENT_CONFIG",
+        "AUTHORITY_READ"
+      ]
+    },
+    "sha": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "latency_ms": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "outcome": {
+      "enum": [
+        "COMMITTED",
+        "NOT_COMMITTED",
+        "UNKNOWN",
+        "NOT_APPLICABLE",
+        "UNOBSERVED"
+      ]
+    },
+    "error_class": {
+      "enum": [
+        null,
+        "DATABASE_TIMEOUT",
+        "DATABASE_UNAVAILABLE",
+        "FEATURE_UNAVAILABLE",
+        "AUTH_INVALID",
+        "AUTHORIZATION_DENIED",
+        "STALE_AUTHORITY",
+        "DEPENDENCY_BLOCKED",
+        "UNKNOWN_OUTCOME",
+        "CONFLICT",
+        "INTERNAL_ERROR"
+      ]
+    },
+    "canonical_readback": {
+      "enum": [
+        "VERIFIED",
+        "FAILED",
+        "NOT_OBSERVED"
+      ]
+    },
+    "dropped_events": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "release": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "activation": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "round": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "target_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "authority_revision": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "http_status": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "operation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 128
+    },
+    "mutation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 128
+    },
+    "job_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 128
+    },
+    "match_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 128
+    },
+    "phase": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 128
+    },
+    "query_family": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 128
+    },
+    "domain_error_code": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 128
+    },
+    "authority_fingerprint": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "sqlstate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9A-Z]{5}$"
+    }
+  }
+}

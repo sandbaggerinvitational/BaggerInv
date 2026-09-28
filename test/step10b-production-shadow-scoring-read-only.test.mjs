@@ -105,7 +105,7 @@ test("every web scoring mutation and scoring-session issuance fails before side 
   ];
   for (const [path, sideEffects] of routes) {
     const route = await source(path);
-    const post = route.slice(route.indexOf("export async function POST"));
+    const post = route.slice(route.search(/(?:export async function POST|async function telemetryPOST)/));
     const guard = post.indexOf("productionShadowScoringMutationResponse(request)");
     const earlyReturn = post.indexOf("if (candidateReadOnly) return candidateReadOnly");
     assert.ok(guard >= 0 && earlyReturn > guard, `${path} must reject the candidate first`);
@@ -121,7 +121,7 @@ test("mobile scoring mutations short-circuit before identity, persistence, and p
     "app/api/mobile/v1/scoring/finalize/route.js",
   ]) {
     const route = await source(path);
-    const post = route.slice(route.indexOf("export const POST"));
+    const post = route.slice(route.search(/(?:export const POST|const telemetryPOST)/));
     assert.match(post, /productionShadowScoringMutationResponse\(request\) \|\| mobileV1ScoringResponse\(request/);
     assert.ok(post.indexOf("productionShadowScoringMutationResponse(request)") < post.indexOf("mobileV1ScoringResponse(request"));
     assert.ok(post.indexOf("mobileV1ScoringResponse(request") < post.indexOf("runMobileScoringPostCommit"));

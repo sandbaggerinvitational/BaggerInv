@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../lib/operational-telemetry.js";
 import { NextResponse } from "next/server";
 import { getTournamentData, tournamentLoaderDiagnostics } from "../../live/sheetData";
 import { workbookInitializationMessage } from "../../../lib/tournament-workbook-initialization";
@@ -10,7 +11,7 @@ import { applicationRequestEnvironment } from "../../../lib/production-shadow-re
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request) {
+async function telemetryGET(request) {
   const profile = createRuntimeProfile("GET /api/live");
   try {
     const env = applicationRequestEnvironment(request);
@@ -53,8 +54,11 @@ export async function GET(request) {
     });
     return attachRuntimeTiming(NextResponse.json({ data }), timing);
   } catch (error) {
+    recordOperationalError(error);
     profile.finish({ failed: true });
     console.error("Public live refresh failed", { reason: error?.message || String(error) });
     return NextResponse.json({ error: workbookInitializationMessage(error, "Unable to refresh live scores.") }, { status: 503 });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/live", domain: "TOURNAMENT_READ" }, telemetryGET);

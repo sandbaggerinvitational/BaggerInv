@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../lib/operational-telemetry.js";
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
 import {hasParticipantCookies} from '../lib/spectator-navigation.js';
 function load(file,modules,env={SPECTATOR_PWA_ENABLED:'true'}){
@@ -23,7 +24,7 @@ test('no-session entry performs zero auth/identity calls; failures retain recove
 });
 for(const resource of ['net-skins','calcutta'])test('direct existing '+resource+' API denies unauthenticated before reading data',async()=>{
   let reads=0,auth=0;const source={resolved:'supabase',productionCutover:{handled:true}};
-  const modules=new Proxy({NextResponse,cookies:async()=>({getAll:()=>[]}),applicationRequestEnvironment:()=>({VERCEL_ENV:'production'}),
+  const modules=new Proxy({withOperationalRoute,recordOperationalError,NextResponse,cookies:async()=>({getAll:()=>[]}),applicationRequestEnvironment:()=>({VERCEL_ENV:'production'}),
     requireNetSkinsReadSource:()=>source,requireCalcuttaReadSource:()=>source,requireParticipantIdentityAuthority:()=>({resolved:'supabase'}),
     resolveSupabaseParticipantIdentity:async()=>{auth++;throw Object.assign(Error('Sign in required'),{status:401,code:'PARTICIPANT_AUTH_REQUIRED'});},
     participantIdentityPublicError:()=>({status:401,code:'PARTICIPANT_AUTH_REQUIRED',error:'Sign in required'})},

@@ -554,10 +554,10 @@ test("Production Odds GET is read-only while same-origin POST owns every calcula
   assert.match(route, /authorizePreviewDirector/);
   assert.match(route, /allowBootstrap:\s*false/);
   const getHandler = route.slice(
-    route.indexOf("export async function GET"),
-    route.indexOf("export async function POST"),
+    route.search(/(?:export async function GET|async function telemetryGET)/),
+    route.search(/(?:export async function POST|async function telemetryPOST)/),
   );
-  const postHandler = route.slice(route.indexOf("export async function POST"));
+  const postHandler = route.slice(route.search(/(?:export async function POST|async function telemetryPOST)/));
   assert.match(getHandler, /authorizeRequest\(request, state, \{ requireOrigin: false \}\)/);
   assert.doesNotMatch(getHandler,
     /continueCalculation|processProductionOddsCalculationJob|certifyProductionOddsCalculation|requestProductionOddsCalculation|after\s*\(/);

@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { readProductionCalcuttaV1 } from "../../../../lib/production-calcutta-v1.js";
 import { mobileCalcuttaDataFromProductionView } from "../../../../lib/mobile-v1-calcutta.js";
 import { cookies } from "next/headers";
@@ -13,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 const headers = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
-export async function GET(request) {
+async function telemetryGET(request) {
   const startedAt = performance.now();
   try {
     const env = applicationRequestEnvironment(request);
@@ -80,6 +81,7 @@ export async function GET(request) {
     response.headers.set("Server-Timing", `identity;dur=${identityMs.toFixed(1)}, postgres;dur=${Number(operational.queryMs || 0).toFixed(1)}, supabase;dur=${Number(operational.serviceMs || 0).toFixed(1)}, calculation;dur=${Number(operational.recalculation?.calculated?.calculationMs || 0).toFixed(1)}, total;dur=${totalMs.toFixed(1)}`);
     return response;
   } catch (error) {
+    recordOperationalError(error);
     const safe = participantIdentityPublicError(error);
     console.error("Calcutta Supabase read failed", { code: error?.code || "CALCUTTA_READ_UNAVAILABLE", message: error?.message || String(error) });
     return NextResponse.json({
@@ -88,3 +90,5 @@ export async function GET(request) {
     }, { status: safe.status || 503, headers: { ...headers, "X-Calcutta-Read-Source": "supabase", "X-Calcutta-Google-Requests": "0" } });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/leaderboards/calcutta", domain: "CALCUTTA" }, telemetryGET);

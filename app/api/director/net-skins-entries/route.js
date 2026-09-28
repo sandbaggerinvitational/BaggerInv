@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { NextResponse } from "next/server";
 import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
 import { assertProductionCutoverActivation, assertProductionCutoverRequest } from "../../../../lib/production-cutover-activation-contract.js";
@@ -29,5 +30,9 @@ async function handle(request, mutation) {
     return reply({error:`Entries were not saved. Refresh and review the current Round (${code}).`,code},error.status||503);
   }
 }
-export async function GET(request){return handle(request,false);}
-export async function POST(request){return handle(request,true);}
+async function telemetryGET(request){return handle(request,false);}
+async function telemetryPOST(request){return handle(request,true);}
+
+export const GET = withOperationalRoute({ route: "/api/director/net-skins-entries", domain: "NET_SKINS" }, telemetryGET);
+
+export const POST = withOperationalRoute({ route: "/api/director/net-skins-entries", domain: "NET_SKINS" }, telemetryPOST);

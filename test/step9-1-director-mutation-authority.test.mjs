@@ -56,7 +56,7 @@ const SUPABASE_ALLOWED = Object.freeze({
 const source = (relativePath) => readFile(new URL(`../${relativePath}`, import.meta.url), "utf8");
 
 function postBody(routeSource) {
-  const index = routeSource.indexOf("export async function POST");
+  const index = routeSource.search(/(?:export async function POST|async function telemetryPOST)/);
   assert.notEqual(index, -1, "route must export POST");
   return routeSource.slice(index);
 }

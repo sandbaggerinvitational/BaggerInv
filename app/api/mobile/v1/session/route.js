@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../../lib/operational-telemetry.js";
 import { NextResponse } from "next/server.js";
 import { mobileApiErrorResult, mobileSessionResult } from "../../../../../lib/mobile-api-v1.js";
 import { resolveMobileBearerIdentity } from "../../../../../lib/mobile-bearer-identity.js";
@@ -5,13 +6,14 @@ import { recheckMobileNativeIdentity } from "../../../../../lib/mobile-native-ad
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request) {
+async function telemetryGET(request) {
   let result;
   try {
     const identity = await resolveMobileBearerIdentity({ request });
     result = mobileSessionResult(identity);
     await recheckMobileNativeIdentity(identity, "reads");
   } catch (error) {
+    recordOperationalError(error);
     result = mobileApiErrorResult(error);
   }
   const headers = {
@@ -21,3 +23,5 @@ export async function GET(request) {
   if (result.status === 401) headers["WWW-Authenticate"] = "Bearer";
   return NextResponse.json(result.body, { status: result.status, headers });
 }
+
+export const GET = withOperationalRoute({ route: "/api/mobile/v1/session", domain: "AUTH" }, telemetryGET);

@@ -1,3 +1,4 @@
+import * as operationalTelemetry from "../../lib/operational-telemetry.js";
 import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { netSkinsConfigurationReadiness } from "../../lib/net-skins-configuration-readiness.js";
@@ -12,6 +13,7 @@ export async function loadDirectorSource(path, dependencies) {
   });
   const module = { exports: {} };
   const resolve = key => {
+    if (key.endsWith("/operational-telemetry.js")) return operationalTelemetry;
     if (!(key in dependencies)) throw new Error(`Unstubbed dependency: ${key}`);
     return dependencies[key];
   };

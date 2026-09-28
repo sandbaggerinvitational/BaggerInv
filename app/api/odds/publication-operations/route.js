@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { NextResponse } from "next/server";
 
 import { deliverSupabaseOddsGoogleMirror } from "../../../../lib/championship-odds-google-mirror.js";
@@ -172,7 +173,7 @@ async function rehearsePublication({ actorId, tournamentId }) {
   };
 }
 
-export async function GET(request) {
+async function telemetryGET(request) {
   if (process.env.VERCEL_ENV !== "preview") return NextResponse.json({ error: "Not found." }, { status: 404 });
   const director = await directorFor(request);
   if (!director) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 401 });
@@ -181,11 +182,12 @@ export async function GET(request) {
     const tournamentId = clean(director.identity?.tournamentId || "2026");
     return NextResponse.json({ ok: true, sources: oddsCalculationEnvironment(), diagnostics: await diagnostics(tournamentId) });
   } catch (error) {
+    recordOperationalError(error);
     return NextResponse.json({ error: "Published Odds publication diagnostics are unavailable.", code: error?.code || "ODDS_PUBLICATION_DIAGNOSTICS_UNAVAILABLE" }, { status: 503 });
   }
 }
 
-export async function POST(request) {
+async function telemetryPOST(request) {
   if (process.env.VERCEL_ENV !== "preview") return NextResponse.json({ error: "Not found." }, { status: 404 });
   const director = await directorFor(request);
   if (!director) return NextResponse.json({ error: "Tournament Director access is required." }, { status: 401 });
@@ -208,6 +210,7 @@ export async function POST(request) {
     }
     return NextResponse.json({ error: "Unsupported Odds publication operation." }, { status: 400 });
   } catch (error) {
+    recordOperationalError(error);
     console.error("Championship Odds publication operation failed", { code: error?.code || "ODDS_PUBLICATION_OPERATION_FAILED",
       message: error?.message || String(error) });
     return NextResponse.json({ error: "Championship Odds publication certification could not be completed.",
@@ -215,3 +218,7 @@ export async function POST(request) {
       ...(process.env.VERCEL_ENV === "preview" && error?.rehearsal ? { rehearsal: error.rehearsal } : {}) }, { status: 503 });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/odds/publication-operations", domain: "ODDS" }, telemetryGET);
+
+export const POST = withOperationalRoute({ route: "/api/odds/publication-operations", domain: "ODDS" }, telemetryPOST);

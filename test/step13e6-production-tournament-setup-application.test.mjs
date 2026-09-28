@@ -154,6 +154,7 @@ async function importTournamentSetupServer() {
   const serverSource = await source("lib/production-tournament-setup-server.js");
   const contractUrl = new URL("../lib/production-tournament-setup-contract.js", import.meta.url).href;
   const transformed = serverSource
+    .replace(/import \{ observedJsonRpc \} from "\.\/operational-telemetry\.js";\n/, "")
     .replace('import "server-only";\n', "")
     .replace('from "./net-skins-entry-workspace.js";', `from "${new URL('../lib/net-skins-entry-workspace.js',import.meta.url).href}";`)
     .replace(
@@ -172,7 +173,7 @@ const PRODUCTION_TOURNAMENT_ID = "2026";`,
       "function recordDataAuthorityTransport() {}",
     )
     .replace('from "./production-tournament-setup-contract.js";', `from "${contractUrl}";`);
-  return import(`data:text/javascript;base64,${Buffer.from(transformed).toString("base64")}`);
+  return import(`data:text/javascript;base64,${Buffer.from(`import { observedJsonRpc } from "${new URL("../lib/operational-telemetry.js", import.meta.url).href}";\n` + transformed).toString("base64")}`);
 }
 
 test("BB, Scramble, and Singles preserve the certified participant/slot shapes", () => {

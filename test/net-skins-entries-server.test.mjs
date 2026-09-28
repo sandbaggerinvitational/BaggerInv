@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../lib/operational-telemetry.js";
 import test from 'node:test';import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';
 import {productionNetSkinsEntries} from '../lib/production-tournament-setup-server.js';
 const actor={actorPlayerId:'CB01',actorAuthUserId:'00000000-0000-4000-8000-000000000001'};
@@ -16,7 +17,7 @@ test('entry read is allowlisted, participant-safe and rejects malformed/foreign 
   const result=await productionNetSkinsEntries(actor,null,{rpc});assert.equal(name,'read_production_net_skins_entries_v1');assert.ok(!('actorSecret' in result));
   await assert.rejects(()=>productionNetSkinsEntries(actor,null,{rpc:async()=>({payload:{ok:true,data:{tournamentId:'2027'}}})}),/authority/);
 });
-async function route(deps){let source=await readFile(new URL('../app/api/director/net-skins-entries/route.js',import.meta.url),'utf8');
+async function route(deps){deps={withOperationalRoute,recordOperationalError,...deps};let source=await readFile(new URL('../app/api/director/net-skins-entries/route.js',import.meta.url),'utf8');
   source=source.replace(/^import .*;$/gm,'').replace(/export /g,'');
   return new Function(...Object.keys(deps),`${source};return{GET,POST};`)(...Object.values(deps));
 }

@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { NextResponse } from "next/server";
 
 import { authorizePreviewDirector } from "../../../../lib/preview-director-authorization.js";
@@ -114,7 +115,7 @@ function safeFailure(error) {
   };
 }
 
-export async function GET(request) {
+async function telemetryGET(request) {
   const access = await authorize(request);
   if (access.response) return access.response;
   try {
@@ -129,6 +130,7 @@ export async function GET(request) {
       googleRequests: 0,
     }, { headers: { ...responseHeaders, ...dataAuthorityResponseHeaders(scoped.diagnostics) } });
   } catch (error) {
+    recordOperationalError(error);
     console.error("Production Tournament Setup read failed", {
       code: clean(error?.code || "TOURNAMENT_SETUP_READ_FAILED"),
       status: Number(error?.status || 0),
@@ -140,7 +142,7 @@ export async function GET(request) {
   }
 }
 
-export async function POST(request) {
+async function telemetryPOST(request) {
   const access = await authorize(request, { mutation: true });
   if (access.response) return access.response;
   let input;
@@ -177,6 +179,7 @@ export async function POST(request) {
       googleRequests: 0,
     }, { headers: { ...responseHeaders, ...dataAuthorityResponseHeaders(scoped.diagnostics) } });
   } catch (error) {
+    recordOperationalError(error);
     console.error("Production Tournament Setup mutation failed", {
       action,
       code: clean(error?.code || "TOURNAMENT_SETUP_OPERATION_FAILED"),
@@ -188,3 +191,7 @@ export async function POST(request) {
     });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/director/tournament-setup", domain: "ROUND_CONTROL" }, telemetryGET);
+
+export const POST = withOperationalRoute({ route: "/api/director/tournament-setup", domain: "ROUND_CONTROL" }, telemetryPOST);

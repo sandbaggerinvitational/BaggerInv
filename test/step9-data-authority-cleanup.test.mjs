@@ -86,7 +86,7 @@ test("legacy /api/live is explicit rollback/Production only and cannot be a Supa
   assert.match(route, /netSkinsReadEnvironment/);
   assert.match(route, /LEGACY_GOOGLE_LIVE_READ_NOT_SELECTED/);
   assert.match(route, /X-Google-Fallback-Used["']:\s*["']false/);
-  const handler = route.slice(route.indexOf("export async function GET"));
+  const handler = route.slice(route.search(/(?:export async function GET|async function telemetryGET)/));
   assert.ok(handler.indexOf("tournamentReadEnvironment()") < handler.indexOf("getTournamentData"));
   assert.match(route, /selectedGoogleConsumers/);
   assert.match(route, /source\.requested === "google"/);

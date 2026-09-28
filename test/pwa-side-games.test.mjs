@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../lib/operational-telemetry.js";
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
@@ -26,9 +27,9 @@ test('wrong tournament and mismatched result facts fail closed',()=>{
 // No network, secrets, provider request or Production configuration is used.
 async function route(product,{authorized=true,production=true,ok=true}={}) {
  let code=await src(`app/api/leaderboards/${product}/route.js`);
- code=code.replace(/^import[\s\S]*?from [^;]+;\n/gm,'').replace(/export const dynamic =[^;]+;/,'').replace('export async function GET','async function GET');
+ code=code.replace(/^import[\s\S]*?from [^;]+;\n/gm,'').replace(/export const dynamic =[^;]+;/,'').replace('export async function GET','async function GET').replace(/export const GET/g, 'const GET');
  const isSkins=product==='net-skins';const calls=[];
- const dependency={cookies:async()=>({}),after:()=>assert.fail('No worker allowed'),NextResponse:{json:(value,init={})=>Response.json(value,init)},performance,
+ const dependency={withOperationalRoute,recordOperationalError,cookies:async()=>({}),after:()=>assert.fail('No worker allowed'),NextResponse:{json:(value,init={})=>Response.json(value,init)},performance,
  applicationRequestEnvironment:()=>({}),requireParticipantIdentityAuthority:()=>({resolved:'supabase'}),
  resolveSupabaseParticipantIdentity:async()=>{calls.push('identity');if(!authorized)throw Object.assign(new Error('Denied'),{status:401});return identity;},
  participantIdentityPublicError:e=>({status:e.status||503,code:'UNAVAILABLE',message:'Sign in'}),

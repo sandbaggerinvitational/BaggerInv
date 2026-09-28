@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { NextResponse } from 'next/server';
 import { authorizePreviewDirector } from '../../../../lib/preview-director-authorization.js';
 import { assertProductionCutoverActivation, assertProductionCutoverRequest } from '../../../../lib/production-cutover-activation-contract.js';
@@ -24,10 +25,15 @@ async function handle(request, mutation) {
     if (!payload || typeof payload.ok !== 'boolean') throw new Error('INVALID_RESPONSE');
     return reply(payload, payload.ok ? 200 : 409, dataAuthorityResponseHeaders(scoped.diagnostics));
   } catch (error) {
+    recordOperationalError(error);
     if (error.code === 'ROUND_INPUT_INVALID') return reply({ error: error.message, code: error.code }, 400);
     // A timeout may follow commit. Never claim rollback without a database denial.
     return reply({ error: mutation ? 'The outcome is not confirmed. Refresh authoritative state before another action.' : 'Round state is temporarily unavailable.', code: mutation ? 'ROUND_OUTCOME_UNKNOWN' : 'ROUND_READ_UNAVAILABLE' }, 503);
   }
 }
-export const GET = request => handle(request, false);
-export const POST = request => handle(request, true);
+const telemetryGET = request => handle(request, false);
+const telemetryPOST = request => handle(request, true);
+
+export const GET = withOperationalRoute({ route: "/api/director/round-scoring", domain: "ROUND_CONTROL" }, telemetryGET);
+
+export const POST = withOperationalRoute({ route: "/api/director/round-scoring", domain: "ROUND_CONTROL" }, telemetryPOST);

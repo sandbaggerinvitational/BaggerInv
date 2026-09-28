@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { authenticateParticipantMatch } from "../../../../lib/google-sheets-write.js";
@@ -9,7 +10,7 @@ import { productionShadowScoringMutationResponse } from "../../../../lib/product
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request) {
+async function telemetryGET(request) {
   try {
     const session = verifyScoringSession(scoringTokenFromRequest(request));
     await validateAuthoritativeParticipantSession(request, session, { cookieStore: await cookies() });
@@ -26,13 +27,13 @@ export async function GET(request) {
   }
 }
 
-export async function DELETE() {
+async function telemetryDELETE() {
   const response = NextResponse.json({ cleared: true });
   response.cookies.set({ ...scoringSessionCookie("", 0), name: SCORING_SESSION_COOKIE });
   return response;
 }
 
-export async function POST(request) {
+async function telemetryPOST(request) {
   const candidateReadOnly = productionShadowScoringMutationResponse(request);
   if (candidateReadOnly) return candidateReadOnly;
   try {
@@ -66,9 +67,16 @@ export async function POST(request) {
     response.cookies.set(scoringSessionCookie(token));
     return response;
   } catch (error) {
+    recordOperationalError(error);
     if (error?.code === "SCORING_AUTHORITY_UNAVAILABLE") {
       return NextResponse.json({ error: error.message, code: error.code }, { status: Number(error.status || 503) });
     }
     return NextResponse.json({ error: "Unable to authorize this match." }, { status: 401 });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/scoring/session", domain: "AUTH" }, telemetryGET);
+
+export const DELETE = withOperationalRoute({ route: "/api/scoring/session", domain: "AUTH" }, telemetryDELETE);
+
+export const POST = withOperationalRoute({ route: "/api/scoring/session", domain: "AUTH" }, telemetryPOST);

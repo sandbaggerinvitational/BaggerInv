@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { after, NextResponse } from "next/server";
 
 import {
@@ -34,6 +35,7 @@ async function continueCalculation(jobId, { failureAt = "" } = {}) {
       const result = await processOddsCalculationJob(jobId, { failureAt: attempt === 0 ? failureAt : "" });
       if (result.completed || result.inProgress) return result;
     } catch (error) {
+    recordOperationalError(error);
       lastError = error;
       console.error("Championship Odds durable worker attempt stopped safely", {
         jobId,
@@ -47,7 +49,7 @@ async function continueCalculation(jobId, { failureAt = "" } = {}) {
   return null;
 }
 
-export async function GET(request) {
+async function telemetryGET(request) {
   const source = previewGate();
   if (!source) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const director = await directorFor(request);
@@ -66,7 +68,8 @@ export async function GET(request) {
     let jobs = state.payload.jobs || [];
     if (jobId && jobs[0]?.status === "SUCCEEDED" && jobs[0]?.publication_status !== "PUBLISHED") {
       try { await readPublishableOddsCalculation({ tournamentId, jobId }); }
-      catch (error) { if (error?.code !== "ODDS_CALCULATION_STALE") throw error; }
+      catch (error) {
+    recordOperationalError(error); if (error?.code !== "ODDS_CALCULATION_STALE") throw error; }
       const refreshed = await readOddsCalculationJobs(tournamentId, jobId);
       jobs = refreshed.payload?.jobs || jobs;
     }
@@ -75,11 +78,12 @@ export async function GET(request) {
     return NextResponse.json({ ok: true, source: { requested: source.requestedInputs, resolved: source.inputSource },
       jobs: jobs.map(publicOddsCalculationJob), checkpoints: state.payload.checkpoints || [] });
   } catch (error) {
+    recordOperationalError(error);
     return NextResponse.json({ error: "Championship calculation status is unavailable.", code: error?.code || "ODDS_CALCULATION_STATUS_FAILED" }, { status: 503 });
   }
 }
 
-export async function POST(request) {
+async function telemetryPOST(request) {
   const source = previewGate();
   if (!source) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const director = await directorFor(request);
@@ -119,7 +123,12 @@ export async function POST(request) {
       rehearsal: Boolean(rehearsalFailure), failureBoundary: rehearsalFailure || null,
     }, { status: 202 });
   } catch (error) {
+    recordOperationalError(error);
     console.error("Championship Odds calculation request failed", { code: error?.code || "ODDS_CALCULATION_REQUEST_FAILED", message: error?.message || String(error) });
     return NextResponse.json({ error: "Championship calculation could not be requested.", code: error?.code || "ODDS_CALCULATION_REQUEST_FAILED" }, { status: 503 });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/odds/calculations", domain: "ODDS" }, telemetryGET);
+
+export const POST = withOperationalRoute({ route: "/api/odds/calculations", domain: "ODDS" }, telemetryPOST);

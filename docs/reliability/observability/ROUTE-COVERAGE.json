@@ -1,0 +1,286 @@
+[
+  {
+    "file": "app/api/mobile/v1/today/route.js",
+    "route": "/api/mobile/v1/today",
+    "domain": "TOURNAMENT_READ",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/mobile/v1/matches/route.js",
+    "route": "/api/mobile/v1/matches",
+    "domain": "TOURNAMENT_READ",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/mobile/v1/matches/[matchId]/route.js",
+    "route": "/api/mobile/v1/matches/[matchId]",
+    "domain": "TOURNAMENT_READ",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/mobile/v1/leaders/route.js",
+    "route": "/api/mobile/v1/leaders",
+    "domain": "TOURNAMENT_READ",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/mobile/v1/net-skins/route.js",
+    "route": "/api/mobile/v1/net-skins",
+    "domain": "NET_SKINS",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/mobile/v1/calcutta/route.js",
+    "route": "/api/mobile/v1/calcutta",
+    "domain": "CALCUTTA",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/mobile/v1/odds/route.js",
+    "route": "/api/mobile/v1/odds",
+    "domain": "ODDS",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/mobile/v1/health/route.js",
+    "route": "/api/mobile/v1/health",
+    "domain": "TOURNAMENT_READ",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/mobile/v1/session/route.js",
+    "route": "/api/mobile/v1/session",
+    "domain": "AUTH",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/mobile/v1/scoring/current/route.js",
+    "route": "/api/mobile/v1/scoring/current",
+    "domain": "SCORING",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/mobile/v1/scoring/hole/route.js",
+    "route": "/api/mobile/v1/scoring/hole",
+    "domain": "SCORING",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/mobile/v1/scoring/finalize/route.js",
+    "route": "/api/mobile/v1/scoring/finalize",
+    "domain": "SCORING",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/scoring/current/route.js",
+    "route": "/api/scoring/current",
+    "domain": "SCORING",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/scoring/matches/route.js",
+    "route": "/api/scoring/matches",
+    "domain": "SCORING",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/scoring/matches/[matchId]/route.js",
+    "route": "/api/scoring/matches/[matchId]",
+    "domain": "SCORING",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/scoring/session/route.js",
+    "route": "/api/scoring/session",
+    "domain": "AUTH",
+    "methods": [
+      "GET",
+      "DELETE",
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/leaderboards/core/route.js",
+    "route": "/api/leaderboards/core",
+    "domain": "TOURNAMENT_READ",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/leaderboards/net-skins/route.js",
+    "route": "/api/leaderboards/net-skins",
+    "domain": "NET_SKINS",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/leaderboards/calcutta/route.js",
+    "route": "/api/leaderboards/calcutta",
+    "domain": "CALCUTTA",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/odds/inputs/route.js",
+    "route": "/api/odds/inputs",
+    "domain": "ODDS",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/odds/calculations/route.js",
+    "route": "/api/odds/calculations",
+    "domain": "ODDS",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/odds/publish/route.js",
+    "route": "/api/odds/publish",
+    "domain": "ODDS",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/odds/publication-operations/route.js",
+    "route": "/api/odds/publication-operations",
+    "domain": "ODDS",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/director/round-scoring/route.js",
+    "route": "/api/director/round-scoring",
+    "domain": "ROUND_CONTROL",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/director/tournament-setup/route.js",
+    "route": "/api/director/tournament-setup",
+    "domain": "ROUND_CONTROL",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/director/net-skins-entries/route.js",
+    "route": "/api/director/net-skins-entries",
+    "domain": "NET_SKINS",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/director/odds-publication/route.js",
+    "route": "/api/director/odds-publication",
+    "domain": "ODDS",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/director/production-overview/route.js",
+    "route": "/api/director/production-overview",
+    "domain": "DIRECTOR",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/admin/production-calcutta-v1/route.js",
+    "route": "/api/admin/production-calcutta-v1",
+    "domain": "CALCUTTA",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/admin/production-net-skins-v1/route.js",
+    "route": "/api/admin/production-net-skins-v1",
+    "domain": "NET_SKINS",
+    "methods": [
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/admin/production-odds-calculations/route.js",
+    "route": "/api/admin/production-odds-calculations",
+    "domain": "ODDS",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/live/route.js",
+    "route": "/api/live",
+    "domain": "TOURNAMENT_READ",
+    "methods": [
+      "GET"
+    ]
+  },
+  {
+    "file": "app/api/live-matches/route.js",
+    "route": "/api/live-matches",
+    "domain": "TOURNAMENT_READ",
+    "methods": [
+      "GET",
+      "POST"
+    ]
+  },
+  {
+    "file": "app/api/tournament/live/route.js",
+    "route": "/api/tournament/live",
+    "domain": "TOURNAMENT_READ",
+    "methods": [
+      "GET"
+    ]
+  }
+]

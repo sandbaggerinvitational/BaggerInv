@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
@@ -78,7 +79,7 @@ function safeFailure(error) {
   };
 }
 
-export async function POST(request) {
+async function telemetryPOST(request) {
   const access = await authorize(request);
   if (access.response) return access.response;
   let input;
@@ -135,6 +136,7 @@ export async function POST(request) {
       },
     });
   } catch (error) {
+    recordOperationalError(error);
     console.error("Production Odds publication withdrawal failed", {
       code: clean(error?.code || "ODDS_WITHDRAWAL_OPERATION_FAILED"),
       status: Number(error?.status || 0),
@@ -145,3 +147,5 @@ export async function POST(request) {
     });
   }
 }
+
+export const POST = withOperationalRoute({ route: "/api/director/odds-publication", domain: "ODDS" }, telemetryPOST);

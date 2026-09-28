@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError, emitOperationalEvent } from "../../../../../lib/operational-telemetry.js";
 import { after, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { canScoreMatch, scoringTokenFromRequest, verifyScoringSession } from "../../../../../lib/scoring-access.js";
@@ -24,7 +25,7 @@ function session(request) {
   return verifyScoringSession(scoringTokenFromRequest(request));
 }
 
-export async function GET(request, { params }) {
+async function telemetryGET(request, { params }) {
   try {
     const current = session(request);
     const { matchId } = await params;
@@ -47,12 +48,13 @@ export async function GET(request, { params }) {
     ) },
       { headers: scoringReadResponseHeaders(scoring.diagnostics) });
   } catch (error) {
+    recordOperationalError(error);
     return NextResponse.json({ error: error?.message || "Unable to load scoring.", code: error?.code || "" },
       { status: Number(error?.status) || 403, headers: { "Cache-Control": "no-store" } });
   }
 }
 
-export async function POST(request, { params }) {
+async function telemetryPOST(request, { params }) {
   const candidateReadOnly = productionShadowScoringMutationResponse(request);
   if (candidateReadOnly) return candidateReadOnly;
   try {
@@ -63,6 +65,7 @@ export async function POST(request, { params }) {
     const verifiedAuthorization = await validateAuthoritativeParticipantSession(request, current,
       { requireWritable: true, cookieStore: await cookies() });
     const authorizationMs = Date.now() - authorizationStartedAt;
+    emitOperationalEvent({ event: "PHASE", domain: "AUTHORIZATION", phase: "authorization", latency_ms: authorizationMs, outcome: "NOT_APPLICABLE" });
     const rateLimit = consumeRateLimit(`scoring-write:${clientAddress(request)}:${matchId}`, {
       limit: 30,
       windowMs: 60_000,
@@ -111,6 +114,7 @@ export async function POST(request, { params }) {
             mirrorDurationMs: mirror.totalDurationMs,
           });
         } catch (error) {
+    recordOperationalError(error);
           console.error("Scoring shadow delivery failed", {
             matchId, holeNumber: observation.hole_number, googleRevision: observation.google_revision,
             status: error?.status || 0, diagnostics: error?.shadowDiagnostics || {},
@@ -159,6 +163,7 @@ export async function POST(request, { params }) {
     }
     return NextResponse.json({ result: participantResult });
   } catch (error) {
+    recordOperationalError(error);
     const conflict = Number(error?.status) === 409 || /updated by someone else/i.test(error?.message || "");
     logScoringFailure(error, { route: "/api/scoring/matches/[matchId]", conflict });
     return NextResponse.json(
@@ -170,3 +175,7 @@ export async function POST(request, { params }) {
     );
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/scoring/matches/[matchId]", domain: "SCORING" }, telemetryGET);
+
+export const POST = withOperationalRoute({ route: "/api/scoring/matches/[matchId]", domain: "SCORING" }, telemetryPOST);

@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { NextResponse } from "next/server";
 import { manageCalcutta } from "../../../../lib/calcutta-management-server.js";
 
@@ -79,7 +80,7 @@ function safeFailure(error) {
  * Director-only V1 operation boundary. Resources, authority, publication
  * policy, engine version, worker identity, and runtime scope are server-fixed.
  */
-export async function POST(request) {
+async function telemetryPOST(request) {
   const access = await authorize(request);
   if (access.response) return access.response;
   let input;
@@ -169,6 +170,7 @@ export async function POST(request) {
       headers: { ...noStore, ...dataAuthorityResponseHeaders(scoped.diagnostics) },
     });
   } catch (error) {
+    recordOperationalError(error);
     console.error("Production Calcutta operation failed", {
       action,
       code: clean(error?.code || "PRODUCTION_CALCUTTA_OPERATION_FAILED"),
@@ -180,3 +182,5 @@ export async function POST(request) {
     });
   }
 }
+
+export const POST = withOperationalRoute({ route: "/api/admin/production-calcutta-v1", domain: "CALCUTTA" }, telemetryPOST);

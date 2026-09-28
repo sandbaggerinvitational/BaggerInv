@@ -1,3 +1,4 @@
+import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { createHash, timingSafeEqual } from "node:crypto";
 import { after, NextResponse } from "next/server";
 
@@ -117,6 +118,7 @@ async function continueCalculation(jobId, { failureAt = "" } = {}) {
       });
       if (result.completed || result.inProgress) return result;
     } catch (error) {
+    recordOperationalError(error);
       lastError = error;
       console.error("Production Championship Odds worker stopped safely", {
         jobId,
@@ -161,7 +163,7 @@ function safeJobs(payload = {}, runtimeContext = null) {
   return (payload.jobs || []).map((job) => safeJob(job, runtimeContext));
 }
 
-export async function GET(request) {
+async function telemetryGET(request) {
   const state = productionOddsCalculationEnvironment(process.env);
   if (!state.allowed) return unavailable(state);
   const director = await authorizeRequest(request, state, { requireOrigin: false });
@@ -194,6 +196,7 @@ export async function GET(request) {
       mirrorCreated: false,
     }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
+    recordOperationalError(error);
     return NextResponse.json({
       error: error?.code === "PRODUCTION_ODDS_CALCULATION_STALE"
         ? "This calculation's inputs changed. Publication is blocked. Review did not change the calculation or any publication."
@@ -203,7 +206,7 @@ export async function GET(request) {
   }
 }
 
-export async function POST(request) {
+async function telemetryPOST(request) {
   const state = productionOddsCalculationEnvironment(process.env);
   if (!state.allowed) return unavailable(state);
   const director = await authorizeRequest(request, state, { requireOrigin: true });
@@ -324,6 +327,7 @@ export async function POST(request) {
       mirrorCreated: false,
     }, { status: 202, headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
+    recordOperationalError(error);
     console.error("Production Championship Odds request failed", {
       code: clean(error?.code || "PRODUCTION_ODDS_CALCULATION_REQUEST_FAILED"),
     });
@@ -333,3 +337,7 @@ export async function POST(request) {
     }, { status: Number(error?.status || 503), headers: { "Cache-Control": "private, no-store" } });
   }
 }
+
+export const GET = withOperationalRoute({ route: "/api/admin/production-odds-calculations", domain: "ODDS" }, telemetryGET);
+
+export const POST = withOperationalRoute({ route: "/api/admin/production-odds-calculations", domain: "ODDS" }, telemetryPOST);
