@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "mode": "build",
+  "startedAt": "2026-09-28T13:56:14.898Z",
+  "endedAt": "2026-09-28T13:56:26.543Z",
+  "baseSha": "184b5c65a8e63784e1af8d38121fa2e16a015628",
+  "environment": "LOCAL_ONLY",
+  "remoteNetwork": "DENIED_AT_NET_TLS_SOCKET",
+  "production": false,
+  "files": [],
+  "exitCode": 0,
+  "error": null,
+  "counts": null,
+  "result": "PASS",
+  "rawPath": "/private/tmp/bagger-phase2-build.log",
+  "rawSha256": "5273195654f85a5ee39dc6a2e5e49da0d74aac22c1cb0082c8e4d343dc4fbf4e",
+  "limitations": [
+    "Compilation only, not hosted deployment."
+  ]
+}

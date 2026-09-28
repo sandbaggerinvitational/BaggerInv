@@ -1,0 +1,461 @@
+{
+  "fixture": "phase2-eligible-history-v2",
+  "source": "PHASE1_184b5c65_R139_FUNCTIONS",
+  "candidate": {
+    "path": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+    "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+  },
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "fsync": false,
+  "syntheticReceipts": true,
+  "runtimeSubstitutions": [
+    "assert_production_scoring_runtime",
+    "assert_production_cutover_read_scope"
+  ],
+  "limitations": [
+    "Not legitimate late-R3 lifecycle issuance or hosted admission proof",
+    "Financial results are synthetic history, not payout correctness proof",
+    "Short warm rollback samples are diagnostic only, not production percentiles"
+  ],
+  "mode": "candidate",
+  "measurements": [
+    {
+      "scale": 1,
+      "variant": "none",
+      "eligible": false,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": false,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 8.841,
+        "medianMs": 9.245,
+        "maxMs": 15.148
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.266,
+        "medianMs": 1.294,
+        "maxMs": 8.591
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "current_compatible",
+      "eligible": true,
+      "compatibleBeforeScore": true,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 54.599,
+        "medianMs": 56.851,
+        "maxMs": 63.067
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.154,
+        "medianMs": 1.298,
+        "maxMs": 8.526
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "current_incompatible_consumed",
+      "eligible": true,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 70.048,
+        "medianMs": 75.603,
+        "maxMs": 89.514
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.253,
+        "medianMs": 1.666,
+        "maxMs": 9.792
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "current_incompatible_financial",
+      "eligible": true,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 38.28,
+        "medianMs": 38.837,
+        "maxMs": 48.385
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.127,
+        "medianMs": 1.283,
+        "maxMs": 8.277
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "stale_source",
+      "eligible": true,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 71.954,
+        "medianMs": 74.593,
+        "maxMs": 87.769
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.278,
+        "medianMs": 1.346,
+        "maxMs": 8.81
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "stale_result_binding",
+      "eligible": false,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": false,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 8.88,
+        "medianMs": 9.094,
+        "maxMs": 14.587
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.176,
+        "medianMs": 1.398,
+        "maxMs": 8.325
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "superseded_result",
+      "eligible": false,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": false,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 8.515,
+        "medianMs": 8.685,
+        "maxMs": 13.91
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.258,
+        "medianMs": 1.299,
+        "maxMs": 8.327
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "multiple_receipts",
+      "eligible": true,
+      "compatibleBeforeScore": true,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 74.771,
+        "medianMs": 75.942,
+        "maxMs": 87.751
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.284,
+        "medianMs": 1.352,
+        "maxMs": 8.253
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "none",
+      "eligible": false,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": false,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 8.628,
+        "medianMs": 8.764,
+        "maxMs": 14.925
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.324,
+        "medianMs": 1.35,
+        "maxMs": 9.178
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "current_compatible",
+      "eligible": true,
+      "compatibleBeforeScore": true,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 279.026,
+        "medianMs": 346.267,
+        "maxMs": 439.147
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.412,
+        "medianMs": 1.431,
+        "maxMs": 9.026
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "current_incompatible_consumed",
+      "eligible": true,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 247.34,
+        "medianMs": 249.595,
+        "maxMs": 266.137
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.232,
+        "medianMs": 1.298,
+        "maxMs": 8.252
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "current_incompatible_financial",
+      "eligible": true,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 199.417,
+        "medianMs": 219.79,
+        "maxMs": 237.046
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.409,
+        "medianMs": 1.705,
+        "maxMs": 10.329
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "stale_source",
+      "eligible": true,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 275.091,
+        "medianMs": 289.897,
+        "maxMs": 326.419
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.131,
+        "medianMs": 1.315,
+        "maxMs": 9.358
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "stale_result_binding",
+      "eligible": false,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": false,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 8.624,
+        "medianMs": 8.628,
+        "maxMs": 13.989
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.168,
+        "medianMs": 1.326,
+        "maxMs": 8.661
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "superseded_result",
+      "eligible": false,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": false,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 8.589,
+        "medianMs": 8.691,
+        "maxMs": 14.438
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.404,
+        "medianMs": 1.631,
+        "maxMs": 9.512
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "multiple_receipts",
+      "eligible": true,
+      "compatibleBeforeScore": true,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 376.321,
+        "medianMs": 382.335,
+        "maxMs": 424.677
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 1.239,
+        "medianMs": 1.332,
+        "maxMs": 8.728
+      },
+      "measuredAcceptedScoreSamples": 3
+    }
+  ],
+  "processorEvidence": [
+    {
+      "mode": "baseline",
+      "domain": "CALCUTTA",
+      "status": "PASS",
+      "path": "COMMITTED_SCORE_PUBLIC_CLAIM_UNCHANGED_JS_ENGINE_PUBLIC_COMPLETE_READBACK",
+      "engine": "calcutta-full-net-v3",
+      "resultState": "PROVISIONAL",
+      "golferCount": 24,
+      "exactClaimReplay": true,
+      "completionReplayAddedResults": 0,
+      "publicationChanged": false,
+      "sourceBoundAtClaimAndCompletion": true,
+      "staleCompletionRejected": true,
+      "staleActivationAndPointerDenied": false,
+      "syntheticCurrentActivationMaterialized": false,
+      "financialStatePreserved": true,
+      "enginePayloadSha256": "3c5f1bda2d9dd58932796aa2290170a77bc07eb98857de98a2b0b7110a473c1c",
+      "intentSummary": null,
+      "limitations": [
+        "Synthetic 24000 pot and ownership; no real financial records",
+        "Public SQL claims and actual unchanged JS engine; not HTTP transport or hosted admission proof",
+        "Activation/pointer tests mutate local fixture metadata, not a real protected release transition"
+      ]
+    },
+    {
+      "mode": "candidate",
+      "domain": "CALCUTTA",
+      "status": "PASS",
+      "path": "COMMITTED_SCORE_PUBLIC_CLAIM_UNCHANGED_JS_ENGINE_PUBLIC_COMPLETE_READBACK",
+      "engine": "calcutta-full-net-v3",
+      "resultState": "PROVISIONAL",
+      "golferCount": 24,
+      "exactClaimReplay": true,
+      "completionReplayAddedResults": 0,
+      "publicationChanged": false,
+      "sourceBoundAtClaimAndCompletion": true,
+      "staleCompletionRejected": true,
+      "staleActivationAndPointerDenied": true,
+      "syntheticCurrentActivationMaterialized": true,
+      "financialStatePreserved": true,
+      "enginePayloadSha256": "3c5f1bda2d9dd58932796aa2290170a77bc07eb98857de98a2b0b7110a473c1c",
+      "intentSummary": {
+        "calcutta_succeeded": 1,
+        "calcutta_unresolved": 0
+      },
+      "limitations": [
+        "Synthetic 24000 pot and ownership; no real financial records",
+        "Public SQL claims and actual unchanged JS engine; not HTTP transport or hosted admission proof",
+        "Activation/pointer tests mutate local fixture metadata, not a real protected release transition"
+      ]
+    },
+    {
+      "mode": "baseline",
+      "domain": "NET_SKINS",
+      "status": "PASS",
+      "path": "COMMITTED_SCORE_PUBLIC_CLAIM_UNCHANGED_JS_ENGINE_PUBLIC_COMPLETE_READBACK",
+      "engine": "net-skins-full-net-v2",
+      "resultState": "PROVISIONAL",
+      "exactClaimReplay": true,
+      "completionReplayAddedResults": 0,
+      "sourceBoundAtClaimAndCompletion": true,
+      "provisionalResultsWithheld": true,
+      "financialConfigurationPreserved": true,
+      "intentSummary": null,
+      "enginePayloadSha256": "1dacb9cf47511ea0e1787ad73ebd76e990419968e9992851ba26dad6f34fdc9d",
+      "limitations": [
+        "Synthetic opt-ins and Live fixture state; no real entry funds or Reopen proof",
+        "Public SQL claims and actual unchanged JS engine; not HTTP transport or hosted admission proof"
+      ]
+    },
+    {
+      "mode": "candidate",
+      "domain": "NET_SKINS",
+      "status": "PASS",
+      "path": "COMMITTED_SCORE_PUBLIC_CLAIM_UNCHANGED_JS_ENGINE_PUBLIC_COMPLETE_READBACK",
+      "engine": "net-skins-full-net-v2",
+      "resultState": "PROVISIONAL",
+      "exactClaimReplay": true,
+      "completionReplayAddedResults": 0,
+      "sourceBoundAtClaimAndCompletion": true,
+      "provisionalResultsWithheld": true,
+      "financialConfigurationPreserved": true,
+      "intentSummary": {
+        "skins_succeeded": 1,
+        "skins_unresolved": 0
+      },
+      "enginePayloadSha256": "1dacb9cf47511ea0e1787ad73ebd76e990419968e9992851ba26dad6f34fdc9d",
+      "limitations": [
+        "Synthetic opt-ins and Live fixture state; no real entry funds or Reopen proof",
+        "Public SQL claims and actual unchanged JS engine; not HTTP transport or hosted admission proof"
+      ]
+    }
+  ],
+  "evidenceCapture": {
+    "rawPath": "/private/tmp/bagger-phase2-notes/eligible-history-candidate-final.tap",
+    "rawSha256": "d7021a9faa02e324ba179e08c73074ac6ef6fedbf4320cc321b0cceebf1400f9",
+    "nodeTests": 19,
+    "pass": 19,
+    "fail": 0,
+    "candidateMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+  }
+}

@@ -1,0 +1,981 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-09-28T12:52:02.631Z",
+  "fixture": "bagger-phase2-score-proof-v2",
+  "seed": "2026-canonical-score-path-2",
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "durableCommit": true,
+  "fsync": false,
+  "handicapCases": {
+    "plus": -2.5,
+    "medium": 17.8,
+    "high": 26.4,
+    "veryHigh": 40.2,
+    "builder": "production_control.handicap_v1_match_context",
+    "source": "SYNTHETIC_EDGE_CASES"
+  },
+  "runtimeSubstitutions": [
+    "assert_production_scoring_runtime",
+    "assert_production_cutover_read_scope"
+  ],
+  "limitations": [
+    "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+    "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+    "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+    "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+    "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+    "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+  ],
+  "candidate": null,
+  "mode": "BASELINE_COUNTEREXAMPLES",
+  "tests": [
+    {
+      "id": "P2-FIXTURE-IDS",
+      "name": "full input seed and hole key produce 432 distinct mutation identities",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "identities": 432,
+        "distinct": 432,
+        "algorithm": "SHA256_ALL_SEED_AND_KEY_BYTES"
+      },
+      "elapsedMs": 0.9324169999999867
+    },
+    {
+      "id": "P2-IDEM-001",
+      "name": "sequential identical mutation and changed payload",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "first": "ACCEPTED",
+        "retry": "ACCEPTED",
+        "replay": true,
+        "changedPayload": "IDEMPOTENCY_CONFLICT",
+        "receiptCount": 1
+      },
+      "elapsedMs": 424.2807499999999
+    },
+    {
+      "id": "P2-IDEM-002",
+      "name": "new mutation same Official score vs intentional revision-aware correction",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "newIdSameScore": "NO_CHANGE_WITHOUT_NEW_RECEIPT",
+        "stale": "MATCH_REVISION_CONFLICT",
+        "deliberateCurrentRevisionCorrection": "ACCEPTED_WITH_HISTORY",
+        "contractChange": false
+      },
+      "elapsedMs": 405.6932499999998
+    },
+    {
+      "id": "P2-CONC-001",
+      "name": "20 concurrent identical requests resolve one canonical outcome",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "requests": 20,
+        "actualLockWaiters": 19,
+        "accepted": 1,
+        "replayed": 19,
+        "canonicalHoles": 1,
+        "receipts": 1,
+        "deadlocks": 0
+      },
+      "elapsedMs": 436.48654099999976
+    },
+    {
+      "id": "P2-CONC-002",
+      "name": "concurrent new mutation IDs / same gross cannot overwrite stale authority",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "ACCEPTED",
+        "loser": "MATCH_REVISION_CONFLICT",
+        "silentOverwrite": false
+      },
+      "elapsedMs": 363.3720840000001
+    },
+    {
+      "id": "P2-CONC-003",
+      "name": "concurrent new mutation IDs / different gross cannot overwrite stale authority",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "ACCEPTED",
+        "loser": "MATCH_REVISION_CONFLICT",
+        "silentOverwrite": false
+      },
+      "elapsedMs": 415.0210410000004
+    },
+    {
+      "id": "P2-CONC-004",
+      "name": "adjacent holes serialize with revision conflict then same-mutation retry",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "staleAdjacent": "MATCH_REVISION_CONFLICT",
+        "sameMutationRefreshedRevision": "ACCEPTED",
+        "canonicalHoles": 2
+      },
+      "elapsedMs": 407.5572080000002
+    },
+    {
+      "id": "P2-CONC-005",
+      "name": "independent match score completes while another match transaction remains open",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "FAIL",
+      "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while inserting index tuple (0,1) in relation \"competition_recalculation_jobs\"\nSQL statement \"insert into scoring_authority.competition_recalculation_jobs (\n      tournament_id, round_number, engine_key, status,\n      requested_source_revision, requested_at, started_at, completed_at,\n      last_error_code, last_error_safe, runtime_generation_id,\n      claim_token, claimed_by, lease_expires_at, updated_at\n    ) values (\n      target_tournament, 0, engine_value, 'PENDING',\n      pg_catalog.jsonb_build_object(\n        'reason', reason_value, 'revision', revision_value,\n        'transactional', true\n      ), pg_catalog.clock_timestamp(), null, null, null, null,\n      runtime_generation, null, null, null, pg_catalog.clock_timestamp()\n    ) on conflict (tournament_id, round_number, engine_key) do update set\n      status = 'PENDING',\n      requested_source_revision = excluded.requested_source_revision,\n      requested_at = excluded.requested_at,\n      started_at = null, completed_at = null,\n      last_error_code = null, last_error_safe = null,\n      runtime_generation_id = excluded.runtime_generation_id,\n      claim_token = null, claimed_by = null, lease_expires_at = null,\n      updated_at = excluded.updated_at\"\nPL/pgSQL function scoring_authority.enqueue_annual_derived_v1_change() line 120 at SQL statement\nSQL statement \"insert into scoring_authority.hole_scores (\n    match_id, hole_number, hole_revision, team_1_gross_scores, team_2_gross_scores,\n    team_1_strokes, team_2_strokes, team_1_net_score, team_2_net_score,\n    hole_winner, mutation_key, actor_id\n  ) values (\n    target_match, target_hole, next_hole_revision, team_1_gross, team_2_gross,\n    team_1_strokes, team_2_strokes, team_1_net, team_2_net, winner, mutation_identity, actor\n  ) on conflict (match_id, hole_number) do update set\n    hole_revision = excluded.hole_revision,\n    team_1_gross_scores = excluded.team_1_gross_scores,\n    team_2_gross_scores = excluded.team_2_gross_scores,\n    team_1_strokes = excluded.team_1_strokes,\n    team_2_strokes = excluded.team_2_strokes,\n    team_1_net_score = excluded.team_1_net_score,\n    team_2_net_score = excluded.team_2_net_score,\n    hole_winner = excluded.hole_winner,\n    mutation_key = excluded.mutation_key,\n    actor_id = excluded.actor_id,\n    updated_at = transition_at\"\nPL/pgSQL function public.submit_production_hole_score(jsonb) line 138 at SQL statement\n",
+      "elapsedMs": 2349.0949579999997
+    },
+    {
+      "id": "P2-CONC-LOCK-SCORE",
+      "name": "SCORE wins Lock/score race safely",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "SCORE",
+        "loser": "MATCH_REVISION_CONFLICT",
+        "holes": 1,
+        "locked": false
+      },
+      "elapsedMs": 498.09649999999965
+    },
+    {
+      "id": "P2-CONC-LOCK-LOCK",
+      "name": "LOCK wins Lock/score race safely",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "LOCK",
+        "loser": "UNAUTHORIZED",
+        "holes": 0,
+        "locked": true
+      },
+      "elapsedMs": 391.5744170000007
+    },
+    {
+      "id": "P2-ATOMIC-BEFORE_HOLE",
+      "name": "failure at BEFORE_HOLE rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "BEFORE_HOLE",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 389.14920899999925
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_HOLE",
+      "name": "failure at AFTER_HOLE rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_HOLE",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 373.27991699999984
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_MATCH",
+      "name": "failure at AFTER_MATCH rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_MATCH",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 403.0641660000001
+    },
+    {
+      "id": "P2-ATOMIC-BEFORE_RECEIPT",
+      "name": "failure at BEFORE_RECEIPT rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "BEFORE_RECEIPT",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 387.2340000000004
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_RECEIPT",
+      "name": "failure at AFTER_RECEIPT rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_RECEIPT",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 391.2333749999998
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_HISTORY",
+      "name": "failure at AFTER_HISTORY rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_HISTORY",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 388.11104200000045
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_AUDIT",
+      "name": "failure at AFTER_AUDIT rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_AUDIT",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 421.37837500000023
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_OUTBOX",
+      "name": "failure at AFTER_OUTBOX rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_OUTBOX",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 409.0776249999999
+    },
+    {
+      "id": "P2-FAIL-57014",
+      "name": "statement timeout after hole work rolls back and preserves SQLSTATE57014",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "sqlstate": "57014",
+        "canonicalCommit": false,
+        "receipt": false,
+        "sameMutationRetry": "ACCEPTED"
+      },
+      "elapsedMs": 457.65799999999945
+    },
+    {
+      "id": "P2-FAIL-BEFORE-COMMIT",
+      "name": "backend connection termination before COMMIT is exactly recoverable",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "connectionLost": "BEFORE_COMMIT",
+        "receiptAtResolution": false,
+        "canonicalOutcome": "NOT_COMMITTED",
+        "sameMutationRetry": "ACCEPTED",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 383.3912080000009
+    },
+    {
+      "id": "P2-FAIL-AFTER-COMMIT",
+      "name": "backend connection termination after COMMIT is exactly recoverable",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "connectionLost": "AFTER_COMMIT_BEFORE_DELIVERY",
+        "receiptAtResolution": true,
+        "canonicalOutcome": "COMMITTED",
+        "sameMutationRetry": "STORED_RECEIPT",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 354.5672080000004
+    },
+    {
+      "id": "P2-UNKNOWN-INFLIGHT",
+      "name": "absent receipt while transaction still active must remain UNKNOWN",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "inflightReadback": "NO_RECEIPT_VISIBLE_IS_NOT_NONCOMMIT_PROOF",
+        "stateWhileActive": "UNKNOWN",
+        "afterCommit": "COMMITTED"
+      },
+      "elapsedMs": 358.4534170000006
+    },
+    {
+      "id": "P2-AUTH-001",
+      "name": "real actor, match permission and private RPC privileges deny unauthorized identities",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "rejected": [
+          "spectator",
+          "signed-out",
+          "another-match",
+          "mismatched-match",
+          "revoked-link"
+        ],
+        "publicRpcGrant": "SERVICE_ROLE_ONLY",
+        "hostedAuth": "NOT_PROVEN",
+        "RLS": "CATALOG_AND_EXISTING_GRANTS_ONLY"
+      },
+      "elapsedMs": 370.5908330000002
+    },
+    {
+      "id": "P2-IDEM-LOCKED-READBACK",
+      "name": "committed receipt survives Lock even when participant replay loses permission",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "original": "COMMITTED",
+        "participantReplay": "UNAUTHORIZED",
+        "trustedExactReceipt": "COMMITTED",
+        "clientStatusResolution": "NOT_PROVEN",
+        "discoveredGap": "Permission revocation can deny replay of already committed score"
+      },
+      "elapsedMs": 306.1553329999988
+    },
+    {
+      "id": "P2-GOLF-432",
+      "name": "all R1/R2/R3 holes and Finalize retain canonical golf and receipts",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "totalCanonicalHoles": 432,
+        "rounds": [
+          {
+            "round": 1,
+            "matches": 6,
+            "holes": 108,
+            "failures": 0,
+            "latency": {
+              "samples": 108,
+              "p50": 0.7817909999994299,
+              "p95": 7.357167000000118,
+              "p99": null,
+              "max": 14.185166999999637,
+              "p99Reason": "INSUFFICIENT SAMPLE"
+            },
+            "finals": [
+              {
+                "matchId": "2026-R1-1",
+                "holes": 18,
+                "team1Points": 0.5,
+                "team2Points": 2.5,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R1-2",
+                "holes": 18,
+                "team1Points": 2,
+                "team2Points": 1,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R1-3",
+                "holes": 18,
+                "team1Points": 0.5,
+                "team2Points": 2.5,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R1-4",
+                "holes": 18,
+                "team1Points": 2,
+                "team2Points": 1,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R1-5",
+                "holes": 18,
+                "team1Points": 0.5,
+                "team2Points": 2.5,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R1-6",
+                "holes": 18,
+                "team1Points": 0,
+                "team2Points": 3,
+                "finalized": true
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "matches": 6,
+            "holes": 108,
+            "failures": 0,
+            "latency": {
+              "samples": 108,
+              "p50": 0.5841250000012224,
+              "p95": 6.988750000000437,
+              "p99": null,
+              "max": 7.685332999999446,
+              "p99Reason": "INSUFFICIENT SAMPLE"
+            },
+            "finals": [
+              {
+                "matchId": "2026-R2-1",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R2-2",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R2-3",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R2-4",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R2-5",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R2-6",
+                "holes": 18,
+                "team1Points": 0,
+                "team2Points": 3,
+                "finalized": true
+              }
+            ]
+          },
+          {
+            "round": 3,
+            "matches": 12,
+            "holes": 216,
+            "failures": 0,
+            "latency": {
+              "samples": 216,
+              "p50": 0.5971669999998994,
+              "p95": 7.1512500000008,
+              "p99": null,
+              "max": 7.7965840000015305,
+              "p99Reason": "INSUFFICIENT SAMPLE"
+            },
+            "finals": [
+              {
+                "matchId": "2026-R3-1",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-2",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-3",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-4",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-5",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-6",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-7",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-8",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-9",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-10",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-11",
+                "holes": 18,
+                "team1Points": 0,
+                "team2Points": 3,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-12",
+                "holes": 18,
+                "team1Points": 0,
+                "team2Points": 3,
+                "finalized": true
+              }
+            ]
+          }
+        ],
+        "historyResetBetweenRounds": false,
+        "actualRpc": true,
+        "commitPerHole": true,
+        "derivedProcessorsRun": false
+      },
+      "elapsedMs": 1752.6039999999994
+    },
+    {
+      "id": "P2-GOLF-HALVES",
+      "name": "all three formats preserve an 18-hole halved result and 1.5/1.5 points",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "formats": [
+          "BB",
+          "SC",
+          "SI"
+        ],
+        "holes": 54,
+        "allHoleResults": "Halved",
+        "points": [
+          1.5,
+          1.5
+        ]
+      },
+      "elapsedMs": 457.80862499999967
+    },
+    {
+      "id": "P2-GOLF-EARLY",
+      "name": "Singles clinch at10 preserves remaining18-hole gross and final three points",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "clinchAt": 10,
+        "clinch": "Team 1 wins 10 & 8",
+        "canonicalHoles": 18,
+        "points": [
+          3,
+          0
+        ]
+      },
+      "elapsedMs": 339.86304199999904
+    },
+    {
+      "id": "P2-CONC-FINALIZE",
+      "name": "final-hole vs Finalize race is never Final with missing hole",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "preFinalHole": "SCORECARD_INCOMPLETE",
+        "staleRace": "MATCH_REVISION_CONFLICT",
+        "sameMutationRetry": "FINALIZED",
+        "holes": 18
+      },
+      "elapsedMs": 729.235333999999
+    },
+    {
+      "id": "P2-RESTART-IN-TRANSACTION",
+      "name": "owned disposable PostgreSQL crash restart during open score transaction",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "FAIL",
+      "error": "pg_ctl: could not start server\nExamine the log output.\n\n2026-09-28 07:52:02.984 CDT [24196] LOG:  starting PostgreSQL 17.11 (Homebrew) on aarch64-apple-darwin25.6.0, compiled by Apple clang version 21.0.0 (clang-2100.1.1.101), 64-bit\n2026-09-28 07:52:02.985 CDT [24196] LOG:  listening on Unix socket \"/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-ka5t87/socket/.s.PGSQL.60578\"\n2026-09-28 07:52:02.987 CDT [24204] LOG:  database system was shut down at 2026-09-28 07:52:02 CDT\n2026-09-28 07:52:02.990 CDT [24196] LOG:  database system is ready to accept connections\n2026-09-28 07:52:06.496 CDT [24593] WARNING:  there is no transaction in progress\n2026-09-28 07:52:06.911 CDT [24611] WARNING:  there is no transaction in progress\n2026-09-28 07:52:07.319 CDT [24627] WARNING:  there is no transaction in progress\n2026-09-28 07:52:09.663 CDT [24648] ERROR:  canceling statement due to statement timeout\n2026-09-28 07:52:09.663 CDT [24648] CONTEXT:  while inserting index tuple (0,1) in relation \"competition_recalculation_jobs\"\n\tSQL statement \"insert into scoring_authority.competition_recalculation_jobs (\n\t      tournament_id, round_number, engine_key, status,\n\t      requested_source_revision, requested_at, started_at, completed_at,\n\t      last_error_code, last_error_safe, runtime_generation_id,\n\t      claim_token, claimed_by, lease_expires_at, updated_at\n\t    ) values (\n\t      target_tournament, 0, engine_value, 'PENDING',\n\t      pg_catalog.jsonb_build_object(\n\t        'reason', reason_value, 'revision', revision_value,\n\t        'transactional', true\n\t      ), pg_catalog.clock_timestamp(), null, null, null, null,\n\t      runtime_generation, null, null, null, pg_catalog.clock_timestamp()\n\t    ) on conflict (tournament_id, round_number, engine_key) do update set\n\t      status = 'PENDING',\n\t      requested_source_revision = excluded.requested_source_revision,\n\t      requested_at = excluded.requested_at,\n\t      started_at = null, completed_at = null,\n\t      last_error_code = null, last_error_safe = null,\n\t      runtime_generation_id = excluded.runtime_generation_id,\n\t      claim_token = null, claimed_by = null, lease_expires_at = null,\n\t      updated_at = excluded.updated_at\"\n\tPL/pgSQL function scoring_authority.enqueue_annual_derived_v1_change() line 120 at SQL statement\n\tSQL statement \"insert into scoring_authority.hole_scores (\n\t    match_id, hole_number, hole_revision, team_1_gross_scores, team_2_gross_scores,\n\t    team_1_strokes, team_2_strokes, team_1_net_score, team_2_net_score,\n\t    hole_winner, mutation_key, actor_id\n\t  ) values (\n\t    target_match, target_hole, next_hole_revision, team_1_gross, team_2_gross,\n\t    team_1_strokes, team_2_strokes, team_1_net, team_2_net, winner, mutation_identity, actor\n\t  ) on conflict (match_id, hole_number) do update set\n\t    hole_revision = excluded.hole_revision,\n\t    team_1_gross_scores = excluded.team_1_gross_scores,\n\t    team_2_gross_scores = excluded.team_2_gross_scores,\n\t    team_1_strokes = excluded.team_1_strokes,\n\t    team_2_strokes = excluded.team_2_strokes,\n\t    team_1_net_score = excluded.team_1_net_score,\n\t    team_2_net_score = excluded.team_2_net_score,\n\t    hole_winner = excluded.hole_winner,\n\t    mutation_key = excluded.mutation_key,\n\t    actor_id = excluded.actor_id,\n\t    updated_at = transition_at\"\n\tPL/pgSQL function public.submit_production_hole_score(jsonb) line 138 at SQL statement\n2026-09-28 07:52:09.663 CDT [24648] STATEMENT:  select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-11\",\"player_id\":\"P11\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000011\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-11\",\"hole_number\":1,\"mutation_key\":\"3aa4c7e7-9376-4881-8a87-fd93d24f2599\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb);\n2026-09-28 07:52:10.167 CDT [24675] WARNING:  there is no transaction in progress\n2026-09-28 07:52:10.559 CDT [24692] WARNING:  there is no transaction in progress\n2026-09-28 07:52:10.909 CDT [24711] ERROR:  PHASE2_INJECTED_BEFORE_HOLE\n2026-09-28 07:52:10.909 CDT [24711] CONTEXT:  PL/pgSQL function public.phase2_fault() line 2 at RAISE\n\tSQL statement \"insert into scoring_authority.hole_scores (\n\t    match_id, hole_number, hole_revision, team_1_gross_scores, team_2_gross_scores,\n\t    team_1_strokes, team_2_strokes, team_1_net_score, team_2_net_score,\n\t    hole_winner, mutation_key, actor_id\n\t  ) values (\n\t    target_match, target_hole, next_hole_revision, team_1_gross, team_2_gross,\n\t    team_1_strokes, team_2_strokes, team_1_net, team_2_net, winner, mutation_identity, actor\n\t  ) on conflict (match_id, hole_number) do update set\n\t    hole_revision = excluded.hole_revision,\n\t    team_1_gross_scores = excluded.team_1_gross_scores,\n\t    team_2_gross_scores = excluded.team_2_gross_scores,\n\t    team_1_strokes = excluded.team_1_strokes,\n\t    team_2_strokes = excluded.team_2_strokes,\n\t    team_1_net_score = excluded.team_1_net_score,\n\t    team_2_net_score = excluded.team_2_net_score,\n\t    hole_winner = excluded.hole_winner,\n\t    mutation_key = excluded.mutation_key,\n\t    actor_id = excluded.actor_id,\n\t    updated_at = transition_at\"\n\tPL/pgSQL function public.submit_production_hole_score(jsonb) line 138 at SQL statement\n2026-09-28 07:52:10.909 CDT [24711] STATEMENT:  select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"45d87e57-f1f7-4813-8010-58a4c77dcb95\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb);\n2026-09-28 07:52:11.277 CDT [24733] ERROR:  PHASE2_INJECTED_AFTER_HOLE\n2026-09-28 07:52:11.277 CDT [24733] CONTEXT:  PL/pgSQL function public.phase2_fault() line 2 at RAISE\n\tSQL statement \"insert into scoring_authority.hole_scores (\n\t    match_id, hole_number, hole_revision, team_1_gross_scores, team_2_gross_scores,\n\t    team_1_strokes, team_2_strokes, team_1_net_score, team_2_net_score,\n\t    hole_winner, mutation_key, actor_id\n\t  ) values (\n\t    target_match, target_hole, next_hole_revision, team_1_gross, team_2_gross,\n\t    team_1_strokes, team_2_strokes, team_1_net, team_2_net, winner, mutation_identity, actor\n\t  ) on conflict (match_id, hole_number) do update set\n\t    hole_revision = excluded.hole_revision,\n\t    team_1_gross_scores = excluded.team_1_gross_scores,\n\t    team_2_gross_scores = excluded.team_2_gross_scores,\n\t    team_1_strokes = excluded.team_1_strokes,\n\t    team_2_strokes = excluded.team_2_strokes,\n\t    team_1_net_score = excluded.team_1_net_score,\n\t    team_2_net_score = excluded.team_2_net_score,\n\t    hole_winner = excluded.hole_winner,\n\t    mutation_key = excluded.mutation_key,\n\t    actor_id = excluded.actor_id,\n\t    updated_at = transition_at\"\n\tPL/pgSQL function public.submit_production_hole_score(jsonb) line 138 at SQL statement\n2026-09-28 07:52:11.277 CDT [24733] STATEMENT:  select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"45d87e57-f1f7-4813-8010-58a4c77dcb95\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb);\n2026-09-28 07:52:11.684 CDT [24755] ERROR:  PHASE2_INJECTED_AFTER_MATCH\n2026-09-28 07:52:11.684 CDT [24755] CONTEXT:  PL/pgSQL function public.phase2_fault() line 2 at RAISE\n\tSQL statement \"update scoring_authority.matches set\n\t    match_revision = next_match_revision,\n\t    scored_holes = (progress->>'scored_holes')::integer,\n\t    current_hole = (progress->>'current_hole')::integer,\n\t    holes_remaining = (progress->>'holes_remaining')::integer,\n\t    team_1_holes_won = (progress->>'team_1_holes_won')::integer,\n\t    team_2_holes_won = (progress->>'team_2_holes_won')::integer,\n\t    running_result = progress->>'running_result',\n\t    result_winner = progress->>'result_winner',\n\t    clinched = (progress->>'clinched')::boolean,\n\t    scorecard_complete = (progress->>'scorecard_complete')::boolean,\n\t    authority_updated_at = transition_at,\n\t    updated_at = transition_at\n\t  where match_id = target_match\"\n\tPL/pgSQL function public.submit_production_hole_score(jsonb) line 158 at SQL statement\n2026-09-28 07:52:11.684 CDT [24755] STATEMENT:  select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"45d87e57-f1f7-4813-8010-58a4c77dcb95\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb);\n2026-09-28 07:52:12.069 CDT [24781] ERROR:  PHASE2_INJECTED_BEFORE_RECEIPT\n2026-09-28 07:52:12.069 CDT [24781] CONTEXT:  PL/pgSQL function public.phase2_fault() line 2 at RAISE\n\tSQL statement \"insert into scoring_authority.score_mutations (\n\t    match_id, mutation_key, mutation_type, hole_number, payload_hash,\n\t    previous_match_revision, next_match_revision, previous_hole_revision,\n\t    next_hole_revision, result, actor_id\n\t  ) values (\n\t    target_match, mutation_identity, 'HOLE_SCORE', target_hole, payload_hash_value,\n\t    match_row.match_revision, next_match_revision, current_hole_revision,\n\t    next_hole_revision, result_value, actor\n\t  )\"\n\tPL/pgSQL function public.submit_production_hole_score(jsonb) line 183 at SQL statement\n2026-09-28 07:52:12.069 CDT [24781] STATEMENT:  select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"45d87e57-f1f7-4813-8010-58a4c77dcb95\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb);\n2026-09-28 07:52:12.460 CDT [24803] ERROR:  PHASE2_INJECTED_AFTER_RECEIPT\n2026-09-28 07:52:12.460 CDT [24803] CONTEXT:  PL/pgSQL function public.phase2_fault() line 2 at RAISE\n\tSQL statement \"insert into scoring_authority.score_mutations (\n\t    match_id, mutation_key, mutation_type, hole_number, payload_hash,\n\t    previous_match_revision, next_match_revision, previous_hole_revision,\n\t    next_hole_revision, result, actor_id\n\t  ) values (\n\t    target_match, mutation_identity, 'HOLE_SCORE', target_hole, payload_hash_value,\n\t    match_row.match_revision, next_match_revision, current_hole_revision,\n\t    next_hole_revision, result_value, actor\n\t  )\"\n\tPL/pgSQL function public.submit_production_hole_score(jsonb) line 183 at SQL statement\n2026-09-28 07:52:12.460 CDT [24803] STATEMENT:  select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"45d87e57-f1f7-4813-8010-58a4c77dcb95\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb);\n2026-09-28 07:52:12.851 CDT [24825] ERROR:  PHASE2_INJECTED_AFTER_HISTORY\n2026-09-28 07:52:12.851 CDT [24825] CONTEXT:  PL/pgSQL function public.phase2_fault() line 2 at RAISE\n\tSQL statement \"insert into scoring_authority.score_revision_history (\n\t    match_id, hole_number, mutation_key, action, previous_match_revision,\n\t    next_match_revision, previous_hole_revision, next_hole_revision,\n\t    before_state, after_state, actor_id\n\t  ) values (\n\t    target_match, target_hole, mutation_identity, 'HOLE_SCORE_UPSERTED',\n\t    match_row.match_revision, next_match_revision, current_hole_revision,\n\t    next_hole_revision, before_state, result_value, actor\n\t  )\"\n\tPL/pgSQL function public.submit_production_hole_score(jsonb) line 192 at SQL statement\n2026-09-28 07:52:12.851 CDT [24825] STATEMENT:  select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"45d87e57-f1f7-4813-8010-58a4c77dcb95\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb);\n2026-09-28 07:52:13.271 CDT [24854] ERROR:  PHASE2_INJECTED_AFTER_AUDIT\n2026-09-28 07:52:13.271 CDT [24854] CONTEXT:  PL/pgSQL function public.phase2_fault() line 2 at RAISE\n\tSQL statement \"insert into scoring_authority.audit_events (tournament_id, match_id, mutation_key, action, actor_id, metadata)\n\t    values ('2026', target_match, mutation_identity, 'HOLE_SCORE_UPSERTED', actor, result_value)\"\n\tPL/pgSQL function public.submit_production_hole_score(jsonb) line 201 at SQL statement\n2026-09-28 07:52:13.271 CDT [24854] STATEMENT:  select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"45d87e57-f1f7-4813-8010-58a4c77dcb95\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb);\n2026-09-28 07:52:13.681 CDT [24888] ERROR:  PHASE2_INJECTED_AFTER_OUTBOX\n2026-09-28 07:52:13.681 CDT [24888] CONTEXT:  PL/pgSQL function public.phase2_fault() line 2 at RAISE\n\tSQL statement \"insert into scoring_authority.google_outbox_events (\n\t    tournament_id, match_id, match_revision, hole_number, hole_revision,\n\t    mutation_key, event_type, payload, payload_hash\n\t  ) values (\n\t    '2026', target_match, next_match_revision, target_hole, next_hole_revision,\n\t    mutation_identity, 'HOLE_SCORE_UPSERTED', result_value, payload_hash_value\n\t  )\"\n\tPL/pgSQL function public.submit_production_hole_score(jsonb) line 203 at SQL statement\n2026-09-28 07:52:13.681 CDT [24888] STATEMENT:  select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"45d87e57-f1f7-4813-8010-58a4c77dcb95\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb);\n2026-09-28 07:52:14.138 CDT [24913] ERROR:  canceling statement due to statement timeout\n2026-09-28 07:52:14.138 CDT [24913] CONTEXT:  SQL statement \"SELECT pg_sleep(1)\"\n\tPL/pgSQL function public.phase2_slow_receipt() line 2 at PERFORM\n\tSQL statement \"insert into scoring_authority.score_mutations (\n\t    match_id, mutation_key, mutation_type, hole_number, payload_hash,\n\t    previous_match_revision, next_match_revision, previous_hole_revision,\n\t    next_hole_revision, result, actor_id\n\t  ) values (\n\t    target_match, mutation_identity, 'HOLE_SCORE', target_hole, payload_hash_value,\n\t    match_row.match_revision, next_match_revision, current_hole_revision,\n\t    next_hole_revision, result_value, actor\n\t  )\"\n\tPL/pgSQL function public.submit_production_hole_score(jsonb) line 183 at SQL statement\n2026-09-28 07:52:14.138 CDT [24913] STATEMENT:  select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"45d87e57-f1f7-4813-8010-58a4c77dcb95\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb);\n2026-09-28 07:52:14.530 CDT [24930] FATAL:  terminating connection due to administrator command\n2026-09-28 07:52:14.890 CDT [24948] FATAL:  terminating connection due to administrator command\n2026-09-28 07:52:15.277 CDT [24972] WARNING:  there is no transaction in progress\n2026-09-28 07:52:15.589 CDT [24987] ERROR:  PRODUCTION_SCORING_AUTHORIZATION_REQUIRED\n2026-09-28 07:52:15.589 CDT [24987] CONTEXT:  PL/pgSQL function assert_production_scoring_actor(jsonb,boolean) line 12 at RAISE\n\tSQL statement \"SELECT production_control.assert_production_scoring_actor(input, false)\"\n\tPL/pgSQL function public.submit_production_hole_score(jsonb) line 34 at PERFORM\n2026-09-28 07:52:15.589 CDT [24987] STATEMENT:  select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"SPECTATOR\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"45d87e57-f1f7-4813-8010-58a4c77dcb95\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb)\n2026-09-28 07:52:15.596 CDT [24989] ERROR:  PRODUCTION_SCORING_AUTHORIZATION_REQUIRED\n2026-09-28 07:52:15.596 CDT [24989] CONTEXT:  PL/pgSQL function assert_production_scoring_actor(jsonb,boolean) line 12 at RAISE\n\tSQL statement \"SELECT production_control.assert_production_scoring_actor(input, false)\"\n\tPL/pgSQL function public.submit_production_hole_score(jsonb) line 34 at PERFORM\n2026-09-28 07:52:15.596 CDT [24989] STATEMENT:  select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":null,\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"45d87e57-f1f7-4813-8010-58a4c77dcb95\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb)\n2026-09-28 07:52:15.628 CDT [24997] ERROR:  PRODUCTION_SCORING_AUTHORIZATION_REQUIRED\n2026-09-28 07:52:15.628 CDT [24997] CONTEXT:  PL/pgSQL function assert_production_scoring_actor(jsonb,boolean) line 45 at RAISE\n\tSQL statement \"SELECT production_control.assert_production_scoring_actor(input, false)\"\n\tPL/pgSQL function public.submit_production_hole_score(jsonb) line 34 at PERFORM\n2026-09-28 07:52:15.628 CDT [24997] STATEMENT:  select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"45d87e57-f1f7-4813-8010-58a4c77dcb95\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb)\n2026-09-28 07:52:19.234 CDT [25429] WARNING:  there is no transaction in progress\n2026-09-28 07:52:19.540 CDT [24196] LOG:  received immediate shutdown request\n2026-09-28 07:52:19.550 CDT [24196] LOG:  database system is shut down\n2026-09-28 07:52:19.687 CDT [25447] LOG:  starting PostgreSQL 17.11 (Homebrew) on aarch64-apple-darwin25.6.0, compiled by Apple clang version 21.0.0 (clang-2100.1.1.101), 64-bit\n2026-09-28 07:52:19.687 CDT [25447] LOG:  listening on Unix socket \"/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-ka5t87/socket/.s.PGSQL.60578\"\n2026-09-28 07:52:19.710 CDT [25447] FATAL:  postmaster became multithreaded during startup\n2026-09-28 07:52:19.710 CDT [25447] HINT:  Set the LC_ALL environment variable to a valid locale.\n2026-09-28 07:52:19.710 CDT [25447] LOG:  database system is shut down\n\n\n1 !== 0\n",
+      "elapsedMs": 547.1219999999994
+    },
+    {
+      "id": "P2-RESTART-AFTER-COMMIT",
+      "name": "owned disposable PostgreSQL crash restart after commit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "FAIL",
+      "error": "/opt/homebrew/opt/postgresql@17/bin/createdb\ncreatedb: error: connection to server on socket \"/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-ka5t87/socket/.s.PGSQL.60578\" failed: No such file or directory\n\tIs the server running locally and accepting connections on that socket?\n",
+      "elapsedMs": 7.308625000001484
+    }
+  ],
+  "fullRounds": {
+    "totalCanonicalHoles": 432,
+    "rounds": [
+      {
+        "round": 1,
+        "matches": 6,
+        "holes": 108,
+        "failures": 0,
+        "latency": {
+          "samples": 108,
+          "p50": 0.7817909999994299,
+          "p95": 7.357167000000118,
+          "p99": null,
+          "max": 14.185166999999637,
+          "p99Reason": "INSUFFICIENT SAMPLE"
+        },
+        "finals": [
+          {
+            "matchId": "2026-R1-1",
+            "holes": 18,
+            "team1Points": 0.5,
+            "team2Points": 2.5,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R1-2",
+            "holes": 18,
+            "team1Points": 2,
+            "team2Points": 1,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R1-3",
+            "holes": 18,
+            "team1Points": 0.5,
+            "team2Points": 2.5,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R1-4",
+            "holes": 18,
+            "team1Points": 2,
+            "team2Points": 1,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R1-5",
+            "holes": 18,
+            "team1Points": 0.5,
+            "team2Points": 2.5,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R1-6",
+            "holes": 18,
+            "team1Points": 0,
+            "team2Points": 3,
+            "finalized": true
+          }
+        ]
+      },
+      {
+        "round": 2,
+        "matches": 6,
+        "holes": 108,
+        "failures": 0,
+        "latency": {
+          "samples": 108,
+          "p50": 0.5841250000012224,
+          "p95": 6.988750000000437,
+          "p99": null,
+          "max": 7.685332999999446,
+          "p99Reason": "INSUFFICIENT SAMPLE"
+        },
+        "finals": [
+          {
+            "matchId": "2026-R2-1",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R2-2",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R2-3",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R2-4",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R2-5",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R2-6",
+            "holes": 18,
+            "team1Points": 0,
+            "team2Points": 3,
+            "finalized": true
+          }
+        ]
+      },
+      {
+        "round": 3,
+        "matches": 12,
+        "holes": 216,
+        "failures": 0,
+        "latency": {
+          "samples": 216,
+          "p50": 0.5971669999998994,
+          "p95": 7.1512500000008,
+          "p99": null,
+          "max": 7.7965840000015305,
+          "p99Reason": "INSUFFICIENT SAMPLE"
+        },
+        "finals": [
+          {
+            "matchId": "2026-R3-1",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-2",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-3",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-4",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-5",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-6",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-7",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-8",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-9",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-10",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-11",
+            "holes": 18,
+            "team1Points": 0,
+            "team2Points": 3,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-12",
+            "holes": 18,
+            "team1Points": 0,
+            "team2Points": 3,
+            "finalized": true
+          }
+        ]
+      }
+    ],
+    "historyResetBetweenRounds": false,
+    "actualRpc": true,
+    "commitPerHole": true,
+    "derivedProcessorsRun": false
+  },
+  "completedAt": "2026-09-28T12:52:19.790Z",
+  "counts": {
+    "pass": 27,
+    "fail": 3
+  }
+}

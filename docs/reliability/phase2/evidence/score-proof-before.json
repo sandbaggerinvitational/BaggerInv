@@ -1,0 +1,993 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-09-28T12:53:03.566Z",
+  "fixture": "bagger-phase2-score-proof-v2",
+  "seed": "2026-canonical-score-path-2",
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "durableCommit": true,
+  "fsync": false,
+  "handicapCases": {
+    "plus": -2.5,
+    "medium": 17.8,
+    "high": 26.4,
+    "veryHigh": 40.2,
+    "builder": "production_control.handicap_v1_match_context",
+    "source": "SYNTHETIC_EDGE_CASES"
+  },
+  "runtimeSubstitutions": [
+    "assert_production_scoring_runtime",
+    "assert_production_cutover_read_scope"
+  ],
+  "limitations": [
+    "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+    "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+    "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+    "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+    "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+    "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+  ],
+  "candidate": null,
+  "mode": "BASELINE_COUNTEREXAMPLES",
+  "tests": [
+    {
+      "id": "P2-FIXTURE-IDS",
+      "name": "full input seed and hole key produce 432 distinct mutation identities",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "identities": 432,
+        "distinct": 432,
+        "algorithm": "SHA256_ALL_SEED_AND_KEY_BYTES"
+      },
+      "elapsedMs": 0.7782079999997222
+    },
+    {
+      "id": "P2-IDEM-001",
+      "name": "sequential identical mutation and changed payload",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "first": "ACCEPTED",
+        "retry": "ACCEPTED",
+        "replay": true,
+        "changedPayload": "IDEMPOTENCY_CONFLICT",
+        "receiptCount": 1
+      },
+      "elapsedMs": 324.9437499999999
+    },
+    {
+      "id": "P2-IDEM-002",
+      "name": "new mutation same Official score vs intentional revision-aware correction",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "newIdSameScore": "NO_CHANGE_WITHOUT_NEW_RECEIPT",
+        "stale": "MATCH_REVISION_CONFLICT",
+        "deliberateCurrentRevisionCorrection": "ACCEPTED_WITH_HISTORY",
+        "contractChange": false
+      },
+      "elapsedMs": 399.1847080000002
+    },
+    {
+      "id": "P2-CONC-001",
+      "name": "20 concurrent identical requests resolve one canonical outcome",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "requests": 20,
+        "actualLockWaiters": 19,
+        "accepted": 1,
+        "replayed": 19,
+        "canonicalHoles": 1,
+        "receipts": 1,
+        "deadlocks": 0
+      },
+      "elapsedMs": 413.60337500000014
+    },
+    {
+      "id": "P2-CONC-002",
+      "name": "concurrent new mutation IDs / same gross cannot overwrite stale authority",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "ACCEPTED",
+        "loser": "MATCH_REVISION_CONFLICT",
+        "silentOverwrite": false
+      },
+      "elapsedMs": 429.6940419999996
+    },
+    {
+      "id": "P2-CONC-003",
+      "name": "concurrent new mutation IDs / different gross cannot overwrite stale authority",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "ACCEPTED",
+        "loser": "MATCH_REVISION_CONFLICT",
+        "silentOverwrite": false
+      },
+      "elapsedMs": 384.6167080000005
+    },
+    {
+      "id": "P2-CONC-004",
+      "name": "adjacent holes serialize with revision conflict then same-mutation retry",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "staleAdjacent": "MATCH_REVISION_CONFLICT",
+        "sameMutationRefreshedRevision": "ACCEPTED",
+        "canonicalHoles": 2
+      },
+      "elapsedMs": 456.69666700000016
+    },
+    {
+      "id": "P2-CONC-005",
+      "name": "independent match score completes while another match transaction remains open",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "FAIL",
+      "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while inserting index tuple (0,1) in relation \"competition_recalculation_jobs\"\nSQL statement \"insert into scoring_authority.competition_recalculation_jobs (\n      tournament_id, round_number, engine_key, status,\n      requested_source_revision, requested_at, started_at, completed_at,\n      last_error_code, last_error_safe, runtime_generation_id,\n      claim_token, claimed_by, lease_expires_at, updated_at\n    ) values (\n      target_tournament, 0, engine_value, 'PENDING',\n      pg_catalog.jsonb_build_object(\n        'reason', reason_value, 'revision', revision_value,\n        'transactional', true\n      ), pg_catalog.clock_timestamp(), null, null, null, null,\n      runtime_generation, null, null, null, pg_catalog.clock_timestamp()\n    ) on conflict (tournament_id, round_number, engine_key) do update set\n      status = 'PENDING',\n      requested_source_revision = excluded.requested_source_revision,\n      requested_at = excluded.requested_at,\n      started_at = null, completed_at = null,\n      last_error_code = null, last_error_safe = null,\n      runtime_generation_id = excluded.runtime_generation_id,\n      claim_token = null, claimed_by = null, lease_expires_at = null,\n      updated_at = excluded.updated_at\"\nPL/pgSQL function scoring_authority.enqueue_annual_derived_v1_change() line 120 at SQL statement\nSQL statement \"insert into scoring_authority.hole_scores (\n    match_id, hole_number, hole_revision, team_1_gross_scores, team_2_gross_scores,\n    team_1_strokes, team_2_strokes, team_1_net_score, team_2_net_score,\n    hole_winner, mutation_key, actor_id\n  ) values (\n    target_match, target_hole, next_hole_revision, team_1_gross, team_2_gross,\n    team_1_strokes, team_2_strokes, team_1_net, team_2_net, winner, mutation_identity, actor\n  ) on conflict (match_id, hole_number) do update set\n    hole_revision = excluded.hole_revision,\n    team_1_gross_scores = excluded.team_1_gross_scores,\n    team_2_gross_scores = excluded.team_2_gross_scores,\n    team_1_strokes = excluded.team_1_strokes,\n    team_2_strokes = excluded.team_2_strokes,\n    team_1_net_score = excluded.team_1_net_score,\n    team_2_net_score = excluded.team_2_net_score,\n    hole_winner = excluded.hole_winner,\n    mutation_key = excluded.mutation_key,\n    actor_id = excluded.actor_id,\n    updated_at = transition_at\"\nPL/pgSQL function public.submit_production_hole_score(jsonb) line 138 at SQL statement\n",
+      "elapsedMs": 2336.3291659999995
+    },
+    {
+      "id": "P2-CONC-LOCK-SCORE",
+      "name": "SCORE wins Lock/score race safely",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "SCORE",
+        "loser": "MATCH_REVISION_CONFLICT",
+        "holes": 1,
+        "locked": false
+      },
+      "elapsedMs": 360.1396249999998
+    },
+    {
+      "id": "P2-CONC-LOCK-LOCK",
+      "name": "LOCK wins Lock/score race safely",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "LOCK",
+        "loser": "UNAUTHORIZED",
+        "holes": 0,
+        "locked": true
+      },
+      "elapsedMs": 363.21916599999986
+    },
+    {
+      "id": "P2-ATOMIC-BEFORE_HOLE",
+      "name": "failure at BEFORE_HOLE rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "BEFORE_HOLE",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 352.06683299999986
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_HOLE",
+      "name": "failure at AFTER_HOLE rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_HOLE",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 372.1800829999993
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_MATCH",
+      "name": "failure at AFTER_MATCH rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_MATCH",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 390.79229099999975
+    },
+    {
+      "id": "P2-ATOMIC-BEFORE_RECEIPT",
+      "name": "failure at BEFORE_RECEIPT rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "BEFORE_RECEIPT",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 396.65341699999954
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_RECEIPT",
+      "name": "failure at AFTER_RECEIPT rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_RECEIPT",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 366.4900830000006
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_HISTORY",
+      "name": "failure at AFTER_HISTORY rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_HISTORY",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 390.67349999999897
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_AUDIT",
+      "name": "failure at AFTER_AUDIT rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_AUDIT",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 375.11433300000135
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_OUTBOX",
+      "name": "failure at AFTER_OUTBOX rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_OUTBOX",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 374.31516700000066
+    },
+    {
+      "id": "P2-FAIL-57014",
+      "name": "statement timeout after hole work rolls back and preserves SQLSTATE57014",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "sqlstate": "57014",
+        "canonicalCommit": false,
+        "receipt": false,
+        "sameMutationRetry": "ACCEPTED"
+      },
+      "elapsedMs": 454.0662919999995
+    },
+    {
+      "id": "P2-FAIL-BEFORE-COMMIT",
+      "name": "backend connection termination before COMMIT is exactly recoverable",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "connectionLost": "BEFORE_COMMIT",
+        "receiptAtResolution": false,
+        "canonicalOutcome": "NOT_COMMITTED",
+        "sameMutationRetry": "ACCEPTED",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 392.1254170000011
+    },
+    {
+      "id": "P2-FAIL-AFTER-COMMIT",
+      "name": "backend connection termination after COMMIT is exactly recoverable",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "connectionLost": "AFTER_COMMIT_BEFORE_DELIVERY",
+        "receiptAtResolution": true,
+        "canonicalOutcome": "COMMITTED",
+        "sameMutationRetry": "STORED_RECEIPT",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 332.3548329999994
+    },
+    {
+      "id": "P2-UNKNOWN-INFLIGHT",
+      "name": "absent receipt while transaction still active must remain UNKNOWN",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "inflightReadback": "NO_RECEIPT_VISIBLE_IS_NOT_NONCOMMIT_PROOF",
+        "stateWhileActive": "UNKNOWN",
+        "afterCommit": "COMMITTED"
+      },
+      "elapsedMs": 333.8919160000005
+    },
+    {
+      "id": "P2-AUTH-001",
+      "name": "real actor, match permission and private RPC privileges deny unauthorized identities",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "rejected": [
+          "spectator",
+          "signed-out",
+          "another-match",
+          "mismatched-match",
+          "revoked-link"
+        ],
+        "publicRpcGrant": "SERVICE_ROLE_ONLY",
+        "hostedAuth": "NOT_PROVEN",
+        "RLS": "CATALOG_AND_EXISTING_GRANTS_ONLY"
+      },
+      "elapsedMs": 358.07283299999835
+    },
+    {
+      "id": "P2-IDEM-LOCKED-READBACK",
+      "name": "committed receipt survives Lock even when participant replay loses permission",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "original": "COMMITTED",
+        "participantReplay": "UNAUTHORIZED",
+        "trustedExactReceipt": "COMMITTED",
+        "clientStatusResolution": "NOT_PROVEN",
+        "discoveredGap": "Permission revocation can deny replay of already committed score"
+      },
+      "elapsedMs": 329.25141599999915
+    },
+    {
+      "id": "P2-GOLF-432",
+      "name": "all R1/R2/R3 holes and Finalize retain canonical golf and receipts",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "totalCanonicalHoles": 432,
+        "rounds": [
+          {
+            "round": 1,
+            "matches": 6,
+            "holes": 108,
+            "failures": 0,
+            "latency": {
+              "samples": 108,
+              "p50": 0.6825000000008004,
+              "p95": 7.318625000001703,
+              "p99": null,
+              "max": 15.22662499999933,
+              "p99Reason": "INSUFFICIENT SAMPLE"
+            },
+            "finals": [
+              {
+                "matchId": "2026-R1-1",
+                "holes": 18,
+                "team1Points": 0.5,
+                "team2Points": 2.5,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R1-2",
+                "holes": 18,
+                "team1Points": 2,
+                "team2Points": 1,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R1-3",
+                "holes": 18,
+                "team1Points": 0.5,
+                "team2Points": 2.5,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R1-4",
+                "holes": 18,
+                "team1Points": 2,
+                "team2Points": 1,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R1-5",
+                "holes": 18,
+                "team1Points": 0.5,
+                "team2Points": 2.5,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R1-6",
+                "holes": 18,
+                "team1Points": 0,
+                "team2Points": 3,
+                "finalized": true
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "matches": 6,
+            "holes": 108,
+            "failures": 0,
+            "latency": {
+              "samples": 108,
+              "p50": 0.8599580000009155,
+              "p95": 7.474833000000217,
+              "p99": null,
+              "max": 11.141583000000537,
+              "p99Reason": "INSUFFICIENT SAMPLE"
+            },
+            "finals": [
+              {
+                "matchId": "2026-R2-1",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R2-2",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R2-3",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R2-4",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R2-5",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R2-6",
+                "holes": 18,
+                "team1Points": 0,
+                "team2Points": 3,
+                "finalized": true
+              }
+            ]
+          },
+          {
+            "round": 3,
+            "matches": 12,
+            "holes": 216,
+            "failures": 0,
+            "latency": {
+              "samples": 216,
+              "p50": 0.6622499999994034,
+              "p95": 7.5625,
+              "p99": null,
+              "max": 7.773084000000381,
+              "p99Reason": "INSUFFICIENT SAMPLE"
+            },
+            "finals": [
+              {
+                "matchId": "2026-R3-1",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-2",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-3",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-4",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-5",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-6",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-7",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-8",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-9",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-10",
+                "holes": 18,
+                "team1Points": 3,
+                "team2Points": 0,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-11",
+                "holes": 18,
+                "team1Points": 0,
+                "team2Points": 3,
+                "finalized": true
+              },
+              {
+                "matchId": "2026-R3-12",
+                "holes": 18,
+                "team1Points": 0,
+                "team2Points": 3,
+                "finalized": true
+              }
+            ]
+          }
+        ],
+        "historyResetBetweenRounds": false,
+        "actualRpc": true,
+        "commitPerHole": true,
+        "derivedProcessorsRun": false
+      },
+      "elapsedMs": 1852.1010420000002
+    },
+    {
+      "id": "P2-GOLF-HALVES",
+      "name": "all three formats preserve an 18-hole halved result and 1.5/1.5 points",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "formats": [
+          "BB",
+          "SC",
+          "SI"
+        ],
+        "holes": 54,
+        "allHoleResults": "Halved",
+        "points": [
+          1.5,
+          1.5
+        ]
+      },
+      "elapsedMs": 418.0821670000005
+    },
+    {
+      "id": "P2-GOLF-EARLY",
+      "name": "Singles clinch at10 preserves remaining18-hole gross and final three points",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "clinchAt": 10,
+        "clinch": "Team 1 wins 10 & 8",
+        "canonicalHoles": 18,
+        "points": [
+          3,
+          0
+        ]
+      },
+      "elapsedMs": 341.50066700000025
+    },
+    {
+      "id": "P2-CONC-FINALIZE",
+      "name": "final-hole vs Finalize race is never Final with missing hole",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "preFinalHole": "SCORECARD_INCOMPLETE",
+        "staleRace": "MATCH_REVISION_CONFLICT",
+        "sameMutationRetry": "FINALIZED",
+        "holes": 18
+      },
+      "elapsedMs": 764.8610000000008
+    },
+    {
+      "id": "P2-RESTART-IN-TRANSACTION",
+      "name": "owned disposable PostgreSQL crash restart during open score transaction",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "restart": "OWNED_CLUSTER_IMMEDIATE_STOP_WAL_RECOVERY",
+        "commitBeforeRestart": false,
+        "resolved": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION",
+        "powerLossDurability": "NOT_PROVEN_FSYNC_OFF"
+      },
+      "elapsedMs": 5782.9260829999985
+    },
+    {
+      "id": "P2-RESTART-AFTER-COMMIT",
+      "name": "owned disposable PostgreSQL crash restart after commit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "restart": "OWNED_CLUSTER_IMMEDIATE_STOP_WAL_RECOVERY",
+        "commitBeforeRestart": true,
+        "resolved": "COMMITTED",
+        "safeRetry": "SAME_MUTATION",
+        "powerLossDurability": "NOT_PROVEN_FSYNC_OFF"
+      },
+      "elapsedMs": 662.4036669999987
+    }
+  ],
+  "fullRounds": {
+    "totalCanonicalHoles": 432,
+    "rounds": [
+      {
+        "round": 1,
+        "matches": 6,
+        "holes": 108,
+        "failures": 0,
+        "latency": {
+          "samples": 108,
+          "p50": 0.6825000000008004,
+          "p95": 7.318625000001703,
+          "p99": null,
+          "max": 15.22662499999933,
+          "p99Reason": "INSUFFICIENT SAMPLE"
+        },
+        "finals": [
+          {
+            "matchId": "2026-R1-1",
+            "holes": 18,
+            "team1Points": 0.5,
+            "team2Points": 2.5,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R1-2",
+            "holes": 18,
+            "team1Points": 2,
+            "team2Points": 1,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R1-3",
+            "holes": 18,
+            "team1Points": 0.5,
+            "team2Points": 2.5,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R1-4",
+            "holes": 18,
+            "team1Points": 2,
+            "team2Points": 1,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R1-5",
+            "holes": 18,
+            "team1Points": 0.5,
+            "team2Points": 2.5,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R1-6",
+            "holes": 18,
+            "team1Points": 0,
+            "team2Points": 3,
+            "finalized": true
+          }
+        ]
+      },
+      {
+        "round": 2,
+        "matches": 6,
+        "holes": 108,
+        "failures": 0,
+        "latency": {
+          "samples": 108,
+          "p50": 0.8599580000009155,
+          "p95": 7.474833000000217,
+          "p99": null,
+          "max": 11.141583000000537,
+          "p99Reason": "INSUFFICIENT SAMPLE"
+        },
+        "finals": [
+          {
+            "matchId": "2026-R2-1",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R2-2",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R2-3",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R2-4",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R2-5",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R2-6",
+            "holes": 18,
+            "team1Points": 0,
+            "team2Points": 3,
+            "finalized": true
+          }
+        ]
+      },
+      {
+        "round": 3,
+        "matches": 12,
+        "holes": 216,
+        "failures": 0,
+        "latency": {
+          "samples": 216,
+          "p50": 0.6622499999994034,
+          "p95": 7.5625,
+          "p99": null,
+          "max": 7.773084000000381,
+          "p99Reason": "INSUFFICIENT SAMPLE"
+        },
+        "finals": [
+          {
+            "matchId": "2026-R3-1",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-2",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-3",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-4",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-5",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-6",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-7",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-8",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-9",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-10",
+            "holes": 18,
+            "team1Points": 3,
+            "team2Points": 0,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-11",
+            "holes": 18,
+            "team1Points": 0,
+            "team2Points": 3,
+            "finalized": true
+          },
+          {
+            "matchId": "2026-R3-12",
+            "holes": 18,
+            "team1Points": 0,
+            "team2Points": 3,
+            "finalized": true
+          }
+        ]
+      }
+    ],
+    "historyResetBetweenRounds": false,
+    "actualRpc": true,
+    "commitPerHole": true,
+    "derivedProcessorsRun": false
+  },
+  "completedAt": "2026-09-28T12:53:26.433Z",
+  "counts": {
+    "pass": 29,
+    "fail": 1
+  }
+}

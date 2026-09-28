@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "extends": "../2026-tournament-postmortem/change-impact-graph.json",
+  "historicalGraphUnchanged": true,
+  "candidateOnly": true,
+  "nodes": [
+    {
+      "id": "score-rpc",
+      "paths": [
+        "supabase/production_migrations/*"
+      ],
+      "functions": [
+        "submit_production_hole_score",
+        "future_production_submit_hole_score"
+      ],
+      "capabilities": [
+        "canonical-score",
+        "idempotency",
+        "round-finalization"
+      ]
+    },
+    {
+      "id": "derived-intent",
+      "paths": [
+        "supabase/production_migrations/202609280121_score_derived_intents_v1.sql"
+      ],
+      "functions": [
+        "append_score_derived_intent_v1",
+        "flush_score_derived_intents_v1"
+      ],
+      "capabilities": [
+        "score-isolation",
+        "derived-delivery",
+        "financial-freshness"
+      ]
+    },
+    {
+      "id": "context-authority",
+      "functions": [
+        "assert_production_scoring_runtime",
+        "assert_production_scoring_actor",
+        "match_progress"
+      ],
+      "capabilities": [
+        "scoring-context",
+        "strokes",
+        "net",
+        "results"
+      ]
+    },
+    {
+      "id": "rehearsal-index",
+      "relations": [
+        "production_control.google_writer_fence_rehearsals"
+      ],
+      "capabilities": [
+        "score-admission",
+        "bounded-current-authority"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "score-rpc",
+      "rerun": [
+        "P2-IDEM-*",
+        "P2-CONC-*",
+        "P2-ATOMIC-*",
+        "P2-GOLF-*",
+        "P2-FAIL-*",
+        "P2-PERF-*"
+      ],
+      "layers": [
+        "POSTGRESQL",
+        "INTEGRATION",
+        "PERFORMANCE",
+        "FAILURE_INJECTION",
+        "CONCURRENCY"
+      ],
+      "laterRequired": [
+        "HOSTED_CLIENT_CONTRACT",
+        "PHYSICAL_SCORING"
+      ]
+    },
+    {
+      "from": "derived-intent",
+      "rerun": [
+        "P2-DERIVED-*",
+        "P2-MIG-*",
+        "P2-PERF-ELIGIBLE",
+        "NA-2026-019"
+      ],
+      "layers": [
+        "POSTGRESQL",
+        "INTEGRATION",
+        "PERFORMANCE",
+        "FAILURE_INJECTION",
+        "CONCURRENCY"
+      ],
+      "laterRequired": [
+        "AUTONOMOUS_DELIVERY",
+        "ANNUAL_RUNTIME",
+        "OFFICIAL_FINANCIAL_LIFECYCLE"
+      ]
+    },
+    {
+      "from": "context-authority",
+      "rerun": [
+        "P2-AUTH-*",
+        "P2-GOLF-*",
+        "P2-CONC-*",
+        "P2-PERF-*"
+      ],
+      "laterRequired": [
+        "HOSTED_ADMISSION",
+        "HANDICAP_APPROVAL_LIFECYCLE"
+      ]
+    },
+    {
+      "from": "rehearsal-index",
+      "rerun": [
+        "P2-FENCE-HISTORY",
+        "P2-MIG-*",
+        "P2-PERF-COMMON"
+      ]
+    }
+  ],
+  "policy": "Changed source/function or fixture invalidates affected evidence; absent wildcard-resolved suite means NOT_PROVEN, never inferred PASS."
+}

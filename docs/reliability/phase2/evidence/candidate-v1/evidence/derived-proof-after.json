@@ -1,0 +1,244 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-09-28T12:54:25.069Z",
+  "fixture": "bagger-phase2-score-proof-v2",
+  "seed": "2026-canonical-score-path-2",
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "durableCommit": true,
+  "fsync": false,
+  "handicapCases": {
+    "plus": -2.5,
+    "medium": 17.8,
+    "high": 26.4,
+    "veryHigh": 40.2,
+    "builder": "production_control.handicap_v1_match_context",
+    "source": "SYNTHETIC_EDGE_CASES"
+  },
+  "runtimeSubstitutions": [
+    "assert_production_scoring_runtime",
+    "assert_production_cutover_read_scope"
+  ],
+  "limitations": [
+    "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+    "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+    "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+    "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+    "Queue/source materialization tested; this suite does not calculate/publish financial results"
+  ],
+  "candidate": {
+    "path": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+    "sha256": "7939755b00a92d9284e933fd81393ca5a78ce0a74a2107641d258bf6e21406c4"
+  },
+  "tests": [
+    {
+      "id": "P2-DERIVED-ATOMIC",
+      "title": "required durable intent append failure rolls back score and receipt",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "canonicalCommit": false,
+        "requiredIntent": false,
+        "receipt": false,
+        "appendFailure": "ATOMIC_ROLLBACK"
+      },
+      "elapsedMs": 547.3271249999998
+    },
+    {
+      "id": "P2-DERIVED-COALESCE",
+      "title": "one canonical transaction coalesces hole/match trigger intent per family",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "intentCount": 3,
+        "canonicalHoles": 1,
+        "sameMutationAdditionalIntents": 0,
+        "processed": 3,
+        "repeatFlush": 0
+      },
+      "elapsedMs": 510.3965420000004
+    },
+    {
+      "id": "P2-DERIVED-FAIL-CALCUTTA",
+      "title": "CALCUTTA unavailable leaves score Official and durable demand retryable",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "score": "ACCEPTED",
+        "failure": "RETRYABLE_P0001",
+        "retry": "SUCCEEDED",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 490.43741600000067
+    },
+    {
+      "id": "P2-DERIVED-FAIL-NET_SKINS",
+      "title": "NET_SKINS unavailable leaves score Official and durable demand retryable",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "score": "ACCEPTED",
+        "failure": "RETRYABLE_P0001",
+        "retry": "SUCCEEDED",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 500.5022919999992
+    },
+    {
+      "id": "P2-DERIVED-FAIL-COMPETITION",
+      "title": "COMPETITION unavailable leaves score Official and durable demand retryable",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "score": "ACCEPTED",
+        "failure": "RETRYABLE_P0001",
+        "retry": "SUCCEEDED",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 515.9779170000002
+    },
+    {
+      "id": "P2-DERIVED-BACKLOG",
+      "title": "432 pending intents do not block canonical writes; bounded batches catch up",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "canonicalHoles": 144,
+        "pendingBefore": 432,
+        "processed": 432,
+        "batches": 57,
+        "pendingAfter": 0,
+        "localPsqlProcessPerScore": {
+          "p50": 20.059708000000683,
+          "p95": 24.815292000001136,
+          "p99": null,
+          "max": 62.341833000000406
+        },
+        "workerDurationMs": 2633.0254999999997,
+        "publicationsCreated": false
+      },
+      "elapsedMs": 7453.638583000002
+    },
+    {
+      "id": "P2-DERIVED-BURST",
+      "title": "12 independent Singles matches commit concurrently with configured history",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "requests": 12,
+        "success": 12,
+        "failures": 0,
+        "deadlocks": 0,
+        "elapsedMs": 91.60000000000218,
+        "connectionModel": "12_REAL_POSTGRESQL_CONNECTIONS",
+        "history": "SYNTHETIC_1X_CALCUTTA_SKINS_ODDS"
+      },
+      "elapsedMs": 596.1972500000011
+    },
+    {
+      "id": "P2-DERIVED-WORKER-RACE",
+      "title": "scoring continues while a derived worker holds shared competition markers",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "worker": "HOLDS_COMPETITION_MARKERS_UNCOMMITTED",
+        "score": "COMMITTED_BEFORE_WORKER",
+        "timeoutMs": 2000,
+        "canonicalHoles": 2
+      },
+      "elapsedMs": 546.0438749999994
+    },
+    {
+      "id": "P2-DERIVED-ORDER",
+      "title": "older financial demand observes latest canonical source instead of publishing obsolete result",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "newerThenOlder": "PROCESSED_CURRENT_SOURCE",
+        "newResult": false,
+        "activeJobCountChanged": false
+      },
+      "elapsedMs": 619.3941669999986
+    },
+    {
+      "id": "P2-DERIVED-DEAD-LETTER",
+      "title": "bounded repeated consumer failure becomes visible dead letter without changing score",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "attempts": 5,
+        "status": "DEAD_LETTER",
+        "closeFencePending": true,
+        "automaticInfiniteRetry": false,
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 740.4317499999997
+    },
+    {
+      "id": "P2-DERIVED-TIMEOUT",
+      "title": "57014 aborts worker transaction while prior canonical score remains committed",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "sqlstate": "57014",
+        "workerTransaction": "ROLLED_BACK",
+        "intent": "PENDING_REPLAYABLE",
+        "canonicalScore": "COMMITTED"
+      },
+      "elapsedMs": 790.294249999999
+    },
+    {
+      "id": "P2-DERIVED-ACL",
+      "title": "intent table and private helpers inaccessible to application/client roles",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "RLS": true,
+        "roleAccess": "DENIED",
+        "invalidBatchLimit": "REJECTED",
+        "maximumBatch": 8
+      },
+      "elapsedMs": 717.1369589999995
+    }
+  ],
+  "completedAt": "2026-09-28T12:54:39.101Z",
+  "counts": {
+    "pass": 12,
+    "fail": 0
+  }
+}

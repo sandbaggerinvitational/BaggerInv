@@ -1,0 +1,780 @@
+{
+  "schemaVersion": 1,
+  "fixture": "phase2-fence-history-v2",
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "candidate": {
+    "path": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+    "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+  },
+  "production": false,
+  "shippingMigrationChanged": false,
+  "method": "Actual installed guard and accepted score RPC; default planner;30 rollback timing samples; nested auto_explain separate from timing",
+  "fixtureBoundary": "CHECK/NOT NULL/UNIQUE-valid RESTORED records; only provider quiesce FK prerequisite omitted with replica mode during fixture INSERT",
+  "limitations": [
+    "Synthetic local records, not provider/restoration certification",
+    "Nested plan work overlaps, do not sum into request time/unique rows",
+    "P99 not proven by30 samples;host scheduling can affect latency",
+    "Before plan drops only the candidate index in a disposable database; after reinstalls the exact installed definition"
+  ],
+  "rows": [
+    {
+      "restoredRows": 0,
+      "before": {
+        "guardPlan": {
+          "statements": 2,
+          "scans": [
+            {
+              "querySha256": "458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9",
+              "nodeType": "Seq Scan",
+              "index": null,
+              "actualRows": 0,
+              "actualLoops": 1,
+              "rowsRemovedByFilter": 0,
+              "sharedHitBlocks": 0,
+              "sharedReadBlocks": 0,
+              "heapFetches": null,
+              "instrumentedStatementMs": 0.003
+            }
+          ]
+        },
+        "scorePlan": {
+          "statements": 88,
+          "scans": [
+            {
+              "querySha256": "458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9",
+              "nodeType": "Seq Scan",
+              "index": null,
+              "actualRows": 0,
+              "actualLoops": 1,
+              "rowsRemovedByFilter": 0,
+              "sharedHitBlocks": 0,
+              "sharedReadBlocks": 0,
+              "heapFetches": null,
+              "instrumentedStatementMs": 0.002
+            }
+          ]
+        },
+        "guard": {
+          "samples": 30,
+          "p50Ms": 0.017,
+          "p95Ms": 0.034,
+          "maxMs": 0.918,
+          "values": [
+            0.918,
+            0.027,
+            0.029,
+            0.02,
+            0.02,
+            0.019,
+            0.015,
+            0.021,
+            0.024,
+            0.015,
+            0.014,
+            0.017,
+            0.022,
+            0.015,
+            0.018,
+            0.034,
+            0.017,
+            0.02,
+            0.016,
+            0.016,
+            0.015,
+            0.02,
+            0.018,
+            0.018,
+            0.017,
+            0.016,
+            0.015,
+            0.015,
+            0.015,
+            0.017
+          ]
+        },
+        "score": {
+          "samples": 30,
+          "p50Ms": 0.649,
+          "p95Ms": 8.213,
+          "maxMs": 8.314,
+          "values": [
+            8.213,
+            1.46,
+            1.303,
+            1.4,
+            1.493,
+            1.512,
+            0.761,
+            0.753,
+            0.784,
+            0.834,
+            0.778,
+            0.649,
+            0.58,
+            0.609,
+            0.573,
+            0.598,
+            0.558,
+            4.414,
+            0.618,
+            0.733,
+            0.619,
+            2.128,
+            8.314,
+            0.607,
+            0.572,
+            0.592,
+            0.566,
+            0.557,
+            0.589,
+            0.602
+          ]
+        }
+      },
+      "after": {
+        "guardPlan": {
+          "statements": 2,
+          "scans": [
+            {
+              "querySha256": "458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9",
+              "nodeType": "Seq Scan",
+              "index": null,
+              "actualRows": 0,
+              "actualLoops": 1,
+              "rowsRemovedByFilter": 0,
+              "sharedHitBlocks": 0,
+              "sharedReadBlocks": 0,
+              "heapFetches": null,
+              "instrumentedStatementMs": 0.001
+            }
+          ]
+        },
+        "scorePlan": {
+          "statements": 88,
+          "scans": [
+            {
+              "querySha256": "458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9",
+              "nodeType": "Seq Scan",
+              "index": null,
+              "actualRows": 0,
+              "actualLoops": 1,
+              "rowsRemovedByFilter": 0,
+              "sharedHitBlocks": 0,
+              "sharedReadBlocks": 0,
+              "heapFetches": null,
+              "instrumentedStatementMs": 0.001
+            }
+          ]
+        },
+        "guard": {
+          "samples": 30,
+          "p50Ms": 0.017,
+          "p95Ms": 0.03,
+          "maxMs": 0.858,
+          "values": [
+            0.858,
+            0.023,
+            0.018,
+            0.019,
+            0.018,
+            0.016,
+            0.03,
+            0.023,
+            0.021,
+            0.018,
+            0.019,
+            0.019,
+            0.016,
+            0.017,
+            0.015,
+            0.017,
+            0.015,
+            0.015,
+            0.017,
+            0.017,
+            0.016,
+            0.017,
+            0.014,
+            0.015,
+            0.018,
+            0.014,
+            0.014,
+            0.015,
+            0.024,
+            0.017
+          ]
+        },
+        "score": {
+          "samples": 30,
+          "p50Ms": 0.609,
+          "p95Ms": 1.38,
+          "maxMs": 8.515,
+          "values": [
+            8.515,
+            1.38,
+            1.223,
+            1.294,
+            1.131,
+            1.347,
+            0.635,
+            0.61,
+            0.58,
+            0.733,
+            0.683,
+            0.714,
+            0.696,
+            0.609,
+            0.552,
+            0.668,
+            0.62,
+            0.563,
+            0.584,
+            0.55,
+            0.581,
+            0.559,
+            0.573,
+            0.55,
+            0.566,
+            0.579,
+            0.536,
+            0.552,
+            0.656,
+            0.595
+          ]
+        }
+      },
+      "indexBuild": {
+        "databaseMs": 0.828,
+        "clientWallMs": 7.537583999999697,
+        "definition": "CREATE INDEX google_writer_fence_rehearsals_unrestored_idx ON production_control.google_writer_fence_rehearsals USING btree (run_id) WHERE ((status = 'RUNNING'::text) OR ((status = 'FAILED'::text) AND (NOT restoration_confirmed)))"
+      }
+    },
+    {
+      "restoredRows": 100,
+      "before": {
+        "guardPlan": {
+          "statements": 2,
+          "scans": [
+            {
+              "querySha256": "458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9",
+              "nodeType": "Seq Scan",
+              "index": null,
+              "actualRows": 0,
+              "actualLoops": 1,
+              "rowsRemovedByFilter": 100,
+              "sharedHitBlocks": 25,
+              "sharedReadBlocks": 0,
+              "heapFetches": null,
+              "instrumentedStatementMs": 0.043
+            }
+          ]
+        },
+        "scorePlan": {
+          "statements": 88,
+          "scans": [
+            {
+              "querySha256": "458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9",
+              "nodeType": "Seq Scan",
+              "index": null,
+              "actualRows": 0,
+              "actualLoops": 1,
+              "rowsRemovedByFilter": 100,
+              "sharedHitBlocks": 25,
+              "sharedReadBlocks": 0,
+              "heapFetches": null,
+              "instrumentedStatementMs": 0.042
+            }
+          ]
+        },
+        "guard": {
+          "samples": 30,
+          "p50Ms": 0.041,
+          "p95Ms": 0.091,
+          "maxMs": 1.05,
+          "values": [
+            1.05,
+            0.08,
+            0.041,
+            0.045,
+            0.091,
+            0.034,
+            0.032,
+            0.039,
+            0.037,
+            0.047,
+            0.035,
+            0.041,
+            0.033,
+            0.059,
+            0.041,
+            0.049,
+            0.042,
+            0.036,
+            0.068,
+            0.039,
+            0.04,
+            0.043,
+            0.043,
+            0.046,
+            0.052,
+            0.032,
+            0.031,
+            0.04,
+            0.042,
+            0.034
+          ]
+        },
+        "score": {
+          "samples": 30,
+          "p50Ms": 0.64,
+          "p95Ms": 1.525,
+          "maxMs": 9.441,
+          "values": [
+            9.441,
+            1.525,
+            1.405,
+            1.429,
+            1.424,
+            1.517,
+            0.689,
+            0.716,
+            0.64,
+            0.647,
+            0.605,
+            0.602,
+            0.586,
+            0.664,
+            0.641,
+            0.637,
+            0.598,
+            0.692,
+            0.648,
+            0.596,
+            0.603,
+            0.61,
+            0.603,
+            0.591,
+            0.577,
+            0.619,
+            0.676,
+            0.622,
+            0.637,
+            0.645
+          ]
+        }
+      },
+      "after": {
+        "guardPlan": {
+          "statements": 2,
+          "scans": [
+            {
+              "querySha256": "458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9",
+              "nodeType": "Index Only Scan",
+              "index": "google_writer_fence_rehearsals_unrestored_idx",
+              "actualRows": 0,
+              "actualLoops": 1,
+              "rowsRemovedByFilter": 0,
+              "sharedHitBlocks": 1,
+              "sharedReadBlocks": 0,
+              "heapFetches": 0,
+              "instrumentedStatementMs": 0.002
+            }
+          ]
+        },
+        "scorePlan": {
+          "statements": 88,
+          "scans": [
+            {
+              "querySha256": "458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9",
+              "nodeType": "Index Only Scan",
+              "index": "google_writer_fence_rehearsals_unrestored_idx",
+              "actualRows": 0,
+              "actualLoops": 1,
+              "rowsRemovedByFilter": 0,
+              "sharedHitBlocks": 1,
+              "sharedReadBlocks": 0,
+              "heapFetches": 0,
+              "instrumentedStatementMs": 0.001
+            }
+          ]
+        },
+        "guard": {
+          "samples": 30,
+          "p50Ms": 0.016,
+          "p95Ms": 0.027,
+          "maxMs": 0.876,
+          "values": [
+            0.876,
+            0.027,
+            0.022,
+            0.026,
+            0.018,
+            0.017,
+            0.015,
+            0.016,
+            0.022,
+            0.015,
+            0.014,
+            0.015,
+            0.015,
+            0.015,
+            0.014,
+            0.017,
+            0.016,
+            0.016,
+            0.016,
+            0.016,
+            0.016,
+            0.017,
+            0.017,
+            0.017,
+            0.015,
+            0.019,
+            0.017,
+            0.02,
+            0.019,
+            0.016
+          ]
+        },
+        "score": {
+          "samples": 30,
+          "p50Ms": 0.593,
+          "p95Ms": 1.424,
+          "maxMs": 8.244,
+          "values": [
+            8.244,
+            1.284,
+            1.323,
+            1.394,
+            1.155,
+            1.424,
+            0.642,
+            0.712,
+            0.752,
+            0.671,
+            0.7,
+            0.607,
+            0.637,
+            0.585,
+            0.558,
+            0.601,
+            0.562,
+            0.593,
+            0.564,
+            0.551,
+            0.588,
+            0.548,
+            0.572,
+            0.55,
+            0.596,
+            0.563,
+            0.551,
+            0.554,
+            0.546,
+            0.584
+          ]
+        }
+      },
+      "indexBuild": {
+        "databaseMs": 1.572,
+        "clientWallMs": 8.76666699999987,
+        "definition": "CREATE INDEX google_writer_fence_rehearsals_unrestored_idx ON production_control.google_writer_fence_rehearsals USING btree (run_id) WHERE ((status = 'RUNNING'::text) OR ((status = 'FAILED'::text) AND (NOT restoration_confirmed)))"
+      }
+    },
+    {
+      "restoredRows": 1000,
+      "before": {
+        "guardPlan": {
+          "statements": 2,
+          "scans": [
+            {
+              "querySha256": "458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9",
+              "nodeType": "Seq Scan",
+              "index": null,
+              "actualRows": 0,
+              "actualLoops": 1,
+              "rowsRemovedByFilter": 1000,
+              "sharedHitBlocks": 250,
+              "sharedReadBlocks": 0,
+              "heapFetches": null,
+              "instrumentedStatementMs": 0.44
+            }
+          ]
+        },
+        "scorePlan": {
+          "statements": 88,
+          "scans": [
+            {
+              "querySha256": "458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9",
+              "nodeType": "Seq Scan",
+              "index": null,
+              "actualRows": 0,
+              "actualLoops": 1,
+              "rowsRemovedByFilter": 1000,
+              "sharedHitBlocks": 250,
+              "sharedReadBlocks": 0,
+              "heapFetches": null,
+              "instrumentedStatementMs": 0.498
+            }
+          ]
+        },
+        "guard": {
+          "samples": 30,
+          "p50Ms": 0.189,
+          "p95Ms": 0.213,
+          "maxMs": 1.314,
+          "values": [
+            1.314,
+            0.213,
+            0.196,
+            0.192,
+            0.195,
+            0.213,
+            0.189,
+            0.19,
+            0.184,
+            0.195,
+            0.184,
+            0.181,
+            0.191,
+            0.193,
+            0.202,
+            0.199,
+            0.189,
+            0.201,
+            0.191,
+            0.183,
+            0.187,
+            0.188,
+            0.188,
+            0.185,
+            0.189,
+            0.181,
+            0.188,
+            0.181,
+            0.189,
+            0.2
+          ]
+        },
+        "score": {
+          "samples": 30,
+          "p50Ms": 0.774,
+          "p95Ms": 1.76,
+          "maxMs": 8.787,
+          "values": [
+            8.787,
+            1.496,
+            1.569,
+            1.439,
+            1.427,
+            1.76,
+            1.184,
+            0.814,
+            0.816,
+            0.761,
+            0.77,
+            0.937,
+            0.751,
+            0.774,
+            0.73,
+            0.742,
+            0.741,
+            0.971,
+            0.773,
+            0.732,
+            0.744,
+            0.74,
+            0.95,
+            0.749,
+            0.813,
+            1.066,
+            0.773,
+            0.77,
+            0.779,
+            0.761
+          ]
+        },
+        "truthTable": [
+          {
+            "status": "RUNNING",
+            "restored": false,
+            "blocked": true
+          },
+          {
+            "status": "RUNNING",
+            "restored": true,
+            "blocked": true
+          },
+          {
+            "status": "FAILED",
+            "restored": false,
+            "blocked": true
+          },
+          {
+            "status": "FAILED",
+            "restored": true,
+            "blocked": false
+          },
+          {
+            "status": "RESTORED",
+            "restored": true,
+            "blocked": false
+          }
+        ]
+      },
+      "after": {
+        "guardPlan": {
+          "statements": 2,
+          "scans": [
+            {
+              "querySha256": "458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9",
+              "nodeType": "Index Only Scan",
+              "index": "google_writer_fence_rehearsals_unrestored_idx",
+              "actualRows": 0,
+              "actualLoops": 1,
+              "rowsRemovedByFilter": 0,
+              "sharedHitBlocks": 1,
+              "sharedReadBlocks": 0,
+              "heapFetches": 0,
+              "instrumentedStatementMs": 0.003
+            }
+          ]
+        },
+        "scorePlan": {
+          "statements": 88,
+          "scans": [
+            {
+              "querySha256": "458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9",
+              "nodeType": "Index Only Scan",
+              "index": "google_writer_fence_rehearsals_unrestored_idx",
+              "actualRows": 0,
+              "actualLoops": 1,
+              "rowsRemovedByFilter": 0,
+              "sharedHitBlocks": 1,
+              "sharedReadBlocks": 0,
+              "heapFetches": 0,
+              "instrumentedStatementMs": 0.001
+            }
+          ]
+        },
+        "guard": {
+          "samples": 30,
+          "p50Ms": 0.018,
+          "p95Ms": 0.026,
+          "maxMs": 0.805,
+          "values": [
+            0.805,
+            0.024,
+            0.023,
+            0.023,
+            0.024,
+            0.018,
+            0.02,
+            0.017,
+            0.019,
+            0.016,
+            0.018,
+            0.026,
+            0.026,
+            0.017,
+            0.015,
+            0.014,
+            0.016,
+            0.015,
+            0.015,
+            0.016,
+            0.019,
+            0.016,
+            0.026,
+            0.019,
+            0.014,
+            0.022,
+            0.017,
+            0.018,
+            0.013,
+            0.014
+          ]
+        },
+        "score": {
+          "samples": 30,
+          "p50Ms": 0.59,
+          "p95Ms": 1.47,
+          "maxMs": 8.293,
+          "values": [
+            8.293,
+            1.365,
+            1.47,
+            1.2,
+            1.171,
+            1.429,
+            0.629,
+            0.592,
+            0.602,
+            0.604,
+            0.577,
+            0.573,
+            0.59,
+            0.575,
+            0.557,
+            0.589,
+            0.597,
+            0.558,
+            0.563,
+            0.548,
+            0.598,
+            0.557,
+            0.58,
+            0.603,
+            0.596,
+            0.595,
+            0.571,
+            0.567,
+            0.563,
+            0.587
+          ]
+        },
+        "truthTable": [
+          {
+            "status": "RUNNING",
+            "restored": false,
+            "blocked": true
+          },
+          {
+            "status": "RUNNING",
+            "restored": true,
+            "blocked": true
+          },
+          {
+            "status": "FAILED",
+            "restored": false,
+            "blocked": true
+          },
+          {
+            "status": "FAILED",
+            "restored": true,
+            "blocked": false
+          },
+          {
+            "status": "RESTORED",
+            "restored": true,
+            "blocked": false
+          }
+        ]
+      },
+      "indexBuild": {
+        "databaseMs": 1.292,
+        "clientWallMs": 7.0911249999990105,
+        "definition": "CREATE INDEX google_writer_fence_rehearsals_unrestored_idx ON production_control.google_writer_fence_rehearsals USING btree (run_id) WHERE ((status = 'RUNNING'::text) OR ((status = 'FAILED'::text) AND (NOT restoration_confirmed)))"
+      }
+    }
+  ],
+  "indexDefinition": "CREATE INDEX google_writer_fence_rehearsals_unrestored_idx ON production_control.google_writer_fence_rehearsals USING btree (run_id) WHERE ((status = 'RUNNING'::text) OR ((status = 'FAILED'::text) AND (NOT restoration_confirmed)))",
+  "guardSourceSha256": "11f0a46a64bad31372178c0db60a6662b0ab79f50770720141b34375283d8105",
+  "evidenceCapture": {
+    "rawPath": "/private/tmp/bagger-phase2-fence-final.tap",
+    "rawSha256": "cf00b4f212a508a44799abd5b8c47c8849d8eec00ae75315aa96744ad0fc0b70",
+    "nodeTests": 4,
+    "pass": 4,
+    "fail": 0
+  }
+}

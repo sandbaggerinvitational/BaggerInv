@@ -1,0 +1,237 @@
+{
+  "migrationSha256": "7939755b00a92d9284e933fd81393ca5a78ce0a74a2107641d258bf6e21406c4",
+  "environment": "ISOLATED_LOCAL_POSTGRESQL_17",
+  "timestamp": "2026-09-28T12:50:23.061Z",
+  "production": false,
+  "beforeCanonicalHashes": {
+    "finalize_production_match(jsonb)": "386b74b9250203331ada325dc02b6105710b4eb50033db02cdd3b097223c08d0",
+    "submit_production_hole_score(jsonb)": "21ba7d1ec29053e7957628657b3a137547e4553688ef6ba5d77dd62e1f7d1ed9",
+    "scoring_authority.match_progress(text,text)": "a9a44c7ecd21bc4f7577797717d2be15051e778f503fe5a6b718b71126eb9ae8",
+    "scoring_authority.strokes_on_hole(integer,integer)": "ac691dceafbe3ee751ccba68e3cced19c843a10f0cf6b22ceeab20e8fe9a1b00"
+  },
+  "afterCanonicalHashes": {
+    "finalize_production_match(jsonb)": "386b74b9250203331ada325dc02b6105710b4eb50033db02cdd3b097223c08d0",
+    "submit_production_hole_score(jsonb)": "21ba7d1ec29053e7957628657b3a137547e4553688ef6ba5d77dd62e1f7d1ed9",
+    "scoring_authority.match_progress(text,text)": "a9a44c7ecd21bc4f7577797717d2be15051e778f503fe5a6b718b71126eb9ae8",
+    "scoring_authority.strokes_on_hole(integer,integer)": "ac691dceafbe3ee751ccba68e3cced19c843a10f0cf6b22ceeab20e8fe9a1b00"
+  },
+  "score": {
+    "ok": true,
+    "net": {
+      "team_1": 4,
+      "team_2": 4
+    },
+    "code": "ACCEPTED",
+    "gross": {
+      "team_1": [
+        4
+      ],
+      "team_2": [
+        5
+      ]
+    },
+    "match": {
+      "clinched": false,
+      "back_winner": "",
+      "current_hole": 1,
+      "front_winner": "",
+      "scored_holes": 1,
+      "result_winner": "",
+      "team_1_points": null,
+      "team_2_points": null,
+      "overall_winner": "",
+      "running_result": "All square through 1",
+      "holes_remaining": 17,
+      "team_1_holes_won": 0,
+      "team_2_holes_won": 0,
+      "scorecard_complete": false
+    },
+    "strokes": {
+      "team_1": [
+        0
+      ],
+      "team_2": [
+        1
+      ]
+    },
+    "match_id": "2026-R3-12",
+    "updated_at": "2026-09-28T07:50:31.67376-05:00",
+    "hole_number": 1,
+    "hole_winner": "Halved",
+    "audit_created": true,
+    "hole_revision": 1,
+    "match_revision": 1,
+    "permission_revision": 1,
+    "google_outbox_created": true,
+    "google_target_match_id": "2026-R3-12"
+  },
+  "intents": [
+    {
+      "family": "CALCUTTA",
+      "reason": "CANONICAL_MATCH_LIFECYCLE_CHANGED",
+      "status": "PENDING",
+      "attempts": 0,
+      "match_id": "2026-R3-12",
+      "intent_id": "3162d9f2-97e2-48fb-994f-3a3ee65045b3",
+      "created_at": "2026-09-28T07:50:31.678492-05:00",
+      "updated_at": "2026-09-28T07:50:31.680335-05:00",
+      "available_at": "2026-09-28T07:50:31.680335-05:00",
+      "completed_at": null,
+      "round_number": 3,
+      "last_sqlstate": null,
+      "tournament_id": "2026",
+      "contract_version": "score-derived-intent-v1",
+      "canonical_revision": {
+        "holeNumber": 1,
+        "mutationKey": "90000000-0000-4000-8000-000000000001",
+        "holeRevision": 1,
+        "matchRevision": 1
+      },
+      "source_transaction": 933,
+      "runtime_generation_id": null
+    },
+    {
+      "family": "COMPETITION",
+      "reason": "CANONICAL_MATCH_CHANGED",
+      "status": "PENDING",
+      "attempts": 0,
+      "match_id": "2026-R3-12",
+      "intent_id": "08e8a494-64ee-43ba-9b19-0ff6415810c7",
+      "created_at": "2026-09-28T07:50:31.677392-05:00",
+      "updated_at": "2026-09-28T07:50:31.679734-05:00",
+      "available_at": "2026-09-28T07:50:31.679734-05:00",
+      "completed_at": null,
+      "round_number": 3,
+      "last_sqlstate": null,
+      "tournament_id": "2026",
+      "contract_version": "score-derived-intent-v1",
+      "canonical_revision": {
+        "status": "LIVE",
+        "matchId": "2026-R3-12",
+        "holeNumber": 1,
+        "mutationKey": "90000000-0000-4000-8000-000000000001",
+        "holeRevision": 1,
+        "resultWinner": "",
+        "matchRevision": 1,
+        "scorecardComplete": false
+      },
+      "source_transaction": 933,
+      "runtime_generation_id": null
+    }
+  ],
+  "flushes": [
+    {
+      "failed": 0,
+      "family": "CALCUTTA",
+      "maximum": 8,
+      "processed": 1
+    },
+    {
+      "failed": 0,
+      "family": "NET_SKINS",
+      "maximum": 8,
+      "processed": 0
+    },
+    {
+      "failed": 0,
+      "family": "COMPETITION",
+      "maximum": 8,
+      "processed": 1
+    }
+  ],
+  "intentStatus": [
+    {
+      "family": "CALCUTTA",
+      "status": "SUCCEEDED",
+      "attempts": 1,
+      "sqlstate": null
+    },
+    {
+      "family": "COMPETITION",
+      "status": "SUCCEEDED",
+      "attempts": 1,
+      "sqlstate": null
+    }
+  ],
+  "security": {
+    "rls": true,
+    "anon_flush_execute": false,
+    "service_table_access": false,
+    "claim_service_execute": true,
+    "service_flush_execute": false
+  },
+  "result": "PASS",
+  "manifestExecuted": true,
+  "candidateCatalog": [
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "config": [
+        "search_path=pg_catalog, production_control, scoring_authority"
+      ],
+      "sha256": "d7289f2f087b1defa7e95c88f5a0a226d40433960384224e490e405e2a715ab2",
+      "function": "scoring_authority.enqueue_production_net_skins_v1_change()"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "sha256": "e643437fc28f35f0500bf260b2eed94cbf3e6a52ec6bb5c3647176191a1a66ce",
+      "function": "scoring_authority.enqueue_annual_derived_v1_change()"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "sha256": "2a61b87144838ea5e59cd4ab4b7d58b25c60cba2fee90f4b659f1e312c410022",
+      "function": "production_control.append_score_derived_intent_v1(text,text,integer,text,text,jsonb,uuid)"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "sha256": "5a9057ad6d32517a7157d0b9380c3cd5880d1a813d746ca767a454f7e7c5de7c",
+      "function": "production_control.score_derived_intents_pending_v1(text)"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "sha256": "a87a7b695ed6b74f0ca57709833cbe92c841be0cd51e24db11a181b2aa338e8f",
+      "function": "production_control.flush_score_derived_intents_v1(text,text,integer)"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "sha256": "a83fe38d11abdc93a53a8948d858c23b439a6beadac08bd6922aa197d0f68632",
+      "function": "scoring_authority.enqueue_production_calcutta_v1_change()"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "sha256": "b47353f39c307321eb6c11c0523dbbda1419dca3d0020025da9c3e2d78ab55c9",
+      "function": "production_control.annual_side_game_implementation_manifest_v1()"
+    }
+  ]
+}

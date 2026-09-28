@@ -1,0 +1,433 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-09-28T12:37:34.868Z",
+  "fixture": "bagger-phase2-score-proof-v1",
+  "seed": "2026-canonical-score-path-2",
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "durableCommit": true,
+  "fsync": false,
+  "runtimeSubstitutions": [
+    "assert_production_scoring_runtime",
+    "assert_production_cutover_read_scope"
+  ],
+  "limitations": [
+    "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+    "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+    "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+    "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+    "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+    "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+  ],
+  "candidate": null,
+  "tests": [
+    {
+      "id": "P2-IDEM-001",
+      "name": "sequential identical mutation and changed payload",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "first": "ACCEPTED",
+        "retry": "ACCEPTED",
+        "replay": true,
+        "changedPayload": "IDEMPOTENCY_CONFLICT",
+        "receiptCount": 1
+      },
+      "elapsedMs": 278.1992500000001
+    },
+    {
+      "id": "P2-IDEM-002",
+      "name": "new mutation same Official score vs intentional revision-aware correction",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "newIdSameScore": "NO_CHANGE_WITHOUT_NEW_RECEIPT",
+        "stale": "MATCH_REVISION_CONFLICT",
+        "deliberateCurrentRevisionCorrection": "ACCEPTED_WITH_HISTORY",
+        "contractChange": false
+      },
+      "elapsedMs": 374.54587500000025
+    },
+    {
+      "id": "P2-CONC-001",
+      "name": "20 concurrent identical requests resolve one canonical outcome",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "FAIL",
+      "error": "Owned SQL session already closed\n\ntrue !== false\n",
+      "elapsedMs": 370.15324999999984
+    },
+    {
+      "id": "P2-CONC-002",
+      "name": "concurrent new mutation IDs / same gross cannot overwrite stale authority",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "ACCEPTED",
+        "loser": "MATCH_REVISION_CONFLICT",
+        "silentOverwrite": false
+      },
+      "elapsedMs": 353.45379200000025
+    },
+    {
+      "id": "P2-CONC-003",
+      "name": "concurrent new mutation IDs / different gross cannot overwrite stale authority",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "ACCEPTED",
+        "loser": "MATCH_REVISION_CONFLICT",
+        "silentOverwrite": false
+      },
+      "elapsedMs": 407.85354099999995
+    },
+    {
+      "id": "P2-CONC-004",
+      "name": "adjacent holes serialize with revision conflict then same-mutation retry",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "staleAdjacent": "MATCH_REVISION_CONFLICT",
+        "sameMutationRefreshedRevision": "ACCEPTED",
+        "canonicalHoles": 2
+      },
+      "elapsedMs": 362.95866700000033
+    },
+    {
+      "id": "P2-CONC-005",
+      "name": "independent match score completes while another match transaction remains open",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "FAIL",
+      "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while inserting index tuple (0,1) in relation \"competition_recalculation_jobs\"\nSQL statement \"insert into scoring_authority.competition_recalculation_jobs (\n      tournament_id, round_number, engine_key, status,\n      requested_source_revision, requested_at, started_at, completed_at,\n      last_error_code, last_error_safe, runtime_generation_id,\n      claim_token, claimed_by, lease_expires_at, updated_at\n    ) values (\n      target_tournament, 0, engine_value, 'PENDING',\n      pg_catalog.jsonb_build_object(\n        'reason', reason_value, 'revision', revision_value,\n        'transactional', true\n      ), pg_catalog.clock_timestamp(), null, null, null, null,\n      runtime_generation, null, null, null, pg_catalog.clock_timestamp()\n    ) on conflict (tournament_id, round_number, engine_key) do update set\n      status = 'PENDING',\n      requested_source_revision = excluded.requested_source_revision,\n      requested_at = excluded.requested_at,\n      started_at = null, completed_at = null,\n      last_error_code = null, last_error_safe = null,\n      runtime_generation_id = excluded.runtime_generation_id,\n      claim_token = null, claimed_by = null, lease_expires_at = null,\n      updated_at = excluded.updated_at\"\nPL/pgSQL function scoring_authority.enqueue_annual_derived_v1_change() line 120 at SQL statement\nSQL statement \"insert into scoring_authority.hole_scores (\n    match_id, hole_number, hole_revision, team_1_gross_scores, team_2_gross_scores,\n    team_1_strokes, team_2_strokes, team_1_net_score, team_2_net_score,\n    hole_winner, mutation_key, actor_id\n  ) values (\n    target_match, target_hole, next_hole_revision, team_1_gross, team_2_gross,\n    team_1_strokes, team_2_strokes, team_1_net, team_2_net, winner, mutation_identity, actor\n  ) on conflict (match_id, hole_number) do update set\n    hole_revision = excluded.hole_revision,\n    team_1_gross_scores = excluded.team_1_gross_scores,\n    team_2_gross_scores = excluded.team_2_gross_scores,\n    team_1_strokes = excluded.team_1_strokes,\n    team_2_strokes = excluded.team_2_strokes,\n    team_1_net_score = excluded.team_1_net_score,\n    team_2_net_score = excluded.team_2_net_score,\n    hole_winner = excluded.hole_winner,\n    mutation_key = excluded.mutation_key,\n    actor_id = excluded.actor_id,\n    updated_at = transition_at\"\nPL/pgSQL function public.submit_production_hole_score(jsonb) line 138 at SQL statement\n",
+      "elapsedMs": 2333.4549580000003
+    },
+    {
+      "id": "P2-CONC-LOCK-SCORE",
+      "name": "SCORE wins Lock/score race safely",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "SCORE",
+        "loser": "MATCH_REVISION_CONFLICT",
+        "holes": 1,
+        "locked": false
+      },
+      "elapsedMs": 399.53441699999985
+    },
+    {
+      "id": "P2-CONC-LOCK-LOCK",
+      "name": "LOCK wins Lock/score race safely",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "LOCK",
+        "loser": "UNAUTHORIZED",
+        "holes": 0,
+        "locked": true
+      },
+      "elapsedMs": 340.9706249999999
+    },
+    {
+      "id": "P2-ATOMIC-BEFORE_HOLE",
+      "name": "failure at BEFORE_HOLE rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "BEFORE_HOLE",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 365.6995829999996
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_HOLE",
+      "name": "failure at AFTER_HOLE rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_HOLE",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 359.57025000000067
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_MATCH",
+      "name": "failure at AFTER_MATCH rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_MATCH",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 388.1270420000001
+    },
+    {
+      "id": "P2-ATOMIC-BEFORE_RECEIPT",
+      "name": "failure at BEFORE_RECEIPT rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "BEFORE_RECEIPT",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 366.4527500000004
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_RECEIPT",
+      "name": "failure at AFTER_RECEIPT rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_RECEIPT",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 351.09112500000083
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_HISTORY",
+      "name": "failure at AFTER_HISTORY rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_HISTORY",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 377.7218329999996
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_AUDIT",
+      "name": "failure at AFTER_AUDIT rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_AUDIT",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 368.5385839999999
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_OUTBOX",
+      "name": "failure at AFTER_OUTBOX rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_OUTBOX",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 411.16433399999914
+    },
+    {
+      "id": "P2-FAIL-57014",
+      "name": "statement timeout after hole work rolls back and preserves SQLSTATE57014",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "sqlstate": "57014",
+        "canonicalCommit": false,
+        "receipt": false,
+        "sameMutationRetry": "ACCEPTED"
+      },
+      "elapsedMs": 448.1543330000004
+    },
+    {
+      "id": "P2-FAIL-BEFORE-COMMIT",
+      "name": "backend connection termination before COMMIT is exactly recoverable",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "connectionLost": "BEFORE_COMMIT",
+        "receiptAtResolution": false,
+        "canonicalOutcome": "NOT_COMMITTED",
+        "sameMutationRetry": "ACCEPTED",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 351.2880419999983
+    },
+    {
+      "id": "P2-FAIL-AFTER-COMMIT",
+      "name": "backend connection termination after COMMIT is exactly recoverable",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "connectionLost": "AFTER_COMMIT_BEFORE_DELIVERY",
+        "receiptAtResolution": true,
+        "canonicalOutcome": "COMMITTED",
+        "sameMutationRetry": "STORED_RECEIPT",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 364.03954200000044
+    },
+    {
+      "id": "P2-RESTART-IN-TRANSACTION",
+      "name": "owned disposable PostgreSQL crash restart during open score transaction",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "FAIL",
+      "error": "pg_ctl: could not start server\nExamine the log output.\n\n\n1 !== 0\n",
+      "elapsedMs": 623.5597079999989
+    },
+    {
+      "id": "P2-RESTART-AFTER-COMMIT",
+      "name": "owned disposable PostgreSQL crash restart after commit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "FAIL",
+      "error": "/opt/homebrew/opt/postgresql@17/bin/createdb\ncreatedb: error: connection to server on socket \"/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-8Rqamn/socket/.s.PGSQL.60793\" failed: No such file or directory\n\tIs the server running locally and accepting connections on that socket?\n",
+      "elapsedMs": 10.692250000000058
+    },
+    {
+      "id": "P2-UNKNOWN-INFLIGHT",
+      "name": "absent receipt while transaction still active must remain UNKNOWN",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "FAIL",
+      "error": "/opt/homebrew/opt/postgresql@17/bin/createdb\ncreatedb: error: connection to server on socket \"/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-8Rqamn/socket/.s.PGSQL.60793\" failed: No such file or directory\n\tIs the server running locally and accepting connections on that socket?\n",
+      "elapsedMs": 15.319750000000568
+    },
+    {
+      "id": "P2-AUTH-001",
+      "name": "real actor, match permission and private RPC privileges deny unauthorized identities",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "FAIL",
+      "error": "/opt/homebrew/opt/postgresql@17/bin/createdb\ncreatedb: error: connection to server on socket \"/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-8Rqamn/socket/.s.PGSQL.60793\" failed: No such file or directory\n\tIs the server running locally and accepting connections on that socket?\n",
+      "elapsedMs": 7.1770419999993464
+    },
+    {
+      "id": "P2-IDEM-LOCKED-READBACK",
+      "name": "committed receipt survives Lock even when participant replay loses permission",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "FAIL",
+      "error": "/opt/homebrew/opt/postgresql@17/bin/createdb\ncreatedb: error: connection to server on socket \"/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-8Rqamn/socket/.s.PGSQL.60793\" failed: No such file or directory\n\tIs the server running locally and accepting connections on that socket?\n",
+      "elapsedMs": 6.378208000000086
+    },
+    {
+      "id": "P2-GOLF-432",
+      "name": "all R1/R2/R3 holes and Finalize retain canonical golf and receipts",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "FAIL",
+      "error": "/opt/homebrew/opt/postgresql@17/bin/createdb\ncreatedb: error: connection to server on socket \"/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-8Rqamn/socket/.s.PGSQL.60793\" failed: No such file or directory\n\tIs the server running locally and accepting connections on that socket?\n",
+      "elapsedMs": 5.629582999999911
+    },
+    {
+      "id": "P2-CONC-FINALIZE",
+      "name": "final-hole vs Finalize race is never Final with missing hole",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "FAIL",
+      "error": "/opt/homebrew/opt/postgresql@17/bin/createdb\ncreatedb: error: connection to server on socket \"/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-8Rqamn/socket/.s.PGSQL.60793\" failed: No such file or directory\n\tIs the server running locally and accepting connections on that socket?\n",
+      "elapsedMs": 5.691999999999098
+    }
+  ],
+  "fullRounds": null,
+  "completedAt": "2026-09-28T12:37:47.130Z",
+  "counts": {
+    "pass": 18,
+    "fail": 9
+  }
+}

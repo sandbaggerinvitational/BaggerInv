@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "mode": "unit",
+  "startedAt": "2026-09-28T13:56:04.792Z",
+  "endedAt": "2026-09-28T13:56:11.563Z",
+  "baseSha": "184b5c65a8e63784e1af8d38121fa2e16a015628",
+  "environment": "LOCAL_ONLY",
+  "remoteNetwork": "DENIED_AT_NET_TLS_SOCKET",
+  "production": false,
+  "files": [
+    {
+      "file": "test/reliability-preservation.test.mjs",
+      "sha256": "5a162a2d5b95f07458a0eb5ea408c40dc67dd0da536d7d7c144c905eff00bc9c"
+    },
+    {
+      "file": "test/reliability-observability.test.mjs",
+      "sha256": "649d7fba7bbba72e47ec5929035ef33bae1f4626cc351e00d98859821545b023"
+    },
+    {
+      "file": "test/reliability-observability-review.test.mjs",
+      "sha256": "c3fd218370bc3f8ae05f803607b3200520b87137aeb7b4fb7fa7322ad9fe3638"
+    },
+    {
+      "file": "test/reliability-observability-api.test.mjs",
+      "sha256": "b64742c4df33dfe089aebd78a70fdcf2bb087cfadd1a49134ec628b4f759fa9f"
+    },
+    {
+      "file": "test/reliability-telemetry-protected-equivalence.test.mjs",
+      "sha256": "bff525130a7f501d3d3e2ffd555ecd0027e79242dda5cbc7d15acf1a9fd1917d"
+    },
+    {
+      "file": "test/reliability-diagnostic-policy.test.mjs",
+      "sha256": "0f49c1da4babf75f22706ef33d993cc6039187949cc03da5005febe2f466d713"
+    },
+    {
+      "file": "test/reliability-diagnostic-cli.test.mjs",
+      "sha256": "c2e2dec007a5e701545a14e714f6d176f0b8c4c16cba5b75ab9af95c44934627"
+    },
+    {
+      "file": "test/reliability-diagnostic-adapter.test.mjs",
+      "sha256": "15672d809155ab75696cec0c6a353c3f02d6f572c4eacf2aac2f71ac72025aa6"
+    },
+    {
+      "file": "test/reliability-native.test.mjs",
+      "sha256": "a2b90e79d64394c824e0760e415ac96bb0cc04128a64abbe61316290dbe7831e"
+    },
+    {
+      "file": "test/reliability-readback.test.mjs",
+      "sha256": "3f28090ce90c1d253a277421e984fec6c53afc9a17b8b0210bd89122f35dfdb8"
+    },
+    {
+      "file": "test/reliability-benchmark-harness.test.mjs",
+      "sha256": "64220934ca8ddf0d995d2237fd08988d44c51bb8f259d66d6f8e531ea52c00d7"
+    },
+    {
+      "file": "test/reliability-benchmark-safety.test.mjs",
+      "sha256": "772ad669c583585aff5e8a5d56b21e206e4d345b55f03dbb511d432ba3a86e79"
+    },
+    {
+      "file": "test/reliability-benchmark-results.test.mjs",
+      "sha256": "7b1eb23b6ff4863cfb9b4be93aea61f50c786842d116bf1ae0c68891b92ff2a0"
+    },
+    {
+      "file": "test/reliability-query-plan-evidence.test.mjs",
+      "sha256": "9cc1059042bb9c241660e33d2cdb576abd4edece92edce69ce48191d0052f1c4"
+    },
+    {
+      "file": "test/reliability-phase2-performance-gate.test.mjs",
+      "sha256": "3e6c110d08bb4323f8e834e568cc1348fe6ab202574a6a9ecc02c6c9e200d481"
+    },
+    {
+      "file": "test/reliability-phase2-application-comparison.test.mjs",
+      "sha256": "b25bd3cd3bae78881017b9e8d14305fe4cced5ff4f13ba3de114a1cfa67bdbb8"
+    }
+  ],
+  "exitCode": 0,
+  "error": null,
+  "counts": {
+    "tests": 96,
+    "pass": 94,
+    "fail": 0,
+    "skipped": 2,
+    "cancelled": 0
+  },
+  "result": "PASS",
+  "rawPath": "/private/tmp/bagger-phase2-unit.log",
+  "rawSha256": "7eb9e61f5e1924263e44ed8d5bfbed77539008bcb656964efc94dbae84895184",
+  "limitations": [
+    "Mock API/transport plus local unit/integration tests, not hosted or physical.",
+    "Native expected-red remediations remain; skips are not physical proof."
+  ]
+}

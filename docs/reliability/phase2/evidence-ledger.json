@@ -1,0 +1,1693 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-28T14:00:58.438Z",
+  "executionHead": "73abf170a6ea4457327031ea903b42bcd56120be",
+  "candidateMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+  "sourceDigest": "fdcc5edb419901095268c7da1d79708a74548a0de53d16a0a4818b73b0118a94",
+  "sources": [
+    {
+      "file": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+      "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+    },
+    {
+      "file": "test/reliability-phase2-application-comparison.test.mjs",
+      "sha256": "b25bd3cd3bae78881017b9e8d14305fe4cced5ff4f13ba3de114a1cfa67bdbb8"
+    },
+    {
+      "file": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "sha256": "074c3c1df926ae6f8b3e9d0c5929362d60959103b62b2c59f44c95164260a2c3"
+    },
+    {
+      "file": "test/reliability-phase2-eligible-history.test.mjs",
+      "sha256": "916d2056f05364fbfa0fb99a051d2081f75c9f880767fdc88f068b7dd4cc3e3b"
+    },
+    {
+      "file": "test/reliability-phase2-fence-history.test.mjs",
+      "sha256": "bb3096f4991c54c5325081aa9e6daf9d5b17c218ffa4b1be57431268de89e0fd"
+    },
+    {
+      "file": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "sha256": "ffe9bbba4beb79c6765a1c9a53b36deab0b0d191d3c9a816a7882771f9422306"
+    },
+    {
+      "file": "test/reliability-phase2-performance-gate.test.mjs",
+      "sha256": "3e6c110d08bb4323f8e834e568cc1348fe6ab202574a6a9ecc02c6c9e200d481"
+    },
+    {
+      "file": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "sha256": "88836567509d32376a519ec321d9566c3bc4068efcc9fabe0c92e4a990ccbec4"
+    },
+    {
+      "file": "test/scoring-authority-phase2.test.mjs",
+      "sha256": "316376d16fb343499834e61f6a2e5779c8996b1aee40bb9ec06c4bef42a1419e"
+    },
+    {
+      "file": "test/support/reliability/phase2-eligible-history.mjs",
+      "sha256": "f3aaced4364da3fc3bc85d62e6b7d1678ebd5a68ab7987dbf795a033e3545517"
+    },
+    {
+      "file": "test/support/reliability/phase2-score-fixture.mjs",
+      "sha256": "7bc6b9953e4080d520883bf3ac8db85d41473ba1b630ecf36146df5fd838b733"
+    },
+    {
+      "file": "tools/reliability/benchmark-phase2-eligible.mjs",
+      "sha256": "8a31b284aeb43b4c8cdaed712bc1b93091d16015efd1a0ba55bc661a0d4505aa"
+    },
+    {
+      "file": "tools/reliability/benchmark-phase2.mjs",
+      "sha256": "25c2846cb5e7fa3cdb445baaa4def0814c6c810a127520af6057e6ab38d62724"
+    },
+    {
+      "file": "tools/reliability/certify-phase2-foundation.mjs",
+      "sha256": "db652dc5bf5a53ba125d42f5fb92d09b8e4662e9047ca87e44a5104028614706"
+    },
+    {
+      "file": "tools/reliability/collect-phase2-evidence.mjs",
+      "sha256": "91b6f0323466564020756e6b2932c88094c4e5fae85f6f85737efdab813dee3a"
+    },
+    {
+      "file": "tools/reliability/measure-phase2-locks.mjs",
+      "sha256": "6440f34e9177af207b5ed65fba83f815fb033604760d63557f4ebce5a878a3b1"
+    },
+    {
+      "file": "tools/reliability/phase2-application-comparison.mjs",
+      "sha256": "302b55a9b8fded4d557a9b2d5651474d47e3368a30864ee1a5261547c6489825"
+    },
+    {
+      "file": "tools/reliability/phase2-network-deny.cjs",
+      "sha256": "48e385b629af2beda571108badbbb4a7cdc81c7c7982ef85cded3caa02046761"
+    },
+    {
+      "file": "tools/reliability/phase2-performance-gate.mjs",
+      "sha256": "1cf94d330f3b92e2dd8acd168f367ad300c317078df6248992e617ab6ca01f7e"
+    },
+    {
+      "file": "tools/reliability/phase2-plan-capture.mjs",
+      "sha256": "439b88d39c09bff113cb9751cb273342d73502fcea0a7790e4625455aedd9828"
+    },
+    {
+      "file": "tools/reliability/run-phase2-application.mjs",
+      "sha256": "27f65f77d2ee7d1733228bded9c3336a268a6b3e652af5bb2831ec71334e665d"
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "benchmark-before.json",
+      "sha256": "d066e38fc5d97f0895aef2770362744b63cb11868295b4653c03a8ed3f6c5118"
+    },
+    {
+      "file": "benchmark-after.json",
+      "sha256": "75a9031c9640dd1a8c42dd635414d4ef71921c4ddb41df57fbc53293d3d08183"
+    },
+    {
+      "file": "eligible-history-before.json",
+      "sha256": "e25b01ef081a21a75b7a7d0be56adb0f8e169b146cb7af33bf995e4b6aa27159"
+    },
+    {
+      "file": "eligible-history-after.json",
+      "sha256": "2102117d71e9b104b7197feda5185b743b3bfbb60ceffff2631f1d7eb0c7c8db"
+    },
+    {
+      "file": "lock-duration-before.json",
+      "sha256": "25e99b5e32744d25b508597caed60228290bd0bf14a9b416bef406b8f8aedd79"
+    },
+    {
+      "file": "lock-duration-after.json",
+      "sha256": "49a114d8ebf346db59a32d78925f9b3791a627a5a3a813168b12798f35a0ed23"
+    },
+    {
+      "file": "performance-gate.json",
+      "sha256": "62cff5db1977285c5233b58e72d381e739ccc07a4c43d1230ff723b6acb94086"
+    },
+    {
+      "file": "evidence/application-baseline.json",
+      "sha256": "ea4ccd8859b527871dad0c645ca4f6c5010da59b62f06e4410480fb434cb1ede"
+    },
+    {
+      "file": "evidence/application-candidate.json",
+      "sha256": "ff9e06f08a0b7d98ea3230e90c7f583e8c7afa74f2ecef00553f102675cb6238"
+    },
+    {
+      "file": "evidence/application-comparison.json",
+      "sha256": "6835c4a10b2d1bf1388b62cde10248318facffdd8a97acded768544e32178605"
+    },
+    {
+      "file": "evidence/foundation-unit.json",
+      "sha256": "e22fda292ea10777c4f3de5a38b46fe9b72819e33396163a3b41df7698ebb333"
+    },
+    {
+      "file": "evidence/foundation-sql.json",
+      "sha256": "dc3443a0c132b3b3008bf38fb5c05d4d3f9fc52cb7a4df93d0169f0151c10aef"
+    },
+    {
+      "file": "evidence/foundation-build.json",
+      "sha256": "12d7721203dea1efb1f574d3637f1b5da9d40ee283999e700ac3c3d3ecd8bb89"
+    },
+    {
+      "file": "evidence/eligible-history-candidate.json",
+      "sha256": "c6022d56fc7ca5a9034cc8752ba5ff526772bf0698add5340714d9512ab2131d"
+    },
+    {
+      "file": "evidence/score-proof-before.json",
+      "sha256": "fff60d69cdc17afdfa9ffb20cdf9dcab529323333a4cf13762cf155110ae25b0"
+    },
+    {
+      "file": "evidence/score-proof-after.json",
+      "sha256": "a3d1227ab2366e20301789df35f2e0cff6badb49bd977538752c255e67d37108"
+    },
+    {
+      "file": "evidence/derived-proof-after.json",
+      "sha256": "37f1b0c71baa0863a0eef61af589a04a33ff4e67b6a08780244bbc0ca99cc561"
+    },
+    {
+      "file": "evidence/migration-safety.json",
+      "sha256": "5f93f3e80619c1a270d421a14dc399cad0a7601bdf316ee225d9c56855e13b90"
+    },
+    {
+      "file": "evidence/fence-history-experiment.json",
+      "sha256": "6bf47cf79645f94feb9ebb521f94b4e9f790094ffb03d7f80269aab648991bc1"
+    },
+    {
+      "file": "evidence/fence-history-final.json",
+      "sha256": "dce8788b002d716006047dd3349a49ac7140726d84c67f372a50573b050f806f"
+    }
+  ],
+  "claims": [
+    {
+      "id": "P2-FIXTURE-IDS",
+      "requirement": "BE-SCORE-002",
+      "claim": "full input seed and hole key produce 432 distinct mutation identities",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-IDEM-001",
+      "requirement": "BE-SCORE-003",
+      "claim": "sequential identical mutation and changed payload",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-IDEM-002",
+      "requirement": "BE-SCORE-003",
+      "claim": "new mutation same Official score vs intentional revision-aware correction",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-CONC-001",
+      "requirement": "BE-SCORE-002",
+      "claim": "20 concurrent identical requests resolve one canonical outcome",
+      "proofLayers": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-CONC-002",
+      "requirement": "BE-SCORE-002",
+      "claim": "concurrent new mutation IDs / same gross cannot overwrite stale authority",
+      "proofLayers": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-CONC-003",
+      "requirement": "BE-SCORE-002",
+      "claim": "concurrent new mutation IDs / different gross cannot overwrite stale authority",
+      "proofLayers": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-CONC-004",
+      "requirement": "BE-SCORE-002",
+      "claim": "adjacent holes serialize with revision conflict then same-mutation retry",
+      "proofLayers": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-CONC-005",
+      "requirement": "BE-SCORE-002",
+      "claim": "independent match score completes while another match transaction remains open",
+      "proofLayers": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-CONC-LOCK-SCORE",
+      "requirement": "BE-SCORE-002",
+      "claim": "SCORE wins Lock/score race safely",
+      "proofLayers": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-CONC-LOCK-LOCK",
+      "requirement": "BE-SCORE-002",
+      "claim": "LOCK wins Lock/score race safely",
+      "proofLayers": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-ATOMIC-BEFORE_HOLE",
+      "requirement": "BE-SCORE-002",
+      "claim": "failure at BEFORE_HOLE rolls back hole, match, receipt and audit",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_HOLE",
+      "requirement": "BE-SCORE-002",
+      "claim": "failure at AFTER_HOLE rolls back hole, match, receipt and audit",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_MATCH",
+      "requirement": "BE-SCORE-002",
+      "claim": "failure at AFTER_MATCH rolls back hole, match, receipt and audit",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-ATOMIC-BEFORE_RECEIPT",
+      "requirement": "BE-SCORE-002",
+      "claim": "failure at BEFORE_RECEIPT rolls back hole, match, receipt and audit",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_RECEIPT",
+      "requirement": "BE-SCORE-002",
+      "claim": "failure at AFTER_RECEIPT rolls back hole, match, receipt and audit",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_HISTORY",
+      "requirement": "BE-SCORE-002",
+      "claim": "failure at AFTER_HISTORY rolls back hole, match, receipt and audit",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_AUDIT",
+      "requirement": "BE-SCORE-002",
+      "claim": "failure at AFTER_AUDIT rolls back hole, match, receipt and audit",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_OUTBOX",
+      "requirement": "BE-SCORE-002",
+      "claim": "failure at AFTER_OUTBOX rolls back hole, match, receipt and audit",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-FAIL-57014",
+      "requirement": "BE-SCORE-002",
+      "claim": "statement timeout after hole work rolls back and preserves SQLSTATE57014",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-FAIL-BEFORE-COMMIT",
+      "requirement": "BE-SCORE-002",
+      "claim": "backend connection termination before COMMIT is exactly recoverable",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-FAIL-AFTER-COMMIT",
+      "requirement": "BE-SCORE-002",
+      "claim": "backend connection termination after COMMIT is exactly recoverable",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-UNKNOWN-INFLIGHT",
+      "requirement": "BE-SCORE-003",
+      "claim": "absent receipt while transaction still active must remain UNKNOWN",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-AUTH-001",
+      "requirement": "BE-SCORE-002",
+      "claim": "real actor, match permission and private RPC privileges deny unauthorized identities",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-IDEM-LOCKED-READBACK",
+      "requirement": "BE-SCORE-003",
+      "claim": "committed receipt survives Lock even when participant replay loses permission",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "NOT_PROVEN_CLIENT_RECOVERY",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-GOLF-432",
+      "requirement": "BE-SCORE-002",
+      "claim": "all R1/R2/R3 holes and Finalize retain canonical golf and receipts",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-GOLF-HALVES",
+      "requirement": "BE-SCORE-002",
+      "claim": "all three formats preserve an 18-hole halved result and 1.5/1.5 points",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-GOLF-EARLY",
+      "requirement": "BE-SCORE-002",
+      "claim": "Singles clinch at10 preserves remaining18-hole gross and final three points",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-CONC-FINALIZE",
+      "requirement": "BE-SCORE-002",
+      "claim": "final-hole vs Finalize race is never Final with missing hole",
+      "proofLayers": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-RESTART-IN-TRANSACTION",
+      "requirement": "BE-SCORE-002",
+      "claim": "owned disposable PostgreSQL crash restart during open score transaction",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-RESTART-AFTER-COMMIT",
+      "requirement": "BE-SCORE-002",
+      "claim": "owned disposable PostgreSQL crash restart after commit",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/score-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "No provider admission, real client transport, native persistence or full tournament lifecycle proof",
+        "Score corrections remain existing revision-aware canonical upserts; no rules changed",
+        "Connection kill tests model PostgreSQL backend loss, not a provider restart or physical power loss"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-ATOMIC",
+      "requirement": "BE-JOB-001",
+      "claim": "required durable intent append failure rolls back score and receipt",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-COALESCE",
+      "requirement": "BE-JOB-001",
+      "claim": "one canonical transaction coalesces hole/match trigger intent per family",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-FAIL-CALCUTTA",
+      "requirement": "BE-JOB-001",
+      "claim": "CALCUTTA unavailable leaves score Official and durable demand retryable",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-FAIL-NET_SKINS",
+      "requirement": "BE-JOB-001",
+      "claim": "NET_SKINS unavailable leaves score Official and durable demand retryable",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-FAIL-COMPETITION",
+      "requirement": "BE-JOB-001",
+      "claim": "COMPETITION unavailable leaves score Official and durable demand retryable",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-STANDALONE-LOCK",
+      "requirement": "BE-JOB-001",
+      "claim": "standalone LOCK retains synchronous derived failure and atomic rollback",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-STANDALONE-FINALIZE",
+      "requirement": "BE-JOB-001",
+      "claim": "standalone FINALIZE retains synchronous derived failure and atomic rollback",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-BACKLOG",
+      "requirement": "BE-JOB-001",
+      "claim": "432 pending intents do not block canonical writes; bounded batches catch up",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-BURST",
+      "requirement": "BE-JOB-001",
+      "claim": "12 independent Singles matches commit concurrently with configured history",
+      "proofLayers": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-WORKER-RACE",
+      "requirement": "BE-JOB-001",
+      "claim": "scoring continues while a derived worker holds shared competition markers",
+      "proofLayers": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-ORDER",
+      "requirement": "BE-JOB-001",
+      "claim": "older financial demand observes latest canonical source instead of publishing obsolete result",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-DEAD-LETTER",
+      "requirement": "BE-JOB-001",
+      "claim": "bounded repeated consumer failure becomes visible dead letter without changing score",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-TIMEOUT",
+      "requirement": "BE-JOB-001",
+      "claim": "57014 aborts worker transaction while prior canonical score remains committed",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DERIVED-ACL",
+      "requirement": "BE-JOB-001",
+      "claim": "intent table and private helpers inaccessible to application/client roles",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-phase2-score-proof-v2",
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/derived-proof-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+        "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+        "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+        "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+        "Queue/source materialization tested; this suite does not calculate/publish financial results"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-MIG-CLEAN",
+      "requirement": "BE-SCORE-002",
+      "claim": "effective clean schema installs and executes implementation manifest",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-r139-synthetic-history-v1",
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/migration-safety.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Effective clean install includes explicit historical Release139 SQL repairs and synthetic platform prerequisite rows",
+        "Expected annual worker SQL failures are reproduced defects, not successful annual worker certification",
+        "No hosted admission/release identity, Production migration or rollback deployment is certified"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-MIG-UPGRADE",
+      "requirement": "BE-SCORE-002",
+      "claim": "synthetic history upgrade preserves canonical data and security attributes",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-r139-synthetic-history-v1",
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/migration-safety.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Effective clean install includes explicit historical Release139 SQL repairs and synthetic platform prerequisite rows",
+        "Expected annual worker SQL failures are reproduced defects, not successful annual worker certification",
+        "No hosted admission/release identity, Production migration or rollback deployment is certified"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-MIG-REAPPLY",
+      "requirement": "BE-SCORE-002",
+      "claim": "non-idempotent reapplication rejects atomically",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-r139-synthetic-history-v1",
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/migration-safety.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Effective clean install includes explicit historical Release139 SQL repairs and synthetic platform prerequisite rows",
+        "Expected annual worker SQL failures are reproduced defects, not successful annual worker certification",
+        "No hosted admission/release identity, Production migration or rollback deployment is certified"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-MIG-CERTIFICATION",
+      "requirement": "BE-SCORE-002",
+      "claim": "existing annual certification blocks install without changing it",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-r139-synthetic-history-v1",
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/migration-safety.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Effective clean install includes explicit historical Release139 SQL repairs and synthetic platform prerequisite rows",
+        "Expected annual worker SQL failures are reproduced defects, not successful annual worker certification",
+        "No hosted admission/release identity, Production migration or rollback deployment is certified"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-MIG-SOURCE-HASH",
+      "requirement": "BE-SCORE-002",
+      "claim": "unexpected installed trigger body rejects all migration changes",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-r139-synthetic-history-v1",
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/migration-safety.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Effective clean install includes explicit historical Release139 SQL repairs and synthetic platform prerequisite rows",
+        "Expected annual worker SQL failures are reproduced defects, not successful annual worker certification",
+        "No hosted admission/release identity, Production migration or rollback deployment is certified"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-MIG-MANIFEST",
+      "requirement": "BE-SCORE-002",
+      "claim": "manifest rejects private helper or table privilege drift",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-r139-synthetic-history-v1",
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/migration-safety.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Effective clean install includes explicit historical Release139 SQL repairs and synthetic platform prerequisite rows",
+        "Expected annual worker SQL failures are reproduced defects, not successful annual worker certification",
+        "No hosted admission/release identity, Production migration or rollback deployment is certified"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-MIG-CLOSE",
+      "requirement": "BE-SCORE-002",
+      "claim": "pending score demand blocks final handoff without changing emergency stop",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-r139-synthetic-history-v1",
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/migration-safety.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Effective clean install includes explicit historical Release139 SQL repairs and synthetic platform prerequisite rows",
+        "Expected annual worker SQL failures are reproduced defects, not successful annual worker certification",
+        "No hosted admission/release identity, Production migration or rollback deployment is certified"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-MIG-GENERATION",
+      "requirement": "BE-SCORE-002",
+      "claim": "obsolete intent generation fails closed without rebinding or score loss",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-r139-synthetic-history-v1",
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/migration-safety.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Effective clean install includes explicit historical Release139 SQL repairs and synthetic platform prerequisite rows",
+        "Expected annual worker SQL failures are reproduced defects, not successful annual worker certification",
+        "No hosted admission/release identity, Production migration or rollback deployment is certified"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-MIG-LIFECYCLE-SCOPE",
+      "requirement": "BE-SCORE-002",
+      "claim": "only score transactions defer; actual Lock/Finalize and round triggers retain synchronous work",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-r139-synthetic-history-v1",
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/migration-safety.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Effective clean install includes explicit historical Release139 SQL repairs and synthetic platform prerequisite rows",
+        "Expected annual worker SQL failures are reproduced defects, not successful annual worker certification",
+        "No hosted admission/release identity, Production migration or rollback deployment is certified"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-MIG-ANNUAL-EXPECTED-RED",
+      "requirement": "BE-SCORE-002",
+      "claim": "actual future worker initializers reproduce pre-existing 42883 before and after",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-r139-synthetic-history-v1",
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "EXPECTED_RED_PRE_EXISTING",
+      "artifact": "evidence/migration-safety.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Effective clean install includes explicit historical Release139 SQL repairs and synthetic platform prerequisite rows",
+        "Expected annual worker SQL failures are reproduced defects, not successful annual worker certification",
+        "No hosted admission/release identity, Production migration or rollback deployment is certified"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-MIG-SKINS-DEADLOCK",
+      "requirement": "BE-SCORE-002",
+      "claim": "mixed-round worker lock inversion is understood and durably retryable",
+      "proofLayers": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "fixture": "bagger-r139-synthetic-history-v1",
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "PASS",
+      "artifact": "evidence/migration-safety.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Effective clean install includes explicit historical Release139 SQL repairs and synthetic platform prerequisite rows",
+        "Expected annual worker SQL failures are reproduced defects, not successful annual worker certification",
+        "No hosted admission/release identity, Production migration or rollback deployment is certified"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-PERF-COMMON",
+      "requirement": "BE-SCORE-002",
+      "claim": "Validated common-path history-scale measurements; local rollback only",
+      "proofLayers": [
+        "PERFORMANCE"
+      ],
+      "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+      "fixture": "bagger-r139-synthetic-history-v1",
+      "testFile": "tools/reliability/benchmark-phase2.mjs",
+      "result": "PASS",
+      "capabilityResult": "SCOPED_LOCAL_PROOF_ONLY",
+      "artifact": "benchmark-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Not HTTP/API/auth provider latency.",
+        "fsync disabled by inherited disposable Phase1 fixture; no power-loss durability proof.",
+        "p99 requires 1000 samples and remains local empirical estimate, not confidence interval or Production SLO.",
+        "No provider resource/capacity proof.",
+        "Nested plan counts are SQL executions, not network round-trips or unique rows.",
+        "First observation is fresh session/plans, not guaranteed OS cold cache."
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-PERF-ELIGIBLE",
+      "requirement": "BE-SCORE-002",
+      "claim": "Synthetic eligible branches; protected receipt issuer lifecycle not proven",
+      "proofLayers": [
+        "PERFORMANCE"
+      ],
+      "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+      "fixture": "bagger-r139-synthetic-history-v1+phase2-eligible-history-v2",
+      "testFile": "tools/reliability/benchmark-phase2-eligible.mjs",
+      "result": "PASS",
+      "capabilityResult": "SCOPED_LOCAL_PROOF_ONLY",
+      "artifact": "eligible-history-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic receipt state exercises genuine installed branch, not proof protected late-R3 issuer would create every adversarial state.",
+        "P99 NOT PROVEN:30 samples perbranch.",
+        "No HTTP/hosted admission/durable COMMIT/physical client/capacity claim.",
+        "Scale order5,1,10,2 avoids monotonically increasing cache/order bias; deterministic branch order alternates by scale.",
+        "Host not exclusively reserved from unrelated owner processes."
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-LOCK-BOUNDS",
+      "requirement": "BE-SCORE-002",
+      "claim": "Measured lock lower and transaction upper bounds, not exact COMMIT timing",
+      "proofLayers": [
+        "PERFORMANCE"
+      ],
+      "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL17",
+      "fixture": "bagger-r139-synthetic-history-v1+phase2-eligible-history-v2",
+      "testFile": "tools/reliability/measure-phase2-locks.mjs",
+      "result": "PASS",
+      "capabilityResult": "SCOPED_LOCAL_PROOF_ONLY",
+      "artifact": "lock-duration-after.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Additional clock/set_config instrumentation has nonzero overhead; not directly comparable to uninstrumented benchmark.",
+        "No COMMIT fsync/durable storage; rollback transaction.",
+        "Lock released after result and rollback, so measured database lock portion is a lower bound; transaction wall includes socket and client work.",
+        "p99 not proven at n100 per branch; no hosted authority or provider-capacity inference."
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-FENCE-HISTORY",
+      "requirement": "DB-PERF-001",
+      "claim": "Exact safety predicate preserved; restored history excluded",
+      "proofLayers": [
+        "POSTGRESQL",
+        "PERFORMANCE"
+      ],
+      "environment": "OWNED_LOCAL_POSTGRESQL17",
+      "fixture": "phase2-fence-history-v2",
+      "testFile": "test/reliability-phase2-fence-history.test.mjs",
+      "result": "PASS",
+      "capabilityResult": "SCOPED_LOCAL_PROOF_ONLY",
+      "artifact": "evidence/fence-history-final.json",
+      "sourceMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+      "limitations": [
+        "Synthetic local records, not provider/restoration certification",
+        "Nested plan work overlaps, do not sum into request time/unique rows",
+        "P99 not proven by30 samples;host scheduling can affect latency",
+        "Before plan drops only the candidate index in a disposable database; after reinstalls the exact installed definition"
+      ],
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    }
+  ],
+  "requiredPendingProof": [
+    {
+      "id": "P2-RECOVERY-001",
+      "gate": "Supported participant unknown-outcome status after permission revocation",
+      "result": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-DELIVERY-001",
+      "gate": "Autonomous durable retry and supported dead-letter recovery",
+      "result": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-ANNUAL-001",
+      "gate": "Future annual worker execution",
+      "result": "EXPECTED_RED_PRE_EXISTING"
+    },
+    {
+      "id": "P2-ATTESTATION-001",
+      "gate": "Real annual/hosted admission and recertification",
+      "result": "NOT_PROVEN"
+    },
+    {
+      "id": "P2-PROOF-001",
+      "gate": "Complete HTTP/control/release races, resource pressure and finite-timeout headroom",
+      "result": "NOT_PROVEN"
+    }
+  ],
+  "status": "PARTIAL",
+  "statusReason": "Required recovery/delivery/annual/runtime proof is incomplete; tests asserting a known defect do not close its capability.",
+  "production": {
+    "queried": false,
+    "mutated": false,
+    "deployed": false
+  },
+  "physical": "NOT_PROVEN",
+  "build11Implemented": false,
+  "tournamentReady": false
+}

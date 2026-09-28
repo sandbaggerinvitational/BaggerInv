@@ -1,0 +1,360 @@
+{
+  "fixture": "phase2-eligible-history-v1",
+  "source": "PHASE1_184b5c65_R139_FUNCTIONS",
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "fsync": false,
+  "syntheticReceipts": true,
+  "runtimeSubstitutions": [
+    "assert_production_scoring_runtime",
+    "assert_production_cutover_read_scope"
+  ],
+  "limitations": [
+    "Not legitimate late-R3 lifecycle issuance or hosted admission proof",
+    "Financial results are synthetic history, not payout correctness proof",
+    "Short warm rollback samples are diagnostic only, not production percentiles"
+  ],
+  "measurements": [
+    {
+      "scale": 1,
+      "variant": "none",
+      "eligible": false,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": false,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 10.675,
+        "medianMs": 10.903,
+        "maxMs": 17.956
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 26.855,
+        "medianMs": 26.939,
+        "maxMs": 39.487
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "current_compatible",
+      "eligible": true,
+      "compatibleBeforeScore": true,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": true,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 72.62,
+        "medianMs": 73.703,
+        "maxMs": 80.803
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 120.716,
+        "medianMs": 122.35,
+        "maxMs": 150.188
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "current_incompatible_consumed",
+      "eligible": true,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": true,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 66.027,
+        "medianMs": 67.001,
+        "maxMs": 76.794
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 121.822,
+        "medianMs": 122.406,
+        "maxMs": 142.314
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "current_incompatible_financial",
+      "eligible": true,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": true,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 55.129,
+        "medianMs": 60.185,
+        "maxMs": 156.3
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 98.879,
+        "medianMs": 100.327,
+        "maxMs": 144.269
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "stale_source",
+      "eligible": true,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": true,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 89.614,
+        "medianMs": 91.667,
+        "maxMs": 97.88
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 115.478,
+        "medianMs": 118.728,
+        "maxMs": 136.017
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "stale_result_binding",
+      "eligible": false,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": false,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 11.183,
+        "medianMs": 11.346,
+        "maxMs": 16.921
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 26.641,
+        "medianMs": 27.686,
+        "maxMs": 39.489
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "superseded_result",
+      "eligible": false,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": false,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 10.165,
+        "medianMs": 10.416,
+        "maxMs": 15.866
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 25.6,
+        "medianMs": 25.694,
+        "maxMs": 38.779
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 1,
+      "variant": "multiple_receipts",
+      "eligible": true,
+      "compatibleBeforeScore": true,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": true,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 93.523,
+        "medianMs": 94.996,
+        "maxMs": 110.856
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 139.975,
+        "medianMs": 154.096,
+        "maxMs": 159.422
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "none",
+      "eligible": false,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": false,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 10.121,
+        "medianMs": 10.61,
+        "maxMs": 17.502
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 24.263,
+        "medianMs": 24.774,
+        "maxMs": 39.07
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "current_compatible",
+      "eligible": true,
+      "compatibleBeforeScore": true,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": true,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 289.278,
+        "medianMs": 291.469,
+        "maxMs": 329.524
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 483.428,
+        "medianMs": 519.577,
+        "maxMs": 528.552
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "current_incompatible_consumed",
+      "eligible": true,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": true,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 266.618,
+        "medianMs": 271.612,
+        "maxMs": 279.005
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 431.134,
+        "medianMs": 448.854,
+        "maxMs": 543.352
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "current_incompatible_financial",
+      "eligible": true,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": true,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 190.941,
+        "medianMs": 191.679,
+        "maxMs": 192.82
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 382.09,
+        "medianMs": 384.599,
+        "maxMs": 410.979
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "stale_source",
+      "eligible": true,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": true,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 260.446,
+        "medianMs": 264.079,
+        "maxMs": 296.954
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 426.945,
+        "medianMs": 427.989,
+        "maxMs": 445.94
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "stale_result_binding",
+      "eligible": false,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": false,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 8.51,
+        "medianMs": 8.74,
+        "maxMs": 13.816
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 21.401,
+        "medianMs": 21.812,
+        "maxMs": 32.514
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "superseded_result",
+      "eligible": false,
+      "compatibleBeforeScore": false,
+      "helperEnteredHistoricalFingerprint": false,
+      "scoreEnteredHistoricalFingerprint": false,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 8.668,
+        "medianMs": 8.878,
+        "maxMs": 13.951
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 21.284,
+        "medianMs": 21.296,
+        "maxMs": 32.756
+      },
+      "measuredAcceptedScoreSamples": 3
+    },
+    {
+      "scale": 10,
+      "variant": "multiple_receipts",
+      "eligible": true,
+      "compatibleBeforeScore": true,
+      "helperEnteredHistoricalFingerprint": true,
+      "scoreEnteredHistoricalFingerprint": true,
+      "compatibility": {
+        "sampleCount": 3,
+        "minMs": 365.549,
+        "medianMs": 392.717,
+        "maxMs": 470.42
+      },
+      "score": {
+        "sampleCount": 3,
+        "minMs": 596.78,
+        "medianMs": 606.761,
+        "maxMs": 614.643
+      },
+      "measuredAcceptedScoreSamples": 3
+    }
+  ],
+  "evidenceCapture": {
+    "source": "/private/tmp/bagger-phase2-notes/eligible-history-baseline.tap",
+    "sha256": "0a63e77b386ed97ba375e41199859a5def55a8940d5adc87eefb129e7e8058ca",
+    "extractedAt": "2026-09-28T12:53:04.012158+00:00",
+    "transformation": "Exact parsed diagnostic object plus this provenance; no result reinterpretation."
+  }
+}

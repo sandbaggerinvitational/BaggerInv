@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "approval": "CANDIDATE_ONLY_PHASE2_PARTIAL",
+  "artifacts": [
+    {
+      "file": "benchmark-before.json",
+      "sha256": "d066e38fc5d97f0895aef2770362744b63cb11868295b4653c03a8ed3f6c5118",
+      "role": "COMMON_BEFORE"
+    },
+    {
+      "file": "benchmark-after.json",
+      "sha256": "75a9031c9640dd1a8c42dd635414d4ef71921c4ddb41df57fbc53293d3d08183",
+      "role": "COMMON_AFTER"
+    },
+    {
+      "file": "eligible-history-before.json",
+      "sha256": "e25b01ef081a21a75b7a7d0be56adb0f8e169b146cb7af33bf995e4b6aa27159",
+      "role": "ELIGIBLE_BEFORE"
+    },
+    {
+      "file": "eligible-history-after.json",
+      "sha256": "2102117d71e9b104b7197feda5185b743b3bfbb60ceffff2631f1d7eb0c7c8db",
+      "role": "ELIGIBLE_AFTER"
+    },
+    {
+      "file": "lock-duration-before.json",
+      "sha256": "25e99b5e32744d25b508597caed60228290bd0bf14a9b416bef406b8f8aedd79",
+      "role": "LOCK_BEFORE"
+    },
+    {
+      "file": "lock-duration-after.json",
+      "sha256": "49a114d8ebf346db59a32d78925f9b3791a627a5a3a813168b12798f35a0ed23",
+      "role": "LOCK_AFTER"
+    }
+  ],
+  "notProduction": true
+}

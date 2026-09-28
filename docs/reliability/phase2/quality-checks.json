@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-09-28T14:02:14.356602+00:00",
+  "requiredArtifacts": 29,
+  "requiredArtifactsPresent": true,
+  "internalLinks": "PASS",
+  "jsonParse": "PASS",
+  "sourceAndArtifactHashes": "PASS",
+  "candidateIdentity": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+  "phase1HistoricalEvidenceUnchanged": true,
+  "nativeAndApplicationShippingSourceUnchanged": true,
+  "secretPatternHits": 0,
+  "secretScanFiles": 153,
+  "secretScanLimit": "Bounded credential pattern scan, not universal secret detection",
+  "sourceScope": "MIGRATION_TESTS_BENCHMARKS_RELIABILITY_DOCS_ONLY",
+  "overallCertification": "PARTIAL",
+  "automatedPerformanceGate": "PASS_SCOPED_LOCAL_ONLY",
+  "broadRegressionComparison": "REVIEW_REQUIRED_DOCUMENTED_EXISTING_FREEZE_DIAGNOSTIC",
+  "production": {
+    "queried": false,
+    "mutated": false,
+    "deployed": false
+  },
+  "physical": "NOT_PROVEN"
+}

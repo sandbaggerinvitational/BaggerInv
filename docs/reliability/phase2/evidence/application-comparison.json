@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 2,
+  "result": "REVIEW_REQUIRED",
+  "baselineCounts": {
+    "tests": 4153,
+    "pass": 4127,
+    "fail": 26,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "duration_ms": 172490.778583
+  },
+  "candidateCounts": {
+    "tests": 4153,
+    "pass": 4127,
+    "fail": 26,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "duration_ms": 166480.823083
+  },
+  "newFailureNames": [],
+  "resolvedFailureNames": [],
+  "sameFailureNames": [
+    "CLI writes one immutable local artifact and never calls a provider",
+    "Clear scope remains limited to Calcutta; other Director and participant files unchanged from Release 132",
+    "Email provider flow remains byte-identical apart from optional enrollment proof issuance",
+    "Google-backed secondary failures are isolated from the core route",
+    "OTP route is no-signup, six-digit, scoped, durably audited, and returns generic unapproved behavior",
+    "PN-1 preserves Production authority, dispatch, fencing, scoring and post-commit implementations byte-for-byte",
+    "PN-2 web/PWA, Production authority, Preview safeguards and canonical persistence are unchanged",
+    "Phase 2 public pages consume the shared scorecard analytics service",
+    "Players uses one compact accessible Round and Rank By control surface",
+    "Release 133 runtime is byte-preserved except the authorized additive recovery SQL",
+    "Release 134 application, guards, Calcutta, Odds and participant runtime remain byte-identical",
+    "SSR session, logout, shadow comparison, and participant context stay Passport-authoritative",
+    "Supabase verification distinguishes rejected tokens from provider outages",
+    "analytics implementation digest requires an explicit version update",
+    "current Calcutta candidate preserves every runtime blob except the exact approved analytics identity update",
+    "every compiled mobile route denies Production before Auth, database, provider or worker transport",
+    "historical READY deployments with the safe-method Google writer are exact",
+    "historical writer-scope evidence is generated from exact retained inputs",
+    "native certification receives only a server-verified Auth UUID and confirmed email",
+    "participant navigation uses one fixed safe-area-aware native shell",
+    "phone candidate introduces no identity tables or Director mutation and keeps service-only grants",
+    "phone lifecycle dispatch is individually enumerated for frozen and future Production, with no Director namespace",
+    "polish is presentation-only and does not add a leaderboard request path",
+    "routes report feedback only after canonical completion; no client-selected receipt",
+    "the provider contract uses one exact all-method path OR group",
+    "v4 credential confinement classifies the complete provider and environment inventories"
+  ],
+  "changedDiagnostics": [
+    "current Calcutta candidate preserves every runtime blob except the exact approved analytics identity update"
+  ],
+  "coverageChanged": false,
+  "selectionCount": 493,
+  "selectionHashMatches": true,
+  "limitation": "Existing failures remain failures. Changed diagnostics require review; no blanket pre-existing exemption."
+}

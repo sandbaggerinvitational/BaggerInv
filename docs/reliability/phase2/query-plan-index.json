@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 1,
+  "plans": [
+    {
+      "artifact": "evidence/eligible-plan-after-10x-current_compatible.json",
+      "sha256": "7cf48492ef8f5e91862f695a181968bc49a0cd4586bfeeba960e9e6d1f6905d6",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-10x-current_incompatible_consumed.json",
+      "sha256": "16b59e3089ccd27b5a054fdfe18c08a9434e60de81ea30c25354aa88b400be89",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-10x-current_incompatible_financial.json",
+      "sha256": "df997cc0f431ab5d0a64629314d3e1f4f769dcf287084ecee9725dff4eaf2695",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-10x-multiple_receipts.json",
+      "sha256": "b2dddab13d764d4f02ef7116e1266ff49b4dffa58a2620168ccdfa1d9c2d3335",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-10x-none.json",
+      "sha256": "fbc9131f423702cf5bfd7db84570aab23a16b8c47f3dc863d4e45442bc117421",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-10x-stale_result_binding.json",
+      "sha256": "3a84c9abf1448e19bf7d4d2b0f717aa0120d9207504d638874973ea96024969b",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-10x-stale_source.json",
+      "sha256": "087c40b2111d34577a31c0046f60127f70332943b8019dd431c64e51d39b8e70",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-10x-superseded_result.json",
+      "sha256": "12818c8b35eafae36bf038b63dcaa10b7ef89fd614f4ada04c5f5f947e34121a",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-1x-current_compatible.json",
+      "sha256": "916f4545af2cabc815aac6a4266289fc475be8a71616780195cdcefef5c8450e",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-1x-current_incompatible_consumed.json",
+      "sha256": "aab091009417d72a5794617625f3e1ae3f1f23adaca2020930d69c766b558f20",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-1x-current_incompatible_financial.json",
+      "sha256": "bd7efebfff6812ebc87cd2725c5d512b13bcc78c0c8c007fe8233c0133fe856a",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-1x-multiple_receipts.json",
+      "sha256": "3f8bdc6ef91d0ad22890877563f5d530aca5e18179f9dfbf1e1469a31aa03669",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-1x-none.json",
+      "sha256": "ff8db005b97f5347e89b34c68dcc1a36b2ddd8404cd7ea8d3488a23671e9d1c9",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-1x-stale_result_binding.json",
+      "sha256": "5c144ab6f932f0e4bda2483321dc03c2f59ce34dcd272da89c27d5b3bfb8aca4",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-1x-stale_source.json",
+      "sha256": "8a76ef0b163c7cbcb8ef7072fdd182c100c9dd607c2099df232c866456ff310c",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-after-1x-superseded_result.json",
+      "sha256": "e11d6fbb60349ed9796ec47da874885fd598a8226cdee11eca068a30020d3596",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-10x-current_compatible.json",
+      "sha256": "0e6b2ae05adc7d533cc10efe215b8f7db686a70276bc8e0ae918231e93e1ce13",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-10x-current_incompatible_consumed.json",
+      "sha256": "5dce7594cd93516d156935cfa6b6ef567e8422d5ee4675470126af7165f6cea7",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-10x-current_incompatible_financial.json",
+      "sha256": "b197aee18fd1c7d713db7337811aa465633d670e9f8c8bbcd50c3103da71d571",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-10x-multiple_receipts.json",
+      "sha256": "f55f50e7d4ea096e5f7c9939412f0cae4264eb5f7cfbbdaaf0750b436230badc",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-10x-none.json",
+      "sha256": "7fa257ca098bb0c6318647be2ef1adb6e71d31444a3a8d20e69a8fe5e6f8d2f6",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-10x-stale_result_binding.json",
+      "sha256": "c3af04deaa5bcb23239d9f2d108dce516784f0b58cda9238c4bc7b03776df738",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-10x-stale_source.json",
+      "sha256": "a538d68564d99c6b7e0aedc0c64cd0805c5a1fa29016569aa6aee95aff10ebd4",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-10x-superseded_result.json",
+      "sha256": "c3366160235955261eca6fb6ca26825b88d9240d67f465fcb8d411802fa60b45",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-1x-current_compatible.json",
+      "sha256": "36878fbf0b3d757f4024ad18a868a0b2459055b6952bba3ed33475d1d53934f0",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-1x-current_incompatible_consumed.json",
+      "sha256": "ab79c59e4d6d6b1a862eef55077f8f40734973398a448890ca4718ce73dc72d0",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-1x-current_incompatible_financial.json",
+      "sha256": "43d50a0ad8063d619feef2c4b2d483cb92c49d8b2ae3e9502d76cd399a7a72b3",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-1x-multiple_receipts.json",
+      "sha256": "8c082a56e9b2eb39f7bf6d0b287547e8b0d66a197c1897e72dc20815ef18a556",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-1x-none.json",
+      "sha256": "9b373b4b5ca67d54363b780e12d8cf655d4fbb5e29c413b6c14c9b6973c962c4",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-1x-stale_result_binding.json",
+      "sha256": "e65403b95454f69c8b560ec57aa6a29afbdcb6989afd451ae9f78cc5c7ea7ca2",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-1x-stale_source.json",
+      "sha256": "1813fd4584f08d41a46b026227f56e0fea66040b8bc872c1e69e2bbda18a910b",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/eligible-plan-before-1x-superseded_result.json",
+      "sha256": "2721bc5847914567e703b67dbad89bae3061890033436f05ce004dd849844726",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/plans-after-10x.json",
+      "sha256": "400aab879234998ec55601201aba7745ded915d3194aec8c81b9f553a3ac845e",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/plans-after-1x.json",
+      "sha256": "00368345b88840a5973f3d6a93bcb2eb7092b62114eaef303950d7d813924fc0",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/plans-after-2x.json",
+      "sha256": "408907afbd102fdb1b35ae7af738da67ccb279193c91c4b84795750bbfb9c810",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/plans-after-5x.json",
+      "sha256": "02144527729267ecd7fecc1672c9c007bc05e46100ce88d6c003d3e3402e4b06",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/plans-before-10x.json",
+      "sha256": "33963d3932700fecfa3c8509ce46637a30b1d4dbd07804cac6ddda1ab556c27c",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/plans-before-1x.json",
+      "sha256": "037f78b12448a51c26830d7b8eea2ef7a9fad7d04f65bad95bd29f5a1661fdcb",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/plans-before-2x.json",
+      "sha256": "779d5b042d441a617f07bbdd55ab8af7fb06b07d8ff83551684b2e83ec4598fb",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    },
+    {
+      "artifact": "evidence/plans-before-5x.json",
+      "sha256": "78795e50acd718391c27290b2acdb95c89e0b5567de5d2577482a2ba85ade40a",
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "format": "DEDUPLICATED_NESTED_QUERY_SHAPES_AND_REPRESENTATIVE_PLANS"
+    }
+  ],
+  "additional": [
+    "evidence/fence-history-experiment.json",
+    "evidence/fence-history-final.json"
+  ],
+  "limitations": [
+    "Nested plans overlap; no sum of distinct rows/time",
+    "Zero-row SeqScan is not evidence of historical cost"
+  ]
+}

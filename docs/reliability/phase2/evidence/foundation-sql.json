@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "mode": "sql",
+  "startedAt": "2026-09-28T13:50:04.201Z",
+  "endedAt": "2026-09-28T13:51:30.990Z",
+  "baseSha": "184b5c65a8e63784e1af8d38121fa2e16a015628",
+  "environment": "LOCAL_ONLY",
+  "remoteNetwork": "DENIED_AT_NET_TLS_SOCKET",
+  "production": false,
+  "files": [
+    {
+      "file": "test/reliability-sql-never-again-postgres.integration.test.mjs",
+      "sha256": "4a99c220569f1c6f57c1053e35f2b4f51124e3d0e8295e2fea49d1c118064787"
+    },
+    {
+      "file": "test/reliability-score-history-postgres.integration.test.mjs",
+      "sha256": "b59a4829c5ac0f88814a958e261e373b8218cdb74732a3714bbd8b54cfe9d6d2"
+    },
+    {
+      "file": "test/reliability-correlation-postgres.integration.test.mjs",
+      "sha256": "850f76f343ee57a4fa0365a0b0edc97b77a0526f318fd08a6c81c68b8dd04b9b"
+    }
+  ],
+  "exitCode": 0,
+  "error": null,
+  "counts": {
+    "tests": 3,
+    "pass": 3,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "result": "PASS",
+  "rawPath": "/private/tmp/bagger-phase2-sql.log",
+  "rawSha256": "a7fc4c6c80f5cf162f3fc6491ba55bf57db3fc769e5dc7a0336564a612c80c5a",
+  "limitations": [
+    "Unchanged Phase1 SQL fixtures install baseline schema; Phase2 candidate proofs are separate."
+  ]
+}

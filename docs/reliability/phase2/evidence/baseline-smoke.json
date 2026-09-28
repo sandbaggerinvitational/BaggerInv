@@ -1,0 +1,3629 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-28T12:25:33.318Z",
+  "release": 139,
+  "sha": "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6",
+  "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+  "productionClone": false,
+  "fixtureLabel": "Production-shaped synthetic, not a Production clone",
+  "samplesPerOperation": 2,
+  "semanticValidation": "EVERY_TIMED_RESULT_VALIDATED_AFTER_TIMING",
+  "p99Policy": "null with INSUFFICIENT_SAMPLE unless samples >= 100",
+  "substitutions": [
+    "Hosted scoring admission/provider attestation replaced by a fail-closed local scope assertion.",
+    "Hosted maintenance release capability proof replaced by a fail-closed local read-scope assertion."
+  ],
+  "processorBoundary": "Side-game calculation rows measure participant read or SQL input assembly only; claim, JavaScript calculate, and complete are separate and are not represented as end-to-end timings.",
+  "scales": [
+    {
+      "scale": 1,
+      "expectedCounts": {
+        "tournamentPlayers": 24,
+        "matches": 24,
+        "matchParticipants": 72,
+        "courseHoles": 54,
+        "matchHoles": 432,
+        "holeScores": 380,
+        "scoreMutations": 327,
+        "scoreRevisionHistory": 327,
+        "googleOutboxEvents": 285,
+        "setupReceipts": 48,
+        "setupAuditEvents": 48,
+        "normalReleaseRebindings": 137,
+        "calcuttaConfigurationRevisions": 2,
+        "calcuttaAuctionRevisions": 37,
+        "calcuttaPublicationRevisions": 41,
+        "calcuttaJobs": 745,
+        "calcuttaResults": 407,
+        "netSkinsConfigurationRevisions": 3,
+        "netSkinsJobs": 569,
+        "netSkinsResults": 2,
+        "oddsInputConfigurations": 2,
+        "oddsJobs": 10,
+        "oddsPublishedSnapshots": 7
+      },
+      "actualCounts": {
+        "matches": 24,
+        "oddsJobs": 10,
+        "holeScores": 380,
+        "matchHoles": 432,
+        "courseHoles": 54,
+        "calcuttaJobs": 745,
+        "netSkinsJobs": 569,
+        "setupReceipts": 48,
+        "scoreMutations": 327,
+        "calcuttaResults": 407,
+        "netSkinsResults": 2,
+        "setupAuditEvents": 48,
+        "matchParticipants": 72,
+        "tournamentPlayers": 24,
+        "googleOutboxEvents": 285,
+        "scoreRevisionHistory": 327,
+        "oddsPublishedSnapshots": 7,
+        "normalReleaseRebindings": 137,
+        "oddsInputConfigurations": 2,
+        "calcuttaAuctionRevisions": 37,
+        "calcuttaPublicationRevisions": 41,
+        "calcuttaConfigurationRevisions": 2,
+        "netSkinsConfigurationRevisions": 3
+      },
+      "resourcesBefore": {
+        "observedAt": "2026-09-28T12:25:56.854Z",
+        "hostLoadAverage": [
+          2.96240234375,
+          3.65283203125,
+          3.58935546875
+        ],
+        "hostFreeMemoryBytes": 153894912,
+        "database": {
+          "commits": 54,
+          "backends": 1,
+          "blocksHit": 2349053,
+          "deadlocks": 0,
+          "rollbacks": 0,
+          "sizeBytes": 41039539,
+          "blocksRead": 893,
+          "statsReset": null,
+          "trackIoTiming": "off",
+          "temporaryBytes": 0,
+          "blockReadTimeMs": 0,
+          "blockWriteTimeMs": 0
+        },
+        "limitations": [
+          "Cumulative database counters can lag; no subtraction across databases.",
+          "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+          "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+          "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+        ]
+      },
+      "resourcesAfter": {
+        "observedAt": "2026-09-28T12:26:02.715Z",
+        "hostLoadAverage": [
+          3.20556640625,
+          3.69140625,
+          3.60302734375
+        ],
+        "hostFreeMemoryBytes": 239583232,
+        "database": {
+          "commits": 120,
+          "backends": 1,
+          "blocksHit": 3715557,
+          "deadlocks": 0,
+          "rollbacks": 80,
+          "sizeBytes": 51361459,
+          "blocksRead": 1429,
+          "statsReset": null,
+          "trackIoTiming": "off",
+          "temporaryBytes": 0,
+          "blockReadTimeMs": 0,
+          "blockWriteTimeMs": 0
+        },
+        "limitations": [
+          "Cumulative database counters can lag; no subtraction across databases.",
+          "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+          "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+          "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+        ]
+      },
+      "archivedCounts": {
+        "archivedYears": 1,
+        "archivedRounds": 3,
+        "archivedScores": 432,
+        "archivedMatches": 24,
+        "archivedPlayers": 24,
+        "archivedMatchHoles": 432,
+        "archivedParticipants": 72
+      },
+      "preparationArchivedCounts": {
+        "archivedYears": 1,
+        "archivedRounds": 3,
+        "archivedScores": 432,
+        "archivedMatches": 24,
+        "archivedPlayers": 24,
+        "archivedMatchHoles": 432,
+        "archivedParticipants": 72
+      },
+      "preparationFixture": {
+        "variant": "SYNTHETIC_PRE_SIDE_GAME_TEMPLATE",
+        "installedDependencyGuard": "UNCHANGED",
+        "sideGameDependencies": [],
+        "selection": "CLONED_BEFORE_SCALED_SIDE_GAME_HISTORY_SEED"
+      },
+      "operations": [
+        {
+          "id": "score-write",
+          "label": "canonical score write",
+          "coverage": "ACTUAL_RPC_ROLLBACK",
+          "sql": "select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"90000000-0000-4000-8000-000000000001\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb)",
+          "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": "ACCEPTED",
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 21.242,
+            "medianMs": 21.242,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 32.779
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 32.779,
+            "Actual Total Time": 32.779,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 9580,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 5,
+            "Shared Written Blocks": 5,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-score-write",
+            "operation": "canonical score write",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 21.242,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 32.779,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 21.242,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC_ROLLBACK",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "score-readback",
+          "label": "score canonical readback",
+          "coverage": "ACTUAL_RPC",
+          "sql": "select public.read_production_scoring_authority('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"mode\":\"SCORECARD\",\"match_id\":\"2026-R3-12\"}'::jsonb)",
+          "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": null,
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 0.12,
+            "medianMs": 0.12,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 1.359
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 1.277,
+            "Actual Total Time": 1.277,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 904,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-score-readback",
+            "operation": "score canonical readback",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 0.12,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 1.359,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 0.12,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "participant-today",
+          "label": "participant Today",
+          "coverage": "ACTUAL_RPC",
+          "sql": "select public.read_production_scoring_participant_context('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1}'::jsonb)",
+          "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": null,
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 0.298,
+            "medianMs": 0.298,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 2.263
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 2.212,
+            "Actual Total Time": 2.212,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 1771,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-participant-today",
+            "operation": "participant Today",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 0.298,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 2.263,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 0.298,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "matches",
+          "label": "Matches",
+          "coverage": "ACTUAL_RPC",
+          "sql": "select public.read_production_scoring_authority('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"mode\":\"CURRENT_STATE\"}'::jsonb)",
+          "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": null,
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 4.978,
+            "medianMs": 4.978,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 6.714
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 5.392,
+            "Actual Total Time": 5.392,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 1778,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-matches",
+            "operation": "Matches",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 4.978,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 6.714,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 4.978,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "leaders",
+          "label": "Leaders",
+          "coverage": "ACTUAL_SQL_FUNCTION",
+          "sql": "select public.read_leaderboards_core_view('2026')",
+          "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": null,
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 6.226,
+            "medianMs": 6.226,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 8.814
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 8.013,
+            "Actual Total Time": 8.014,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 2920,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-leaders",
+            "operation": "Leaders",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 6.226,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 8.814,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 6.226,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_SQL_FUNCTION",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "prepare-match",
+          "label": "Prepare match",
+          "coverage": "ACTUAL_RPC_ROLLBACK_RESULT_CLASSIFIED",
+          "fixtureVariant": "SYNTHETIC_PRE_SIDE_GAME_TEMPLATE",
+          "setupSql": "\n  set local session_replication_role=replica;\n  delete from scoring_authority.finalized_scorecard_snapshots where match_id like '2026-R3-%';\n  delete from scoring_authority.score_revision_history where match_id like '2026-R3-%';\n  delete from scoring_authority.score_mutations where match_id like '2026-R3-%';\n  delete from scoring_authority.google_outbox_events where match_id like '2026-R3-%';\n  delete from scoring_authority.audit_events where match_id like '2026-R3-%';\n  delete from scoring_authority.hole_scores where match_id like '2026-R3-%';\n  update scoring_authority.matches set status='UPCOMING',scoring_locked=false,\n    permission_revision=1,match_revision=0,scored_holes=0,current_hole=0,\n    holes_remaining=18,team_1_holes_won=0,team_2_holes_won=0,\n    running_result='Scheduled',result_winner='',clinched=false,\n    scorecard_complete=false,unresolved_mutations=0,finalized_at=null\n  where round_number=3 and tournament_id='2026';\n  update scoring_authority.scoring_permissions set can_score=false,\n    permission_revision=1,revoked_at=clock_timestamp() where match_id like '2026-R3-%';\n  update scoring_authority.scoring_snapshots set\n    handicap_revision_id=(select revision_id from scoring_authority.handicap_revision_current\n      where tournament_id='2026')\n  where snapshot_id in(select scoring_snapshot_id from scoring_authority.matches\n    where tournament_id='2026' and round_number=3);\n  update scoring_authority.match_participants set\n    handicap_revision_id=(select revision_id from scoring_authority.handicap_revision_current\n      where tournament_id='2026')\n  where match_id like '2026-R3-%';\n  set local session_replication_role=origin;",
+          "sql": "select public.mutate_production_tournament_setup_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"player_id\":\"P01\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000001\",\"role\":\"DIRECTOR\"},\"contract_version\":\"production-tournament-setup-v1\",\"actor_player_id\":\"P01\",\"actor_auth_user_id\":\"10000000-0000-4000-8000-000000000001\",\"operation\":\"PREPARE_SCORING_CONTEXT\",\"expected_revision\":1,\"operation_request_id\":\"90000000-0000-4000-8000-000000000006\",\"request_payload_hash\":\"6666666666666666666666666666666666666666666666666666666666666666\",\"scoring_context\":{\"match_id\":\"2026-R3-12\"}}'::jsonb)",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": "TOURNAMENT_SETUP_UPDATED",
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 26.288,
+            "medianMs": 26.288,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 38.106
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 37.894,
+            "Actual Total Time": 37.894,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 13246,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-prepare-match",
+            "operation": "Prepare match",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_PRE_SIDE_GAME_TEMPLATE",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 26.288,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 38.106,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 26.288,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC_ROLLBACK_RESULT_CLASSIFIED",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "round-open",
+          "label": "Open Round",
+          "coverage": "ACTUAL_RPC_ROLLBACK_RESULT_CLASSIFIED",
+          "fixtureVariant": "SYNTHETIC_R3_RESET_PRISTINE",
+          "sql": "select public.mutate_production_round_scoring_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"player_id\":\"P01\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000001\",\"role\":\"DIRECTOR\"},\"round\":3,\"operation\":\"OPEN\",\"operation_id\":\"90000000-0000-4000-8000-000000000007\"}'::jsonb || jsonb_build_object('expected_fingerprint',production_control.round_scoring_state_v1(3)->>'fingerprint'))",
+          "setupSql": "\n  set local session_replication_role=replica;\n  delete from scoring_authority.finalized_scorecard_snapshots where match_id like '2026-R3-%';\n  delete from scoring_authority.score_revision_history where match_id like '2026-R3-%';\n  delete from scoring_authority.score_mutations where match_id like '2026-R3-%';\n  delete from scoring_authority.google_outbox_events where match_id like '2026-R3-%';\n  delete from scoring_authority.audit_events where match_id like '2026-R3-%';\n  delete from scoring_authority.hole_scores where match_id like '2026-R3-%';\n  update scoring_authority.matches set status='UPCOMING',scoring_locked=false,\n    permission_revision=1,match_revision=0,scored_holes=0,current_hole=0,\n    holes_remaining=18,team_1_holes_won=0,team_2_holes_won=0,\n    running_result='Scheduled',result_winner='',clinched=false,\n    scorecard_complete=false,unresolved_mutations=0,finalized_at=null\n  where round_number=3 and tournament_id='2026';\n  update scoring_authority.scoring_permissions set can_score=false,\n    permission_revision=1,revoked_at=clock_timestamp() where match_id like '2026-R3-%';\n  update scoring_authority.scoring_snapshots set\n    handicap_revision_id=(select revision_id from scoring_authority.handicap_revision_current\n      where tournament_id='2026')\n  where snapshot_id in(select scoring_snapshot_id from scoring_authority.matches\n    where tournament_id='2026' and round_number=3);\n  update scoring_authority.match_participants set\n    handicap_revision_id=(select revision_id from scoring_authority.handicap_revision_current\n      where tournament_id='2026')\n  where match_id like '2026-R3-%';\n  set local session_replication_role=origin;",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": null,
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 258.067,
+            "medianMs": 258.067,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 274.454
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.52,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 272.458,
+            "Actual Total Time": 272.458,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 69864,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 90,
+            "Shared Written Blocks": 90,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-round-open",
+            "operation": "Open Round",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_R3_RESET_PRISTINE",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 258.067,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 274.454,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 258.067,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC_ROLLBACK_RESULT_CLASSIFIED",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "round-lock",
+          "label": "Lock Round",
+          "coverage": "ACTUAL_RPC_ROLLBACK_RESULT_CLASSIFIED",
+          "fixtureVariant": "SYNTHETIC_CURRENT_LIVE_MATCHES",
+          "sql": "select public.mutate_production_round_scoring_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"player_id\":\"P01\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000001\",\"role\":\"DIRECTOR\"},\"round\":3,\"operation\":\"LOCK\",\"operation_id\":\"90000000-0000-4000-8000-000000000008\"}'::jsonb || jsonb_build_object('expected_fingerprint',production_control.round_scoring_state_v1(3)->>'fingerprint'))",
+          "setupSql": "\n  update scoring_authority.scoring_snapshots set\n    handicap_revision_id=(select revision_id from scoring_authority.handicap_revision_current\n      where tournament_id='2026')\n  where snapshot_id in(select scoring_snapshot_id from scoring_authority.matches\n    where tournament_id='2026' and round_number=3);\n  update scoring_authority.match_participants set\n    handicap_revision_id=(select revision_id from scoring_authority.handicap_revision_current\n      where tournament_id='2026')\n  where match_id like '2026-R3-%';",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": null,
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 62.092,
+            "medianMs": 62.092,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 80.732
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.52,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 81.366,
+            "Actual Total Time": 81.366,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 21545,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 11,
+            "Shared Written Blocks": 13,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-round-lock",
+            "operation": "Lock Round",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_LIVE_MATCHES",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 62.092,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 80.732,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 62.092,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC_ROLLBACK_RESULT_CLASSIFIED",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "round-resume",
+          "label": "Resume Round",
+          "coverage": "ACTUAL_RPC_ROLLBACK_RESULT_CLASSIFIED",
+          "fixtureVariant": "SYNTHETIC_R3_ACTUAL_OPEN_THEN_LOCK",
+          "sql": "select public.mutate_production_round_scoring_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"player_id\":\"P01\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000001\",\"role\":\"DIRECTOR\"},\"round\":3,\"operation\":\"RESUME\",\"operation_id\":\"90000000-0000-4000-8000-000000000009\"}'::jsonb || jsonb_build_object('expected_fingerprint',production_control.round_scoring_state_v1(3)->>'fingerprint'))",
+          "setupSql": "\n  set local session_replication_role=replica;\n  delete from scoring_authority.finalized_scorecard_snapshots where match_id like '2026-R3-%';\n  delete from scoring_authority.score_revision_history where match_id like '2026-R3-%';\n  delete from scoring_authority.score_mutations where match_id like '2026-R3-%';\n  delete from scoring_authority.google_outbox_events where match_id like '2026-R3-%';\n  delete from scoring_authority.audit_events where match_id like '2026-R3-%';\n  delete from scoring_authority.hole_scores where match_id like '2026-R3-%';\n  update scoring_authority.matches set status='UPCOMING',scoring_locked=false,\n    permission_revision=1,match_revision=0,scored_holes=0,current_hole=0,\n    holes_remaining=18,team_1_holes_won=0,team_2_holes_won=0,\n    running_result='Scheduled',result_winner='',clinched=false,\n    scorecard_complete=false,unresolved_mutations=0,finalized_at=null\n  where round_number=3 and tournament_id='2026';\n  update scoring_authority.scoring_permissions set can_score=false,\n    permission_revision=1,revoked_at=clock_timestamp() where match_id like '2026-R3-%';\n  update scoring_authority.scoring_snapshots set\n    handicap_revision_id=(select revision_id from scoring_authority.handicap_revision_current\n      where tournament_id='2026')\n  where snapshot_id in(select scoring_snapshot_id from scoring_authority.matches\n    where tournament_id='2026' and round_number=3);\n  update scoring_authority.match_participants set\n    handicap_revision_id=(select revision_id from scoring_authority.handicap_revision_current\n      where tournament_id='2026')\n  where match_id like '2026-R3-%';\n  set local session_replication_role=origin;\n          do $bench$ begin\n            perform public.mutate_production_round_scoring_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"player_id\":\"P01\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000001\",\"role\":\"DIRECTOR\"},\"round\":3,\"operation\":\"OPEN\",\"operation_id\":\"90000000-0000-4000-8000-000000000098\"}'::jsonb || jsonb_build_object('expected_fingerprint',production_control.round_scoring_state_v1(3)->>'fingerprint'));\n            perform public.mutate_production_round_scoring_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"player_id\":\"P01\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000001\",\"role\":\"DIRECTOR\"},\"round\":3,\"operation\":\"LOCK\",\"operation_id\":\"90000000-0000-4000-8000-000000000097\"}'::jsonb || jsonb_build_object('expected_fingerprint',production_control.round_scoring_state_v1(3)->>'fingerprint'));\n          end $bench$;",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": null,
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 165.003,
+            "medianMs": 165.003,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 167.837
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.52,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 166.517,
+            "Actual Total Time": 166.517,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 52991,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 45,
+            "Shared Written Blocks": 45,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-round-resume",
+            "operation": "Resume Round",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_R3_ACTUAL_OPEN_THEN_LOCK",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 165.003,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 167.837,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 165.003,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC_ROLLBACK_RESULT_CLASSIFIED",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "finalize",
+          "label": "Finalize",
+          "coverage": "ACTUAL_RPC_ROLLBACK_RESULT_CLASSIFIED",
+          "setupSql": "set local session_replication_role=replica;\n      update scoring_authority.matches set status='LIVE',scoring_locked=false\n      where match_id='2026-R3-1';\n      update scoring_authority.scoring_permissions set can_score=true,revoked_at=null\n      where match_id='2026-R3-1';\n      set local session_replication_role=origin;",
+          "sql": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"player_id\":\"P01\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000001\",\"role\":\"DIRECTOR\",\"match_id\":\"2026-R3-1\"},\"match_id\":\"2026-R3-1\",\"mutation_key\":\"90000000-0000-4000-8000-000000000010\"}'::jsonb || jsonb_build_object(\n    'expected_match_revision',(select match_revision from scoring_authority.matches where match_id='2026-R3-1'),\n    'authorization',('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"player_id\":\"P01\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000001\",\"role\":\"DIRECTOR\",\"match_id\":\"2026-R3-1\"},\"match_id\":\"2026-R3-1\",\"mutation_key\":\"90000000-0000-4000-8000-000000000010\"}'::jsonb->'authorization') || jsonb_build_object(\n      'permission_revision',(select permission_revision from scoring_authority.matches where match_id='2026-R3-1'))))",
+          "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": "FINALIZED",
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 14.744,
+            "medianMs": 14.744,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 36.861
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 16.32,
+            "Total Cost": 16.59,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 143.809,
+            "Actual Total Time": 143.81,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 8285,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 3,
+            "Shared Written Blocks": 3,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Index Scan",
+                "Parent Relationship": "InitPlan",
+                "Subplan Name": "InitPlan 1",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Scan Direction": "Forward",
+                "Index Name": "matches_pkey",
+                "Relation Name": "matches",
+                "Alias": "matches",
+                "Startup Cost": 0.14,
+                "Total Cost": 8.16,
+                "Plan Rows": 1,
+                "Plan Width": 8,
+                "Actual Startup Time": 0.003,
+                "Actual Total Time": 0.004,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Index Cond": "(match_id = '2026-R3-1'::text)",
+                "Rows Removed by Index Recheck": 0,
+                "Shared Hit Blocks": 2,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              {
+                "Node Type": "Index Scan",
+                "Parent Relationship": "InitPlan",
+                "Subplan Name": "InitPlan 2",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Scan Direction": "Forward",
+                "Index Name": "matches_pkey",
+                "Relation Name": "matches",
+                "Alias": "matches_1",
+                "Startup Cost": 0.14,
+                "Total Cost": 8.16,
+                "Plan Rows": 1,
+                "Plan Width": 8,
+                "Actual Startup Time": 0.001,
+                "Actual Total Time": 0.001,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Index Cond": "(match_id = '2026-R3-1'::text)",
+                "Rows Removed by Index Recheck": 0,
+                "Shared Hit Blocks": 2,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            ]
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-finalize",
+            "operation": "Finalize",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 14.744,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 36.861,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 14.744,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC_ROLLBACK_RESULT_CLASSIFIED",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "net-skins-read",
+          "label": "Net Skins participant read",
+          "coverage": "ACTUAL_RPC",
+          "sql": "select public.read_production_net_skins_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1}}'::jsonb)",
+          "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": null,
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 13.564,
+            "medianMs": 13.564,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 20.307
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 20.281,
+            "Actual Total Time": 20.281,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 7912,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-net-skins-read",
+            "operation": "Net Skins participant read",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 13.564,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 20.307,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 13.564,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "net-skins-calculation",
+          "label": "Net Skins calculation path",
+          "coverage": "ACTUAL_SQL_INPUT_ASSEMBLY_ONLY",
+          "sql": "select production_control.full_net_tournament_v1('2026')",
+          "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+          "runnable": true,
+          "semantic": {
+            "contract": "SQL_FULL_NET_INPUT",
+            "ok": null,
+            "code": null,
+            "matchCount": 24
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 9.251,
+            "medianMs": 9.251,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 13.011
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 12.495,
+            "Actual Total Time": 12.495,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 3615,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-net-skins-calculation",
+            "operation": "Net Skins calculation path",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 9.251,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 13.011,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 9.251,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_SQL_INPUT_ASSEMBLY_ONLY",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "calcutta-read",
+          "label": "Calcutta participant read",
+          "coverage": "ACTUAL_RPC",
+          "sql": "select public.read_production_calcutta_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1}}'::jsonb)",
+          "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": null,
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 9.709,
+            "medianMs": 9.709,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 16.439
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 16.277,
+            "Actual Total Time": 16.277,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 5508,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-calcutta-read",
+            "operation": "Calcutta participant read",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 9.709,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 16.439,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 9.709,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "calcutta-calculation",
+          "label": "Calcutta calculation path",
+          "coverage": "ACTUAL_SQL_INPUT_ASSEMBLY_ONLY",
+          "sql": "select production_control.calcutta_v1_source_revision('2026')",
+          "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+          "runnable": true,
+          "semantic": {
+            "contract": "SQL_CALCUTTA_SOURCE",
+            "ok": null,
+            "code": null,
+            "matchCount": 24
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 9.261,
+            "medianMs": 9.261,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 13.41
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 12.097,
+            "Actual Total Time": 12.097,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 3884,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-calcutta-calculation",
+            "operation": "Calcutta calculation path",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 9.261,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 13.41,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 9.261,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_SQL_INPUT_ASSEMBLY_ONLY",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "odds-read",
+          "label": "Odds participant read",
+          "coverage": "ACTUAL_RPC",
+          "sql": "select public.read_production_odds_publication_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"operation\":\"READ_PRODUCTION_ODDS_PUBLICATION_V1\",\"contract_version\":\"production-odds-publication-v1\",\"canonical_domain\":\"https://baggerinv.com\",\"tournament_year\":2026}'::jsonb)",
+          "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": null,
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 0.333,
+            "medianMs": 0.333,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 2.972
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 2.826,
+            "Actual Total Time": 2.826,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 2038,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-odds-read",
+            "operation": "Odds participant read",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 0.333,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 2.972,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 0.333,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "odds-calculation",
+          "label": "Odds calculation path",
+          "coverage": "ACTUAL_RPC_INPUT_READ_ONLY",
+          "setupSql": "update production_control.cutover_activation_state set\n      state='SCORING_COMMITTED',current_authority='SUPABASE',\n      scoring_ingress_enabled=true,read_cutover_phase='ODDS_WAR_ROOM'\n      where scope_key='BAGGER_INV_PRODUCTION';\n      update production_control.odds_calculation_runtime set enabled=true,\n        operation_mode='PRODUCTION_CUTOVER',cutover_phase='ODDS_WAR_ROOM',\n        deployment_commit='7777777777777777777777777777777777777777',activation_revision=139,\n        candidate_hostname=null,configured_by='reliability-fixture',configured_at=now()\n      where scope_key='BAGGER_INV_PRODUCTION';\n      update production_control.worker_controls set enabled=true,\n        scheduler_installed=false,google_writes_allowed=false\n      where worker_name='ODDS_CALCULATION';\n      update production_control.resource_scope set scoring_authority='SUPABASE',\n        scoring_ingress_enabled=true,google_writes_enabled=false,workers_enabled=true,\n        odds_publication_authority='SUPABASE',odds_publication_enabled=true\n      where scope_key='BAGGER_INV_PRODUCTION';",
+          "sql": "select public.read_production_odds_calculation_inputs('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"operation_mode\":\"PRODUCTION_CUTOVER\",\"cutover_phase\":\"ODDS_WAR_ROOM\",\"worker_name\":\"ODDS_CALCULATION\",\"tournament_year\":2026,\"canonical_domain\":\"https://baggerinv.com\"}'::jsonb)",
+          "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": null,
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 7.213,
+            "medianMs": 7.213,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 9.992
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 9.098,
+            "Actual Total Time": 9.099,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 3207,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-odds-calculation",
+            "operation": "Odds calculation path",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 7.213,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 9.992,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 7.213,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC_INPUT_READ_ONLY",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        {
+          "id": "director-current",
+          "label": "Director readiness/current-state read",
+          "coverage": "ACTUAL_RPC",
+          "sql": "select public.read_production_director_operations_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"player_id\":\"P01\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000001\",\"role\":\"DIRECTOR\"},\"contract_version\":\"production-director-private-operations-v1\",\"operation\":\"READ_PRODUCTION_DIRECTOR_OPERATIONS_V1\"}'::jsonb)",
+          "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": null,
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 12.461,
+            "medianMs": 12.461,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 22.296
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 22.035,
+            "Actual Total Time": 22.035,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 8162,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-director-current",
+            "operation": "Director readiness/current-state read",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "SYNTHETIC_CURRENT_WITH_SCALED_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 12.461,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 22.296,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 12.461,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        }
+      ],
+      "comparison": {
+        "oldCompatibility": {
+          "id": "late-r3-compatibility-old",
+          "label": "old unbounded compatibility",
+          "coverage": "ACTUAL_SQL_FUNCTION",
+          "sql": "select production_control.late_r3_result_compatible_v1(\n    (select result_id from scoring_authority.calcutta_v1_result_revisions where is_current),\n    production_control.calcutta_v1_hash(production_control.calcutta_v1_source_revision('2026'))\n  )",
+          "runnable": true,
+          "semantic": {
+            "contract": "SQL_BOOLEAN",
+            "ok": null,
+            "code": null,
+            "booleanValue": false
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 31.617,
+            "medianMs": 31.617,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 39.16
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 38.08,
+            "Total Cost": 38.84,
+            "Plan Rows": 1,
+            "Plan Width": 1,
+            "Actual Startup Time": 38.145,
+            "Actual Total Time": 38.146,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 6896,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Seq Scan",
+                "Parent Relationship": "InitPlan",
+                "Subplan Name": "InitPlan 1",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Relation Name": "calcutta_v1_result_revisions",
+                "Alias": "calcutta_v1_result_revisions",
+                "Startup Cost": 0,
+                "Total Cost": 38.08,
+                "Plan Rows": 304,
+                "Plan Width": 16,
+                "Actual Startup Time": 0.043,
+                "Actual Total Time": 0.043,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Filter": "is_current",
+                "Rows Removed by Filter": 406,
+                "Shared Hit Blocks": 32,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            ]
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-late-r3-compatibility-old-oldCompatibility",
+            "operation": "old unbounded compatibility",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "R139_SYNTHETIC_CURRENT_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 31.617,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 39.16,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 31.617,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_SQL_FUNCTION",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        "fixedCompatibility": {
+          "id": "late-r3-compatibility-fixed",
+          "label": "fixed bounded compatibility",
+          "coverage": "ACTUAL_SQL_FUNCTION",
+          "sql": "select production_control.late_r3_result_compatible_v1(\n    (select result_id from scoring_authority.calcutta_v1_result_revisions where is_current),\n    production_control.calcutta_v1_hash(production_control.calcutta_v1_source_revision('2026'))\n  )",
+          "runnable": true,
+          "semantic": {
+            "contract": "SQL_BOOLEAN",
+            "ok": null,
+            "code": null,
+            "booleanValue": false
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 9.217,
+            "medianMs": 9.217,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 14.421
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 38.08,
+            "Total Cost": 38.84,
+            "Plan Rows": 1,
+            "Plan Width": 1,
+            "Actual Startup Time": 13.844,
+            "Actual Total Time": 13.845,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 3896,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Seq Scan",
+                "Parent Relationship": "InitPlan",
+                "Subplan Name": "InitPlan 1",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Relation Name": "calcutta_v1_result_revisions",
+                "Alias": "calcutta_v1_result_revisions",
+                "Startup Cost": 0,
+                "Total Cost": 38.08,
+                "Plan Rows": 304,
+                "Plan Width": 16,
+                "Actual Startup Time": 0.046,
+                "Actual Total Time": 0.046,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Filter": "is_current",
+                "Rows Removed by Filter": 406,
+                "Shared Hit Blocks": 32,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            ]
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-late-r3-compatibility-fixed-fixedCompatibility",
+            "operation": "fixed bounded compatibility",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "R139_SYNTHETIC_CURRENT_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 9.217,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 14.421,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 9.217,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_SQL_FUNCTION",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        "oldScore": {
+          "id": "score-write",
+          "label": "canonical score write",
+          "coverage": "ACTUAL_RPC_ROLLBACK",
+          "sql": "select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"90000000-0000-4000-8000-000000000001\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb)",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": "ACCEPTED",
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 67.35,
+            "medianMs": 67.35,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 80.305
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 79.73,
+            "Actual Total Time": 79.731,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 14017,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 6,
+            "Shared Written Blocks": 6,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-score-write-oldScore",
+            "operation": "canonical score write",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "R139_SYNTHETIC_CURRENT_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 67.35,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 80.305,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 67.35,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC_ROLLBACK",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        },
+        "fixedScore": {
+          "id": "score-write",
+          "label": "canonical score write",
+          "coverage": "ACTUAL_RPC_ROLLBACK",
+          "sql": "select public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"90000000-0000-4000-8000-000000000001\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb)",
+          "runnable": true,
+          "semantic": {
+            "contract": "RPC_OK_TRUE",
+            "ok": true,
+            "code": "ACCEPTED",
+            "failures": 0
+          },
+          "semanticValidation": {
+            "preflight": "PASSED",
+            "samples": "EVERY_SAMPLE_VALIDATED",
+            "validatedSamples": 2
+          },
+          "successCount": 2,
+          "failureCount": 0,
+          "measurements": {
+            "samples": 2,
+            "minMs": 21.523,
+            "medianMs": 21.523,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 32.464
+          },
+          "representativePlan": {
+            "Node Type": "Result",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0,
+            "Total Cost": 0.26,
+            "Plan Rows": 1,
+            "Plan Width": 32,
+            "Actual Startup Time": 32.357,
+            "Actual Total Time": 32.357,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 9565,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 6,
+            "Shared Written Blocks": 6,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "evidence": {
+            "benchmarkId": "BENCH-score-write-fixedScore",
+            "operation": "canonical score write",
+            "fixtureVersion": "bagger-r139-synthetic-history-v1",
+            "fixtureSeed": "2026-never-again-139",
+            "fixtureVariant": "R139_SYNTHETIC_CURRENT_HISTORY",
+            "historyScale": 1,
+            "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+            "databaseVersion": "17.11 (Homebrew)",
+            "computeResourceProfile": {
+              "scope": "LOCAL_SOCKET_ONLY",
+              "databaseVersion": "17.11 (Homebrew)",
+              "host": {
+                "platform": "darwin",
+                "architecture": "arm64",
+                "osRelease": "25.5.0",
+                "nodeVersion": "v26.7.0",
+                "cpuModel": "Apple M5",
+                "logicalCpus": 10,
+                "totalMemoryBytes": 17179869184
+              },
+              "databaseSettings": {
+                "jit": "on",
+                "fsync": "off",
+                "work_mem": "4MB",
+                "shared_buffers": "32MB",
+                "max_connections": "20",
+                "synchronous_commit": "on"
+              },
+              "resourceUtilization": {
+                "cpu": null,
+                "memory": null,
+                "io": null,
+                "connections": null,
+                "status": "UNAVAILABLE_NOT_SAMPLED"
+              },
+              "initialResourceSnapshot": {
+                "observedAt": "2026-09-28T12:25:34.977Z",
+                "hostLoadAverage": [
+                  3.62939453125,
+                  3.81982421875,
+                  3.64599609375
+                ],
+                "hostFreeMemoryBytes": 194035712,
+                "database": {
+                  "commits": 301,
+                  "backends": 1,
+                  "blocksHit": 723274,
+                  "deadlocks": 0,
+                  "rollbacks": 0,
+                  "sizeBytes": 31790771,
+                  "blocksRead": 441,
+                  "statsReset": null,
+                  "trackIoTiming": "off",
+                  "temporaryBytes": 0,
+                  "blockReadTimeMs": 0,
+                  "blockWriteTimeMs": 0
+                },
+                "limitations": [
+                  "Cumulative database counters can lag; no subtraction across databases.",
+                  "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+                  "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+                  "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+                ]
+              },
+              "limitations": [
+                "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+                "This is not a Supabase compute tier or Production capacity measurement.",
+                "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+              ]
+            },
+            "sampleCount": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "semanticValidation": {
+              "preflight": "PASSED",
+              "samples": "EVERY_SAMPLE_VALIDATED",
+              "validatedSamples": 2
+            },
+            "p50Ms": 21.523,
+            "p95Ms": null,
+            "p95Status": "INSUFFICIENT_SAMPLE",
+            "p99Ms": null,
+            "p99Status": "INSUFFICIENT_SAMPLE",
+            "maxMs": 32.464,
+            "databaseTime": {
+              "scope": "LOCAL_PSQL_STATEMENT_ELAPSED_INCLUDING_SOCKET_AND_RESULT_TRANSFER",
+              "p50Ms": 21.523,
+              "serverOnlyMs": null
+            },
+            "queryCount": null,
+            "topLevelTimedStatementsPerSample": 1,
+            "rowsExamined": null,
+            "result": "MEASURED",
+            "notes": [
+              "ACTUAL_RPC_ROLLBACK",
+              "Preflight and every timed result satisfy the operation result contract; validation runs after timing and each sample starts from the same rolled-back fixture state.",
+              "Nested query count and rows examined are not sampled in latency runs. See separate query-plan evidence.",
+              "No durable COMMIT, deployed API, client rendering, concurrency, provider resource or physical-device proof."
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "environmentDetails": {
+    "scope": "LOCAL_SOCKET_ONLY",
+    "databaseVersion": "17.11 (Homebrew)",
+    "host": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "osRelease": "25.5.0",
+      "nodeVersion": "v26.7.0",
+      "cpuModel": "Apple M5",
+      "logicalCpus": 10,
+      "totalMemoryBytes": 17179869184
+    },
+    "databaseSettings": {
+      "jit": "on",
+      "fsync": "off",
+      "work_mem": "4MB",
+      "shared_buffers": "32MB",
+      "max_connections": "20",
+      "synchronous_commit": "on"
+    },
+    "resourceUtilization": {
+      "cpu": null,
+      "memory": null,
+      "io": null,
+      "connections": null,
+      "status": "UNAVAILABLE_NOT_SAMPLED"
+    },
+    "initialResourceSnapshot": {
+      "observedAt": "2026-09-28T12:25:34.977Z",
+      "hostLoadAverage": [
+        3.62939453125,
+        3.81982421875,
+        3.64599609375
+      ],
+      "hostFreeMemoryBytes": 194035712,
+      "database": {
+        "commits": 301,
+        "backends": 1,
+        "blocksHit": 723274,
+        "deadlocks": 0,
+        "rollbacks": 0,
+        "sizeBytes": 31790771,
+        "blocksRead": 441,
+        "statsReset": null,
+        "trackIoTiming": "off",
+        "temporaryBytes": 0,
+        "blockReadTimeMs": 0,
+        "blockWriteTimeMs": 0
+      },
+      "limitations": [
+        "Cumulative database counters can lag; no subtraction across databases.",
+        "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+        "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+        "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+      ]
+    },
+    "limitations": [
+      "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+      "This is not a Supabase compute tier or Production capacity measurement.",
+      "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+    ]
+  },
+  "fixtureDeterminism": {
+    "status": "PASS",
+    "independentDatabaseCount": 2,
+    "scale": 1,
+    "semanticSha256": "da0ccb945c8e92af2058c5613bf0dc15a17b94c4b179f0043cee25464d4fd177",
+    "included": [
+      "stable identifiers",
+      "current authority inputs",
+      "lifecycle state",
+      "row counts"
+    ],
+    "excluded": [
+      "created_at",
+      "updated_at",
+      "effective_at",
+      "configured_at",
+      "other volatile timestamps"
+    ]
+  },
+  "reusableScoreInvocation": {
+    "sql": "BEGIN; SET LOCAL request.jwt.claim.role='service_role'; SELECT public.submit_production_hole_score('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.co\",\"source_workbook_id\":\"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4\",\"tournament_id\":\"2026\",\"expected_tournament_id\":\"2026\",\"deployment_id\":\"dpl_ReliabilityFixture139\",\"deployment_commit\":\"7777777777777777777777777777777777777777\",\"deployment_capability_contract\":\"production-maintenance-single-deployment-capability-v1\",\"deployment_capability_ceiling\":\"OBSERVATION\",\"expected_epoch_id\":\"30000000-0000-4000-8000-000000000001\",\"expected_activation_revision\":139,\"vercel_project_id\":\"prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU\",\"vercel_team_id\":\"team_kPw5zaib8uaQJALAwj4fWI6R\",\"vercel_environment\":\"production\",\"player_id\":\"P12\",\"actor_id\":\"reliability-fixture\",\"authorization\":{\"tournament_id\":\"2026\",\"match_id\":\"2026-R3-12\",\"player_id\":\"P12\",\"auth_user_id\":\"10000000-0000-4000-8000-000000000012\",\"role\":\"PLAYER\",\"permission_revision\":1},\"match_id\":\"2026-R3-12\",\"hole_number\":1,\"mutation_key\":\"90000000-0000-4000-8000-000000000001\",\"expected_match_revision\":0,\"expected_hole_revision\":0,\"team_1_gross_scores\":[4],\"team_2_gross_scores\":[5]}'::jsonb); ROLLBACK;",
+    "note": "Use a fresh database clone or reset the deterministic mutation between enabled/disabled telemetry samples."
+  },
+  "fixtureVersion": "bagger-r139-synthetic-history-v1",
+  "fixtureSeed": "2026-never-again-139",
+  "samplePolicy": "p50 from successful samples; p95 at >=20; p99 at >=100. Thirty samples are a coarse local baseline, not a tail SLO."
+}

@@ -1,0 +1,575 @@
+{
+  "schemaVersion": 1,
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "candidateMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+  "production": false,
+  "physical": "NOT_PROVEN",
+  "tests": [
+    {
+      "id": "P2-ATOMIC-BEFORE_HOLE",
+      "name": "failure at BEFORE_HOLE rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "BEFORE_HOLE",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 378.6130839999996,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_HOLE",
+      "name": "failure at AFTER_HOLE rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_HOLE",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 419.98425000000043,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_MATCH",
+      "name": "failure at AFTER_MATCH rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_MATCH",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 415.0499580000005,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-ATOMIC-BEFORE_RECEIPT",
+      "name": "failure at BEFORE_RECEIPT rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "BEFORE_RECEIPT",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 397.230458,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_RECEIPT",
+      "name": "failure at AFTER_RECEIPT rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_RECEIPT",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 391.79791599999953,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_HISTORY",
+      "name": "failure at AFTER_HISTORY rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_HISTORY",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 380.8403330000001,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_AUDIT",
+      "name": "failure at AFTER_AUDIT rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_AUDIT",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 408.71291700000074,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_OUTBOX",
+      "name": "failure at AFTER_OUTBOX rolls back hole, match, receipt and audit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "failurePoint": "AFTER_OUTBOX",
+        "canonicalCommit": false,
+        "receipt": false,
+        "statusAfterTransactionEnded": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION_ACCEPTED",
+        "noPartialState": true
+      },
+      "elapsedMs": 389.90749999999935,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-FAIL-57014",
+      "name": "statement timeout after hole work rolls back and preserves SQLSTATE57014",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "sqlstate": "57014",
+        "canonicalCommit": false,
+        "receipt": false,
+        "sameMutationRetry": "ACCEPTED"
+      },
+      "elapsedMs": 486.4277080000011,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-FAIL-BEFORE-COMMIT",
+      "name": "backend connection termination before COMMIT is exactly recoverable",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "connectionLost": "BEFORE_COMMIT",
+        "receiptAtResolution": false,
+        "canonicalOutcome": "NOT_COMMITTED",
+        "sameMutationRetry": "ACCEPTED",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 453.1292909999993,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-FAIL-AFTER-COMMIT",
+      "name": "backend connection termination after COMMIT is exactly recoverable",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "connectionLost": "AFTER_COMMIT_BEFORE_DELIVERY",
+        "receiptAtResolution": true,
+        "canonicalOutcome": "COMMITTED",
+        "sameMutationRetry": "STORED_RECEIPT",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 382.38545800000065,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-UNKNOWN-INFLIGHT",
+      "name": "absent receipt while transaction still active must remain UNKNOWN",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "inflightReadback": "NO_RECEIPT_VISIBLE_IS_NOT_NONCOMMIT_PROOF",
+        "stateWhileActive": "UNKNOWN",
+        "afterCommit": "COMMITTED"
+      },
+      "elapsedMs": 345.77770899999996,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-RESTART-IN-TRANSACTION",
+      "name": "owned disposable PostgreSQL crash restart during open score transaction",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "restart": "OWNED_CLUSTER_IMMEDIATE_STOP_WAL_RECOVERY",
+        "commitBeforeRestart": false,
+        "resolved": "NOT_COMMITTED",
+        "safeRetry": "SAME_MUTATION",
+        "powerLossDurability": "NOT_PROVEN_FSYNC_OFF"
+      },
+      "elapsedMs": 5181.822125000001,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-RESTART-AFTER-COMMIT",
+      "name": "owned disposable PostgreSQL crash restart after commit",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "restart": "OWNED_CLUSTER_IMMEDIATE_STOP_WAL_RECOVERY",
+        "commitBeforeRestart": true,
+        "resolved": "COMMITTED",
+        "safeRetry": "SAME_MUTATION",
+        "powerLossDurability": "NOT_PROVEN_FSYNC_OFF"
+      },
+      "elapsedMs": 699.3637500000004,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-DERIVED-ATOMIC",
+      "title": "required durable intent append failure rolls back score and receipt",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "canonicalCommit": false,
+        "requiredIntent": false,
+        "receipt": false,
+        "appendFailure": "ATOMIC_ROLLBACK"
+      },
+      "elapsedMs": 485.80420799999956,
+      "artifact": "evidence/derived-proof-after.json"
+    },
+    {
+      "id": "P2-DERIVED-FAIL-CALCUTTA",
+      "title": "CALCUTTA unavailable leaves score Official and durable demand retryable",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "score": "ACCEPTED",
+        "failure": "RETRYABLE_P0001",
+        "retry": "SUCCEEDED",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 447.0307499999999,
+      "artifact": "evidence/derived-proof-after.json"
+    },
+    {
+      "id": "P2-DERIVED-FAIL-NET_SKINS",
+      "title": "NET_SKINS unavailable leaves score Official and durable demand retryable",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "score": "ACCEPTED",
+        "failure": "RETRYABLE_P0001",
+        "retry": "SUCCEEDED",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 494.8551659999994,
+      "artifact": "evidence/derived-proof-after.json"
+    },
+    {
+      "id": "P2-DERIVED-FAIL-COMPETITION",
+      "title": "COMPETITION unavailable leaves score Official and durable demand retryable",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "score": "ACCEPTED",
+        "failure": "RETRYABLE_P0001",
+        "retry": "SUCCEEDED",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 443.2034169999988,
+      "artifact": "evidence/derived-proof-after.json"
+    },
+    {
+      "id": "P2-DERIVED-STANDALONE-LOCK",
+      "title": "standalone LOCK retains synchronous derived failure and atomic rollback",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "scope": "SCORE_ONLY_DEFERRAL_NOT_ROUND_CONTROL_ISOLATION",
+        "observations": [
+          {
+            "family": "CALCUTTA",
+            "standaloneOperation": "LOCK",
+            "derivedFailureCanAbort": true,
+            "canonicalChange": false,
+            "newIntent": false,
+            "semantics": "UNCHANGED_SYNCHRONOUS_NON_SCORE_PATH"
+          },
+          {
+            "family": "NET_SKINS",
+            "standaloneOperation": "LOCK",
+            "derivedFailureCanAbort": true,
+            "canonicalChange": false,
+            "newIntent": false,
+            "semantics": "UNCHANGED_SYNCHRONOUS_NON_SCORE_PATH"
+          },
+          {
+            "family": "COMPETITION",
+            "standaloneOperation": "LOCK",
+            "derivedFailureCanAbort": true,
+            "canonicalChange": false,
+            "newIntent": false,
+            "semantics": "UNCHANGED_SYNCHRONOUS_NON_SCORE_PATH"
+          }
+        ]
+      },
+      "elapsedMs": 1265.257125,
+      "artifact": "evidence/derived-proof-after.json"
+    },
+    {
+      "id": "P2-DERIVED-STANDALONE-FINALIZE",
+      "title": "standalone FINALIZE retains synchronous derived failure and atomic rollback",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "scope": "SCORE_ONLY_DEFERRAL_NOT_ROUND_CONTROL_ISOLATION",
+        "observations": [
+          {
+            "family": "CALCUTTA",
+            "standaloneOperation": "FINALIZE",
+            "derivedFailureCanAbort": true,
+            "canonicalChange": false,
+            "newIntent": false,
+            "semantics": "UNCHANGED_SYNCHRONOUS_NON_SCORE_PATH"
+          },
+          {
+            "family": "NET_SKINS",
+            "standaloneOperation": "FINALIZE",
+            "derivedFailureCanAbort": true,
+            "canonicalChange": false,
+            "newIntent": false,
+            "semantics": "UNCHANGED_SYNCHRONOUS_NON_SCORE_PATH"
+          },
+          {
+            "family": "COMPETITION",
+            "standaloneOperation": "FINALIZE",
+            "derivedFailureCanAbort": true,
+            "canonicalChange": false,
+            "newIntent": false,
+            "semantics": "UNCHANGED_SYNCHRONOUS_NON_SCORE_PATH"
+          }
+        ]
+      },
+      "elapsedMs": 2451.724042,
+      "artifact": "evidence/derived-proof-after.json"
+    },
+    {
+      "id": "P2-DERIVED-DEAD-LETTER",
+      "title": "bounded repeated consumer failure becomes visible dead letter without changing score",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "attempts": 5,
+        "status": "DEAD_LETTER",
+        "closeFencePending": true,
+        "automaticInfiniteRetry": false,
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 494.4845000000023,
+      "artifact": "evidence/derived-proof-after.json"
+    },
+    {
+      "id": "P2-DERIVED-TIMEOUT",
+      "title": "57014 aborts worker transaction while prior canonical score remains committed",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "sqlstate": "57014",
+        "workerTransaction": "ROLLED_BACK",
+        "intent": "PENDING_REPLAYABLE",
+        "canonicalScore": "COMMITTED"
+      },
+      "elapsedMs": 568.4263330000031,
+      "artifact": "evidence/derived-proof-after.json"
+    },
+    {
+      "id": "P2-MIG-SKINS-DEADLOCK",
+      "title": "mixed-round worker lock inversion is understood and durably retryable",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "classification": "KNOWN_WORKER_DEADLOCK_RETRYABLE_NOT_ELIMINATED",
+        "scope": "TWO_MATERIALIZATION_CALLS_PER_WORKER_TRANSACTION",
+        "lockGraph": [
+          {
+            "pid": 65879,
+            "blockedBy": [
+              65880
+            ],
+            "waitEvent": "advisory"
+          },
+          {
+            "pid": 65880,
+            "blockedBy": [
+              65879
+            ],
+            "waitEvent": "advisory"
+          }
+        ],
+        "locks": [
+          {
+            "pid": 65879,
+            "mode": "ExclusiveLock",
+            "objid": "2082806337",
+            "classid": "1549167931",
+            "granted": false,
+            "objsubid": 1
+          },
+          {
+            "pid": 65879,
+            "mode": "ExclusiveLock",
+            "objid": "2723577776",
+            "classid": "1616170987",
+            "granted": true,
+            "objsubid": 1
+          },
+          {
+            "pid": 65879,
+            "mode": "ShareLock",
+            "objid": "957585712",
+            "classid": "170",
+            "granted": true,
+            "objsubid": 1
+          },
+          {
+            "pid": 65880,
+            "mode": "ExclusiveLock",
+            "objid": "2723577776",
+            "classid": "1616170987",
+            "granted": false,
+            "objsubid": 1
+          },
+          {
+            "pid": 65880,
+            "mode": "ExclusiveLock",
+            "objid": "2082806337",
+            "classid": "1549167931",
+            "granted": true,
+            "objsubid": 1
+          },
+          {
+            "pid": 65880,
+            "mode": "ShareLock",
+            "objid": "957585712",
+            "classid": "170",
+            "granted": true,
+            "objsubid": 1
+          }
+        ],
+        "responses": [
+          {
+            "failed": 1,
+            "family": "NET_SKINS",
+            "maximum": 1,
+            "processed": 0
+          },
+          {
+            "failed": 0,
+            "family": "NET_SKINS",
+            "maximum": 1,
+            "processed": 1
+          }
+        ],
+        "afterDeadlock": [
+          {
+            "match": "2026-R1-1",
+            "status": "SUCCEEDED",
+            "attempts": 1,
+            "sqlstate": null
+          },
+          {
+            "match": "2026-R2-1",
+            "status": "SUCCEEDED",
+            "attempts": 1,
+            "sqlstate": null
+          },
+          {
+            "match": "2026-R2-2",
+            "status": "RETRYABLE",
+            "attempts": 1,
+            "sqlstate": "40P01"
+          },
+          {
+            "match": "2026-R1-2",
+            "status": "SUCCEEDED",
+            "attempts": 1,
+            "sqlstate": null
+          }
+        ],
+        "retry": {
+          "failed": 0,
+          "family": "NET_SKINS",
+          "maximum": 8,
+          "processed": 1
+        },
+        "canonicalDataUnchanged": true,
+        "automaticSchedulerProven": false,
+        "limitation": "Production claim batches also retain per-round locks; this reproduces lock-order mechanism, not hosted frequency"
+      },
+      "artifact": "evidence/migration-safety.json"
+    }
+  ]
+}

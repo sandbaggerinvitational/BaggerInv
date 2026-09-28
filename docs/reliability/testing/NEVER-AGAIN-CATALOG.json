@@ -253,7 +253,43 @@
         "Proves the zero-eligible-receipt branch; eligible recovery receipts remain additional required coverage.",
         "Local rollback samples do not establish hosted or durable-commit latency.",
         "Current-tournament synchronous derived work remains; Phase1 does not redesign it."
-      ]
+      ],
+      "phase2Addendum": {
+        "status": "PASS_SCOPED_LOCAL_SCORE_ISOLATION__PHASE2_OVERALL_PARTIAL",
+        "historicalPhase1ObservationUnchanged": true,
+        "proofLayers": [
+          "POSTGRESQL",
+          "INTEGRATION",
+          "PERFORMANCE",
+          "FAILURE_INJECTION",
+          "CONCURRENCY"
+        ],
+        "candidateMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+        "evidence": "docs/reliability/phase2/EVIDENCE.md",
+        "catalog": "docs/reliability/phase2/test-catalog-addendum.json",
+        "eligibleCases": [
+          "none",
+          "current_compatible",
+          "current_incompatible_consumed",
+          "current_incompatible_financial",
+          "stale_source",
+          "stale_result_binding",
+          "superseded_result",
+          "multiple_receipts"
+        ],
+        "historyScales": [
+          1,
+          2,
+          5,
+          10
+        ],
+        "futureTournamentReleaseBlocking": true,
+        "limitations": [
+          "Synthetic recognized receipt states do not certify protected issuer lifecycle.",
+          "Supported participant recovery after revocation, autonomous delivery, annual runtime and hosted/physical proof remain open.",
+          "No historical native expected-red state is changed."
+        ]
+      }
     }
   ],
   "deferredDiscoveries": [

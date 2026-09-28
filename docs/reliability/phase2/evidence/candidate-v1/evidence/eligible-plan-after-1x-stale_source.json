@@ -1,0 +1,5767 @@
+{
+  "proofLayer": "POSTGRESQL",
+  "environment": "LOCAL_SOCKET_ONLY",
+  "loggedStatements": 82,
+  "derivedRelations": [
+    "calcutta_v1_current",
+    "net_skins_v1_configuration_current",
+    "net_skins_v1_configuration_revisions"
+  ],
+  "shapes": [
+    {
+      "querySha256": "60f72a5f0bd6079c463c98c9ee32fd3c62a28e93f9179275a9313ae0c36c28d6",
+      "shapeSha256": "20cbee85714e180b3b3df267afafea80541afe68527c523b69b5d58c2b9aa234",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.043,
+      "durationMaxMsWithPlanLogging": 0.043,
+      "sequentialScans": [],
+      "relations": [],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.Total Cost": {
+          "min": 0.26,
+          "max": 0.26
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 17,
+          "max": 17
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 4,
+        "Total Cost": 0.26,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 17,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "728cde93912a3d68cadaa5f86e6edd0afca03c782c3d7e505713e239724715b5",
+      "shapeSha256": "3264c8b8f6366297223048f26b2ce9c168ec5900b18272d4207c2bd3ba424c56",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.025,
+      "durationMaxMsWithPlanLogging": 0.025,
+      "sequentialScans": [],
+      "relations": [
+        "user_player_links",
+        "users",
+        "participant_auth_identifiers",
+        "tournament_roles",
+        "tournament_players"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Total Cost": {
+          "min": 40.89,
+          "max": 40.89
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 10,
+          "max": 10
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Total Cost": {
+          "min": 40.88,
+          "max": 40.88
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 10,
+          "max": 10
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.Plan Width": {
+          "min": 32,
+          "max": 32
+        },
+        "root.0.0.Total Cost": {
+          "min": 32.7,
+          "max": 32.7
+        },
+        "root.0.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.Shared Hit Blocks": {
+          "min": 8,
+          "max": 8
+        },
+        "root.0.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.Plan Width": {
+          "min": 48,
+          "max": 48
+        },
+        "root.0.0.0.Total Cost": {
+          "min": 24.52,
+          "max": 24.52
+        },
+        "root.0.0.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.Shared Hit Blocks": {
+          "min": 6,
+          "max": 6
+        },
+        "root.0.0.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.0.Plan Width": {
+          "min": 48,
+          "max": 48
+        },
+        "root.0.0.0.0.Total Cost": {
+          "min": 16.34,
+          "max": 16.34
+        },
+        "root.0.0.0.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.0.Shared Hit Blocks": {
+          "min": 4,
+          "max": 4
+        },
+        "root.0.0.0.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.0.0.Plan Width": {
+          "min": 48,
+          "max": 48
+        },
+        "root.0.0.0.0.0.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.0.0.0.0.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.0.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.0.0.Rows Removed by Filter": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.0.0.0.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.1.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.0.1.Plan Width": {
+          "min": 16,
+          "max": 16
+        },
+        "root.0.0.0.0.1.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.0.0.0.0.1.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.0.1.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.0.1.Rows Removed by Filter": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.1.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.1.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.0.0.0.1.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.1.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.1.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.1.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.1.Plan Width": {
+          "min": 48,
+          "max": 48
+        },
+        "root.0.0.0.1.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.0.0.0.1.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.1.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.1.Rows Removed by Filter": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.1.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.1.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.0.0.1.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.1.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.1.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.1.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.1.Plan Width": {
+          "min": 16,
+          "max": 16
+        },
+        "root.0.0.1.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.0.0.1.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.1.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.1.Rows Removed by Filter": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.1.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.1.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.0.1.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.1.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.1.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.1.Plan Width": {
+          "min": 32,
+          "max": 32
+        },
+        "root.0.1.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.0.1.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.1.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.1.Rows Removed by Filter": {
+          "min": 11,
+          "max": 11
+        },
+        "root.0.1.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.1.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 1,
+        "Total Cost": 40.89,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 10,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Nested Loop",
+            "Parent Relationship": "InitPlan",
+            "Join Type": "Inner",
+            "Plan Rows": 1,
+            "Plan Width": 0,
+            "Total Cost": 40.88,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 10,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Nested Loop",
+                "Parent Relationship": "Outer",
+                "Join Type": "Inner",
+                "Plan Rows": 1,
+                "Plan Width": 32,
+                "Total Cost": 32.7,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 8,
+                "Shared Read Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Nested Loop",
+                    "Parent Relationship": "Outer",
+                    "Join Type": "Inner",
+                    "Plan Rows": 1,
+                    "Plan Width": 48,
+                    "Total Cost": 24.52,
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Shared Hit Blocks": 6,
+                    "Shared Read Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Nested Loop",
+                        "Parent Relationship": "Outer",
+                        "Join Type": "Inner",
+                        "Plan Rows": 1,
+                        "Plan Width": 48,
+                        "Total Cost": 16.34,
+                        "Actual Rows": 1,
+                        "Actual Loops": 1,
+                        "Shared Hit Blocks": 4,
+                        "Shared Read Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0,
+                        "Plans": [
+                          {
+                            "Node Type": "Index Scan",
+                            "Parent Relationship": "Outer",
+                            "Relation Name": "user_player_links",
+                            "Alias": "link",
+                            "Index Name": "participant_identity_links_status_idx",
+                            "Scan Direction": "Forward",
+                            "Plan Rows": 1,
+                            "Plan Width": 48,
+                            "Total Cost": 8.17,
+                            "Actual Rows": 1,
+                            "Actual Loops": 1,
+                            "Rows Removed by Filter": 0,
+                            "Rows Removed by Index Recheck": 0,
+                            "Shared Hit Blocks": 2,
+                            "Shared Read Blocks": 0,
+                            "Temp Read Blocks": 0,
+                            "Temp Written Blocks": 0
+                          },
+                          {
+                            "Node Type": "Index Scan",
+                            "Parent Relationship": "Inner",
+                            "Relation Name": "users",
+                            "Alias": "auth_user",
+                            "Index Name": "users_pkey",
+                            "Scan Direction": "Forward",
+                            "Plan Rows": 1,
+                            "Plan Width": 16,
+                            "Total Cost": 8.17,
+                            "Actual Rows": 1,
+                            "Actual Loops": 1,
+                            "Rows Removed by Filter": 0,
+                            "Rows Removed by Index Recheck": 0,
+                            "Shared Hit Blocks": 2,
+                            "Shared Read Blocks": 0,
+                            "Temp Read Blocks": 0,
+                            "Temp Written Blocks": 0
+                          }
+                        ]
+                      },
+                      {
+                        "Node Type": "Index Scan",
+                        "Parent Relationship": "Inner",
+                        "Relation Name": "participant_auth_identifiers",
+                        "Alias": "identifier",
+                        "Index Name": "participant_auth_identifier_current_user_method_idx",
+                        "Scan Direction": "Forward",
+                        "Plan Rows": 1,
+                        "Plan Width": 48,
+                        "Total Cost": 8.17,
+                        "Actual Rows": 1,
+                        "Actual Loops": 1,
+                        "Rows Removed by Filter": 0,
+                        "Rows Removed by Index Recheck": 0,
+                        "Shared Hit Blocks": 2,
+                        "Shared Read Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0
+                      }
+                    ]
+                  },
+                  {
+                    "Node Type": "Index Scan",
+                    "Parent Relationship": "Inner",
+                    "Relation Name": "tournament_roles",
+                    "Alias": "tournament_role",
+                    "Index Name": "tournament_roles_pkey",
+                    "Scan Direction": "Forward",
+                    "Plan Rows": 1,
+                    "Plan Width": 16,
+                    "Total Cost": 8.17,
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Rows Removed by Filter": 0,
+                    "Rows Removed by Index Recheck": 0,
+                    "Shared Hit Blocks": 2,
+                    "Shared Read Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0
+                  }
+                ]
+              },
+              {
+                "Node Type": "Index Scan",
+                "Parent Relationship": "Inner",
+                "Relation Name": "tournament_players",
+                "Alias": "membership",
+                "Index Name": "scoring_authority_tournament_players_team_idx",
+                "Scan Direction": "Forward",
+                "Plan Rows": 1,
+                "Plan Width": 32,
+                "Total Cost": 8.17,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Rows Removed by Filter": 11,
+                "Rows Removed by Index Recheck": 0,
+                "Shared Hit Blocks": 2,
+                "Shared Read Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "c9de36638aa6cacf76314390b5fe28eae83916cb4ef310a3f3b4baf5856915c2",
+      "shapeSha256": "20cbee85714e180b3b3df267afafea80541afe68527c523b69b5d58c2b9aa234",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0,
+      "durationMaxMsWithPlanLogging": 0,
+      "sequentialScans": [],
+      "relations": [],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Total Cost": {
+          "min": 0.01,
+          "max": 0.01
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 1,
+        "Total Cost": 0.01,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 0,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "fb71c46e8c3f7c4c0aca6584185e25a95c5291d2140dec1c1bbf26a224b094e3",
+      "shapeSha256": "20cbee85714e180b3b3df267afafea80541afe68527c523b69b5d58c2b9aa234",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 1.309,
+      "durationMaxMsWithPlanLogging": 1.309,
+      "sequentialScans": [],
+      "relations": [],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.Total Cost": {
+          "min": 0.26,
+          "max": 0.26
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 841,
+          "max": 841
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 4,
+        "Total Cost": 0.26,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 841,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "d67715b416f8c8a5f023e627a6e02e26518d9d768f62c1595af45d3bc12c9841",
+      "shapeSha256": "d4378c635ee2080f6bfbc77c82469fd8fd8bbad27c30bad087e4217e44277a5d",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.017,
+      "durationMaxMsWithPlanLogging": 0.017,
+      "sequentialScans": [],
+      "relations": [
+        "matches"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 325,
+          "max": 325
+        },
+        "root.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 5,
+          "max": 5
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 325,
+          "max": 325
+        },
+        "root.0.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Filter": {
+          "min": 23,
+          "max": 23
+        },
+        "root.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 4,
+          "max": 4
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "LockRows",
+        "Plan Rows": 1,
+        "Plan Width": 325,
+        "Total Cost": 8.17,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 5,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Index Scan",
+            "Parent Relationship": "Outer",
+            "Relation Name": "matches",
+            "Alias": "matches",
+            "Index Name": "scoring_authority_matches_round_status_idx",
+            "Scan Direction": "Forward",
+            "Plan Rows": 1,
+            "Plan Width": 325,
+            "Total Cost": 8.16,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Rows Removed by Filter": 23,
+            "Rows Removed by Index Recheck": 0,
+            "Shared Hit Blocks": 4,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "dd0d1c991477f11e6184fed87b937a7f6cb9eb5bf5a498eb64252ec762b649d9",
+      "shapeSha256": "c282c7322a0ca6cca7958cbf86bea76a4f4961ffe94508a3f758193fe4513df4",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.004,
+      "durationMaxMsWithPlanLogging": 0.004,
+      "sequentialScans": [],
+      "relations": [
+        "scoring_permissions"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 89,
+          "max": 89
+        },
+        "root.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "scoring_permissions",
+        "Alias": "scoring_permissions",
+        "Index Name": "scoring_permissions_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 89,
+        "Total Cost": 8.17,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "c6350a8532c3579951ee0d59b4df5147365e3feb8324351388420339f5252fd5",
+      "shapeSha256": "20cbee85714e180b3b3df267afafea80541afe68527c523b69b5d58c2b9aa234",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.111,
+      "durationMaxMsWithPlanLogging": 0.111,
+      "sequentialScans": [],
+      "relations": [],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 32,
+          "max": 32
+        },
+        "root.Total Cost": {
+          "min": 0.02,
+          "max": 0.02
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 32,
+        "Total Cost": 0.02,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 0,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "d42846e501c354a9eb9c94eeb479cd80681af3d69854616cb8a6d022e4438b35",
+      "shapeSha256": "fdc8ce183edc64b6cbe74d324842517c3a4fea024f4dc6f455830446fccbd67b",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.006,
+      "durationMaxMsWithPlanLogging": 0.006,
+      "sequentialScans": [],
+      "relations": [
+        "score_mutations"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 236,
+          "max": 236
+        },
+        "root.Total Cost": {
+          "min": 8.29,
+          "max": 8.29
+        },
+        "root.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 4,
+          "max": 4
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "score_mutations",
+        "Alias": "score_mutations",
+        "Index Name": "score_mutations_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 236,
+        "Total Cost": 8.29,
+        "Actual Rows": 0,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 4,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "832218d7e343a97547235255d625eb2e7c22714fd0ff57dab4efc6d674f15d41",
+      "shapeSha256": "be2baa826594c1f65bde316b17d9a8964ea01bcdffe9d660657a8483ea9929f0",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.003,
+      "durationMaxMsWithPlanLogging": 0.003,
+      "sequentialScans": [],
+      "relations": [
+        "hole_scores"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 308,
+          "max": 308
+        },
+        "root.Total Cost": {
+          "min": 8.29,
+          "max": 8.29
+        },
+        "root.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 4,
+          "max": 4
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "hole_scores",
+        "Alias": "hole_scores",
+        "Index Name": "scoring_authority_hole_score_revision_idx",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 308,
+        "Total Cost": 8.29,
+        "Actual Rows": 0,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 4,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "055979dbf0ec08c12674422d7b1e00d4669290b58e4c1106a2021f742fa06f67",
+      "shapeSha256": "edfb3efe1404dd4fd48e3b1916a0cca85204e6713878c504759c3f138beea23e",
+      "invocations": 2,
+      "durationMinMsWithPlanLogging": 0.003,
+      "durationMaxMsWithPlanLogging": 0.005,
+      "sequentialScans": [],
+      "relations": [],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Total Cost": {
+          "min": 0.05,
+          "max": 0.05
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 96,
+          "max": 96
+        },
+        "root.0.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Total Cost": {
+          "min": 2.75,
+          "max": 2.75
+        },
+        "root.0.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Filter": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 1,
+        "Total Cost": 0.05,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 0,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Function Scan",
+            "Parent Relationship": "InitPlan",
+            "Alias": "value",
+            "Plan Rows": 96,
+            "Plan Width": 0,
+            "Total Cost": 2.75,
+            "Actual Rows": 0,
+            "Actual Loops": 1,
+            "Rows Removed by Filter": 1,
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "362d7df4122899b58737c0d8fd813edebe6ef098898fb58302fbf85907ad3dcd",
+      "shapeSha256": "39b86e5c3005ca5786e551a4b8e97284153ba9f74351c14719e54f4c04b835a0",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.005,
+      "durationMaxMsWithPlanLogging": 0.005,
+      "sequentialScans": [],
+      "relations": [
+        "match_holes"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.Total Cost": {
+          "min": 8.29,
+          "max": 8.29
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 3,
+          "max": 3
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "match_holes",
+        "Alias": "match_holes",
+        "Index Name": "match_holes_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 4,
+        "Total Cost": 8.29,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 3,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "ac691dceafbe3ee751ccba68e3cced19c843a10f0cf6b22ceeab20e8fe9a1b00",
+      "shapeSha256": "20cbee85714e180b3b3df267afafea80541afe68527c523b69b5d58c2b9aa234",
+      "invocations": 2,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.003,
+      "sequentialScans": [],
+      "relations": [],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.Total Cost": {
+          "min": 0.04,
+          "max": 0.04
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 4,
+        "Total Cost": 0.04,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 0,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "d5222d46201d0a05262078bdf6c48d9556cd4297900d7e64c6810f3c9072f064",
+      "shapeSha256": "5d406f14b083c977fd38c6c1988f63c654771c900ca2026e0caa5564de5617e8",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.09,
+      "durationMaxMsWithPlanLogging": 0.09,
+      "sequentialScans": [],
+      "relations": [
+        "match_participants"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 32,
+          "max": 32
+        },
+        "root.Total Cost": {
+          "min": 8.43,
+          "max": 8.43
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 112,
+          "max": 112
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 8,
+          "max": 8
+        },
+        "root.0.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Aggregate",
+        "Plan Rows": 1,
+        "Plan Width": 32,
+        "Total Cost": 8.43,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 112,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Index Scan",
+            "Parent Relationship": "Outer",
+            "Relation Name": "match_participants",
+            "Alias": "participant",
+            "Index Name": "match_participants_pkey",
+            "Scan Direction": "Forward",
+            "Plan Rows": 1,
+            "Plan Width": 8,
+            "Total Cost": 8.17,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Rows Removed by Index Recheck": 0,
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "b564839c892b80dea79d48b6b4e047929ee96c7e70a390c21ebc97b06ace12aa",
+      "shapeSha256": "5d406f14b083c977fd38c6c1988f63c654771c900ca2026e0caa5564de5617e8",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.027,
+      "durationMaxMsWithPlanLogging": 0.027,
+      "sequentialScans": [],
+      "relations": [
+        "match_participants"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 32,
+          "max": 32
+        },
+        "root.Total Cost": {
+          "min": 8.43,
+          "max": 8.43
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 8,
+          "max": 8
+        },
+        "root.0.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Aggregate",
+        "Plan Rows": 1,
+        "Plan Width": 32,
+        "Total Cost": 8.43,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Index Scan",
+            "Parent Relationship": "Outer",
+            "Relation Name": "match_participants",
+            "Alias": "participant",
+            "Index Name": "match_participants_pkey",
+            "Scan Direction": "Forward",
+            "Plan Rows": 1,
+            "Plan Width": 8,
+            "Total Cost": 8.17,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Rows Removed by Index Recheck": 0,
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "b311640558720a79bb83cc3edec5087e4c7e59efde711654cba58549a67dcc9f",
+      "shapeSha256": "c6347bb4f63f9143a0034523a3818fe2bb4d36bc1197650a50aaf3b2ac24fb39",
+      "invocations": 4,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.002,
+      "sequentialScans": [],
+      "relations": [
+        "matches"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 10,
+          "max": 10
+        },
+        "root.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 3,
+          "max": 3
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 10,
+          "max": 10
+        },
+        "root.0.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "LockRows",
+        "Plan Rows": 1,
+        "Plan Width": 10,
+        "Total Cost": 8.17,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 3,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Index Scan",
+            "Parent Relationship": "Outer",
+            "Relation Name": "matches",
+            "Alias": "x",
+            "Index Name": "matches_pkey",
+            "Scan Direction": "Forward",
+            "Plan Rows": 1,
+            "Plan Width": 10,
+            "Total Cost": 8.16,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Rows Removed by Index Recheck": 0,
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "39c773b4b492bc8806273bc33017e2cbc5e0039aae7bc452b6bec6706e37034a",
+      "shapeSha256": "cd1da26e8321e38578e7bd2bab8d778289226c6796f656ad91347e7bf6ffe505",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.001,
+      "sequentialScans": [],
+      "relations": [
+        "matches"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 32,
+          "max": 32
+        },
+        "root.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "matches",
+        "Alias": "value",
+        "Index Name": "matches_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 32,
+        "Total Cost": 8.16,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "b74f3bf6d69c641a6e5f2c9521b8832eabf2bf33b53a5df3d595b1eb65df6a41",
+      "shapeSha256": "20cbee85714e180b3b3df267afafea80541afe68527c523b69b5d58c2b9aa234",
+      "invocations": 2,
+      "durationMinMsWithPlanLogging": 0,
+      "durationMaxMsWithPlanLogging": 0,
+      "sequentialScans": [],
+      "relations": [],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 8,
+          "max": 8
+        },
+        "root.Total Cost": {
+          "min": 0.01,
+          "max": 0.01
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 8,
+        "Total Cost": 0.01,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 0,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "0dbf11ee4319501f50f6ccd3954d1383867e1a9ffebe6ed5042acd97d4c195a2",
+      "shapeSha256": "20cbee85714e180b3b3df267afafea80541afe68527c523b69b5d58c2b9aa234",
+      "invocations": 2,
+      "durationMinMsWithPlanLogging": 0,
+      "durationMaxMsWithPlanLogging": 0.001,
+      "sequentialScans": [],
+      "relations": [],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.Total Cost": {
+          "min": 0.01,
+          "max": 0.01
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 4,
+        "Total Cost": 0.01,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 0,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "4d068e1379f6b3cade8b76d8f47191666e6b4cd8674098ecb2f5fd8da3e7a67a",
+      "shapeSha256": "36dc947425aa7fdff26881356c42211ed5b4949c34f8b758d3e8ff4b91cc61af",
+      "invocations": 2,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.003,
+      "sequentialScans": [],
+      "relations": [
+        "current_tournament_pointer_v1"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 32,
+          "max": 32
+        },
+        "root.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "current_tournament_pointer_v1",
+        "Alias": "value",
+        "Index Name": "current_tournament_pointer_v1_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 32,
+        "Total Cost": 8.17,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "b24d0227e6701ddbbb821adb3e6e101e3e78569a37795ea1f835b8ed602a8764",
+      "shapeSha256": "dab9535351a9c48781768f7ee2c10cb362e39e76899d1a90300ba51c6e17f3ed",
+      "invocations": 2,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.004,
+      "sequentialScans": [],
+      "relations": [
+        "ingress_gates"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Total Cost": {
+          "min": 8.18,
+          "max": 8.18
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Filter": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 1,
+        "Total Cost": 8.18,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Index Scan",
+            "Parent Relationship": "InitPlan",
+            "Relation Name": "ingress_gates",
+            "Alias": "value",
+            "Index Name": "ingress_gates_pkey",
+            "Scan Direction": "Forward",
+            "Plan Rows": 1,
+            "Plan Width": 0,
+            "Total Cost": 8.17,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Rows Removed by Filter": 0,
+            "Rows Removed by Index Recheck": 0,
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "475cc40a4c82a4f1dd7e5f1b26533652e49b100316f93fd8f86b58f071078193",
+      "shapeSha256": "0598f54f4e33672384dd1e0da8129be79692f81de52600c17316ad70b5e2b15b",
+      "invocations": 6,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.005,
+      "sequentialScans": [],
+      "relations": [
+        "tournaments"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 10,
+          "max": 10
+        },
+        "root.Total Cost": {
+          "min": 8.18,
+          "max": 8.18
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 3,
+          "max": 3
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 10,
+          "max": 10
+        },
+        "root.0.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "LockRows",
+        "Plan Rows": 1,
+        "Plan Width": 10,
+        "Total Cost": 8.18,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 3,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Index Scan",
+            "Parent Relationship": "Outer",
+            "Relation Name": "tournaments",
+            "Alias": "x",
+            "Index Name": "tournaments_pkey",
+            "Scan Direction": "Forward",
+            "Plan Rows": 1,
+            "Plan Width": 10,
+            "Total Cost": 8.17,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Rows Removed by Index Recheck": 0,
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "ca81501038262f422083a353c7b71fbaf215572c07d28ff159f9948ea8e6d992",
+      "shapeSha256": "9f213e43442b6725e76044ad60557f2254b5e9b4046a34e8666d3d818cb3236d",
+      "invocations": 4,
+      "durationMinMsWithPlanLogging": 0.07,
+      "durationMaxMsWithPlanLogging": 0.249,
+      "sequentialScans": [],
+      "relations": [
+        "score_derived_intents_v1"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Total Cost": {
+          "min": 0.02,
+          "max": 0.02
+        },
+        "root.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 8,
+          "max": 24
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 336,
+          "max": 336
+        },
+        "root.0.Total Cost": {
+          "min": 0.02,
+          "max": 0.02
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "ModifyTable",
+        "Relation Name": "score_derived_intents_v1",
+        "Alias": "stored",
+        "Plan Rows": 0,
+        "Plan Width": 0,
+        "Total Cost": 0.02,
+        "Actual Rows": 0,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 24,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Result",
+            "Parent Relationship": "Outer",
+            "Plan Rows": 1,
+            "Plan Width": 336,
+            "Total Cost": 0.02,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "450cfd199bc9908658e25ab76dacf99d7e5a8f2f4ef5b1926bb2f3b7d04bd5b7",
+      "shapeSha256": "8b50dee80d3b0caf750a7d37df6675a03088857118c8843a202196f0153473df",
+      "invocations": 2,
+      "durationMinMsWithPlanLogging": 0.135,
+      "durationMaxMsWithPlanLogging": 0.406,
+      "sequentialScans": [],
+      "relations": [
+        "matches"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.Total Cost": {
+          "min": 8.43,
+          "max": 8.44
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 19,
+          "max": 265
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.0.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 4,
+        "Total Cost": 8.44,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 265,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Index Scan",
+            "Parent Relationship": "InitPlan",
+            "Relation Name": "matches",
+            "Alias": "matches",
+            "Index Name": "matches_pkey",
+            "Scan Direction": "Forward",
+            "Plan Rows": 1,
+            "Plan Width": 4,
+            "Total Cost": 8.16,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Rows Removed by Index Recheck": 0,
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "2ddaea9c7b8cdc95a9833cadeb3b2ef2c0f9242df26f5bd8a95049e40d1a6d10",
+      "shapeSha256": "cd1da26e8321e38578e7bd2bab8d778289226c6796f656ad91347e7bf6ffe505",
+      "invocations": 4,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.001,
+      "sequentialScans": [],
+      "relations": [
+        "matches"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 319,
+          "max": 319
+        },
+        "root.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "matches",
+        "Alias": "value",
+        "Index Name": "matches_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 319,
+        "Total Cost": 8.16,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "3d4289ba43c25c88853597cf0c8338d274b9c3374f2a84df39b11698edf53133",
+      "shapeSha256": "20cbee85714e180b3b3df267afafea80541afe68527c523b69b5d58c2b9aa234",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0,
+      "durationMaxMsWithPlanLogging": 0,
+      "sequentialScans": [],
+      "relations": [],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Total Cost": {
+          "min": 0.01,
+          "max": 0.01
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 1,
+        "Total Cost": 0.01,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 0,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "6fe6349b099fd3f8b667ebb8cc6760c54e87bd983c5eb4684eecc1b0ce2616e1",
+      "shapeSha256": "aca441200edfed4030bbfca3e39405800adc5bcb0e320d69c4daa47dc8fd9bbf",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.001,
+      "sequentialScans": [],
+      "relations": [
+        "matches"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 32,
+          "max": 32
+        },
+        "root.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "matches",
+        "Alias": "match_value",
+        "Index Name": "matches_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 32,
+        "Total Cost": 8.16,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "6d3c5493938b40df6bcf61d88d130aa96c3d2c68d3214ad95ad21618da22589b",
+      "shapeSha256": "36dc947425aa7fdff26881356c42211ed5b4949c34f8b758d3e8ff4b91cc61af",
+      "invocations": 2,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.001,
+      "sequentialScans": [],
+      "relations": [
+        "current_tournament_pointer_v1"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 172,
+          "max": 172
+        },
+        "root.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "current_tournament_pointer_v1",
+        "Alias": "value",
+        "Index Name": "current_tournament_pointer_v1_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 172,
+        "Total Cost": 8.17,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "060784844b743f4c8f6545f8a772b1cdc53235c24da263543faa1d5137d70c5b",
+      "shapeSha256": "06b5bafe9360eecb77fc68a5c566351fde1b36632a5b74a2f8503178e460dad1",
+      "invocations": 2,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.005,
+      "sequentialScans": [],
+      "relations": [
+        "calcutta_v1_current"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 248,
+          "max": 248
+        },
+        "root.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "calcutta_v1_current",
+        "Alias": "value",
+        "Index Name": "calcutta_v1_current_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 248,
+        "Total Cost": 8.17,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "843dcf59aca4c08789b8074a985bbec9c43d1d2ce880bb296edd938207919692",
+      "shapeSha256": "f21ea8516cba0e7eff936a833fe6daa1e69880ee388008f165f94f12856ab5f3",
+      "invocations": 4,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.005,
+      "sequentialScans": [],
+      "relations": [
+        "cutover_activation_state"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 793,
+          "max": 793
+        },
+        "root.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "cutover_activation_state",
+        "Alias": "value",
+        "Index Name": "cutover_activation_state_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 793,
+        "Total Cost": 8.16,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "cf18bb458fb104ad82149276495084b90d6b3a9118e17bc3b3dba7548b38f61d",
+      "shapeSha256": "212f51a429786fb9965aa3a9d3b36d0294b2fa52b6a81129b1882be2aa812f4a",
+      "invocations": 4,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.003,
+      "sequentialScans": [],
+      "relations": [
+        "resource_scope"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 410,
+          "max": 410
+        },
+        "root.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "resource_scope",
+        "Alias": "value",
+        "Index Name": "resource_scope_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 410,
+        "Total Cost": 8.16,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "2e964082749cac109872cbcf7e7d3203495a078077812fdb197f6777e11e2550",
+      "shapeSha256": "8b50dee80d3b0caf750a7d37df6675a03088857118c8843a202196f0153473df",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.117,
+      "durationMaxMsWithPlanLogging": 0.117,
+      "sequentialScans": [],
+      "relations": [
+        "matches"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.Total Cost": {
+          "min": 8.43,
+          "max": 8.43
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 14,
+          "max": 14
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.0.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 4,
+        "Total Cost": 8.43,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 14,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Index Scan",
+            "Parent Relationship": "InitPlan",
+            "Relation Name": "matches",
+            "Alias": "matches",
+            "Index Name": "matches_pkey",
+            "Scan Direction": "Forward",
+            "Plan Rows": 1,
+            "Plan Width": 4,
+            "Total Cost": 8.16,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Rows Removed by Index Recheck": 0,
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "34f97b207f6b7715a2656ccf7a9471af167f1fe296f101885f24b1b127440793",
+      "shapeSha256": "f1ba2235f464fb3d896f290fdf078044690d90237953710108ecf0be261489aa",
+      "invocations": 2,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.003,
+      "sequentialScans": [],
+      "relations": [
+        "net_skins_v1_configuration_current"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 96,
+          "max": 96
+        },
+        "root.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "net_skins_v1_configuration_current",
+        "Alias": "value",
+        "Index Name": "net_skins_v1_configuration_current_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 96,
+        "Total Cost": 8.17,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "23044b379a013101a3abd8d524d43eb5db94e350750d19bb77654a7d95a2cbe6",
+      "shapeSha256": "a516967a574f778759dc12f5cd5bb2bf0e5090a7f97c932e3caa879ae2af4503",
+      "invocations": 2,
+      "durationMinMsWithPlanLogging": 0.005,
+      "durationMaxMsWithPlanLogging": 0.009,
+      "sequentialScans": [],
+      "relations": [
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Total Cost": {
+          "min": 10.19,
+          "max": 10.19
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Total Cost": {
+          "min": 10.18,
+          "max": 10.18
+        },
+        "root.0.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.Plan Width": {
+          "min": 32,
+          "max": 32
+        },
+        "root.0.0.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.0.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.1.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Total Cost": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.1.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.1.Rows Removed by Filter": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.1.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 1,
+        "Total Cost": 10.19,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Nested Loop",
+            "Parent Relationship": "InitPlan",
+            "Join Type": "Inner",
+            "Plan Rows": 1,
+            "Plan Width": 0,
+            "Total Cost": 10.18,
+            "Actual Rows": 0,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Index Scan",
+                "Parent Relationship": "Outer",
+                "Relation Name": "net_skins_v1_configuration_revisions",
+                "Alias": "revision",
+                "Index Name": "net_skins_v1_configuration_revisions_pkey",
+                "Scan Direction": "Forward",
+                "Plan Rows": 1,
+                "Plan Width": 32,
+                "Total Cost": 8.16,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Rows Removed by Index Recheck": 0,
+                "Shared Hit Blocks": 2,
+                "Shared Read Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              {
+                "Node Type": "Function Scan",
+                "Parent Relationship": "Inner",
+                "Alias": "configured",
+                "Plan Rows": 1,
+                "Plan Width": 0,
+                "Total Cost": 2,
+                "Actual Rows": 0,
+                "Actual Loops": 1,
+                "Rows Removed by Filter": 2,
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "8106757f18696c3280dc01c029876e2b8728dc3fec721bbc86beb6120da0b5d5",
+      "shapeSha256": "b8e76e3cdb1aa3fe6d6e5d58116c1ae5e48ae1b87a92cec6d3e886f4df26528a",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 2.56,
+      "durationMaxMsWithPlanLogging": 2.56,
+      "sequentialScans": [],
+      "relations": [
+        "hole_scores"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Total Cost": {
+          "min": 0.01,
+          "max": 0.01
+        },
+        "root.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 25,
+          "max": 25
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 308,
+          "max": 308
+        },
+        "root.0.Total Cost": {
+          "min": 0.01,
+          "max": 0.01
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "ModifyTable",
+        "Relation Name": "hole_scores",
+        "Alias": "hole_scores",
+        "Plan Rows": 0,
+        "Plan Width": 0,
+        "Total Cost": 0.01,
+        "Actual Rows": 0,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 25,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Result",
+            "Parent Relationship": "Outer",
+            "Plan Rows": 1,
+            "Plan Width": 308,
+            "Total Cost": 0.01,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "833cc291fe837046ec10c880f75ac3f3a4499dff39f2a22b1a80c293fc3ef3ab",
+      "shapeSha256": "944b77b03a398ce8041c98117c73eef18a6cfc7c197374e00c369f85cbb069c1",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.005,
+      "durationMaxMsWithPlanLogging": 0.005,
+      "sequentialScans": [],
+      "relations": [
+        "hole_scores"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 28,
+          "max": 28
+        },
+        "root.Total Cost": {
+          "min": 13.21,
+          "max": 13.21
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 3,
+          "max": 3
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 3,
+          "max": 3
+        },
+        "root.0.Plan Width": {
+          "min": 36,
+          "max": 36
+        },
+        "root.0.Total Cost": {
+          "min": 13.15,
+          "max": 13.15
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 3,
+          "max": 3
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Plan Rows": {
+          "min": 3,
+          "max": 3
+        },
+        "root.0.0.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Total Cost": {
+          "min": 4.3,
+          "max": 4.3
+        },
+        "root.0.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Aggregate",
+        "Plan Rows": 1,
+        "Plan Width": 28,
+        "Total Cost": 13.21,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 3,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Bitmap Heap Scan",
+            "Parent Relationship": "Outer",
+            "Relation Name": "hole_scores",
+            "Alias": "hole_scores",
+            "Plan Rows": 3,
+            "Plan Width": 36,
+            "Total Cost": 13.15,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Rows Removed by Index Recheck": 0,
+            "Shared Hit Blocks": 3,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Bitmap Index Scan",
+                "Parent Relationship": "Outer",
+                "Index Name": "scoring_authority_hole_score_revision_idx",
+                "Plan Rows": 3,
+                "Plan Width": 0,
+                "Total Cost": 4.3,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 2,
+                "Shared Read Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "1fc3dc4633cf5ed00f125eaa8901887ff081c4f7bb919b3346f5c7ce360c82b9",
+      "shapeSha256": "5f3a4e3cdb5963bc4d24b2ec178df03f99c4e8109f9170624881bd27713d1a9e",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.007,
+      "durationMaxMsWithPlanLogging": 0.007,
+      "sequentialScans": [],
+      "relations": [
+        "hole_scores"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Total Cost": {
+          "min": 12.33,
+          "max": 12.33
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 3,
+          "max": 3
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.0.Total Cost": {
+          "min": 12.32,
+          "max": 12.32
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 3,
+          "max": 3
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.0.0.Total Cost": {
+          "min": 0.01,
+          "max": 0.01
+        },
+        "root.0.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.1.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.0.1.Total Cost": {
+          "min": 8.29,
+          "max": 8.29
+        },
+        "root.0.1.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.1.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.1.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Shared Hit Blocks": {
+          "min": 3,
+          "max": 3
+        },
+        "root.0.1.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.1.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Aggregate",
+        "Plan Rows": 1,
+        "Plan Width": 1,
+        "Total Cost": 12.33,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 3,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Nested Loop",
+            "Parent Relationship": "Outer",
+            "Join Type": "Left",
+            "Plan Rows": 1,
+            "Plan Width": 4,
+            "Total Cost": 12.32,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 3,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Function Scan",
+                "Parent Relationship": "Outer",
+                "Alias": "expected",
+                "Plan Rows": 1,
+                "Plan Width": 4,
+                "Total Cost": 0.01,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 0,
+                "Shared Read Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              },
+              {
+                "Node Type": "Index Only Scan",
+                "Parent Relationship": "Inner",
+                "Relation Name": "hole_scores",
+                "Alias": "existing",
+                "Index Name": "scoring_authority_hole_score_revision_idx",
+                "Scan Direction": "Forward",
+                "Plan Rows": 1,
+                "Plan Width": 4,
+                "Total Cost": 8.29,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Rows Removed by Index Recheck": 0,
+                "Shared Hit Blocks": 3,
+                "Shared Read Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "cfef8cd55ab51874cd36776489211c26bc82b7acf5055904f97615adf2612d79",
+      "shapeSha256": "ce72d46c3d5a755e0dc69283487383d7d99c07ea5addbfd5986ab257b2b92259",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.009,
+      "durationMaxMsWithPlanLogging": 0.009,
+      "sequentialScans": [],
+      "relations": [
+        "hole_scores"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 28,
+          "max": 28
+        },
+        "root.Total Cost": {
+          "min": 13.32,
+          "max": 13.32
+        },
+        "root.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 6,
+          "max": 6
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 28,
+          "max": 28
+        },
+        "root.0.Total Cost": {
+          "min": 13.32,
+          "max": 13.32
+        },
+        "root.0.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Filter": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 6,
+          "max": 6
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Plan Rows": {
+          "min": 3,
+          "max": 3
+        },
+        "root.0.0.Plan Width": {
+          "min": 20,
+          "max": 20
+        },
+        "root.0.0.Total Cost": {
+          "min": 13.25,
+          "max": 13.25
+        },
+        "root.0.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.Shared Hit Blocks": {
+          "min": 6,
+          "max": 6
+        },
+        "root.0.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.Plan Rows": {
+          "min": 3,
+          "max": 3
+        },
+        "root.0.0.0.Plan Width": {
+          "min": 36,
+          "max": 36
+        },
+        "root.0.0.0.Total Cost": {
+          "min": 13.19,
+          "max": 13.19
+        },
+        "root.0.0.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.Shared Hit Blocks": {
+          "min": 6,
+          "max": 6
+        },
+        "root.0.0.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.Sort Space Used": {
+          "min": 25,
+          "max": 25
+        },
+        "root.0.0.0.0.Plan Rows": {
+          "min": 3,
+          "max": 3
+        },
+        "root.0.0.0.0.Plan Width": {
+          "min": 36,
+          "max": 36
+        },
+        "root.0.0.0.0.Total Cost": {
+          "min": 13.15,
+          "max": 13.15
+        },
+        "root.0.0.0.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.Shared Hit Blocks": {
+          "min": 3,
+          "max": 3
+        },
+        "root.0.0.0.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.0.Plan Rows": {
+          "min": 3,
+          "max": 3
+        },
+        "root.0.0.0.0.0.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.0.Total Cost": {
+          "min": 4.3,
+          "max": 4.3
+        },
+        "root.0.0.0.0.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.0.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.0.0.0.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.0.0.0.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.0.0.0.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Limit",
+        "Plan Rows": 1,
+        "Plan Width": 28,
+        "Total Cost": 13.32,
+        "Actual Rows": 0,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 6,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Subquery Scan",
+            "Parent Relationship": "Outer",
+            "Alias": "running",
+            "Plan Rows": 1,
+            "Plan Width": 28,
+            "Total Cost": 13.32,
+            "Actual Rows": 0,
+            "Actual Loops": 1,
+            "Rows Removed by Filter": 1,
+            "Shared Hit Blocks": 6,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "WindowAgg",
+                "Parent Relationship": "Subquery",
+                "Plan Rows": 3,
+                "Plan Width": 20,
+                "Total Cost": 13.25,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 6,
+                "Shared Read Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Sort",
+                    "Parent Relationship": "Outer",
+                    "Plan Rows": 3,
+                    "Plan Width": 36,
+                    "Total Cost": 13.19,
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Shared Hit Blocks": 6,
+                    "Shared Read Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Sort Method": "quicksort",
+                    "Sort Space Used": 25,
+                    "Sort Space Type": "Memory",
+                    "Plans": [
+                      {
+                        "Node Type": "Bitmap Heap Scan",
+                        "Parent Relationship": "Outer",
+                        "Relation Name": "hole_scores",
+                        "Alias": "hole_scores",
+                        "Plan Rows": 3,
+                        "Plan Width": 36,
+                        "Total Cost": 13.15,
+                        "Actual Rows": 1,
+                        "Actual Loops": 1,
+                        "Rows Removed by Index Recheck": 0,
+                        "Shared Hit Blocks": 3,
+                        "Shared Read Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0,
+                        "Plans": [
+                          {
+                            "Node Type": "Bitmap Index Scan",
+                            "Parent Relationship": "Outer",
+                            "Index Name": "scoring_authority_hole_score_revision_idx",
+                            "Plan Rows": 3,
+                            "Plan Width": 0,
+                            "Total Cost": 4.3,
+                            "Actual Rows": 1,
+                            "Actual Loops": 1,
+                            "Shared Hit Blocks": 2,
+                            "Shared Read Blocks": 0,
+                            "Temp Read Blocks": 0,
+                            "Temp Written Blocks": 0
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "3d4289ba43c25c88853597cf0c8338d274b9c3374f2a84df39b11698edf53133",
+      "shapeSha256": "02e430d30101bf00e322df6887c97764c93883a847fed8835cd146f2946efd3d",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.001,
+      "sequentialScans": [],
+      "relations": [
+        "late_r3_transactions_v1"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Total Cost": {
+          "min": 8.2,
+          "max": 8.2
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Total Cost": {
+          "min": 8.19,
+          "max": 8.19
+        },
+        "root.0.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Filter": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 1,
+        "Total Cost": 8.2,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Index Scan",
+            "Parent Relationship": "InitPlan",
+            "Relation Name": "late_r3_transactions_v1",
+            "Alias": "late_r3_transactions_v1",
+            "Index Name": "late_r3_transactions_v1_pkey",
+            "Scan Direction": "Forward",
+            "Plan Rows": 1,
+            "Plan Width": 0,
+            "Total Cost": 8.19,
+            "Actual Rows": 0,
+            "Actual Loops": 1,
+            "Rows Removed by Filter": 0,
+            "Rows Removed by Index Recheck": 0,
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "2e964082749cac109872cbcf7e7d3203495a078077812fdb197f6777e11e2550",
+      "shapeSha256": "20cbee85714e180b3b3df267afafea80541afe68527c523b69b5d58c2b9aa234",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.111,
+      "durationMaxMsWithPlanLogging": 0.111,
+      "sequentialScans": [],
+      "relations": [],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.Total Cost": {
+          "min": 0.27,
+          "max": 0.27
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 17,
+          "max": 17
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 4,
+        "Total Cost": 0.27,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 17,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "3092d62bfc0f6ed0c9251faf6f77867e20b96774cb61217bf191e28856e54cd8",
+      "shapeSha256": "644dc53c4e8e7c6548f2b563b34402203caeac608d4f434fd4bc0a7cf48cee59",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 1.415,
+      "durationMaxMsWithPlanLogging": 1.415,
+      "sequentialScans": [],
+      "relations": [
+        "matches"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 119,
+          "max": 119
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 116,
+          "max": 116
+        },
+        "root.0.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "ModifyTable",
+        "Relation Name": "matches",
+        "Alias": "matches",
+        "Plan Rows": 0,
+        "Plan Width": 0,
+        "Total Cost": 8.16,
+        "Actual Rows": 0,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 119,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Index Scan",
+            "Parent Relationship": "Outer",
+            "Relation Name": "matches",
+            "Alias": "matches",
+            "Index Name": "matches_pkey",
+            "Scan Direction": "Forward",
+            "Plan Rows": 1,
+            "Plan Width": 116,
+            "Total Cost": 8.16,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Rows Removed by Index Recheck": 0,
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9",
+      "shapeSha256": "1d28e10075f6bdcc62d28379d1bf0caf0402e5e252e06c208e91678eb9370190",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.002,
+      "durationMaxMsWithPlanLogging": 0.002,
+      "sequentialScans": [
+        "google_writer_fence_rehearsals"
+      ],
+      "relations": [
+        "google_writer_fence_rehearsals"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Total Cost": {
+          "min": 11.06,
+          "max": 11.06
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Total Cost": {
+          "min": 11.05,
+          "max": 11.05
+        },
+        "root.0.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Filter": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 1,
+        "Total Cost": 11.06,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 0,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Seq Scan",
+            "Parent Relationship": "InitPlan",
+            "Relation Name": "google_writer_fence_rehearsals",
+            "Alias": "value",
+            "Plan Rows": 1,
+            "Plan Width": 0,
+            "Total Cost": 11.05,
+            "Actual Rows": 0,
+            "Actual Loops": 1,
+            "Rows Removed by Filter": 0,
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "b6d6fe540450cc23065c45ff8970fbf61f636688842d6cd5860ec0ad04a805ab",
+      "shapeSha256": "20cbee85714e180b3b3df267afafea80541afe68527c523b69b5d58c2b9aa234",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.281,
+      "durationMaxMsWithPlanLogging": 0.281,
+      "sequentialScans": [],
+      "relations": [],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 4,
+          "max": 4
+        },
+        "root.Total Cost": {
+          "min": 0.26,
+          "max": 0.26
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 255,
+          "max": 255
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 4,
+        "Total Cost": 0.26,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 255,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "ab01ec442eaaa4f5293e14f9839aaf44564045d3ea8b470860bcbaf2b7e47add",
+      "shapeSha256": "6b42b125818c1b64cc5fd04ddfc0cba39844f76aa92a526025cf0fe778a9c283",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.001,
+      "sequentialScans": [],
+      "relations": [
+        "matches"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 32,
+          "max": 32
+        },
+        "root.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "matches",
+        "Alias": "matches",
+        "Index Name": "matches_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 32,
+        "Total Cost": 8.16,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "983b0d7c1232477cc69e7a7b05c54f96641965a97c56cfdf996cc976a99f6811",
+      "shapeSha256": "a77bf2a9f063727f5c962150015798a57beaafd3da5c9b55364b782707b351c6",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.001,
+      "sequentialScans": [],
+      "relations": [
+        "cutover_activation_state"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 793,
+          "max": 793
+        },
+        "root.Total Cost": {
+          "min": 8.16,
+          "max": 8.16
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Index Scan",
+        "Relation Name": "cutover_activation_state",
+        "Alias": "cutover_activation_state",
+        "Index Name": "cutover_activation_state_pkey",
+        "Scan Direction": "Forward",
+        "Plan Rows": 1,
+        "Plan Width": 793,
+        "Total Cost": 8.16,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Rows Removed by Index Recheck": 0,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    },
+    {
+      "querySha256": "c13e631cc8878f50669968b34036209d80931a506b47080a6a46f9461f0f7562",
+      "shapeSha256": "1b3d4bdec8a92b871629d42c0bbbbc790fa5806e5e8401e2b22c5c9cbeef4a2b",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.001,
+      "sequentialScans": [],
+      "relations": [
+        "ingress_gates"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Total Cost": {
+          "min": 8.18,
+          "max": 8.18
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Filter": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 1,
+        "Total Cost": 8.18,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Index Scan",
+            "Parent Relationship": "InitPlan",
+            "Relation Name": "ingress_gates",
+            "Alias": "gate",
+            "Index Name": "ingress_gates_pkey",
+            "Scan Direction": "Forward",
+            "Plan Rows": 1,
+            "Plan Width": 0,
+            "Total Cost": 8.17,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Rows Removed by Filter": 0,
+            "Rows Removed by Index Recheck": 0,
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "e69f6d2bc106db4c9997c80520e4b04c9aa9b90448c8a1ed610c4c3f5d2c7f69",
+      "shapeSha256": "7c2c2c477f636747c5e7857ef40c667f869c76f0e4950098c4323b59eca3a79f",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.001,
+      "durationMaxMsWithPlanLogging": 0.001,
+      "sequentialScans": [],
+      "relations": [
+        "cutover_activation_state"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 94,
+          "max": 94
+        },
+        "root.0.Total Cost": {
+          "min": 8.17,
+          "max": 8.17
+        },
+        "root.0.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Filter": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Rows Removed by Index Recheck": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 2,
+          "max": 2
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "ModifyTable",
+        "Relation Name": "cutover_activation_state",
+        "Alias": "cutover_activation_state",
+        "Plan Rows": 0,
+        "Plan Width": 0,
+        "Total Cost": 8.17,
+        "Actual Rows": 0,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 2,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Index Scan",
+            "Parent Relationship": "Outer",
+            "Relation Name": "cutover_activation_state",
+            "Alias": "cutover_activation_state",
+            "Index Name": "cutover_activation_state_pkey",
+            "Scan Direction": "Forward",
+            "Plan Rows": 1,
+            "Plan Width": 94,
+            "Total Cost": 8.17,
+            "Actual Rows": 0,
+            "Actual Loops": 1,
+            "Rows Removed by Filter": 1,
+            "Rows Removed by Index Recheck": 0,
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "724a87e5e4f66bef34f7bce628b654e16640c31d7ee534454677acb726fb289f",
+      "shapeSha256": "51b7b12c6330b86aaa39d2c08201f4ad7649bec4a195921cbf203b80dcadf6bd",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.615,
+      "durationMaxMsWithPlanLogging": 0.615,
+      "sequentialScans": [],
+      "relations": [
+        "score_mutations"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Total Cost": {
+          "min": 0.01,
+          "max": 0.01
+        },
+        "root.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 270,
+          "max": 270
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 236,
+          "max": 236
+        },
+        "root.0.Total Cost": {
+          "min": 0.01,
+          "max": 0.01
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "ModifyTable",
+        "Relation Name": "score_mutations",
+        "Alias": "score_mutations",
+        "Plan Rows": 0,
+        "Plan Width": 0,
+        "Total Cost": 0.01,
+        "Actual Rows": 0,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 270,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Result",
+            "Parent Relationship": "Outer",
+            "Plan Rows": 1,
+            "Plan Width": 236,
+            "Total Cost": 0.01,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "cfc67be4660b59e3e1878e159b0aac15ac754e3c13839e175a37d0814b737bdb",
+      "shapeSha256": "afafd6ce52373d5b4fb2c5eaa48d98b0f3bccdf3917d354148d99aa155e11f02",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.086,
+      "durationMaxMsWithPlanLogging": 0.086,
+      "sequentialScans": [],
+      "relations": [
+        "score_revision_history"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Total Cost": {
+          "min": 0.01,
+          "max": 0.01
+        },
+        "root.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 40,
+          "max": 40
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 252,
+          "max": 252
+        },
+        "root.0.Total Cost": {
+          "min": 0.01,
+          "max": 0.01
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "ModifyTable",
+        "Relation Name": "score_revision_history",
+        "Alias": "score_revision_history",
+        "Plan Rows": 0,
+        "Plan Width": 0,
+        "Total Cost": 0.01,
+        "Actual Rows": 0,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 40,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Result",
+            "Parent Relationship": "Outer",
+            "Plan Rows": 1,
+            "Plan Width": 252,
+            "Total Cost": 0.01,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "ef537e5799f39170c3cf4b2f227560c1e86aab0b778e633ab22d2ea7582331e4",
+      "shapeSha256": "68ca0e218cc992121bad9cf4fe666263e815b553961cd026ccb35dc9bf68ddfc",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.07,
+      "durationMaxMsWithPlanLogging": 0.07,
+      "sequentialScans": [],
+      "relations": [
+        "audit_events"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Total Cost": {
+          "min": 0.01,
+          "max": 0.01
+        },
+        "root.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 19,
+          "max": 19
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 216,
+          "max": 216
+        },
+        "root.0.Total Cost": {
+          "min": 0.01,
+          "max": 0.01
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "ModifyTable",
+        "Relation Name": "audit_events",
+        "Alias": "audit_events",
+        "Plan Rows": 0,
+        "Plan Width": 0,
+        "Total Cost": 0.01,
+        "Actual Rows": 0,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 19,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Result",
+            "Parent Relationship": "Outer",
+            "Plan Rows": 1,
+            "Plan Width": 216,
+            "Total Cost": 0.01,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "7cb6664dcfd46f8e18a41243a148f78f2aca64cf61a607b7a64f97baa52b5719",
+      "shapeSha256": "d22c0c5bae95e46d4f46bcec36a17a0a8360fc1984f9d1a5eecce92c58aa298d",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 0.175,
+      "durationMaxMsWithPlanLogging": 0.175,
+      "sequentialScans": [],
+      "relations": [
+        "google_outbox_events"
+      ],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Plan Width": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Total Cost": {
+          "min": 0.02,
+          "max": 0.02
+        },
+        "root.Actual Rows": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 89,
+          "max": 89
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Plan Width": {
+          "min": 416,
+          "max": 416
+        },
+        "root.0.Total Cost": {
+          "min": 0.02,
+          "max": 0.02
+        },
+        "root.0.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.0.Shared Hit Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.0.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "ModifyTable",
+        "Relation Name": "google_outbox_events",
+        "Alias": "google_outbox_events",
+        "Plan Rows": 0,
+        "Plan Width": 0,
+        "Total Cost": 0.02,
+        "Actual Rows": 0,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 89,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Result",
+            "Parent Relationship": "Outer",
+            "Plan Rows": 1,
+            "Plan Width": 416,
+            "Total Cost": 0.02,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      }
+    },
+    {
+      "querySha256": "3e247ac8bf85ccd597d5d9b40aaa21db750ec8297f53a88430ca54fc15a772e7",
+      "shapeSha256": "20cbee85714e180b3b3df267afafea80541afe68527c523b69b5d58c2b9aa234",
+      "invocations": 1,
+      "durationMinMsWithPlanLogging": 9.892,
+      "durationMaxMsWithPlanLogging": 9.892,
+      "sequentialScans": [],
+      "relations": [],
+      "maximumTemporaryWrittenBlocks": 0,
+      "nodeMetricRanges": {
+        "root.Plan Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Plan Width": {
+          "min": 32,
+          "max": 32
+        },
+        "root.Total Cost": {
+          "min": 0.26,
+          "max": 0.26
+        },
+        "root.Actual Rows": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Actual Loops": {
+          "min": 1,
+          "max": 1
+        },
+        "root.Shared Hit Blocks": {
+          "min": 4325,
+          "max": 4325
+        },
+        "root.Shared Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Read Blocks": {
+          "min": 0,
+          "max": 0
+        },
+        "root.Temp Written Blocks": {
+          "min": 0,
+          "max": 0
+        }
+      },
+      "representative": "highest-duration observation of this query/shape; not baseline timing",
+      "plan": {
+        "Node Type": "Result",
+        "Plan Rows": 1,
+        "Plan Width": 32,
+        "Total Cost": 0.26,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Shared Hit Blocks": 4325,
+        "Shared Read Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      }
+    }
+  ],
+  "limitations": [
+    "Instrumented nested durations overlap; not latency benchmark or distinct rows."
+  ]
+}

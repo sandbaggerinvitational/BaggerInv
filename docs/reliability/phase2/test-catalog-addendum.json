@@ -1,0 +1,1188 @@
+{
+  "schemaVersion": 1,
+  "baseCatalog": "../2026-tournament-postmortem/test-catalog.json",
+  "historicalCatalogUnchanged": true,
+  "tests": [
+    {
+      "id": "P2-FIXTURE-IDS",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-IDEM-001",
+      "requirement": "BE-SCORE-003",
+      "incidentIds": [
+        "2026-INC-018",
+        "2026-INC-020"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-IDEM-002",
+      "requirement": "BE-SCORE-003",
+      "incidentIds": [
+        "2026-INC-018",
+        "2026-INC-020"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-CONC-001",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-CONC-002",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-CONC-003",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-CONC-004",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-CONC-005",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-CONC-LOCK-SCORE",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-CONC-LOCK-LOCK",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-ATOMIC-BEFORE_HOLE",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_HOLE",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_MATCH",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-ATOMIC-BEFORE_RECEIPT",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_RECEIPT",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_HISTORY",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_AUDIT",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-ATOMIC-AFTER_OUTBOX",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-FAIL-57014",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-FAIL-BEFORE-COMMIT",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-FAIL-AFTER-COMMIT",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-UNKNOWN-INFLIGHT",
+      "requirement": "BE-SCORE-003",
+      "incidentIds": [
+        "2026-INC-018",
+        "2026-INC-020"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-AUTH-001",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-IDEM-LOCKED-READBACK",
+      "requirement": "BE-SCORE-003",
+      "incidentIds": [
+        "2026-INC-018",
+        "2026-INC-020"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "NOT_PROVEN_CLIENT_RECOVERY"
+    },
+    {
+      "id": "P2-GOLF-432",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-GOLF-HALVES",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-GOLF-EARLY",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-CONC-FINALIZE",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-RESTART-IN-TRANSACTION",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-RESTART-AFTER-COMMIT",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "artifact": "evidence/score-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-ATOMIC",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-COALESCE",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-FAIL-CALCUTTA",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-FAIL-NET_SKINS",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-FAIL-COMPETITION",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-STANDALONE-LOCK",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-STANDALONE-FINALIZE",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-BACKLOG",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-BURST",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-WORKER-RACE",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "CONCURRENCY"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-ORDER",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-DEAD-LETTER",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-TIMEOUT",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-DERIVED-ACL",
+      "requirement": "BE-JOB-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "artifact": "evidence/derived-proof-after.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-MIG-CLEAN",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "artifact": "evidence/migration-safety.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-MIG-UPGRADE",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "artifact": "evidence/migration-safety.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-MIG-REAPPLY",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "artifact": "evidence/migration-safety.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-MIG-CERTIFICATION",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "artifact": "evidence/migration-safety.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-MIG-SOURCE-HASH",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "artifact": "evidence/migration-safety.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-MIG-MANIFEST",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "artifact": "evidence/migration-safety.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-MIG-CLOSE",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "artifact": "evidence/migration-safety.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-MIG-GENERATION",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "artifact": "evidence/migration-safety.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-MIG-LIFECYCLE-SCOPE",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "artifact": "evidence/migration-safety.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-MIG-ANNUAL-EXPECTED-RED",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "artifact": "evidence/migration-safety.json",
+      "capabilityResult": "EXPECTED_RED_PRE_EXISTING"
+    },
+    {
+      "id": "P2-MIG-SKINS-DEADLOCK",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "artifact": "evidence/migration-safety.json",
+      "capabilityResult": "PASS"
+    },
+    {
+      "id": "P2-PERF-COMMON",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "PERFORMANCE"
+      ],
+      "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "tools/reliability/benchmark-phase2.mjs",
+      "artifact": "benchmark-after.json",
+      "capabilityResult": "SCOPED_LOCAL_PROOF_ONLY"
+    },
+    {
+      "id": "P2-PERF-ELIGIBLE",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "PERFORMANCE"
+      ],
+      "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL_17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "tools/reliability/benchmark-phase2-eligible.mjs",
+      "artifact": "eligible-history-after.json",
+      "capabilityResult": "SCOPED_LOCAL_PROOF_ONLY"
+    },
+    {
+      "id": "P2-LOCK-BOUNDS",
+      "requirement": "BE-SCORE-002",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "layer": [
+        "PERFORMANCE"
+      ],
+      "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "tools/reliability/measure-phase2-locks.mjs",
+      "artifact": "lock-duration-after.json",
+      "capabilityResult": "SCOPED_LOCAL_PROOF_ONLY"
+    },
+    {
+      "id": "P2-FENCE-HISTORY",
+      "requirement": "DB-PERF-001",
+      "incidentIds": [
+        "2026-INC-019"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "layer": [
+        "POSTGRESQL",
+        "PERFORMANCE"
+      ],
+      "environment": "OWNED_LOCAL_POSTGRESQL17",
+      "automated": true,
+      "physical": false,
+      "frequency": "Every affected score-path candidate",
+      "futureReleaseBlocking": true,
+      "testFile": "test/reliability-phase2-fence-history.test.mjs",
+      "artifact": "evidence/fence-history-final.json",
+      "capabilityResult": "SCOPED_LOCAL_PROOF_ONLY"
+    }
+  ]
+}

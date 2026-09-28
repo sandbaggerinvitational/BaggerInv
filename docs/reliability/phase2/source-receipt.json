@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "implementationCommit": "73abf170a6ea4457327031ea903b42bcd56120be",
+  "phase1Base": "184b5c65a8e63784e1af8d38121fa2e16a015628",
+  "branch": "codex/reliability-phase2-score-path",
+  "sourceFiles": [
+    {
+      "path": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+      "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+    },
+    {
+      "path": "test/reliability-phase2-application-comparison.test.mjs",
+      "sha256": "b25bd3cd3bae78881017b9e8d14305fe4cced5ff4f13ba3de114a1cfa67bdbb8"
+    },
+    {
+      "path": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "sha256": "074c3c1df926ae6f8b3e9d0c5929362d60959103b62b2c59f44c95164260a2c3"
+    },
+    {
+      "path": "test/reliability-phase2-eligible-history.test.mjs",
+      "sha256": "916d2056f05364fbfa0fb99a051d2081f75c9f880767fdc88f068b7dd4cc3e3b"
+    },
+    {
+      "path": "test/reliability-phase2-fence-history.test.mjs",
+      "sha256": "bb3096f4991c54c5325081aa9e6daf9d5b17c218ffa4b1be57431268de89e0fd"
+    },
+    {
+      "path": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "sha256": "ffe9bbba4beb79c6765a1c9a53b36deab0b0d191d3c9a816a7882771f9422306"
+    },
+    {
+      "path": "test/reliability-phase2-performance-gate.test.mjs",
+      "sha256": "3e6c110d08bb4323f8e834e568cc1348fe6ab202574a6a9ecc02c6c9e200d481"
+    },
+    {
+      "path": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "sha256": "88836567509d32376a519ec321d9566c3bc4068efcc9fabe0c92e4a990ccbec4"
+    },
+    {
+      "path": "test/support/reliability/phase2-eligible-history.mjs",
+      "sha256": "f3aaced4364da3fc3bc85d62e6b7d1678ebd5a68ab7987dbf795a033e3545517"
+    },
+    {
+      "path": "test/support/reliability/phase2-score-fixture.mjs",
+      "sha256": "7bc6b9953e4080d520883bf3ac8db85d41473ba1b630ecf36146df5fd838b733"
+    },
+    {
+      "path": "tools/reliability/benchmark-phase2-eligible.mjs",
+      "sha256": "8a31b284aeb43b4c8cdaed712bc1b93091d16015efd1a0ba55bc661a0d4505aa"
+    },
+    {
+      "path": "tools/reliability/benchmark-phase2.mjs",
+      "sha256": "25c2846cb5e7fa3cdb445baaa4def0814c6c810a127520af6057e6ab38d62724"
+    },
+    {
+      "path": "tools/reliability/certify-phase2-foundation.mjs",
+      "sha256": "db652dc5bf5a53ba125d42f5fb92d09b8e4662e9047ca87e44a5104028614706"
+    },
+    {
+      "path": "tools/reliability/collect-phase2-evidence.mjs",
+      "sha256": "91b6f0323466564020756e6b2932c88094c4e5fae85f6f85737efdab813dee3a"
+    },
+    {
+      "path": "tools/reliability/measure-phase2-locks.mjs",
+      "sha256": "6440f34e9177af207b5ed65fba83f815fb033604760d63557f4ebce5a878a3b1"
+    },
+    {
+      "path": "tools/reliability/phase2-application-comparison.mjs",
+      "sha256": "302b55a9b8fded4d557a9b2d5651474d47e3368a30864ee1a5261547c6489825"
+    },
+    {
+      "path": "tools/reliability/phase2-network-deny.cjs",
+      "sha256": "48e385b629af2beda571108badbbb4a7cdc81c7c7982ef85cded3caa02046761"
+    },
+    {
+      "path": "tools/reliability/phase2-performance-gate.mjs",
+      "sha256": "1cf94d330f3b92e2dd8acd168f367ad300c317078df6248992e617ab6ca01f7e"
+    },
+    {
+      "path": "tools/reliability/phase2-plan-capture.mjs",
+      "sha256": "439b88d39c09bff113cb9751cb273342d73502fcea0a7790e4625455aedd9828"
+    },
+    {
+      "path": "tools/reliability/run-phase2-application.mjs",
+      "sha256": "27f65f77d2ee7d1733228bded9c3336a268a6b3e652af5bb2831ec71334e665d"
+    }
+  ],
+  "sourceFileCount": 20,
+  "candidateMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+  "testExecutionNote": "Tests ran on the exact Phase1 checkout plus these candidate files. Runtime artifacts retain base HEAD and candidate migration hash; this commit binds final source bytes. Evidence compiler HEAD identifies generation, not an additional test run.",
+  "productionQueried": false,
+  "productionMutated": false,
+  "productionDeployed": false
+}

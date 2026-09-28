@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 1,
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "candidateMigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+  "production": false,
+  "physical": "NOT_PROVEN",
+  "tests": [
+    {
+      "id": "P2-CONC-001",
+      "name": "20 concurrent identical requests resolve one canonical outcome",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "requests": 20,
+        "actualLockWaiters": 19,
+        "accepted": 1,
+        "replayed": 19,
+        "canonicalHoles": 1,
+        "receipts": 1,
+        "deadlocks": 0
+      },
+      "elapsedMs": 375.43933300000026,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-CONC-002",
+      "name": "concurrent new mutation IDs / same gross cannot overwrite stale authority",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "ACCEPTED",
+        "loser": "MATCH_REVISION_CONFLICT",
+        "silentOverwrite": false
+      },
+      "elapsedMs": 341.8959169999998,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-CONC-003",
+      "name": "concurrent new mutation IDs / different gross cannot overwrite stale authority",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "ACCEPTED",
+        "loser": "MATCH_REVISION_CONFLICT",
+        "silentOverwrite": false
+      },
+      "elapsedMs": 364.0356249999995,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-CONC-004",
+      "name": "adjacent holes serialize with revision conflict then same-mutation retry",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "staleAdjacent": "MATCH_REVISION_CONFLICT",
+        "sameMutationRefreshedRevision": "ACCEPTED",
+        "canonicalHoles": 2
+      },
+      "elapsedMs": 403.81174999999985,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-CONC-005",
+      "name": "independent match score completes while another match transaction remains open",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "differentMatch": "ACCEPTED_BEFORE_FIRST_COMMIT",
+        "timeoutMs": 2000,
+        "fixture": "NO_CALCUTTA_PUBLICATION"
+      },
+      "elapsedMs": 331.91112499999963,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-CONC-LOCK-SCORE",
+      "name": "SCORE wins Lock/score race safely",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "SCORE",
+        "loser": "MATCH_REVISION_CONFLICT",
+        "holes": 1,
+        "locked": false
+      },
+      "elapsedMs": 396.80254199999945,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-CONC-LOCK-LOCK",
+      "name": "LOCK wins Lock/score race safely",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "winner": "LOCK",
+        "loser": "UNAUTHORIZED",
+        "holes": 0,
+        "locked": true
+      },
+      "elapsedMs": 372.66754200000014,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-CONC-FINALIZE",
+      "name": "final-hole vs Finalize race is never Final with missing hole",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "result": "PASS",
+      "details": {
+        "preFinalHole": "SCORECARD_INCOMPLETE",
+        "staleRace": "MATCH_REVISION_CONFLICT",
+        "sameMutationRetry": "FINALIZED",
+        "holes": 18
+      },
+      "elapsedMs": 805.293083999999,
+      "artifact": "evidence/score-proof-after.json"
+    },
+    {
+      "id": "P2-DERIVED-BURST",
+      "title": "12 independent Singles matches commit concurrently with configured history",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "requests": 12,
+        "success": 12,
+        "failures": 0,
+        "deadlocks": 0,
+        "elapsedMs": 40.23554199999853,
+        "connectionModel": "12_REAL_POSTGRESQL_CONNECTIONS",
+        "history": "SYNTHETIC_1X_CALCUTTA_SKINS_ODDS"
+      },
+      "elapsedMs": 417.112000000001,
+      "artifact": "evidence/derived-proof-after.json"
+    },
+    {
+      "id": "P2-DERIVED-WORKER-RACE",
+      "title": "scoring continues while a derived worker holds shared competition markers",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "worker": "HOLDS_COMPETITION_MARKERS_UNCOMMITTED",
+        "score": "COMMITTED_BEFORE_WORKER",
+        "timeoutMs": 2000,
+        "canonicalHoles": 2
+      },
+      "elapsedMs": 392.89987499999916,
+      "artifact": "evidence/derived-proof-after.json"
+    },
+    {
+      "id": "P2-MIG-SKINS-DEADLOCK",
+      "title": "mixed-round worker lock inversion is understood and durably retryable",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "classification": "KNOWN_WORKER_DEADLOCK_RETRYABLE_NOT_ELIMINATED",
+        "scope": "TWO_MATERIALIZATION_CALLS_PER_WORKER_TRANSACTION",
+        "lockGraph": [
+          {
+            "pid": 65879,
+            "blockedBy": [
+              65880
+            ],
+            "waitEvent": "advisory"
+          },
+          {
+            "pid": 65880,
+            "blockedBy": [
+              65879
+            ],
+            "waitEvent": "advisory"
+          }
+        ],
+        "locks": [
+          {
+            "pid": 65879,
+            "mode": "ExclusiveLock",
+            "objid": "2082806337",
+            "classid": "1549167931",
+            "granted": false,
+            "objsubid": 1
+          },
+          {
+            "pid": 65879,
+            "mode": "ExclusiveLock",
+            "objid": "2723577776",
+            "classid": "1616170987",
+            "granted": true,
+            "objsubid": 1
+          },
+          {
+            "pid": 65879,
+            "mode": "ShareLock",
+            "objid": "957585712",
+            "classid": "170",
+            "granted": true,
+            "objsubid": 1
+          },
+          {
+            "pid": 65880,
+            "mode": "ExclusiveLock",
+            "objid": "2723577776",
+            "classid": "1616170987",
+            "granted": false,
+            "objsubid": 1
+          },
+          {
+            "pid": 65880,
+            "mode": "ExclusiveLock",
+            "objid": "2082806337",
+            "classid": "1549167931",
+            "granted": true,
+            "objsubid": 1
+          },
+          {
+            "pid": 65880,
+            "mode": "ShareLock",
+            "objid": "957585712",
+            "classid": "170",
+            "granted": true,
+            "objsubid": 1
+          }
+        ],
+        "responses": [
+          {
+            "failed": 1,
+            "family": "NET_SKINS",
+            "maximum": 1,
+            "processed": 0
+          },
+          {
+            "failed": 0,
+            "family": "NET_SKINS",
+            "maximum": 1,
+            "processed": 1
+          }
+        ],
+        "afterDeadlock": [
+          {
+            "match": "2026-R1-1",
+            "status": "SUCCEEDED",
+            "attempts": 1,
+            "sqlstate": null
+          },
+          {
+            "match": "2026-R2-1",
+            "status": "SUCCEEDED",
+            "attempts": 1,
+            "sqlstate": null
+          },
+          {
+            "match": "2026-R2-2",
+            "status": "RETRYABLE",
+            "attempts": 1,
+            "sqlstate": "40P01"
+          },
+          {
+            "match": "2026-R1-2",
+            "status": "SUCCEEDED",
+            "attempts": 1,
+            "sqlstate": null
+          }
+        ],
+        "retry": {
+          "failed": 0,
+          "family": "NET_SKINS",
+          "maximum": 8,
+          "processed": 1
+        },
+        "canonicalDataUnchanged": true,
+        "automaticSchedulerProven": false,
+        "limitation": "Production claim batches also retain per-round locks; this reproduces lock-order mechanism, not hosted frequency"
+      },
+      "artifact": "evidence/migration-safety.json"
+    }
+  ]
+}
