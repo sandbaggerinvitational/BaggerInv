@@ -1,0 +1,41 @@
+TAP version 13
+# Subtest: Phase2C delivery transaction boundaries preserve actual owner/control lock order
+    # Subtest: match-control has one-way waiting and commits inside its existing timeout
+    ok 1 - match-control has one-way waiting and commits inside its existing timeout
+      ---
+      duration_ms: 589.632
+      type: 'test'
+      ...
+    # Subtest: owner-net-completion has one-way waiting and commits inside its existing timeout
+    ok 2 - owner-net-completion has one-way waiting and commits inside its existing timeout
+      ---
+      duration_ms: 494.791833
+      type: 'test'
+      ...
+    # Subtest: Intelligence old-lexicographic prefix has the expected actual control graph
+    ok 3 - Intelligence old-lexicographic prefix has the expected actual control graph
+      ---
+      duration_ms: 1446.14075
+      type: 'test'
+      ...
+    # Subtest: Intelligence inherited-control prefix has the expected actual control graph
+    ok 4 - Intelligence inherited-control prefix has the expected actual control graph
+      ---
+      duration_ms: 462.814167
+      type: 'test'
+      ...
+    1..4
+ok 1 - Phase2C delivery transaction boundaries preserve actual owner/control lock order
+  ---
+  duration_ms: 11762.341417
+  type: 'test'
+  ...
+1..1
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 11827.188833

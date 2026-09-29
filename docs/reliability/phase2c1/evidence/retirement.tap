@@ -1,0 +1,292 @@
+TAP version 13
+# Subtest: API: retired scoring-google-outbox rejects GET/POST before credentials, body, queue or adapter
+ok 1 - API: retired scoring-google-outbox rejects GET/POST before credentials, body, queue or adapter
+  ---
+  duration_ms: 19.958833
+  type: 'test'
+  ...
+# Subtest: API: retired round-scorecards-archive rejects GET/POST before credentials, body, queue or adapter
+ok 2 - API: retired round-scorecards-archive rejects GET/POST before credentials, body, queue or adapter
+  ---
+  duration_ms: 0.549
+  type: 'test'
+  ...
+# Subtest: API: retired future-match-google-compatibility rejects GET/POST before credentials, body, queue or adapter
+ok 3 - API: retired future-match-google-compatibility rejects GET/POST before credentials, body, queue or adapter
+  ---
+  duration_ms: 0.56625
+  type: 'test'
+  ...
+# Subtest: UNIT: mobile post-commit ignores unavailable retired transports and retains three internal families
+ok 4 - UNIT: mobile post-commit ignores unavailable retired transports and retains three internal families
+  ---
+  duration_ms: 0.72925
+  type: 'test'
+  ...
+# Subtest: UNIT: managed post-commit failure remains settled and does not invoke a retired fallback
+ok 5 - UNIT: managed post-commit failure remains settled and does not invoke a retired fallback
+  ---
+  duration_ms: 0.4155
+  type: 'test'
+  ...
+# Subtest: API: app/api/scoring/current/route.js retains score acknowledgement and only internal post-commit families
+ok 6 - API: app/api/scoring/current/route.js retains score acknowledgement and only internal post-commit families
+  ---
+  duration_ms: 1.162042
+  type: 'test'
+  ...
+# Subtest: API: app/api/scoring/matches/[matchId]/route.js retains score acknowledgement and only internal post-commit families
+ok 7 - API: app/api/scoring/matches/[matchId]/route.js retains score acknowledgement and only internal post-commit families
+  ---
+  duration_ms: 0.708291
+  type: 'test'
+  ...
+# Subtest: API: app/api/director/route.js successful canonical lifecycle never awaits retired delivery
+ok 8 - API: app/api/director/route.js successful canonical lifecycle never awaits retired delivery
+  ---
+  duration_ms: 1.066584
+  type: 'test'
+  ...
+# Subtest: API: app/api/director/route.js preserves rejected authorization
+ok 9 - API: app/api/director/route.js preserves rejected authorization
+  ---
+  duration_ms: 0.752125
+  type: 'test'
+  ...
+# Subtest: API: app/api/live-matches/route.js successful canonical lifecycle never awaits retired delivery
+ok 10 - API: app/api/live-matches/route.js successful canonical lifecycle never awaits retired delivery
+  ---
+  duration_ms: 0.936917
+  type: 'test'
+  ...
+# Subtest: API: app/api/live-matches/route.js preserves rejected authorization
+ok 11 - API: app/api/live-matches/route.js preserves rejected authorization
+  ---
+  duration_ms: 0.610625
+  type: 'test'
+  ...
+# Subtest: API: legacy Director workbook dashboard is explicitly retired without any transport
+ok 12 - API: legacy Director workbook dashboard is explicitly retired without any transport
+  ---
+  duration_ms: 0.97975
+  type: 'test'
+  ...
+# Subtest: API: canonical frozen-2026 live-match read preserves BB admin contract without Google
+ok 13 - API: canonical frozen-2026 live-match read preserves BB admin contract without Google
+  ---
+  duration_ms: 2.229208
+  type: 'test'
+  ...
+# Subtest: API: canonical frozen-2026 live-match read preserves SC admin contract without Google
+ok 14 - API: canonical frozen-2026 live-match read preserves SC admin contract without Google
+  ---
+  duration_ms: 0.651625
+  type: 'test'
+  ...
+# Subtest: API: canonical frozen-2026 live-match read preserves SI admin contract without Google
+ok 15 - API: canonical frozen-2026 live-match read preserves SI admin contract without Google
+  ---
+  duration_ms: 0.77525
+  type: 'test'
+  ...
+# Subtest: UNIT: disabled/failed historical Google consumers cannot degrade healthy internal workers
+ok 16 - UNIT: disabled/failed historical Google consumers cannot degrade healthy internal workers
+  ---
+  duration_ms: 0.698542
+  type: 'test'
+  ...
+# Subtest: UNIT: absence of internal worker evidence remains NOT_OBSERVED, never fabricated healthy
+ok 17 - UNIT: absence of internal worker evidence remains NOT_OBSERVED, never fabricated healthy
+  ---
+  duration_ms: 0.069541
+  type: 'test'
+  ...
+# Subtest: UNIT: disabled or backlogged required internal family remains visible after retirement
+ok 18 - UNIT: disabled or backlogged required internal family remains visible after retirement
+  ---
+  duration_ms: 0.112084
+  type: 'test'
+  ...
+# Subtest: UNIT: enabled controls without internal queue measurement are not healthy evidence
+ok 19 - UNIT: enabled controls without internal queue measurement are not healthy evidence
+  ---
+  duration_ms: 0.069583
+  type: 'test'
+  ...
+# Subtest: API: canonical Final confirmation survives a failed readback without any Google fallback
+ok 20 - API: canonical Final confirmation survives a failed readback without any Google fallback
+  ---
+  duration_ms: 0.855833
+  type: 'test'
+  ...
+# Subtest: API: canonical match read failure fails closed without fallback
+ok 21 - API: canonical match read failure fails closed without fallback
+  ---
+  duration_ms: 0.638625
+  type: 'test'
+  ...
+# Subtest: API: canonical match read scope mismatch fails closed without fallback
+ok 22 - API: canonical match read scope mismatch fails closed without fallback
+  ---
+  duration_ms: 0.586208
+  type: 'test'
+  ...
+# Subtest: UNIT COMPLETED_HISTORY_READ_SOURCE requires canonical database authority and no Google configuration
+ok 23 - UNIT COMPLETED_HISTORY_READ_SOURCE requires canonical database authority and no Google configuration
+  ---
+  duration_ms: 0.802
+  type: 'test'
+  ...
+# Subtest: UNIT SECONDARY_HISTORY_READ_SOURCE requires canonical database authority and no Google configuration
+ok 24 - UNIT SECONDARY_HISTORY_READ_SOURCE requires canonical database authority and no Google configuration
+  ---
+  duration_ms: 0.109
+  type: 'test'
+  ...
+# Subtest: UNIT HISTORICAL_COURSE_READ_SOURCE requires canonical database authority and no Google configuration
+ok 25 - UNIT HISTORICAL_COURSE_READ_SOURCE requires canonical database authority and no Google configuration
+  ---
+  duration_ms: 0.094042
+  type: 'test'
+  ...
+# Subtest: UNIT HISTORY_2026_READ_SOURCE requires canonical database authority and no Google configuration
+ok 26 - UNIT HISTORY_2026_READ_SOURCE requires canonical database authority and no Google configuration
+  ---
+  duration_ms: 0.137416
+  type: 'test'
+  ...
+# Subtest: UNIT missing runtime configuration never selects Google for a supported History year
+ok 27 - UNIT missing runtime configuration never selects Google for a supported History year
+  ---
+  duration_ms: 0.092875
+  type: 'test'
+  ...
+# Subtest: INTEGRATION injected canonical YEAR reads render every2017–2025 year without Google
+ok 28 - INTEGRATION injected canonical YEAR reads render every2017–2025 year without Google
+  ---
+  duration_ms: 81.236792
+  type: 'test'
+  ...
+# Subtest: INTEGRATION missing year and changed revision fail closed without historical fallback
+ok 29 - INTEGRATION missing year and changed revision fail closed without historical fallback
+  ---
+  duration_ms: 51.406542
+  type: 'test'
+  ...
+# Subtest: INTEGRATION 2026 canonical current/finalized History and Records work with no Google or network
+ok 30 - INTEGRATION 2026 canonical current/finalized History and Records work with no Google or network
+  ---
+  duration_ms: 221.166875
+  type: 'test'
+  ...
+# Subtest: FAILURE_INJECTION remote Google and provider sockets are denied before connect
+ok 31 - FAILURE_INJECTION remote Google and provider sockets are denied before connect
+  ---
+  duration_ms: 28.651666
+  type: 'test'
+  ...
+# Subtest: UNIT historical proof paths redirect writes without changing baseline evidence
+ok 32 - UNIT historical proof paths redirect writes without changing baseline evidence
+  ---
+  duration_ms: 27.593625
+  type: 'test'
+  ...
+# Subtest: UNIT zeroGoogle HOME_READ_SOURCE default/canonical rejection
+ok 33 - UNIT zeroGoogle HOME_READ_SOURCE default/canonical rejection
+  ---
+  duration_ms: 1.032834
+  type: 'test'
+  ...
+# Subtest: UNIT zeroGoogle MY_MATCH_READ_SOURCE default/canonical rejection
+ok 34 - UNIT zeroGoogle MY_MATCH_READ_SOURCE default/canonical rejection
+  ---
+  duration_ms: 0.2705
+  type: 'test'
+  ...
+# Subtest: UNIT zeroGoogle GAME_CENTER_READ_SOURCE default/canonical rejection
+ok 35 - UNIT zeroGoogle GAME_CENTER_READ_SOURCE default/canonical rejection
+  ---
+  duration_ms: 0.252458
+  type: 'test'
+  ...
+# Subtest: UNIT zeroGoogle LEADERBOARDS_CORE_READ_SOURCE default/canonical rejection
+ok 36 - UNIT zeroGoogle LEADERBOARDS_CORE_READ_SOURCE default/canonical rejection
+  ---
+  duration_ms: 0.610958
+  type: 'test'
+  ...
+# Subtest: UNIT zeroGoogle SCORING_READ_SOURCE default/canonical rejection
+ok 37 - UNIT zeroGoogle SCORING_READ_SOURCE default/canonical rejection
+  ---
+  duration_ms: 0.1895
+  type: 'test'
+  ...
+# Subtest: UNIT zeroGoogle NET_SKINS_READ_SOURCE default/canonical rejection
+ok 38 - UNIT zeroGoogle NET_SKINS_READ_SOURCE default/canonical rejection
+  ---
+  duration_ms: 0.162875
+  type: 'test'
+  ...
+# Subtest: UNIT zeroGoogle CALCUTTA_READ_SOURCE default/canonical rejection
+ok 39 - UNIT zeroGoogle CALCUTTA_READ_SOURCE default/canonical rejection
+  ---
+  duration_ms: 0.17275
+  type: 'test'
+  ...
+# Subtest: UNIT zeroGoogle PUBLISHED_ODDS_READ_SOURCE default/canonical rejection
+ok 40 - UNIT zeroGoogle PUBLISHED_ODDS_READ_SOURCE default/canonical rejection
+  ---
+  duration_ms: 0.1605
+  type: 'test'
+  ...
+# Subtest: UNIT zeroGoogle database isolation rejects remote credentials and malformed identities
+ok 41 - UNIT zeroGoogle database isolation rejects remote credentials and malformed identities
+  ---
+  duration_ms: 0.096792
+  type: 'test'
+  ...
+# Subtest: UNIT scoring canonical-only with no Google configuration
+ok 42 - UNIT scoring canonical-only with no Google configuration
+  ---
+  duration_ms: 0.154833
+  type: 'test'
+  ...
+# Subtest: UNIT Production activation retains security tuple without external workbook admission
+ok 43 - UNIT Production activation retains security tuple without external workbook admission
+  ---
+  duration_ms: 0.115583
+  type: 'test'
+  ...
+# Subtest: UNIT canonical identity requires matching database/auth authority with no Passport fallback
+ok 44 - UNIT canonical identity requires matching database/auth authority with no Passport fallback
+  ---
+  duration_ms: 0.366
+  type: 'test'
+  ...
+# Subtest: UNIT accidental legacy transport fails locally and attempted Google dependency is observable
+ok 45 - UNIT accidental legacy transport fails locally and attempted Google dependency is observable
+  ---
+  duration_ms: 0.447958
+  type: 'test'
+  ...
+# Subtest: API annual score dispatch binds canonical generations without calling Google destination RPC
+ok 46 - API annual score dispatch binds canonical generations without calling Google destination RPC
+  ---
+  duration_ms: 7.860625
+  type: 'test'
+  ...
+# Subtest: API canonical score acknowledgement preserves legacy boolean field and reports retired outbox false
+ok 47 - API canonical score acknowledgement preserves legacy boolean field and reports retired outbox false
+  ---
+  duration_ms: 0.2585
+  type: 'test'
+  ...
+1..47
+# tests 47
+# suites 0
+# pass 47
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 619.896084

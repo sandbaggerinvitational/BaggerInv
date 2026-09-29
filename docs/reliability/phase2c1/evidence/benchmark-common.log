@@ -1,0 +1,4 @@
+candidate common 5x none: 1000 accepted, p50 0.558, p95 0.724, max 8.751 ms
+candidate common 1x none: 1000 accepted, p50 0.570, p95 1.369, max 8.977 ms
+candidate common 10x none: 1000 accepted, p50 0.606, p95 1.289, max 27.974 ms
+candidate common 2x none: 1000 accepted, p50 0.600, p95 0.702, max 20.444 ms

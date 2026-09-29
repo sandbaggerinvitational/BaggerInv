@@ -1,0 +1,26 @@
+[
+  {
+    "step": "annual",
+    "exitCode": 0
+  },
+  {
+    "step": "release-detail",
+    "exitCode": 0
+  },
+  {
+    "step": "benchmark",
+    "exitCode": 0
+  },
+  {
+    "step": "build",
+    "exitCode": 0
+  },
+  {
+    "step": "boot",
+    "exitCode": 0
+  },
+  {
+    "step": "application",
+    "exitCode": 1
+  }
+]

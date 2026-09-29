@@ -1,0 +1,25 @@
+TAP version 13
+# {"fixture":"phase2c1-zero-google-release-v1","environment":"OWNED_SOCKET_ONLY_POSTGRESQL17","schema":126,"result":"PASS","runtimeGuardsSubstituted":false,"GoogleWriterRows":0,"GoogleCalls":0,"GoogleCredentialsRequired":false,"frozen2026Release":"PASS","frozen2026Replay":"PASS","annual2099Release":"PASS","annualReplay":"PASS","secondAnnualRelease":"PASS","staleAuthorityDenied":true,"conflictingReplayDenied":true,"canonicalActiveWorkerDenied":true,"orphanCanonicalLeaseDenied":true,"activeAnnualTransitionDenied":true,"GoogleFlagsRejected":5,"retiredMirrorHistoryIgnored":true,"annualRowsUnchanged":true,"canonicalSideGameCertification":"6f0f68b1cf6c113bb7b95879c4ddf58f046862d03c0a51648221c1c0f6c771fc","limitations":["Synthetic annual authority fixture; not a full CREATE/PREPARE/ACTIVATE annual initialization","Historical platform bootstrap models prior Google cutover locally; candidate normal release phase requires no Google","No hosted, Production, real Google or physical proof"],"timestamp":"2026-09-29T23:17:47.076Z"}
+# {"result":"ANNUAL_RELEASE_REVIEW_OK","migrations":25,"annualSnapshot":"aad0557246cb24aeac6e7030634594ca321058b6b6bad35dcb3f3f8e22233df0","authorization":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_AUTHORIZED","status":"PENDING","idempotent":false,"release_sequence":2,"release_intent_id":"d5fdab1d-10f9-4f8f-b1f4-aef7f3585bfc","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","target_deployment_commit":"56ded61379e3308ab5c465ce186140550f3827a7","authorization_fingerprint":"285c0f66961789d64a51aa82e24e05bab432368c30d0763622c24ad5f2dd4940"},"rebind":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_REBOUND","ingress":"OPEN","authority":"SUPABASE","idempotent":false,"boundary_mode":"MAINTENANCE_WINDOW_V1","cutover_phase":"OBSERVATION","deployment_id":"dpl_PostcutoverNormalRelease054","workers_enabled":true,"release_sequence":2,"deployment_commit":"56ded61379e3308ab5c465ce186140550f3827a7","maintenance_state":"NORMAL","release_rebind_id":"cc8f231a-a81a-45f1-93df-68bcf4ec068d","admission_revision":12,"capability_ceiling":"OBSERVATION","activation_revision":23,"capability_contract":"production-maintenance-single-deployment-capability-v1","runtime_fingerprint":"9fa1d47e6ae73f7f42f37ae91041e4dc6722f32078dce1ab4995a69f294da1de","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","admission_generation_id":"fb4d4908-3945-47b8-9d32-13e0df9aca62","authority_generation_id":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb","predecessor_deployment_id":"dpl_PostcutoverApplication053","predecessor_release_sequence":1,"participant_identity_authority":"SUPABASE"},"secondRebind":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_REBOUND","ingress":"OPEN","authority":"SUPABASE","idempotent":false,"boundary_mode":"MAINTENANCE_WINDOW_V1","cutover_phase":"OBSERVATION","deployment_id":"dpl_PostcutoverNormalRelease055","workers_enabled":true,"release_sequence":3,"deployment_commit":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","maintenance_state":"NORMAL","release_rebind_id":"978cea2c-2df3-4e15-b774-922450d3ce46","admission_revision":13,"capability_ceiling":"OBSERVATION","activation_revision":24,"capability_contract":"production-maintenance-single-deployment-capability-v1","runtime_fingerprint":"28e167ee47fcfdc986a6dc3d246571acfa93540416d6a5a80e4375d415a539ed","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","admission_generation_id":"fb4d4908-3945-47b8-9d32-13e0df9aca62","authority_generation_id":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb","predecessor_deployment_id":"dpl_PostcutoverNormalRelease054","predecessor_release_sequence":2,"participant_identity_authority":"SUPABASE"}}
+# Subtest: migration 078 rebinds future annual normal releases without mutating annual state
+    # Subtest: future annual authorization, replay, stale and invariance
+    ok 1 - future annual authorization, replay, stale and invariance
+      ---
+      duration_ms: 3008.233958
+      type: 'test'
+      ...
+    1..1
+ok 1 - migration 078 rebinds future annual normal releases without mutating annual state
+  ---
+  duration_ms: 4722.447875
+  type: 'test'
+  ...
+1..1
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4780.878834

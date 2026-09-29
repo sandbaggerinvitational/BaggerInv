@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "scope": "CHANGED_FILES_VS_BASE_AND_UNTRACKED_REPORTS",
+  "filesScanned": 206,
+  "patternClasses": [
+    "private-key",
+    "credential-url",
+    "jwt",
+    "google-api-key",
+    "google-oauth",
+    "private-sheet-url"
+  ],
+  "findings": [],
+  "valuesPrinted": false,
+  "limitation": "Pattern scan plus synthetic/no-provider environment review; not exhaustive secret detection",
+  "nativeShippingChanged": false,
+  "historicalEvidenceChanged": false
+}

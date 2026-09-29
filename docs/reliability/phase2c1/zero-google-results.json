@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "status": "PARTIAL",
+  "production": false,
+  "googleAccountAccessed": false,
+  "capabilities": [
+    {
+      "capability": "Scoring",
+      "googleRequiredBefore": "NO oncanonicalpath;legacyselectionYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "ActualcanonicalSQL432holes, noenqueue/transport attempts"
+    },
+    {
+      "capability": "Score Recovery",
+      "googleRequiredBefore": "NO",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "Actual bounded recovery afterLock/revocation/Finalize;50tests"
+    },
+    {
+      "capability": "Prepare",
+      "googleRequiredBefore": "AnnualGooglegatesYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "NOT PROVEN",
+      "scopeAndLimitations": "Source retirement; complete annual/DirectorPrepare flow notproven"
+    },
+    {
+      "capability": "Open",
+      "googleRequiredBefore": "ControlmirrorgateYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "NOT PROVEN",
+      "scopeAndLimitations": "InitialLivefixture is not wholeRoundOpenproof"
+    },
+    {
+      "capability": "Lock",
+      "googleRequiredBefore": "ControlmirrorgateYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "ActualcanonicalSQL and canonical admission unchanged"
+    },
+    {
+      "capability": "Resume",
+      "googleRequiredBefore": "ControlmirrorgateYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "ActualcanonicalSQL; no Googlejobs"
+    },
+    {
+      "capability": "Finalize",
+      "googleRequiredBefore": "ArchivedeliveryYESoperationally",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "24results and24requiredsnapshots without externalarchive"
+    },
+    {
+      "capability": "Matches",
+      "googleRequiredBefore": "LegacyselectorYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "InjectedcanonicalAPI/readtests; nohostedclientproof"
+    },
+    {
+      "capability": "Today",
+      "googleRequiredBefore": "LegacyselectorYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "Canonicalselector andservicecontracts; authenticatedpageintegrationNOTPROVEN"
+    },
+    {
+      "capability": "Leaderboards",
+      "googleRequiredBefore": "LegacyselectorYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "Canonicalselector/readcontract; no realdatasetparityclaim"
+    },
+    {
+      "capability": "Net Skins",
+      "googleRequiredBefore": "Legacyread/writerYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "ActualSQLworker/deadlockfixture andfinancialstatepreservation; ownercalculation remainsmanual"
+    },
+    {
+      "capability": "Calcutta",
+      "googleRequiredBefore": "Legacyreader/reportingYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "Actualinternalworker andsyntheticfinancialsnapshot preservation"
+    },
+    {
+      "capability": "Odds",
+      "googleRequiredBefore": "Legacypublication/mirrorYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "CanonicalannualworkerSQL/injectedpublicationcontracts; noautopublication"
+    },
+    {
+      "capability": "Competition",
+      "googleRequiredBefore": "ParallelGooglepostcommitNOauthority",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "Actualautonomousworker54matrix andfullsequence"
+    },
+    {
+      "capability": "Intelligence",
+      "googleRequiredBefore": "ParallelGooglepostcommitNOauthority",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "Actualautonomousworker; FinalRecap waitsownerpublication"
+    },
+    {
+      "capability": "History",
+      "googleRequiredBefore": "Legacyfallback/provenanceconfigYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "2017\u20132026syntheticcanonicalservices;2026actualPreviewSQL; realdatasetunknown"
+    },
+    {
+      "capability": "Records",
+      "googleRequiredBefore": "Legacyrefresh/fallbackYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "Unchangedrecordengines/syntheticcanonicalinputs; realdatasetunknown"
+    },
+    {
+      "capability": "Audit",
+      "googleRequiredBefore": "Externalcopyoptional",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "Requiredcanonicalreceipts/snapshots retainedactualSQL"
+    },
+    {
+      "capability": "Annual Setup",
+      "googleRequiredBefore": "GoogleprovisioninggateYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "NOT PROVEN",
+      "scopeAndLimitations": "ActualCREATE current/targetyearcontradiction P2C1-ANNUAL-001"
+    },
+    {
+      "capability": "Derived Workers",
+      "googleRequiredBefore": "ParallelGoogleconsumersYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "PASS",
+      "scopeAndLimitations": "RequiredCalcutta/Competition/Intelligence independent;BscopedPASS"
+    },
+    {
+      "capability": "Director Core",
+      "googleRequiredBefore": "Legacyread/write/mirrorYES",
+      "googleRequiredAfterAtSource": false,
+      "status": "PARTIAL",
+      "scopeAndLimitations": "KnownPreviewclient selects retiredGET; canonicalreplacement adapters incomplete"
+    }
+  ],
+  "fullSequenceArtifact": "evidence/revalidation/phase2c/full-sequence-results.json",
+  "annualArtifact": "evidence/annual-initialization.json",
+  "proofMatrix": "PROOF-MATRIX.md",
+  "limitations": [
+    "Status is per stated proof layer, not full hosted functionality",
+    "Director replacement incomplete",
+    "Actual annualCREATE expectedred",
+    "Broad failures unresolved",
+    "Real historical completeness not proven"
+  ]
+}

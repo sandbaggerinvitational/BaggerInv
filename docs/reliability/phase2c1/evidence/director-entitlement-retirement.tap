@@ -1,0 +1,23 @@
+✔ linked Director access follows the verified Supabase account with no Passport or Google inspection (2.299875ms)
+✔ capability follows account changes and a different participant account is denied (0.147125ms)
+✔ retired Passport bootstrap cannot create a canonical Director entitlement (1.510625ms)
+✔ revocation is central, fail-closed, and a stale Passport cannot reactivate it (0.21775ms)
+✔ an entitlement cannot bypass expired, revoked, missing, or mismatched impersonation leases (0.37725ms)
+✔ active entitlement plus an account-bound current lease preserves Preview impersonation (1.427125ms)
+✔ Production without canonical admission denies before account or retired Passport transport (0.098583ms)
+✔ schema is narrow, RLS-closed, account-bound, audited, and 2026-only (3.742208ms)
+✔ menu warms account capability and every Director surface uses canonical account authorization (2.108292ms)
+✔ canonical Director missing database fails closed even with an active legacy Passport (0.171625ms)
+✔ canonical Director unapproved project fails closed even with an active legacy Passport (0.066875ms)
+✔ canonical Director Auth/database origin mismatch fails closed even with an active legacy Passport (0.043541ms)
+✔ canonical Director credential missing fails closed even with an active legacy Passport (0.04025ms)
+✔ canonical Director retired Passport configured fails closed even with an active legacy Passport (0.040583ms)
+✔ retired Director migration endpoints reject without identity/provider transport (12.985083ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 123.950584

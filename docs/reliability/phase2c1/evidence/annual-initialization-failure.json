@@ -1,0 +1,63 @@
+{
+  "issue": "P2C1-ANNUAL-001",
+  "status": "EXPECTED_RED",
+  "gate": "ANNUAL_INITIALIZATION_NOT_PROVEN",
+  "confidence": "PROVEN",
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "proofLayer": "POSTGRESQL",
+  "targetYear": 2098,
+  "currentYear": 2026,
+  "observedError": "PRODUCTION_FUTURE_RUNTIME_EXACT_RESOURCE_REQUIRED",
+  "observedFailureFunction": "production_control.assert_annual_future_admin_scope_v1",
+  "input": {
+    "action": "CREATE_TOURNAMENT",
+    "tournament_id": "2026",
+    "tournament_year": 2098,
+    "target_tournament_id": "2098",
+    "target_tournament_year": 2098
+  },
+  "definitions": [
+    {
+      "schema": "124",
+      "signature": "mutate_production_future_year_administration_v1(jsonb)",
+      "sourceSha256": "cc4067b15e88ad89549bf4fa3c416f2cf3be1437d8f7405f3896d18a6799b938",
+      "targetYearParsedFromTournamentYear": true,
+      "currentScopeRequiresPointerYear": false
+    },
+    {
+      "schema": "124",
+      "signature": "production_control.assert_annual_future_admin_scope_v1(jsonb,text,boolean,boolean)",
+      "sourceSha256": "e1e303b265c98316570f41ac740fa066a66261d87904665d51286f5467b5e6d3",
+      "targetYearParsedFromTournamentYear": false,
+      "currentScopeRequiresPointerYear": true
+    },
+    {
+      "schema": "125",
+      "signature": "mutate_production_future_year_administration_v1(jsonb)",
+      "sourceSha256": "7a566ac47d639bd28ebdf912dba1f026e19f83fefbaf32d172f264502e04fff7",
+      "targetYearParsedFromTournamentYear": true,
+      "currentScopeRequiresPointerYear": false
+    },
+    {
+      "schema": "125",
+      "signature": "production_control.assert_annual_future_admin_scope_v1(jsonb,text,boolean,boolean)",
+      "sourceSha256": "e1e303b265c98316570f41ac740fa066a66261d87904665d51286f5467b5e6d3",
+      "targetYearParsedFromTournamentYear": false,
+      "currentScopeRequiresPointerYear": true
+    }
+  ],
+  "counterevidence": "Old future-year unit/SQL fixtures use narrower schema/authorization fixtures; they do not prove the installed annual-scope contract together with current creation parser",
+  "codeTouchedForWorkaround": false,
+  "runtimeGuardsSubstituted": false,
+  "ProductionAccess": false,
+  "GoogleAccess": false,
+  "nextAction": "Separate current authority tournament_year from target metadata year in canonical annual protocol, with client/RPC compatibility proof; do not weaken current pointer or owner checks",
+  "limits": [
+    "The initial failing runtime attempted target year2098",
+    "The source-stable final runner reproduced both2098 scope rejection and2026 metadata rejection; annual-initialization.json records both actual responses",
+    "Downstream annual creation/setup/activation is NOT PROVEN"
+  ],
+  "timestamp": "2026-09-29T23:11:32.258996+00:00",
+  "finalRunner": "retirement-release.json",
+  "finalRunnerCompletedAt": "2026-09-29T23:12:04.538Z"
+}

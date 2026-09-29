@@ -1,0 +1,48 @@
+✔ Step 1C schemas are versioned, strict, and aligned with representative Codable fixtures (3.562792ms)
+✔ scoring fixtures and documentation contain no Production PII, credentials, or browser scoring secrets (1.245291ms)
+✔ the error schema exactly tracks the stable mobile v1 vocabulary and bounded conflict data (1.49075ms)
+✔ mobile routes stay thin, Bearer-only, no-store adapters over shared authority (0.940541ms)
+✔ successful mobile mutations retain internal post-commit work with retired Google unavailable (0.413708ms)
+✔ canonical acknowledgement enrichment is mobile-only and preserves browser scoring response shape (0.587333ms)
+✔ API: retired scoring-google-outbox rejects GET/POST before credentials, body, queue or adapter (13.70425ms)
+✔ API: retired round-scorecards-archive rejects GET/POST before credentials, body, queue or adapter (0.874417ms)
+✔ API: retired future-match-google-compatibility rejects GET/POST before credentials, body, queue or adapter (0.743042ms)
+✔ UNIT: mobile post-commit ignores unavailable retired transports and retains three internal families (0.829709ms)
+✔ UNIT: managed post-commit failure remains settled and does not invoke a retired fallback (0.515959ms)
+✔ API: app/api/scoring/current/route.js retains score acknowledgement and only internal post-commit families (1.283416ms)
+✔ API: app/api/scoring/matches/[matchId]/route.js retains score acknowledgement and only internal post-commit families (0.7815ms)
+✔ API: app/api/director/route.js successful canonical lifecycle never awaits retired delivery (1.251125ms)
+✔ API: app/api/director/route.js preserves rejected authorization (0.848583ms)
+✔ API: app/api/live-matches/route.js successful canonical lifecycle never awaits retired delivery (1.353041ms)
+✔ API: app/api/live-matches/route.js preserves rejected authorization (0.780333ms)
+✔ API: legacy Director workbook dashboard is explicitly retired without any transport (1.14225ms)
+✔ API: canonical frozen-2026 live-match read preserves BB admin contract without Google (2.55175ms)
+✔ API: canonical frozen-2026 live-match read preserves SC admin contract without Google (0.971792ms)
+✔ API: canonical frozen-2026 live-match read preserves SI admin contract without Google (0.883208ms)
+✔ UNIT: disabled/failed historical Google consumers cannot degrade healthy internal workers (0.770042ms)
+✔ UNIT: absence of internal worker evidence remains NOT_OBSERVED, never fabricated healthy (0.074209ms)
+✔ UNIT: disabled or backlogged required internal family remains visible after retirement (0.095709ms)
+✔ UNIT: enabled controls without internal queue measurement are not healthy evidence (0.073084ms)
+✔ API: canonical Final confirmation survives a failed readback without any Google fallback (1.072583ms)
+✔ API: canonical match read failure fails closed without fallback (0.868125ms)
+✔ API: canonical match read scope mismatch fails closed without fallback (0.658375ms)
+✔ Phase 1 telemetry preserves current-tournament RPC authority input, transport, payload, and error result from Release 139 (33.790041ms)
+✔ Phase 1 telemetry preserves scoring dispatch order, bounded request body, transport, and acknowledgement from Release 139 (13.943917ms)
+✔ Phase 2C.1 retains Release 139 internal fan-out behavior and explicitly retires Google delivery (10.511166ms)
+✔ Phase 1 telemetry preserves hole route authority and mutation order plus response semantics from Release 139 (10.911916ms)
+✔ Phase 1 telemetry preserves finalize route authority and mutation order plus response semantics from Release 139 (10.35975ms)
+✔ Production Director discovery is enabled by the existing Production entitlement gate (0.924084ms)
+✔ ordinary participants do not discover Director navigation and Preview discovery remains isolated (0.120083ms)
+✔ Director authorization outages and Production data outages remain distinct (0.461417ms)
+✔ Production overview reads Supabase contracts without touching Preview, Passport, or workbook readiness (1.34725ms)
+✔ Production console foundation exposes the bounded navigation and hides legacy editors (4.452291ms)
+✔ post-cutover SCORING_COMMITTED state reports normal maintenance while ingress is open (0.264416ms)
+✔ overview model marks legacy Production controls and Preview tooling unavailable by construction (0.241209ms)
+ℹ tests 40
+ℹ suites 0
+ℹ pass 40
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 125.96775

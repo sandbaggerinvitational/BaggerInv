@@ -1,0 +1,30 @@
+{
+  "fixture": "phase2c1-zero-google-release-v1",
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "schema": 126,
+  "result": "PASS",
+  "runtimeGuardsSubstituted": false,
+  "GoogleWriterRows": 0,
+  "GoogleCalls": 0,
+  "GoogleCredentialsRequired": false,
+  "frozen2026Release": "PASS",
+  "frozen2026Replay": "PASS",
+  "annual2099Release": "PASS",
+  "annualReplay": "PASS",
+  "secondAnnualRelease": "PASS",
+  "staleAuthorityDenied": true,
+  "conflictingReplayDenied": true,
+  "canonicalActiveWorkerDenied": true,
+  "orphanCanonicalLeaseDenied": true,
+  "activeAnnualTransitionDenied": true,
+  "GoogleFlagsRejected": 5,
+  "retiredMirrorHistoryIgnored": true,
+  "annualRowsUnchanged": true,
+  "canonicalSideGameCertification": "6f0f68b1cf6c113bb7b95879c4ddf58f046862d03c0a51648221c1c0f6c771fc",
+  "limitations": [
+    "Synthetic annual authority fixture; not a full CREATE/PREPARE/ACTIVATE annual initialization",
+    "Historical platform bootstrap models prior Google cutover locally; candidate normal release phase requires no Google",
+    "No hosted, Production, real Google or physical proof"
+  ],
+  "timestamp": "2026-09-29T23:17:47.076Z"
+}

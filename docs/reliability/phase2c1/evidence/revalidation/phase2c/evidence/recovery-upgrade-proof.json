@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "id": "P2C-A-UPGRADE",
+  "requirements": [
+    "P2C-268",
+    "P2C-064",
+    "P2C-008"
+  ],
+  "proofLayers": [
+    "POSTGRESQL",
+    "INTEGRATION"
+  ],
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "startedAt": "2026-09-29T23:12:04.876Z",
+  "production": false,
+  "result": "PASS",
+  "limitations": [
+    "Synthetic prepared/Live and runtime fixture; real actor and SQL bodies execute",
+    "Legacy receipt is genuinely committed by121, not manufactured by setting a new receipt ownership NULL",
+    "No Production data/provider identity or hosted upgrade proof; not a general migration matrix"
+  ],
+  "beforeFixture": {
+    "fixture": "bagger-phase2-score-proof-v2",
+    "seed": "2026-canonical-score-path-2",
+    "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+    "durableCommit": true,
+    "fsync": false,
+    "handicapCases": {
+      "plus": -2.5,
+      "medium": 17.8,
+      "high": 26.4,
+      "veryHigh": 40.2,
+      "builder": "production_control.handicap_v1_match_context",
+      "source": "SYNTHETIC_EDGE_CASES"
+    },
+    "runtimeSubstitutions": [
+      "assert_production_scoring_runtime",
+      "assert_production_cutover_read_scope"
+    ],
+    "limitations": [
+      "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+      "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+      "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof"
+    ],
+    "candidate": {
+      "path": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+      "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+    }
+  },
+  "upgrade": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48"
+      },
+      {
+        "path": "supabase/production_migrations/202609290125_google_runtime_retirement_v1.sql",
+        "sha256": "355be26c45d1e52ad0fd8a8e1520b7b0ad06dedba6a48b4aa15c6e2d3ee6b7dc"
+      },
+      {
+        "path": "supabase/production_migrations/202609290126_google_retired_release_admission_v1.sql",
+        "sha256": "4e14777857cd69b893662761c621753bfb5f1d48ceaed49c8283968e58d8c5a3"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "details": {
+    "through": 124,
+    "preUpgradeAccepted": true,
+    "preUpgradeOwnershipColumnAbsent": true,
+    "preUpgradeReceiptSha256": "b978f2c5b5ffb0241c73276dcc732fdf18a76c158a330c7f63bba7c1bb30e0ff",
+    "postUpgradeLegacyReceiptSha256": "b978f2c5b5ffb0241c73276dcc732fdf18a76c158a330c7f63bba7c1bb30e0ff",
+    "preUpgradeResultSha256": "d8c34f57d4066db545ea489777a1eb8fed1ad6a690c5b63b659002a82d9d0384",
+    "postUpgradeResultSha256": "d8c34f57d4066db545ea489777a1eb8fed1ad6a690c5b63b659002a82d9d0384",
+    "legacyOwnership": null,
+    "legacyStatus": "UNKNOWN",
+    "oldCanonicalFieldsUnchanged": true,
+    "newAcceptedReceiptBound": true,
+    "newAfterLockStatus": "COMMITTED",
+    "newWritesDenied": "UNAUTHORIZED",
+    "recoveryWrites": false,
+    "canonicalHoles": 2,
+    "canonicalScoreReceipts": 2,
+    "lockReceipts": 1,
+    "totalMutationReceipts": 3,
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC"
+  },
+  "clusterDestroyed": true,
+  "completedAt": "2026-09-29T23:12:07.665Z"
+}

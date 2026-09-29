@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "reason": "Lossless storage of exact failing TAP output, preserving original whitespace and receipt hashes; no evidence trimmed or rewritten. Original receipt rawArtifact refers to decompressed byte stream.",
+  "artifacts": [
+    {
+      "originalPath": "evidence/application.tap",
+      "storedPath": "evidence/application.tap.gz",
+      "encoding": "gzip",
+      "originalSha256": "0827587ee3678cfd920bd9c4e83e872a3d6349f076d6e12a95416701ed14afd0",
+      "storedSha256": "369d3dcfa93661e912a66fa0a3e2ab85a2fa5649898c66edda852c4103c09e20",
+      "originalBytes": 2600117,
+      "storedBytes": 380572
+    },
+    {
+      "originalPath": "evidence/build.tap",
+      "storedPath": "evidence/build.tap.gz",
+      "encoding": "gzip",
+      "originalSha256": "0e38728d30022a996bdfe8acd38af48a0b20833d91ef981f7d58ca33ebaca121",
+      "storedSha256": "79f3901da8e8130210de6c5e9e975dce68bbc3f0f5437c54c3443c58b94d7dca",
+      "originalBytes": 41963,
+      "storedBytes": 4263
+    },
+    {
+      "originalPath": "evidence/diagnostic-first-broad/application.tap",
+      "storedPath": "evidence/diagnostic-first-broad/application.tap.gz",
+      "encoding": "gzip",
+      "originalSha256": "0e72e5e5a08055aef25e3ea80afe3f60ba167d6fbf526bf4dda1ff2aef91a59e",
+      "storedSha256": "3b7d3beb4de30baa4b8e28d221a2b4fc48a11e892f0a7875b733e104ebd1186e",
+      "originalBytes": 2524885,
+      "storedBytes": 365946
+    },
+    {
+      "originalPath": "evidence/diagnostic-second-broad/application.tap",
+      "storedPath": "evidence/diagnostic-second-broad/application.tap.gz",
+      "encoding": "gzip",
+      "originalSha256": "3e2873ea66f7d79197220b0f7b00fa9508611095b6703593dcccb1dceb9e6046",
+      "storedSha256": "370dc2fff59214effa6a097ea2e12216fb06779941ab1548657b94c603a7125c",
+      "originalBytes": 2601607,
+      "storedBytes": 380572
+    },
+    {
+      "originalPath": "evidence/identity-admission-before.tap",
+      "storedPath": "evidence/identity-admission-before.tap.gz",
+      "encoding": "gzip",
+      "originalSha256": "cd819cf8cf19bcb70415551a958eb92c53c316524f41b8ecf0f708281659b189",
+      "storedSha256": "452e8c424f4c14853b0286800263faa27e8ee83cff0f23cde68ee21f76ad9df0",
+      "originalBytes": 6422,
+      "storedBytes": 1255
+    }
+  ]
+}

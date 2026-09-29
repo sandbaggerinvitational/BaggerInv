@@ -1,0 +1,294 @@
+{
+  "schemaVersion": 1,
+  "id": "phase2c1-current-catalog-overlay-v1",
+  "baseSha": "ab909d4519ea1331e27b0924de1572ebaf690777",
+  "historicalCatalogsUnmodified": true,
+  "status": "CANDIDATE_PARTIAL",
+  "requiredAutomaticFamilies": [
+    "CALCUTTA",
+    "COMPETITION",
+    "INTELLIGENCE"
+  ],
+  "requiredOwnerControlledFamilies": [
+    "NET_SKINS",
+    "ODDS"
+  ],
+  "retiredFamilies": [
+    "GOOGLE_REPORTING",
+    "GOOGLE_ARCHIVE",
+    "GOOGLE_COMPATIBILITY",
+    "ODDS_GOOGLE_MIRROR"
+  ],
+  "dependencyGraph": [
+    {
+      "from": "CANONICAL_SCORE",
+      "to": "POSTGRESQL_SCORE_RECEIPT_AUDIT",
+      "required": true
+    },
+    {
+      "from": "CANONICAL_FINALIZE",
+      "to": "CANONICAL_SNAPSHOT_AUDIT",
+      "required": true
+    },
+    {
+      "from": "COMMITTED_SCORE",
+      "to": "CALCUTTA",
+      "required": true
+    },
+    {
+      "from": "COMMITTED_SCORE",
+      "to": "COMPETITION",
+      "required": true
+    },
+    {
+      "from": "COMMITTED_SCORE",
+      "to": "INTELLIGENCE",
+      "required": true
+    },
+    {
+      "from": "TOURNAMENT_RUNTIME",
+      "to": "GOOGLE_REPORTING",
+      "required": false,
+      "edge": "REMOVED"
+    },
+    {
+      "from": "TOURNAMENT_RUNTIME",
+      "to": "GOOGLE_ARCHIVE",
+      "required": false,
+      "edge": "REMOVED"
+    },
+    {
+      "from": "TOURNAMENT_RUNTIME",
+      "to": "GOOGLE_COMPATIBILITY",
+      "required": false,
+      "edge": "REMOVED"
+    },
+    {
+      "from": "TOURNAMENT_RUNTIME",
+      "to": "ODDS_GOOGLE_MIRROR",
+      "required": false,
+      "edge": "REMOVED"
+    }
+  ],
+  "monitoring": [
+    {
+      "id": "GRT-MON-001",
+      "condition": "required_internal_worker_failed_or_terminal",
+      "critical": true,
+      "action": "Preserve current job/intent/generation and exact supported recovery; no providerfallback"
+    },
+    {
+      "id": "GRT-MON-002",
+      "condition": "retired_Google_job_history_pending",
+      "critical": false,
+      "action": "Historicalonly; do not page or deny RoundGO"
+    },
+    {
+      "id": "GRT-MON-003",
+      "condition": "new_Google_job_or_transport_attempt",
+      "critical": true,
+      "action": "Blockcandidatecertification; newruntimecoupling defect"
+    },
+    {
+      "id": "GRT-MON-004",
+      "condition": "internal_worker_evidence_missing",
+      "critical": false,
+      "state": "NOT_OBSERVED",
+      "action": "Do not fabricatehealthy fromzeroGooglebacklog"
+    }
+  ],
+  "automation": [
+    {
+      "id": "GRT-AUTO-001",
+      "family": "CALCUTTA",
+      "trigger": "durablecurrentcanonicaldemand",
+      "delivery": "existing124managedworker",
+      "ownerPublication": "neverautomatic"
+    },
+    {
+      "id": "GRT-AUTO-001",
+      "family": "COMPETITION",
+      "trigger": "durablecurrentcanonicaldemand",
+      "delivery": "existing124managedworker",
+      "ownerPublication": "neverautomatic"
+    },
+    {
+      "id": "GRT-AUTO-001",
+      "family": "INTELLIGENCE",
+      "trigger": "durablecurrentcanonicaldemand",
+      "delivery": "existing124managedworker",
+      "ownerPublication": "neverautomatic"
+    }
+  ],
+  "neverAgain": [
+    {
+      "id": "NA-2026-GOOGLE-RUNTIME-DEPENDENCY",
+      "requirements": [
+        "GRT-002",
+        "GRT-003",
+        "GRT-004",
+        "GRT-006",
+        "GRT-011"
+      ],
+      "tests": [
+        "test/reliability-phase2c1-runtime.test.mjs",
+        "test/reliability-phase2c1-delivery-retirement.test.mjs",
+        "test/reliability-phase2c1-google-retirement-postgres.integration.test.mjs",
+        "test/reliability-phase2c-full-sequence.integration.test.mjs"
+      ],
+      "proofLayers": [
+        "UNIT",
+        "API_INJECTED",
+        "POSTGRESQL",
+        "INTEGRATION",
+        "FULL_SEQUENCE"
+      ],
+      "futureTournamentReleaseBlocking": true,
+      "status": "PARTIAL_REQUIRED_CAPABILITY_GAPS",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "passingSubgates": [
+        "SCOPED_SQL_RETIREMENT",
+        "FINANCIAL_ISOLATION",
+        "REMAINING_AUTO_DELIVERY",
+        "ZERO_GOOGLE_432_HOLE_SEQUENCE"
+      ]
+    }
+  ],
+  "riskRegister": [
+    {
+      "id": "GRT-RISK-PROVIDER",
+      "status": "REMOVED_FROM_CANDIDATE_RUNTIME_SOURCE",
+      "risk": "Googlequota/outage/credential/sheetpermissions/delivery",
+      "deployedStatus": "UNKNOWN_UNCHANGED"
+    },
+    {
+      "id": "GRT-RISK-HISTORY",
+      "status": "OPEN",
+      "risk": "Externalhistoricalartifactpreservation andrealcorrected2017\u20132025canonicalcompleteness"
+    },
+    {
+      "id": "GRT-RISK-DIRECTOR",
+      "status": "OPEN",
+      "risk": "IsolatedPreviewDirectorpage stillselectsretired workbook dashboard"
+    },
+    {
+      "id": "GRT-RISK-CONFIG-ATTESTATION",
+      "status": "EXPLICIT_EFFECTIVE_SEMANTICS",
+      "risk": "Legacy *_configured fields mean no effective retired worker capability; actual external secret presence UNKNOWN; no revocation claim"
+    },
+    {
+      "id": "P2C1-ANNUAL-001",
+      "status": "OPEN_INDEPENDENT_PROTOCOL",
+      "risk": "ActualCREATE current-vs-target year contradiction blocks future tournament rehearsal without implying Google authority"
+    }
+  ],
+  "changeImpact": [
+    {
+      "changed": [
+        "scoreSQL",
+        "Googleproducer",
+        "archivecapture",
+        "workergrants",
+        "generationtrigger"
+      ],
+      "invalidate": [
+        "SQL_RETIREMENT",
+        "FINANCIAL_ISOLATION",
+        "FULL_SEQUENCE",
+        "PERFORMANCE"
+      ]
+    },
+    {
+      "changed": [
+        "identityselector",
+        "canonicalPrevieworigin",
+        "Directorauthorization"
+      ],
+      "invalidate": [
+        "AUTHORIZATION_SECURITY",
+        "CLIENT_COMPATIBILITY",
+        "ZERO_CREDENTIAL_BOOT"
+      ]
+    },
+    {
+      "changed": [
+        "annualruntime",
+        "releaseadmission",
+        "implementationmanifest"
+      ],
+      "invalidate": [
+        "ANNUAL_CREATE_ACTIVATE",
+        "PROTECTED_RELEASE",
+        "ANNUAL_WORKERS"
+      ]
+    },
+    {
+      "changed": [
+        "historyadapter",
+        "historicalprovenance",
+        "recordsmodel"
+      ],
+      "invalidate": [
+        "HISTORY_ALL_SUPPORTED_YEARS",
+        "RECORDS",
+        "PREVIEW_HISTORY_SQL"
+      ]
+    },
+    {
+      "changed": [
+        "reporting",
+        "export",
+        "archive",
+        "Googleadapter"
+      ],
+      "invalidate": [
+        "GOOGLE_DEPENDENCY_REGISTER",
+        "ZERO_NETWORK",
+        "FULL_SEQUENCE"
+      ],
+      "architectureReviewRequired": true
+    }
+  ],
+  "tournamentReady": {
+    "GoogleCredentialsRequired": false,
+    "GoogleJobHealthRequired": false,
+    "GoogleDeliveryProof": "N/A_RETIRED",
+    "canonicalSnapshotAuditRequired": true,
+    "requiredInternalDeliveryRequired": true,
+    "fullCandidateProofRequired": true,
+    "status": "NOT_TOURNAMENT_READY"
+  },
+  "remainingGlobalP0": [
+    "Productioncapacity_IO_connections",
+    "backup_restore",
+    "server_enforced_diagnostic_admission",
+    "native_queue_navigation",
+    "physical_scoring",
+    "RoundControlLifecycle",
+    "full_tournament_chronology",
+    "owner_rehearsal"
+  ],
+  "p0B": {
+    "status": "PASS",
+    "scope": "LOCAL_REQUIRED_AUTOMATIC_FAMILIES",
+    "families": [
+      "CALCUTTA",
+      "COMPETITION",
+      "INTELLIGENCE"
+    ],
+    "evidence": [
+      "evidence/delivery.json",
+      "evidence/revalidation/phase2c/evidence/worker-delivery-results.json",
+      "evidence/full-sequence.json",
+      "evidence/revalidation/phase2c/full-sequence-results.json",
+      "evidence/google-retirement-sql.json"
+    ],
+    "limitations": [
+      "Hosted scheduler not proven",
+      "Synthetic declared runtime boundaries",
+      "Owner-controlled financial publication unchanged",
+      "Independent annual initialization and isolated Director gaps keep overall retirement PARTIAL"
+    ]
+  }
+}

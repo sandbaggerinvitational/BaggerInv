@@ -1,0 +1,78 @@
+{
+  "fixture": "phase2c1-google-retirement-sql-v1",
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "proofLayers": [
+    "POSTGRESQL",
+    "INTEGRATION"
+  ],
+  "production": false,
+  "migration": "supabase/production_migrations/202609290125_google_runtime_retirement_v1.sql",
+  "sha256": "355be26c45d1e52ad0fd8a8e1520b7b0ad06dedba6a48b4aa15c6e2d3ee6b7dc",
+  "tests": [
+    {
+      "name": "HISTORICAL_EVIDENCE_BYTE_PRESERVED",
+      "status": "PASS",
+      "audit": 20,
+      "holes": 18,
+      "outbox": 19,
+      "archive": 1,
+      "receipts": 19,
+      "snapshot": 1
+    },
+    {
+      "name": "CANONICAL_SCORE_CONTROL_SNAPSHOT_INDEPENDENT",
+      "status": "PASS",
+      "audit": 23,
+      "holes": 18,
+      "outbox": 0,
+      "archive": 0,
+      "receipts": 22,
+      "snapshot": 1,
+      "allNewResponseAndReceiptGoogleFlagsFalse": true,
+      "historicalFlagsPreserved": true
+    },
+    {
+      "name": "RETIRED_WORKERS_AND_IMMUTABLE_GUARD",
+      "status": "PASS"
+    },
+    {
+      "name": "AUTOMATIC_BINDING_SCOPE",
+      "status": "PASS"
+    },
+    {
+      "name": "PRIVATE_CANONICAL_AUTHORITY_PRESERVED",
+      "status": "PASS"
+    },
+    {
+      "name": "FINANCIAL_WRITEBACK_UNAVAILABLE",
+      "status": "PASS",
+      "auctionRevisions": 37,
+      "purchases": 24,
+      "ownershipEntries": 24,
+      "calcuttaResults": 407,
+      "netResults": 2,
+      "financialStateBytePreserved": true,
+      "newGoogleJobs": 0,
+      "scope": "Retired delivery cannot mutate financial authority; calculator/payout correctness covered separately"
+    },
+    {
+      "name": "PREVIEW_CANONICAL_HISTORY_PROVENANCE",
+      "status": "PASS",
+      "players": 24,
+      "matches": 24,
+      "finalizedSnapshots": 1,
+      "googleConfigurationRequired": false,
+      "canonicalProvenance": "SQL tournament row",
+      "publicSafe": true,
+      "productionContextDenied": true
+    }
+  ],
+  "limitations": [
+    "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+    "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+    "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+    "Annual full activation/release tested separately",
+    "No Google account or Production proof"
+  ],
+  "result": "PASS"
+}

@@ -1,0 +1,36 @@
+✔ Supabase identity resolves verified claims to a stable Player ID without email or browser identity (1.062833ms)
+✔ missing, expired, suspended, revoked, inactive, and wrong-tournament identity fail deterministically (0.495125ms)
+✔ Director Preview impersonation is an audited lease bound to the real Auth account (0.500125ms)
+✔ Supabase scoring and Finalization validate the current Auth-linked player without Google freshness (0.34275ms)
+✔ authority-boundary, link mismatch, revoked permission, and locked/final scoring cannot silently fall back (0.202208ms)
+✔ cutover migration and routes preserve RLS, audit, rollback, and zero-Google identity semantics (2.357209ms)
+✔ linked Director access follows the verified Supabase account with no Passport or Google inspection (1.972167ms)
+✔ capability follows account changes and a different participant account is denied (0.143916ms)
+✔ retired Passport bootstrap cannot create a canonical Director entitlement (0.884209ms)
+✔ revocation is central, fail-closed, and a stale Passport cannot reactivate it (0.225917ms)
+✔ an entitlement cannot bypass expired, revoked, missing, or mismatched impersonation leases (0.782583ms)
+✔ active entitlement plus an account-bound current lease preserves Preview impersonation (1.440042ms)
+✔ Production without canonical admission denies before account or retired Passport transport (0.143583ms)
+✔ schema is narrow, RLS-closed, account-bound, audited, and 2026-only (2.897375ms)
+✔ menu warms account capability and every Director surface uses canonical account authorization (2.401667ms)
+✔ canonical Director missing database fails closed even with an active legacy Passport (0.19125ms)
+✔ canonical Director unapproved project fails closed even with an active legacy Passport (0.054083ms)
+✔ canonical Director Auth/database origin mismatch fails closed even with an active legacy Passport (0.042584ms)
+✔ canonical Director credential missing fails closed even with an active legacy Passport (0.035959ms)
+✔ canonical Director retired Passport configured fails closed even with an active legacy Passport (0.050625ms)
+✔ retired Director migration endpoints reject without identity/provider transport (11.169875ms)
+✔ UNIT requested invalid candidate cannot inherit otherwise valid Preview identity (1.606792ms)
+✔ UNIT invalid candidate blocks administrative authority and Auth client construction (0.281708ms)
+✔ UNIT unknown and retired identity authority cannot acquire administrative capability (0.230917ms)
+✔ UNIT mismatched Auth origin cannot acquire administrative capability (0.065333ms)
+✔ UNIT invalid candidate is denied before Director claims, entitlement, or Passport lookup (0.435958ms)
+✔ UNIT invalid candidate is denied before participant claims or canonical context lookup (0.195416ms)
+✔ UNIT ordinary admitted Preview identity and administration remain supported without Google (0.092625ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 108.58875

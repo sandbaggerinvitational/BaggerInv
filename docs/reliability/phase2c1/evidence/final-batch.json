@@ -1,0 +1,42 @@
+[
+  {
+    "suite": "retirement",
+    "exitCode": 0
+  },
+  {
+    "suite": "retirement-security",
+    "exitCode": 0
+  },
+  {
+    "suite": "retirement-sql",
+    "exitCode": 0
+  },
+  {
+    "suite": "retirement-release",
+    "exitCode": 0
+  },
+  {
+    "suite": "recovery",
+    "exitCode": 0
+  },
+  {
+    "suite": "delivery",
+    "exitCode": 0
+  },
+  {
+    "suite": "deadlock",
+    "exitCode": 0
+  },
+  {
+    "suite": "finite",
+    "exitCode": 0
+  },
+  {
+    "suite": "worker-lock-order",
+    "exitCode": 0
+  },
+  {
+    "suite": "full-sequence",
+    "exitCode": 0
+  }
+]

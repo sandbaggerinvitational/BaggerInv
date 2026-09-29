@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "PHASE2C1-IDENTITY-ADMISSION-FAIL-CLOSED",
+  "proofLayer": "UNIT_INJECTED",
+  "finding": "PROVEN",
+  "status": "FOCUSED_TESTS_PASS",
+  "baseSha": "ab909d4519ea1331e27b0924de1572ebaf690777",
+  "candidateSource": "Uncommitted working tree; post-test source hashes below. No immutable candidate certification implied.",
+  "before": {
+    "artifact": "identity-admission-before.tap",
+    "tests": 7,
+    "pass": 1,
+    "fail": 6,
+    "skip": 0,
+    "scope": "New7-test regression fixture executed before correction."
+  },
+  "after": {
+    "artifact": "identity-admission-after.tap",
+    "tests": 28,
+    "pass": 28,
+    "fail": 0,
+    "skip": 0,
+    "scope": "New7-test regression plus existing15 Director and6 participant identity tests. New regression subset7/7."
+  },
+  "command": "node --conditions=react-server --require ./tools/reliability/phase2c1-proof-isolation.cjs --test test/reliability-phase2c1-identity-fail-closed.test.mjs test/preview-director-entitlement.test.mjs test/participant-identity-cutover.test.mjs",
+  "sourceHashes": {
+    "lib/participant-identity-authority.js": "38453e38a4556c4b3d670a12d4f200500070202a3ed0830af4ccba951f967b17",
+    "lib/production-maintenance-precommit-deployment-rebind.js": "f88bb8ee5aba7c8b17cf95bd6bef1b2ffe2857b5906071e92f46e88eaacd2dd7",
+    "test/reliability-phase2c1-identity-fail-closed.test.mjs": "65c8032d5da5c1eddc9c9298f6962de35a993d167c297b67723c885ceb05aa80",
+    "test/preview-director-entitlement.test.mjs": "78946af2e442d0b97bb33060d190f649ffb646c794c86d14c9141a4bf197fc0f",
+    "test/participant-identity-cutover.test.mjs": "21711b3f72e9e6db9708ade56f60d091135b26d4e724c63e427173f4a24fc354"
+  },
+  "boundaries": {
+    "databaseAccess": false,
+    "providerAccess": false,
+    "productionAccess": false,
+    "googleAccountAccess": false,
+    "sourceFrozenAfterFocusedVerification": true
+  },
+  "limitations": [
+    "Local injected authorization proof only.",
+    "No SQL/API-hosted or physical proof.",
+    "Full source-stable broad suite and build are parent task responsibilities.",
+    "Existing Production-shadow read compatibility and isolated Director page gaps are not automatically closed."
+  ]
+}

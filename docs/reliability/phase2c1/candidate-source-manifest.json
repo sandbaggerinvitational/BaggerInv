@@ -1,0 +1,512 @@
+{
+  "schemaVersion": 1,
+  "baseSha": "ab909d4519ea1331e27b0924de1572ebaf690777",
+  "candidateSourceSha": "ab07b843dc20b8b4d3843c52f1be5755d19ec9af",
+  "branch": "codex/reliability-phase2c1-google-retirement",
+  "status": "PARTIAL_NOT_READY_FOR_STAGING",
+  "files": [
+    {
+      "status": "M",
+      "file": ".env.example",
+      "sha256": "e42eac691e6ba369e034dce649bf837ea1f7b20b29956b71bbc2e40f906dfec6"
+    },
+    {
+      "status": "M",
+      "file": "README.md",
+      "sha256": "14c1c9fb7f6e6e63218c479df4018ca9d19796ca80814322a32970a047289b4b"
+    },
+    {
+      "status": "M",
+      "file": "app/api/admin/step11-6-production-google-writer-fence/route.js",
+      "sha256": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e"
+    },
+    {
+      "status": "M",
+      "file": "app/api/admin/step11-production-google-certificate/route.js",
+      "sha256": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e"
+    },
+    {
+      "status": "M",
+      "file": "app/api/admin/step11-production-google-metadata/route.js",
+      "sha256": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e"
+    },
+    {
+      "status": "M",
+      "file": "app/api/cron/future-match-google-compatibility/route.js",
+      "sha256": "28613420397be9f7b6d26eb592bd14586844410f8625c639c2047446d8177a28"
+    },
+    {
+      "status": "M",
+      "file": "app/api/cron/guide-sync/diagnostics/route.js",
+      "sha256": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e"
+    },
+    {
+      "status": "M",
+      "file": "app/api/cron/guide-sync/route.js",
+      "sha256": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e"
+    },
+    {
+      "status": "M",
+      "file": "app/api/cron/round-scorecards-archive/route.js",
+      "sha256": "6322a323f1813aec3d9695c2c77b6c5c37636df634b78fee2ca2d3295a14820b"
+    },
+    {
+      "status": "M",
+      "file": "app/api/cron/scoring-google-outbox/route.js",
+      "sha256": "68cd4c0af6b4f6660e944a92f9aebfa65bc9dda8f0755ff449e4c9de112254ae"
+    },
+    {
+      "status": "M",
+      "file": "app/api/director/future-tournaments/google-writer/route.js",
+      "sha256": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e"
+    },
+    {
+      "status": "M",
+      "file": "app/api/director/route.js",
+      "sha256": "38281903fa36cf1a239da27476f674187c6fefa2674f0cd0f91da0a99854e9c8"
+    },
+    {
+      "status": "M",
+      "file": "app/api/director/scoring-authority/route.js",
+      "sha256": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e"
+    },
+    {
+      "status": "M",
+      "file": "app/api/director/scoring-shadow/benchmark/route.js",
+      "sha256": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e"
+    },
+    {
+      "status": "M",
+      "file": "app/api/director/scoring-shadow/phase2-dry-run/route.js",
+      "sha256": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e"
+    },
+    {
+      "status": "M",
+      "file": "app/api/director/scoring-shadow/route.js",
+      "sha256": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e"
+    },
+    {
+      "status": "M",
+      "file": "app/api/live-matches/route.js",
+      "sha256": "5a58e84196d3bd4cc47f12923c8653f4dac2568d5a87add21077300c55d25e77"
+    },
+    {
+      "status": "M",
+      "file": "app/api/odds/publication-operations/route.js",
+      "sha256": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e"
+    },
+    {
+      "status": "M",
+      "file": "app/api/odds/publish/route.js",
+      "sha256": "cff24676fe7687853e2b56367c63deab4f3608496f1a372b7b0fbc7a762e4d73"
+    },
+    {
+      "status": "M",
+      "file": "app/api/scoring/current/route.js",
+      "sha256": "0c4b0cc915259c2e94d5c072d9d79e57a16b17d0c32c3c2f859d3edf6012d717"
+    },
+    {
+      "status": "M",
+      "file": "app/api/scoring/matches/[matchId]/route.js",
+      "sha256": "29080b7cb9f20c6fc9b1a6d3b812db91d75dc08f451e074200d5f57a7925c936"
+    },
+    {
+      "status": "M",
+      "file": "app/history/[year]/page.js",
+      "sha256": "38b51a654034f74c884ba755124078613cf1ca3d3946b65fd1f7697fcfd059a9"
+    },
+    {
+      "status": "M",
+      "file": "app/history/[year]/round/[round]/page.js",
+      "sha256": "e86ddf6906212a803f309231e3296baf996aa5edc765e2293f389028f817a789"
+    },
+    {
+      "status": "M",
+      "file": "app/history/[year]/team/[side]/page.js",
+      "sha256": "ae8baba53e8be2e7dfd9e14fbaaf7602f18c153a2afde42f3a5c637ecc914ea7"
+    },
+    {
+      "status": "M",
+      "file": "app/live/sheetData.js",
+      "sha256": "8791b8d3a18596973fdce1649c91d14b0ac76368a6f70b1efe2d35b4fcab7ff4"
+    },
+    {
+      "status": "M",
+      "file": "app/records/[slug]/page.js",
+      "sha256": "e263681d9fe020698204aeadc4849a6e4e5aa11f11dba6f3f574405c8b6f0dcb"
+    },
+    {
+      "status": "M",
+      "file": "app/records/page.js",
+      "sha256": "02b809a0302acc644fd39f93022ca4d247721e6ed82d6f398fae51ac7935ac88"
+    },
+    {
+      "status": "M",
+      "file": "lib/calcutta-read-source.js",
+      "sha256": "d695c4706559676a70942ea4bac70735272c214ccb6906491686a4f4b7c62a62"
+    },
+    {
+      "status": "A",
+      "file": "lib/canonical-runtime-source.js",
+      "sha256": "1e86a9ffd9ea238bdd40e2ac006f003c5f31d7dab8c4b45c36995c8d1c9b4a02"
+    },
+    {
+      "status": "M",
+      "file": "lib/competition-derived-read-source.js",
+      "sha256": "36be9959e2a697362a84f0e9af5583348a12b3a3174db23e098e2fe8e66b9c30"
+    },
+    {
+      "status": "M",
+      "file": "lib/completed-history-read-source.js",
+      "sha256": "8118e4854a8f2a815291946da4a93500fe3507e47904678795bdad7d86cf8a90"
+    },
+    {
+      "status": "M",
+      "file": "lib/completed-history-supabase.js",
+      "sha256": "022ccc5bb8b9cf9628ccdf3804bbc21e5f90d239eb6ae5a13ee3dfe5117c4cf2"
+    },
+    {
+      "status": "M",
+      "file": "lib/draft-read-source.js",
+      "sha256": "0f18318bfb3b527cbc85ccdbc7389fa64740a87e440b74d3513d9d362a89a951"
+    },
+    {
+      "status": "M",
+      "file": "lib/game-center-read-source.js",
+      "sha256": "c727a0ae35c2c2dbc61d0fafa734fe8796abddf8377e707df1d8ca1c5180235d"
+    },
+    {
+      "status": "A",
+      "file": "lib/google-runtime-retirement.js",
+      "sha256": "edfe3c873a0fef69bcd756ad534c225095c4bf0c742e51ab875c3285a1793fff"
+    },
+    {
+      "status": "M",
+      "file": "lib/google-service-account-credential-context.js",
+      "sha256": "ec4fc1ef1240504f73a7efc926ebc10aaba23305047593661f1c6500482dd461"
+    },
+    {
+      "status": "M",
+      "file": "lib/google-sheets-data.js",
+      "sha256": "fd7a16453665a42ff450dcd2f1bb0dfe411eed04b2278de4bd78ec56de679cb6"
+    },
+    {
+      "status": "M",
+      "file": "lib/google-sheets-server-read.js",
+      "sha256": "916323091ac6d6987a751236e98cfbb8830426c92bb80235b1a90cbb2d5eefb6"
+    },
+    {
+      "status": "M",
+      "file": "lib/google-sheets-write.js",
+      "sha256": "9c312ab52fa7c318ded8e9afb98cbf9d9f945d06939d1e44cc591d7d15b09c4e"
+    },
+    {
+      "status": "M",
+      "file": "lib/guide-read-source.js",
+      "sha256": "10ba0407bd4f3edbc9468962d8a7461cdc2df94f1fadec7846d71456cf8b3f01"
+    },
+    {
+      "status": "M",
+      "file": "lib/historical-course-read-source.js",
+      "sha256": "7261e83330f3b6b67d9e07af5c30b18a71f5ad586859c69ec668f9638316e364"
+    },
+    {
+      "status": "M",
+      "file": "lib/history-2026-read-source.js",
+      "sha256": "80a8d2f28d9330eea00e14c7f49ddd4fe3c7e0a438a8aee73e0a02a4780fb528"
+    },
+    {
+      "status": "M",
+      "file": "lib/history-2026-supabase.js",
+      "sha256": "a5817da01311be5bf4c18ec39ec54099ba97b632dcc955b871eb57b311877ac4"
+    },
+    {
+      "status": "M",
+      "file": "lib/home-read-source.js",
+      "sha256": "da6087325378b7a13aa555cad8994af127128c8b271f79fb6ad367ae77a7f12a"
+    },
+    {
+      "status": "M",
+      "file": "lib/intelligence-derived-read-source.js",
+      "sha256": "fef745bbef7fe9babe8e9bbbc019726acb8d9d52684015f6734d66b4c1f8161a"
+    },
+    {
+      "status": "M",
+      "file": "lib/leaderboards-core-read-source.js",
+      "sha256": "fe9938b2425debc8e9e580a67c8709e1ac69928931a4236ef39827bb7e5c80e8"
+    },
+    {
+      "status": "M",
+      "file": "lib/match-authorization-source.js",
+      "sha256": "f2232d9b04889c99b7e7a35623956a9c465b4bae2db7a919ec415076c9b214b8"
+    },
+    {
+      "status": "M",
+      "file": "lib/mobile-native-development-authority.js",
+      "sha256": "6357508f46f90728c5756336bcee8b6fbdbe31c2e830ea14b0df740c5a895c0b"
+    },
+    {
+      "status": "M",
+      "file": "lib/mobile-v1-scoring-post-commit.js",
+      "sha256": "c7c15ab13cc17efdbd312a6aee58909b05f658c8419603c28925f236a2e4c4ee"
+    },
+    {
+      "status": "M",
+      "file": "lib/my-match-read-source.js",
+      "sha256": "c7ad5dbd6ff6166a971dc6e36e0b0dd1b56ed0d6d6e40774a7b636f318e6720d"
+    },
+    {
+      "status": "M",
+      "file": "lib/net-skins-read-source.js",
+      "sha256": "e5b1f25e1f552429e2b2a8037b9e42862d403315ef15e90075d8d02bfe2a792f"
+    },
+    {
+      "status": "M",
+      "file": "lib/odds-calculation-source.js",
+      "sha256": "ae3d50b8dc1984be89080623d2ae58bfc137acab36242b62b17940bd07477a92"
+    },
+    {
+      "status": "M",
+      "file": "lib/participant-identity-authority.js",
+      "sha256": "38453e38a4556c4b3d670a12d4f200500070202a3ed0830af4ccba951f967b17"
+    },
+    {
+      "status": "M",
+      "file": "lib/prediction-settings-source.js",
+      "sha256": "2542beb7e361076c46b52e0501ca729318d1b6634502db6414f77b0a0671b9c0"
+    },
+    {
+      "status": "M",
+      "file": "lib/preview-director-authorization.js",
+      "sha256": "f8a36ec3f30e5e5b9ab4876aa1ffff593ba2cc6c3403efc5e161578e7dda860d"
+    },
+    {
+      "status": "M",
+      "file": "lib/production-cutover-activation-contract.js",
+      "sha256": "b5e9d133eae4ccf51e605f4ced68c3d13adb5305ed69ecd55f075ad831377a2e"
+    },
+    {
+      "status": "M",
+      "file": "lib/production-cutover-read-source.js",
+      "sha256": "d74a9bc1a583510d394023b5966f7e70b1b956097f4256394f7cba0fd18920ea"
+    },
+    {
+      "status": "M",
+      "file": "lib/production-director-console.js",
+      "sha256": "0ad471a07f10f8894fad9c57de43dc17e7a79a547ea5baaefb9a42654f86c1e1"
+    },
+    {
+      "status": "M",
+      "file": "lib/production-maintenance-precommit-deployment-rebind.js",
+      "sha256": "f88bb8ee5aba7c8b17cf95bd6bef1b2ffe2857b5906071e92f46e88eaacd2dd7"
+    },
+    {
+      "status": "M",
+      "file": "lib/production-odds-calculation-contract.js",
+      "sha256": "df5b2b8de965708b71cd089782985dc480e6a78fb1febfeb0436ae10abaa8c15"
+    },
+    {
+      "status": "M",
+      "file": "lib/production-odds-calculation-server.js",
+      "sha256": "21516b4d6393d4319551abe0b959b4ca37fccc39038375f124075bc2d71a14c5"
+    },
+    {
+      "status": "M",
+      "file": "lib/production-scoring-operations-server.js",
+      "sha256": "d8784df786c3c1260a3720b67f109dc7d81d475983ea1a5ccb59dc5e41ae7286"
+    },
+    {
+      "status": "M",
+      "file": "lib/published-odds-read-source.js",
+      "sha256": "38901aede6f87070283243f9493ab84e325d3050f8e9313104f0e4fd5a6a5a7c"
+    },
+    {
+      "status": "M",
+      "file": "lib/scoring-authority.js",
+      "sha256": "0a5aabfa79ac3e6d4227446d3f514af2a6b0ff3f8adab011bbe82e2898445b54"
+    },
+    {
+      "status": "M",
+      "file": "lib/scoring-persistence-adapter.js",
+      "sha256": "78f0f41b80ec88c47d86775f2777738760349de2be896212826e451ab1c0e064"
+    },
+    {
+      "status": "M",
+      "file": "lib/scoring-read-source.js",
+      "sha256": "9c651a159615543cda110eda1a821221d32539174af40d3493526b09ede4df44"
+    },
+    {
+      "status": "M",
+      "file": "lib/scoring-shadow.js",
+      "sha256": "654ed7e58d5d8168296a64a80ce8bf43308e4533fcbd27b512fbc3573d892748"
+    },
+    {
+      "status": "M",
+      "file": "lib/secondary-history-read-source.js",
+      "sha256": "9b5404c4d6303da8ce4e5291104dfb0d5ba0ec45fb40c3ec2be851840d04b08e"
+    },
+    {
+      "status": "M",
+      "file": "lib/tournament-read-source.js",
+      "sha256": "dc0652b44a9628e2b54e4e07bebb6eff004fbf9b6933ff178f1229cb9dceebdd"
+    },
+    {
+      "status": "M",
+      "file": "lib/war-room-input-source.js",
+      "sha256": "ed3d5d0d733c2808ad174ea8987ac1636f6839d185fc7e6f91660d1868f95688"
+    },
+    {
+      "status": "A",
+      "file": "supabase/migrations/202609290001_canonical_history_provenance_v1.sql",
+      "sha256": "8ae8dbf64f9d4094dfe7a2214a0bd2d4dffc0e60d29efdff8abd4069126ec151"
+    },
+    {
+      "status": "A",
+      "file": "supabase/production_migrations/202609290125_google_runtime_retirement_v1.sql",
+      "sha256": "355be26c45d1e52ad0fd8a8e1520b7b0ad06dedba6a48b4aa15c6e2d3ee6b7dc"
+    },
+    {
+      "status": "A",
+      "file": "supabase/production_migrations/202609290126_google_retired_release_admission_v1.sql",
+      "sha256": "4e14777857cd69b893662761c621753bfb5f1d48ceaed49c8283968e58d8c5a3"
+    },
+    {
+      "status": "A",
+      "file": "test/fixtures/reliability-phase2c1-annual-release.sql",
+      "sha256": "91a5472d351ea0095e3252f6b058d49cde5e1bea8bf03bf4762b33f25ae056da"
+    },
+    {
+      "status": "M",
+      "file": "test/mobile-api-v1.test.mjs",
+      "sha256": "861c3c8c2d8a3f0015eae07d7724dc665c6a273d5eb1dcfa67103414107e7e22"
+    },
+    {
+      "status": "M",
+      "file": "test/mobile-v1-scoring-contracts.test.mjs",
+      "sha256": "1c766e8ed3006fafa64f84d9445897e5db6b9b2794b1e7be5523f79730f107cb"
+    },
+    {
+      "status": "M",
+      "file": "test/participant-identity-cutover.test.mjs",
+      "sha256": "21711b3f72e9e6db9708ade56f60d091135b26d4e724c63e427173f4a24fc354"
+    },
+    {
+      "status": "M",
+      "file": "test/participant-phone-otp-controlled-preview.test.mjs",
+      "sha256": "ec4fcac85fa95fcd6be714d33a53474c494469a8ec7e67faab46553011cde663"
+    },
+    {
+      "status": "M",
+      "file": "test/preview-director-entitlement.test.mjs",
+      "sha256": "78946af2e442d0b97bb33060d190f649ffb646c794c86d14c9141a4bf197fc0f"
+    },
+    {
+      "status": "M",
+      "file": "test/preview-impersonation-lease-security.test.mjs",
+      "sha256": "b945a98854573e0f93c6303782f41661e78c1a96101f895661bca5e691cf0fee"
+    },
+    {
+      "status": "M",
+      "file": "test/reliability-phase2c-full-sequence.integration.test.mjs",
+      "sha256": "3eba1e2c118374ba35a9acdbe591fe01e157a4f92e94c8786f0626643e8b90c4"
+    },
+    {
+      "status": "A",
+      "file": "test/reliability-phase2c1-boot.integration.test.mjs",
+      "sha256": "25bc1690deee1a56731c3568db5c9fe598f65783482e401ac36c9d069a24920c"
+    },
+    {
+      "status": "A",
+      "file": "test/reliability-phase2c1-delivery-retirement.test.mjs",
+      "sha256": "b30a978cc0e5ae846e3460e45f81b86d633bd806e995d8ef05ccfc28bd331d66"
+    },
+    {
+      "status": "A",
+      "file": "test/reliability-phase2c1-google-retirement-postgres.integration.test.mjs",
+      "sha256": "a9c7367527c66e0a91c31460b9502c460f6594f8e21f89d9b0108b6ffaa5ce97"
+    },
+    {
+      "status": "A",
+      "file": "test/reliability-phase2c1-history.test.mjs",
+      "sha256": "b5f26eb4585f0331ac6a3c938404ef51712a1057d323ad3f7bea3816df1e9041"
+    },
+    {
+      "status": "A",
+      "file": "test/reliability-phase2c1-identity-fail-closed.test.mjs",
+      "sha256": "65c8032d5da5c1eddc9c9298f6962de35a993d167c297b67723c885ceb05aa80"
+    },
+    {
+      "status": "A",
+      "file": "test/reliability-phase2c1-proof-harness.test.mjs",
+      "sha256": "247d54926a1bb72014f5a21c7f2791a193feb3f421044ed622f1b253ab5be465"
+    },
+    {
+      "status": "A",
+      "file": "test/reliability-phase2c1-release-admission.integration.test.mjs",
+      "sha256": "938b6ac158c3ce10d08337a6218a45094211032711bbe865c7893f55b1de52d3"
+    },
+    {
+      "status": "A",
+      "file": "test/reliability-phase2c1-runtime.test.mjs",
+      "sha256": "12526d2780273a06e0a5173749b24c4908ed96c5e9fd80b0d8fa5bec924e3378"
+    },
+    {
+      "status": "M",
+      "file": "test/reliability-telemetry-protected-equivalence.test.mjs",
+      "sha256": "66b851144aa6150dea3bd1f8c63f63920c61b8789db797dc355944cb6c2eb24f"
+    },
+    {
+      "status": "M",
+      "file": "test/scoring-read-supabase.test.mjs",
+      "sha256": "014cd59d8427fca1fb8a469e83ce31580622c774fbeb2dc29924735bc2cce472"
+    },
+    {
+      "status": "M",
+      "file": "test/step13e1-production-director-console-foundation.test.mjs",
+      "sha256": "1e809efbb9360f19e8239fbad19cf8d71fbbdc537ccca2296db5020c6c7b4fdb"
+    },
+    {
+      "status": "M",
+      "file": "test/support/reliability/phase2c-install.mjs",
+      "sha256": "36932d1f1a0a4af65cd748baafc1f93562306e6f0992615f5dc4a8dcc8904821"
+    },
+    {
+      "status": "A",
+      "file": "test/support/reliability/phase2c1-annual-initialization.mjs",
+      "sha256": "29891e6e4ff80ee59eae89273633d78da53e2c4d9c01b5ee73503abb4914f996"
+    },
+    {
+      "status": "A",
+      "file": "test/support/reliability/phase2c1-history-fixture.mjs",
+      "sha256": "5b54bb777a578d92d4f14f2deed1ad174bb57703c2e36508ec9448de772da600"
+    },
+    {
+      "status": "A",
+      "file": "tools/maintenance/retired-google-http-manifest.json",
+      "sha256": "8e5b8190de56dc4d4099a9c2c977e348af5158d6c92dc7ec689b1c34e82c269c"
+    },
+    {
+      "status": "A",
+      "file": "tools/reliability/benchmark-phase2c1.mjs",
+      "sha256": "bb121683ff2a31e41673def53786a741c25390121e0711f841e764389cf87885"
+    },
+    {
+      "status": "A",
+      "file": "tools/reliability/phase2c1-proof-isolation.cjs",
+      "sha256": "7972810856f47b9780fe617b6b4586963c7ce86358932566a8515f28c0ba8940"
+    },
+    {
+      "status": "A",
+      "file": "tools/reliability/run-phase2c1-tests.mjs",
+      "sha256": "0dcad8fbc53264b42109102892398ff8287efcf01d91fc9d76784705dfe15704"
+    },
+    {
+      "status": "M",
+      "file": "vercel.json",
+      "sha256": "0049512c25893f6335f99eea6adc6871818d9296d051bf018745086b32a870c9"
+    }
+  ],
+  "deploymentPerformed": false,
+  "productionQueried": false,
+  "googleAccountAccessed": false
+}
