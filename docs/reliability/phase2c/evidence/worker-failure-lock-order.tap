@@ -1,0 +1,107 @@
+TAP version 13
+# Subtest: Worker expiry, failure and future claims preserve actual control lock order
+    # Subtest: expiry-update SCORING_LOCK before
+    ok 1 - expiry-update SCORING_LOCK before
+      ---
+      duration_ms: 1614.331875
+      type: 'test'
+      ...
+    # Subtest: expiry-update SCORING_LOCK after
+    ok 2 - expiry-update SCORING_LOCK after
+      ---
+      duration_ms: 537.552833
+      type: 'test'
+      ...
+    # Subtest: expiry-update FINALIZE before
+    ok 3 - expiry-update FINALIZE before
+      ---
+      duration_ms: 1575.18175
+      type: 'test'
+      ...
+    # Subtest: expiry-update FINALIZE after
+    ok 4 - expiry-update FINALIZE after
+      ---
+      duration_ms: 635.798375
+      type: 'test'
+      ...
+    # Subtest: bundle-failure SCORING_LOCK before
+    ok 5 - bundle-failure SCORING_LOCK before
+      ---
+      duration_ms: 1515.586708
+      type: 'test'
+      ...
+    # Subtest: bundle-failure SCORING_LOCK after
+    ok 6 - bundle-failure SCORING_LOCK after
+      ---
+      duration_ms: 472.714208
+      type: 'test'
+      ...
+    # Subtest: bundle-failure FINALIZE before
+    ok 7 - bundle-failure FINALIZE before
+      ---
+      duration_ms: 1614.224625
+      type: 'test'
+      ...
+    # Subtest: bundle-failure FINALIZE after
+    ok 8 - bundle-failure FINALIZE after
+      ---
+      duration_ms: 479.100834
+      type: 'test'
+      ...
+    # Subtest: preclaim-skip-locked SCORING_LOCK after
+    ok 9 - preclaim-skip-locked SCORING_LOCK after
+      ---
+      duration_ms: 462.484292
+      type: 'test'
+      ...
+    # Subtest: preclaim-skip-locked FINALIZE after
+    ok 10 - preclaim-skip-locked FINALIZE after
+      ---
+      duration_ms: 459.110792
+      type: 'test'
+      ...
+    # Subtest: future-expiry INSTALLED_MATCH_CONTROL_TRIGGER before
+    ok 11 - future-expiry INSTALLED_MATCH_CONTROL_TRIGGER before
+      ---
+      duration_ms: 1474.593584
+      type: 'test'
+      ...
+    # Subtest: future-expiry INSTALLED_MATCH_CONTROL_TRIGGER after
+    ok 12 - future-expiry INSTALLED_MATCH_CONTROL_TRIGGER after
+      ---
+      duration_ms: 443.090666
+      type: 'test'
+      ...
+    # Subtest: future-intelligence INSTALLED_MATCH_CONTROL_TRIGGER before
+    ok 13 - future-intelligence INSTALLED_MATCH_CONTROL_TRIGGER before
+      ---
+      duration_ms: 1430.318792
+      type: 'test'
+      ...
+    # Subtest: future-intelligence INSTALLED_MATCH_CONTROL_TRIGGER after
+    ok 14 - future-intelligence INSTALLED_MATCH_CONTROL_TRIGGER after
+      ---
+      duration_ms: 414.484584
+      type: 'test'
+      ...
+    # Subtest: all four affected function privileges and attributes remain unchanged
+    ok 15 - all four affected function privileges and attributes remain unchanged
+      ---
+      duration_ms: 34.727041
+      type: 'test'
+      ...
+    1..15
+ok 1 - Worker expiry, failure and future claims preserve actual control lock order
+  ---
+  duration_ms: 23077.936875
+  type: 'test'
+  ...
+1..1
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 23143.802667

@@ -1,0 +1,735 @@
+{
+  "schemaVersion": 1,
+  "environment": "OWNED_LOCAL_SOCKET_POSTGRESQL17",
+  "production": false,
+  "startedAt": "2026-09-28T18:34:17.262Z",
+  "scales": [
+    {
+      "scale": 1,
+      "identity": {
+        "seqscan": "on",
+        "version": "17.11 (Homebrew)",
+        "database": "p2c_optional_index_1",
+        "socketOnly": true
+      },
+      "currentActiveLimits": {
+        "calcutta": 1,
+        "netSkinsRounds": 2,
+        "competitionMarkers": 5
+      },
+      "sourceHashes": {
+        "calcutta": "adf8f2fd93339e2d15b5f7be00d2dbbafee00edd14f754c250d0841ba98f88c1",
+        "netSkins": "1228207461354644a269d5a58af2ae764b1afae93e67e3e3847fd80931ebb18d"
+      },
+      "cases": [
+        {
+          "name": "CALCUTTA_DUE",
+          "index": "scoring_authority.calcutta_v1_recalculation_jobs_delivery_due",
+          "query": "select value.*\n  from scoring_authority.calcutta_v1_recalculation_jobs value\n  where value.tournament_id = '2026'\n    and value.configuration_revision = 2\n    and value.configuration_fingerprint =\n      '6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474'\n    and value.auction_revision = 37\n    and value.auction_fingerprint = '2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a'\n    and value.activation_revision =\n      139\n    and value.status = 'PENDING' and value.delivery_dead_letter_at is null\n    and value.delivery_attempts<5 and value.delivery_available_at<=clock_timestamp() and value.attempts < 5\n  order by value.requested_at, value.job_id\n  for update skip locked\n  limit 1",
+          "expected": 1,
+          "indexDefinition": "CREATE INDEX calcutta_v1_recalculation_jobs_delivery_due ON scoring_authority.calcutta_v1_recalculation_jobs USING btree (tournament_id, delivery_available_at) WHERE ((status = ANY (ARRAY['PENDING'::text, 'FAILED'::text])) AND (delivery_dead_letter_at IS NULL))",
+          "withIndex": {
+            "ids": [
+              "1eaddf67-761f-5e06-1a6e-f60c7fefa956"
+            ],
+            "plan": {
+              "Plan": {
+                "Plans": [
+                  {
+                    "Plans": [
+                      {
+                        "Plans": [
+                          {
+                            "Alias": "value",
+                            "Filter": "((delivery_dead_letter_at IS NULL) AND (delivery_attempts < 5) AND (attempts < 5) AND (tournament_id = '2026'::text) AND (configuration_revision = 2) AND (configuration_fingerprint = '6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474'::text) AND (auction_revision = 37) AND (auction_fingerprint = '2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a'::text) AND (activation_revision = 139) AND (delivery_available_at <= clock_timestamp()))",
+                            "Node Type": "Index Scan",
+                            "Plan Rows": 1,
+                            "Index Cond": "(status = 'PENDING'::text)",
+                            "Index Name": "production_calcutta_v1_claim_queue",
+                            "Plan Width": 666,
+                            "Total Cost": 8.17,
+                            "Actual Rows": 1,
+                            "Actual Loops": 1,
+                            "Startup Cost": 0.12,
+                            "Async Capable": false,
+                            "Relation Name": "calcutta_v1_recalculation_jobs",
+                            "Parallel Aware": false,
+                            "Scan Direction": "Forward",
+                            "Local Hit Blocks": 0,
+                            "Temp Read Blocks": 0,
+                            "Actual Total Time": 0.005,
+                            "Local Read Blocks": 0,
+                            "Shared Hit Blocks": 2,
+                            "Shared Read Blocks": 0,
+                            "Actual Startup Time": 0.005,
+                            "Parent Relationship": "Outer",
+                            "Temp Written Blocks": 0,
+                            "Local Dirtied Blocks": 0,
+                            "Local Written Blocks": 0,
+                            "Shared Dirtied Blocks": 0,
+                            "Shared Written Blocks": 0,
+                            "Rows Removed by Filter": 0,
+                            "Rows Removed by Index Recheck": 0
+                          }
+                        ],
+                        "Sort Key": [
+                          "requested_at",
+                          "job_id"
+                        ],
+                        "Node Type": "Incremental Sort",
+                        "Plan Rows": 2,
+                        "Plan Width": 666,
+                        "Total Cost": 8.22,
+                        "Actual Rows": 1,
+                        "Actual Loops": 1,
+                        "Startup Cost": 8.18,
+                        "Async Capable": false,
+                        "Presorted Key": [
+                          "requested_at"
+                        ],
+                        "Parallel Aware": false,
+                        "Full-sort Groups": {
+                          "Group Count": 1,
+                          "Sort Methods Used": [
+                            "quicksort"
+                          ],
+                          "Sort Space Memory": {
+                            "Peak Sort Space Used": 25,
+                            "Average Sort Space Used": 25
+                          }
+                        },
+                        "Local Hit Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Actual Total Time": 0.015,
+                        "Local Read Blocks": 0,
+                        "Shared Hit Blocks": 2,
+                        "Shared Read Blocks": 0,
+                        "Actual Startup Time": 0.015,
+                        "Parent Relationship": "Outer",
+                        "Temp Written Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0
+                      }
+                    ],
+                    "Node Type": "LockRows",
+                    "Plan Rows": 2,
+                    "Plan Width": 666,
+                    "Total Cost": 8.24,
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Startup Cost": 8.18,
+                    "Async Capable": false,
+                    "Parallel Aware": false,
+                    "Local Hit Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Actual Total Time": 0.017,
+                    "Local Read Blocks": 0,
+                    "Shared Hit Blocks": 3,
+                    "Shared Read Blocks": 0,
+                    "Actual Startup Time": 0.017,
+                    "Parent Relationship": "Outer",
+                    "Temp Written Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0
+                  }
+                ],
+                "Node Type": "Limit",
+                "Plan Rows": 1,
+                "Plan Width": 666,
+                "Total Cost": 8.21,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Startup Cost": 8.18,
+                "Async Capable": false,
+                "Parallel Aware": false,
+                "Local Hit Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Actual Total Time": 0.018,
+                "Local Read Blocks": 0,
+                "Shared Hit Blocks": 3,
+                "Shared Read Blocks": 0,
+                "Actual Startup Time": 0.018,
+                "Temp Written Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0
+              },
+              "Planning": {
+                "Local Hit Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Local Read Blocks": 0,
+                "Shared Hit Blocks": 168,
+                "Shared Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0
+              },
+              "Settings": {},
+              "Triggers": [],
+              "Planning Time": 0.262,
+              "Execution Time": 0.043
+            },
+            "rows": 1,
+            "summary": {
+              "indexes": [
+                "production_calcutta_v1_claim_queue"
+              ],
+              "nodes": [
+                "Limit",
+                "LockRows",
+                "Incremental Sort",
+                "Index Scan"
+              ],
+              "rowsRemoved": 0,
+              "rootHits": 3,
+              "rootReads": 0,
+              "executionMs": 0.043
+            }
+          },
+          "withoutIndex": {
+            "ids": [
+              "1eaddf67-761f-5e06-1a6e-f60c7fefa956"
+            ],
+            "plan": {
+              "Plan": {
+                "Plans": [
+                  {
+                    "Plans": [
+                      {
+                        "Plans": [
+                          {
+                            "Alias": "value",
+                            "Filter": "((delivery_dead_letter_at IS NULL) AND (delivery_attempts < 5) AND (attempts < 5) AND (tournament_id = '2026'::text) AND (configuration_revision = 2) AND (configuration_fingerprint = '6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474'::text) AND (auction_revision = 37) AND (auction_fingerprint = '2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a'::text) AND (activation_revision = 139) AND (delivery_available_at <= clock_timestamp()))",
+                            "Node Type": "Index Scan",
+                            "Plan Rows": 1,
+                            "Index Cond": "(status = 'PENDING'::text)",
+                            "Index Name": "production_calcutta_v1_claim_queue",
+                            "Plan Width": 666,
+                            "Total Cost": 8.17,
+                            "Actual Rows": 1,
+                            "Actual Loops": 1,
+                            "Startup Cost": 0.12,
+                            "Async Capable": false,
+                            "Relation Name": "calcutta_v1_recalculation_jobs",
+                            "Parallel Aware": false,
+                            "Scan Direction": "Forward",
+                            "Local Hit Blocks": 0,
+                            "Temp Read Blocks": 0,
+                            "Actual Total Time": 0.006,
+                            "Local Read Blocks": 0,
+                            "Shared Hit Blocks": 3,
+                            "Shared Read Blocks": 0,
+                            "Actual Startup Time": 0.005,
+                            "Parent Relationship": "Outer",
+                            "Temp Written Blocks": 0,
+                            "Local Dirtied Blocks": 0,
+                            "Local Written Blocks": 0,
+                            "Shared Dirtied Blocks": 0,
+                            "Shared Written Blocks": 0,
+                            "Rows Removed by Filter": 0,
+                            "Rows Removed by Index Recheck": 0
+                          }
+                        ],
+                        "Sort Key": [
+                          "requested_at",
+                          "job_id"
+                        ],
+                        "Node Type": "Incremental Sort",
+                        "Plan Rows": 2,
+                        "Plan Width": 666,
+                        "Total Cost": 8.22,
+                        "Actual Rows": 1,
+                        "Actual Loops": 1,
+                        "Startup Cost": 8.18,
+                        "Async Capable": false,
+                        "Presorted Key": [
+                          "requested_at"
+                        ],
+                        "Parallel Aware": false,
+                        "Full-sort Groups": {
+                          "Group Count": 1,
+                          "Sort Methods Used": [
+                            "quicksort"
+                          ],
+                          "Sort Space Memory": {
+                            "Peak Sort Space Used": 25,
+                            "Average Sort Space Used": 25
+                          }
+                        },
+                        "Local Hit Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Actual Total Time": 0.017,
+                        "Local Read Blocks": 0,
+                        "Shared Hit Blocks": 3,
+                        "Shared Read Blocks": 0,
+                        "Actual Startup Time": 0.017,
+                        "Parent Relationship": "Outer",
+                        "Temp Written Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0
+                      }
+                    ],
+                    "Node Type": "LockRows",
+                    "Plan Rows": 2,
+                    "Plan Width": 666,
+                    "Total Cost": 8.24,
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Startup Cost": 8.18,
+                    "Async Capable": false,
+                    "Parallel Aware": false,
+                    "Local Hit Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Actual Total Time": 0.022,
+                    "Local Read Blocks": 0,
+                    "Shared Hit Blocks": 4,
+                    "Shared Read Blocks": 0,
+                    "Actual Startup Time": 0.022,
+                    "Parent Relationship": "Outer",
+                    "Temp Written Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0
+                  }
+                ],
+                "Node Type": "Limit",
+                "Plan Rows": 1,
+                "Plan Width": 666,
+                "Total Cost": 8.21,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Startup Cost": 8.18,
+                "Async Capable": false,
+                "Parallel Aware": false,
+                "Local Hit Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Actual Total Time": 0.023,
+                "Local Read Blocks": 0,
+                "Shared Hit Blocks": 4,
+                "Shared Read Blocks": 0,
+                "Actual Startup Time": 0.022,
+                "Temp Written Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0
+              },
+              "Planning": {
+                "Local Hit Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Local Read Blocks": 0,
+                "Shared Hit Blocks": 154,
+                "Shared Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0
+              },
+              "Settings": {},
+              "Triggers": [],
+              "Planning Time": 0.173,
+              "Execution Time": 0.049
+            },
+            "rows": 1,
+            "summary": {
+              "indexes": [
+                "production_calcutta_v1_claim_queue"
+              ],
+              "nodes": [
+                "Limit",
+                "LockRows",
+                "Incremental Sort",
+                "Index Scan"
+              ],
+              "rowsRemoved": 0,
+              "rootHits": 4,
+              "rootReads": 0,
+              "executionMs": 0.049
+            }
+          },
+          "result": "PASS",
+          "rollbackVerified": true
+        },
+        {
+          "name": "CALCUTTA_DELAYED",
+          "index": "scoring_authority.calcutta_v1_recalculation_jobs_delivery_due",
+          "query": "select value.*\n  from scoring_authority.calcutta_v1_recalculation_jobs value\n  where value.tournament_id = '2026'\n    and value.configuration_revision = 2\n    and value.configuration_fingerprint =\n      '6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474'\n    and value.auction_revision = 37\n    and value.auction_fingerprint = '2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a'\n    and value.activation_revision =\n      139\n    and value.status = 'PENDING' and value.delivery_dead_letter_at is null\n    and value.delivery_attempts<5 and value.delivery_available_at<=clock_timestamp() and value.attempts < 5\n  order by value.requested_at, value.job_id\n  for update skip locked\n  limit 1",
+          "expected": 0,
+          "indexDefinition": "CREATE INDEX calcutta_v1_recalculation_jobs_delivery_due ON scoring_authority.calcutta_v1_recalculation_jobs USING btree (tournament_id, delivery_available_at) WHERE ((status = ANY (ARRAY['PENDING'::text, 'FAILED'::text])) AND (delivery_dead_letter_at IS NULL))",
+          "withIndex": {
+            "ids": [],
+            "plan": {
+              "Plan": {
+                "Plans": [
+                  {
+                    "Plans": [
+                      {
+                        "Plans": [
+                          {
+                            "Alias": "value",
+                            "Filter": "((delivery_dead_letter_at IS NULL) AND (delivery_attempts < 5) AND (attempts < 5) AND (tournament_id = '2026'::text) AND (configuration_revision = 2) AND (configuration_fingerprint = '6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474'::text) AND (auction_revision = 37) AND (auction_fingerprint = '2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a'::text) AND (activation_revision = 139) AND (delivery_available_at <= clock_timestamp()))",
+                            "Node Type": "Index Scan",
+                            "Plan Rows": 1,
+                            "Index Cond": "(status = 'PENDING'::text)",
+                            "Index Name": "production_calcutta_v1_claim_queue",
+                            "Plan Width": 666,
+                            "Total Cost": 8.17,
+                            "Actual Rows": 0,
+                            "Actual Loops": 1,
+                            "Startup Cost": 0.12,
+                            "Async Capable": false,
+                            "Relation Name": "calcutta_v1_recalculation_jobs",
+                            "Parallel Aware": false,
+                            "Scan Direction": "Forward",
+                            "Local Hit Blocks": 0,
+                            "Temp Read Blocks": 0,
+                            "Actual Total Time": 0.005,
+                            "Local Read Blocks": 0,
+                            "Shared Hit Blocks": 3,
+                            "Shared Read Blocks": 0,
+                            "Actual Startup Time": 0.005,
+                            "Parent Relationship": "Outer",
+                            "Temp Written Blocks": 0,
+                            "Local Dirtied Blocks": 0,
+                            "Local Written Blocks": 0,
+                            "Shared Dirtied Blocks": 0,
+                            "Shared Written Blocks": 0,
+                            "Rows Removed by Filter": 1,
+                            "Rows Removed by Index Recheck": 0
+                          }
+                        ],
+                        "Sort Key": [
+                          "requested_at",
+                          "job_id"
+                        ],
+                        "Node Type": "Incremental Sort",
+                        "Plan Rows": 2,
+                        "Plan Width": 666,
+                        "Total Cost": 8.22,
+                        "Actual Rows": 0,
+                        "Actual Loops": 1,
+                        "Startup Cost": 8.18,
+                        "Async Capable": false,
+                        "Presorted Key": [
+                          "requested_at"
+                        ],
+                        "Parallel Aware": false,
+                        "Full-sort Groups": {
+                          "Group Count": 1,
+                          "Sort Methods Used": [
+                            "quicksort"
+                          ],
+                          "Sort Space Memory": {
+                            "Peak Sort Space Used": 25,
+                            "Average Sort Space Used": 25
+                          }
+                        },
+                        "Local Hit Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Actual Total Time": 0.013,
+                        "Local Read Blocks": 0,
+                        "Shared Hit Blocks": 3,
+                        "Shared Read Blocks": 0,
+                        "Actual Startup Time": 0.013,
+                        "Parent Relationship": "Outer",
+                        "Temp Written Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0
+                      }
+                    ],
+                    "Node Type": "LockRows",
+                    "Plan Rows": 2,
+                    "Plan Width": 666,
+                    "Total Cost": 8.24,
+                    "Actual Rows": 0,
+                    "Actual Loops": 1,
+                    "Startup Cost": 8.18,
+                    "Async Capable": false,
+                    "Parallel Aware": false,
+                    "Local Hit Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Actual Total Time": 0.013,
+                    "Local Read Blocks": 0,
+                    "Shared Hit Blocks": 3,
+                    "Shared Read Blocks": 0,
+                    "Actual Startup Time": 0.013,
+                    "Parent Relationship": "Outer",
+                    "Temp Written Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0
+                  }
+                ],
+                "Node Type": "Limit",
+                "Plan Rows": 1,
+                "Plan Width": 666,
+                "Total Cost": 8.21,
+                "Actual Rows": 0,
+                "Actual Loops": 1,
+                "Startup Cost": 8.18,
+                "Async Capable": false,
+                "Parallel Aware": false,
+                "Local Hit Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Actual Total Time": 0.013,
+                "Local Read Blocks": 0,
+                "Shared Hit Blocks": 3,
+                "Shared Read Blocks": 0,
+                "Actual Startup Time": 0.013,
+                "Temp Written Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0
+              },
+              "Planning": {
+                "Local Hit Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Local Read Blocks": 0,
+                "Shared Hit Blocks": 147,
+                "Shared Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0
+              },
+              "Settings": {},
+              "Triggers": [],
+              "Planning Time": 0.152,
+              "Execution Time": 0.039
+            },
+            "rows": 0,
+            "summary": {
+              "indexes": [
+                "production_calcutta_v1_claim_queue"
+              ],
+              "nodes": [
+                "Limit",
+                "LockRows",
+                "Incremental Sort",
+                "Index Scan"
+              ],
+              "rowsRemoved": 1,
+              "rootHits": 3,
+              "rootReads": 0,
+              "executionMs": 0.039
+            }
+          },
+          "withoutIndex": {
+            "ids": [],
+            "plan": {
+              "Plan": {
+                "Plans": [
+                  {
+                    "Plans": [
+                      {
+                        "Plans": [
+                          {
+                            "Alias": "value",
+                            "Filter": "((delivery_dead_letter_at IS NULL) AND (delivery_attempts < 5) AND (attempts < 5) AND (tournament_id = '2026'::text) AND (configuration_revision = 2) AND (configuration_fingerprint = '6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474'::text) AND (auction_revision = 37) AND (auction_fingerprint = '2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a'::text) AND (activation_revision = 139) AND (delivery_available_at <= clock_timestamp()))",
+                            "Node Type": "Index Scan",
+                            "Plan Rows": 1,
+                            "Index Cond": "(status = 'PENDING'::text)",
+                            "Index Name": "production_calcutta_v1_claim_queue",
+                            "Plan Width": 666,
+                            "Total Cost": 8.17,
+                            "Actual Rows": 0,
+                            "Actual Loops": 1,
+                            "Startup Cost": 0.12,
+                            "Async Capable": false,
+                            "Relation Name": "calcutta_v1_recalculation_jobs",
+                            "Parallel Aware": false,
+                            "Scan Direction": "Forward",
+                            "Local Hit Blocks": 0,
+                            "Temp Read Blocks": 0,
+                            "Actual Total Time": 0.005,
+                            "Local Read Blocks": 0,
+                            "Shared Hit Blocks": 3,
+                            "Shared Read Blocks": 0,
+                            "Actual Startup Time": 0.005,
+                            "Parent Relationship": "Outer",
+                            "Temp Written Blocks": 0,
+                            "Local Dirtied Blocks": 0,
+                            "Local Written Blocks": 0,
+                            "Shared Dirtied Blocks": 0,
+                            "Shared Written Blocks": 0,
+                            "Rows Removed by Filter": 1,
+                            "Rows Removed by Index Recheck": 0
+                          }
+                        ],
+                        "Sort Key": [
+                          "requested_at",
+                          "job_id"
+                        ],
+                        "Node Type": "Incremental Sort",
+                        "Plan Rows": 2,
+                        "Plan Width": 666,
+                        "Total Cost": 8.22,
+                        "Actual Rows": 0,
+                        "Actual Loops": 1,
+                        "Startup Cost": 8.18,
+                        "Async Capable": false,
+                        "Presorted Key": [
+                          "requested_at"
+                        ],
+                        "Parallel Aware": false,
+                        "Full-sort Groups": {
+                          "Group Count": 1,
+                          "Sort Methods Used": [
+                            "quicksort"
+                          ],
+                          "Sort Space Memory": {
+                            "Peak Sort Space Used": 25,
+                            "Average Sort Space Used": 25
+                          }
+                        },
+                        "Local Hit Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Actual Total Time": 0.013,
+                        "Local Read Blocks": 0,
+                        "Shared Hit Blocks": 3,
+                        "Shared Read Blocks": 0,
+                        "Actual Startup Time": 0.012,
+                        "Parent Relationship": "Outer",
+                        "Temp Written Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0
+                      }
+                    ],
+                    "Node Type": "LockRows",
+                    "Plan Rows": 2,
+                    "Plan Width": 666,
+                    "Total Cost": 8.24,
+                    "Actual Rows": 0,
+                    "Actual Loops": 1,
+                    "Startup Cost": 8.18,
+                    "Async Capable": false,
+                    "Parallel Aware": false,
+                    "Local Hit Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Actual Total Time": 0.013,
+                    "Local Read Blocks": 0,
+                    "Shared Hit Blocks": 3,
+                    "Shared Read Blocks": 0,
+                    "Actual Startup Time": 0.013,
+                    "Parent Relationship": "Outer",
+                    "Temp Written Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0
+                  }
+                ],
+                "Node Type": "Limit",
+                "Plan Rows": 1,
+                "Plan Width": 666,
+                "Total Cost": 8.21,
+                "Actual Rows": 0,
+                "Actual Loops": 1,
+                "Startup Cost": 8.18,
+                "Async Capable": false,
+                "Parallel Aware": false,
+                "Local Hit Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Actual Total Time": 0.013,
+                "Local Read Blocks": 0,
+                "Shared Hit Blocks": 3,
+                "Shared Read Blocks": 0,
+                "Actual Startup Time": 0.013,
+                "Temp Written Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0
+              },
+              "Planning": {
+                "Local Hit Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Local Read Blocks": 0,
+                "Shared Hit Blocks": 154,
+                "Shared Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0
+              },
+              "Settings": {},
+              "Triggers": [],
+              "Planning Time": 0.166,
+              "Execution Time": 0.04
+            },
+            "rows": 0,
+            "summary": {
+              "indexes": [
+                "production_calcutta_v1_claim_queue"
+              ],
+              "nodes": [
+                "Limit",
+                "LockRows",
+                "Incremental Sort",
+                "Index Scan"
+              ],
+              "rowsRemoved": 1,
+              "rootHits": 3,
+              "rootReads": 0,
+              "executionMs": 0.04
+            }
+          },
+          "result": "PASS",
+          "rollbackVerified": true
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Actual installed claim-selector SQL is extracted and bound to current fixture values; this is query-plan execution, not full claim RPC certification.",
+    "Synthetic delayed/terminal/current backlog states use explicit fixture DML with trigger/FK omission inside rollback; CHECK and unique constraints remain active.",
+    "Default planner; one execution per variant; not latency percentiles, capacity or isolated write-amplification measurement.",
+    "Current financial cardinalities preserve one-active-Calcutta and one-active-Net-per-round constraints; no invented thousands of active current jobs.",
+    "Current intent backlog models432 first-entry canonical hole transactions with two universally automatic families =864 intents, not speculative extra golfers/rounds.",
+    "Index removal is transaction-local and its definition is verified restored. No shipping source or persistent competitive state changes."
+  ],
+  "installed": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "85f91fa8f13206669e4e622bf7f227f1531577acd7e1790a88fb1e12a5a4c930"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "clusterDestroyed": true,
+  "completedAt": "2026-09-28T18:34:36.039Z"
+}

@@ -1,0 +1,63 @@
+TAP version 13
+# Subtest: migration 078 rebinds future annual normal releases without mutating annual state
+    # Subtest: future annual authorization, replay, stale and invariance
+    not ok 1 - future annual authorization, replay, stale and invariance
+      ---
+      duration_ms: 3096.047
+      type: 'test'
+      location: 'phase2c-protected-annual-admission-generated.mjs:25:13'
+      failureType: 'testCodeFailure'
+      error: |-
+        Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -qAt -v ON_ERROR_STOP=1 -d maintenance_capability_1_phases
+        ERROR:  PRODUCTION_SERVICE_ROLE_REQUIRED
+        CONTEXT:  PL/pgSQL function assert_production_service_role() line 12 at RAISE
+        SQL statement "SELECT production_control.assert_production_service_role()"
+        PL/pgSQL function assert_exact_cutover_resource_scope(jsonb,boolean) line 6 at PERFORM
+        SQL statement "SELECT production_control.assert_exact_cutover_resource_scope(input, true)"
+        PL/pgSQL function production_control.annual_scoring_platform_certification_v1(jsonb) line 20 at PERFORM
+        SQL statement "SELECT production_control.annual_scoring_platform_certification_v1(input)"
+        PL/pgSQL function production_control.assert_annual_scoring_platform_v1(jsonb,text,text) line 20 at PERFORM
+        SQL statement "SELECT production_control.assert_annual_scoring_platform_v1(
+            input, operation.required_phase, operation.required_worker
+          )"
+        PL/pgSQL function production_control.assert_annual_scoring_runtime_pre_side_games_v1(jsonb,text,text) line 31 at PERFORM
+        PL/pgSQL function production_control.assert_annual_scoring_runtime_v1(jsonb,text,text) line 5 at assignment
+        SQL statement "SELECT production_control.assert_annual_scoring_runtime_v1(
+            input, operation.operation_name, operation.required_worker
+          )"
+        PL/pgSQL function public.dispatch_production_annual_scoring_v1(jsonb) line 16 at PERFORM
+        SQL statement "SELECT public.dispatch_production_annual_scoring_v1(value)"
+        PL/pgSQL function pg_temp_10.capture_authority_denial(jsonb) line 3 at PERFORM
+      code: 'ERR_TEST_FAILURE'
+      name: 'CommandFailure'
+      stack: |-
+        runCommand (phase2c-protected-annual-admission-generated.mjs:141:11)
+        psql (phase2c-protected-annual-admission-generated.mjs:157:10)
+        TestContext.<anonymous> (phase2c-protected-annual-admission-generated.mjs:2492:37)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+        context.test (phase2c-protected-annual-admission-generated.mjs:25:13)
+        phase2c-protected-annual-admission-generated.mjs:1715:15
+        async TestContext.<anonymous> (phase2c-protected-annual-admission-generated.mjs:31:9)
+      ...
+    1..1
+not ok 1 - migration 078 rebinds future annual normal releases without mutating annual state
+  ---
+  duration_ms: 4830.344166
+  type: 'test'
+  location: 'phase2c-protected-annual-admission-generated.mjs:18:10'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4901.06775

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "historicalCandidate": "9bd77498ad3ea0d54c2af2adfba5609fd1951e6ee910d564b35cb621a890bcf6",
+  "production": false,
+  "files": [
+    {
+      "file": "202609280124_score_derived_delivery_v1.sql",
+      "sha256": "9bd77498ad3ea0d54c2af2adfba5609fd1951e6ee910d564b35cb621a890bcf6"
+    },
+    {
+      "file": "README.md",
+      "sha256": "6574a3eb0591222d50ce4a0cb42d72738a57fb499f8c09d0d40c8a2a2b65ab7e"
+    },
+    {
+      "file": "phase2c-capture-worker-failure-before.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "phase2c-capture-worker-failure-before.mjs",
+      "sha256": "7e43c0b8b654821a8c7c75bbb9a412dfbde727f794eba3bbb39566b21cb4cad7"
+    },
+    {
+      "file": "phase2c-future-worker-lock-review-results.json",
+      "sha256": "69e2777b504b5c104ab14d9e946662ddf990d2693414475e2d1f3049aaedb0d6"
+    },
+    {
+      "file": "phase2c-future-worker-lock-review.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "phase2c-future-worker-lock-review.mjs",
+      "sha256": "5a05190bd666ca88bc95396b50fa2395282664c4be33f7a2c2c6928784d477e1"
+    },
+    {
+      "file": "phase2c-worker-failure-before-definitions.json",
+      "sha256": "d77b4dff574ba0c70ff9c5c5a0c63de7a147abdbe059f12b3413054d96acd2f7"
+    },
+    {
+      "file": "phase2c-worker-failure-lock-review-results.json",
+      "sha256": "c4019f64252ad6e1332e1dc2566664dad5c1e002de577278c6941985d2109c09"
+    },
+    {
+      "file": "phase2c-worker-failure-lock-review.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "phase2c-worker-failure-lock-review.mjs",
+      "sha256": "f993bd5214b9641e7ddfdc784577609ca5d2a4239eb8f5a2dafa4fea9ff9e56b"
+    }
+  ]
+}

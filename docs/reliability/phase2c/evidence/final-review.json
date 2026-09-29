@@ -1,0 +1,153 @@
+{
+  "status": "REVIEWED",
+  "reviewer": "Codex engineering review",
+  "reviewedAt": "2026-09-29T21:49:18.781312+00:00",
+  "production": false,
+  "ownerAcceptance": "NOT_PERFORMED",
+  "overallStatus": "PARTIAL",
+  "p0B": {
+    "status": "PARTIAL",
+    "unprovenWorkClasses": [
+      "GOOGLE_REPORTING_OUTBOX",
+      "SCORECARD_ARCHIVE"
+    ],
+    "reason": "Three-family local derived delivery does not prove admitted Google reporting/Finalize archive autonomous lifecycle or financial isolation."
+  },
+  "migrationSourceManifest": [
+    {
+      "path": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+      "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+    },
+    {
+      "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+    },
+    {
+      "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+    },
+    {
+      "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48"
+    }
+  ],
+  "manifestCapturedAt": "2026-09-29T21:17:47.604558+00:00",
+  "queryPlanAndIndexReview": true,
+  "securityScopePrivacyReview": true,
+  "noHiddenProductionActions": true,
+  "competitiveSemanticsUnchanged": true,
+  "all314RequirementsAdjudicated": true,
+  "counterevidenceRetained": true,
+  "crossDocumentClaimsReviewed": true,
+  "googleOutboxScopeReviewSha256": "874cc5228610157cd138bed16b4634e2d508ed8716d86bc8594d270fa4ec2a44",
+  "backlogLoadIsolation": {
+    "result": "PASS",
+    "requirement": "P2C-027",
+    "scoreP50": "PROVEN_LOCAL",
+    "scoreP95": "PROVEN_LOCAL",
+    "scoreP99": "PROVEN_LOCAL",
+    "scoreLockDurationDuringDrain": "PROVEN_LOCAL",
+    "databaseContention": "PROVEN_LOCAL",
+    "timeouts": "PROVEN_LOCAL",
+    "deadlocks": "PROVEN_LOCAL",
+    "pendingDemandOverlap": "PROVEN_LOCAL",
+    "evidence": [
+      {
+        "path": "docs/reliability/phase2c/evidence/backlog-tail.json",
+        "sha256": "d88b45611824dead8efb6046d42a696e153f7070f96383c8eb67524b4c175ba2"
+      },
+      {
+        "path": "docs/reliability/phase2c/evidence/backlog-tail-results.json",
+        "sha256": "69ffc41bbb26ec8632db5ebf02d90868ba594867589b4798923c847e055727cf"
+      },
+      {
+        "path": "docs/reliability/phase2c/evidence/backlog-tail.tap",
+        "sha256": "0ff66c64c93b56b92d6df75f1bc9d0840259409ff1fa8a7e6f7699f06382b078"
+      },
+      {
+        "path": "docs/reliability/phase2c/evidence/backlog-tail-independent-review.json",
+        "sha256": "487bd0e2b150af1248378d62084298b72f2b95f4b865b6b0857cb03b30883845"
+      }
+    ],
+    "limitations": [
+      "Empirical repeated-burst tails with actual automatic pending-demand overlap; not provider SLO/capacity.",
+      "Lock acquisition-to-precommit clock and whole RPC response supply lower/upper brackets, not exact continuous lock duration.",
+      "Sampled resource maxima do not establish continuous maxima; retain actual observed lock-wait samples.",
+      "40001 source-staleness attribution must retain its actual observability limit; no universal same-job retry/backoff claim."
+    ],
+    "scope": "Calcutta/Competition/Intelligence families only. Requirement27 remains PARTIAL for full Google/archive work inventory; observed local metrics do not close that missing lifecycle."
+  },
+  "reviewEvidence": [
+    {
+      "path": "docs/reliability/phase2c/evidence/import-order-review-addendum.json",
+      "sha256": "484030c542bea7e4f6b01ec1b73c37af288e5ec549297ef4364232fc626b6585",
+      "binding": "REVIEW_SNAPSHOT_RETAINED; finalGit binds later documentation metadata"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/google-outbox-scope-review.json",
+      "sha256": "874cc5228610157cd138bed16b4634e2d508ed8716d86bc8594d270fa4ec2a44",
+      "binding": "REVIEW_SNAPSHOT_RETAINED; finalGit binds later documentation metadata"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/backlog-tail-independent-review.json",
+      "sha256": "487bd0e2b150af1248378d62084298b72f2b95f4b865b6b0857cb03b30883845",
+      "binding": "REVIEW_SNAPSHOT_RETAINED; finalGit binds later documentation metadata"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/performance-variance-review.json",
+      "sha256": "5d640de0e5d7bc796c03f479d86f2b388f2b6b74aef52a93eb49c30ba4038a1c",
+      "binding": "REVIEW_SNAPSHOT_RETAINED; finalGit binds later documentation metadata"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/privacy-scan-prepack.json",
+      "sha256": "ee4383b4e97a53483f4c31450d2957fcfcf35e895781627348de5d5aa32b9f1d",
+      "binding": "REVIEW_SNAPSHOT_RETAINED; finalGit binds later documentation metadata"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/privacy-adjudication-prepack.json",
+      "sha256": "92018be718b9bd236440fd638ddd1ee981efd1e258f2ae5ff37c4ff0598bf149",
+      "binding": "REVIEW_SNAPSHOT_RETAINED; finalGit binds later documentation metadata"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/application-comparison.json",
+      "sha256": "700fa01de301b3340a14030e6e0168f78626757582fd7df9fbc0b34af9300937",
+      "binding": "REVIEW_SNAPSHOT_RETAINED; finalGit binds later documentation metadata"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/tested-uncommitted-candidate-manifest.json",
+      "sha256": "1acde9854df58ec8799e5b5e904bf8a05187e8863ead935b7fbc319a9097c712",
+      "binding": "IMMUTABLE_TESTED_SOURCE_SNAPSHOT_BEFORE_COMMIT; source bytes later matched to Git commit separately"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/final-query-index-security-review.json",
+      "sha256": "5fadc9632c54109d4381ac8b409ab845e47875bed43444bef4ded3b362a6612f",
+      "binding": "REVIEW_SNAPSHOT_RETAINED; finalGit binds later documentation metadata"
+    }
+  ],
+  "finalConclusion": "PHASE 2C: PARTIAL \u2014 SCORE-PATH CANDIDATE NOT READY FOR STAGING; REMAINING GATES LISTED ABOVE",
+  "reviewScope": "Current source/runtime, delegated exact-query/security and314 scoped dispositions; existing reports and proposed core authoring reviewed. Final generated output/link/privacy and Git actions receive separate closing checks. This is a reviewed PARTIAL checkpoint, not overall completion or owner acceptance.",
+  "productionActionSelfAudit": {
+    "queries": false,
+    "mutations": false,
+    "deployment": false,
+    "schemaOrProviderSettings": false,
+    "realScoreOrFinancialWork": false,
+    "realSessionsOrNotifications": false,
+    "method": "Task tool/action review; no provider calls. All executed databases owned local Unix-socket fixtures. Read-only process audit shows no task runtimes; unrelated existing database untouched.",
+    "externalGitProviderAutomation": "Not inspected; no agent deployment; isolated branch push only."
+  },
+  "sourceScopeSelfAudit": {
+    "sourceFiles": 78,
+    "manifestSha256": "a452f883c3e2b422d0e20f1acc8ef6b2f7026c3d0ff74a5090749a3888f9e987",
+    "drift": [],
+    "shippingNativeChanged": false,
+    "golfRulesChanged": false,
+    "scope": "Recovery, bounded derived delivery, required SQL/lock corrections, tests/evidence only."
+  },
+  "performanceCounterevidence": {
+    "requirement73": "PARTIAL",
+    "issue": "P2C-NEW-PERF-VARIANCE",
+    "cause": "UNKNOWN",
+    "rule": "Scoped latest gate PASS does not erase retainedFAIL or approve replacement baseline."
+  }
+}

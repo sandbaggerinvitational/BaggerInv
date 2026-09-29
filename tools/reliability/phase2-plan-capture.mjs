@@ -58,7 +58,8 @@ export function capturePhase2Plan(cluster,database,operation) {
  set local auto_explain.log_nested_statements=on; set local auto_explain.log_format=json;
  ${operation.sql}; set local auto_explain.log_min_duration=-1; rollback;`);
  assert.equal(result.status,0,result.stderr?.slice(-2000));
- validateBenchmarkResult(operation,result.stdout);
+ if (operation.validateResult) operation.validateResult(result.stdout);
+ else validateBenchmarkResult(operation,result.stdout);
  const plans=extractPlans(result.stderr || ""); assert.ok(plans.length);
  const statements=plans.map(entry=>{
   const plan=compactPlan(entry.Plan),nodes=scanNodes(plan);

@@ -1,0 +1,615 @@
+TAP version 13
+# Subtest: reliability benchmark inventory is the requested 17 actual path set
+ok 1 - reliability benchmark inventory is the requested 17 actual path set
+  ---
+  duration_ms: 0.754625
+  type: 'test'
+  ...
+# Subtest: history profiles preserve the current tournament and add deterministic archived years
+ok 2 - history profiles preserve the current tournament and add deterministic archived years
+  ---
+  duration_ms: 0.177333
+  type: 'test'
+  ...
+# Subtest: score fixture is gross-only and contains no client-derived net fields
+ok 3 - score fixture is gross-only and contains no client-derived net fields
+  ---
+  duration_ms: 0.045917
+  type: 'test'
+  ...
+# Subtest: PostgreSQL runner exposes local binaries only and no remote target option
+ok 4 - PostgreSQL runner exposes local binaries only and no remote target option
+  ---
+  duration_ms: 0.337042
+  type: 'test'
+  ...
+# Subtest: BENCH-RESULT canonical score samples reject replay and semantic no-op
+ok 5 - BENCH-RESULT canonical score samples reject replay and semantic no-op
+  ---
+  duration_ms: 0.7295
+  type: 'test'
+  ...
+# Subtest: BENCH-RESULT RPC success requires explicit true and no partial failures
+ok 6 - BENCH-RESULT RPC success requires explicit true and no partial failures
+  ---
+  duration_ms: 0.604291
+  type: 'test'
+  ...
+# Subtest: BENCH-RESULT SQL helper outputs require reviewed structures and exact scalar types
+ok 7 - BENCH-RESULT SQL helper outputs require reviewed structures and exact scalar types
+  ---
+  duration_ms: 0.423792
+  type: 'test'
+  ...
+# Subtest: BENCH-SAMPLES validates every payload while preserving original stdout or stderr timings
+ok 8 - BENCH-SAMPLES validates every payload while preserving original stdout or stderr timings
+  ---
+  duration_ms: 0.276583
+  type: 'test'
+  ...
+# Subtest: BENCH-SAMPLES never returns successful timings for a failed or malformed later sample
+ok 9 - BENCH-SAMPLES never returns successful timings for a failed or malformed later sample
+  ---
+  duration_ms: 0.2
+  type: 'test'
+  ...
+# Subtest: BENCH-SAMPLES rejects framing, result-count and timing ambiguity without exposing payloads
+ok 10 - BENCH-SAMPLES rejects framing, result-count and timing ambiguity without exposing payloads
+  ---
+  duration_ms: 0.1975
+  type: 'test'
+  ...
+# Subtest: BENCH-SAMPLES actual timing helper retains SQL and validates captured output before returning
+ok 11 - BENCH-SAMPLES actual timing helper retains SQL and validates captured output before returning
+  ---
+  duration_ms: 1.038208
+  type: 'test'
+  ...
+# Subtest: BENCH-SAFE-001 every SQL entrypoint rejects a caller-created remote cluster
+ok 12 - BENCH-SAFE-001 every SQL entrypoint rejects a caller-created remote cluster
+  ---
+  duration_ms: 1.043958
+  type: 'test'
+  ...
+# Subtest: BENCH-SAFE-002 remote connection CLI arguments fail before database creation
+ok 13 - BENCH-SAFE-002 remote connection CLI arguments fail before database creation
+  ---
+  duration_ms: 212.424791
+  type: 'test'
+  ...
+# Subtest: query-client adapter applies a read-only transaction and local budgets before catalog SQL
+ok 14 - query-client adapter applies a read-only transaction and local budgets before catalog SQL
+  ---
+  duration_ms: 2.870959
+  type: 'test'
+  ...
+# Subtest: policy rejection occurs before the adapter can acquire a connection
+ok 15 - policy rejection occurs before the adapter can acquire a connection
+  ---
+  duration_ms: 0.26675
+  type: 'test'
+  ...
+# Subtest: query error rolls back and releases without committing
+ok 16 - query error rolls back and releases without committing
+  ---
+  duration_ms: 0.1955
+  type: 'test'
+  ...
+# Subtest: timeout keeps the runner locked until an abort-ignoring query settles, then rolls back
+ok 17 - timeout keeps the runner locked until an abort-ignoring query settles, then rolls back
+  ---
+  duration_ms: 16.773584
+  type: 'test'
+  ...
+# Subtest: failed rollback discards the client while preserving the operation error
+ok 18 - failed rollback discards the client while preserving the operation error
+  ---
+  duration_ms: 0.270541
+  type: 'test'
+  ...
+# Subtest: indeterminate commit discards the client even after rollback responds
+ok 19 - indeterminate commit discards the client even after rollback responds
+  ---
+  duration_ms: 0.196834
+  type: 'test'
+  ...
+# Subtest: CLI emits a validated plan and never executes a database query
+ok 20 - CLI emits a validated plan and never executes a database query
+  ---
+  duration_ms: 30.500542
+  type: 'test'
+  ...
+# Subtest: CLI rejects raw SQL and execute flags
+ok 21 - CLI rejects raw SQL and execute flags
+  ---
+  duration_ms: 77.568917
+  type: 'test'
+  ...
+# Subtest: the checked-in catalog is valid and produces a bounded read-only plan
+ok 22 - the checked-in catalog is valid and produces a bounded read-only plan
+  ---
+  duration_ms: 2.23775
+  type: 'test'
+  ...
+# Subtest: only catalog operation names are accepted; raw SQL and unknown options fail closed
+ok 23 - only catalog operation names are accepted; raw SQL and unknown options fail closed
+  ---
+  duration_ms: 0.244417
+  type: 'test'
+  ...
+# Subtest: a representative historical JSON whole-dataset comparison is rejected
+ok 24 - a representative historical JSON whole-dataset comparison is rejected
+  ---
+  duration_ms: 0.073292
+  type: 'test'
+  ...
+# Subtest: EXPLAIN ANALYZE and administrative SQL are rejected before execution
+ok 25 - EXPLAIN ANALYZE and administrative SQL are rejected before execution
+  ---
+  duration_ms: 0.049125
+  type: 'test'
+  ...
+# Subtest: maintenance mode is allowed only in verified isolated non-production
+ok 26 - maintenance mode is allowed only in verified isolated non-production
+  ---
+  duration_ms: 0.140292
+  type: 'test'
+  ...
+# Subtest: missing, malformed, and extra current IDs are rejected
+ok 27 - missing, malformed, and extra current IDs are rejected
+  ---
+  duration_ms: 0.143542
+  type: 'test'
+  ...
+# Subtest: runner enforces one in-flight operation and does not retry
+ok 28 - runner enforces one in-flight operation and does not retry
+  ---
+  duration_ms: 0.284209
+  type: 'test'
+  ...
+# Subtest: runner aborts at the operation time budget
+ok 29 - runner aborts at the operation time budget
+  ---
+  duration_ms: 16.682167
+  type: 'test'
+  ...
+# Subtest: runner rejects row and payload overages after one execution
+ok 30 - runner rejects row and payload overages after one execution
+  ---
+  duration_ms: 0.345709
+  type: 'test'
+  ...
+# Subtest: catalog validation rejects function calls, CTEs, and subqueries
+ok 31 - catalog validation rejects function calls, CTEs, and subqueries
+  ---
+  duration_ms: 0.129667
+  type: 'test'
+  ...
+# Subtest: NA-2026-006 reproduces the Build 10 SQLite fractional timestamp CAS failure after process termination
+ok 32 - NA-2026-006 reproduces the Build 10 SQLite fractional timestamp CAS failure after process termination
+  ---
+  duration_ms: 4710.492541
+  type: 'test'
+  ...
+# Subtest: NA-2026-006 reloads a persisted accepted acknowledgement and compares matching Official evidence through the Build 10 coordinator
+ok 33 - NA-2026-006 reloads a persisted accepted acknowledgement and compares matching Official evidence through the Build 10 coordinator # SKIP set BAGGER_NATIVE_BUILD10_ROOT to the exact pinned Build 10 checkout
+  ---
+  duration_ms: 0.094875
+  type: 'test'
+  ...
+# Subtest: NA-2026-007 reproduces the Build 10 authenticated shell reset in a simulator when a pinned checkout is supplied
+ok 34 - NA-2026-007 reproduces the Build 10 authenticated shell reset in a simulator when a pinned checkout is supplied # SKIP set BAGGER_NATIVE_BUILD10_ROOT to the exact pinned Build 10 checkout
+  ---
+  duration_ms: 0.041292
+  type: 'test'
+  ...
+# Subtest: OBS-API actual route and canonical adapter telemetry in isolated server runtime
+ok 35 - OBS-API actual route and canonical adapter telemetry in isolated server runtime
+  ---
+  duration_ms: 196.617916
+  type: 'test'
+  ...
+# Subtest: review: explicit RPC effect catalog covers every instrumented server allowlist
+not ok 36 - review: explicit RPC effect catalog covers every instrumented server allowlist
+  ---
+  duration_ms: 2.803584
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-observability-review.test.mjs:73:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+    + [
+    +   'fail_intelligence_derived_bundle_v1',
+    +   'fail_score_derived_preclaim_v1',
+    +   'requeue_score_derived_delivery_v1',
+    +   'score_derived_delivery_tick_v1'
+    + ]
+    - []
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+    0: 'fail_intelligence_derived_bundle_v1'
+    1: 'fail_score_derived_preclaim_v1'
+    2: 'requeue_score_derived_delivery_v1'
+    3: 'score_derived_delivery_tick_v1'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-observability-review.test.mjs:104:10)
+    Test.runInAsyncScope (node:async_hooks:226:14)
+    Test.run (node:internal/test_runner/test:1397:25)
+    Test.start (node:internal/test_runner/test:1257:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+  ...
+# Subtest: review: write, read, and unresolved dispatcher families preserve outcome uncertainty
+ok 37 - review: write, read, and unresolved dispatcher families preserve outcome uncertainty
+  ---
+  duration_ms: 11.072167
+  type: 'test'
+  ...
+# Subtest: review: final request classification combines recorded code with actual status
+ok 38 - review: final request classification combines recorded code with actual status
+  ---
+  duration_ms: 0.628959
+  type: 'test'
+  ...
+# Subtest: review: shared-cache responses omit attempt ID without changing cache policy
+ok 39 - review: shared-cache responses omit attempt ID without changing cache policy
+  ---
+  duration_ms: 0.294875
+  type: 'test'
+  ...
+# Subtest: review: invalid configured bindings stay null with UNAVAILABLE provenance
+ok 40 - review: invalid configured bindings stay null with UNAVAILABLE provenance
+  ---
+  duration_ms: 0.554792
+  type: 'test'
+  ...
+# Subtest: review: all actual event branches conform to OPERATIONAL-EVENT-SCHEMA
+ok 41 - review: all actual event branches conform to OPERATIONAL-EVENT-SCHEMA
+  ---
+  duration_ms: 16.820875
+  type: 'test'
+  ...
+# Subtest: OBS-001 UNIT generates a UUID and preserves a safe incoming attempt ID
+ok 42 - OBS-001 UNIT generates a UUID and preserves a safe incoming attempt ID
+  ---
+  duration_ms: 10.032666
+  type: 'test'
+  ...
+# Subtest: OBS-002 SECURITY rejects untrusted/oversized correlation IDs and never logs request URLs
+ok 43 - OBS-002 SECURITY rejects untrusted/oversized correlation IDs and never logs request URLs
+  ---
+  duration_ms: 0.706583
+  type: 'test'
+  ...
+# Subtest: OBS-003 INTEGRATION request → RPC → receipt association → response keeps mutation distinct
+ok 44 - OBS-003 INTEGRATION request → RPC → receipt association → response keeps mutation distinct
+  ---
+  duration_ms: 1.512
+  type: 'test'
+  ...
+# Subtest: OBS-004 UNIT same mutation can have distinct request attempts
+ok 45 - OBS-004 UNIT same mutation can have distinct request attempts
+  ---
+  duration_ms: 0.424291
+  type: 'test'
+  ...
+# Subtest: OBS-005 INTEGRATION PostgreSQL 57014 is classified before generic application mapping
+ok 46 - OBS-005 INTEGRATION PostgreSQL 57014 is classified before generic application mapping
+  ---
+  duration_ms: 0.356
+  type: 'test'
+  ...
+# Subtest: OBS-006 FAILURE_INJECTION lost transport response emits UNKNOWN without changing thrown error
+ok 47 - OBS-006 FAILURE_INJECTION lost transport response emits UNKNOWN without changing thrown error
+  ---
+  duration_ms: 0.317125
+  type: 'test'
+  ...
+# Subtest: OBS-007 UNIT a gateway 503 or invalid JSON cannot prove non-commit
+ok 48 - OBS-007 UNIT a gateway 503 or invalid JSON cannot prove non-commit
+  ---
+  duration_ms: 0.352958
+  type: 'test'
+  ...
+# Subtest: OBS-008 UNIT canonical denial stays NOT_COMMITTED and has domain error
+ok 49 - OBS-008 UNIT canonical denial stays NOT_COMMITTED and has domain error
+  ---
+  duration_ms: 0.432916
+  type: 'test'
+  ...
+# Subtest: OBS-009 FAILURE_INJECTION sink throw/rejection cannot fail acknowledged score
+ok 50 - OBS-009 FAILURE_INJECTION sink throw/rejection cannot fail acknowledged score
+  ---
+  duration_ms: 0.3485
+  type: 'test'
+  ...
+# Subtest: OBS-010 UNIT telemetry is bounded to 64 events and always retains request summary
+ok 51 - OBS-010 UNIT telemetry is bounded to 64 events and always retains request summary
+  ---
+  duration_ms: 0.324125
+  type: 'test'
+  ...
+# Subtest: OBS-011 UNIT concurrent request scopes do not leak IDs or authority
+ok 52 - OBS-011 UNIT concurrent request scopes do not leak IDs or authority
+  ---
+  duration_ms: 4.633958
+  type: 'test'
+  ...
+# Subtest: OBS-012 SECURITY attribute allowlist excludes payload, headers, PII, SQL and error text
+ok 53 - OBS-012 SECURITY attribute allowlist excludes payload, headers, PII, SQL and error text
+  ---
+  duration_ms: 0.536042
+  type: 'test'
+  ...
+# Subtest: OBS-013 UNIT optional metadata is absent rather than guessed
+ok 54 - OBS-013 UNIT optional metadata is absent rather than guessed
+  ---
+  duration_ms: 0.127042
+  type: 'test'
+  ...
+# Subtest: OBS-014 UNIT every required domain is distinct and typed failures preserve meaning
+ok 55 - OBS-014 UNIT every required domain is distinct and typed failures preserve meaning
+  ---
+  duration_ms: 0.118875
+  type: 'test'
+  ...
+# Subtest: OBS-015 UNIT telemetry disabled does not alter headers, result or idempotency
+ok 56 - OBS-015 UNIT telemetry disabled does not alter headers, result or idempotency
+  ---
+  duration_ms: 0.255583
+  type: 'test'
+  ...
+# Subtest: OBS-018 INTEGRATION a claimed job joins its calculation and completion without exposing job input
+ok 57 - OBS-018 INTEGRATION a claimed job joins its calculation and completion without exposing job input
+  ---
+  duration_ms: 0.30975
+  type: 'test'
+  ...
+# Subtest: unchanged failures are retained without calling the whole suite PASS
+ok 58 - unchanged failures are retained without calling the whole suite PASS
+  ---
+  duration_ms: 0.534916
+  type: 'test'
+  ...
+# Subtest: equal failure counts with a new failure name fail
+ok 59 - equal failure counts with a new failure name fail
+  ---
+  duration_ms: 0.316042
+  type: 'test'
+  ...
+# Subtest: changed failure diagnostic needs explicit review
+ok 60 - changed failure diagnostic needs explicit review
+  ---
+  duration_ms: 0.06325
+  type: 'test'
+  ...
+# Subtest: resolved prior failure is a reviewed difference
+ok 61 - resolved prior failure is a reviewed difference
+  ---
+  duration_ms: 0.069041
+  type: 'test'
+  ...
+# Subtest: wrong baseline SHA or selection identity is rejected
+ok 62 - wrong baseline SHA or selection identity is rejected
+  ---
+  duration_ms: 0.860458
+  type: 'test'
+  ...
+# Subtest: missing failed-test detail or incomplete counts is rejected
+ok 63 - missing failed-test detail or incomplete counts is rejected
+  ---
+  duration_ms: 2.857208
+  type: 'test'
+  ...
+# Subtest: complete common and 32-branch evidence passes only the unapproved automated scope
+ok 64 - complete common and 32-branch evidence passes only the unapproved automated scope
+  ---
+  duration_ms: 5.23625
+  type: 'test'
+  ...
+# Subtest: common-only evidence remains PARTIAL rather than hiding eligible-history gaps
+ok 65 - common-only evidence remains PARTIAL rather than hiding eligible-history gaps
+  ---
+  duration_ms: 2.809958
+  type: 'test'
+  ...
+# Subtest: gate rejects missing, null, nonnumeric, nonfinite and unordered measured fields
+ok 66 - gate rejects missing, null, nonnumeric, nonfinite and unordered measured fields
+  ---
+  duration_ms: 126.284833
+  type: 'test'
+  ...
+# Subtest: gate rejects incomplete and inconsistent batch evidence
+ok 67 - gate rejects incomplete and inconsistent batch evidence
+  ---
+  duration_ms: 12.909791
+  type: 'test'
+  ...
+# Subtest: gate rejects missing plans and forbidden derived history on the common score path
+ok 68 - gate rejects missing plans and forbidden derived history on the common score path
+  ---
+  duration_ms: 12.798709
+  type: 'test'
+  ...
+# Subtest: four distinct required history scales cannot be omitted, duplicated or substituted
+ok 69 - four distinct required history scales cannot be omitted, duplicated or substituted
+  ---
+  duration_ms: 7.702833
+  type: 'test'
+  ...
+# Subtest: provenance, environment, fixture counts and candidate identity must match
+ok 70 - provenance, environment, fixture counts and candidate identity must match
+  ---
+  duration_ms: 23.90325
+  type: 'test'
+  ...
+# Subtest: low common-path sample count cannot become p99 proof
+ok 71 - low common-path sample count cannot become p99 proof
+  ---
+  duration_ms: 5.574292
+  type: 'test'
+  ...
+# Subtest: small bounded local changes are tolerated without accepting eighteen-fold history growth
+ok 72 - small bounded local changes are tolerated without accepting eighteen-fold history growth
+  ---
+  duration_ms: 5.75975
+  type: 'test'
+  ...
+# Subtest: history growth at intermediate scales is not hidden by a fast ten-times result
+ok 73 - history growth at intermediate scales is not hidden by a fast ten-times result
+  ---
+  duration_ms: 2.784
+  type: 'test'
+  ...
+# Subtest: material tail regression fails independently of forbidden-history detection
+ok 74 - material tail regression fails independently of forbidden-history detection
+  ---
+  duration_ms: 2.705458
+  type: 'test'
+  ...
+# Subtest: eligible evidence requires every one of the 32 branch-scale cases on both sides
+ok 75 - eligible evidence requires every one of the 32 branch-scale cases on both sides
+  ---
+  duration_ms: 7.510583
+  type: 'test'
+  ...
+# Subtest: eligible before and after require plan coverage at one-times and ten-times scale
+ok 76 - eligible before and after require plan coverage at one-times and ten-times scale
+  ---
+  duration_ms: 10.270666
+  type: 'test'
+  ...
+# Subtest: eligible branch historical work cannot hide behind a fast common path
+ok 77 - eligible branch historical work cannot hide behind a fast common path
+  ---
+  duration_ms: 2.68725
+  type: 'test'
+  ...
+# Subtest: eligible identity, binding, duplicates and missing timing evidence fail closed
+ok 78 - eligible identity, binding, duplicates and missing timing evidence fail closed
+  ---
+  duration_ms: 17.742875
+  type: 'test'
+  ...
+# Subtest: eligible history growth is evaluated separately for each branch
+ok 79 - eligible history growth is evaluated separately for each branch
+  ---
+  duration_ms: 2.519667
+  type: 'test'
+  ...
+# Subtest: malformed root artifacts cannot become an automated PASS
+ok 80 - malformed root artifacts cannot become an automated PASS
+  ---
+  duration_ms: 0.067542
+  type: 'test'
+  ...
+# Subtest: excess candidate batch variance requires a repeat even with valid summaries
+ok 81 - excess candidate batch variance requires a repeat even with valid summaries
+  ---
+  duration_ms: 2.738
+  type: 'test'
+  ...
+# Subtest: PRESERVE-001 all preserved report bytes match the approved manifest
+ok 82 - PRESERVE-001 all preserved report bytes match the approved manifest
+  ---
+  duration_ms: 25.37925
+  type: 'test'
+  ...
+# Subtest: PRESERVE-002 original source manifest remains a byte-exact subset
+ok 83 - PRESERVE-002 original source manifest remains a byte-exact subset
+  ---
+  duration_ms: 0.562916
+  type: 'test'
+  ...
+# Subtest: plan evidence retains shape regressions, invocation counts and node-work ranges
+ok 84 - plan evidence retains shape regressions, invocation counts and node-work ranges
+  ---
+  duration_ms: 1.057625
+  type: 'test'
+  ...
+# Subtest: NA-2026-017 rejects acknowledged 12-pairing preparation with placeholder zero readiness and no current contexts
+ok 85 - NA-2026-017 rejects acknowledged 12-pairing preparation with placeholder zero readiness and no current contexts
+  ---
+  duration_ms: 11.069834
+  type: 'test'
+  ...
+# Subtest: NA-2026-017 accepts only exact canonical 12-pairing, current-context, HI 13, READY readback
+ok 86 - NA-2026-017 accepts only exact canonical 12-pairing, current-context, HI 13, READY readback
+  ---
+  duration_ms: 0.309208
+  type: 'test'
+  ...
+# Subtest: NA-2026-017 rejects stale operation revisions, fingerprint drift, substituted data sets, and noncurrent context
+ok 87 - NA-2026-017 rejects stale operation revisions, fingerprint drift, substituted data sets, and noncurrent context
+  ---
+  duration_ms: 1.522583
+  type: 'test'
+  ...
+# Subtest: NA-2026-017 CLI exits nonzero for placeholder readback and zero for exact canonical readback
+ok 88 - NA-2026-017 CLI exits nonzero for placeholder readback and zero for exact canonical readback
+  ---
+  duration_ms: 68.280917
+  type: 'test'
+  ...
+# Subtest: NA-2026-017 rejects missing reviewed identity and dependency or pairing bindings
+ok 89 - NA-2026-017 rejects missing reviewed identity and dependency or pairing bindings
+  ---
+  duration_ms: 1.292792
+  type: 'test'
+  ...
+# Subtest: NA-2026-017 rejects per-match pairing and context drift despite unchanged declared fingerprints
+ok 90 - NA-2026-017 rejects per-match pairing and context drift despite unchanged declared fingerprints
+  ---
+  duration_ms: 1.487083
+  type: 'test'
+  ...
+# Subtest: NA-2026-017 requires independent canonical lifecycle counts despite a successful receipt
+ok 91 - NA-2026-017 requires independent canonical lifecycle counts despite a successful receipt
+  ---
+  duration_ms: 1.036958
+  type: 'test'
+  ...
+# Subtest: Phase 1 telemetry preserves current-tournament RPC authority input, transport, payload, and error result from Release 139
+ok 92 - Phase 1 telemetry preserves current-tournament RPC authority input, transport, payload, and error result from Release 139
+  ---
+  duration_ms: 22.971375
+  type: 'test'
+  ...
+# Subtest: Phase 1 telemetry preserves scoring dispatch order, bounded request body, transport, and acknowledgement from Release 139
+ok 93 - Phase 1 telemetry preserves scoring dispatch order, bounded request body, transport, and acknowledgement from Release 139
+  ---
+  duration_ms: 12.433084
+  type: 'test'
+  ...
+# Subtest: Phase 1 telemetry preserves post-commit fan-out order, arguments, and settled results from Release 139
+ok 94 - Phase 1 telemetry preserves post-commit fan-out order, arguments, and settled results from Release 139
+  ---
+  duration_ms: 9.444417
+  type: 'test'
+  ...
+# Subtest: Phase 1 telemetry preserves hole route authority and mutation order plus response semantics from Release 139
+ok 95 - Phase 1 telemetry preserves hole route authority and mutation order plus response semantics from Release 139
+  ---
+  duration_ms: 10.566125
+  type: 'test'
+  ...
+# Subtest: Phase 1 telemetry preserves finalize route authority and mutation order plus response semantics from Release 139
+ok 96 - Phase 1 telemetry preserves finalize route authority and mutation order plus response semantics from Release 139
+  ---
+  duration_ms: 10.018959
+  type: 'test'
+  ...
+1..96
+# tests 96
+# suites 0
+# pass 93
+# fail 1
+# cancelled 0
+# skipped 2
+# todo 0
+# duration_ms 6396.853

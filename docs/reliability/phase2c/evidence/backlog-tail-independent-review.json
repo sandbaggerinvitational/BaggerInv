@@ -1,0 +1,334 @@
+{
+  "review": "INDEPENDENT_READ_ONLY_BACKLOG_TAIL",
+  "reviewedAt": "2026-09-29T21:19:25.587729+00:00",
+  "verdict": "PASS_FOR_CURRENT_LOCAL_EMPIRICAL_MANAGED_BACKLOG_SCOPE_WITH_ATTRIBUTION_LIMIT",
+  "overallPhase2C": "PARTIAL \u2014 Google reporting/export/archive delivery obligations remain unproven",
+  "blockers": [],
+  "priorReview": {
+    "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/backlog-tail-independent-review.json",
+    "sha256": "b6f09d1217b365693d01adb0652d7cd460f0046022f8b9d683efc6e066d01946"
+  },
+  "artifactAndSourceHashes": [
+    {
+      "file": "docs/reliability/phase2c/evidence/backlog-tail.json",
+      "sha256": "d88b45611824dead8efb6046d42a696e153f7070f96383c8eb67524b4c175ba2",
+      "bytes": 172215
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/backlog-tail-results.json",
+      "sha256": "69ffc41bbb26ec8632db5ebf02d90868ba594867589b4798923c847e055727cf",
+      "bytes": 5499304
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/backlog-tail.tap",
+      "sha256": "0ff66c64c93b56b92d6df75f1bc9d0840259409ff1fa8a7e6f7699f06382b078",
+      "bytes": 5268
+    },
+    {
+      "file": "test/reliability-phase2c-backlog-tail.integration.test.mjs",
+      "sha256": "f8285682fde446ecc72f53fa7e03cedb63fa2e7a03614119561c7ed824456a54",
+      "bytes": 15090
+    },
+    {
+      "file": "test/support/reliability/phase2c-worker-child.mjs",
+      "sha256": "0b06845de3c464f2d2569b022eb9db0c5585bbb15a8ec051aaacaa278df516ca",
+      "bytes": 9261
+    },
+    {
+      "file": "test/support/reliability/phase2c-worker.mjs",
+      "sha256": "8296bc143395abfc70ef4f1fc71ff9a346cb89b87f69b2505528ca1106ec5d12",
+      "bytes": 7637
+    },
+    {
+      "file": "test/support/reliability/postgres17.mjs",
+      "sha256": "83375c1f10c2da92c58d1ec501cf713f7a2bc5714ba9ae1ec5af16bc574be7ff",
+      "bytes": 11852
+    },
+    {
+      "file": "lib/score-derived-worker.js",
+      "sha256": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+      "bytes": 6779
+    },
+    {
+      "file": "lib/production-calcutta-server.js",
+      "sha256": "cb183d4b5f8159dad552541a72ec5b83e18378c7c50705955c129ec2784be89b",
+      "bytes": 38843
+    },
+    {
+      "file": "lib/production-net-skins-server.js",
+      "sha256": "4007eee4e309d18ae2e2d89f80980c306de29e7e78b5e9fad07f68f408690952",
+      "bytes": 18552
+    },
+    {
+      "file": "supabase/production_migrations/202608290056_production_calcutta_v1.sql",
+      "sha256": "cf1987b7e7ad3d69d0836aed214a77c85ac1daa68c19aeab6408d82e0296399f",
+      "bytes": 135172
+    },
+    {
+      "file": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48",
+      "bytes": 76764
+    }
+  ],
+  "verification": {
+    "rawTapHashMatches": true,
+    "receiptSourcesStable": true,
+    "transitiveProvenanceStable": true,
+    "currentTransitiveInputsVerified": 191,
+    "currentSourceDrift": [],
+    "clusterDestroyed": true,
+    "quantilesAndCountsIndependentlyRecomputed": true,
+    "executionStartedAt": "2026-09-29T21:12:29.983Z",
+    "executionCompletedAt": "2026-09-29T21:17:09.996Z"
+  },
+  "workerFailureClassification": {
+    "observedCount": 56,
+    "unexpectedEvents": [],
+    "classification": "Observed CALCUTTA/40001/RETRYABLE events are consistent with optimistic source invalidation during concurrent scoring, not an error-free run.",
+    "confidence": "STRONGLY SUPPORTED causal attribution; event SQLSTATE/group/counts PROVEN from retained logs",
+    "attributionLimit": "Transport retains SQLSTATE rather than exception message or exact failed RPC. Individual SOURCE_REVISION_CONFLICT attribution is not proven; another40001 guard is possible.",
+    "retryIdentityLimit": "No per-failure exact-job attempt ledger is retained here. Later same-family success may be newer-source replacement/coalescing, not necessarily same-job retry with same-cycle backoff."
+  },
+  "profiles": [
+    {
+      "name": "normal_preload_one_hole",
+      "independentBursts": 28,
+      "initialBacklogAllIntentFamilies": 18,
+      "qualifiedOrdinaryScores": 1008,
+      "nonqualifyingScores": 0,
+      "actualScoreErrors": 0,
+      "quantilesRecomputed": {
+        "lockHeldThroughRpcMs": {
+          "samples": 1008,
+          "p50Ms": 2.115,
+          "p95Ms": 10.758,
+          "p99Ms": 12.26,
+          "maxMs": 15.182
+        },
+        "dbFunctionWallMs": {
+          "samples": 1008,
+          "p50Ms": 2.599,
+          "p95Ms": 13.555,
+          "p99Ms": 15.721,
+          "maxMs": 18.553
+        },
+        "transactionWallUpperMs": {
+          "samples": 1008,
+          "p50Ms": 2.8479169999991427,
+          "p95Ms": 14.803667000000132,
+          "p99Ms": 16.901834000000235,
+          "maxMs": 19.965458000006038
+        }
+      },
+      "workerErrorCounts": {
+        "deadlock40P01": 0,
+        "statementTimeout57014": 0,
+        "failedInvocations": 28
+      },
+      "workerFailureGroups": [
+        {
+          "type": "failed",
+          "family": "CALCUTTA",
+          "sqlstate": "40001",
+          "classification": "RETRYABLE",
+          "count": 28
+        }
+      ],
+      "workerFailuresPerBurst": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "subsequentSameFamilySuccessDelayMs": {
+        "minimum": 781,
+        "maximum": 953
+      },
+      "allBurstsCurrentAndIdleWithinManagedScope": true,
+      "allBurstsFinancialFactsPublicationCountsUnchanged": true,
+      "allBurstClonesRemoved": true,
+      "resourceSamples": 3061,
+      "sampledMaximaExcludingSampler": {
+        "connections": 7,
+        "active": 7,
+        "idleInTransaction": 0,
+        "lockWaitingSessions": 0,
+        "workerConnections": 1,
+        "scoreConnections": 6,
+        "ungrantedLocks": 0,
+        "blockedSessions": 0
+      },
+      "sampledMaxTotalConnectionsIncludingSampler": 8,
+      "resourceCapsVerified": {
+        "maximumScoreConnections": 6,
+        "maximumWorkerConnections": 1,
+        "meaning": "Actual observed maxima satisfy fixture-owned connection topology, not provider/pool capacity or continuous maxima."
+      },
+      "samplesWithLockWait": 0,
+      "samplesWithWorkerConnection": 750,
+      "finalNonautomaticStates": {
+        "netSkins": "WAITING_OWNER",
+        "finalRecap": "WAITING_PUBLISHED_FINAL_GATE"
+      }
+    },
+    {
+      "name": "larger_preload_six_holes",
+      "independentBursts": 28,
+      "initialBacklogAllIntentFamilies": 108,
+      "qualifiedOrdinaryScores": 1008,
+      "nonqualifyingScores": 0,
+      "actualScoreErrors": 0,
+      "quantilesRecomputed": {
+        "lockHeldThroughRpcMs": {
+          "samples": 1008,
+          "p50Ms": 2.104,
+          "p95Ms": 11.206,
+          "p99Ms": 12.803,
+          "maxMs": 14.831
+        },
+        "dbFunctionWallMs": {
+          "samples": 1008,
+          "p50Ms": 2.546,
+          "p95Ms": 14.122,
+          "p99Ms": 15.787,
+          "maxMs": 17.5
+        },
+        "transactionWallUpperMs": {
+          "samples": 1008,
+          "p50Ms": 2.8303330000053393,
+          "p95Ms": 15.751709000003757,
+          "p99Ms": 16.974708000023384,
+          "maxMs": 18.44900000002235
+        }
+      },
+      "workerErrorCounts": {
+        "deadlock40P01": 0,
+        "statementTimeout57014": 0,
+        "failedInvocations": 28
+      },
+      "workerFailureGroups": [
+        {
+          "type": "failed",
+          "family": "CALCUTTA",
+          "sqlstate": "40001",
+          "classification": "RETRYABLE",
+          "count": 28
+        }
+      ],
+      "workerFailuresPerBurst": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "subsequentSameFamilySuccessDelayMs": {
+        "minimum": 794,
+        "maximum": 990
+      },
+      "allBurstsCurrentAndIdleWithinManagedScope": true,
+      "allBurstsFinancialFactsPublicationCountsUnchanged": true,
+      "allBurstClonesRemoved": true,
+      "resourceSamples": 4566,
+      "sampledMaximaExcludingSampler": {
+        "connections": 8,
+        "active": 7,
+        "idleInTransaction": 0,
+        "lockWaitingSessions": 0,
+        "workerConnections": 1,
+        "scoreConnections": 6,
+        "ungrantedLocks": 0,
+        "blockedSessions": 0
+      },
+      "sampledMaxTotalConnectionsIncludingSampler": 9,
+      "resourceCapsVerified": {
+        "maximumScoreConnections": 6,
+        "maximumWorkerConnections": 1,
+        "meaning": "Actual observed maxima satisfy fixture-owned connection topology, not provider/pool capacity or continuous maxima."
+      },
+      "samplesWithLockWait": 0,
+      "samplesWithWorkerConnection": 1260,
+      "finalNonautomaticStates": {
+        "netSkins": "WAITING_OWNER",
+        "finalRecap": "WAITING_PUBLISHED_FINAL_GATE"
+      }
+    }
+  ],
+  "scopeAndClaimLimits": [
+    "Accepted ordinary R1 scores pool only within identical preload profile; groups/holes in a burst are correlated. Empirical nearest-rank p99 has no confidence interval/provider SLO.",
+    "18/108 initial counts include all intent families. Qualification is immediate pending CALCUTTA/COMPETITION EXISTS, not automatic-only backlog depth.",
+    "Live runner plus pending automatic demand does not prove the worker occupied CPU or SQL at every exact scoring instant.",
+    "Timing includes test-only clocks and sampler overhead. Lower bracket ends before COMMIT; upper autocommit acknowledgement includes acquisition, wrapper, IPC and scheduling. Neither is exact lock-through-durable-COMMIT time.",
+    "Raw evidence does not retain lastCommitAt. freshIdle.tickStartedAt>lastCommitAt is an executed source assertion, not independently re-evaluable from raw timestamps.",
+    "Resource sampler excludes itself and observes approximately25ms-plus-query intervals. Sampled maxima cannot prove continuous maxima or absence of brief waits; pg_stat_activity/pg_locks observations need not be simultaneous.",
+    "No CPU, memory, IOPS, connection-pool headroom, durable-fsync capacity, or matched worker-off overhead conclusion follows.",
+    "Managed-family current pointer equality and fixed configuration/publication facts are verified; independent payout math is not established by this performance run.",
+    "Net Skins WAITING_OWNER and FinalRecap WAITING_PUBLICATION are explicit nonautomatic authority states.",
+    "The tick and convergence oracle do not cover Google reporting outbox or external archive delivery. No all-work idle, external financial safety, P0-B closure or staging readiness is claimed.",
+    "This independent review executes only local artifact/hash/numeric analysis; no PostgreSQL, test suite, provider or network. Evidence preservation/publication is separate from this temporary output."
+  ],
+  "sourceReferences": [
+    {
+      "file": "test/reliability-phase2c-backlog-tail.integration.test.mjs",
+      "lines": "46-50,76-80",
+      "supports": "bounded qualification and clock instrumentation"
+    },
+    {
+      "file": "test/reliability-phase2c-backlog-tail.integration.test.mjs",
+      "lines": "110-144",
+      "supports": "canonical parity, receipt identity, fresh idle, financial and observed worker-error assertions"
+    },
+    {
+      "file": "test/reliability-phase2c-backlog-tail.integration.test.mjs",
+      "lines": "155-165",
+      "supports": "sample minimum, recomputed quantiles, cluster cleanup and artifact status"
+    }
+  ]
+}

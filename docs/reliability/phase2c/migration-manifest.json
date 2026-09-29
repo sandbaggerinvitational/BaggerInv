@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "scope": "SOURCE_INSPECTED complete intended122/123/124 inventory, not final hosted catalog certification",
+  "production": false,
+  "migrations": [
+    {
+      "number": 122,
+      "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce",
+      "newPersistentFunctionDefinitions": [
+        "production_control.read_score_mutation_status_v1(jsonb,text)",
+        "public.read_production_score_mutation_status_v1(jsonb)",
+        "public.future_production_read_score_mutation_status_v1(jsonb)",
+        "production_control.annual_side_game_implementation_manifest_v1()"
+      ],
+      "existingFunctionBodyEdits": [
+        "public.submit_production_hole_score(jsonb)",
+        "public.future_production_submit_hole_score_v1(jsonb)"
+      ],
+      "renamedFunctions": [
+        {
+          "from": "production_control.annual_side_game_implementation_manifest_v1()",
+          "to": "production_control.annual_side_game_implementation_manifest_pre_score_recovery_v1()"
+        }
+      ],
+      "temporaryHelpersDropped": [
+        "pg_temp.patch_score_recovery_source_v1(text,text,jsonb)"
+      ]
+    },
+    {
+      "number": 123,
+      "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0",
+      "newPersistentFunctionDefinitions": [],
+      "existingFunctionBodyEdits": [
+        "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+        "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+        "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+        "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+        "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+        "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+        "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+        "public.future_production_dispatch_odds_pre_withdrawal_v1(jsonb)",
+        "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+        "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+        "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+        "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+        "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+        "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+        "production_control.flush_score_derived_intents_v1(text,text,integer)",
+        "production_control.future_google_writer_implementation_manifest_v2()"
+      ],
+      "renamedFunctions": [],
+      "temporaryHelpersDropped": []
+    },
+    {
+      "number": 124,
+      "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48",
+      "newPersistentFunctionDefinitions": [
+        "production_control.capture_derived_delivery_provenance_v1()",
+        "production_control.derived_delivery_retryable_v1(text)",
+        "production_control.derived_delivery_delay_v1(integer,text)",
+        "production_control.capture_derived_delivery_transition_v1()",
+        "production_control.assert_score_derived_delivery_scope_v1(jsonb)",
+        "production_control.derived_final_recap_ready_v1(text)",
+        "public.score_derived_delivery_tick_v1(jsonb)",
+        "production_control.intelligence_delivery_ready_v1(text,jsonb)",
+        "production_control.lock_net_skins_storylines_v1(text,jsonb)",
+        "production_control.enqueue_score_calcutta_v1(text,text,boolean,text,text)",
+        "production_control.capture_derived_intent_attempt_v1()",
+        "public.requeue_score_derived_delivery_v1(jsonb)",
+        "public.fail_intelligence_derived_bundle_v1(jsonb)",
+        "public.fail_score_derived_preclaim_v1(jsonb)",
+        "public.future_production_score_derived_delivery_tick_v1(jsonb)",
+        "public.future_production_requeue_score_derived_delivery_v1(jsonb)",
+        "public.future_production_fail_intelligence_derived_bundle_v1(jsonb)",
+        "public.future_production_fail_score_derived_preclaim_v1(jsonb)",
+        "production_control.recover_derived_calcutta_activation_v1(text)",
+        "production_control.annual_side_game_implementation_manifest_v1()"
+      ],
+      "existingFunctionBodyEdits": [
+        "production_control.flush_score_derived_intents_v1(text,text,integer)",
+        "production_control.frozen_2026_claim_competition_derived_jobs_v1(jsonb)",
+        "production_control.frozen_2026_claim_intelligence_derived_bundle_v1(jsonb)",
+        "public.claim_production_calcutta_v1_recalculation(jsonb)",
+        "public.claim_production_net_skins_v1_recalculation(jsonb)",
+        "public.complete_production_calcutta_v1_recalculation(jsonb)",
+        "public.complete_production_net_skins_v1_recalculation(jsonb)",
+        "public.fail_production_calcutta_v1_recalculation(jsonb)",
+        "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+        "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+        "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+        "public.future_production_claim_net_skins_recalculation_v1(jsonb)",
+        "public.future_production_complete_calcutta_recalculation_v1(jsonb)",
+        "public.future_production_complete_net_skins_recalculation_v1(jsonb)",
+        "public.future_production_fail_calcutta_recalculation_v1(jsonb)"
+      ],
+      "renamedFunctions": [
+        {
+          "from": "production_control.annual_side_game_implementation_manifest_v1()",
+          "to": "production_control.annual_side_game_implementation_manifest_pre_delivery_v1()"
+        }
+      ],
+      "temporaryHelpersDropped": [
+        "pg_temp.patch_derived_delivery_v1(text,text,jsonb)"
+      ]
+    }
+  ],
+  "indexes": {
+    "schemaVersion": 1,
+    "retainedNonuniqueIndexes": [
+      "scoring_authority.calcutta_v1_recalculation_jobs_delivery_terminal",
+      "scoring_authority.net_skins_v1_recalculation_jobs_delivery_terminal",
+      "scoring_authority.competition_recalculation_jobs_delivery_due",
+      "scoring_authority.score_derived_intents_terminal_v1",
+      "production_control.score_derived_delivery_attempts_work_v1"
+    ],
+    "removedOptionalIndexes": [
+      "scoring_authority.calcutta_v1_recalculation_jobs_delivery_due",
+      "scoring_authority.net_skins_v1_recalculation_jobs_delivery_due",
+      "scoring_authority.competition_recalculation_jobs_delivery_terminal"
+    ],
+    "historicalReferenceDefinitions": {
+      "scoring_authority.calcutta_v1_recalculation_jobs_delivery_due": "CREATE INDEX calcutta_v1_recalculation_jobs_delivery_due ON scoring_authority.calcutta_v1_recalculation_jobs USING btree (tournament_id, delivery_available_at) WHERE ((status = ANY (ARRAY['PENDING'::text, 'FAILED'::text])) AND (delivery_dead_letter_at IS NULL))",
+      "scoring_authority.net_skins_v1_recalculation_jobs_delivery_due": "CREATE INDEX net_skins_v1_recalculation_jobs_delivery_due ON scoring_authority.net_skins_v1_recalculation_jobs USING btree (tournament_id, delivery_available_at) WHERE ((status = ANY (ARRAY['PENDING'::text, 'FAILED'::text])) AND (delivery_dead_letter_at IS NULL))",
+      "scoring_authority.competition_recalculation_jobs_delivery_terminal": "CREATE INDEX competition_recalculation_jobs_delivery_terminal ON scoring_authority.competition_recalculation_jobs USING btree (tournament_id, delivery_dead_letter_at) WHERE (delivery_dead_letter_at IS NOT NULL)"
+    },
+    "evidencePurpose": "Exact candidate set plus transaction-local historical counterfactuals. Do not install removed optional indexes outside isolated rollback tests.",
+    "historicalDefinitionSource": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/202609280124_score_derived_delivery_v1.sql",
+    "historicalMigrationSHA256": "85f91fa8f13206669e4e622bf7f227f1531577acd7e1790a88fb1e12a5a4c930"
+  },
+  "counts": {
+    "newPersistentFunctionDefinitionsByMigration": {
+      "122": 4,
+      "123": 0,
+      "124": 20
+    },
+    "existingFunctionBodyEditsByMigration": {
+      "122": 2,
+      "123": 16,
+      "124": 15
+    },
+    "newTables": 1,
+    "existingTableAddedColumns": 18,
+    "newTableColumns": 20,
+    "newTriggers": 5,
+    "newIndexes": 7,
+    "removedExistingConstraints": 1
+  },
+  "limitations": [
+    "Per-migration function counts include new replacement manifest definitions after rename; same signature appears in122 and124. Do not sum these as distinct final signatures.",
+    "Counts describe source operations. Actual installed catalog proof is tied to individual recorded suite sources; final integrated catalog refresh is separate.",
+    "The five-row future-expiry bound is supported-writer scope, not a schema-wide constraint."
+  ]
+}

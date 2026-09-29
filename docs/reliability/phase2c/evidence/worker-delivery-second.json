@@ -1,0 +1,59 @@
+{
+  "installed": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "cc4bd9d640d17e9f39081f18f7c79c8e7735aadd498d8e87e9edfe2318b31b6a"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "7bcd61e2f00f64afaf6234bdfd10755e84113e53716654aa9c811eac4b94c777"
+      }
+    ],
+    "statementTimeoutMs": 5000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "productionQueries": 0,
+  "networkDenied": true,
+  "fixtureSetupTimeoutMs": 30000,
+  "scoreTimeoutMs": 1000,
+  "workerTimeoutMs": 5000,
+  "fsync": false,
+  "outcomes": [
+    {
+      "case": "service-only-chained-manifest",
+      "pass": true
+    },
+    {
+      "case": "actual57014-durable-budget",
+      "pass": true,
+      "statementTimeoutMs": 25,
+      "attempts": 5,
+      "elapsedMs": [
+        35.71941700000025,
+        33.213167000001704,
+        33.875833000001876,
+        32.99816699999792,
+        33.91458299999795
+      ],
+      "expeditedBackoffClock": true,
+      "newConnectionEachAttempt": true
+    }
+  ],
+  "limitations": [
+    "Synthetic initial approved financial rules and runtime boundaries",
+    "Hosted scheduler installation is not proven",
+    "Net Skins processing remains owner-controlled",
+    "Crash recovery uses explicit lease clock injection"
+  ]
+}

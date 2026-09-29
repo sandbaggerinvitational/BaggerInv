@@ -1,0 +1,379 @@
+{
+  "schemaVersion": 1,
+  "id": "P2C-NEW-TIMESTAMP-TIMEZONE",
+  "severity": "P1",
+  "confidence": "PROVEN in isolated inherited-timezone fixture",
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17 inherited America/Chicago",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "migrations": [
+    {
+      "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+    }
+  ],
+  "shippingNativeChanged": false,
+  "production": false,
+  "observation": "Unchanged retained Build10 MobileTimestamp rejects otherwise successful canonical score acknowledgement updatedAt with -05:00 offset. It accepts UTC suffixes only. No candidate-only timestamp shape modification was introduced.",
+  "nativeResponses": [
+    {
+      "format": "BB",
+      "request": {
+        "matchId": "2026-R1-1",
+        "holeNumber": 1,
+        "teamOneGrossScores": [
+          4,
+          5
+        ],
+        "teamTwoGrossScores": [
+          5,
+          6
+        ],
+        "mutationId": "6e0895fe-b5fc-48fc-8e80-7929ed52eac7",
+        "expectedMatchRevision": 0,
+        "expectedHoleRevision": 0
+      },
+      "accepted": {
+        "ok": true,
+        "apiVersion": "v1",
+        "data": {
+          "mutationId": "6e0895fe-b5fc-48fc-8e80-7929ed52eac7",
+          "accepted": true,
+          "idempotent": false,
+          "semanticNoop": false,
+          "matchId": "2026-R1-1",
+          "hole": {
+            "holeNumber": 1,
+            "revision": 1,
+            "gross": {
+              "teamOne": [
+                4,
+                5
+              ],
+              "teamTwo": [
+                5,
+                6
+              ]
+            },
+            "strokes": {
+              "teamOne": [
+                0,
+                2
+              ],
+              "teamTwo": [
+                1,
+                1
+              ]
+            },
+            "net": {
+              "teamOne": 3,
+              "teamTwo": 4
+            },
+            "winner": "teamOne",
+            "updatedAt": "2026-09-28T10:09:59.179903-05:00"
+          },
+          "match": {
+            "revision": 1,
+            "status": "inProgress",
+            "currentHole": 1,
+            "holesRemaining": 17,
+            "scorecardComplete": false,
+            "statusText": "Team 1 1 UP through 1"
+          },
+          "refreshRequired": false
+        },
+        "meta": {
+          "generatedAt": "2026-09-28T15:09:59.198Z"
+        }
+      },
+      "replay": {
+        "ok": true,
+        "apiVersion": "v1",
+        "data": {
+          "mutationId": "6e0895fe-b5fc-48fc-8e80-7929ed52eac7",
+          "accepted": true,
+          "idempotent": true,
+          "semanticNoop": false,
+          "matchId": "2026-R1-1",
+          "hole": {
+            "holeNumber": 1,
+            "revision": 1,
+            "gross": {
+              "teamOne": [
+                4,
+                5
+              ],
+              "teamTwo": [
+                5,
+                6
+              ]
+            },
+            "strokes": {
+              "teamOne": [
+                0,
+                2
+              ],
+              "teamTwo": [
+                1,
+                1
+              ]
+            },
+            "net": {
+              "teamOne": 3,
+              "teamTwo": 4
+            },
+            "winner": "teamOne",
+            "updatedAt": "2026-09-28T10:09:59.179903-05:00"
+          },
+          "match": {
+            "revision": 1,
+            "status": "inProgress",
+            "currentHole": 1,
+            "holesRemaining": 17,
+            "scorecardComplete": false,
+            "statusText": "Team 1 1 UP through 1"
+          },
+          "refreshRequired": false
+        },
+        "meta": {
+          "generatedAt": "2026-09-28T15:09:59.210Z"
+        }
+      }
+    },
+    {
+      "format": "SC",
+      "request": {
+        "matchId": "2026-R2-1",
+        "holeNumber": 1,
+        "teamOneGrossScores": [
+          4
+        ],
+        "teamTwoGrossScores": [
+          5
+        ],
+        "mutationId": "b5b6543d-a763-4d73-8e2e-1ce4a0294bb1",
+        "expectedMatchRevision": 0,
+        "expectedHoleRevision": 0
+      },
+      "accepted": {
+        "ok": true,
+        "apiVersion": "v1",
+        "data": {
+          "mutationId": "b5b6543d-a763-4d73-8e2e-1ce4a0294bb1",
+          "accepted": true,
+          "idempotent": false,
+          "semanticNoop": false,
+          "matchId": "2026-R2-1",
+          "hole": {
+            "holeNumber": 1,
+            "revision": 1,
+            "gross": {
+              "teamOne": [
+                4
+              ],
+              "teamTwo": [
+                5
+              ]
+            },
+            "strokes": {
+              "teamOne": [
+                1
+              ],
+              "teamTwo": [
+                0
+              ]
+            },
+            "net": {
+              "teamOne": 3,
+              "teamTwo": 5
+            },
+            "winner": "teamOne",
+            "updatedAt": "2026-09-28T10:09:59.567518-05:00"
+          },
+          "match": {
+            "revision": 1,
+            "status": "inProgress",
+            "currentHole": 1,
+            "holesRemaining": 17,
+            "scorecardComplete": false,
+            "statusText": "Team 1 1 UP through 1"
+          },
+          "refreshRequired": false
+        },
+        "meta": {
+          "generatedAt": "2026-09-28T15:09:59.579Z"
+        }
+      },
+      "replay": {
+        "ok": true,
+        "apiVersion": "v1",
+        "data": {
+          "mutationId": "b5b6543d-a763-4d73-8e2e-1ce4a0294bb1",
+          "accepted": true,
+          "idempotent": true,
+          "semanticNoop": false,
+          "matchId": "2026-R2-1",
+          "hole": {
+            "holeNumber": 1,
+            "revision": 1,
+            "gross": {
+              "teamOne": [
+                4
+              ],
+              "teamTwo": [
+                5
+              ]
+            },
+            "strokes": {
+              "teamOne": [
+                1
+              ],
+              "teamTwo": [
+                0
+              ]
+            },
+            "net": {
+              "teamOne": 3,
+              "teamTwo": 5
+            },
+            "winner": "teamOne",
+            "updatedAt": "2026-09-28T10:09:59.567518-05:00"
+          },
+          "match": {
+            "revision": 1,
+            "status": "inProgress",
+            "currentHole": 1,
+            "holesRemaining": 17,
+            "scorecardComplete": false,
+            "statusText": "Team 1 1 UP through 1"
+          },
+          "refreshRequired": false
+        },
+        "meta": {
+          "generatedAt": "2026-09-28T15:09:59.591Z"
+        }
+      }
+    },
+    {
+      "format": "SI",
+      "request": {
+        "matchId": "2026-R3-12",
+        "holeNumber": 1,
+        "teamOneGrossScores": [
+          4
+        ],
+        "teamTwoGrossScores": [
+          5
+        ],
+        "mutationId": "45d87e57-f1f7-4813-8010-58a4c77dcb95",
+        "expectedMatchRevision": 0,
+        "expectedHoleRevision": 0
+      },
+      "accepted": {
+        "ok": true,
+        "apiVersion": "v1",
+        "data": {
+          "mutationId": "45d87e57-f1f7-4813-8010-58a4c77dcb95",
+          "accepted": true,
+          "idempotent": false,
+          "semanticNoop": false,
+          "matchId": "2026-R3-12",
+          "hole": {
+            "holeNumber": 1,
+            "revision": 1,
+            "gross": {
+              "teamOne": [
+                4
+              ],
+              "teamTwo": [
+                5
+              ]
+            },
+            "strokes": {
+              "teamOne": [
+                0
+              ],
+              "teamTwo": [
+                3
+              ]
+            },
+            "net": {
+              "teamOne": 4,
+              "teamTwo": 2
+            },
+            "winner": "teamTwo",
+            "updatedAt": "2026-09-28T10:09:59.958589-05:00"
+          },
+          "match": {
+            "revision": 1,
+            "status": "inProgress",
+            "currentHole": 1,
+            "holesRemaining": 17,
+            "scorecardComplete": false,
+            "statusText": "Team 2 1 UP through 1"
+          },
+          "refreshRequired": false
+        },
+        "meta": {
+          "generatedAt": "2026-09-28T15:09:59.974Z"
+        }
+      },
+      "replay": {
+        "ok": true,
+        "apiVersion": "v1",
+        "data": {
+          "mutationId": "45d87e57-f1f7-4813-8010-58a4c77dcb95",
+          "accepted": true,
+          "idempotent": true,
+          "semanticNoop": false,
+          "matchId": "2026-R3-12",
+          "hole": {
+            "holeNumber": 1,
+            "revision": 1,
+            "gross": {
+              "teamOne": [
+                4
+              ],
+              "teamTwo": [
+                5
+              ]
+            },
+            "strokes": {
+              "teamOne": [
+                0
+              ],
+              "teamTwo": [
+                3
+              ]
+            },
+            "net": {
+              "teamOne": 4,
+              "teamTwo": 2
+            },
+            "winner": "teamTwo",
+            "updatedAt": "2026-09-28T10:09:59.958589-05:00"
+          },
+          "match": {
+            "revision": 1,
+            "status": "inProgress",
+            "currentHole": 1,
+            "holesRemaining": 17,
+            "scorecardComplete": false,
+            "statusText": "Team 2 1 UP through 1"
+          },
+          "refreshRequired": false
+        },
+        "meta": {
+          "generatedAt": "2026-09-28T15:09:59.986Z"
+        }
+      }
+    }
+  ],
+  "decoderError": "MobileReadModelError.invalidTimestamp",
+  "limitations": [
+    "Provider/Production timezone not queried or proven",
+    "No physical device; actual retained Swift model decoder executed on macOS",
+    "Candidate response was not normalized or rewritten to pass"
+  ],
+  "recommendedControl": "Explicit UTC fixture profile and future staging timezone assertion; keep nonUTC rejection visible. No native or response patch in Phase2C.",
+  "category": "ENVIRONMENT/CLIENT CONTRACT RISK"
+}

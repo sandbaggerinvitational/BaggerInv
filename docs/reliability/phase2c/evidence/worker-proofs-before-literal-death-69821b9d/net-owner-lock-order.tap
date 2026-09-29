@@ -1,0 +1,131 @@
+TAP version 13
+# Subtest: Net Skins owner completion locks exact Storylines before supported controls
+    # Subtest: present FINALIZE before
+    ok 1 - present FINALIZE before
+      ---
+      duration_ms: 2756.101875
+      type: 'test'
+      ...
+    # Subtest: present FINALIZE after
+    ok 2 - present FINALIZE after
+      ---
+      duration_ms: 2203.400916
+      type: 'test'
+      ...
+    # Subtest: present SCORING_LOCK before
+    ok 3 - present SCORING_LOCK before
+      ---
+      duration_ms: 2570.671417
+      type: 'test'
+      ...
+    # Subtest: present SCORING_LOCK after
+    ok 4 - present SCORING_LOCK after
+      ---
+      duration_ms: 2065.664458
+      type: 'test'
+      ...
+    # Subtest: absent FINALIZE before
+    ok 5 - absent FINALIZE before
+      ---
+      duration_ms: 2938.230333
+      type: 'test'
+      ...
+    # Subtest: absent FINALIZE after
+    ok 6 - absent FINALIZE after
+      ---
+      duration_ms: 1846.523
+      type: 'test'
+      ...
+    # Subtest: absent SCORING_LOCK before
+    ok 7 - absent SCORING_LOCK before
+      ---
+      duration_ms: 2595.455041
+      type: 'test'
+      ...
+    # Subtest: absent SCORING_LOCK after
+    ok 8 - absent SCORING_LOCK after
+      ---
+      duration_ms: 1429.683167
+      type: 'test'
+      ...
+    # Subtest: absent marker rolls back on rejected lease
+    ok 9 - absent marker rolls back on rejected lease
+      ---
+      duration_ms: 2446.554208
+      type: 'test'
+      ...
+    # Subtest: absent marker rolls back on rejected source
+    ok 10 - absent marker rolls back on rejected source
+      ---
+      duration_ms: 2337.4665
+      type: 'test'
+      ...
+    # Subtest: two simultaneous rounds create only unchanged canonical Storylines demand
+    ok 11 - two simultaneous rounds create only unchanged canonical Storylines demand
+      ---
+      duration_ms: 1840.64975
+      type: 'test'
+      ...
+    # Subtest: future2099 present marker actual claim/calculator/completion matches unchanged serial body
+    ok 12 - future2099 present marker actual claim/calculator/completion matches unchanged serial body
+      ---
+      duration_ms: 1570.547167
+      type: 'test'
+      ...
+    # Subtest: future2099 absent marker actual claim/calculator/completion matches unchanged serial body
+    ok 13 - future2099 absent marker actual claim/calculator/completion matches unchanged serial body
+      ---
+      duration_ms: 1724.863875
+      type: 'test'
+      ...
+    # Subtest: future2099 absent marker rejects lease without provisional footprint
+    ok 14 - future2099 absent marker rejects lease without provisional footprint
+      ---
+      duration_ms: 827.906459
+      type: 'test'
+      ...
+    # Subtest: future2099 absent marker rejects source without provisional footprint
+    ok 15 - future2099 absent marker rejects source without provisional footprint
+      ---
+      duration_ms: 910.756333
+      type: 'test'
+      ...
+    # Subtest: future2099 absent marker rejects job-generation without provisional footprint
+    ok 16 - future2099 absent marker rejects job-generation without provisional footprint
+      ---
+      duration_ms: 857.869417
+      type: 'test'
+      ...
+    # Subtest: future2099 completion waits for Storylines before taking configuration or job lock
+    ok 17 - future2099 completion waits for Storylines before taking configuration or job lock
+      ---
+      duration_ms: 890.442583
+      type: 'test'
+      ...
+    # Subtest: actual absent-marker max lookup remains indexed with irrelevant result history
+    ok 18 - actual absent-marker max lookup remains indexed with irrelevant result history
+      ---
+      duration_ms: 5476.838292
+      type: 'test'
+      ...
+    # Subtest: both completion bodies and private helper are manifest bound without changed authority attributes
+    ok 19 - both completion bodies and private helper are manifest bound without changed authority attributes
+      ---
+      duration_ms: 77.349083
+      type: 'test'
+      ...
+    1..19
+ok 1 - Net Skins owner completion locks exact Storylines before supported controls
+  ---
+  duration_ms: 58685.688416
+  type: 'test'
+  ...
+1..1
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 58818.350708

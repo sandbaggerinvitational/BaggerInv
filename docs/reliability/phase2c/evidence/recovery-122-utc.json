@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "suite": "recovery",
+  "startedAt": "2026-09-28T15:20:41.917Z",
+  "completedAt": "2026-09-28T15:21:00.478Z",
+  "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "remoteNetwork": "DENIED_AT_NET_TLS_SOCKET",
+  "credentials": "REMOVED_FROM_CHILD_ENV",
+  "production": false,
+  "sources": [
+    {
+      "file": "test/reliability-phase2c-recovery.test.mjs",
+      "sha256": "7e573c32ef38cce423a43e17eafff672fb6303a59344c372e219b5108c2c22c9"
+    },
+    {
+      "file": "test/reliability-phase2c-recovery.integration.test.mjs",
+      "sha256": "7c4552fc9aaf67d4c3c6f4e64509eecc83a18d777086b404655da30e4643887d"
+    },
+    {
+      "file": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+      "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+    },
+    {
+      "file": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+    },
+    {
+      "file": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "sha256": "cb9f35a414a816305871043b570fb669854e2c41485bcadfe0703ab3592697aa"
+    },
+    {
+      "file": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "0d381b25f971b38d9076115f825af5db7c97e8762951ddb42c1dd42d31a44853"
+    }
+  ],
+  "counts": {
+    "tests": 40,
+    "pass": 40,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "exitCode": 0,
+  "error": null,
+  "result": "PASS",
+  "failures": [],
+  "rawArtifact": "recovery.tap",
+  "rawSha256": "f48aca986ce9644a8314809f6cc4350ea637c94cba9810b90dc9afcfddbfc561",
+  "limitations": [
+    "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+  ]
+}

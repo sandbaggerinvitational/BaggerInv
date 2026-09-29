@@ -11,6 +11,9 @@ import { sql,sqlResult,openSqlSession,destroyIsolatedCluster,repositoryRoot,json
   from "./support/reliability/postgres17.mjs";
 import { seedSyntheticSideGameHistory } from "./support/reliability/synthetic-history.mjs";
 
+const phase2cCandidate=process.env.BAGGER_PHASE2C_CANDIDATE==="1";
+const transientState=phase2cCandidate?"40001":"P0001";
+const scoreCalcuttaEnqueue=phase2cCandidate?"enqueue_score_calcutta_v1":"enqueue_production_calcutta_v1";
 const migration="supabase/production_migrations/202609280121_score_derived_intents_v1.sql";
 const score=(c,d,i)=>rpc(c,d,"submit_production_hole_score",i);
 const flush=(c,d,f,n=8)=>JSON.parse(sql(c,d,
@@ -21,12 +24,11 @@ const intents=(c,d)=>JSON.parse(sql(c,d,`select coalesce(jsonb_agg(jsonb_build_o
   from scoring_authority.score_derived_intents_v1`));
 const artifact=process.env.BAGGER_PHASE2_DERIVED_OUTPUT;
 let output;
-if(artifact){output=path.resolve(repositoryRoot,artifact);assert.ok(output.startsWith(path.join(repositoryRoot,"docs/reliability/phase2")+path.sep));assert.match(output,/\.json$/);}
+if(artifact){output=path.resolve(repositoryRoot,artifact);assert.ok(["phase2","phase2c"].some(phase=>output.startsWith(path.join(repositoryRoot,"docs/reliability",phase)+path.sep)));assert.match(output,/\.json$/);}
 
 test("Phase2 durable derived intent behavioral proof",{timeout:600000},async t=>{
  const fixture=await createScoreProofFixture({candidateSql:migration}),c=fixture.cluster;
- // Production-shaped side-game history is synthetic and seeded with triggers off.
- seedSyntheticSideGameHistory(c,fixture.database,1);
+
  const evidence={schemaVersion:1,startedAt:new Date().toISOString(),...fixture.metadata,
    candidate:fixture.candidate,tests:[],limitations:[...fixture.metadata.limitations,
      "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
@@ -37,6 +39,13 @@ test("Phase2 durable derived intent behavioral proof",{timeout:600000},async t=>
    finally{row.elapsedMs=performance.now()-start;evidence.tests.push(row);}
  });
  try{
+  // Setup is not a measured operation; retain finite1s for every candidate clone.
+  if(phase2cCandidate)sql(c,fixture.database,`alter database ${fixture.database} set statement_timeout='180s'`,{role:""});
+  seedSyntheticSideGameHistory(c,fixture.database,1);
+  if(phase2cCandidate)sql(c,fixture.database,`alter database ${fixture.database} set statement_timeout='1s'`,{role:""});
+  evidence.fixtureSetupTimeoutMs=phase2cCandidate?180000:null;
+  evidence.transientFaultSqlstate=transientState;
+  evidence.failureClassificationChange=phase2cCandidate?"124 treats deterministic P0001 as terminal; this preserved retry matrix injects actual transient40001. Dedicated worker suite separately proves deterministic isolation.":"BASELINE_P0001_RETRY_POLICY";
   await run("P2-DERIVED-ATOMIC","required durable intent append failure rolls back score and receipt",()=>{
    const d=cloneScoreProofDatabase(fixture,"intent_atomic"),i=inputFor(c,d,"2026-R1-1"),before=canonicalState(c,d,i.match_id);
    sql(c,d,`create function public.phase2_intent_fault()returns trigger language plpgsql as $$begin raise exception 'PHASE2_INTENT_APPEND_FAULT';end$$;
@@ -61,21 +70,21 @@ test("Phase2 durable derived intent behavioral proof",{timeout:600000},async t=>
    const d=cloneScoreProofDatabase(fixture,`fail_${family.toLowerCase()}`),i=inputFor(c,d,"2026-R1-1");
    let original;
    if(family==="CALCUTTA"){
-    original=sql(c,d,"select pg_get_functiondef('production_control.enqueue_production_calcutta_v1(text,text,boolean,text,text)'::regprocedure)");
-    sql(c,d,`create or replace function production_control.enqueue_production_calcutta_v1(reason_value text,requested_by_value text,force_value boolean default false,request_fingerprint_value text default null,request_payload_hash_value text default null)
-     returns jsonb language plpgsql security definer set search_path=pg_catalog as $$begin raise exception using errcode='P0001',message='PHASE2_CALCUTTA_UNAVAILABLE';end$$;`,{role:""});
+    original=sql(c,d,`select pg_get_functiondef('production_control.${scoreCalcuttaEnqueue}(text,text,boolean,text,text)'::regprocedure)`);
+    sql(c,d,`create or replace function production_control.${scoreCalcuttaEnqueue}(reason_value text,requested_by_value text,force_value boolean default false,request_fingerprint_value text default null,request_payload_hash_value text default null)
+     returns jsonb language plpgsql security definer set search_path=pg_catalog as $$begin raise exception using errcode='${transientState}',message='PHASE2_CALCUTTA_UNAVAILABLE';end$$;`,{role:""});
    }else if(family==="NET_SKINS"){
     original=sql(c,d,"select pg_get_functiondef('production_control.enqueue_production_net_skins_v1_round(integer,text,text)'::regprocedure)");
     sql(c,d,`create or replace function production_control.enqueue_production_net_skins_v1_round(target_round_number integer,reason_value text,requested_by_value text)
-     returns scoring_authority.net_skins_v1_recalculation_jobs language plpgsql security definer set search_path=pg_catalog as $$begin raise exception using errcode='P0001',message='PHASE2_SKINS_UNAVAILABLE';end$$;`,{role:""});
+     returns scoring_authority.net_skins_v1_recalculation_jobs language plpgsql security definer set search_path=pg_catalog as $$begin raise exception using errcode='${transientState}',message='PHASE2_SKINS_UNAVAILABLE';end$$;`,{role:""});
    }else{
-    sql(c,d,`create function public.phase2_competition_fault()returns trigger language plpgsql as $$begin raise exception 'PHASE2_COMPETITION_UNAVAILABLE';end$$;
+    sql(c,d,`create function public.phase2_competition_fault()returns trigger language plpgsql as $$begin raise exception using errcode='${transientState}',message='PHASE2_COMPETITION_UNAVAILABLE';end$$;
      create trigger phase2_competition_fault before insert or update on scoring_authority.competition_recalculation_jobs
      for each row execute function public.phase2_competition_fault();`,{role:""});
    }
    assert.equal(score(c,d,i).code,"ACCEPTED");
    const failed=flush(c,d,family);assert.equal(failed.failed,1);assert.equal(failed.processed,0);
-   const row=intents(c,d).find(r=>r.family===family);assert.equal(row.status,"RETRYABLE");assert.equal(row.attempts,1);assert.equal(row.sqlstate,"P0001");
+   const row=intents(c,d).find(r=>r.family===family);assert.equal(row.status,"RETRYABLE");assert.equal(row.attempts,1);assert.equal(row.sqlstate,transientState);
    const state=canonicalState(c,d,i.match_id);assert.equal(state.holes.length,1);assert.equal(state.receipts.length,1);
    if(original)sql(c,d,original,{role:""});else sql(c,d,"drop trigger phase2_competition_fault on scoring_authority.competition_recalculation_jobs;drop function public.phase2_competition_fault();",{role:""});
    // Clock advancement is fixture-only; production retry backoff is not changed.
@@ -83,7 +92,7 @@ test("Phase2 durable derived intent behavioral proof",{timeout:600000},async t=>
    const retry=flush(c,d,family);assert.equal(retry.failed,0);assert.equal(retry.processed,1);
    assert.equal(intents(c,d).find(r=>r.family===family).status,"SUCCEEDED");
    assert.equal(canonicalState(c,d,i.match_id).holes.length,1);
-   return {score:"ACCEPTED",failure:"RETRYABLE_P0001",retry:"SUCCEEDED",canonicalHoles:1};
+   return {score:"ACCEPTED",failure:`RETRYABLE_${transientState}`,retry:"SUCCEEDED",canonicalHoles:1};
   });
   for(const operation of ["LOCK","FINALIZE"])await run(`P2-DERIVED-STANDALONE-${operation}`,`standalone ${operation} retains synchronous derived failure and atomic rollback`,()=>{
    const observations=[];
@@ -153,9 +162,9 @@ test("Phase2 durable derived intent behavioral proof",{timeout:600000},async t=>
    const worker=openSqlSession(c,d),scorer=openSqlSession(c,d);
    try{
     await worker.query("begin");const drained=JSON.parse(await worker.query("select production_control.flush_score_derived_intents_v1('2026','COMPETITION',8)"));assert.equal(drained.processed,1);
-    const next=inputFor(c,d,"2026-R1-2");const result=JSON.parse(await scorer.query(`set statement_timeout='2s';${rpcSql("submit_production_hole_score",next)}`));assert.equal(result.code,"ACCEPTED");
+    const next=inputFor(c,d,"2026-R1-2");const result=JSON.parse(await scorer.query(`set statement_timeout='${phase2cCandidate?'1s':'2s'}';${rpcSql("submit_production_hole_score",next)}`));assert.equal(result.code,"ACCEPTED");
     await worker.query("commit");assert.equal(canonicalState(c,d,next.match_id).holes.length,1);
-    return {worker:"HOLDS_COMPETITION_MARKERS_UNCOMMITTED",score:"COMMITTED_BEFORE_WORKER",timeoutMs:2000,canonicalHoles:2};
+    return {worker:"HOLDS_COMPETITION_MARKERS_UNCOMMITTED",score:"COMMITTED_BEFORE_WORKER",timeoutMs:phase2cCandidate?1000:2000,canonicalHoles:2};
    }finally{await Promise.resolve().then(()=>worker.query("rollback")).catch(()=>{});await Promise.allSettled([worker.close(),scorer.close()]);}
   });
   await run("P2-DERIVED-ORDER","older financial demand observes latest canonical source instead of publishing obsolete result",()=>{
@@ -173,8 +182,8 @@ test("Phase2 durable derived intent behavioral proof",{timeout:600000},async t=>
   });
   await run("P2-DERIVED-DEAD-LETTER","bounded repeated consumer failure becomes visible dead letter without changing score",()=>{
    const d=cloneScoreProofDatabase(fixture,"dead_letter"),i=inputFor(c,d,"2026-R1-1");
-   sql(c,d,`create or replace function production_control.enqueue_production_calcutta_v1(reason_value text,requested_by_value text,force_value boolean default false,request_fingerprint_value text default null,request_payload_hash_value text default null)
-     returns jsonb language plpgsql security definer set search_path=pg_catalog as $$begin raise exception using errcode='P0001',message='PHASE2_PERSISTENT_FAILURE';end$$;`,{role:""});
+   sql(c,d,`create or replace function production_control.${scoreCalcuttaEnqueue}(reason_value text,requested_by_value text,force_value boolean default false,request_fingerprint_value text default null,request_payload_hash_value text default null)
+     returns jsonb language plpgsql security definer set search_path=pg_catalog as $$begin raise exception using errcode='${transientState}',message='PHASE2_PERSISTENT_FAILURE';end$$;`,{role:""});
    assert.equal(score(c,d,i).code,"ACCEPTED");
    for(let attempt=1;attempt<=5;attempt++){
     const failed=flush(c,d,"CALCUTTA");assert.equal(failed.failed,1);
@@ -187,12 +196,35 @@ test("Phase2 durable derived intent behavioral proof",{timeout:600000},async t=>
    assert.equal(canonicalState(c,d,i.match_id).holes.length,1);
    return {attempts:5,status:"DEAD_LETTER",closeFencePending:true,automaticInfiniteRetry:false,canonicalHoles:1};
   });
-  await run("P2-DERIVED-TIMEOUT","57014 aborts worker transaction while prior canonical score remains committed",()=>{
+  await run("P2-DERIVED-TIMEOUT","57014 cancels derived work with versioned retry evidence while prior canonical score remains committed",()=>{
    const d=cloneScoreProofDatabase(fixture,"worker_timeout"),i=inputFor(c,d,"2026-R1-1");
-   assert.equal(score(c,d,i).code,"ACCEPTED");const before=intents(c,d);
-   sql(c,d,`create or replace function production_control.enqueue_production_calcutta_v1(reason_value text,requested_by_value text,force_value boolean default false,request_fingerprint_value text default null,request_payload_hash_value text default null)
-     returns jsonb language plpgsql security definer set search_path=pg_catalog as $$begin perform pg_sleep(1);return '{}'::jsonb;end$$;`,{role:""});
+   assert.equal(score(c,d,i).code,"ACCEPTED");const before=intents(c,d),canonicalBefore=canonicalState(c,d,i.match_id);
+   const original=sql(c,d,`select pg_get_functiondef('production_control.${scoreCalcuttaEnqueue}(text,text,boolean,text,text)'::regprocedure)`);
+   sql(c,d,"create table public.phase2_timeout_write_probe(value integer)",{role:""});
+   sql(c,d,`create or replace function production_control.${scoreCalcuttaEnqueue}(reason_value text,requested_by_value text,force_value boolean default false,request_fingerprint_value text default null,request_payload_hash_value text default null)
+     returns jsonb language plpgsql security definer set search_path=pg_catalog as $$begin insert into public.phase2_timeout_write_probe values(1);perform pg_sleep(1);return '{}'::jsonb;end$$;`,{role:""});
    const failure=sqlResult(c,d,"\\set VERBOSITY verbose\nset statement_timeout='100ms';select production_control.flush_score_derived_intents_v1('2026','CALCUTTA',8)");
+   assert.equal(sql(c,d,"select count(*) from public.phase2_timeout_write_probe"),"0","cancelled subwork must roll back its actual write");
+   if(phase2cCandidate){
+    assert.equal(failure.status,0,failure.stderr);const result=JSON.parse(failure.stdout);
+    assert.equal(result.cancelled,true);assert.equal(result.failed,1);assert.equal(result.processed,0);
+    const after=intents(c,d),cancelled=after.find(r=>r.family==='CALCUTTA');
+    assert.equal(cancelled.status,'RETRYABLE');assert.equal(cancelled.attempts,1);assert.equal(cancelled.sqlstate,'57014');
+    assert.deepEqual(after.filter(r=>r.family!=='CALCUTTA'),before.filter(r=>r.family!=='CALCUTTA'));
+    assert.equal(canonicalState(c,d,i.match_id).holes.length,1);assert.equal(canonicalState(c,d,i.match_id).receipts.length,1);
+    assert.equal(cancelled.id,before.find(r=>r.family==='CALCUTTA').id);
+    assert.deepEqual(cancelled.revision,before.find(r=>r.family==='CALCUTTA').revision);
+    const attempt=JSON.parse(sql(c,d,`select jsonb_build_object('count',count(*),'valid',bool_and(cycle=1 and attempt=1 and transition='RETRYABLE' and safe_code='57014')) from production_control.score_derived_delivery_attempts_v1 where family='INTENT' and work_identity='${cancelled.id}'`));
+    assert.deepEqual(attempt,{count:1,valid:true});
+    assert.equal(sql(c,d,`select available_at>clock_timestamp() from scoring_authority.score_derived_intents_v1 where intent_id='${cancelled.id}'`),'t');
+    const canonicalOnly=value=>Object.fromEntries(Object.entries(value).filter(([key])=>key!=='derived_intents'));
+    assert.deepEqual(canonicalOnly(canonicalState(c,d,i.match_id)),canonicalOnly(canonicalBefore));
+    sql(c,d,original,{role:''});sql(c,d,`update scoring_authority.score_derived_intents_v1 set available_at=clock_timestamp()-interval '1 second' where intent_id='${cancelled.id}'`,{role:''});
+    const retry=flush(c,d,'CALCUTTA');assert.equal(retry.processed,1);assert.equal(retry.failed,0);
+    assert.equal(intents(c,d).find(r=>r.id===cancelled.id).status,'SUCCEEDED');
+    assert.deepEqual(canonicalOnly(canonicalState(c,d,i.match_id)),canonicalOnly(canonicalBefore));
+    return {sqlstate:'57014',workerTransaction:'CANCELLED_SUBWORK_ROLLED_BACK_RETRY_RECEIPT_COMMITTED',intent:'RETRYABLE_THEN_SUCCEEDED',canonicalScore:'COMMITTED',partialWriteRolledBack:true,immutableRetryReceipt:attempt,result};
+   }
    assert.notEqual(failure.status,0);assert.match(failure.stderr,/57014/);assert.deepEqual(intents(c,d),before);
    assert.equal(canonicalState(c,d,i.match_id).holes.length,1);
    return {sqlstate:"57014",workerTransaction:"ROLLED_BACK",intent:"PENDING_REPLAYABLE",canonicalScore:"COMMITTED"};

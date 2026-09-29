@@ -1,0 +1,197 @@
+TAP version 13
+# Subtest: Phase2 actual canonical score proof matrix
+    # Subtest: P2-FIXTURE-IDS: full input seed and hole key produce 432 distinct mutation identities
+    ok 1 - P2-FIXTURE-IDS: full input seed and hole key produce 432 distinct mutation identities
+      ---
+      duration_ms: 0.984083
+      type: 'test'
+      ...
+    # Subtest: P2-IDEM-001: sequential identical mutation and changed payload
+    ok 2 - P2-IDEM-001: sequential identical mutation and changed payload
+      ---
+      duration_ms: 290.442833
+      type: 'test'
+      ...
+    # Subtest: P2-IDEM-002: new mutation same Official score vs intentional revision-aware correction
+    ok 3 - P2-IDEM-002: new mutation same Official score vs intentional revision-aware correction
+      ---
+      duration_ms: 413.780833
+      type: 'test'
+      ...
+    # Subtest: P2-CONC-001: 20 concurrent identical requests resolve one canonical outcome
+    ok 4 - P2-CONC-001: 20 concurrent identical requests resolve one canonical outcome
+      ---
+      duration_ms: 387.853667
+      type: 'test'
+      ...
+    # Subtest: P2-CONC-002: concurrent new mutation IDs / same gross cannot overwrite stale authority
+    ok 5 - P2-CONC-002: concurrent new mutation IDs / same gross cannot overwrite stale authority
+      ---
+      duration_ms: 358.6415
+      type: 'test'
+      ...
+    # Subtest: P2-CONC-003: concurrent new mutation IDs / different gross cannot overwrite stale authority
+    ok 6 - P2-CONC-003: concurrent new mutation IDs / different gross cannot overwrite stale authority
+      ---
+      duration_ms: 361.620208
+      type: 'test'
+      ...
+    # Subtest: P2-CONC-004: adjacent holes serialize with revision conflict then same-mutation retry
+    ok 7 - P2-CONC-004: adjacent holes serialize with revision conflict then same-mutation retry
+      ---
+      duration_ms: 400.874584
+      type: 'test'
+      ...
+    # Subtest: P2-CONC-005: independent match score completes while another match transaction remains open
+    ok 8 - P2-CONC-005: independent match score completes while another match transaction remains open
+      ---
+      duration_ms: 341.906334
+      type: 'test'
+      ...
+    # Subtest: P2-CONC-LOCK-SCORE: SCORE wins Lock/score race safely
+    ok 9 - P2-CONC-LOCK-SCORE: SCORE wins Lock/score race safely
+      ---
+      duration_ms: 373.611958
+      type: 'test'
+      ...
+    # Subtest: P2-CONC-LOCK-LOCK: LOCK wins Lock/score race safely
+    ok 10 - P2-CONC-LOCK-LOCK: LOCK wins Lock/score race safely
+      ---
+      duration_ms: 368.555958
+      type: 'test'
+      ...
+    # Subtest: P2-ATOMIC-BEFORE_HOLE: failure at BEFORE_HOLE rolls back hole, match, receipt and audit
+    ok 11 - P2-ATOMIC-BEFORE_HOLE: failure at BEFORE_HOLE rolls back hole, match, receipt and audit
+      ---
+      duration_ms: 427.733167
+      type: 'test'
+      ...
+    # Subtest: P2-ATOMIC-AFTER_HOLE: failure at AFTER_HOLE rolls back hole, match, receipt and audit
+    ok 12 - P2-ATOMIC-AFTER_HOLE: failure at AFTER_HOLE rolls back hole, match, receipt and audit
+      ---
+      duration_ms: 386.242458
+      type: 'test'
+      ...
+    # Subtest: P2-ATOMIC-AFTER_MATCH: failure at AFTER_MATCH rolls back hole, match, receipt and audit
+    ok 13 - P2-ATOMIC-AFTER_MATCH: failure at AFTER_MATCH rolls back hole, match, receipt and audit
+      ---
+      duration_ms: 383.272833
+      type: 'test'
+      ...
+    # Subtest: P2-ATOMIC-BEFORE_RECEIPT: failure at BEFORE_RECEIPT rolls back hole, match, receipt and audit
+    ok 14 - P2-ATOMIC-BEFORE_RECEIPT: failure at BEFORE_RECEIPT rolls back hole, match, receipt and audit
+      ---
+      duration_ms: 371.14225
+      type: 'test'
+      ...
+    # Subtest: P2-ATOMIC-AFTER_RECEIPT: failure at AFTER_RECEIPT rolls back hole, match, receipt and audit
+    ok 15 - P2-ATOMIC-AFTER_RECEIPT: failure at AFTER_RECEIPT rolls back hole, match, receipt and audit
+      ---
+      duration_ms: 411.420917
+      type: 'test'
+      ...
+    # Subtest: P2-ATOMIC-AFTER_HISTORY: failure at AFTER_HISTORY rolls back hole, match, receipt and audit
+    ok 16 - P2-ATOMIC-AFTER_HISTORY: failure at AFTER_HISTORY rolls back hole, match, receipt and audit
+      ---
+      duration_ms: 406.748875
+      type: 'test'
+      ...
+    # Subtest: P2-ATOMIC-AFTER_AUDIT: failure at AFTER_AUDIT rolls back hole, match, receipt and audit
+    ok 17 - P2-ATOMIC-AFTER_AUDIT: failure at AFTER_AUDIT rolls back hole, match, receipt and audit
+      ---
+      duration_ms: 389.755708
+      type: 'test'
+      ...
+    # Subtest: P2-ATOMIC-AFTER_OUTBOX: failure at AFTER_OUTBOX rolls back hole, match, receipt and audit
+    ok 18 - P2-ATOMIC-AFTER_OUTBOX: failure at AFTER_OUTBOX rolls back hole, match, receipt and audit
+      ---
+      duration_ms: 413.216333
+      type: 'test'
+      ...
+    # Subtest: P2-FAIL-57014: statement timeout after hole work rolls back and preserves SQLSTATE57014
+    ok 19 - P2-FAIL-57014: statement timeout after hole work rolls back and preserves SQLSTATE57014
+      ---
+      duration_ms: 474.805958
+      type: 'test'
+      ...
+    # Subtest: P2-FAIL-BEFORE-COMMIT: backend connection termination before COMMIT is exactly recoverable
+    ok 20 - P2-FAIL-BEFORE-COMMIT: backend connection termination before COMMIT is exactly recoverable
+      ---
+      duration_ms: 397.701833
+      type: 'test'
+      ...
+    # Subtest: P2-FAIL-AFTER-COMMIT: backend connection termination after COMMIT is exactly recoverable
+    ok 21 - P2-FAIL-AFTER-COMMIT: backend connection termination after COMMIT is exactly recoverable
+      ---
+      duration_ms: 375.830458
+      type: 'test'
+      ...
+    # Subtest: P2-UNKNOWN-INFLIGHT: absent receipt while transaction still active must remain UNKNOWN
+    ok 22 - P2-UNKNOWN-INFLIGHT: absent receipt while transaction still active must remain UNKNOWN
+      ---
+      duration_ms: 357.839
+      type: 'test'
+      ...
+    # Subtest: P2-AUTH-001: real actor, match permission and private RPC privileges deny unauthorized identities
+    ok 23 - P2-AUTH-001: real actor, match permission and private RPC privileges deny unauthorized identities
+      ---
+      duration_ms: 369.547042
+      type: 'test'
+      ...
+    # Subtest: P2-IDEM-LOCKED-READBACK: committed receipt survives Lock even when participant replay loses permission
+    ok 24 - P2-IDEM-LOCKED-READBACK: committed receipt survives Lock even when participant replay loses permission
+      ---
+      duration_ms: 386.283791
+      type: 'test'
+      ...
+    # Subtest: P2-GOLF-432: all R1/R2/R3 holes and Finalize retain canonical golf and receipts
+    ok 25 - P2-GOLF-432: all R1/R2/R3 holes and Finalize retain canonical golf and receipts
+      ---
+      duration_ms: 1910.674208
+      type: 'test'
+      ...
+    # Subtest: P2-GOLF-HALVES: all three formats preserve an 18-hole halved result and 1.5/1.5 points
+    ok 26 - P2-GOLF-HALVES: all three formats preserve an 18-hole halved result and 1.5/1.5 points
+      ---
+      duration_ms: 449.391583
+      type: 'test'
+      ...
+    # Subtest: P2-GOLF-EARLY: Singles clinch at10 preserves remaining18-hole gross and final three points
+    ok 27 - P2-GOLF-EARLY: Singles clinch at10 preserves remaining18-hole gross and final three points
+      ---
+      duration_ms: 343.539667
+      type: 'test'
+      ...
+    # Subtest: P2-CONC-FINALIZE: final-hole vs Finalize race is never Final with missing hole
+    ok 28 - P2-CONC-FINALIZE: final-hole vs Finalize race is never Final with missing hole
+      ---
+      duration_ms: 792.869792
+      type: 'test'
+      ...
+    # Subtest: P2-RESTART-IN-TRANSACTION: owned disposable PostgreSQL crash restart during open score transaction
+    ok 29 - P2-RESTART-IN-TRANSACTION: owned disposable PostgreSQL crash restart during open score transaction
+      ---
+      duration_ms: 5628.5165
+      type: 'test'
+      ...
+    # Subtest: P2-RESTART-AFTER-COMMIT: owned disposable PostgreSQL crash restart after commit
+    ok 30 - P2-RESTART-AFTER-COMMIT: owned disposable PostgreSQL crash restart after commit
+      ---
+      duration_ms: 696.763375
+      type: 'test'
+      ...
+    1..30
+ok 1 - Phase2 actual canonical score proof matrix
+  ---
+  duration_ms: 22102.001292
+  type: 'test'
+  ...
+1..1
+# tests 31
+# suites 0
+# pass 31
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 22159.750708

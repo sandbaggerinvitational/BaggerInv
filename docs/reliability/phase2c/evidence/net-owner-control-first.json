@@ -1,0 +1,196 @@
+{
+  "issue": "P2C-POTENTIAL-NET-OWNER-CONTROL-LOCK",
+  "status": "SOURCE_HYPOTHESIS_RUNTIME_REPRODUCED",
+  "production": false,
+  "tests": [
+    {
+      "controlKind": "FINALIZE",
+      "expectedCounterexample": true,
+      "held": [
+        {
+          "pid": 33420,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 33418,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            33419
+          ]
+        },
+        {
+          "pid": 33419,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 33420,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            33418
+          ]
+        },
+        {
+          "pid": 33418,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            33419
+          ]
+        },
+        {
+          "pid": 33419,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 33420,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            33418
+          ]
+        },
+        {
+          "pid": 33418,
+          "wait": "transactionid",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            33420
+          ]
+        },
+        {
+          "pid": 33419,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        }
+      ],
+      "control": {
+        "ok": false,
+        "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (23,19) in relation \"net_skins_v1_recalculation_jobs\"\nSQL statement \"update scoring_authority.net_skins_v1_recalculation_jobs\n  set status = 'SUPERSEDED',\n      claimed_by = null,\n      claim_token = null,\n      lease_expires_at = null,\n      completed_at = pg_catalog.now(),\n      updated_at = pg_catalog.now()\n  where tournament_id = '2026'\n    and round_number = target_round_number\n    and status in ('PENDING', 'RUNNING')\"\nPL/pgSQL function enqueue_production_net_skins_v1_round(integer,text,text) line 64 at SQL statement\nSQL statement \"SELECT production_control.enqueue_production_net_skins_v1_round(\n    match_value.round_number,\n    case when tg_table_name = 'hole_scores'\n      then 'CANONICAL_SCORE_CHANGED'\n      else 'CANONICAL_MATCH_LIFECYCLE_CHANGED' end,\n    'production-net-skins-v1-trigger'\n  )\"\nPL/pgSQL function enqueue_production_net_skins_v1_change() line 55 at PERFORM\nSQL statement \"update scoring_authority.matches set\n    status = 'FINAL', scoring_locked = true, match_revision = next_revision,\n    permission_revision = next_permission_revision, finalized_at = transition_at,\n    authority_updated_at = transition_at, updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function public.finalize_production_match(jsonb) line 77 at SQL statement\n"
+      },
+      "completionSucceededAfterControlRollback": true,
+      "sameControlMutationRetry": "FINALIZED",
+      "canonicalHoles": 18,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "controlKind": "SCORING_LOCK",
+      "expectedCounterexample": true,
+      "held": [
+        {
+          "pid": 33471,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 33472,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 33473,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            33471
+          ]
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 33471,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 33472,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            33473
+          ]
+        },
+        {
+          "pid": 33473,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            33471
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 33471,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 33472,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            33473
+          ]
+        },
+        {
+          "pid": 33473,
+          "wait": "transactionid",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            33472
+          ]
+        }
+      ],
+      "control": {
+        "ok": false,
+        "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (23,19) in relation \"net_skins_v1_recalculation_jobs\"\nSQL statement \"update scoring_authority.net_skins_v1_recalculation_jobs\n  set status = 'SUPERSEDED',\n      claimed_by = null,\n      claim_token = null,\n      lease_expires_at = null,\n      completed_at = pg_catalog.now(),\n      updated_at = pg_catalog.now()\n  where tournament_id = '2026'\n    and round_number = target_round_number\n    and status in ('PENDING', 'RUNNING')\"\nPL/pgSQL function enqueue_production_net_skins_v1_round(integer,text,text) line 64 at SQL statement\nSQL statement \"SELECT production_control.enqueue_production_net_skins_v1_round(\n    match_value.round_number,\n    case when tg_table_name = 'hole_scores'\n      then 'CANONICAL_SCORE_CHANGED'\n      else 'CANONICAL_MATCH_LIFECYCLE_CHANGED' end,\n    'production-net-skins-v1-trigger'\n  )\"\nPL/pgSQL function enqueue_production_net_skins_v1_change() line 55 at PERFORM\nSQL statement \"update scoring_authority.matches set\n    status = case when operation = 'MARK_LIVE' then 'LIVE' else status end,\n    scoring_locked = target_locked,\n    match_revision = next_match_revision,\n    permission_revision = next_permission_revision,\n    authority_updated_at = transition_at,\n    updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function public.mutate_production_match_control(jsonb) line 269 at SQL statement\n"
+      },
+      "completionSucceededAfterControlRollback": true,
+      "sameControlMutationRetry": "SCORING_LOCK",
+      "canonicalHoles": 18,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    }
+  ],
+  "installed": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "c3bf7090d8ebc20c2039f60848176f6a6e6ef88db846477e575a702affb13fb3"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  }
+}

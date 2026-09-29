@@ -1,0 +1,871 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-29T21:42:06.484803+00:00",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "candidateMigrations": [
+    {
+      "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+    },
+    {
+      "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+    },
+    {
+      "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48"
+    }
+  ],
+  "records": [
+    {
+      "id": "E-P2C-B-EXPIRY-FAILURE-LOCK",
+      "requirement": "P2C-B-EXPIRY-FAILURE-LOCK",
+      "proofLayer": "CONCURRENCY/POSTGRESQL",
+      "artifact": "evidence/worker-failure-lock-order.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 16,
+        "pass": 16,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof",
+        "Automatic delivery is Calcutta/Competition/Intelligence only; legacy Google/archive is not covered."
+      ]
+    },
+    {
+      "id": "E-P2C-B-INDEXES",
+      "requirement": "P2C-B-INDEXES",
+      "proofLayer": "POSTGRESQL/PERFORMANCE",
+      "artifact": "evidence/delivery-index-review.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 23,
+        "pass": 23,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "dd8383437d05d2102b8c79ca9e2ba9758b1be0a57aecb200877f0742fa7d965f",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof",
+        "Automatic delivery is Calcutta/Competition/Intelligence only; legacy Google/archive is not covered."
+      ]
+    },
+    {
+      "id": "E-P2C-SCORE",
+      "requirement": "P2C-SCORE",
+      "proofLayer": "POSTGRESQL/CONCURRENCY/FAILURE_INJECTION",
+      "artifact": "evidence/canonical.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 31,
+        "pass": 31,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "d2cad26397bf031988ac1af8391eaca5a745e8bc3624a7c9ad9ce16a4324036f",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "E-P2C-SCORE-ISOLATION",
+      "requirement": "P2C-SCORE-ISOLATION",
+      "proofLayer": "POSTGRESQL/INTEGRATION",
+      "artifact": "evidence/derived.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 15,
+        "pass": 15,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "f7587daad3a7ed4b6c694edb13d9d0b501ca62ea92d4722651f537c818e31f84",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "E-P2C-QUERY",
+      "requirement": "P2C-QUERY",
+      "proofLayer": "PERFORMANCE/POSTGRESQL",
+      "artifact": "evidence/index.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "d9f43650fc430c11d0622867cccd969fc796f01f596c1dff189148c8d8bc4206",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "E-P2C-A",
+      "requirement": "P2C-A",
+      "proofLayer": "POSTGRESQL/API/INTEGRATION",
+      "artifact": "evidence/recovery.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 50,
+        "pass": 50,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "E-P2C-C",
+      "requirement": "P2C-C",
+      "proofLayer": "POSTGRESQL",
+      "artifact": "evidence/annual.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 26,
+        "pass": 26,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "d54a12f7b8fe717791c8fd60a10f21ef01eb70765c99f2b9b4bc3f3c29db1c7e",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "E-P2C-F",
+      "requirement": "P2C-F",
+      "proofLayer": "POSTGRESQL/INTEGRATION",
+      "artifact": "evidence/annual-admission-run.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "E-P2C-D",
+      "requirement": "P2C-D",
+      "proofLayer": "CONCURRENCY/POSTGRESQL",
+      "artifact": "evidence/deadlock.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "5f89462b6e315e93399281b3afe8d06800d0d91866db4babf8688424a9f91334",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "E-P2C-B",
+      "requirement": "P2C-B",
+      "proofLayer": "INTEGRATION/FAILURE_INJECTION",
+      "artifact": "evidence/delivery.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 54,
+        "pass": 54,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof",
+        "Automatic delivery is Calcutta/Competition/Intelligence only; legacy Google/archive is not covered."
+      ]
+    },
+    {
+      "id": "E-P2C-BD-LOCK",
+      "requirement": "P2C-BD-LOCK",
+      "proofLayer": "CONCURRENCY",
+      "artifact": "evidence/worker-lock-order.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "6a37b73ca48808e45e854a2c3db786e20c6fc669da3ecbbcad48ba5fc6b1fbf8",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof",
+        "Automatic delivery is Calcutta/Competition/Intelligence only; legacy Google/archive is not covered."
+      ]
+    },
+    {
+      "id": "E-P2C-B-CAL-LOCK",
+      "requirement": "P2C-B-CAL-LOCK",
+      "proofLayer": "CONCURRENCY/POSTGRESQL",
+      "artifact": "evidence/calcutta-lock-order.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "990cb30fa365d8e43742fdaa60f3775c8ac1d27fc995a6d74e70792444f33831",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof",
+        "Automatic delivery is Calcutta/Competition/Intelligence only; legacy Google/archive is not covered."
+      ]
+    },
+    {
+      "id": "E-P2C-B-NET-OWNER-LOCK",
+      "requirement": "P2C-B-NET-OWNER-LOCK",
+      "proofLayer": "CONCURRENCY/POSTGRESQL",
+      "artifact": "evidence/net-owner-lock-order.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 20,
+        "pass": 20,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof",
+        "Automatic delivery is Calcutta/Competition/Intelligence only; legacy Google/archive is not covered."
+      ]
+    },
+    {
+      "id": "E-P2C-B-TAIL",
+      "requirement": "P2C-B-TAIL",
+      "proofLayer": "PERFORMANCE/CONCURRENCY",
+      "artifact": "evidence/backlog-tail.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "d88b45611824dead8efb6046d42a696e153f7070f96383c8eb67524b4c175ba2",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof",
+        "Automatic delivery is Calcutta/Competition/Intelligence only; legacy Google/archive is not covered."
+      ]
+    },
+    {
+      "id": "E-P2C-B-HISTORY",
+      "requirement": "P2C-B-HISTORY",
+      "proofLayer": "POSTGRESQL/PERFORMANCE",
+      "artifact": "evidence/worker-history.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 33,
+        "pass": 33,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "d31c74e44e2e73aa506a8e43a56a5b1af4d38c2b7cec9660e6e32bad5fed2633",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof",
+        "Automatic delivery is Calcutta/Competition/Intelligence only; legacy Google/archive is not covered."
+      ]
+    },
+    {
+      "id": "E-P2C-B-BACKLOG",
+      "requirement": "P2C-B-BACKLOG",
+      "proofLayer": "INTEGRATION/PERFORMANCE/CONCURRENCY",
+      "artifact": "evidence/backlog-pressure.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "3535067952bedac3f5e9d5d16fb020c566efa87f27173f9bef4603e4ea4105af",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof",
+        "Automatic delivery is Calcutta/Competition/Intelligence only; legacy Google/archive is not covered."
+      ]
+    },
+    {
+      "id": "E-P2C-FULL",
+      "requirement": "P2C-FULL",
+      "proofLayer": "INTEGRATION",
+      "artifact": "evidence/full-sequence.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof",
+        "Automatic delivery is Calcutta/Competition/Intelligence only; legacy Google/archive is not covered."
+      ]
+    },
+    {
+      "id": "E-P2C-E",
+      "requirement": "P2C-E",
+      "proofLayer": "FAILURE_INJECTION",
+      "artifact": "evidence/finite.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "b7fc65ac9cf97774189307499eb478b32ae3e6420fe31943342af1f8bc6e320c",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "E-P2C-UNIT",
+      "requirement": "P2C-UNIT",
+      "proofLayer": "UNIT",
+      "artifact": "evidence/phase2c-unit.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 21,
+        "pass": 21,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "828120598561f16c060ee9d2f58d38dbb309fd3fdf57b144604c7c3381598fbc",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "E-P2C-FOUNDATION",
+      "requirement": "P2C-FOUNDATION",
+      "proofLayer": "UNIT/API/INTEGRATION",
+      "artifact": "evidence/foundation.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 96,
+        "pass": 94,
+        "fail": 0,
+        "skipped": 2,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "ca76c11fcaa574bdb5441ba8c43850d36c5e33886ad9b5e3dd701cf90fac5005",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "E-P2C-NA",
+      "requirement": "P2C-NA",
+      "proofLayer": "POSTGRESQL",
+      "artifact": "evidence/phase1-sql.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "5b2495456d1d60e6d008456f84bc17fbb91b451b05b40b51b19524b20f97bd49",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "E-P2C-BROAD",
+      "requirement": "P2C-BROAD",
+      "proofLayer": "UNIT/INTEGRATION",
+      "artifact": "evidence/application.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "FAIL",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": {
+        "tests": 4153,
+        "pass": 4127,
+        "fail": 26,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "6ad50658761f8503f0966f1f3b1906baa8212bd1e650d7e42e7f8cbd449117da",
+      "limitations": [
+        "Identical493-file selection; compare known failure identities before adjudication",
+        "Automatic delivery is Calcutta/Competition/Intelligence only; legacy Google/archive is not covered."
+      ]
+    },
+    {
+      "id": "E-P2C-BUILD",
+      "requirement": "P2C-BUILD",
+      "proofLayer": "BUILD",
+      "artifact": "evidence/build.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "validation": "verify_receipt (raw/source/dependency checks); semantic named gates remain separate",
+      "sourceStable": true,
+      "counts": null,
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "sha256": "a8776ba7c28574058756cfc30993a7ab678eff1728db35491a24d56fc65223bb",
+      "limitations": [
+        "Compilation only",
+        "Automatic delivery is Calcutta/Competition/Intelligence only; legacy Google/archive is not covered."
+      ]
+    },
+    {
+      "id": "E-P2C-PERF-COMMON",
+      "requirement": "P2C-E",
+      "proofLayer": "PERFORMANCE",
+      "artifact": "benchmark-candidate-common.json",
+      "sha256": "1547f03216c08420bb666d74d63a1a00ab058e6f1f27b8f2db51f723e6616292",
+      "result": "MEASURED_VALIDATED_LOCAL",
+      "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL17",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "sampleCount": 4000,
+      "limitations": [
+        "Local, fsync disabled; not HTTP, hosted authentication, provider capacity or durable COMMIT latency.",
+        "Nested statement counts include loops and are not network calls or distinct rows.",
+        "P99 at n1000 is a local empirical estimate, not a confidence interval.",
+        "CPU/I/O host activity outside this task is not controlled.",
+        "Intent claim/financial worker/recovery benchmark results are separate."
+      ]
+    },
+    {
+      "id": "E-P2C-PERF-ELIGIBLE",
+      "requirement": "P2C-E",
+      "proofLayer": "PERFORMANCE",
+      "artifact": "benchmark-candidate-eligible.json",
+      "sha256": "879021af1133b9ec014cf6a22bf9c2d956f1abedfca54dacba54437fc2051d8a",
+      "result": "MEASURED_VALIDATED_LOCAL",
+      "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL17",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "sampleCount": 960,
+      "limitations": [
+        "Local, fsync disabled; not HTTP, hosted authentication, provider capacity or durable COMMIT latency.",
+        "Nested statement counts include loops and are not network calls or distinct rows.",
+        "P99 at n1000 is a local empirical estimate, not a confidence interval.",
+        "CPU/I/O host activity outside this task is not controlled.",
+        "Intent claim/financial worker/recovery benchmark results are separate."
+      ]
+    },
+    {
+      "id": "E-P2C-PERF-RECOVERY",
+      "requirement": "P2C-E",
+      "proofLayer": "PERFORMANCE",
+      "artifact": "benchmark-candidate-recovery.json",
+      "sha256": "c2a64c76e17523d8d61eb70509f30539a6162582c1993ea962711bccbb52953e",
+      "result": "MEASURED_VALIDATED_LOCAL",
+      "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL17",
+      "currentMigrations": true,
+      "currentSourceClosureValidated": true,
+      "sampleCount": 4000,
+      "limitations": [
+        "Local, fsync disabled; not HTTP, hosted authentication, provider capacity or durable COMMIT latency.",
+        "Nested statement counts include loops and are not network calls or distinct rows.",
+        "P99 at n1000 is a local empirical estimate, not a confidence interval.",
+        "CPU/I/O host activity outside this task is not controlled.",
+        "Intent claim/financial worker/recovery benchmark results are separate."
+      ]
+    },
+    {
+      "id": "E-P2C-GAP-GOOGLE_REPORTING_OUTBOX",
+      "requirement": "P2C-B",
+      "proofLayer": "SOURCE_REVIEW",
+      "artifact": "evidence/google-outbox-scope-review.json",
+      "sha256": "874cc5228610157cd138bed16b4634e2d508ed8716d86bc8594d270fa4ec2a44",
+      "result": "NOT_PROVEN_AUTONOMOUS_DELIVERY",
+      "workClass": "GOOGLE_REPORTING_OUTBOX",
+      "currentScopeSourcesValidated": true,
+      "limitations": [
+        "Source inventory only; no autonomous SQL/local-sink delivery lifecycle or full-queue emptiness proof."
+      ]
+    },
+    {
+      "id": "E-P2C-GAP-SCORECARD_ARCHIVE",
+      "requirement": "P2C-B",
+      "proofLayer": "SOURCE_REVIEW",
+      "artifact": "evidence/google-outbox-scope-review.json",
+      "sha256": "874cc5228610157cd138bed16b4634e2d508ed8716d86bc8594d270fa4ec2a44",
+      "result": "NOT_PROVEN_AUTONOMOUS_DELIVERY",
+      "workClass": "SCORECARD_ARCHIVE",
+      "currentScopeSourcesValidated": true,
+      "limitations": [
+        "Source inventory only; no autonomous SQL/local-sink delivery lifecycle or full-queue emptiness proof."
+      ]
+    },
+    {
+      "id": "E-P2C-IMPORT-ORDER-REVIEW",
+      "requirement": "P2C-SCOPE",
+      "proofLayer": "SOURCE_REVIEW",
+      "artifact": "evidence/import-order-review-addendum.json",
+      "sha256": "484030c542bea7e4f6b01ec1b73c37af288e5ec549297ef4364232fc626b6585",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "REVIEWED",
+      "executionHead": null,
+      "limitations": [
+        "Exact two-import correction; no function body or test weakening; execution evidence remains separate"
+      ]
+    },
+    {
+      "id": "E-P2C-GOOGLE-GAP",
+      "requirement": "P2C-B",
+      "proofLayer": "SOURCE_REVIEW",
+      "artifact": "evidence/google-outbox-scope-review.json",
+      "sha256": "874cc5228610157cd138bed16b4634e2d508ed8716d86bc8594d270fa4ec2a44",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "NOT_PROVEN_DELIVERY",
+      "executionHead": null,
+      "limitations": [
+        "Automatic reporting/archive work not covered by three-family proof; overall Phase2C PARTIAL"
+      ]
+    },
+    {
+      "id": "E-P2C-ENGINEERING-REVIEW",
+      "requirement": "P2C-SCOPE",
+      "proofLayer": "SOURCE_REVIEW",
+      "artifact": "evidence/independent-engineering-review.json",
+      "sha256": "3b7e647ce04e6e73eb8490e5537b9cc2407ec7bb9eb2ae182dac593916b35b72",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "HISTORICAL_REVIEW_WITH_CURRENT_IMPORT_ADDENDUM",
+      "executionHead": null,
+      "limitations": [
+        "Original source/runtime snapshot retained; current17-file source is validated by the separate import-order addendum, current runtime wrappers are separately revalidated"
+      ]
+    },
+    {
+      "id": "E-P2C-BACKLOG-REVIEW",
+      "requirement": "P2C-B",
+      "proofLayer": "PERFORMANCE_REVIEW",
+      "artifact": "evidence/backlog-tail-independent-review.json",
+      "sha256": "487bd0e2b150af1248378d62084298b72f2b95f4b865b6b0857cb03b30883845",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "REVIEWED",
+      "executionHead": null,
+      "limitations": [
+        "Recomputed quantiles and current convergence;40001 exception attribution remains inference; sampled contention limits retained"
+      ]
+    },
+    {
+      "id": "E-P2C-ARTIFACT-UNIT",
+      "requirement": "P2C-PROOF",
+      "proofLayer": "UNIT",
+      "artifact": "evidence/artifact-gate-unit.json",
+      "sha256": "393fd3853f45342ccb8addfc0ae2ee9b4db66dfed45aaf12654191cc72c4a665",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "limitations": [
+        "Synthetic evidence-validator positive/negative cases only; no product runtime substitution"
+      ]
+    },
+    {
+      "id": "E-P2C-COMBINED-GATE",
+      "requirement": "P2C-E",
+      "proofLayer": "ARTIFACT_VALIDATION",
+      "artifact": "certification-gate.json",
+      "sha256": "47e6ea06660cc2b7dac920df251bdc8bc19950e63cce18a68543adb1a6b2acc7",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "executionHead": null,
+      "limitations": [
+        "Local evidence consistency; does not replace runtime or human query review"
+      ]
+    },
+    {
+      "id": "E-P2C-SWIFT",
+      "requirement": "P2C-F",
+      "proofLayer": "INTEGRATION",
+      "artifact": "evidence/native-decoder-proof.json",
+      "sha256": "4e40036d52a4f04f944011b359eb47a847a532f2cc19b1c65ac04bd6084a6107",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "executionHead": null,
+      "limitations": [
+        "Retained Swift model decoding on macOS/UTC; not native transport or physical"
+      ]
+    },
+    {
+      "id": "E-P2C-AUDIT-PLANS",
+      "requirement": "P2C-B",
+      "proofLayer": "POSTGRESQL/PERFORMANCE",
+      "artifact": "evidence/audit-index-plans.json",
+      "sha256": "dc2209d85b9ae47fbf8b17386834500d6d0bdcd45997722d3ee65177a3cd9f67",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "executionHead": null,
+      "limitations": [
+        "Forensic exact-key design and current terminal predicate; not a shipped forensic API"
+      ]
+    },
+    {
+      "id": "E-P2C-FINAL-PUBLICATION-PLANS",
+      "requirement": "P2C-B",
+      "proofLayer": "POSTGRESQL/PERFORMANCE",
+      "artifact": "evidence/final-publication-plans.json",
+      "sha256": "2c1999019cd75b38566bba0ab7f07f2cd6122f4e3b5e3344950ab705d55f9bc4",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "executionHead": null,
+      "limitations": [
+        "Actual private readiness predicate; synthetic final/publication setup, not protected publication issuance"
+      ]
+    },
+    {
+      "id": "E-P2C-LOCKS",
+      "requirement": "P2C-E",
+      "proofLayer": "PERFORMANCE",
+      "artifact": "lock-duration-candidate.json",
+      "sha256": "fe1a10eef683e61508f7600b6b832dad9883340266e89be032279e4afff878c0",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "MEASURED",
+      "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+      "limitations": [
+        "Instrumented RPC lock lower bound and rollback transaction upper bound"
+      ]
+    },
+    {
+      "id": "E-P2C-PERF-GATE",
+      "requirement": "P2C-E",
+      "proofLayer": "PERFORMANCE",
+      "artifact": "performance-gate.json",
+      "sha256": "dc167167a0affa866b185b1a031f7f36792909e763b6565780fe96789185f4d4",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PASS",
+      "executionHead": null,
+      "limitations": [
+        "Proposed local comparison tolerances; no Production SLO"
+      ]
+    },
+    {
+      "id": "E-P2C-BROAD-COMPARISON",
+      "requirement": "P2C-BROAD",
+      "proofLayer": "REGRESSION_COMPARISON",
+      "artifact": "evidence/application-comparison.json",
+      "sha256": "700fa01de301b3340a14030e6e0168f78626757582fd7df9fbc0b34af9300937",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "NO_NEW_FAILURE_IDENTITIES",
+      "executionHead": null,
+      "limitations": [
+        "26pre-existing failing tests retained, not overall application PASS"
+      ]
+    },
+    {
+      "id": "E-P2C-PERF-VARIANCE",
+      "requirement": "P2C-073",
+      "proofLayer": "PERFORMANCE_ARTIFACT_REVIEW",
+      "artifact": "evidence/performance-variance-review.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "PARTIAL",
+      "sha256": "bd8b39f3f102df1c8dc2bb76904ffb74696041a6a415addadb85bb0ff4c91416",
+      "limitations": [
+        "Original tail gate FAIL retained alongside one unchanged-source repeat PASS; cause UNKNOWN.",
+        "Finite local headroom remains separately measured; replacement baseline and unconditional tail non-regression not approved."
+      ]
+    },
+    {
+      "id": "E-P2C-QUERY-SECURITY-REVIEW",
+      "requirement": "P2C-REVIEW",
+      "proofLayer": "SOURCE_AND_EVIDENCE_REVIEW",
+      "artifact": "evidence/final-query-index-security-review.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "REVIEWED_PARTIAL",
+      "sha256": "5fadc9632c54109d4381ac8b409ab845e47875bed43444bef4ded3b362a6612f",
+      "limitations": [
+        "Source and retained evidence review only; no new runtime or hosted proof."
+      ]
+    },
+    {
+      "id": "E-P2C-FINAL-REVIEW",
+      "requirement": "P2C-REVIEW",
+      "proofLayer": "SOURCE_AND_EVIDENCE_REVIEW",
+      "artifact": "evidence/final-review.json",
+      "environment": "LOCAL_NON_PRODUCTION",
+      "result": "REVIEWED_PARTIAL",
+      "sha256": "db3d8901d0662db4e405229b05585375932ebc738791d02be3e78c40880aa955",
+      "limitations": [
+        "Reviewed PARTIAL scope; missing Google/archive and performance repeatability remain. Final packaging/Git actions separately recorded."
+      ]
+    }
+  ],
+  "status": "PARTIAL",
+  "p0BStatus": "PARTIAL",
+  "indexKind": "SOURCE_VALIDATED_LOCAL_EVIDENCE_INDEX_NOT_OVERALL_CERTIFICATION",
+  "ownerAcceptance": "NOT_PERFORMED",
+  "stagingReady": false,
+  "prohibitedProofSubstitution": [
+    "LOCAL\u2192PRODUCTION",
+    "MODEL\u2192PHYSICAL",
+    "INTENT_MATERIALIZED\u2192RESULT_CURRENT",
+    "LEGACY_RECEIPT\u2192OWNED_RECEIPT",
+    "THREE_DERIVED_FAMILIES\u2192ALL_AUTOMATIC_WORK"
+  ],
+  "productionQueries": 0,
+  "productionMutations": 0,
+  "deploymentPerformed": false,
+  "finalConclusion": "PHASE 2C: PARTIAL \u2014 SCORE-PATH CANDIDATE NOT READY FOR STAGING; REMAINING GATES LISTED ABOVE"
+}

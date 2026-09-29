@@ -1,0 +1,348 @@
+{
+  "schemaVersion": 2,
+  "appendOnlyToHistoricalPhase1": true,
+  "scope": "CHANGE_IMPACT_NOT_EXECUTION_PROOF",
+  "nodes": [
+    {
+      "id": "NA-P2C-WORKER-EXPIRY-FAILURE-LOCK",
+      "type": "test",
+      "path": "test/reliability-phase2c-worker-failure-lock-order.test.mjs"
+    },
+    {
+      "id": "NA-P2C-DELIVERY-INDEXES",
+      "type": "test",
+      "path": "test/reliability-phase2c-delivery-index-review.test.mjs"
+    },
+    {
+      "id": "NA-P2C-CAL-CURRENT-JOB",
+      "type": "test",
+      "path": "test/reliability-phase2c-calcutta-lock-order.test.mjs"
+    },
+    {
+      "id": "NA-P2C-NET-OWNER-CONTROL",
+      "type": "test",
+      "path": "test/reliability-phase2c-net-owner-lock-order.test.mjs"
+    },
+    {
+      "id": "NA-P2C-BACKLOG-TAIL",
+      "type": "test",
+      "path": "test/reliability-phase2c-backlog-tail.integration.test.mjs"
+    },
+    {
+      "id": "NA-P2C-BACKLOG",
+      "type": "test",
+      "path": "test/reliability-phase2c-backlog-pressure.integration.test.mjs"
+    },
+    {
+      "id": "NA-P2C-RECOVERY",
+      "type": "test",
+      "path": "test/reliability-phase2c-recovery.integration.test.mjs"
+    },
+    {
+      "id": "NA-P2C-LEGACY-UPGRADE",
+      "type": "test",
+      "path": "test/reliability-phase2c-recovery-upgrade.integration.test.mjs"
+    },
+    {
+      "id": "NA-P2C-DELIVERY",
+      "type": "test",
+      "path": "test/reliability-phase2c-worker.test.mjs"
+    },
+    {
+      "id": "NA-P2C-ANNUAL-SQL",
+      "type": "test",
+      "path": "test/reliability-phase2c-annual-workers.integration.test.mjs"
+    },
+    {
+      "id": "NA-P2C-NETSKINS-LOCK",
+      "type": "test",
+      "path": "test/reliability-phase2c-net-skins-deadlock.integration.test.mjs"
+    },
+    {
+      "id": "NA-P2C-WORKER-CONTROL-LOCK",
+      "type": "test",
+      "path": "test/reliability-phase2c-worker-lock-order.test.mjs"
+    },
+    {
+      "id": "NA-P2C-FINITE-TIMEOUT",
+      "type": "test",
+      "path": "test/reliability-phase2c-finite-timeout.integration.test.mjs"
+    },
+    {
+      "id": "NA-P2C-ANNUAL-ADMISSION",
+      "type": "test",
+      "path": "test/reliability-phase2c-annual-admission.integration.test.mjs"
+    },
+    {
+      "id": "NA-P2C-SEQUENCE",
+      "type": "test",
+      "path": "test/reliability-phase2c-full-sequence.integration.test.mjs"
+    },
+    {
+      "id": "NA-P2C-CLIENT-COMPATIBILITY",
+      "type": "test",
+      "path": "test/reliability-phase2c-recovery.integration.test.mjs"
+    }
+  ],
+  "edges": [
+    {
+      "source": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sourceSha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce",
+      "invalidates": [
+        "NA-P2C-RECOVERY",
+        "NA-P2C-LEGACY-UPGRADE",
+        "NA-P2C-SEQUENCE",
+        "NA-P2C-FINITE-TIMEOUT"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "lib/scoring-mutation-recovery.js",
+      "sourceSha256": "0f6b5aa1c5f042f846861cee22e61c113cfb98cd058d160c6982f458d77359b3",
+      "invalidates": [
+        "NA-P2C-RECOVERY"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "lib/scoring-mutation-recovery-route.js",
+      "sourceSha256": "0e98f14294d531e33b08cc23493c1f326e796e1107f63c30c7404fcf1a6a4cfb",
+      "invalidates": [
+        "NA-P2C-RECOVERY"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "sourceSha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0",
+      "invalidates": [
+        "NA-P2C-ANNUAL-SQL",
+        "NA-P2C-NETSKINS-LOCK",
+        "NA-P2C-ANNUAL-ADMISSION",
+        "NA-P2C-DELIVERY"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sourceSha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48",
+      "invalidates": [
+        "NA-P2C-WORKER-EXPIRY-FAILURE-LOCK",
+        "NA-P2C-DELIVERY-INDEXES",
+        "NA-P2C-DELIVERY",
+        "NA-P2C-WORKER-CONTROL-LOCK",
+        "NA-P2C-CAL-CURRENT-JOB",
+        "NA-P2C-NET-OWNER-CONTROL",
+        "NA-P2C-BACKLOG",
+        "NA-P2C-BACKLOG-TAIL",
+        "NA-P2C-NETSKINS-LOCK",
+        "NA-P2C-ANNUAL-ADMISSION",
+        "NA-P2C-SEQUENCE"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "lib/score-derived-delivery.js",
+      "sourceSha256": "cb18835d2bb540572d6460dc4313b678266560e8f6a56b56376b1ee783a321bd",
+      "invalidates": [
+        "NA-P2C-DELIVERY",
+        "NA-P2C-SEQUENCE"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "lib/score-derived-worker.js",
+      "sourceSha256": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+      "invalidates": [
+        "NA-P2C-DELIVERY",
+        "NA-P2C-SEQUENCE"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "lib/intelligence-derived-supabase.js",
+      "sourceSha256": "aa3d5b53012176ad3ed8ce681758a97770a68e1c18dd38a5cd210f22c636e5e9",
+      "invalidates": [
+        "NA-P2C-DELIVERY",
+        "NA-P2C-SEQUENCE"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "app/api/scoring/mutation-status/route.js",
+      "sourceSha256": "39e35bfe30419eb87ae092e7b17feb5e8164abb963c5dc861ba0a3e585cd0c2a",
+      "invalidates": [
+        "NA-P2C-RECOVERY",
+        "NA-P2C-FINITE-TIMEOUT",
+        "NA-P2C-CLIENT-COMPATIBILITY"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "app/api/mobile/v1/scoring/mutation-status/route.js",
+      "sourceSha256": "6d4ffb20d5dd156c8ed4af1fd71a0a275304debdb550d8b477bed470931878d9",
+      "invalidates": [
+        "NA-P2C-RECOVERY",
+        "NA-P2C-ANNUAL-ADMISSION",
+        "NA-P2C-CLIENT-COMPATIBILITY"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "lib/scoring-authority-supabase.js",
+      "sourceSha256": "4dde49461f6805cccce8b5805a80ab4ba159627abc90e1b321d27d92df941196",
+      "invalidates": [
+        "NA-P2C-RECOVERY",
+        "NA-P2C-SEQUENCE",
+        "NA-P2C-CLIENT-COMPATIBILITY"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "lib/production-scoring-operations-server.js",
+      "sourceSha256": "b66b5c083801fc6ab4356d1d26320efb805b22cf2a075cb216db0a592ed2cf70",
+      "invalidates": [
+        "NA-P2C-RECOVERY",
+        "NA-P2C-ANNUAL-ADMISSION"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "lib/operational-rpc-contract.js",
+      "sourceSha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+      "invalidates": [
+        "NA-P2C-RECOVERY",
+        "NA-P2C-DELIVERY",
+        "NA-P2C-ANNUAL-ADMISSION"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "lib/competition-derived-supabase.js",
+      "sourceSha256": "7609a613f538e2252314b383305469317803ff23f384fe298ea24e53d40bb241",
+      "invalidates": [
+        "NA-P2C-DELIVERY",
+        "NA-P2C-SEQUENCE",
+        "NA-P2C-WORKER-CONTROL-LOCK"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "lib/production-calcutta-server.js",
+      "sourceSha256": "cb183d4b5f8159dad552541a72ec5b83e18378c7c50705955c129ec2784be89b",
+      "invalidates": [
+        "NA-P2C-DELIVERY",
+        "NA-P2C-CAL-CURRENT-JOB",
+        "NA-P2C-SEQUENCE"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "lib/production-net-skins-server.js",
+      "sourceSha256": "4007eee4e309d18ae2e2d89f80980c306de29e7e78b5e9fad07f68f408690952",
+      "invalidates": [
+        "NA-P2C-DELIVERY",
+        "NA-P2C-NET-OWNER-CONTROL",
+        "NA-P2C-NETSKINS-LOCK"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    },
+    {
+      "source": "tools/reliability/run-score-derived-worker.mjs",
+      "sourceSha256": "65f7ab486d4a7404b1003d180cb08f91405ea3dca518c2f3cdaf27eec3c1e9db",
+      "invalidates": [
+        "NA-P2C-DELIVERY",
+        "NA-P2C-BACKLOG",
+        "NA-P2C-SEQUENCE"
+      ],
+      "requires": [
+        "FINITE_TIMEOUT",
+        "HISTORY_SCALE",
+        "SECURITY",
+        "BROAD_APPLICATION_COMPARISON"
+      ]
+    }
+  ],
+  "nativeBehavior": "UNCHANGED; future client integration needs separate physical evidence",
+  "infrastructure": "Hosted resource/configuration changes require relevant hosted validation. Behavior-affecting worker timeout/retry/admission changes also require applicable local proof. Historical receipts stay immutable; current applicability must be reassessed."
+}

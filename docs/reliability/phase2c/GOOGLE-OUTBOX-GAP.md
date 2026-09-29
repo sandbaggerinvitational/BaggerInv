@@ -1,0 +1,51 @@
+# Google reporting outbox: Phase 2C scope review
+
+Status: material incomplete inventory / local delivery proof. Read-only source and retained-artifact review; no PostgreSQL, Google/provider access, secrets or real data used.
+
+## Finding
+
+PROVEN (SOURCE): Google reporting demand is distinct from the three new score-derived intent families and is still inserted atomically by accepted canonical score submission. It is not an owner-approved financial calculation. Once its explicit deployment/resource gates admit it, the existing application automatically tries to mirror it after scoring. Neither a disabled synthetic guard nor the absence of a scheduler in this checkout establishes that delivery is unnecessary.
+
+The current Phase 2C 54-case automatic worker suite covers Calcutta, Competition and Intelligence; it does not execute the Google reporting transport or its complete runtime chain. The 432-hole sequence checks zero required work only through the new three-family tick, not all legacy reporting demand. P0-B cannot currently claim every intended automatic score-derived work class is covered without an explicit, evidence-backed applicability decision or additional implementation/proof.
+
+## Exact source and current evidence
+
+| Element | Evidence | Established fact / boundary |
+|---|---|---|
+| Producer | `supabase/production_migrations/202608300067_production_current_scoring_runtime_v1.sql`, `future_production_submit_hole_score_v1`, accepted write near lines897–921; frozen equivalent preserved in migration021/current catalogue | Receipt, revision history, audit and one `HOLE_SCORE_UPSERTED` Google outbox event commit atomically. Response says `google_outbox_created:true`. Phase122 adds receipt origin only; it does not remove the outbox. |
+| Canonical delivery protection | `docs/reliability/phase2/SCORE-CRITICAL-PATH-AFTER.md`; `test/reliability-phase2-score-proof.integration.test.mjs` AFTER_OUTBOX rollback | Failure to record this required intent aborts the score; later provider failure does not roll back score. This establishes creation, not delivery. |
+| Data contract | migration002 `google_outbox_events`, unique(match_id,match_revision) and unique(match_id,mutation_key); pending partial index | Separate event payload/revision, PENDING/PROCESSING/DELIVERED/RETRYABLE/BLOCKED; match checkpoint preserves ordered delivery. |
+| Existing consumer | `lib/scoring-google-outbox.js::processNextGoogleOutboxEvent`, `drainGoogleOutbox` | Claim actual event, perform writer, verify lifecycle/control where applicable, commit exact checkpoint, otherwise mark RETRYABLE. Default lease45s (SQL clamps5–300), delay exponential capped300s. |
+| Existing automatic request hooks | `app/api/scoring/current/route.js`, `app/api/scoring/matches/[matchId]/route.js`, `lib/mobile-v1-scoring-post-commit.js` | PWA Next after and native post-commit drain calls happen after a successful score. This is request-triggered automatic work, not proof of recovery after the process disappears before/within after. |
+| Existing operational endpoint | `app/api/cron/scoring-google-outbox/route.js` | POST-only; disabled404 unless WORKERS phase, Supabase scoring, WORKERS_ENABLED and GOOGLE_MIRROR_ENABLED. Requires dedicated>=32-character secret; offers inspect/drain bounded1–25. It is not a permanently running process. |
+| Declared host scheduling | `vercel.json` | Only account-deletion cron is listed. No repository-declared Google schedule found. External scheduler configuration is UNKNOWN; no provider query performed. |
+| SQL admission | migration021 `assert_production_scoring_runtime` worker condition, subsequently fenced by migration069/current-pointer/platform wrappers; annual `assert_annual_scoring_platform_v1` lines808+ | Explicit resource workers/google-writes flags, matching worker control, operation_allowed/requires_google_write/not-authoritative-write, exact runtime generation/deployment admission. No safe assumption that current Production is enabled or disabled. |
+| Local fixture | `test/support/reliability/synthetic-tournament.mjs` lines145–155 | Its substituted frozen runtime assertion rejects every non-null required_worker, including SCORING_GOOGLE_OUTBOX. This is a declared fixture boundary, not a product disabling policy. |
+| Phase2C annual SQL proof | `evidence/annual-workers.json`, P2C-C-GOOGLE and P2C-C-GOOGLE-MATRIX | Real claim/lease/failure/ordering SQL executes; own limits explicitly say no transport or verified mirror, and DELIVERED is fixture construction. Cannot substitute for actual delivery. |
+| Existing JavaScript tests | `test/scoring-authority-phase2.test.mjs`, `test/step11-production-scoring-rehearsal.test.mjs` | Injected in-memory claim/writer/complete/fail adapters exercise mapping and checkpoint loss; these are useful unit tests, not process restart plus actual local SQL authority. Final broad suite rerun returned 4,127 pass / 26 fail, matching the baseline failure identities; it does not add local SQL/process delivery coverage for this class. |
+
+## Retry and terminal/requeue gaps
+
+PROVEN (SOURCE): frozen migration021 and annual migration067/071 claim increments attempts but does not impose a finite attempt ceiling. `fail_*google_outbox` supports caller-selected `block:true`, but the shipping `processNextGoogleOutboxEvent` catch always supplies retry delay without block. Its failure-ack error is swallowed and it returns a failed delivery; the event then remains PROCESSING until lease expiry if that acknowledgment did not commit. This is recoverable in principle, but the complete process/unknown-outcome behavior is not proved by the current Phase2C suite.
+
+No supported BLOCKED→eligible exact Google requeue API was found in the inspected source. BLOCKED is excluded from claim. A finite-attempt policy therefore needs an explicit safe operational recovery contract, rather than simply setting BLOCKED after five failures and stranding it. The new private Calcutta/Competition/Intelligence attempt ledger does not govern these events.
+
+## Financial and archive implications
+
+PROVEN (SOURCE): `deliverWithGoogleWriter(MATCH_FINALIZED)` invokes the legacy `finalizeLiveMatch` writer. That writer calls `synchronizeNetSkinsAfterMatch` and `synchronizeCalcuttaAfterOfficialUpdate`; the latter reaches `publishOfficialCalcutta` under its own environment restrictions. This does not prove a live unauthorized publication happened. It does mean wiring a new autonomous mirror loop must review the existing projection-versus-financial boundary; a fake `finalizeLiveMatch` transport alone would conceal those side effects. The existing repeated-finalization unit avoids re-running a successfully mirrored writer after checkpoint loss, but it is not full financial isolation proof.
+
+Related inventory item: Finalize's actual match transition captures a canonical finalized snapshot and `scorecard_archive_jobs` through `capture_scorecard_archive_transition` / `capture_finalized_scorecard_snapshot` (migration002). That is not an ordinary hole-score intent, but it participates in this task's full score/Finalize chronology and existing native post-commit worker hook. It should be separately listed as admitted external archive work. Existing archive SQL branch proof also does not establish external transport/restart delivery. Do not silently treat a Google reporting/archive job as Calcutta/Net Skins owner approval.
+
+## Smallest safe in-scope engineering path
+
+1. Specify the intended external reporting contract before code: which immutable/canonical projection goes to the isolated sink, which workers are explicitly admitted, which output is mirror-only, and what disabled export means. Disabled must be visible as disabled/pending-admission, not SUCCEEDED or zero automatic backlog. Do not change live flags.
+2. Reuse actual Google outbox claim/checkpoint SQL and `processNextGoogleOutboxEvent`; add local autonomous process scheduling/polling with explicit enabled authority and no default provider fall-through. Inject only a deterministic in-memory/file mirror transport; keep actual SQL and canonical input generation.
+3. Define bounded transient versus deterministic retry, finite attempts, durable terminal visibility and exact authenticated requeue. Existing BLOCKED can be reused, but a supported safe requeue and audit likely require a small additive SQL/contract change or a clearly specified existing authority that has not yet been found. Do not use owner SQL table updates to fake recovery.
+4. Review/split mirror-only lifecycle writer semantics before reusing legacy finalization hooks automatically. Preserve existing financial approval; do not accidentally publish via a retrying mirror worker. This is a hard design prerequisite, not a test workaround.
+5. Prove actual score commit→autonomous claim→local mirror→actual checkpoint; restart/lease expiry; lost external acknowledgment vs lost SQL checkpoint; deterministic failure/exhaustion/requeue; duplicate and match-revision ordering; future generation/release; disabled admission; finite query/lock/backlog isolation; financial payload/publication unchanged. Add archive delivery scope explicitly or retain its gap.
+
+No real Google access is necessary for local architecture proof. A fake local sink will still leave provider idempotency, actual Sheets behavior, credentials, scheduler and hosted capacity as later proof layers. The corrections are within the stated durable-delivery objective but exceed a documentation-only fix; they require reviewed semantics and a new source/proof freeze. Merely adding `drainGoogleOutbox()` to the new runner does not satisfy retry/dead-letter or financial-isolation requirements.
+
+## Adjudication consequence
+
+Hold P2C-013,014,016–029,067–068,075,083–085,094,099 and related later acceptance rows wherever they claim **all** automatic durable work. Existing three-family proofs remain valid in their named scope. Sections13 and15 can become COMPLETE once the full inventory/classification is documented; generic P0-B closure still needs the enabled Google class's required local proof or a user-authorized narrower requirement. Current Production enablement is UNKNOWN and is not to be queried for this task.

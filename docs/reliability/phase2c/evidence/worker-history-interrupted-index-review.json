@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "result": "INTERRUPTED_NOT_CERTIFICATION_EVIDENCE",
+  "suite": "worker-history",
+  "time": "2026-09-28T18:33:20.001582+00:00",
+  "production": false,
+  "reason": "Sequencing parent intentionally stopped before index scope correction; execution host also terminated child group. Partial sample run discarded; no PASS inferred.",
+  "ownedCluster": "/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-Y6kkmU",
+  "ownedClusterStartedAt": "2026-09-28T18:27:51Z",
+  "clusterStopped": true,
+  "clusterFilesRetained": true,
+  "logBeforeStopSha256": "02ab34c97e70a9114e2422365ecee61e778c74d347f10109f7d0a5d49f4b6546",
+  "requiredFollowUp": "Fresh final-source worker-history rerun"
+}

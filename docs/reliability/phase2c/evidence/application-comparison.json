@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "result": "NO_NEW_FAILURE_IDENTITIES_WITH_REVIEWED_DIAGNOSTIC_CHANGE",
+  "baselineCounts": {
+    "tests": 4153,
+    "pass": 4127,
+    "fail": 26,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "duration_ms": 172490.778583
+  },
+  "candidateCounts": {
+    "tests": 4153,
+    "pass": 4127,
+    "fail": 26,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "newFailureNames": [],
+  "resolvedFailureNames": [],
+  "unchangedFailureIdentities": 26,
+  "diagnosticChanges": [
+    {
+      "name": "current Calcutta candidate preserves every runtime blob except the exact approved analytics identity update",
+      "classification": "REVIEWED_ADDITIVE_ROUTE_FIRST_OFFENDER",
+      "explanation": "Historical Release133 byte-freeze test rejects all later runtime additions. New explicit Phase2C recovery route sorts before the already-rejected TournamentDayLabel. This is an approved source addition, not a behavioral security exemption; route admission and recovery security are tested separately.",
+      "before": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/calcutta-candidate-integrity.test.mjs:24:1'\n  failureType: 'testCodeFailure'\n  error: 'unexpected runtime addition: app/TournamentDayLabel.js'\n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: true\n  actual: false\n  operator: '=='\n  stack: |-\n    TestContext.<anonymous> (file://<CHECKOUT>/test/calcutta-candidate-integrity.test.mjs:49:40)\n    Test.runInAsyncScope (node:async_hooks:226:14)\n    Test.run (node:internal/test_runner/test:1397:25)\n    Test.start (node:internal/test_runner/test:1257:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)\n  ...\n",
+      "after": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/calcutta-candidate-integrity.test.mjs:24:1'\n  failureType: 'testCodeFailure'\n  error: 'unexpected runtime addition: app/api/mobile/v1/scoring/mutation-status/route.js'\n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: true\n  actual: false\n  operator: '=='\n  stack: |-\n    TestContext.<anonymous> (file://<CHECKOUT>/test/calcutta-candidate-integrity.test.mjs:49:40)\n    Test.runInAsyncScope (node:async_hooks:226:14)\n    Test.run (node:internal/test_runner/test:1397:25)\n    Test.start (node:internal/test_runner/test:1257:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)\n  ...\n"
+    }
+  ],
+  "baselineSha256": "ea4ccd8859b527871dad0c645ca4f6c5010da59b62f06e4410480fb434cb1ede",
+  "candidateSha256": "6ad50658761f8503f0966f1f3b1906baa8212bd1e650d7e42e7f8cbd449117da",
+  "limitation": "Broad suite remains26failed; this comparison is not an overall application PASS. Exact same493file selection.",
+  "generatedAt": "2026-09-29T21:01:07.350303+00:00"
+}

@@ -1,0 +1,121 @@
+{
+  "timestamp": "2026-09-28T18:51:12.566460+00:00",
+  "classification": "HISTORICAL_MEASUREMENT_WITHOUT_TRANSITIVE_SOURCE_PROVENANCE",
+  "files": [
+    {
+      "source": "docs/reliability/phase2c/benchmark-baseline-common.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/benchmark-baseline-common.json",
+      "sha256": "9e0ea27fd7c29ca0750943ae011173475be8deb6e8d3c6c49dc6abe77f64c94c"
+    },
+    {
+      "source": "docs/reliability/phase2c/benchmark-baseline-eligible.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/benchmark-baseline-eligible.json",
+      "sha256": "62249a5e982c4a1bad8ced4850090fa72a11a908c2a90d390e670f45cd010c66"
+    },
+    {
+      "source": "docs/reliability/phase2c/lock-duration-baseline.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/lock-duration-baseline.json",
+      "sha256": "97341f23975e0c892cc6711026575c9e676cb34bd82285dc9b9a9a8968308586"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-1x-stale_result_binding-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-stale_result_binding-plan.json",
+      "sha256": "2df1e1991bb40c5db4818526735087875cb673f07149ca1c8ca0ef44e3716bf2"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-10x-current_incompatible_financial-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-current_incompatible_financial-plan.json",
+      "sha256": "7d556597ece03b0afabb97fb8546b88fa5c21616ea24dbe92c2315877060c185"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-1x-stale_source-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-stale_source-plan.json",
+      "sha256": "731a78405f0171725072b5a9aa794ec42d3b5c8ba7af46054bd5dfcfa7ef7400"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-common-1x-none-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-common-1x-none-plan.json",
+      "sha256": "aeaf3b91eb058f1b3717496b5f28d294d90e245fb2337e4b6ba081da18261502"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-10x-current_incompatible_consumed-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-current_incompatible_consumed-plan.json",
+      "sha256": "b6802e7965d6b11b9fe0783f4c7133658a66acfc4e8731ba695633de115634f0"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-1x-superseded_result-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-superseded_result-plan.json",
+      "sha256": "aff238f6dbecf8a186920614f85c24a1d167f42cd27264a94e79c706d17bfe8d"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-common-10x-none-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-common-10x-none-plan.json",
+      "sha256": "653a447d76dfeaf37ffe9417aca2c319846873295c6215ec79cea2de151eb0a1"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-10x-stale_source-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-stale_source-plan.json",
+      "sha256": "a2f2e2d3a6c4c01cb672bf3d1dc7fec26ef562fe8f96a33fd891b4b1863beea0"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-10x-superseded_result-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-superseded_result-plan.json",
+      "sha256": "fb060b62c67114c5b6862656fccf328deca5cd3236ca9136fbbcd2ea95575ab8"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-10x-stale_result_binding-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-stale_result_binding-plan.json",
+      "sha256": "d569684b2049a7658f0c85f31ca8772e0ec181ae06843e0460671ce09bfde412"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-10x-multiple_receipts-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-multiple_receipts-plan.json",
+      "sha256": "15d1ccda3be9bcfbc3071d3fd764e12fd85de10d39889b2e770ddcff66024928"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-1x-none-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-none-plan.json",
+      "sha256": "e7e52d483d5b999e8952ba19f94e0ba370c228daa3c646804d480e70cef4ac79"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-1x-current_incompatible_financial-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-current_incompatible_financial-plan.json",
+      "sha256": "0cb7d5dc957d3c2d2ca1d2b48314badb0ec15bda4a668f36c93c4036ed77bfe8"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-1x-multiple_receipts-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-multiple_receipts-plan.json",
+      "sha256": "c889b18bac2bef2cf5081fdbde1f4fb4f6946173517257c23c79d554e46264ce"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-common-2x-none-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-common-2x-none-plan.json",
+      "sha256": "b21af97b3ffbec4506a57c994fd655cfb2f123c82a071eee1d13a751896e13dc"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-common-5x-none-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-common-5x-none-plan.json",
+      "sha256": "8cdf771886e8438ba33659c2a648f1c51d142c16c741fb9c2cf03d7d8088f8fc"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-10x-none-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-none-plan.json",
+      "sha256": "64a91e1694ac979a0b4492a6306c0a3305429cdd094fb095795d6da22bb64f07"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-1x-current_incompatible_consumed-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-current_incompatible_consumed-plan.json",
+      "sha256": "420100e2a8fbf42fa770e04765c8a53d0e24c0b5f126384ff1ecfa521aa19bd6"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-10x-current_compatible-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-current_compatible-plan.json",
+      "sha256": "1b79b4bd116559d3d4ae549cc4c6989f424fce76fa7405c532080e66b097de4e"
+    },
+    {
+      "source": "docs/reliability/phase2c/evidence/baseline-eligible-1x-current_compatible-plan.json",
+      "retained": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-current_compatible-plan.json",
+      "sha256": "17656ad51dcef4e8582cd95022333b5fbf425b62642e37c18169a9d2ff5c1301"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+TAP version 13
+# Subtest: Phase2C full432hole chronological score sequence with autonomous derived delivery
+not ok 1 - Phase2C full432hole chronological score sequence with autonomous derived delivery
+  ---
+  duration_ms: 28783.502875
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-full-sequence.integration.test.mjs:43:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    /opt/homebrew/opt/postgresql@17/bin/psql
+    ERROR:  column "current_result_revision" does not exist
+    LINE 8:  'currentCalcutta',(select current_result_revision from scor...
+                                       ^
+    
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+    sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+    current (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-full-sequence.integration.test.mjs:35:33)
+    TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-full-sequence.integration.test.mjs:127:66)
+    async Test.run (node:internal/test_runner/test:1404:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 28891.355167

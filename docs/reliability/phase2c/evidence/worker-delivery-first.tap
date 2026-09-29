@@ -1,0 +1,18 @@
+▶ NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue
+  ✔ migration is chained and delivery administration is unavailable to participants (32.6555ms)
+  ✔ a running child discovers a later committed score and completes automatic families (962.020292ms)
+  ✔ a crash after real claim retains a lease and restart recovers after expiry (4989.193125ms)
+  ✔ unknown completion acknowledgement leaves one successful canonical result (809.94725ms)
+  ✔ deterministic preclaim failure terminates once, Director requeue preserves exact receipt (425.105708ms)
+  ✔ real25ms cancellation records each intent attempt across connections and reaches terminal (712.609625ms)
+  ✔ compatible activation replaces old pending identity without transferring a lease (420.195458ms)
+✔ NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue (17449.290958ms)
+✔ deterministic global tick failure stops visibly and classifies only known transient errors (0.458041ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17511.772125

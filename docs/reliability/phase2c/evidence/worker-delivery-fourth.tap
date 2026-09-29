@@ -1,0 +1,128 @@
+▶ NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue
+  ✖ upgrade preserves121 pending identity, durable demand and prior successful result (79.843583ms)
+  ✔ migration is chained and delivery administration is unavailable to participants (39.673375ms)
+  ✔ a running child discovers a later committed score and completes automatic families (1130.639625ms)
+  ✔ a crash after real claim retains a lease and restart recovers after expiry (4032.384416ms)
+  ✔ COMPETITION actual claim crash survives process restart and expired lease (4984.582625ms)
+  ✔ INTELLIGENCE actual claim crash survives process restart and expired lease (5287.713917ms)
+  ✔ unknown completion acknowledgement leaves one successful canonical result (872.487833ms)
+  ✔ deterministic preclaim failure terminates once, Director requeue preserves exact receipt (421.547083ms)
+  ✔ intelligence-before-claim retains later score demand and converges to canonical source (5084.058875ms)
+  ✔ intelligence-after-claim retains later score demand and converges to canonical source (1292.767458ms)
+  ✔ intelligence-before-write retains later score demand and converges to canonical source (1304.300958ms)
+  ✔ calcutta-before-claim retains later score demand and converges to canonical source (945.03975ms)
+  ✔ score-intent exact-current processing preserves financial output: none (917.27075ms)
+  ✔ score-intent exact-current processing preserves financial output: current_compatible (1054.406375ms)
+  ✔ score-intent exact-current processing preserves financial output: current_incompatible_consumed (1010.439083ms)
+  ✔ score-intent exact-current processing preserves financial output: current_incompatible_financial (1017.429125ms)
+  ✔ score-intent exact-current processing preserves financial output: stale_source (1062.335208ms)
+  ✔ score-intent exact-current processing preserves financial output: stale_result_binding (985.29625ms)
+  ✔ score-intent exact-current processing preserves financial output: superseded_result (999.004541ms)
+  ✔ score-intent exact-current processing preserves financial output: multiple_receipts (1032.10325ms)
+  ✔ real25ms cancellation records each intent attempt across connections and reaches terminal (620.868083ms)
+  ✖ Intelligence delayed, running and terminal siblings suppress automatic thrash (389.673792ms)
+  ✖ lone FinalRecap recovery requires existing final publication and preserves successful siblings (923.349916ms)
+  ✔ two autonomous workers share claims and converge without a manual tick (1040.706125ms)
+  ✔ closed worker gate stops the autonomous process visibly after one denied tick (438.97225ms)
+  ✔ each automatic family exhausts five durable attempts then exact Director requeue recovers (1538.425708ms)
+  ✖ compatible activation replacement is atomic and rejects late old completion (482.972959ms)
+  ✔ compatible activation replaces old pending identity without transferring a lease (498.435291ms)
+✖ NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue (48996.230334ms)
+✔ deterministic global tick failure stops visibly and classifies only known transient errors (0.653042ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 25
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 49096.812708
+
+✖ failing tests:
+
+test at test/reliability-phase2c-worker.test.mjs:52:11
+✖ upgrade preserves121 pending identity, durable demand and prior successful result (79.843583ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  role "anon" already exists
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at installSupabaseCompatibility (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/release139-schema.mjs:25:3)
+      at installRelease139Schema (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/release139-schema.mjs:76:3)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:54:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at TestContext.test (node:internal/test_runner/test:399:20)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:52:11) {
+    result: { status: 3, signal: null, output: [ null, '', 'ERROR:  role "anon" already exists\n' ], pid: 19105, stdout: '', stderr: 'ERROR:  role "anon" already exists\n' }
+  }
+
+test at test/reliability-phase2c-worker.test.mjs:206:11
+✖ Intelligence delayed, running and terminal siblings suppress automatic thrash (389.673792ms)
+  AssertionError [ERR_ASSERTION]: claim_intelligence_derived_bundle
+  
+  false !== true
+  
+      at call (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:22:9)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:214:16)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at TestContext.test (node:internal/test_runner/test:399:20)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:206:11)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/reliability-phase2c-worker.test.mjs:223:11
+✖ lone FinalRecap recovery requires existing final publication and preserves successful siblings (923.349916ms)
+  AssertionError [ERR_ASSERTION]: claim_intelligence_derived_bundle
+  
+  false !== true
+  
+      at call (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:22:9)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:227:16)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:223:3)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/reliability-phase2c-worker.test.mjs:318:11
+✖ compatible activation replacement is atomic and rejects late old completion (482.972959ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /CLAIM|LEASE|JOB/. Input:
+  
+  'ERROR:  PRODUCTION_CALCUTTA_COMPLETION_INPUT_INVALID\n' +
+    'CONTEXT:  PL/pgSQL function public.complete_production_calcutta_v1_recalculation(jsonb) line 32 at RAISE\n'
+  
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:339:42)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at TestContext.test (node:internal/test_runner/test:399:20)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:318:11)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'ERROR:  PRODUCTION_CALCUTTA_COMPLETION_INPUT_INVALID\nCONTEXT:  PL/pgSQL function public.complete_production_calcutta_v1_recalculation(jsonb) line 32 at RAISE\n',
+    expected: /CLAIM|LEASE|JOB/,
+    operator: 'match',
+    diff: 'simple'
+  }

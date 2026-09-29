@@ -1,0 +1,252 @@
+{
+  "environment": "OWNED_LOCAL_SOCKET_ONLY_POSTGRESQL17",
+  "production": false,
+  "tests": [
+    {
+      "scenario": "future-expiry",
+      "function": "future_production_claim_competition_derived_jobs_v1",
+      "initial": [
+        {
+          "ctid": "(0,13)",
+          "engine": "TEAM_MOMENTUM",
+          "status": "SUCCEEDED"
+        },
+        {
+          "ctid": "(0,14)",
+          "engine": "TOURNAMENT_FINAL_RECAP",
+          "status": "SUCCEEDED"
+        },
+        {
+          "ctid": "(0,15)",
+          "engine": "TOURNAMENT_STORYLINES",
+          "status": "SUCCEEDED"
+        },
+        {
+          "ctid": "(0,16)",
+          "engine": "PROJECTION_EDITORIAL",
+          "status": "RUNNING"
+        },
+        {
+          "ctid": "(0,17)",
+          "engine": "TOURNAMENT_INTELLIGENCE",
+          "status": "RUNNING"
+        }
+      ],
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 86004,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 86005,
+          "wait": "advisory",
+          "query": "select public.future_production_claim_competition_derived_jobs_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhh",
+          "blockedBy": [
+            86004
+          ]
+        },
+        {
+          "pid": 86006,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 86004,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 86005,
+          "wait": "advisory",
+          "query": "select public.future_production_claim_competition_derived_jobs_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhh",
+          "blockedBy": [
+            86004
+          ]
+        },
+        {
+          "pid": 86006,
+          "wait": "transactionid",
+          "query": "update scoring_authority.matches set scoring_locked=true,match_revision=match_revision+1,authority_updated_at=clock_timestamp(),updated_at=clock_timestamp()wher",
+          "blockedBy": [
+            86005
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 86004,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 86005,
+          "wait": "transactionid",
+          "query": "select public.future_production_claim_competition_derived_jobs_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhh",
+          "blockedBy": [
+            86006
+          ]
+        },
+        {
+          "pid": 86006,
+          "wait": "transactionid",
+          "query": "update scoring_authority.matches set scoring_locked=true,match_revision=match_revision+1,authority_updated_at=clock_timestamp(),updated_at=clock_timestamp()wher",
+          "blockedBy": [
+            86005
+          ]
+        }
+      ],
+      "results": [
+        {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "claims": []
+          }
+        },
+        {
+          "ok": false,
+          "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (0,16) in relation \"competition_recalculation_jobs\"\nSQL statement \"insert into scoring_authority.competition_recalculation_jobs (\n      tournament_id, round_number, engine_key, status,\n      requested_source_revision, requested_at, started_at, completed_at,\n      last_error_code, last_error_safe, runtime_generation_id,\n      claim_token, claimed_by, lease_expires_at, updated_at\n    ) values (\n      target_tournament, 0, engine_value, 'PENDING',\n      pg_catalog.jsonb_build_object(\n        'reason', reason_value, 'revision', revision_value,\n        'transactional', true\n      ), pg_catalog.clock_timestamp(), null, null, null, null,\n      runtime_generation, null, null, null, pg_catalog.clock_timestamp()\n    ) on conflict (tournament_id, round_number, engine_key) do update set\n      status = 'PENDING',\n      requested_source_revision = excluded.requested_source_revision,\n      requested_at = excluded.requested_at,\n      started_at = null, completed_at = null,\n      last_error_code = null, last_error_safe = null,\n      runtime_generation_id = excluded.runtime_generation_id,\n      claim_token = null, claimed_by = null, lease_expires_at = null,\n      updated_at = excluded.updated_at\"\nPL/pgSQL function scoring_authority.enqueue_annual_derived_v1_change() line 132 at SQL statement\n"
+        }
+      ],
+      "expected": "CONTROL_TRIGGER_57014_FROM_ACTUAL_RECIPROCAL_CYCLE",
+      "controlBoundary": "Actual installed match-control trigger via isolated synthetic DML, not protected Director RPC"
+    },
+    {
+      "scenario": "future-intelligence",
+      "function": "future_production_claim_intelligence_derived_bundle_v1",
+      "initial": [
+        {
+          "ctid": "(0,13)",
+          "engine": "TEAM_MOMENTUM",
+          "status": "SUCCEEDED"
+        },
+        {
+          "ctid": "(0,14)",
+          "engine": "TOURNAMENT_FINAL_RECAP",
+          "status": "SUCCEEDED"
+        },
+        {
+          "ctid": "(0,15)",
+          "engine": "TOURNAMENT_STORYLINES",
+          "status": "SUCCEEDED"
+        },
+        {
+          "ctid": "(0,16)",
+          "engine": "PROJECTION_EDITORIAL",
+          "status": "PENDING"
+        },
+        {
+          "ctid": "(0,17)",
+          "engine": "TOURNAMENT_INTELLIGENCE",
+          "status": "PENDING"
+        }
+      ],
+      "pass": true,
+      "oneWay": [
+        {
+          "pid": 86066,
+          "wait": "transactionid",
+          "query": "update scoring_authority.matches set scoring_locked=true,match_revision=match_revision+1,authority_updated_at=clock_timestamp(),updated_at=clock_timestamp()wher",
+          "blockedBy": [
+            86068
+          ]
+        },
+        {
+          "pid": 86067,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 86068,
+          "wait": "ClientRead",
+          "query": "select 1 from scoring_authority.competition_recalculation_jobs where tournament_id='2099' and round_number=0 and engine_key='PROJECTION_EDITORIAL' for update;",
+          "blockedBy": []
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 86066,
+          "wait": "transactionid",
+          "query": "update scoring_authority.matches set scoring_locked=true,match_revision=match_revision+1,authority_updated_at=clock_timestamp(),updated_at=clock_timestamp()wher",
+          "blockedBy": [
+            86068
+          ]
+        },
+        {
+          "pid": 86067,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 86068,
+          "wait": "transactionid",
+          "query": "select public.future_production_claim_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ym",
+          "blockedBy": [
+            86066
+          ]
+        }
+      ],
+      "results": [
+        {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "worker_id": "failure-lock-worker",
+            "claim_token": "0b1fe97d-349c-465d-82bb-879ce9365763",
+            "claim_started_at": "2026-09-28T19:01:51.202032+00:00",
+            "runtime_generation_id": "a2200000-0000-4000-8000-000000000003"
+          }
+        },
+        {
+          "ok": false,
+          "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (0,16) in relation \"competition_recalculation_jobs\"\nSQL statement \"insert into scoring_authority.competition_recalculation_jobs (\n      tournament_id, round_number, engine_key, status,\n      requested_source_revision, requested_at, started_at, completed_at,\n      last_error_code, last_error_safe, runtime_generation_id,\n      claim_token, claimed_by, lease_expires_at, updated_at\n    ) values (\n      target_tournament, 0, engine_value, 'PENDING',\n      pg_catalog.jsonb_build_object(\n        'reason', reason_value, 'revision', revision_value,\n        'transactional', true\n      ), pg_catalog.clock_timestamp(), null, null, null, null,\n      runtime_generation, null, null, null, pg_catalog.clock_timestamp()\n    ) on conflict (tournament_id, round_number, engine_key) do update set\n      status = 'PENDING',\n      requested_source_revision = excluded.requested_source_revision,\n      requested_at = excluded.requested_at,\n      started_at = null, completed_at = null,\n      last_error_code = null, last_error_safe = null,\n      runtime_generation_id = excluded.runtime_generation_id,\n      claim_token = null, claimed_by = null, lease_expires_at = null,\n      updated_at = excluded.updated_at\"\nPL/pgSQL function scoring_authority.enqueue_annual_derived_v1_change() line 132 at SQL statement\n"
+        }
+      ],
+      "expected": "CONTROL_TRIGGER_57014_FROM_ACTUAL_RECIPROCAL_CYCLE",
+      "controlBoundary": "Actual installed match-control trigger via isolated synthetic DML, not protected Director RPC"
+    }
+  ],
+  "startedAt": "2026-09-28T19:01:31.723Z",
+  "result": "PASS",
+  "limitations": [
+    "Actual worker and supported control bodies are unchanged. A fixture-only BEFORE UPDATE trigger pauses after the worker has locked its first job row.",
+    "The five current marker rows are reinserted in a legal different physical order, with all CHECK and unique constraints active; fixture triggers/FKs are bypassed during construction only.",
+    "Frozen2026 synthetic runtime boundary; actual annual admission is separate.",
+    "Control1s and worker5s finite budgets; no Production or provider capacity claim."
+  ],
+  "installed": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "9bd77498ad3ea0d54c2af2adfba5609fd1951e6ee910d564b35cb621a890bcf6"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "clusterDestroyed": true,
+  "completedAt": "2026-09-28T19:01:52.694Z"
+}

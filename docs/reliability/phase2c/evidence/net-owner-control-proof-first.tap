@@ -1,0 +1,87 @@
+▶ Net Skins owner completion locks exact Storylines before supported controls
+  ✔ present FINALIZE before (2727.387542ms)
+  ✔ present FINALIZE after (1595.635875ms)
+  ✔ present SCORING_LOCK before (2680.326375ms)
+  ✔ present SCORING_LOCK after (1414.214333ms)
+  ✔ absent FINALIZE before (2488.98775ms)
+  ✔ absent FINALIZE after (1684.350666ms)
+  ✔ absent SCORING_LOCK before (2592.159667ms)
+  ✔ absent SCORING_LOCK after (1822.02475ms)
+  ✖ absent marker rolls back on rejected lease (656.005292ms)
+  ✖ absent marker rolls back on rejected source (674.821834ms)
+  ✖ two simultaneous rounds create only unchanged canonical Storylines demand (709.518584ms)
+  ✔ both completion bodies and private helper are manifest bound without changed authority attributes (83.159875ms)
+✖ Net Skins owner completion locks exact Storylines before supported controls (38947.962875ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 9
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 39116.7635
+
+✖ failing tests:
+
+test at test/reliability-phase2c-net-owner-lock-order.test.mjs:63:51
+✖ absent marker rolls back on rejected lease (656.005292ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  relation "production_control.cutover_mutation_receipts" does not exist
+  LINE 1: ...ery_attempts_v1),'receipts',(select count(*) from production...
+                                                               ^
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at fingerprint (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:32:26)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:64:231)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at TestContext.test (node:internal/test_runner/test:399:20)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:63:51)
+      at async Test.run (node:internal/test_runner/test:1404:7) {
+    result: { status: 3, signal: null, output: [ null, '', `ERROR:  relation "production_control.cutover_mutation_receipts" does not exist\nLINE 1: ...ery_attempts_v1),'receipts',(select count(*) from production...\n                                                             ^\n` ], pid: 38570, stdout: '', stderr: `ERROR:  relation "production_control.cutover_mutation_receipts" does not exist\nLINE 1: ...ery_attempts_v1),'receipts',(select count(*) from production...\n                                                             ^\n` }
+  }
+
+test at test/reliability-phase2c-net-owner-lock-order.test.mjs:63:51
+✖ absent marker rolls back on rejected source (674.821834ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  relation "production_control.cutover_mutation_receipts" does not exist
+  LINE 1: ...ery_attempts_v1),'receipts',(select count(*) from production...
+                                                               ^
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at fingerprint (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:32:26)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:64:231)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at TestContext.test (node:internal/test_runner/test:399:20)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:63:51)
+      at async Test.run (node:internal/test_runner/test:1404:7) {
+    result: { status: 3, signal: null, output: [ null, '', `ERROR:  relation "production_control.cutover_mutation_receipts" does not exist\nLINE 1: ...ery_attempts_v1),'receipts',(select count(*) from production...\n                                                             ^\n` ], pid: 38589, stdout: '', stderr: `ERROR:  relation "production_control.cutover_mutation_receipts" does not exist\nLINE 1: ...ery_attempts_v1),'receipts',(select count(*) from production...\n                                                             ^\n` }
+  }
+
+test at test/reliability-phase2c-net-owner-lock-order.test.mjs:67:11
+✖ two simultaneous rounds create only unchanged canonical Storylines demand (709.518584ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(claimed.job?.claim_token)
+  
+      at claim (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:27:9)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:68:81)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at TestContext.test (node:internal/test_runner/test:399:20)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:67:11)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

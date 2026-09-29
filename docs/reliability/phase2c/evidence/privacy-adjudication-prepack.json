@@ -1,0 +1,1004 @@
+{
+  "timestamp": "2026-09-29T21:44:23.270723+00:00",
+  "updaterSha256": "01cc059ff8be9ead9c2b6e12e89f991d4e375358135580cb907efdd024fb542d",
+  "reviewedRegistrySha256": "d148378d607b243e6855007d92c50269705a41440c263cad6f1b64ff018aa4ef",
+  "scannerPatternDefinitionSha256": "54968843631e0faa188c8bfbe45f5598fabb511540e24bc7c9cefb7a4c52d418",
+  "reviewMode": "READ_ONLY_LOCAL_SOURCE_NO_PROVIDER_ACCESS",
+  "finalScanComplete": false,
+  "actualValuesRetained": false,
+  "secretValuesPrinted": false,
+  "scanSource": "/private/tmp/phase2c-scope-privacy-scan.json",
+  "scanSourceSha256": "ee4383b4e97a53483f4c31450d2957fcfcf35e895781627348de5d5aa32b9f1d",
+  "scanTimestamp": "2026-09-29T21:44:23.225774+00:00",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "fileCount": 658,
+  "totalBytes": 107489612,
+  "largeFileCount": 4,
+  "binaryFileCount": 0,
+  "patternCounts": {
+    "EMAIL": 62,
+    "PHONE_CANDIDATE": 30,
+    "SECRET_ASSIGNMENT_CANDIDATE": 5
+  },
+  "candidateHitCount": 97,
+  "uniqueValueCount": 10,
+  "unresolvedValueCount": 0,
+  "credentialFound": false,
+  "realPersonDataEstablished": false,
+  "items": [
+    {
+      "valueSha256": "1a2d415d4fef1dfafe57e0d98af15bbad8cc4bd8ca8ac66e89f2e0ef3941d500",
+      "scannerClass": "PHONE_CANDIDATE",
+      "length": 12,
+      "hitCount": 10,
+      "locations": [
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+          "line": 30907
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+          "line": 30908
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.tap",
+          "line": 30897
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.tap",
+          "line": 30898
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+          "line": 30897
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+          "line": 30898
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+          "line": 33064
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+          "line": 33065
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+          "line": 33064
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+          "line": 33065
+        }
+      ],
+      "classification": "SYNTHETIC_RESERVED_FICTIONAL_PHONE",
+      "rationale": "Alternate fictional555 test destination used by unknown-destination/rejection fixtures.",
+      "provenance": [
+        {
+          "file": "test/pwa-phone-route.test.mjs",
+          "lines": [
+            46
+          ],
+          "fileSha256": "d71721a757c81c3c27af7db98eefb2fabd387fb14d448ce18e955a7090f2ad7d",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 46,
+              "contextSha256": "65713ea3d65b34f79a95dd82faf14116166215ebec64f24bea60709f582375ed"
+            }
+          ]
+        },
+        {
+          "file": "test/production-approved-sms-hook.test.mjs",
+          "lines": [
+            28
+          ],
+          "fileSha256": "439ea9cf074690ee029716900ede0e86d12a38f0215e60550dc773348d97f4fb",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 28,
+              "contextSha256": "ab13af4d06e02710f4024c60bb0d09206468ea1122d328f4511599ad362ce551"
+            }
+          ]
+        }
+      ],
+      "actualValueRetained": false
+    },
+    {
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "scannerClass": "EMAIL",
+      "length": 20,
+      "hitCount": 50,
+      "locations": [
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.json",
+          "line": 2047
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.json",
+          "line": 2047
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.json",
+          "line": 2047
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.json",
+          "line": 2047
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.json",
+          "line": 2047
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+          "line": 10090
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+          "line": 10093
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+          "line": 10107
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+          "line": 10112
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+          "line": 10115
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.tap",
+          "line": 10090
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.tap",
+          "line": 10093
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.tap",
+          "line": 10107
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.tap",
+          "line": 10112
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.tap",
+          "line": 10115
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+          "line": 10090
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+          "line": 10093
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+          "line": 10107
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+          "line": 10112
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+          "line": 10115
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/533e0dfb542d4f66-application.json",
+          "line": 2047
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/533e0dfb542d4f66-application.json",
+          "line": 2047
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/533e0dfb542d4f66-application.json",
+          "line": 2047
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/533e0dfb542d4f66-application.json",
+          "line": 2047
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/533e0dfb542d4f66-application.json",
+          "line": 2047
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+          "line": 10090
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+          "line": 10093
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+          "line": 10107
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+          "line": 10112
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+          "line": 10115
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-7a338ee405dda7b8.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-7a338ee405dda7b8.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-7a338ee405dda7b8.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-7a338ee405dda7b8.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-7a338ee405dda7b8.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.json",
+          "line": 64331
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+          "line": 10090
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+          "line": 10093
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+          "line": 10107
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+          "line": 10112
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+          "line": 10115
+        }
+      ],
+      "classification": "SYNTHETIC_RESERVED_EXAMPLE_EMAIL",
+      "rationale": "Hardcoded mocked authentication/identity test data; broad-test failure output reproduces the same pre-existing test literal.",
+      "provenance": [
+        {
+          "file": "test/mobile-api-v1.test.mjs",
+          "lines": [
+            236,
+            241
+          ],
+          "fileSha256": "7ba59913adb579908df8ff944d635acf7ff17e17c5b0b399d8efe69df3a6f18c",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 236,
+              "contextSha256": "189c9c80f0a2a2da40537a63e19d1c64a895df1d10a434e9b239a4727fe30a13"
+            },
+            {
+              "line": 241,
+              "contextSha256": "a91e7558502b08fd385025042c9cf9124ee2a5bc58327fe6485bd53830985721"
+            }
+          ]
+        },
+        {
+          "file": "test/mobile-v1-native-auth.test.mjs",
+          "lines": [
+            69,
+            112,
+            118,
+            146,
+            167,
+            175,
+            196,
+            204,
+            250,
+            279,
+            294,
+            370,
+            396,
+            402,
+            437,
+            480,
+            503,
+            539
+          ],
+          "fileSha256": "1e6d69bf5aa97b0122ffe7a9b54dcf82950372051fb5acae8568361d74602c71",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 69,
+              "contextSha256": "6ee34d33b8d0ce5f6d163e2bd6dec9b2fdf13f580c2ea23c77dfe4d7b6873671"
+            },
+            {
+              "line": 112,
+              "contextSha256": "ad6630333670e2694dd6e1860e08651590feffaddce895ea1e17e4a70ff33a88"
+            },
+            {
+              "line": 118,
+              "contextSha256": "7a9347ef0089a56d4473705381f42e394573537d6331be1119221f76c4828304"
+            },
+            {
+              "line": 146,
+              "contextSha256": "35902627ad5c01b541fcdd37cf1e2ab5cc02016e7dbb426d6bb2eb19e36bff2c"
+            },
+            {
+              "line": 167,
+              "contextSha256": "a98cbfe4b0ac0fd2f14a31592f658e65cd813a50174eef1347ab2ada5885bc18"
+            },
+            {
+              "line": 175,
+              "contextSha256": "a0a971da816543b9dc5629a39b0144b1de6945645e33c80444719777ebe02c68"
+            },
+            {
+              "line": 196,
+              "contextSha256": "a84521cb65f5171fc0b9def3b660274fb67998d1198188cb33ffcb865ec80cfa"
+            },
+            {
+              "line": 204,
+              "contextSha256": "2ea49775aba41ae87bb3b77377779c11d893dbfc394f5465d3b0da7857cefcd4"
+            },
+            {
+              "line": 250,
+              "contextSha256": "bc1bbd639e24c1ad4a882a92efde23123af23fb004b5620e69eb356e218139be"
+            },
+            {
+              "line": 279,
+              "contextSha256": "7f86a9f83605427c1d552fc9af8390a82c4ba734b65459fc44e6696112bc1d52"
+            },
+            {
+              "line": 294,
+              "contextSha256": "f26d32cfe056d79e0548e9b8bcbec15498abeb66dd48f27738046888a183de99"
+            },
+            {
+              "line": 370,
+              "contextSha256": "8184bc55062fb1df48d17adcc291f6ba8382db36d105536a004ec2458fa51e55"
+            },
+            {
+              "line": 396,
+              "contextSha256": "6ef2233e8aac202a7812d9bc1fb491e0796542df8d909ab11641c7473e798cb8"
+            },
+            {
+              "line": 402,
+              "contextSha256": "8f597b218db42ff3fb44ef66bac5903f2f7db0749ac7780c37564a865decca34"
+            },
+            {
+              "line": 437,
+              "contextSha256": "52f2a156cc06a5070e3718dbf66b4c92d1e31bed3f235bbaa2c548f2de6f540b"
+            },
+            {
+              "line": 480,
+              "contextSha256": "a9372aeeaf4967f99e6bbb9f6ed83adf3a90af1c02ab51cfb3a6f8d471ba82e4"
+            },
+            {
+              "line": 503,
+              "contextSha256": "a4d32d0e407afcf3aa09efa4eb7b40f93efd9fde9046ba0bdd1f7a8e8168abc6"
+            },
+            {
+              "line": 539,
+              "contextSha256": "5a3a972846f1bbf797bd8cc91118ca82550d917cf6dfe49aab35aa0cbcdcebb2"
+            }
+          ]
+        }
+      ],
+      "actualValueRetained": false
+    },
+    {
+      "valueSha256": "37733ca908ecc9bf5c8c230f60bfdf209e9a55aaacfe389b77abb569e8e85c5b",
+      "scannerClass": "EMAIL",
+      "length": 22,
+      "hitCount": 3,
+      "locations": [
+        {
+          "file": "test/pn2-native-admission.test.mjs",
+          "line": 262
+        },
+        {
+          "file": "test/pn2-native-admission.test.mjs",
+          "line": 287
+        },
+        {
+          "file": "test/pn2-native-admission.test.mjs",
+          "line": 295
+        }
+      ],
+      "classification": "SYNTHETIC_RESERVED_EXAMPLE_EMAIL",
+      "rationale": "Explicit synthetic email returned by mocked verifier/identity dependencies in native-admission tests.",
+      "provenance": [
+        {
+          "file": "test/pn2-native-admission.test.mjs",
+          "lines": [
+            262,
+            287,
+            295
+          ],
+          "fileSha256": "d5acf992a9ba05e1f49c7ee020001d8880b555e46ecba53db3ea8aecc9e17246",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 262,
+              "contextSha256": "ec5af0022ad4b6b3ada7567c10f7b9164bade0273ed29ff40a8adb7ec64a9116"
+            },
+            {
+              "line": 287,
+              "contextSha256": "9b5ad9105814788a9fe3f1661938a91870fac212c4b1eecf619eb47c3ccad7e8"
+            },
+            {
+              "line": 295,
+              "contextSha256": "dfb0ed6f0c3dc12f98e500627ba4e58bb275d285ed8e3dd0cb9bc0857a98af42"
+            }
+          ]
+        }
+      ],
+      "actualValueRetained": false
+    },
+    {
+      "valueSha256": "6cb87fc0119d96cf7a8fe79050cc92160e8a96ad48f0fe26b68dc221ed4e4b59",
+      "scannerClass": "EMAIL",
+      "length": 71,
+      "hitCount": 1,
+      "locations": [
+        {
+          "file": "test/reliability-phase2-fence-history.test.mjs",
+          "line": 30
+        }
+      ],
+      "classification": "EXISTING_NONSECRET_SERVICE_ACCOUNT_CONTRACT_IDENTIFIER",
+      "rationale": "This is a service-account email identity required by existing source/schema fence checks, reused in a synthetic local rehearsal row. It is not a private key, bearer token, password or personal contact. Do not mislabel the identifier itself as invented synthetic data; no service-account access or ownership validation was performed.",
+      "provenance": [
+        {
+          "file": "lib/google-service-account-credential-context.js",
+          "lines": [
+            31
+          ],
+          "fileSha256": "35b657dfb036a7c6cf2bdb7e01fef1848371e4c30670ca728ff9b5814cd6cb0f",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 31,
+              "contextSha256": "3683eecbfaea18504cd6c9576befbfe5a333683e9bdec9b7b8cc32a57973030e"
+            }
+          ]
+        },
+        {
+          "file": "supabase/production_migrations/202608260034_production_scoring_admission_fence_v2.sql",
+          "lines": [
+            785,
+            5341
+          ],
+          "fileSha256": "71878547ea7537e97f3d4d18324dbc1cdb046f7f6ff5a78e53c64df5690ade35",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 785,
+              "contextSha256": "24acb6446bd29281501e9cc7e72e827c323067dea7ba4fb1d2cac74a89cf9c02"
+            },
+            {
+              "line": 5341,
+              "contextSha256": "d2d98862e298e4d8b0b2e55a1a343b63764eaccb7991a9f287c3da19905067a7"
+            }
+          ]
+        },
+        {
+          "file": "test/reliability-phase2-fence-history.test.mjs",
+          "lines": [
+            30
+          ],
+          "fileSha256": "4c865bec330acb12819b8dcb45582576166e500b138dbfd09f0c0c334be7d964",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 30,
+              "contextSha256": "5f00497914554596807d908334591a79eaf259092786387f8d5f814ead09e709"
+            }
+          ]
+        }
+      ],
+      "actualValueRetained": false
+    },
+    {
+      "valueSha256": "7a48631611725d33b4e55b59872cc495504dd691c6f1daff81c6da84c188846f",
+      "scannerClass": "SECRET_ASSIGNMENT_CANDIDATE",
+      "length": 33,
+      "hitCount": 4,
+      "locations": [
+        {
+          "file": "test/pn2-native-admission.test.mjs",
+          "line": 31
+        },
+        {
+          "file": "test/pn2-native-admission.test.mjs",
+          "line": 181
+        },
+        {
+          "file": "test/pn2-native-admission.test.mjs",
+          "line": 273
+        },
+        {
+          "file": "test/pn2-native-admission.test.mjs",
+          "line": 320
+        }
+      ],
+      "classification": "SYNTHETIC_BEARER_TEST_LITERAL",
+      "rationale": "Authorization assignment containing an explicitly synthetic bearer test value; authenticated behavior is supplied by injected test dependencies, not a live provider credential.",
+      "provenance": [
+        {
+          "file": "test/pn2-native-admission.test.mjs",
+          "lines": [
+            31,
+            181,
+            273,
+            320
+          ],
+          "fileSha256": "d5acf992a9ba05e1f49c7ee020001d8880b555e46ecba53db3ea8aecc9e17246",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 31,
+              "contextSha256": "6f1366d6e720658ec96227aacb8c584b8a13b6be1fac5d4acfc356a872da4b57"
+            },
+            {
+              "line": 181,
+              "contextSha256": "4d28c9336300a5ca40e11b3920a72dc6d032d2781038239daeae43342691e625"
+            },
+            {
+              "line": 273,
+              "contextSha256": "f6d68203727443a37fa28030fafe9033312cc152bb8745bd3a9a9f8d7977292c"
+            },
+            {
+              "line": 320,
+              "contextSha256": "2e102fffa1da2b5b9aadb008ce0c7f3363265f54627567749164cd7f2c49866c"
+            }
+          ]
+        },
+        {
+          "file": "test/pn8a-auth-integration.test.mjs",
+          "lines": [
+            70,
+            108
+          ],
+          "fileSha256": "1be63efcdfa1fd0eb065dda221ba5c9985e51f9279486439563504aef7cf7742",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 70,
+              "contextSha256": "3bef86869acac2072883a06fa953a8080ded228d72737123ce18ca859583717f"
+            },
+            {
+              "line": 108,
+              "contextSha256": "40663753838da25e582305ff1da031d463ecef08ce0bb06020ac3049956efc2f"
+            }
+          ]
+        }
+      ],
+      "actualValueRetained": false
+    },
+    {
+      "valueSha256": "8b4a7779bef2b85974d9d58f56440bc80edd41c777de9c71e7c2f32652d8ff49",
+      "scannerClass": "EMAIL",
+      "length": 19,
+      "hitCount": 1,
+      "locations": [
+        {
+          "file": "test/reliability-phase2c-recovery.test.mjs",
+          "line": 26
+        }
+      ],
+      "classification": "SYNTHETIC_RESERVED_EXAMPLE_EMAIL_INVALID_INPUT",
+      "rationale": "Reserved-example email-shaped input intentionally supplied as an invalid mutation identity in a unit rejection case.",
+      "provenance": [
+        {
+          "file": "test/reliability-phase2c-recovery.test.mjs",
+          "lines": [
+            26
+          ],
+          "fileSha256": "a1f9f2137dac4a1d1c36da38bb909638ca2b8c21abfbd1bdcdea9ef8489229b1",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": false,
+          "contexts": [
+            {
+              "line": 26,
+              "contextSha256": "4c8bd3b037d7da9a981d47bc056ce88e14fb6ef96f244abacacaf711c412c10d"
+            }
+          ]
+        }
+      ],
+      "actualValueRetained": false
+    },
+    {
+      "valueSha256": "a18a21057d1a81ab59d21e6b48685d5c6d6b75195ee171e6de1d7fb164e67aae",
+      "scannerClass": "EMAIL",
+      "length": 29,
+      "hitCount": 2,
+      "locations": [
+        {
+          "file": "test/reliability-phase2c-recovery.integration.test.mjs",
+          "line": 274
+        },
+        {
+          "file": "test/reliability-phase2c-recovery.integration.test.mjs",
+          "line": 279
+        }
+      ],
+      "classification": "SYNTHETIC_RESERVED_EXAMPLE_EMAIL",
+      "rationale": "New local ownership-reassignment fixture inserts an explicit synthetic auth user and identifier with SYNTHETIC_FIXTURE provenance.",
+      "provenance": [
+        {
+          "file": "test/reliability-phase2c-recovery.integration.test.mjs",
+          "lines": [
+            274,
+            279
+          ],
+          "fileSha256": "2b4ab8a0cf2c14c6190f67e1f7108bade794e6f4a27bebef7d3279ef8e6d9fa7",
+          "fileChangedSincePriorReview": true,
+          "sameLiteralExistsAtBase": false,
+          "contexts": [
+            {
+              "line": 274,
+              "contextSha256": "e24d4d023cfa7940aac154314497edbb0cc49dcb89e232e511527d6a6502ab82"
+            },
+            {
+              "line": 279,
+              "contextSha256": "7ccf93649bbd4fbfe294bfba246de26288ccaeff66f9787f92650ea599ecc85f"
+            }
+          ]
+        }
+      ],
+      "actualValueRetained": false
+    },
+    {
+      "valueSha256": "d2403a8ee49a441bd446a86df99d00a4cd4e3fa9d8d21b6f3fae52d56a8ceb8b",
+      "scannerClass": "EMAIL",
+      "length": 27,
+      "hitCount": 5,
+      "locations": [
+        {
+          "file": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+          "line": 131
+        },
+        {
+          "file": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+          "line": 134
+        },
+        {
+          "file": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+          "line": 147
+        },
+        {
+          "file": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+          "line": 147
+        },
+        {
+          "file": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+          "line": 152
+        }
+      ],
+      "classification": "SYNTHETIC_FIXTURE_IDENTITY_NONRESERVED_DOMAIN",
+      "rationale": "Reused from the pre-existing migration078 annual review fixture: deterministic synthetic auth UUID and review player identity. Current local annual fixture explicitly records SYNTHETIC_FIXTURE. Domain is not a reserved-example assertion; ownership/existence of an external mailbox is not inferred and no message is sent.",
+      "provenance": [
+        {
+          "file": "test/fixtures/step13e7b-production-annual-normal-release-rebind.sql",
+          "lines": [
+            8
+          ],
+          "fileSha256": "2428f1f63807c660250db5edf8d9514a9017eca128ed90f89ec0b6c66abc9fdb",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 8,
+              "contextSha256": "acdafd5abd0b44852e038e4ea4fde36ac30597ed9098f6c398c5ba587b17864b"
+            }
+          ]
+        },
+        {
+          "file": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+          "lines": [
+            131,
+            134,
+            147,
+            152
+          ],
+          "fileSha256": "b7679b475c61d93cfd7b50a2b60f896364c175af4f74208ce633cfc5cfb9adcc",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": false,
+          "contexts": [
+            {
+              "line": 131,
+              "contextSha256": "a0835222a20c3e7d254d6dbb4e0c8b123aa560ebc0cf0ec82474de41ae06e61e"
+            },
+            {
+              "line": 134,
+              "contextSha256": "fd6ed96897bc9c79674a754737b9fa7502252b1d4f78c06e194556fafc19cccc"
+            },
+            {
+              "line": 147,
+              "contextSha256": "3e2b7fd3cc5db7cf8f66f9cc249afe6fdf1c6d73193b56cf6f16f0b52f25ce3e"
+            },
+            {
+              "line": 152,
+              "contextSha256": "17e78c8f3c0bc10be0792d45c78c2e09965a8ddf97189169346c0c80abaee763"
+            }
+          ]
+        }
+      ],
+      "actualValueRetained": false
+    },
+    {
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "scannerClass": "PHONE_CANDIDATE",
+      "length": 12,
+      "hitCount": 20,
+      "locations": [
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+          "line": 30895
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+          "line": 30896
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+          "line": 30901
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+          "line": 30902
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.tap",
+          "line": 30885
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.tap",
+          "line": 30886
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.tap",
+          "line": 30891
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/application.tap",
+          "line": 30892
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+          "line": 30885
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+          "line": 30886
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+          "line": 30891
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+          "line": 30892
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+          "line": 33052
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+          "line": 33053
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+          "line": 33058
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+          "line": 33059
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+          "line": 33052
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+          "line": 33053
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+          "line": 33058
+        },
+        {
+          "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+          "line": 33059
+        }
+      ],
+      "classification": "SYNTHETIC_RESERVED_FICTIONAL_PHONE",
+      "rationale": "Hardcoded phone-normalization/provider mock fixture in the NANP555-0100\u20130199 fictional range; no provider delivery is evidenced by this literal.",
+      "provenance": [
+        {
+          "file": "test/participant-phone-ownership-foundation.test.mjs",
+          "lines": [
+            19,
+            32
+          ],
+          "fileSha256": "bf13f99f0fb34fe6440e8b039706b6ab8fa6759b46223de4c2946990745c5aeb",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 19,
+              "contextSha256": "f6f9370ec19422455c51bb032c0e38ea66de37f4c5fb70f3df8365f0fbb90068"
+            },
+            {
+              "line": 32,
+              "contextSha256": "572a160877c1fbc9cf23516fbce56b6d0c57f615404c99cc76dcc8ae3d6e6a0f"
+            }
+          ]
+        },
+        {
+          "file": "test/pwa-phone-route.test.mjs",
+          "lines": [
+            14,
+            45,
+            48,
+            49
+          ],
+          "fileSha256": "d71721a757c81c3c27af7db98eefb2fabd387fb14d448ce18e955a7090f2ad7d",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 14,
+              "contextSha256": "4e5b005b15bbfebe1ae2a2ad10fc66394d0ff0a82cf837e51bc307872c3f0ff2"
+            },
+            {
+              "line": 45,
+              "contextSha256": "737889bd8adff940e49c6c17f883675607f100d1cfbabbade2ff5df514750a32"
+            },
+            {
+              "line": 48,
+              "contextSha256": "23f280ceef7101399bad566a4456f7f6a0d8dc17312a4660440b7224ab2fe43f"
+            },
+            {
+              "line": 49,
+              "contextSha256": "fb47a65a860bad06432b502fd72476b9465a91c7145ce522759dcbfd9fedb35b"
+            }
+          ]
+        }
+      ],
+      "actualValueRetained": false
+    },
+    {
+      "valueSha256": "e925cac40d762c211d0f094a375d0d5b674dbc344529047fb7463904b80719ac",
+      "scannerClass": "SECRET_ASSIGNMENT_CANDIDATE",
+      "length": 32,
+      "hitCount": 1,
+      "locations": [
+        {
+          "file": "test/reliability-phase2c-recovery.test.mjs",
+          "line": 101
+        }
+      ],
+      "classification": "SYNTHETIC_BEARER_TEST_LITERAL",
+      "rationale": "Authorization assignment uses an explicitly synthetic bearer test literal with local mocked identity/certification behavior.",
+      "provenance": [
+        {
+          "file": "test/reliability-phase2c-recovery.test.mjs",
+          "lines": [
+            101
+          ],
+          "fileSha256": "a1f9f2137dac4a1d1c36da38bb909638ca2b8c21abfbd1bdcdea9ef8489229b1",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": false,
+          "contexts": [
+            {
+              "line": 101,
+              "contextSha256": "b50a9ce151e9e9331887d164ed9c19245a676269f418b636b7edfcb431aa71a9"
+            }
+          ]
+        },
+        {
+          "file": "test/mobile-reviewer-security.test.mjs",
+          "lines": [
+            52,
+            89
+          ],
+          "fileSha256": "153e3260588b8d66815cafc631a18a508477ad595a105780526c5562fe505994",
+          "fileChangedSincePriorReview": false,
+          "sameLiteralExistsAtBase": true,
+          "contexts": [
+            {
+              "line": 52,
+              "contextSha256": "2238e4ef16ec7d8f0f3d29349ecaaf024170dc08ade977ab70e47c7694c28a4f"
+            },
+            {
+              "line": 89,
+              "contextSha256": "1ba2bda807238a349fb3eb94f6dd5dec50267e968849adef7fd42a1cd68c10ad"
+            }
+          ]
+        }
+      ],
+      "actualValueRetained": false
+    }
+  ],
+  "currentGitScopeVerified": true,
+  "everyFileHashVerifiedBeforeAndAfter": true,
+  "fullHitMultisetRecomputed": true,
+  "scopeDefinition": "Existing regular files changed since the fixed base plus nonignored untracked files; deleted paths, ignored build outputs, external files and temporary artifacts are outside this scanner scope.",
+  "registryValuesNotPresentInScan": [],
+  "result": "SCAN_SNAPSHOT_HITS_ADJUDICATED",
+  "scanAdjudicated": true,
+  "limitations": [
+    "Adjudicates exactly 97 pattern hits/10 values across the referenced 658-file snapshot (107489612 bytes); subsequent changes require a fresh scan and updater run.",
+    "Pattern absence is not proof of absence of every possible secret or identifying value.",
+    "One existing nonsecret service-account contract identifier is distinguished from invented synthetic data; no account access or ownership validation.",
+    "One historical synthetic test identity uses a nonreserved domain; source provenance is proven, mailbox existence/ownership is not inferred.",
+    "Source locations and context hashes are refreshed, but this carries forward the reviewed classification of exact values rather than proving external ownership.",
+    "This does not mark final scan/release/package completion. Root must separately validate final scope, including any generated-report exclusions or supplements.",
+    "No actual candidate value, credential or contact literal is included in this report; no provider/network/database access."
+  ]
+}

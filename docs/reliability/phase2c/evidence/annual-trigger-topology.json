@@ -1,0 +1,275 @@
+{
+  "timestamp": "2026-09-29T20:17:09.273Z",
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "snapshots": [
+    {
+      "label": "UNCHANGED_SCHEMA_078",
+      "topology": [
+        {
+          "name": "sync_future_google_writer_binding_v2",
+          "type": 21,
+          "attrs": "5 4 3 6",
+          "columns": [
+            "runtime_state",
+            "runtime_revision",
+            "structural_setup_revision",
+            "configuration_fingerprint"
+          ],
+          "enabled": "O",
+          "function": "production_control.sync_future_google_writer_binding_v2()",
+          "relation": "production_control.future_runtime_match_bindings_v2"
+        },
+        {
+          "name": "future_google_writer_generation_immutable_v2",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_generations_v2"
+        },
+        {
+          "name": "future_google_writer_target_immutable_v2",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_targets_v2"
+        },
+        {
+          "name": "production_future_google_writer_receipt_immutable_v1",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_certification_receipts_v1"
+        },
+        {
+          "name": "production_future_google_writer_audit_immutable_v1",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_certification_audit_v1"
+        }
+      ],
+      "manifest": {
+        "status": "PASS",
+        "sha256": "e95c6eeb326f6a7771d089bceb545d0cb0f84d8d0e70055eacc1c4dc24b7cd9a"
+      }
+    },
+    {
+      "label": "202609110102_account_deletion_audit_attribution_v1.sql",
+      "topology": [
+        {
+          "name": "sync_future_google_writer_binding_v2",
+          "type": 21,
+          "attrs": "5 4 3 6",
+          "columns": [
+            "runtime_state",
+            "runtime_revision",
+            "structural_setup_revision",
+            "configuration_fingerprint"
+          ],
+          "enabled": "O",
+          "function": "production_control.sync_future_google_writer_binding_v2()",
+          "relation": "production_control.future_runtime_match_bindings_v2"
+        },
+        {
+          "name": "future_google_writer_generation_immutable_v2",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_generations_v2"
+        },
+        {
+          "name": "future_google_writer_target_immutable_v2",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_targets_v2"
+        },
+        {
+          "name": "production_future_google_writer_receipt_immutable_v1",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_certification_receipts_v1"
+        },
+        {
+          "name": "production_future_google_writer_audit_immutable_v1",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_certification_audit_v1"
+        },
+        {
+          "name": "bagger_live_actor_auth_user_id",
+          "type": 23,
+          "attrs": "8",
+          "columns": [
+            "actor_auth_user_id"
+          ],
+          "enabled": "O",
+          "function": "participant_identity.require_live_authorship_v1()",
+          "relation": "production_control.future_google_writer_certification_receipts_v1"
+        }
+      ],
+      "manifest": {
+        "status": "FAIL",
+        "error": "Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -qAt -v ON_ERROR_STOP=1 -d maintenance_capability_1_phases\nERROR:  PRODUCTION_FUTURE_GOOGLE_IMPLEMENTATION_TRIGGER_TOPOLOGY_REQUIRED\nCONTEXT:  PL/pgSQL function production_control.future_google_writer_implementation_manifest_v2() line 292 at RAISE"
+      }
+    },
+    {
+      "label": "202609280121_score_derived_intents_v1.sql",
+      "topology": [
+        {
+          "name": "sync_future_google_writer_binding_v2",
+          "type": 21,
+          "attrs": "5 4 3 6",
+          "columns": [
+            "runtime_state",
+            "runtime_revision",
+            "structural_setup_revision",
+            "configuration_fingerprint"
+          ],
+          "enabled": "O",
+          "function": "production_control.sync_future_google_writer_binding_v2()",
+          "relation": "production_control.future_runtime_match_bindings_v2"
+        },
+        {
+          "name": "future_google_writer_generation_immutable_v2",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_generations_v2"
+        },
+        {
+          "name": "future_google_writer_target_immutable_v2",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_targets_v2"
+        },
+        {
+          "name": "production_future_google_writer_receipt_immutable_v1",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_certification_receipts_v1"
+        },
+        {
+          "name": "production_future_google_writer_audit_immutable_v1",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_certification_audit_v1"
+        },
+        {
+          "name": "bagger_live_actor_auth_user_id",
+          "type": 23,
+          "attrs": "8",
+          "columns": [
+            "actor_auth_user_id"
+          ],
+          "enabled": "O",
+          "function": "participant_identity.require_live_authorship_v1()",
+          "relation": "production_control.future_google_writer_certification_receipts_v1"
+        }
+      ],
+      "manifest": {
+        "status": "FAIL",
+        "error": "Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -qAt -v ON_ERROR_STOP=1 -d maintenance_capability_1_phases\nERROR:  PRODUCTION_FUTURE_GOOGLE_IMPLEMENTATION_TRIGGER_TOPOLOGY_REQUIRED\nCONTEXT:  PL/pgSQL function production_control.future_google_writer_implementation_manifest_v2() line 292 at RAISE"
+      }
+    },
+    {
+      "label": "CANDIDATE_SCHEMA_124",
+      "topology": [
+        {
+          "name": "sync_future_google_writer_binding_v2",
+          "type": 21,
+          "attrs": "5 4 3 6",
+          "columns": [
+            "runtime_state",
+            "runtime_revision",
+            "structural_setup_revision",
+            "configuration_fingerprint"
+          ],
+          "enabled": "O",
+          "function": "production_control.sync_future_google_writer_binding_v2()",
+          "relation": "production_control.future_runtime_match_bindings_v2"
+        },
+        {
+          "name": "future_google_writer_generation_immutable_v2",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_generations_v2"
+        },
+        {
+          "name": "future_google_writer_target_immutable_v2",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_targets_v2"
+        },
+        {
+          "name": "production_future_google_writer_receipt_immutable_v1",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_certification_receipts_v1"
+        },
+        {
+          "name": "production_future_google_writer_audit_immutable_v1",
+          "type": 27,
+          "attrs": "",
+          "columns": null,
+          "enabled": "O",
+          "function": "production_control.reject_future_runtime_immutable_v2()",
+          "relation": "production_control.future_google_writer_certification_audit_v1"
+        },
+        {
+          "name": "bagger_live_actor_auth_user_id",
+          "type": 23,
+          "attrs": "8",
+          "columns": [
+            "actor_auth_user_id"
+          ],
+          "enabled": "O",
+          "function": "participant_identity.require_live_authorship_v1()",
+          "relation": "production_control.future_google_writer_certification_receipts_v1"
+        }
+      ],
+      "manifest": {
+        "status": "PASS",
+        "sha256": "92c93c7be21d3e0436598980a278603be8096b1cd3b5084a54333a702b564b0e"
+      }
+    }
+  ]
+}

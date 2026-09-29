@@ -1,0 +1,7 @@
+{
+  "source": "/private/tmp/bagger-build10-promo/PROJECT/SOURCE-PROVENANCE.json",
+  "retained": "docs/reliability/phase2c/evidence/native-retained-source-provenance.json",
+  "sha256": "9e4fe63d2f5311ca5a569f436bd54ae88f0de7e0f671b1522a4d4d5812bc7fc0",
+  "confidence": "STRONGLY_SUPPORTED_ATTRIBUTION",
+  "limitation": "Contemporaneous retained report; pinned native Git object not independently available. Runtime vendor byte hashes are separate proof."
+}

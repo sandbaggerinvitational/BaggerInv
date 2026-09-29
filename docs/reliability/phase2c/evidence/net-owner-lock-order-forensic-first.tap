@@ -1,0 +1,111 @@
+TAP version 13
+# Subtest: Net Skins owner completion locks exact Storylines before supported controls
+    # Subtest: present FINALIZE before
+    ok 1 - present FINALIZE before
+      ---
+      duration_ms: 2991.760916
+      type: 'test'
+      ...
+    # Subtest: present FINALIZE after
+    ok 2 - present FINALIZE after
+      ---
+      duration_ms: 1473.452417
+      type: 'test'
+      ...
+    # Subtest: present SCORING_LOCK before
+    ok 3 - present SCORING_LOCK before
+      ---
+      duration_ms: 2522.712416
+      type: 'test'
+      ...
+    # Subtest: present SCORING_LOCK after
+    ok 4 - present SCORING_LOCK after
+      ---
+      duration_ms: 1449.205041
+      type: 'test'
+      ...
+    # Subtest: absent FINALIZE before
+    ok 5 - absent FINALIZE before
+      ---
+      duration_ms: 2529.87725
+      type: 'test'
+      ...
+    # Subtest: absent FINALIZE after
+    ok 6 - absent FINALIZE after
+      ---
+      duration_ms: 1487.746375
+      type: 'test'
+      ...
+    # Subtest: absent SCORING_LOCK before
+    ok 7 - absent SCORING_LOCK before
+      ---
+      duration_ms: 2760.376458
+      type: 'test'
+      ...
+    # Subtest: absent SCORING_LOCK after
+    ok 8 - absent SCORING_LOCK after
+      ---
+      duration_ms: 1579.317208
+      type: 'test'
+      ...
+    # Subtest: absent marker rolls back on rejected lease
+    not ok 9 - absent marker rolls back on rejected lease
+      ---
+      duration_ms: 1754.766875
+      type: 'test'
+      location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:63:51'
+      failureType: 'testCodeFailure'
+      error: |-
+        /opt/homebrew/opt/postgresql@17/bin/psql
+        ERROR:  canceling statement due to statement timeout
+        
+      code: 'ERR_TEST_FAILURE'
+      stack: |-
+        run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+        sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+        fingerprint (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:32:26)
+        TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:64:231)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+        TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:63:51)
+        async Test.run (node:internal/test_runner/test:1404:7)
+      ...
+    # Subtest: absent marker rolls back on rejected source
+    ok 10 - absent marker rolls back on rejected source
+      ---
+      duration_ms: 2405.265709
+      type: 'test'
+      ...
+    # Subtest: two simultaneous rounds create only unchanged canonical Storylines demand
+    ok 11 - two simultaneous rounds create only unchanged canonical Storylines demand
+      ---
+      duration_ms: 1521.837667
+      type: 'test'
+      ...
+    # Subtest: both completion bodies and private helper are manifest bound without changed authority attributes
+    ok 12 - both completion bodies and private helper are manifest bound without changed authority attributes
+      ---
+      duration_ms: 79.611
+      type: 'test'
+      ...
+    1..12
+not ok 1 - Net Skins owner completion locks exact Storylines before supported controls
+  ---
+  duration_ms: 44547.015583
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:33:1'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 13
+# suites 0
+# pass 11
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 44703.02175

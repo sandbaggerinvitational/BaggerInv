@@ -1,0 +1,186 @@
+{
+  "proof": "ACTUAL_SQL_LOCK_GRAPH",
+  "production": false,
+  "tests": [
+    {
+      "case": "match-control",
+      "pass": true,
+      "waiting": [
+        {
+          "pid": 36846,
+          "wait": "advisory",
+          "blockedBy": [
+            36848
+          ]
+        },
+        {
+          "pid": 36847,
+          "wait": "advisory",
+          "blockedBy": [
+            36846
+          ]
+        },
+        {
+          "pid": 36848,
+          "wait": "ClientRead",
+          "blockedBy": []
+        }
+      ],
+      "results": [
+        {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "work": [],
+            "ready": {
+              "CALCUTTA": false,
+              "COMPETITION": false,
+              "INTELLIGENCE": false
+            },
+            "scope": {
+              "tournamentId": "2026",
+              "runtimeGenerationId": null
+            },
+            "calcutta": {
+              "auctionRevision": 37,
+              "auctionFingerprint": "2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a",
+              "configurationRevision": 2,
+              "configurationFingerprint": "6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474"
+            },
+            "terminal": 0,
+            "cancelled": false,
+            "activeLeases": 0,
+            "materialized": 1,
+            "waitingOwner": {
+              "NET_SKINS": 1
+            },
+            "blockedAutomatic": 0,
+            "pendingAutomatic": 2,
+            "statusIncomplete": false,
+            "terminalTruncated": false,
+            "waitingPublication": {
+              "FINAL_RECAP": 0
+            },
+            "blockedAutomaticLimit": 101,
+            "pendingAutomaticLimit": 101
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "code": "SCORING_LOCK",
+            "status": "LIVE",
+            "match_id": "2026-R1-1",
+            "updated_at": "2026-09-28T16:26:27.038345+00:00",
+            "access_active": false,
+            "audit_created": true,
+            "match_revision": 2,
+            "scoring_locked": true,
+            "permission_revision": 2,
+            "scoring_context_hash": null,
+            "google_outbox_created": true,
+            "permission_transition": {
+              "after": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P01",
+                  "revoked_at": "2026-09-28T16:26:27.038345+00:00",
+                  "updated_at": "2026-09-28T16:26:27.038345+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P02",
+                  "revoked_at": "2026-09-28T16:26:27.038345+00:00",
+                  "updated_at": "2026-09-28T16:26:27.038345+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P13",
+                  "revoked_at": "2026-09-28T16:26:27.038345+00:00",
+                  "updated_at": "2026-09-28T16:26:27.038345+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P14",
+                  "revoked_at": "2026-09-28T16:26:27.038345+00:00",
+                  "updated_at": "2026-09-28T16:26:27.038345+00:00",
+                  "permission_revision": 2
+                }
+              ],
+              "before": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P01",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-28T16:26:20.299771+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P02",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-28T16:26:20.299771+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P13",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-28T16:26:20.299771+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P14",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-28T16:26:20.299771+00:00",
+                  "permission_revision": 1
+                }
+              ]
+            },
+            "google_target_match_id": "2026-R1-1",
+            "previous_permission_revision": 1
+          }
+        }
+      ],
+      "controlTimeoutMs": 1000,
+      "workerTimeoutMs": 5000,
+      "barrier": "test-only after actual family flush; status uses no other-family write locks"
+    }
+  ],
+  "installed": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "295f3657c710b0b1e7937d603ac8db9c5439afe20734d41dc0e61a2f8e320221"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  }
+}

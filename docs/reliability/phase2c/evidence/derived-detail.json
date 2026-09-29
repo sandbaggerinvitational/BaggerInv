@@ -1,0 +1,377 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-09-29T21:09:43.222Z",
+  "fixture": "bagger-phase2-score-proof-v2",
+  "seed": "2026-canonical-score-path-2",
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "durableCommit": true,
+  "fsync": false,
+  "handicapCases": {
+    "plus": -2.5,
+    "medium": 17.8,
+    "high": 26.4,
+    "veryHigh": 40.2,
+    "builder": "production_control.handicap_v1_match_context",
+    "source": "SYNTHETIC_EDGE_CASES"
+  },
+  "runtimeSubstitutions": [
+    "assert_production_scoring_runtime",
+    "assert_production_cutover_read_scope"
+  ],
+  "limitations": [
+    "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+    "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+    "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+    "Private flush exercised as database owner; existing public worker claim hooks need separate runtime proof",
+    "Queue/source materialization tested; this suite does not calculate/publish financial results"
+  ],
+  "candidate": {
+    "path": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+    "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+  },
+  "tests": [
+    {
+      "id": "P2-DERIVED-ATOMIC",
+      "title": "required durable intent append failure rolls back score and receipt",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "canonicalCommit": false,
+        "requiredIntent": false,
+        "receipt": false,
+        "appendFailure": "ATOMIC_ROLLBACK"
+      },
+      "elapsedMs": 336.5689170000005
+    },
+    {
+      "id": "P2-DERIVED-COALESCE",
+      "title": "one canonical transaction coalesces hole/match trigger intent per family",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "intentCount": 3,
+        "canonicalHoles": 1,
+        "sameMutationAdditionalIntents": 0,
+        "processed": 3,
+        "repeatFlush": 0
+      },
+      "elapsedMs": 454.6294160000016
+    },
+    {
+      "id": "P2-DERIVED-FAIL-CALCUTTA",
+      "title": "CALCUTTA unavailable leaves score Official and durable demand retryable",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "score": "ACCEPTED",
+        "failure": "RETRYABLE_40001",
+        "retry": "SUCCEEDED",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 464.11362499999996
+    },
+    {
+      "id": "P2-DERIVED-FAIL-NET_SKINS",
+      "title": "NET_SKINS unavailable leaves score Official and durable demand retryable",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "score": "ACCEPTED",
+        "failure": "RETRYABLE_40001",
+        "retry": "SUCCEEDED",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 460.6612920000007
+    },
+    {
+      "id": "P2-DERIVED-FAIL-COMPETITION",
+      "title": "COMPETITION unavailable leaves score Official and durable demand retryable",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "score": "ACCEPTED",
+        "failure": "RETRYABLE_40001",
+        "retry": "SUCCEEDED",
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 431.940333999999
+    },
+    {
+      "id": "P2-DERIVED-STANDALONE-LOCK",
+      "title": "standalone LOCK retains synchronous derived failure and atomic rollback",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "scope": "SCORE_ONLY_DEFERRAL_NOT_ROUND_CONTROL_ISOLATION",
+        "observations": [
+          {
+            "family": "CALCUTTA",
+            "standaloneOperation": "LOCK",
+            "derivedFailureCanAbort": true,
+            "canonicalChange": false,
+            "newIntent": false,
+            "semantics": "UNCHANGED_SYNCHRONOUS_NON_SCORE_PATH"
+          },
+          {
+            "family": "NET_SKINS",
+            "standaloneOperation": "LOCK",
+            "derivedFailureCanAbort": true,
+            "canonicalChange": false,
+            "newIntent": false,
+            "semantics": "UNCHANGED_SYNCHRONOUS_NON_SCORE_PATH"
+          },
+          {
+            "family": "COMPETITION",
+            "standaloneOperation": "LOCK",
+            "derivedFailureCanAbort": true,
+            "canonicalChange": false,
+            "newIntent": false,
+            "semantics": "UNCHANGED_SYNCHRONOUS_NON_SCORE_PATH"
+          }
+        ]
+      },
+      "elapsedMs": 1228.1462919999994
+    },
+    {
+      "id": "P2-DERIVED-STANDALONE-FINALIZE",
+      "title": "standalone FINALIZE retains synchronous derived failure and atomic rollback",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "scope": "SCORE_ONLY_DEFERRAL_NOT_ROUND_CONTROL_ISOLATION",
+        "observations": [
+          {
+            "family": "CALCUTTA",
+            "standaloneOperation": "FINALIZE",
+            "derivedFailureCanAbort": true,
+            "canonicalChange": false,
+            "newIntent": false,
+            "semantics": "UNCHANGED_SYNCHRONOUS_NON_SCORE_PATH"
+          },
+          {
+            "family": "NET_SKINS",
+            "standaloneOperation": "FINALIZE",
+            "derivedFailureCanAbort": true,
+            "canonicalChange": false,
+            "newIntent": false,
+            "semantics": "UNCHANGED_SYNCHRONOUS_NON_SCORE_PATH"
+          },
+          {
+            "family": "COMPETITION",
+            "standaloneOperation": "FINALIZE",
+            "derivedFailureCanAbort": true,
+            "canonicalChange": false,
+            "newIntent": false,
+            "semantics": "UNCHANGED_SYNCHRONOUS_NON_SCORE_PATH"
+          }
+        ]
+      },
+      "elapsedMs": 2429.7135000000017
+    },
+    {
+      "id": "P2-DERIVED-BACKLOG",
+      "title": "432 pending intents do not block canonical writes; bounded batches catch up",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "canonicalHoles": 144,
+        "pendingBefore": 432,
+        "processed": 432,
+        "batches": 57,
+        "pendingAfter": 0,
+        "localPsqlProcessPerScore": {
+          "p50": 14.02191700000003,
+          "p95": 16.10779199999888,
+          "p99": null,
+          "max": 21.280000000002474
+        },
+        "workerDurationMs": 2078.648624999998,
+        "publicationsCreated": false
+      },
+      "elapsedMs": 5428.1104589999995
+    },
+    {
+      "id": "P2-DERIVED-BURST",
+      "title": "12 independent Singles matches commit concurrently with configured history",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "requests": 12,
+        "success": 12,
+        "failures": 0,
+        "deadlocks": 0,
+        "elapsedMs": 44.12325000000055,
+        "connectionModel": "12_REAL_POSTGRESQL_CONNECTIONS",
+        "history": "SYNTHETIC_1X_CALCUTTA_SKINS_ODDS"
+      },
+      "elapsedMs": 396.74025000000256
+    },
+    {
+      "id": "P2-DERIVED-WORKER-RACE",
+      "title": "scoring continues while a derived worker holds shared competition markers",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "worker": "HOLDS_COMPETITION_MARKERS_UNCOMMITTED",
+        "score": "COMMITTED_BEFORE_WORKER",
+        "timeoutMs": 1000,
+        "canonicalHoles": 2
+      },
+      "elapsedMs": 415.4037500000013
+    },
+    {
+      "id": "P2-DERIVED-ORDER",
+      "title": "older financial demand observes latest canonical source instead of publishing obsolete result",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "newerThenOlder": "PROCESSED_CURRENT_SOURCE",
+        "newResult": false,
+        "activeJobCountChanged": false
+      },
+      "elapsedMs": 445.1309579999979
+    },
+    {
+      "id": "P2-DERIVED-DEAD-LETTER",
+      "title": "bounded repeated consumer failure becomes visible dead letter without changing score",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "attempts": 5,
+        "status": "DEAD_LETTER",
+        "closeFencePending": true,
+        "automaticInfiniteRetry": false,
+        "canonicalHoles": 1
+      },
+      "elapsedMs": 483.3520410000019
+    },
+    {
+      "id": "P2-DERIVED-TIMEOUT",
+      "title": "57014 cancels derived work with versioned retry evidence while prior canonical score remains committed",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "sqlstate": "57014",
+        "workerTransaction": "CANCELLED_SUBWORK_ROLLED_BACK_RETRY_RECEIPT_COMMITTED",
+        "intent": "RETRYABLE_THEN_SUCCEEDED",
+        "canonicalScore": "COMMITTED",
+        "partialWriteRolledBack": true,
+        "immutableRetryReceipt": {
+          "count": 1,
+          "valid": true
+        },
+        "result": {
+          "failed": 1,
+          "family": "CALCUTTA",
+          "maximum": 8,
+          "cancelled": true,
+          "processed": 0
+        }
+      },
+      "elapsedMs": 634.6077499999992
+    },
+    {
+      "id": "P2-DERIVED-ACL",
+      "title": "intent table and private helpers inaccessible to application/client roles",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "RLS": true,
+        "RLSProof": "ENABLED_FLAG_ONLY_NOT_FULL_ROW_POLICY_MATRIX",
+        "catalogAndRealRoleDenial": true,
+        "roleAccess": "DENIED",
+        "roleDenials": [
+          {
+            "role": "anon",
+            "operation": "SELECT_INTENT_TABLE",
+            "sqlstate": "42501",
+            "result": "DENIED"
+          },
+          {
+            "role": "anon",
+            "operation": "INVOKE_PRIVATE_FLUSH",
+            "sqlstate": "42501",
+            "result": "DENIED"
+          },
+          {
+            "role": "authenticated",
+            "operation": "SELECT_INTENT_TABLE",
+            "sqlstate": "42501",
+            "result": "DENIED"
+          },
+          {
+            "role": "authenticated",
+            "operation": "INVOKE_PRIVATE_FLUSH",
+            "sqlstate": "42501",
+            "result": "DENIED"
+          },
+          {
+            "role": "service_role",
+            "operation": "SELECT_INTENT_TABLE",
+            "sqlstate": "42501",
+            "result": "DENIED"
+          },
+          {
+            "role": "service_role",
+            "operation": "INVOKE_PRIVATE_FLUSH",
+            "sqlstate": "42501",
+            "result": "DENIED"
+          }
+        ],
+        "invalidBatchLimit": "REJECTED",
+        "maximumBatch": 8
+      },
+      "elapsedMs": 409.85629100000006
+    }
+  ],
+  "fixtureSetupTimeoutMs": 180000,
+  "transientFaultSqlstate": "40001",
+  "failureClassificationChange": "124 treats deterministic P0001 as terminal; this preserved retry matrix injects actual transient40001. Dedicated worker suite separately proves deterministic isolation.",
+  "completedAt": "2026-09-29T21:10:03.373Z",
+  "counts": {
+    "pass": 14,
+    "fail": 0
+  }
+}

@@ -1,0 +1,681 @@
+"""UNIT: synthetic retained-artifact validation; never database/Production proof.
+Run: python3 test/reliability-phase2c-certification-gate.test.py
+"""
+import copy
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import tempfile
+import unittest
+
+ROOT=Path(__file__).resolve().parents[1]
+SPEC=importlib.util.spec_from_file_location('phase2c_gate',ROOT/'tools/reliability/phase2c-certification-gate.py')
+gate=importlib.util.module_from_spec(SPEC);SPEC.loader.exec_module(gate)
+VARIANTS=['none','current_compatible','current_incompatible_consumed','current_incompatible_financial','stale_source','stale_result_binding','superseded_result','multiple_receipts']
+BASE='b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18'
+DELIVERY=['121-pending-upgrade','service-only-chained-manifest','autonomous-after-commit','crash-lease-restart','competition-claim-crash-restart','intelligence-claim-crash-restart','unknown-completion-ack','competition-completion-ack-loss','intelligence-completion-ack-loss','calcutta-failure-isolation','competition-failure-isolation','intelligence-failure-isolation','deterministic-terminal-exact-requeue','intelligence-correction-before-write','competition-before-claim','competition-before-write','intelligence-before-claim','intelligence-after-claim','intelligence-before-write','calcutta-before-claim','competition-late-writer-current-pointer','intelligence-late-writer-current-pointer',*[f'receipt-{v}' for v in VARIANTS],'actual57014-durable-budget','intelligence-sibling-no-thrash','lone-final-recovery','two-workers','closed-gate-autonomous',*[f'{f}-five-attempt-budget' for f in ['calcutta','competition','intelligence']],'all-family-requeue-delivery','terminal-compatible-activation-requeue','activation-atomic-late-completion','compatible-activation-replacement',*[f'{f}-expired-live-same-source' for f in ['calcutta','competition','intelligence']]]
+
+DELIVERY += [f+'-'+p+'-process-death' for f in ['calcutta','competition','intelligence'] for p in ['during-calculation','before-completion','after-result-write']]
+
+def plan():
+    return {'loggedStatements':1,'derivedRelations':[],'shapes':[{'querySha256':'a'*64,'shapeSha256':'b'*64,'invocations':1,'durationMinMsWithPlanLogging':1,'durationMaxMsWithPlanLogging':1,'maximumTemporaryWrittenBlocks':0,'nodeMetricRanges':{'root.Total Cost':{'min':1,'max':1}},'plan':{'Node Type':'Index Scan'}}]}
+
+def summary(n,value=2,p99=False):
+    return {'samples':n,'minMs':value,'p50Ms':value,'p95Ms':value,'p99Ms':value if p99 else None,'maxMs':value}
+
+class ArtifactGateTests(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
+        self.root=Path(self.temp.name);self.docs=self.root/'docs/reliability/phase2c';self.docs.mkdir(parents=True)
+        self.sources={}
+        for number in range(121,125):
+            relative=f'supabase/production_migrations/202609280{number}_'+('score_derived_delivery_v1.sql' if number==124 else 'test.sql')
+            path=self.root/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(f'-- synthetic {number}\n')
+            self.sources[relative]=hashlib.sha256(path.read_bytes()).hexdigest()
+        gate.R=self.root;gate.D=self.docs;gate.INPUTS={};gate.MIGRATIONS=self.sources
+        self.candidate={'migrations':[{'path':p,'sha256':h} for p,h in self.sources.items() if '202609280121_' not in p]}
+        self.fixture={**self.candidate,'baseSha':BASE,'production':False,'environment':'OWNED_SOCKET_ONLY_POSTGRESQL17','statementTimeoutMs':1000,'timeZone':'UTC'}
+
+    def save(self,name,value):
+        path=self.docs/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(value));return value
+
+    def benchmark(self,kind):
+        artifact={'result':'PASS','mode':'candidate','kind':kind,'baseSha':BASE,'executionHead':'c'*40,'phase2MigrationSha256':next(h for p,h in self.sources.items() if '202609280121_' in p),'candidate':self.candidate,'production':False,'environment':'LOCAL_SOCKET_ONLY_POSTGRESQL17','statementTimeoutMs':1000,'timeZone':'UTC','scales':[]}
+        for scale in [1,2,5,10]:
+            branches=[]
+            for variant in VARIANTS if kind=='eligible' else ['none']:
+                n=30 if kind=='eligible' else 1000;size=10 if kind=='eligible' else 200
+                path=f'evidence/{kind}-{scale}-{variant}.json';self.save(path,plan())
+                branches.append({**summary(n,p99=n>=1000),'variant':variant,'successCount':n,'failureCount':0,'rollbackVerified':True,'statementTimeoutMs':1000,'batches':[{'valuesMs':[2]*size} for _ in range(n//size)],'queryPlanArtifact':path,'nestedSqlExecutions':1,'derivedRelationsOnScorePath':[]})
+                if kind=='recovery':branches[-1]['recoveryState']={'operation':'SCORING_LOCK','supportedControlSucceeded':True,'beforeTiming':True,'matchStatus':'LIVE','scoringLocked':True,'activePermissions':0,'expectedStatus':'COMMITTED','verifiedTimedSamples':n}
+            artifact['scales'].append({'scale':scale,'branches':branches})
+        artifact['sourceProvenance']=self.provenance(['tools/reliability/benchmark-phase2c.mjs'],'BENCHMARK')
+        return artifact
+
+    def locks(self):
+        benchmark=self.benchmark('common');benchmark.pop('kind');benchmark.pop('scales');benchmark['samplesPerBranch']=100
+        benchmark['sourceProvenance']=self.provenance(['tools/reliability/measure-phase2c-locks.mjs'],'LOCK_BENCHMARK')
+        benchmark['rows']=[{'scale':s,'variant':v,'successCount':100,'failureCount':0,'canonicalRollbackDigestVerified':True,'transactionWallUpperBound':summary(100,4),'databaseRpc':summary(100,3),'lockHeldThroughRpcLowerBound':summary(100,2)} for s in [1,2,5,10] for v in ['none','multiple_receipts']]
+        return benchmark
+
+    def delivery(self):
+        rows=[{'case':name,'pass':True} for name in DELIVERY]
+        for row in rows:
+            if row['case'].endswith('five-attempt-budget'):row.update(attempts=5,immutableEvents=10)
+            if 'late-writer-current-pointer' in row['case']:row['newerCurrentPointersUnchanged']=True
+            if row['case'].endswith('-expired-live-same-source'):row.update({k:True for k in ['clockInjectedLeaseExpiry','sourceActivationGenerationUnchanged','jobIdentitiesPreserved','claimIdentityChanged','realBackoffObservedWithoutDueTimeEdit','oldChildAliveUntilRelease','currentAndHistoryAndAuditUnchanged']})
+            if row['case'].endswith('-process-death'):
+                family,point=row['case'].split('-',1);point=point.removesuffix('-process-death');n=1 if family=='calcutta' else 2;done=1 if point=='after-result-write' else 0
+                before=[{'identity':str(i),'attempt':1,'status':'SUCCEEDED' if i<done else 'RUNNING','leasePresent':i>=done,'cycle':'same-cycle'} for i in range(n)]
+                after=[{'identity':str(i),'attempt':1 if i<done else 2,'status':'SUCCEEDED','leasePresent':False,'cycle':'same-cycle'} for i in range(n)]
+                event={'type':'injected-crash' if point=='after-result-write' else 'held-before-write'}
+                row.update(family=family.upper(),cutpoint=point,actualProcessDeath={'code':77,'signal':None} if done else {'code':None,'signal':'SIGKILL'},claimCommitted=True,canonicalUnchanged=True,clockInjectedLeaseExpiry=n>done,beforeRestart={'rows':before,'running':n-done,'succeeded':done,'newResults':done},afterRestart={'rows':after,'running':0,'succeeded':n,'newResults':n},parity={'exactCanonicalSource':True},faultEvent=event,calculationInstrumentation='NONE')
+                if point=='during-calculation':
+                    file,function={'calcutta':('lib/production-full-net.js','calculateProductionFullNetCalcutta'),'competition':('lib/competition-derived-supabase.js','calculateCompetitionDerivedFromData'),'intelligence':('lib/intelligence-derived-supabase.js','calculateIntelligenceDerivedFromData')}[family]
+                    target=self.root/file;target.parent.mkdir(parents=True,exist_ok=True);target.write_text('// synthetic unit calculator '+family)
+                    event.update(type='held-during-calculation',family=family.upper(),sourceFile=file,functionName=function,originalSourceSha256=hashlib.sha256(target.read_bytes()).hexdigest(),instrumentedSourceSha256='a'*64,anchorSha256='b'*64,insertionAfterLine=1,claimCommitted=True,barrierTimeoutMs=10000)
+                    row['calculationInstrumentation']='ONE_TEST_ONLY_BARRIER_AFTER_REAL_STEP_WITH_ORIGINAL_AND_INSTRUMENTED_HASHES'
+        return {'installed':self.fixture,'productionQueries':0,'networkDenied':True,'scoreTimeoutMs':1000,'workerTimeoutMs':5000,'outcomes':rows}
+
+    def history(self):
+        rows=[]
+        for scale in [1,2,5,10]:
+            for variant in VARIANTS:
+                plans={key:plan() for key in ['tick','competitionTick','claim','finalReady']}
+                plans['candidateIndexCounterfactual']={'indexNames':sorted(gate.CANDIDATE_DELIVERY_INDEXES),**{key:plan() for key in ['readinessWith','readinessWithout','claimWith','claimWithout','requeueWith','requeueWithout']}}
+                rows.append({'scale':scale,'variant':variant,'pass':True,'workerStatementTimeoutMs':5000,'intentsPerFamily':8,'materialized':16,'tickMs':[1,2,3],'competitionTickMs':[1,2,3],'claimMs':[1,2,3],'actualAdapterFamilyTransactions':[{'family':f,'operationId':f,'cycleId':'cycle'} for f in ['CALCUTTA','NET_SKINS','COMPETITION']],'plans':plans})
+        return {'installed':self.fixture,'production':False,'declaredBranches':32,'passedBranches':32,'rows':rows}
+
+    def backlog(self):
+        rows=[]
+        for demand,preload in [(18,1),(108,6)]:
+            rows.append({'expectedDemand':demand,'preloadHoles':preload,'result':'PASS','scoreErrors':[],'scoreTimeouts':0,'initial':{'pendingIntents':0},'backlogBeforeStart':{'pendingIntents':demand},'measurements':[{'result':'ACCEPTED','pendingImmediatelyBeforeScore':True,'dbFunctionWallMs':2,'rpcRoundTripMs':3} for _ in range(12)],'final':{'pendingIntents':0,'holes':6*(preload+2),'receipts':6*(preload+2)},'canonicalCurrent':{'exactCanonicalSource':True},'noFinancialPublicationOrOwnershipChange':True,'sampledResources':{'samples':3,**{k:1 for k in ['maxObservedConnections','maxObservedActive','maxObservedWaitingSessions','maxObservedUngrantedLocks','maxObservedBlockedSessions','maxSampleRoundTripMs','maxObservedSampleGapMs']},'exactLockDuration':'NOT_MEASURED','cpuMemoryIo':'UNAVAILABLE'},'worker':{'maxMaterializedPerTick':24,'boundedMaterializationPerTick':24,'processedByFamily':{f:1 for f in ['CALCUTTA','COMPETITION','INTELLIGENCE']},'tickLatency':{'valuesMs':[1,2,3]}},'scoreRpc':{'samples':12,'p95Ms':None,'p99Ms':None},'scoreDbFunction':{'samples':12,'p95Ms':None,'p99Ms':None}})
+        return {'fixture':self.fixture,'production':False,'result':'PASS','clusterDestroyed':True,'measurement':{'scoreStatementTimeoutMs':1000,'workerStatementTimeoutMs':5000},'scenarios':rows}
+
+    def finite(self):
+        rows=[{'id':'P2C-TIME-001','result':'PASS','details':{'outcomes':[{'round':r,'code':'ACCEPTED'} for r in [1,2,3]]}}]
+        for name in ['hole_scores','score_mutations','score_derived_intents_v1']:rows.append({'id':'P2C-TIME-'+name,'result':'PASS','details':{'sqlstate':'57014','partialState':False,'readAfterRollback':'UNKNOWN','sameMutationRetry':'ACCEPTED'}})
+        rows.extend([{'id':'P2C-TIME-LOCK','result':'PASS','details':{'canonical':'UNCHANGED_UNTIL_SAFE_SAME_MUTATION_RETRY'}},{'id':'P2C-TIME-RECOVERY','result':'PASS','details':{'afterRelease':'COMMITTED','newWritePermission':False,'receiptPreserved':True}}])
+        return {'fixture':self.fixture,'production':False,'normalScoreTimeoutMs':1000,'normalWorkerTimeoutMs':5000,'tightTimeoutMs':25,'rows':rows}
+
+    def backlog_tail(self):
+        rows=[]
+        for name,preload,demand in [('normal_preload_one_hole',1,18),('larger_preload_six_holes',6,108)]:
+            bursts=[];qualified=[]
+            for rep in range(28):
+                measured=[{'repetition':rep,'match':f'2026-R1-{m}','hole':h,'mutation':f'{rep}:{m}:{h}','result':'ACCEPTED','pendingAutomaticBeforeScore':True,'lockHeldThroughRpcMs':1,'dbFunctionWallMs':2,'transactionWallUpperMs':3} for m in range(1,7) for h in range(preload+1,preload+7)]
+                qualified.extend(measured)
+                bursts.append({'repetition':rep,'result':'PASS','cloneRemoved':True,'financialUnchanged':True,'initialBacklog':{'pendingIntents':demand},'measurements':measured,'freshIdle':{'type':'tick','materialized':0,'terminal':0,'blockedAutomatic':0,'pendingAutomatic':0,'activeLeases':0,'statusIncomplete':False,'ready':{'CALCUTTA':False}},'current':{'exactCanonicalSource':True},'final':{'pendingIntents':0,'holes':6*(preload+6),'receipts':6*(preload+6)},'resourceSamples':[{k:1 for k in ['connections','active','idleInTransaction','lockWaitingSessions','workerConnections','scoreConnections','ungrantedLocks','blockedSessions']}],'workerEvents':[{'type':'tick'}]})
+            row={'name':name,'preloadHoles':preload,'expectedDemand':demand,'result':'PASS','scoreFailures':0,'qualified':qualified,'nonqualifying':[],'bursts':bursts,'totalAccepted':len(qualified)}
+            for key,n in [('lockHeldThroughRpcMs',1),('dbFunctionWallMs',2),('transactionWallUpperMs',3)]:row[key]={**summary(len(qualified),n,True),'tailStatus':'EMPIRICAL_1000_PLUS','valuesMs':[n]*len(qualified)}
+            rows.append(row)
+        return {'fixture':self.fixture,'id':'P2C-B-BACKLOG-TAIL','production':False,'result':'PASS','clusterDestroyed':True,'method':{'targetQualifiedSamplesPerProfile':1000,'maximumBurstsPerProfile':100,'groups':6,'measuredHolesPerGroup':6,'workerIntervalMs':250,'scoreStatementTimeoutMs':1000,'workerStatementTimeoutMs':5000},'profiles':rows}
+
+    def provenance(self,roots,scope='TEST'):
+        common=['tools/reliability/phase2c-source-provenance.mjs','package.json','package-lock.json','tools/reliability/phase2-network-deny.cjs']
+        if scope in {'TEST','APPLICATION','BUILD'}:common.append('tools/reliability/run-phase2c-tests.mjs')
+        if any('worker-failure-lock-order' in root for root in roots):common.append('docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/phase2c-worker-failure-before-definitions.json')
+        if any('worker-history' in root or 'delivery-index-review' in root for root in roots):
+            data='test/support/reliability/phase2c-delivery-indexes.json';common.append(data);path=self.root/data;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(self.index_manifest()))
+        support='test/support/reliability/direct-fixture.mjs';deep='test/support/reliability/deep-fixture.mjs'
+        names=list(dict.fromkeys(roots+common+[support,deep]+list(self.sources)))
+        for file in names:
+            path=self.root/file
+            if not path.exists():path.parent.mkdir(parents=True,exist_ok=True);path.write_text('// original '+file)
+        parser=[]
+        for file in ['node_modules/next/dist/compiled/babel/parser.js','node_modules/next/dist/compiled/babel/bundle.js']:
+            path=self.root/file;path.parent.mkdir(parents=True,exist_ok=True)
+            if not path.exists():path.write_text('// synthetic parser')
+            parser.append({'path':file,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
+        snapshot={'contract':gate.PROVENANCE_CONTRACT,'capturedAt':'2026-09-28T00:00:00Z','scope':scope,'through':124,'entryPoints':roots,'declaredFiles':common+list(self.sources),'files':[{'file':file,'sha256':hashlib.sha256((self.root/file).read_bytes()).hexdigest()} for file in names],
+            'edges':[{'from':root,'to':support,'kind':'STATIC_MODULE'} for root in roots]+[{'from':support,'to':deep,'kind':'STATIC_MODULE'}],'dynamicImports':[],'externalImports':[],'parserManifest':parser}
+        if not roots:snapshot['declaredFiles']+=[support,deep]
+        after=copy.deepcopy(snapshot);after['capturedAt']='2026-09-28T00:00:01Z'
+        return {'contract':gate.PROVENANCE_CONTRACT,'before':snapshot,'after':after,'stable':True,'result':'PASS'}
+
+    def receipt(self,name):
+        raw=f'{name}.tap';path=self.docs/'evidence'/raw;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('TAP version 13\n1..1\nok 1 - synthetic artifact validator fixture\n')
+        direct=f'test/{name}.test.mjs';provenance=self.provenance([direct]);sources=[{'file':direct,'sha256':hashlib.sha256((self.root/direct).read_bytes()).hexdigest()}]+[{'file':p,'sha256':h} for p,h in self.sources.items()]
+        return {'sourceProvenance':provenance,'sourcesStable':True,'production':False,'environment':'LOCAL_NON_PRODUCTION','rawArtifact':raw,'rawSha256':hashlib.sha256(path.read_bytes()).hexdigest(),'sources':sources,'implementationSourceManifest':[],'counts':{'tests':1,'pass':1,'fail':0,'skipped':0,'cancelled':0},'exitCode':0,'result':'PASS'}
+
+    def complete(self):
+        comparisons=[]
+        for kind in ['common','eligible','recovery']:
+            artifact=self.benchmark(kind);self.save(f'benchmark-candidate-{kind}.json',artifact)
+            if kind!='recovery':
+                baseline=copy.deepcopy(artifact);baseline['mode']='baseline';baseline.pop('candidate')
+                for snap in ['before','after']:baseline['sourceProvenance'][snap]['through']=121
+                self.save(f'benchmark-baseline-{kind}.json',baseline)
+                comparisons.extend({'kind':kind,'key':f"{s['scale']}:{row['variant']}",'beforeP50Ms':2,'beforeP95Ms':2,'afterP50Ms':2,'afterP95Ms':2} for s in artifact['scales'] for row in s['branches'])
+        self.save('performance-gate.json',{'status':'PASS','failures':[],'missing':[],'comparisons':comparisons})
+        self.save('lock-duration-candidate.json',self.locks())
+        baseline=self.locks();baseline['mode']='baseline';baseline.pop('candidate')
+        for snap in ['before','after']:baseline['sourceProvenance'][snap]['through']=121
+        self.save('lock-duration-baseline.json',baseline)
+        for name in ['delivery','worker-history','backlog-pressure','backlog-tail','finite']:self.save('evidence/'+name+'.json',self.receipt(name))
+        run,detail=self.calcutta_lock();self.save('evidence/calcutta-current-job-lock-run.json',run);self.save('evidence/calcutta-current-job-lock-after.json',detail)
+        wrapper=self.receipt('calcutta-lock-order');wrapper['counts']=run['counts'];raw=self.docs/'evidence/calcutta-lock-order.tap';raw.write_text('# tests 10\n# pass 10\n# fail 0\n# skipped 0\n# cancelled 0\n');wrapper['rawSha256']=hashlib.sha256(raw.read_bytes()).hexdigest();self.save('evidence/calcutta-lock-order.json',wrapper)
+        self.save('evidence/worker-delivery-results.json',self.delivery());self.save('evidence/worker-history-detail.json',self.history());self.save('evidence/backlog-pressure-results.json',self.backlog());self.save('timeout-results.json',self.finite());self.save('evidence/backlog-tail-results.json',self.backlog_tail())
+        receipt,detail=self.net_owner_lock();self.save('evidence/net-owner-lock-order.json',receipt);self.save('evidence/net-owner-control-lock-after.json',detail)
+        receipt,detail=self.delivery_indexes();self.save('evidence/delivery-index-review.json',receipt);self.save('evidence/delivery-index-review-detail.json',detail)
+        receipt,detail=self.worker_failure_lock();self.save('evidence/worker-failure-lock-order.json',receipt);self.save('evidence/worker-failure-lock-after.json',detail)
+
+    def calcutta_lock(self):
+        relative=next(p for p in self.sources if '202609280124_' in p)
+        required='supabase/production_migrations/202609280124_score_derived_delivery_v1.sql'
+        # The Calcutta proof captures this exact real migration path.
+        if relative!=required:
+            content=(self.root/relative).read_bytes();(self.root/relative).unlink();(self.root/required).write_bytes(content)
+            sha=self.sources.pop(relative);self.sources[required]=sha
+            for item in self.candidate['migrations']:
+                if item['path']==relative:item['path']=required
+        sources=[]
+        for file in [required,'test/reliability-phase2c-calcutta-lock-order.test.mjs','lib/score-derived-worker.js','lib/score-derived-delivery.js']:
+            path=self.root/file
+            if not path.exists():path.parent.mkdir(parents=True,exist_ok=True);path.write_text('// synthetic current source')
+            sources.append({'path':file,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
+        tap=self.docs/'evidence/calcutta-current-job-lock-after.tap';tap.parent.mkdir(parents=True,exist_ok=True);tap.write_text('# tests 10\n# pass 10\n# fail 0\n# skipped 0\n# cancelled 0\n')
+        run={'issue':'P2C-NEW-CALCUTTA-CURRENT-JOB-LOCK','result':'PASS','production':False,'environment':'OWNED_SOCKET_ONLY_POSTGRESQL17','counts':{'tests':10,'pass':10,'fail':0,'skipped':0,'cancelled':0},'sources':sources,'sourceCapture':'POST_RUN_HASH; this direct diagnostic run is not the full root wrapper snapshot','scoreTimeoutMs':1000,'workerTimeoutMs':5000,'clusterDestroyed':True}
+        tests=[]
+        for op in ['claim','complete','fail']:
+            tests.append({'operation':op,'order':'before','expectedCounterexample':True,'finalize':{'ok':False,'error':'statement timeout'},'workerSucceededAfterRollback':True,'reciprocal':[{'pid':1,'blockedBy':[2]},{'pid':2,'blockedBy':[1]}]})
+            tests.append({'operation':op,'order':'after','worker':True,'finalize':True,'scoreTimeoutMs':1000,'workerTimeoutMs':5000})
+        tests += [{'case':'held-intent-claim','pass':True,'claimCommittedBeforeMaterializerReleased':True,'currentSourceReplacement':True},{'case':'stale-lease-after-finalize','pass':True,'denial':'42501 LEASE_REQUIRED','replacementAndResultAndAuditUnchanged':True}]
+        functions=['claim_production_calcutta_v1_recalculation(jsonb)','complete_production_calcutta_v1_recalculation(jsonb)','fail_production_calcutta_v1_recalculation(jsonb)','future_production_claim_calcutta_recalculation_v1(jsonb)','future_production_complete_calcutta_recalculation_v1(jsonb)','future_production_fail_calcutta_recalculation_v1(jsonb)']
+        value={'issue':run['issue'],'production':False,'proof':'ACTUAL_RPC_RECIPROCAL_LOCK_GRAPH','installed':self.fixture,'tests':tests,'workerSources':[{'signature':v,'hash':'a'*64,'definer':True,'configuration':['search_path=pg_catalog'],'acl':['postgres=X/postgres']} for v in functions]}
+        return run,value
+
+    def test_calcutta_lock_missing_repair_is_not_hidden_by_passing_count(self):
+        run,value=self.calcutta_lock();gate.MIGRATIONS=self.sources;value['tests'][1]['finalize']=False
+        with self.assertRaises(ValueError):gate.validate_calcutta_lock(run,value)
+
+    def test_calcutta_lock_counterexample_requires_real_reciprocal_wait(self):
+        run,value=self.calcutta_lock();gate.MIGRATIONS=self.sources;value['tests'][0]['reciprocal'][1]['blockedBy']=[]
+        with self.assertRaises(ValueError):gate.validate_calcutta_lock(run,value)
+
+    def test_calcutta_lock_stale_lease_may_not_mutate_replacement(self):
+        run,value=self.calcutta_lock();gate.MIGRATIONS=self.sources;value['tests'][-1]['replacementAndResultAndAuditUnchanged']=False
+        with self.assertRaises(ValueError):gate.validate_calcutta_lock(run,value)
+
+    def test_calcutta_wrapper_cannot_hide_changed_migration(self):
+        self.complete();receipt=json.loads((self.docs/'evidence/calcutta-lock-order.json').read_text());receipt['sources'][-1]['sha256']='0'*64
+        with self.assertRaises(ValueError):gate.verify_receipt('calcutta-lock-order',receipt)
+
+    def net_owner_lock(self):
+        receipt=self.receipt('net-owner-lock-order');receipt['counts']={'tests':20,'pass':20,'fail':0,'skipped':0,'cancelled':0}
+        raw=self.docs/'evidence/net-owner-lock-order.tap';raw.write_text('# tests 20\n# pass 20\n# fail 0\n# skipped 0\n# cancelled 0\n');receipt['rawSha256']=hashlib.sha256(raw.read_bytes()).hexdigest()
+        tests=[]
+        for marker in ['present','absent']:
+            for control in ['FINALIZE','SCORING_LOCK']:
+                for order in ['before','after']:
+                    tests.append({'marker':marker,'controlKind':control,'order':order,'pass':True,'expectedCounterexample':order=='before','semanticParityWithUnchangedSerial':True,'controlBudgetMs':1000,'ownerBudgetMs':5000,'oneWay':[{'pid':1,'blockedBy':[2]}],'reciprocal':[{'pid':1,'blockedBy':[2]},{'pid':2,'blockedBy':[1]}] if order=='before' else None})
+        tests += [{'case':'absent-marker-rejected-'+v,'pass':True,'allRowsReceiptsAuditUnchanged':True} for v in ['lease','source']]
+        tests += [{'case':'two-rounds-absent-marker','pass':True,'serialFinancialAndDemandParity':True,'wait':[{'pid':1,'blockedBy':[2]}]},{'case':'manifest-security','pass':True,'futureCoverage':'ACTUAL_COMPLETION_WITH_EXPLICIT_OUTER_CERTIFICATION_SEAM'}]
+        tests.extend({'case':'future2099-'+marker,'pass':True,'actualFutureClaimAndComplete':True,'actualSharedHelper':True,'unchangedFullNetCalculator':True,'financialAndDemandCycleParity':True,'receiptReplayWithoutFootprint':True,'generation':'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee','boundary':'Synthetic canonical retarget; outer annual certification substituted, original Net resource/generation guards retained'} for marker in ['present','absent'])
+        tests.extend({'case':'future2099-rejected-'+failure,'pass':True,'absentMarkerAndAllRowsUnchanged':True,'actualFutureCompletionGuard':True,'generationNegativeFixtureFkBypass':failure=='job-generation'} for failure in ['lease','source','job-generation'])
+        tests.append({'case':'future2099-prefix-before-config-job','pass':True,'waiting':[{'pid':2,'blockedBy':[1]}],'configAndJobNowaitSucceededWhileCompletionBlocked':True})
+        tests.append({'case':'absent-marker-current-round-max-history-plan','pass':True,'observations':[{'historyCount':n,'currentRoundResultRows':1,'otherRoundNoncurrentRows':n,'planner':'DEFAULT_NO_PLANNER_OVERRIDE','actualCompletionOk':True,'currentFinancialRowsUnchanged':True,'allCheckUniqueFkConstraintsActive':True,'rollbackVerified':True,'actualHelperMaxPlans':[{'querySha256':'d'*64,'instrumentedDurationMs':1,'plan':{'Node Type':'Index Only Scan','Relation Name':'net_skins_v1_result_revisions','Index Name':'current_round_revision','Actual Rows':1,'Actual Loops':1}}]} for n in [1000,10000]],'limitations':['Current-round revision growth is not measured; irrelevant other-round history only.']})
+        value={'issue':'P2C-NEW-NETSKINS-OWNER-CONTROL-LOCK','production':False,'installed':self.fixture,'tests':tests,'sources':[{'signature':v,'hash':'a'*64,'definer':True,'owner':'10','configuration':['search_path=pg_catalog'],'acl':['postgres=X/postgres']} for v in ['complete_production_net_skins_v1_recalculation(jsonb)','future_production_complete_net_skins_recalculation_v1(jsonb)']]}
+        return receipt,value
+
+    def index_manifest(self):
+        return {'schemaVersion':1,'retainedNonuniqueIndexes':sorted(gate.CANDIDATE_DELIVERY_INDEXES),'removedOptionalIndexes':sorted(gate.REMOVED_DELIVERY_INDEXES),'historicalReferenceDefinitions':{name:'CREATE INDEX '+name.split('.')[-1]+' ON synthetic_table(id)' for name in gate.REMOVED_DELIVERY_INDEXES}}
+
+    def delivery_indexes(self):
+        manifest=self.index_manifest();path=self.root/'test/support/reliability/phase2c-delivery-indexes.json';path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(manifest))
+        receipt=self.receipt('delivery-index-review');receipt['counts']={'tests':23,'pass':23,'fail':0,'skipped':0,'cancelled':0}
+        specs=[('CALCUTTA_DUE','calcutta_v1_recalculation_jobs_delivery_due',1),('CALCUTTA_DELAYED','calcutta_v1_recalculation_jobs_delivery_due',0),('NET_SKINS_DUE','net_skins_v1_recalculation_jobs_delivery_due',1),('NET_SKINS_DELAYED','net_skins_v1_recalculation_jobs_delivery_due',0),('COMPETITION_DUE','competition_recalculation_jobs_delivery_due',1),('COMPETITION_DELAYED','competition_recalculation_jobs_delivery_due',1),('COMPETITION_TERMINAL_COUNT_DUE','competition_recalculation_jobs_delivery_terminal',0),('COMPETITION_TERMINAL_COUNT_TERMINAL','competition_recalculation_jobs_delivery_terminal',5)]+[(f'INTENT_BACKLOG_864_DEAD_{n}','score_derived_intents_terminal_v1',n) for n in [0,1,101]]
+        rows=[]
+        for scale in [1,10]:
+            row={'scale':scale,'identity':{'database':'owned_'+str(scale),'socketOnly':True,'version':'17.11','seqscan':'on'},'currentActiveLimits':{'calcutta':1,'netSkinsRounds':2,'competitionMarkers':5},'sourceHashes':{name:'a'*64 for name in ['calcutta','netSkins','deliveryTick']},'cases':[]}
+            for name,index,expected in specs:
+                qualified='scoring_authority.'+index;case={'name':name,'index':qualified,'candidateInstalled':qualified in gate.CANDIDATE_DELIVERY_INDEXES,'query':'select 1','expected':expected,'indexDefinition':'CREATE INDEX '+index+' ON synthetic_table(id)','result':'PASS','rollbackVerified':True}
+                for variant in ['withIndex','withoutIndex']:
+                    is_index=variant=='withIndex';removed=0 if is_index else 864-expected;hits=2 if is_index else 100
+                    node={'Node Type':'Index Scan' if is_index else 'Seq Scan','Actual Rows':expected,'Actual Loops':1,'Rows Removed by Filter':removed,'Shared Hit Blocks':hits,'Shared Read Blocks':0}
+                    if is_index:node['Index Name']=index
+                    ids=(['true'] if name=='COMPETITION_DUE' else ['false'] if name=='COMPETITION_DELAYED' else ['1']*expected)
+                    case[variant]={'rows':expected,'ids':ids,'plan':{'Plan':node,'Execution Time':1},'summary':{'indexes':[index] if is_index else [],'nodes':[node['Node Type']],'rowsRemoved':removed,'rootHits':hits,'rootReads':0,'executionMs':1}}
+                row['cases'].append(case)
+            rows.append(row)
+        return receipt,{'schemaVersion':1,'environment':'OWNED_LOCAL_SOCKET_POSTGRESQL17','production':False,'result':'PASS','indexManifest':manifest,'scales':rows,'installed':self.fixture,'clusterDestroyed':True}
+
+    def worker_failure_lock(self):
+        functions={'expiry-update':'score_derived_delivery_tick_v1','bundle-failure':'fail_intelligence_derived_bundle_v1','preclaim-skip-locked':'fail_score_derived_preclaim_v1','future-expiry':'future_production_claim_competition_derived_jobs_v1','future-intelligence':'future_production_claim_intelligence_derived_bundle_v1'}
+        attributes={'acl':['postgres=X/postgres','service_role=X/postgres'],'owner':'10','securityDefiner':True,'config':['search_path=pg_catalog'],'volatility':'v'}
+        catalog={'functions':[{'signature':fn+'(jsonb)','sha256':'a'*64,**attributes} for fn in functions.values()]}
+        relative='docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/phase2c-worker-failure-before-definitions.json';path=self.root/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(catalog))
+        receipt=self.receipt('worker-failure-lock-order');receipt['counts']={'tests':16,'pass':16,'fail':0,'skipped':0,'cancelled':0}
+        specs=[(scenario,control,order) for scenario in ['expiry-update','bundle-failure'] for control in ['SCORING_LOCK','FINALIZE'] for order in ['before','after']]+[('preclaim-skip-locked',control,'after') for control in ['SCORING_LOCK','FINALIZE']]+[(scenario,'INSTALLED_MATCH_CONTROL_TRIGGER',order) for scenario in ['future-expiry','future-intelligence'] for order in ['before','after']]
+        rows=[]
+        for scenario,control,order in specs:
+            row={'scenario':scenario,'control':control,'order':order,'tournamentId':'2099' if scenario.startswith('future-') else '2026','function':functions[scenario],'functionSHA256':'a'*64 if order=='before' or scenario=='preclaim-skip-locked' else 'b'*64,'controlBudgetMs':1000,'workerBudgetMs':5000,'pass':True,'oneWay':[{'pid':2,'blockedBy':[1]}],'canonicalHolesUnchanged':18,'expectedCounterexample':order=='before','results':{'worker':{'ok':True,'value':{'ok':True,'marked':1}},'control':{'ok':True,'value':{'ok':True}}}}
+            if scenario=='future-intelligence':row['workerManualPrelock']=False
+            if order=='before':row.update(reciprocal=[{'pid':1,'blockedBy':[2]},{'pid':2,'blockedBy':[1]}],sameControlRetry=True);row['results']['control']={'ok':False,'error':'statement timeout'}
+            rows.append(row)
+        return receipt,{'schemaVersion':1,'environment':'OWNED_LOCAL_SOCKET_ONLY_POSTGRESQL17','production':False,'clusterDestroyed':True,'installed':self.fixture,'beforeDefinitionSHA256':hashlib.sha256(path.read_bytes()).hexdigest(),'futureExpiryDomain':{'proofLayer':'SOURCE','exactTargetAndGeneration':True,'nonRoundZeroNotExcluded':True,'existingUpdatePredicatesUnchanged':True},'tests':rows,'attributes':[{'signature':fn+'(jsonb)',**attributes} for fn in functions.values()],'limitations':['Future cases use an explicit outer runtime seam; not protected annual Director RPC proof.']}
+
+    def test_worker_failure_lock_exact_all_schedules_valid(self):
+        run,value=self.worker_failure_lock();summary=gate.validate_worker_failure_lock(run,value);self.assertEqual(summary['runtimeSchedules'],14);self.assertEqual(summary['retainedBeforeCycles'],6)
+
+    def test_worker_failure_lock_same_count_cannot_hide_future_path(self):
+        run,value=self.worker_failure_lock();value['tests'][-1]=copy.deepcopy(value['tests'][0])
+        with self.assertRaises(ValueError):gate.validate_worker_failure_lock(run,value)
+
+    def test_worker_failure_lock_old_counterexample_requires_reciprocal_edges(self):
+        run,value=self.worker_failure_lock();value['tests'][0]['reciprocal'][1]['blockedBy']=[]
+        with self.assertRaises(ValueError):gate.validate_worker_failure_lock(run,value)
+
+    def test_worker_failure_lock_changed_security_attributes_reject(self):
+        run,value=self.worker_failure_lock();value['attributes'][0]['owner']='11'
+        with self.assertRaises(ValueError):gate.validate_worker_failure_lock(run,value)
+
+    def test_worker_failure_lock_requires_both_commits_and_unchanged_golf(self):
+        for kind in ['worker','control','holes','source']:
+            with self.subTest(kind=kind):
+                run,value=self.worker_failure_lock();row=value['tests'][1]
+                if kind in ['worker','control']:row['results'][kind]['ok']=False
+                elif kind=='holes':row['canonicalHolesUnchanged']=17
+                else:row['functionSHA256']='a'*64
+                with self.assertRaises(ValueError):gate.validate_worker_failure_lock(run,value)
+
+    def test_worker_failure_lock_retains_skip_locked_counterevidence(self):
+        run,value=self.worker_failure_lock();row=next(v for v in value['tests'] if v['scenario']=='preclaim-skip-locked');row['results']['worker']['value']['marked']=0
+        with self.assertRaises(ValueError):gate.validate_worker_failure_lock(run,value)
+
+    def test_future_intelligence_requires_full_claim_lock_execution(self):
+        run,value=self.worker_failure_lock();next(v for v in value['tests'] if v['scenario']=='future-intelligence')['workerManualPrelock']=True
+        with self.assertRaises(ValueError):gate.validate_worker_failure_lock(run,value)
+
+    def test_worker_failure_lock_historical_body_input_cannot_drift(self):
+        run,value=self.worker_failure_lock();source=self.root/'docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/phase2c-worker-failure-before-definitions.json';source.write_text('{}')
+        with self.assertRaises(ValueError):gate.validate_worker_failure_lock(run,value)
+
+    def native_decoder(self):
+        prefix='tools/reliability/native-never-again/decoder/'
+        models=[]
+        for n in range(12):
+            file=f'Vendor/Model{n}.swift';path=self.root/(prefix+file);path.parent.mkdir(parents=True,exist_ok=True);path.write_text('// synthetic model '+str(n));models.append({'path':file,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
+        manifest={'files':models,'pinnedNative':{'build':10},'provenance':{'claim':'STRONGLY SUPPORTED'}}
+        (self.root/(prefix+'fixture-manifest.json')).write_text(json.dumps(manifest))
+        fixture='docs/reliability/phase2c/evidence/recovery-proof.json';counter='docs/reliability/phase2c/evidence/native-timezone-counterexample.json'
+        for name in [prefix+'run.mjs',prefix+'main.swift',fixture,counter]:
+            path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('// synthetic '+name)
+        files=[{'path':name,'sha256':hashlib.sha256((self.root/name).read_bytes()).hexdigest()} for name in [prefix+'run.mjs',prefix+'main.swift',prefix+'fixture-manifest.json',fixture,counter]+[prefix+v['path'] for v in models]]
+        hashes={v['path']:v['sha256'] for v in files};before={'capturedAt':'before','files':files};after={'capturedAt':'after','files':copy.deepcopy(files)}
+        return {'production':False,'shippingNativeChanged':False,'physical':False,'simulator':False,'executionRuntime':'SWIFT_MACOS_MODEL','sourcesStable':True,'compatibilityCondition':'SQL session TimeZone=UTC','summary':{'passed':24,'failed':0},'checks':[{'format':format,'id':case,'result':'PASS'} for format in ['BB','SC','SI'] for case in ['REQUEST','ACCEPTED','REPLAY','WRONG_MUTATION_DENIED','WRONG_GROSS_DENIED','MISSING_REQUIRED_ACK_DENIED','CONFLICT_ERROR','SQL_TIMEOUT_ERROR']],'sourceProvenance':{'contract':'phase2c-swift-decoder-inputs-v1','before':before,'after':after,'sourcesStable':True,'result':'PASS'},'modelSources':models,'fixture':{'path':fixture,'sha256':hashes[fixture]},'knownLimitations':[{'id':'P2C-NEW-TIMESTAMP-TIMEZONE','result':'EXPECTED_REJECTION_CONFIRMED','artifact':counter,'sha256':hashes[counter],'error':'invalidTimestamp'}],'native':manifest['pinnedNative'],'provenance':manifest['provenance']}
+
+    def test_native_decoder_all_consumed_inputs_are_bound(self):
+        self.assertEqual(gate.validate_native_decoder(self.native_decoder())['capturedInputs'],17)
+
+    def test_native_decoder_driver_or_assertion_drift_invalidates_proof(self):
+        for name in ['run.mjs','main.swift','fixture-manifest.json']:
+            with self.subTest(name=name):
+                value=self.native_decoder();(self.root/'tools/reliability/native-never-again/decoder'/name).write_text('changed')
+                with self.assertRaises(ValueError):gate.validate_native_decoder(value)
+
+    def test_native_decoder_missing_historical_capture_not_backfilled(self):
+        value=self.native_decoder();value.pop('sourceProvenance')
+        with self.assertRaises(ValueError):gate.validate_native_decoder(value)
+
+    def test_native_decoder_input_change_during_execution_rejects(self):
+        value=self.native_decoder();value['sourceProvenance']['after']['files'][0]['sha256']='f'*64
+        with self.assertRaises(ValueError):gate.validate_native_decoder(value)
+
+    def test_native_decoder_requires_actual_counterexample_and_model_boundary(self):
+        for kind in ['missing_counterexample','physical_inference','dto_rewrite']:
+            with self.subTest(kind=kind):
+                value=self.native_decoder()
+                if kind=='missing_counterexample':value['knownLimitations']=[]
+                elif kind=='physical_inference':value['physical']=True
+                else:value['fixture']['sha256']='0'*64
+                with self.assertRaises(ValueError):gate.validate_native_decoder(value)
+
+    def test_runner_policy_must_be_recorded_before_and_after(self):
+        receipt=self.receipt('direct-runner')
+        for snapshot in ['before','after']:
+            data=receipt['sourceProvenance'][snapshot];data['declaredFiles'].remove('tools/reliability/run-phase2c-tests.mjs');data['files']=[v for v in data['files'] if v['file']!='tools/reliability/run-phase2c-tests.mjs']
+        with self.assertRaises(ValueError):gate.verify_receipt('direct-runner',receipt)
+
+    def test_optional_index_manifest_must_be_an_original_captured_input(self):
+        run,value=self.delivery_indexes()
+        for snapshot in ['before','after']:
+            data=run['sourceProvenance'][snapshot];data['declaredFiles'].remove('test/support/reliability/phase2c-delivery-indexes.json');data['files']=[v for v in data['files'] if v['file']!='test/support/reliability/phase2c-delivery-indexes.json']
+        with self.assertRaises(ValueError):gate.validate_delivery_index_review(run,value)
+
+    def test_future_net_actual_body_cases_are_required(self):
+        run,value=self.net_owner_lock();value['tests']=[v for v in value['tests'] if v.get('case')!='future2099-absent']
+        with self.assertRaises(ValueError):gate.validate_net_owner_lock(run,value)
+
+    def test_future_net_cannot_substitute_financial_parity_claim(self):
+        run,value=self.net_owner_lock();next(v for v in value['tests'] if v.get('case')=='future2099-present')['financialAndDemandCycleParity']=False
+        with self.assertRaises(ValueError):gate.validate_net_owner_lock(run,value)
+
+    def test_future_net_generation_negative_fixture_disclosed(self):
+        run,value=self.net_owner_lock();next(v for v in value['tests'] if v.get('case')=='future2099-rejected-job-generation')['generationNegativeFixtureFkBypass']=False
+        with self.assertRaises(ValueError):gate.validate_net_owner_lock(run,value)
+
+    def test_future_net_prefix_requires_actual_wait_and_free_later_locks(self):
+        for field,bad in [('waiting',[]),('configAndJobNowaitSucceededWhileCompletionBlocked',False)]:
+            with self.subTest(field=field):
+                run,value=self.net_owner_lock();next(v for v in value['tests'] if v.get('case')=='future2099-prefix-before-config-job')[field]=bad
+                with self.assertRaises(ValueError):gate.validate_net_owner_lock(run,value)
+
+    def test_future_net_seam_must_not_be_mislabeled_full_admission(self):
+        run,value=self.net_owner_lock();next(v for v in value['tests'] if v.get('case')=='future2099-present')['boundary']='Full protected annual runtime'
+        with self.assertRaises(ValueError):gate.validate_net_owner_lock(run,value)
+
+    def test_net_max_plan_must_be_executed_bounded_index_at_both_sizes(self):
+        for kind in ['missing_scale','seq_scan','many_rows','nonfinite','missing_loops']:
+            with self.subTest(kind=kind):
+                run,value=self.net_owner_lock();obs=next(v for v in value['tests'] if v.get('case')=='absent-marker-current-round-max-history-plan')['observations']
+                if kind=='missing_scale':obs.pop()
+                else:
+                    plan=obs[-1]['actualHelperMaxPlans'][0]['plan']
+                    if kind=='seq_scan':plan['Node Type']='Seq Scan'
+                    if kind=='many_rows':plan['Rows Removed by Filter']=10000
+                    if kind=='nonfinite':plan['Actual Rows']=float('nan')
+                    if kind=='missing_loops':plan.pop('Actual Loops')
+                with self.assertRaises(ValueError):gate.validate_net_owner_lock(run,value)
+
+    def test_optional_index_actual_counterfactual_matrix_accepts_scoped_evidence(self):
+        run,value=self.delivery_indexes();result=gate.validate_delivery_index_review(run,value)
+        self.assertEqual(result['counterfactualCases'],22);self.assertEqual(result['indexApproval'],'SEPARATE_ENGINEERING_REVIEW_REQUIRED')
+
+    def test_optional_index_requires_fully_qualified_exact_set(self):
+        run,value=self.delivery_indexes();value['indexManifest']['retainedNonuniqueIndexes'][0]='public.'+value['indexManifest']['retainedNonuniqueIndexes'][0].split('.')[-1]
+        with self.assertRaises(ValueError):gate.validate_delivery_index_review(run,value)
+
+    def test_optional_index_same_count_cannot_hide_missing_case(self):
+        run,value=self.delivery_indexes();value['scales'][-1]['cases'][-1]=copy.deepcopy(value['scales'][-1]['cases'][0])
+        with self.assertRaises(ValueError):gate.validate_delivery_index_review(run,value)
+
+    def test_optional_index_cannot_change_query_semantics_or_rollback(self):
+        for field,bad in [('rollbackVerified',False),('candidateInstalled',True),('expected',99)]:
+            with self.subTest(field=field):
+                run,value=self.delivery_indexes();value['scales'][0]['cases'][0][field]=bad
+                with self.assertRaises(ValueError):gate.validate_delivery_index_review(run,value)
+        run,value=self.delivery_indexes();value['scales'][0]['cases'][0]['withoutIndex']['ids']=['different']
+        with self.assertRaises(ValueError):gate.validate_delivery_index_review(run,value)
+
+    def test_optional_index_default_planner_and_two_scales_required(self):
+        for kind in ['planner','scale']:
+            with self.subTest(kind=kind):
+                run,value=self.delivery_indexes()
+                if kind=='planner':value['scales'][0]['identity']['seqscan']='off'
+                else:value['scales'].pop()
+                with self.assertRaises(ValueError):gate.validate_delivery_index_review(run,value)
+
+    def test_optional_index_requires_actual_plan_numbers_and_summary_identity(self):
+        for kind in ['nan','false','summary']:
+            with self.subTest(kind=kind):
+                run,value=self.delivery_indexes();result=value['scales'][0]['cases'][0]['withIndex']
+                if kind=='nan':result['plan']['Plan']['Actual Rows']=float('nan')
+                elif kind=='false':result['plan']['Execution Time']=False
+                else:result['summary']['rootHits']=100
+                with self.assertRaises(ValueError):gate.validate_delivery_index_review(run,value)
+
+    def test_optional_index_dense_intent_benefit_not_inferred_from_index_presence(self):
+        run,value=self.delivery_indexes();result=value['scales'][0]['cases'][-1]['withoutIndex'];result['plan']['Plan']['Rows Removed by Filter']=0;result['summary']['rowsRemoved']=0
+        with self.assertRaises(ValueError):gate.validate_delivery_index_review(run,value)
+
+    def test_net_owner_lock_requires_absent_marker_and_both_controls(self):
+        receipt,value=self.net_owner_lock();value['tests']=[v for v in value['tests'] if v.get('marker')!='absent']
+        with self.assertRaises(ValueError):gate.validate_net_owner_lock(receipt,value)
+
+    def test_net_owner_lock_does_not_certify_changed_financial_semantics(self):
+        receipt,value=self.net_owner_lock();value['tests'][1]['semanticParityWithUnchangedSerial']=False
+        with self.assertRaises(ValueError):gate.validate_net_owner_lock(receipt,value)
+
+    def test_net_owner_rejection_must_rollback_placeholder_and_audit(self):
+        receipt,value=self.net_owner_lock();next(v for v in value['tests'] if v.get('case')=='absent-marker-rejected-source')['allRowsReceiptsAuditUnchanged']=False
+        with self.assertRaises(ValueError):gate.validate_net_owner_lock(receipt,value)
+
+    def test_net_owner_lock_cannot_claim_end_user_execute_permission(self):
+        receipt,value=self.net_owner_lock();value['sources'][0]['acl'].append('authenticated=X/postgres')
+        with self.assertRaises(ValueError):gate.validate_net_owner_lock(receipt,value)
+
+    def test_complete_synthetic_artifacts_pass_without_approving_production_or_baseline(self):
+        self.complete();result=gate.evaluate(self.root)
+        self.assertEqual(result['status'],'PASS',result);self.assertFalse(result['approvedBaseline']);self.assertFalse(result['production']);self.assertEqual(result['checkpoints']['score'],4000);self.assertEqual(result['checkpoints']['lockSamples'],800)
+
+    def test_missing_input_is_partial_not_pass(self):
+        self.complete();(self.docs/'timeout-results.json').unlink();self.assertEqual(gate.evaluate(self.root)['status'],'PARTIAL')
+
+    def test_stale_migration_rejects_previously_passing_evidence(self):
+        self.complete();next((self.root/'supabase/production_migrations').glob('*124*')).write_text('-- changed');self.assertEqual(gate.evaluate(self.root)['status'],'FAIL')
+
+    def test_raw_receipt_tampering_fails(self):
+        self.complete();(self.docs/'evidence/delivery.tap').write_text('changed');self.assertEqual(gate.evaluate(self.root)['status'],'FAIL')
+
+    def test_declared_pass_does_not_hide_missing_scale(self):
+        artifact=self.benchmark('common');artifact['scales'].pop()
+        with self.assertRaises(ValueError):gate.validate_benchmark(artifact,'common')
+
+    def test_declared_pass_does_not_hide_eligible_missing_branch(self):
+        artifact=self.benchmark('eligible');artifact['scales'][-1]['branches'].pop()
+        with self.assertRaises(ValueError):gate.validate_benchmark(artifact,'eligible')
+
+    def test_nonfinite_and_negative_or_false_numeric_measurements_rejected(self):
+        for value in [float('nan'),float('inf'),-1,True]:
+            with self.subTest(value=value):
+                artifact=self.benchmark('recovery');artifact['scales'][0]['branches'][0]['p50Ms']=value
+                with self.assertRaises(ValueError):gate.validate_benchmark(artifact,'recovery')
+
+    def test_percentiles_must_match_actual_samples(self):
+        artifact=self.benchmark('common');artifact['scales'][0]['branches'][0]['p50Ms']=1
+        with self.assertRaises(ValueError):gate.validate_benchmark(artifact,'common')
+
+    def test_recovery_requires_supported_lock_before_each_scale(self):
+        for scale in range(4):
+            for field,value in [('operation','NONE'),('supportedControlSucceeded',False),('beforeTiming',False),('scoringLocked',False),('activePermissions',1),('activePermissions',False),('expectedStatus','UNKNOWN'),('verifiedTimedSamples',999)]:
+                with self.subTest(scale=scale,field=field):
+                    artifact=self.benchmark('recovery');artifact['scales'][scale]['branches'][0]['recoveryState'][field]=value
+                    with self.assertRaises(ValueError):gate.validate_benchmark(artifact,'recovery')
+
+    def test_recovery_without_post_revocation_state_rejected(self):
+        artifact=self.benchmark('recovery');artifact['scales'][0]['branches'][0].pop('recoveryState')
+        with self.assertRaises(ValueError):gate.validate_benchmark(artifact,'recovery')
+
+    def final_pwa(self):
+        return {'tests':[{'id':'P2C-A-FINAL-'+format,'result':'PASS','details':{'format':format,'holes':18,'final':True,'lostFinalHoleAcknowledgement':True,'newScoreDenied':True,'actualStatusHandler':True,'postFinalizePwaWriteDenied':True,'noRecoveryWrites':True,'pwaAdapter':'persistParticipantScore','providerBoundary':'INJECTED_LOCAL_SQL','finalHoleRecovery':'COMMITTED','postFinalizeApiStatus':'COMMITTED'}} for format in ['BB','SC','SI']]}
+
+    def test_actual_pwa_final_recovery_all_formats(self):
+        self.assertEqual(gate.validate_pwa_final_recovery(self.final_pwa())['formats'],3)
+
+    def test_pwa_final_recovery_rejects_rpc_only_or_missing_proof(self):
+        for field,value in [('actualStatusHandler',False),('postFinalizePwaWriteDenied',False),('noRecoveryWrites',False),('pwaAdapter','directRPC'),('postFinalizeApiStatus','UNKNOWN')]:
+            with self.subTest(field=field):
+                artifact=self.final_pwa();artifact['tests'][1]['details'][field]=value
+                with self.assertRaises(ValueError):gate.validate_pwa_final_recovery(artifact)
+        artifact=self.final_pwa();artifact['tests'].pop()
+        with self.assertRaises(ValueError):gate.validate_pwa_final_recovery(artifact)
+
+    def test_native_decoder_missing_error_case_rejected(self):
+        value=self.native_decoder();value['checks'][0]={'format':'BB','id':'CONFLICT_ERROR','result':'PASS'}
+        with self.assertRaises(ValueError):gate.validate_native_decoder(value)
+
+    def test_nine_literal_worker_process_deaths_required(self):
+        value=self.delivery();self.assertEqual(gate.validate_delivery(value)['behavioralOutcomes'],54)
+        for case in [f+'-'+p+'-process-death' for f in ['calcutta','competition','intelligence'] for p in ['during-calculation','before-completion','after-result-write']]:
+            bad=copy.deepcopy(value);bad['outcomes']=[r for r in bad['outcomes'] if r['case']!=case]
+            with self.subTest(case=case),self.assertRaises(ValueError):gate.validate_delivery(bad)
+
+    def test_restart_cannot_replace_logical_delivery_cycle(self):
+        value=self.delivery();row=next(r for r in value['outcomes'] if r['case']=='competition-before-completion-process-death');row['afterRestart']['rows'][0]['cycle']='replacement'
+        with self.assertRaises(ValueError):gate.validate_delivery(value)
+
+    def test_live_pause_does_not_substitute_for_process_death(self):
+        value=self.delivery();row=next(r for r in value['outcomes'] if r['case']=='competition-before-completion-process-death');row['actualProcessDeath']={'code':None,'signal':None}
+        with self.assertRaises(ValueError):gate.validate_delivery(value)
+
+    def test_calculator_source_drift_invalidates_crash_proof(self):
+        value=self.delivery();(self.root/'lib/production-full-net.js').write_text('// changed calculator')
+        with self.assertRaises(ValueError):gate.validate_delivery(value)
+
+    def test_calculation_claim_and_insertion_must_be_proven(self):
+        for field,value in [('claimCommitted',False),('insertionAfterLine',0),('barrierTimeoutMs',None),('instrumentedSourceSha256','invalid')]:
+            artifact=self.delivery();row=next(r for r in artifact['outcomes'] if r['case']=='intelligence-during-calculation-process-death');row['faultEvent'][field]=value
+            with self.subTest(field=field),self.assertRaises(ValueError):gate.validate_delivery(artifact)
+
+    def test_post_result_death_requires_already_committed_result(self):
+        artifact=self.delivery();row=next(r for r in artifact['outcomes'] if r['case']=='calcutta-after-result-write-process-death');row['beforeRestart']['newResults']=0
+        with self.assertRaises(ValueError):gate.validate_delivery(artifact)
+
+    def test_restart_duplicate_result_or_stranded_running_rejected(self):
+        for field,value in [('newResults',3),('running',1),('succeeded',1)]:
+            artifact=self.delivery();row=next(r for r in artifact['outcomes'] if r['case']=='intelligence-before-completion-process-death');row['afterRestart'][field]=value
+            with self.subTest(field=field),self.assertRaises(ValueError):gate.validate_delivery(artifact)
+
+    def sequence_interruptions(self):
+        return {'interruptionAcknowledgements':[{'matchId':'2026-R1-1','hole':hole,'nextControl':control,'mutationId':f'12345678-1234-4234-8234-{hole:012d}','clientOutcome':'LOST_ACK_AFTER_COMMIT','statusResolution':'COMMITTED','canonicalReceiptCount':1,'scoreRequestMs':2,'latencyExcludesControlAndRecovery':True,'controlCommittedBeforeRecovery':True,'scoringLocked':True,'activePermissions':0} for hole,control in [(2,'SCORING_LOCK'),(18,'FINALIZE')]]}
+
+    def test_fullsequence_exact_interrupted_acknowledgements(self):
+        self.assertEqual(gate.validate_sequence_interrupted_acknowledgements(self.sequence_interruptions())['interruptedAcknowledgements'],2)
+
+    def test_fullsequence_missing_or_precontrol_recovery_rejected(self):
+        for field,value in [('clientOutcome','ACKNOWLEDGED'),('statusResolution','UNKNOWN'),('controlCommittedBeforeRecovery',False),('activePermissions',1),('canonicalReceiptCount',2),('scoreRequestMs',None),('latencyExcludesControlAndRecovery',False)]:
+            artifact=self.sequence_interruptions();artifact['interruptionAcknowledgements'][0][field]=value
+            with self.subTest(field=field),self.assertRaises(ValueError):gate.validate_sequence_interrupted_acknowledgements(artifact)
+        artifact=self.sequence_interruptions();artifact['interruptionAcknowledgements'].pop()
+        with self.assertRaises(ValueError):gate.validate_sequence_interrupted_acknowledgements(artifact)
+
+    def test_recovery_history_growth_rejected_even_with_100_percent_success(self):
+        artifact=self.benchmark('recovery');row=artifact['scales'][-1]['branches'][0]
+        row.update(summary(1000,8,True));row['batches']=[{'valuesMs':[8]*200} for _ in range(5)]
+        with self.assertRaisesRegex(ValueError,'history growth'):gate.validate_benchmark(artifact,'recovery')
+
+    def test_unrelated_derived_relation_on_recovery_rejected(self):
+        artifact=self.benchmark('recovery');row=artifact['scales'][0]['branches'][0];row['derivedRelationsOnScorePath']=['calcutta_v1_result_revisions'];p=plan();p['derivedRelations']=row['derivedRelationsOnScorePath'];self.save(row['queryPlanArtifact'],p)
+        with self.assertRaisesRegex(ValueError,'derived relation'):gate.validate_benchmark(artifact,'recovery')
+
+    def test_missing_or_invalid_query_plan_is_not_source_proof(self):
+        artifact=self.benchmark('eligible');row=artifact['scales'][-1]['branches'][0];self.save(row['queryPlanArtifact'],{'loggedStatements':1,'shapes':[],'derivedRelations':[]})
+        with self.assertRaises(ValueError):gate.validate_benchmark(artifact,'eligible')
+
+    def test_nonfinite_plan_metrics_rejected(self):
+        p=plan();p['shapes'][0]['nodeMetricRanges']['root.Total Cost']['max']=float('nan')
+        with self.assertRaises(ValueError):gate.validate_plan(p,'test')
+
+    def test_recovery_cannot_escape_local_plan_path(self):
+        artifact=self.benchmark('recovery');artifact['scales'][0]['branches'][0]['queryPlanArtifact']='../../credentials.json'
+        with self.assertRaises(ValueError):gate.validate_benchmark(artifact,'recovery')
+
+    def test_lock_bound_order_and_tail_claim_rejected(self):
+        for field,value in [('p50Ms',10),('p99Ms',2)]:
+            artifact=self.locks();artifact['rows'][0]['lockHeldThroughRpcLowerBound'][field]=value
+            with self.assertRaises(ValueError):gate.validate_locks(artifact)
+
+    def test_worker_history_requires_separate_transaction_identity(self):
+        artifact=self.history();artifact['rows'][0]['actualAdapterFamilyTransactions'][1]['operationId']='CALCUTTA'
+        with self.assertRaises(ValueError):gate.validate_worker_history(artifact)
+
+    def test_worker_history_requires_actual_index_counterfactual_plans(self):
+        artifact=self.history();artifact['rows'][0]['plans']['candidateIndexCounterfactual'].pop('requeueWithout')
+        with self.assertRaises(ValueError):gate.validate_worker_history(artifact)
+
+    def test_backlog_requires_real_score_overlap_and_drain(self):
+        for mutation in ['overlap','drain','source','tails']:
+            artifact=self.backlog();row=artifact['scenarios'][0]
+            if mutation=='overlap':
+                for sample in row['measurements']:sample['pendingImmediatelyBeforeScore']=False
+            elif mutation=='drain':row['final']['pendingIntents']=1
+            elif mutation=='source':row['canonicalCurrent']['exactCanonicalSource']=False
+            else:row['scoreRpc']['p99Ms']=2
+            with self.subTest(mutation=mutation),self.assertRaises(ValueError):gate.validate_backlog(artifact)
+
+    def test_finite_timeout_requires_complete_rollback_and_safe_retry(self):
+        artifact=self.finite();artifact['rows'][1]['details']['partialState']=True
+        with self.assertRaises(ValueError):gate.validate_finite(artifact)
+
+    def test_post_revocation_recovery_cannot_grant_new_write_permission(self):
+        artifact=self.finite();artifact['rows'][-1]['details']['newWritePermission']=True
+        with self.assertRaises(ValueError):gate.validate_finite(artifact)
+
+    def test_backlog_tail_cannot_credit_post_idle_scores(self):
+        value=self.backlog_tail();value['profiles'][0]['qualified'][0]['pendingAutomaticBeforeScore']=False
+        with self.assertRaises(ValueError):gate.validate_backlog_tail(value)
+
+    def test_backlog_tail_rejects_insufficient_p99_sample(self):
+        value=self.backlog_tail();value['profiles'][0]['qualified']=value['profiles'][0]['qualified'][:999]
+        with self.assertRaises(ValueError):gate.validate_backlog_tail(value)
+
+    def test_backlog_tail_preserves_all_accepted_and_nonqualifying_samples(self):
+        value=self.backlog_tail();value['profiles'][0]['bursts'][0]['measurements']=[]
+        with self.assertRaises(ValueError):gate.validate_backlog_tail(value)
+
+    def test_backlog_tail_cannot_claim_complete_drain_from_old_idle(self):
+        value=self.backlog_tail();value['profiles'][0]['bursts'][0]['freshIdle']['pendingAutomatic']=1
+        with self.assertRaises(ValueError):gate.validate_backlog_tail(value)
+
+    def test_lease_expiration_proof_requires_same_source_and_living_old_worker(self):
+        artifact=self.delivery();next(v for v in artifact['outcomes'] if v['case']=='calcutta-expired-live-same-source')['oldChildAliveUntilRelease']=False
+        with self.assertRaises(ValueError):gate.validate_delivery(artifact)
+
+    def test_delivery_requires_bounded_attempts_and_current_pointer_protection(self):
+        for label in ['attempts','current']:
+            artifact=self.delivery()
+            if label=='attempts':next(r for r in artifact['outcomes'] if r['case']=='calcutta-five-attempt-budget')['attempts']=6
+            else:next(r for r in artifact['outcomes'] if r['case']=='competition-late-writer-current-pointer')['newerCurrentPointersUnchanged']=False
+            with self.subTest(label=label),self.assertRaises(ValueError):gate.validate_delivery(artifact)
+
+    def test_nonfocused_direct_assertion_change_invalidates_receipt(self):
+        receipt=self.receipt('delivery');(self.root/'test/delivery.test.mjs').write_text('// weakened assertion')
+        with self.assertRaisesRegex(ValueError,'directly executed source drift'):gate.verify_receipt('delivery',receipt)
+
+    def test_focused_direct_assertion_change_invalidates_receipt(self):
+        receipt=self.receipt('annual');(self.root/'test/annual.test.mjs').write_text('// changed exact directly executed test')
+        with self.assertRaisesRegex(ValueError,'directly executed source drift'):gate.verify_receipt('annual',receipt)
+
+    def test_transitive_fixture_change_invalidates_receipt(self):
+        receipt=self.receipt('delivery');(self.root/'test/support/reliability/deep-fixture.mjs').write_text('// changed deeper fixture')
+        with self.assertRaisesRegex(ValueError,'dependency source drift'):gate.verify_receipt('delivery',receipt)
+
+    def test_missing_dependency_hash_cannot_be_backfilled(self):
+        receipt=self.receipt('delivery')
+        for key in ['before','after']:receipt['sourceProvenance'][key]['files']=[v for v in receipt['sourceProvenance'][key]['files'] if 'deep-fixture' not in v['file']]
+        with self.assertRaisesRegex(ValueError,'incomplete dependency graph'):gate.verify_receipt('delivery',receipt)
+
+    def test_dependency_change_during_run_rejects_even_if_stable_flag_true(self):
+        receipt=self.receipt('delivery');receipt['sourceProvenance']['after']['files'][0]['sha256']='0'*64
+        with self.assertRaisesRegex(ValueError,'exact stable dependency closure'):gate.verify_receipt('delivery',receipt)
+
+    def test_unrelated_new_test_report_and_tool_do_not_invalidate_receipt(self):
+        receipt=self.receipt('delivery')
+        for file in ['test/unrelated-new.test.mjs','tools/unrelated-new.mjs','docs/unrelated.md']:
+            path=self.root/file;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('unrelated')
+        gate.verify_receipt('delivery',receipt)
+
+    def test_historical_receipt_without_provenance_is_not_backfilled(self):
+        receipt=self.receipt('delivery');receipt.pop('sourceProvenance')
+        with self.assertRaisesRegex(ValueError,'recorded dependency provenance required'):gate.verify_receipt('delivery',receipt)
+
+    def test_omitted_direct_test_does_not_match_recorded_execution_roots(self):
+        receipt=self.receipt('delivery');receipt['sources']=[v for v in receipt['sources'] if not v['file'].startswith('test/')]
+        with self.assertRaisesRegex(ValueError,'direct executed files match'):gate.verify_receipt('delivery',receipt)
+
+    def test_benchmark_tool_or_fixture_drift_invalidates_measurement(self):
+        for file in ['tools/reliability/benchmark-phase2c.mjs','test/support/reliability/deep-fixture.mjs']:
+            with self.subTest(file=file):
+                artifact=self.benchmark('common');path=self.root/file;old=path.read_text();path.write_text('// changed benchmark input')
+                with self.assertRaisesRegex(ValueError,'dependency source drift'):gate.validate_benchmark(artifact,'common')
+                path.write_text(old)
+
+    def test_lock_tool_drift_invalidates_measurement(self):
+        artifact=self.locks();(self.root/'tools/reliability/measure-phase2c-locks.mjs').write_text('// changed clock instrumentation')
+        with self.assertRaisesRegex(ValueError,'dependency source drift'):gate.validate_locks(artifact)
+
+    def test_worker_history_rejects_wrong_index_set_with_same_count(self):
+        artifact=self.history();artifact['rows'][0]['plans']['candidateIndexCounterfactual']['indexNames'][0]='removed_or_unproven_index'
+        with self.assertRaisesRegex(ValueError,'index counterfactual identity'):gate.validate_worker_history(artifact)
+
+    def test_baseline_measurement_requires_original_provenance(self):
+        self.complete();baseline=json.loads((self.docs/'benchmark-baseline-common.json').read_text());baseline.pop('sourceProvenance');self.save('benchmark-baseline-common.json',baseline)
+        self.assertEqual(gate.evaluate(self.root)['status'],'FAIL')
+
+    def test_performance_comparison_must_match_recorded_before_values(self):
+        self.complete();value=json.loads((self.docs/'performance-gate.json').read_text());value['comparisons'][0]['beforeP50Ms']=99;self.save('performance-gate.json',value)
+        self.assertEqual(gate.evaluate(self.root)['status'],'FAIL')
+
+if __name__=='__main__':unittest.main()

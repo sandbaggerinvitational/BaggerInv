@@ -1,0 +1,603 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-29T21:42:11.593790+00:00",
+  "scope": "SCOPED_LOCAL_REGRESSION_TRACEABILITY_NOT_OVERALL_CERTIFICATION",
+  "overallStatus": "PARTIAL",
+  "p0BStatus": "PARTIAL",
+  "ownerAcceptance": "NOT_PERFORMED",
+  "stagingReady": false,
+  "finalConclusion": "PHASE 2C: PARTIAL \u2014 SCORE-PATH CANDIDATE NOT READY FOR STAGING; REMAINING GATES LISTED ABOVE",
+  "historicalCatalog": "../testing/NEVER-AGAIN-CATALOG.json",
+  "historicalCatalogSha256": "df71dcf4e6a7779457711be5f5f2fe7c4d694465273496274555e58d1f71aa04",
+  "verificationToolSha256": "a50fa40982a2f742c73ae5795bfeb6720523bd61cf63c2bb82debbcaa66fd698",
+  "candidateMigrations": {
+    "supabase/production_migrations/202609280121_score_derived_intents_v1.sql": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+    "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48",
+    "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce",
+    "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+  },
+  "tests": [
+    {
+      "id": "NA-P2C-WORKER-EXPIRY-FAILURE-LOCK",
+      "requirement": "P2C-B",
+      "incidents": [],
+      "incidentRelationship": "NONE",
+      "discoveredIssues": [
+        "P2C-NEW-WORKER-EXPIRY-CONTROL-LOCK",
+        "P2C-NEW-INTELLIGENCE-FAIL-CONTROL-LOCK",
+        "P2C-NEW-ANNUAL-COMPETITION-EXPIRY-LOCK",
+        "P2C-NEW-ANNUAL-INTELLIGENCE-PREFIX-LOCK"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "behavior": "Actual expiry, bundle-failure and annual-claim reciprocal control cycles are replaced by the inherited ordered prefix; SKIP LOCKED counterevidence is preserved.",
+      "source": "test/reliability-phase2c-worker-failure-lock-order.test.mjs",
+      "evidence": "evidence/worker-failure-lock-order.json",
+      "evidenceSha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18",
+      "executionReceipt": "evidence/worker-failure-lock-order.json",
+      "executionReceiptSha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T21:05:29.612Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION",
+        "CONCURRENCY",
+        "FAILURE_INJECTION"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof.",
+        "Future control-trigger mechanism cases retain an outer runtime seam. Five marker rows is supported-writer scope, not a schema-wide cardinality constraint."
+      ]
+    },
+    {
+      "id": "NA-P2C-DELIVERY-INDEXES",
+      "requirement": "P2C-B",
+      "incidents": [],
+      "incidentRelationship": "NONE",
+      "discoveredIssues": [],
+      "basis": "ARCHITECTURE_DERIVED",
+      "behavior": "Exact installed queue selectors and current terminal backlog exercise default plans and rolled-back optional-index counterfactuals.",
+      "source": "test/reliability-phase2c-delivery-index-review.test.mjs",
+      "evidence": "evidence/delivery-index-review.json",
+      "evidenceSha256": "dd8383437d05d2102b8c79ca9e2ba9758b1be0a57aecb200877f0742fa7d965f",
+      "executionReceipt": "evidence/delivery-index-review.json",
+      "executionReceiptSha256": "dd8383437d05d2102b8c79ca9e2ba9758b1be0a57aecb200877f0742fa7d965f",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T21:09:18.330Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION",
+        "PERFORMANCE"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof.",
+        "Default-plan counterfactuals are local single-execution evidence; no hosted DDL/write-amplification claim. The audit-work index supports a proposed privileged forensic lookup, not a shipped RPC."
+      ]
+    },
+    {
+      "id": "NA-P2C-CAL-CURRENT-JOB",
+      "requirement": "P2C-B",
+      "incidents": [],
+      "incidentRelationship": "NONE",
+      "discoveredIssues": [
+        "P2C-NEW-CALCUTTA-CURRENT-JOB-LOCK"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "behavior": "Actual claim/complete/fail reciprocal Finalize graph becomes one-way current-before-job; stale completion denied.",
+      "source": "test/reliability-phase2c-calcutta-lock-order.test.mjs",
+      "evidence": "evidence/calcutta-lock-order.json",
+      "evidenceSha256": "990cb30fa365d8e43742fdaa60f3775c8ac1d27fc995a6d74e70792444f33831",
+      "executionReceipt": "evidence/calcutta-lock-order.json",
+      "executionReceiptSha256": "990cb30fa365d8e43742fdaa60f3775c8ac1d27fc995a6d74e70792444f33831",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T21:04:30.223Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "RPC",
+        "CONCURRENCY"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof."
+      ]
+    },
+    {
+      "id": "NA-P2C-NET-OWNER-CONTROL",
+      "requirement": "P2C-B/D",
+      "incidents": [],
+      "incidentRelationship": "NONE",
+      "discoveredIssues": [
+        "P2C-NEW-NETSKINS-OWNER-CONTROL-LOCK"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "behavior": "Actual owner completion versus Lock/Finalize graph, present/absent marker, unchanged financial parity and failed-write rollback.",
+      "source": "test/reliability-phase2c-net-owner-lock-order.test.mjs",
+      "evidence": "evidence/net-owner-lock-order.json",
+      "evidenceSha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf",
+      "executionReceipt": "evidence/net-owner-lock-order.json",
+      "executionReceiptSha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T21:05:05.993Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "RPC",
+        "CONCURRENCY",
+        "FAILURE_INJECTION"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof.",
+        "Future owner-completion mechanism cases retain an explicitly stated outer runtime seam; protected annual admission is separate."
+      ]
+    },
+    {
+      "id": "NA-P2C-BACKLOG-TAIL",
+      "requirement": "P2C-B",
+      "incidents": [],
+      "incidentRelationship": "NONE",
+      "discoveredIssues": [],
+      "basis": "ARCHITECTURE_DERIVED",
+      "behavior": "Repeated ordinary-score bursts with pending automatic demand; empirical tails and lock bounds in each profile.",
+      "source": "test/reliability-phase2c-backlog-tail.integration.test.mjs",
+      "evidence": "evidence/backlog-tail.json",
+      "evidenceSha256": "d88b45611824dead8efb6046d42a696e153f7070f96383c8eb67524b4c175ba2",
+      "executionReceipt": "evidence/backlog-tail.json",
+      "executionReceiptSha256": "d88b45611824dead8efb6046d42a696e153f7070f96383c8eb67524b4c175ba2",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T21:17:09.996Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION",
+        "CONCURRENCY",
+        "PERFORMANCE"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof."
+      ]
+    },
+    {
+      "id": "NA-P2C-BACKLOG",
+      "requirement": "P2C-B",
+      "incidents": [],
+      "incidentRelationship": "NONE",
+      "discoveredIssues": [],
+      "basis": "ARCHITECTURE_DERIVED",
+      "behavior": "Existing backlog drains autonomously while six matches keep scoring; final current result checked.",
+      "source": "test/reliability-phase2c-backlog-pressure.integration.test.mjs",
+      "evidence": "evidence/backlog-pressure.json",
+      "evidenceSha256": "3535067952bedac3f5e9d5d16fb020c566efa87f27173f9bef4603e4ea4105af",
+      "executionReceipt": "evidence/backlog-pressure.json",
+      "executionReceiptSha256": "3535067952bedac3f5e9d5d16fb020c566efa87f27173f9bef4603e4ea4105af",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T21:12:29.770Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION",
+        "CONCURRENCY",
+        "PERFORMANCE"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof."
+      ]
+    },
+    {
+      "id": "NA-P2C-RECOVERY",
+      "requirement": "P2C-A",
+      "incidents": [
+        "2026-INC-018",
+        "2026-INC-020"
+      ],
+      "incidentRelationship": "RELATED_FAILURE_PATTERN_NOT_INCIDENT_CLOSURE",
+      "discoveredIssues": [],
+      "basis": "PHASE2B_PROOF_GAP",
+      "behavior": "New owned committed receipt remains recoverable after actual Lock/Finalize; new write denied.",
+      "source": "test/reliability-phase2c-recovery.integration.test.mjs",
+      "evidence": "evidence/recovery.json",
+      "evidenceSha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+      "executionReceipt": "evidence/recovery.json",
+      "executionReceiptSha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T21:01:49.939Z",
+      "proofLayers": [
+        "UNIT",
+        "POSTGRESQL",
+        "API",
+        "INTEGRATION",
+        "FAILURE_INJECTION"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof.",
+        "Incidents 018/020 are related recovery patterns, not proof of whole-round Open reconciliation or physical scorecard workflow. API proof uses local injected provider boundaries; no hosted authentication or shipping-client adoption claim."
+      ]
+    },
+    {
+      "id": "NA-P2C-LEGACY-UPGRADE",
+      "requirement": "P2C-A",
+      "incidents": [],
+      "incidentRelationship": "NONE",
+      "discoveredIssues": [],
+      "basis": "PHASE2B_PROOF_GAP",
+      "behavior": "Actual121 accepted receipt preserves original bytes and UNKNOWN ownership after122\u2013124 upgrade.",
+      "source": "test/reliability-phase2c-recovery-upgrade.integration.test.mjs",
+      "evidence": "evidence/recovery-upgrade-proof.json",
+      "evidenceSha256": "0738b21029b1f1ca7702583a23fa3cfdf9d7cf349cc11963da8bd40be8826314",
+      "executionReceipt": "evidence/recovery.json",
+      "executionReceiptSha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T21:01:49.939Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof.",
+        "Explicit synthetic runtime seams; genuine121 committed receipt before122\u2013124. The enclosing execution receipt is recovery.json, not a separate upgrade wrapper."
+      ]
+    },
+    {
+      "id": "NA-P2C-DELIVERY",
+      "requirement": "P2C-B",
+      "incidents": [
+        "2026-INC-011",
+        "2026-INC-019"
+      ],
+      "incidentRelationship": "RELATED_FAILURE_PATTERN_NOT_INCIDENT_CLOSURE",
+      "discoveredIssues": [
+        "P2C-NEW-INTEL-SOURCE-RACE",
+        "P2C-NEW-INTEL-DEMAND-METADATA",
+        "P2C-NEW-WORKER-TRANSPORT"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "behavior": "Separate worker finds committed intents, retries with persisted limits, rejects stale work and converges.",
+      "source": "test/reliability-phase2c-worker.test.mjs",
+      "evidence": "evidence/delivery.json",
+      "evidenceSha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+      "executionReceipt": "evidence/delivery.json",
+      "executionReceiptSha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T21:04:00.957Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION",
+        "CONCURRENCY",
+        "FAILURE_INJECTION"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof.",
+        "Automatic families and materialization only as stated by actual cases. Net Skins financial processing remains owner-invoked. Google reporting-outbox and scorecard archive delivery are not covered or marked complete. Automatic families are explicitly Calcutta, Competition and Intelligence."
+      ]
+    },
+    {
+      "id": "NA-P2C-ANNUAL-SQL",
+      "requirement": "P2C-C",
+      "incidents": [
+        "2026-INC-010",
+        "2026-INC-012"
+      ],
+      "incidentRelationship": "RELATED_FAILURE_PATTERN_NOT_INCIDENT_CLOSURE",
+      "discoveredIssues": [
+        "P2C-NEW-ANNUAL-42702"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "behavior": "Execute the 14 actual SQL functions containing invalid special-expression qualification; preserve grants/authority and invoke the applicable corrected branches.",
+      "source": "test/reliability-phase2c-annual-workers.integration.test.mjs",
+      "evidence": "evidence/annual.json",
+      "evidenceSha256": "d54a12f7b8fe717791c8fd60a10f21ef01eb70765c99f2b9b4bc3f3c29db1c7e",
+      "executionReceipt": "evidence/annual.json",
+      "executionReceiptSha256": "d54a12f7b8fe717791c8fd60a10f21ef01eb70765c99f2b9b4bc3f3c29db1c7e",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T20:17:06.233Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "RPC",
+        "INTEGRATION",
+        "FAILURE_INJECTION"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof.",
+        "Explicit per-function fixture seams are retained in the branch matrix. Corrected SQL function execution is distinct from fully protected annual admission."
+      ]
+    },
+    {
+      "id": "NA-P2C-NETSKINS-LOCK",
+      "requirement": "P2C-D",
+      "incidents": [],
+      "incidentRelationship": "NONE",
+      "discoveredIssues": [],
+      "basis": "ARCHITECTURE_DERIVED",
+      "behavior": "Reproduce opposite-round40P01; ordered prefix prevents cycle; concurrent financial output equals serial.",
+      "source": "test/reliability-phase2c-net-skins-deadlock.integration.test.mjs",
+      "evidence": "evidence/deadlock.json",
+      "evidenceSha256": "5f89462b6e315e93399281b3afe8d06800d0d91866db4babf8688424a9f91334",
+      "executionReceipt": "evidence/deadlock.json",
+      "executionReceiptSha256": "5f89462b6e315e93399281b3afe8d06800d0d91866db4babf8688424a9f91334",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T20:18:28.644Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "RPC",
+        "CONCURRENCY"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof."
+      ]
+    },
+    {
+      "id": "NA-P2C-WORKER-CONTROL-LOCK",
+      "requirement": "P2C-B",
+      "incidents": [],
+      "incidentRelationship": "NONE",
+      "discoveredIssues": [
+        "P2C-NEW-CROSS-FAMILY-LOCK"
+      ],
+      "basis": "ARCHITECTURE_DERIVED",
+      "behavior": "Retain old worker/control and Intelligence-row reciprocal graphs; separate family transactions avoid inversion.",
+      "source": "test/reliability-phase2c-worker-lock-order.test.mjs",
+      "evidence": "evidence/worker-lock-order.json",
+      "evidenceSha256": "6a37b73ca48808e45e854a2c3db786e20c6fc669da3ecbbcad48ba5fc6b1fbf8",
+      "executionReceipt": "evidence/worker-lock-order.json",
+      "executionReceiptSha256": "6a37b73ca48808e45e854a2c3db786e20c6fc669da3ecbbcad48ba5fc6b1fbf8",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T21:04:13.007Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "RPC",
+        "CONCURRENCY",
+        "FAILURE_INJECTION"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof."
+      ]
+    },
+    {
+      "id": "NA-P2C-FINITE-TIMEOUT",
+      "requirement": "P2C-E",
+      "incidents": [
+        "2026-INC-019"
+      ],
+      "incidentRelationship": "RELATED_FAILURE_PATTERN_NOT_INCIDENT_CLOSURE",
+      "discoveredIssues": [],
+      "basis": "INCIDENT_DERIVED",
+      "behavior": "One-second score/recovery with25ms intentional cancellation preserves atomicity and conservative outcome.",
+      "source": "test/reliability-phase2c-finite-timeout.integration.test.mjs",
+      "evidence": "evidence/finite.json",
+      "evidenceSha256": "b7fc65ac9cf97774189307499eb478b32ae3e6420fe31943342af1f8bc6e320c",
+      "executionReceipt": "evidence/finite.json",
+      "executionReceiptSha256": "b7fc65ac9cf97774189307499eb478b32ae3e6420fe31943342af1f8bc6e320c",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T21:12:15.385Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION",
+        "FAILURE_INJECTION"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof."
+      ]
+    },
+    {
+      "id": "NA-P2C-ANNUAL-ADMISSION",
+      "requirement": "P2C-F",
+      "incidents": [
+        "2026-INC-013"
+      ],
+      "incidentRelationship": "RELATED_FAILURE_PATTERN_NOT_INCIDENT_CLOSURE",
+      "discoveredIssues": [
+        "P2C-NEW-ANNUAL-MANIFEST-102",
+        "P2C-NEW-WRITER-CONSTRAINT"
+      ],
+      "basis": "INCIDENT_DERIVED",
+      "behavior": "Protected2099 actual release/activation and current runtime guards; no fixture guard replacement.",
+      "source": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+      "evidence": "evidence/annual-admission-run.json",
+      "evidenceSha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d",
+      "executionReceipt": "evidence/annual-admission-run.json",
+      "executionReceiptSha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T20:17:26.463Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "RPC",
+        "INTEGRATION",
+        "PERFORMANCE"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof.",
+        "Actual protected2099 admission and scoped retained-history operations; not full future-year provisioning or full tournament lifecycle. Incident013 is a related release-authority pattern, not whole-round Open certification."
+      ]
+    },
+    {
+      "id": "NA-P2C-SEQUENCE",
+      "requirement": "P2C-F",
+      "incidents": [],
+      "incidentRelationship": "NONE",
+      "discoveredIssues": [],
+      "basis": "ARCHITECTURE_DERIVED",
+      "behavior": "432 canonical holes and 24 Final results, owner controls, worker interruption, current derived fingerprints, and discarded acknowledgements recovered after supported Lock and Finalize. Score latency excludes subsequent control/recovery.",
+      "source": "test/reliability-phase2c-full-sequence.integration.test.mjs",
+      "evidence": "evidence/full-sequence.json",
+      "evidenceSha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+      "executionReceipt": "evidence/full-sequence.json",
+      "executionReceiptSha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T21:12:09.988Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "RPC",
+        "INTEGRATION",
+        "CONCURRENCY",
+        "FAILURE_INJECTION"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Exact artifact fixture/layer only; no Production or physical proof.",
+        "A historical incident is not resolved merely by local regression proof.",
+        "Initial prepared/live authority is synthetic; this is432-hole score/control/delivery composition, not full tournament Prepare/Open/provisioning or physical-device proof."
+      ]
+    },
+    {
+      "id": "NA-P2C-CLIENT-COMPATIBILITY",
+      "requirement": "P2C-F",
+      "incidents": [],
+      "incidentRelationship": "NONE",
+      "discoveredIssues": [],
+      "basis": "OPERATIONS_DERIVED",
+      "behavior": "Actual unchanged PWA adapter, current mobile DTOs and24retained Swift decoder checks with supported control/recovery; no physical proof.",
+      "source": "test/reliability-phase2c-recovery.integration.test.mjs",
+      "evidence": "evidence/recovery.json",
+      "evidenceSha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+      "executionReceipt": "evidence/recovery.json",
+      "executionReceiptSha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+      "sourceProvenanceContract": "phase2c-source-provenance-v1",
+      "sourceProvenanceResult": "PASS",
+      "executionCompletedAt": "2026-09-29T21:01:49.939Z",
+      "proofLayers": [
+        "POSTGRESQL",
+        "API",
+        "INTEGRATION"
+      ],
+      "recordedResult": "PASS",
+      "status": "PASS_SCOPED_LOCAL_CURRENT_SOURCE",
+      "currentEvidenceCheck": "tools/reliability/phase2c-certification-gate.py:verify_receipt + exact scoped detail assertions",
+      "releaseBlocking": true,
+      "limitations": [
+        "Injected local Auth/SQL transport; no hosted or browser proof.",
+        "Retained Build10 lineage STRONGLY SUPPORTED; decoder executes on macOS underUTC, not an iPhone.",
+        "Current shipping clients do not automatically consume recovery."
+      ],
+      "additionalEvidence": [
+        {
+          "artifact": "evidence/native-decoder-proof.json",
+          "sha256": "4e40036d52a4f04f944011b359eb47a847a532f2cc19b1c65ac04bd6084a6107"
+        }
+      ]
+    }
+  ],
+  "retainedExpectedRed": [
+    {
+      "id": "NA-2026-006",
+      "status": "EXPECTED_RED",
+      "reason": "Native SQLite timestamp reconciliation unchanged"
+    },
+    {
+      "id": "NA-2026-007",
+      "status": "EXPECTED_RED",
+      "reason": "Native feature failure/navigation coupling unchanged"
+    }
+  ],
+  "plannedBlockingTests": [
+    {
+      "id": "NA-P2C-GOOGLE-EXPORT-DELIVERY",
+      "requirement": "P2C-B",
+      "status": "NOT_IMPLEMENTED_NOT_PROVEN",
+      "source": null,
+      "releaseBlocking": true,
+      "issue": "P2C-NEW-GOOGLE-DELIVERY",
+      "acceptance": "Actual SQL, autonomous fake-sink mirror/archive lifecycle with finite terminal/requeue and financial isolation"
+    },
+    {
+      "id": "NA-P2C-SCORECARD-ARCHIVE-DELIVERY",
+      "requirement": "P2C-B",
+      "status": "NOT_IMPLEMENTED_NOT_PROVEN",
+      "source": null,
+      "releaseBlocking": true,
+      "acceptance": "Explicit admitted archive contract; autonomous actual-SQL/local-sink delivery, restart/unknown checkpoint, bounded retry/terminal/requeue and stale/generation/release isolation"
+    }
+  ],
+  "outsideCoverage": [
+    "Google reporting-outbox delivery",
+    "Finalize scorecard archive autonomous delivery",
+    "Hosted/provider capacity",
+    "Shipping native behavior",
+    "Full tournament certification"
+  ],
+  "scopeReviewArtifact": {
+    "path": "evidence/google-outbox-scope-review.json",
+    "sha256": "874cc5228610157cd138bed16b4634e2d508ed8716d86bc8594d270fa4ec2a44"
+  }
+}

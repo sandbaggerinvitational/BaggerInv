@@ -1,0 +1,41 @@
+{
+  "issue": "P2C-NEW-CALCUTTA-CURRENT-JOB-LOCK",
+  "result": "PASS",
+  "production": false,
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "counts": {
+    "tests": 10,
+    "pass": 10,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "sources": [
+    {
+      "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "c3bf7090d8ebc20c2039f60848176f6a6e6ef88db846477e575a702affb13fb3"
+    },
+    {
+      "path": "test/reliability-phase2c-calcutta-lock-order.test.mjs",
+      "sha256": "10fe12c4624d4a41431130681cc0f7e7c95179c032711f4912c7a31c58517dd3"
+    },
+    {
+      "path": "lib/score-derived-worker.js",
+      "sha256": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d"
+    },
+    {
+      "path": "lib/score-derived-delivery.js",
+      "sha256": "cb18835d2bb540572d6460dc4313b678266560e8f6a56b56376b1ee783a321bd"
+    }
+  ],
+  "sourceCapture": "POST_RUN_HASH; this direct diagnostic run is not the full root wrapper snapshot",
+  "scoreTimeoutMs": 1000,
+  "workerTimeoutMs": 5000,
+  "clusterDestroyed": true,
+  "limitations": [
+    "Synthetic financial configuration/runtime boundaries; actual canonical score and Finalize RPCs",
+    "Deterministic before source loaded only into per-case owned database clones",
+    "Future functions compile, retain ACL/configuration and are manifest-bound; reciprocal graph schedules exercise2026",
+    "No hosted deployment, financial publication, or universal deadlock-freedom claim"
+  ]
+}

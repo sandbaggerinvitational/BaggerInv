@@ -1,0 +1,405 @@
+{
+  "issue": "P2C-NEW-CALCUTTA-CURRENT-JOB-LOCK",
+  "proof": "ACTUAL_RPC_RECIPROCAL_LOCK_GRAPH",
+  "production": false,
+  "tests": [
+    {
+      "operation": "claim",
+      "order": "before",
+      "expectedCounterexample": true,
+      "oneWay": [
+        {
+          "pid": 10141,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124101);",
+          "blockedBy": []
+        },
+        {
+          "pid": 10142,
+          "wait": "advisory",
+          "query": "select public.claim_production_calcutta_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":",
+          "blockedBy": [
+            10141
+          ]
+        },
+        {
+          "pid": 10143,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllyn",
+          "blockedBy": [
+            10142
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 10141,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 10142,
+          "wait": "transactionid",
+          "query": "select public.claim_production_calcutta_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":",
+          "blockedBy": [
+            10143
+          ]
+        },
+        {
+          "pid": 10143,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllyn",
+          "blockedBy": [
+            10142
+          ]
+        }
+      ],
+      "finalize": {
+        "ok": false,
+        "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (88,13) in relation \"calcutta_v1_recalculation_jobs\"\nSQL statement \"update scoring_authority.calcutta_v1_recalculation_jobs\n  set status = 'SUPERSEDED', claimed_by = null, claim_token = null,\n      lease_expires_at = null, completed_at = pg_catalog.now(),\n      updated_at = pg_catalog.now()\n  where tournament_id = '2026' and status in ('PENDING', 'RUNNING')\"\nPL/pgSQL function enqueue_production_calcutta_v1(text,text,boolean,text,text) line 86 at SQL statement\nSQL statement \"SELECT production_control.enqueue_production_calcutta_v1(\n      case\n        when tg_table_name = 'hole_scores' then 'CANONICAL_SCORE_CHANGED'\n        when tg_table_name = 'rounds'\n          then 'CANONICAL_ROUND_LIFECYCLE_CHANGED'\n        else 'CANONICAL_MATCH_LIFECYCLE_CHANGED'\n      end,\n      'production-calcutta-v1-trigger', false, null, null\n    )\"\nPL/pgSQL function scoring_authority.enqueue_production_calcutta_v1_change() line 71 at PERFORM\nSQL statement \"update scoring_authority.matches set\n    status = 'FINAL', scoring_locked = true, match_revision = next_revision,\n    permission_revision = next_permission_revision, finalized_at = transition_at,\n    authority_updated_at = transition_at, updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function public.finalize_production_match(jsonb) line 77 at SQL statement\n"
+      },
+      "workerSucceededAfterRollback": true
+    },
+    {
+      "operation": "claim",
+      "order": "after",
+      "oneWay": [
+        {
+          "pid": 10184,
+          "wait": "advisory",
+          "query": "select public.claim_production_calcutta_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":",
+          "blockedBy": [
+            10186
+          ]
+        },
+        {
+          "pid": 10185,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllyn",
+          "blockedBy": [
+            10184
+          ]
+        },
+        {
+          "pid": 10186,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124101);",
+          "blockedBy": []
+        }
+      ],
+      "worker": true,
+      "finalize": true,
+      "scoreTimeoutMs": 1000,
+      "workerTimeoutMs": 5000
+    },
+    {
+      "operation": "complete",
+      "order": "before",
+      "expectedCounterexample": true,
+      "oneWay": [
+        {
+          "pid": 10218,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124101);",
+          "blockedBy": []
+        },
+        {
+          "pid": 10219,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllyn",
+          "blockedBy": [
+            10220
+          ]
+        },
+        {
+          "pid": 10220,
+          "wait": "advisory",
+          "query": "select public.complete_production_calcutta_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_re",
+          "blockedBy": [
+            10218
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 10218,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 10219,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllyn",
+          "blockedBy": [
+            10220
+          ]
+        },
+        {
+          "pid": 10220,
+          "wait": "transactionid",
+          "query": "select public.complete_production_calcutta_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_re",
+          "blockedBy": [
+            10219
+          ]
+        }
+      ],
+      "finalize": {
+        "ok": false,
+        "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (88,14) in relation \"calcutta_v1_recalculation_jobs\"\nSQL statement \"update scoring_authority.calcutta_v1_recalculation_jobs\n  set status = 'SUPERSEDED', claimed_by = null, claim_token = null,\n      lease_expires_at = null, completed_at = pg_catalog.now(),\n      updated_at = pg_catalog.now()\n  where tournament_id = '2026' and status in ('PENDING', 'RUNNING')\"\nPL/pgSQL function enqueue_production_calcutta_v1(text,text,boolean,text,text) line 86 at SQL statement\nSQL statement \"SELECT production_control.enqueue_production_calcutta_v1(\n      case\n        when tg_table_name = 'hole_scores' then 'CANONICAL_SCORE_CHANGED'\n        when tg_table_name = 'rounds'\n          then 'CANONICAL_ROUND_LIFECYCLE_CHANGED'\n        else 'CANONICAL_MATCH_LIFECYCLE_CHANGED'\n      end,\n      'production-calcutta-v1-trigger', false, null, null\n    )\"\nPL/pgSQL function scoring_authority.enqueue_production_calcutta_v1_change() line 71 at PERFORM\nSQL statement \"update scoring_authority.matches set\n    status = 'FINAL', scoring_locked = true, match_revision = next_revision,\n    permission_revision = next_permission_revision, finalized_at = transition_at,\n    authority_updated_at = transition_at, updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function public.finalize_production_match(jsonb) line 77 at SQL statement\n"
+      },
+      "workerSucceededAfterRollback": true
+    },
+    {
+      "operation": "complete",
+      "order": "after",
+      "oneWay": [
+        {
+          "pid": 10258,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124101);",
+          "blockedBy": []
+        },
+        {
+          "pid": 10259,
+          "wait": "advisory",
+          "query": "select public.complete_production_calcutta_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_re",
+          "blockedBy": [
+            10258
+          ]
+        },
+        {
+          "pid": 10260,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllyn",
+          "blockedBy": [
+            10259
+          ]
+        }
+      ],
+      "worker": true,
+      "finalize": true,
+      "scoreTimeoutMs": 1000,
+      "workerTimeoutMs": 5000
+    },
+    {
+      "operation": "fail",
+      "order": "before",
+      "expectedCounterexample": true,
+      "oneWay": [
+        {
+          "pid": 10289,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllyn",
+          "blockedBy": [
+            10287
+          ]
+        },
+        {
+          "pid": 10287,
+          "wait": "advisory",
+          "query": "select public.fail_production_calcutta_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"",
+          "blockedBy": [
+            10288
+          ]
+        },
+        {
+          "pid": 10288,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124101);",
+          "blockedBy": []
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 10289,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllyn",
+          "blockedBy": [
+            10287
+          ]
+        },
+        {
+          "pid": 10287,
+          "wait": "transactionid",
+          "query": "select public.fail_production_calcutta_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"",
+          "blockedBy": [
+            10289
+          ]
+        },
+        {
+          "pid": 10288,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        }
+      ],
+      "finalize": {
+        "ok": false,
+        "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (88,14) in relation \"calcutta_v1_recalculation_jobs\"\nSQL statement \"update scoring_authority.calcutta_v1_recalculation_jobs\n  set status = 'SUPERSEDED', claimed_by = null, claim_token = null,\n      lease_expires_at = null, completed_at = pg_catalog.now(),\n      updated_at = pg_catalog.now()\n  where tournament_id = '2026' and status in ('PENDING', 'RUNNING')\"\nPL/pgSQL function enqueue_production_calcutta_v1(text,text,boolean,text,text) line 86 at SQL statement\nSQL statement \"SELECT production_control.enqueue_production_calcutta_v1(\n      case\n        when tg_table_name = 'hole_scores' then 'CANONICAL_SCORE_CHANGED'\n        when tg_table_name = 'rounds'\n          then 'CANONICAL_ROUND_LIFECYCLE_CHANGED'\n        else 'CANONICAL_MATCH_LIFECYCLE_CHANGED'\n      end,\n      'production-calcutta-v1-trigger', false, null, null\n    )\"\nPL/pgSQL function scoring_authority.enqueue_production_calcutta_v1_change() line 71 at PERFORM\nSQL statement \"update scoring_authority.matches set\n    status = 'FINAL', scoring_locked = true, match_revision = next_revision,\n    permission_revision = next_permission_revision, finalized_at = transition_at,\n    authority_updated_at = transition_at, updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function public.finalize_production_match(jsonb) line 77 at SQL statement\n"
+      },
+      "workerSucceededAfterRollback": true
+    },
+    {
+      "operation": "fail",
+      "order": "after",
+      "oneWay": [
+        {
+          "pid": 10326,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllyn",
+          "blockedBy": [
+            10325
+          ]
+        },
+        {
+          "pid": 10324,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124101);",
+          "blockedBy": []
+        },
+        {
+          "pid": 10325,
+          "wait": "advisory",
+          "query": "select public.fail_production_calcutta_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"",
+          "blockedBy": [
+            10324
+          ]
+        }
+      ],
+      "worker": true,
+      "finalize": true,
+      "scoreTimeoutMs": 1000,
+      "workerTimeoutMs": 5000
+    },
+    {
+      "case": "held-intent-claim",
+      "pass": true,
+      "held": [
+        {
+          "pid": 10384,
+          "wait": "advisory",
+          "query": "select production_control.flush_score_derived_intents_v1('2026','CALCUTTA',8);",
+          "blockedBy": [
+            10385
+          ]
+        },
+        {
+          "pid": 10385,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124102);",
+          "blockedBy": []
+        },
+        {
+          "pid": 10383,
+          "wait": "ClientRead",
+          "query": "set statement_timeout='5s';",
+          "blockedBy": []
+        }
+      ],
+      "claimCommittedBeforeMaterializerReleased": true,
+      "currentSourceReplacement": true
+    },
+    {
+      "case": "stale-lease-after-finalize",
+      "pass": true,
+      "denial": "42501 PRODUCTION_CALCUTTA_JOB_LEASE_REQUIRED",
+      "replacementAndResultAndAuditUnchanged": true
+    }
+  ],
+  "installed": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "workerSources": [
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "hash": "a2442635c55d2df893a270785b8139e3b35dbef30f9563e4a817641189e3036a",
+      "definer": true,
+      "signature": "claim_production_calcutta_v1_recalculation(jsonb)",
+      "configuration": [
+        "search_path=pg_catalog, production_control, scoring_authority"
+      ]
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "hash": "37c634815bb67fac29c9ea027aeab18bfd54562157a2f5a86ae021281ee7aee2",
+      "definer": true,
+      "signature": "complete_production_calcutta_v1_recalculation(jsonb)",
+      "configuration": [
+        "search_path=pg_catalog, production_control, scoring_authority"
+      ]
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "hash": "e3b25e64f1eb3eefc5e000f72cf2844befcce42a90aba2cdc18bcbac7076a9d9",
+      "definer": true,
+      "signature": "fail_production_calcutta_v1_recalculation(jsonb)",
+      "configuration": [
+        "search_path=pg_catalog, production_control, scoring_authority"
+      ]
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "hash": "88830b40d3ee60dfd187c28657ba397768efd3b89dae802f8ef4ea75cfd94122",
+      "definer": true,
+      "signature": "future_production_claim_calcutta_recalculation_v1(jsonb)",
+      "configuration": [
+        "search_path=pg_catalog"
+      ]
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "hash": "ef9567807c28fbda3999e675f9e0ce3e6dc4efb178bae4404f316640df034978",
+      "definer": true,
+      "signature": "future_production_complete_calcutta_recalculation_v1(jsonb)",
+      "configuration": [
+        "search_path=pg_catalog"
+      ]
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "hash": "2fc9f1817718fdf867c7ebfa12c9f938cc61978db02c9038b5dd22a45f6f8589",
+      "definer": true,
+      "signature": "future_production_fail_calcutta_recalculation_v1(jsonb)",
+      "configuration": [
+        "search_path=pg_catalog"
+      ]
+    }
+  ]
+}

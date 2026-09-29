@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "suite": "foundation",
+  "startedAt": "2026-09-28T15:22:07.486Z",
+  "completedAt": "2026-09-28T15:22:13.988Z",
+  "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "remoteNetwork": "DENIED_AT_NET_TLS_SOCKET",
+  "credentials": "REMOVED_FROM_CHILD_ENV",
+  "production": false,
+  "sources": [
+    {
+      "file": "test/reliability-preservation.test.mjs",
+      "sha256": "5a162a2d5b95f07458a0eb5ea408c40dc67dd0da536d7d7c144c905eff00bc9c"
+    },
+    {
+      "file": "test/reliability-observability.test.mjs",
+      "sha256": "649d7fba7bbba72e47ec5929035ef33bae1f4626cc351e00d98859821545b023"
+    },
+    {
+      "file": "test/reliability-observability-review.test.mjs",
+      "sha256": "c3fd218370bc3f8ae05f803607b3200520b87137aeb7b4fb7fa7322ad9fe3638"
+    },
+    {
+      "file": "test/reliability-observability-api.test.mjs",
+      "sha256": "b64742c4df33dfe089aebd78a70fdcf2bb087cfadd1a49134ec628b4f759fa9f"
+    },
+    {
+      "file": "test/reliability-telemetry-protected-equivalence.test.mjs",
+      "sha256": "bff525130a7f501d3d3e2ffd555ecd0027e79242dda5cbc7d15acf1a9fd1917d"
+    },
+    {
+      "file": "test/reliability-diagnostic-policy.test.mjs",
+      "sha256": "0f49c1da4babf75f22706ef33d993cc6039187949cc03da5005febe2f466d713"
+    },
+    {
+      "file": "test/reliability-diagnostic-cli.test.mjs",
+      "sha256": "c2e2dec007a5e701545a14e714f6d176f0b8c4c16cba5b75ab9af95c44934627"
+    },
+    {
+      "file": "test/reliability-diagnostic-adapter.test.mjs",
+      "sha256": "15672d809155ab75696cec0c6a353c3f02d6f572c4eacf2aac2f71ac72025aa6"
+    },
+    {
+      "file": "test/reliability-native.test.mjs",
+      "sha256": "a2b90e79d64394c824e0760e415ac96bb0cc04128a64abbe61316290dbe7831e"
+    },
+    {
+      "file": "test/reliability-readback.test.mjs",
+      "sha256": "3f28090ce90c1d253a277421e984fec6c53afc9a17b8b0210bd89122f35dfdb8"
+    },
+    {
+      "file": "test/reliability-benchmark-harness.test.mjs",
+      "sha256": "64220934ca8ddf0d995d2237fd08988d44c51bb8f259d66d6f8e531ea52c00d7"
+    },
+    {
+      "file": "test/reliability-benchmark-safety.test.mjs",
+      "sha256": "772ad669c583585aff5e8a5d56b21e206e4d345b55f03dbb511d432ba3a86e79"
+    },
+    {
+      "file": "test/reliability-benchmark-results.test.mjs",
+      "sha256": "7b1eb23b6ff4863cfb9b4be93aea61f50c786842d116bf1ae0c68891b92ff2a0"
+    },
+    {
+      "file": "test/reliability-query-plan-evidence.test.mjs",
+      "sha256": "9cc1059042bb9c241660e33d2cdb576abd4edece92edce69ce48191d0052f1c4"
+    },
+    {
+      "file": "test/reliability-phase2-performance-gate.test.mjs",
+      "sha256": "3e6c110d08bb4323f8e834e568cc1348fe6ab202574a6a9ecc02c6c9e200d481"
+    },
+    {
+      "file": "test/reliability-phase2-application-comparison.test.mjs",
+      "sha256": "b25bd3cd3bae78881017b9e8d14305fe4cced5ff4f13ba3de114a1cfa67bdbb8"
+    },
+    {
+      "file": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+      "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+    },
+    {
+      "file": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+    },
+    {
+      "file": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "sha256": "cb9f35a414a816305871043b570fb669854e2c41485bcadfe0703ab3592697aa"
+    },
+    {
+      "file": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "0d381b25f971b38d9076115f825af5db7c97e8762951ddb42c1dd42d31a44853"
+    }
+  ],
+  "counts": {
+    "tests": 96,
+    "pass": 94,
+    "fail": 0,
+    "skipped": 2,
+    "cancelled": 0
+  },
+  "exitCode": 0,
+  "error": null,
+  "result": "PASS",
+  "failures": [],
+  "rawArtifact": "foundation.tap",
+  "rawSha256": "4757c98c6e4c6e1cf818c308860d3c1250481aaddcf21a3c6fff0ce57e491695",
+  "limitations": [
+    "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+  ]
+}

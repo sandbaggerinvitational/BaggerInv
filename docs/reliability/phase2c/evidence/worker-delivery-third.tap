@@ -1,0 +1,168 @@
+▶ NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue
+  ✔ migration is chained and delivery administration is unavailable to participants (29.835209ms)
+  ✔ a running child discovers a later committed score and completes automatic families (971.173666ms)
+  ✔ a crash after real claim retains a lease and restart recovers after expiry (3011.306375ms)
+  ✔ unknown completion acknowledgement leaves one successful canonical result (814.748834ms)
+  ✔ deterministic preclaim failure terminates once, Director requeue preserves exact receipt (428.389542ms)
+  ✔ intelligence-before-claim retains later score demand and converges to canonical source (5366.635625ms)
+  ✔ intelligence-after-claim retains later score demand and converges to canonical source (1457.034375ms)
+  ✔ intelligence-before-write retains later score demand and converges to canonical source (1511.909708ms)
+  ✔ calcutta-before-claim retains later score demand and converges to canonical source (1132.355583ms)
+  ✖ score-intent exact-current processing preserves financial output: none (1115.2375ms)
+  ✖ score-intent exact-current processing preserves financial output: current_compatible (1341.358042ms)
+  ✖ score-intent exact-current processing preserves financial output: current_incompatible_consumed (1162.46475ms)
+  ✖ score-intent exact-current processing preserves financial output: current_incompatible_financial (1347.03775ms)
+  ✖ score-intent exact-current processing preserves financial output: stale_source (1102.647583ms)
+  ✖ score-intent exact-current processing preserves financial output: stale_result_binding (1193.43625ms)
+  ✖ score-intent exact-current processing preserves financial output: superseded_result (1083.868917ms)
+  ✖ score-intent exact-current processing preserves financial output: multiple_receipts (1056.519833ms)
+  ✔ real25ms cancellation records each intent attempt across connections and reaches terminal (571.885042ms)
+  ✔ compatible activation replaces old pending identity without transferring a lease (382.008833ms)
+✖ NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue (34100.2815ms)
+✔ deterministic global tick failure stops visibly and classifies only known transient errors (0.50975ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 12
+ℹ fail 9
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 34165.162041
+
+✖ failing tests:
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: none (1115.2375ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  column "result_payload" does not exist
+  LINE 1: select result_payload from scoring_authority.calcutta_v1_res...
+                 ^
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:136:29)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    result: { status: 3, signal: null, output: [ null, '', 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' ], pid: 94180, stdout: '', stderr: 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' }
+  }
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: current_compatible (1341.358042ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  column "result_payload" does not exist
+  LINE 1: select result_payload from scoring_authority.calcutta_v1_res...
+                 ^
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:136:29)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    result: { status: 3, signal: null, output: [ null, '', 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' ], pid: 94303, stdout: '', stderr: 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' }
+  }
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: current_incompatible_consumed (1162.46475ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  column "result_payload" does not exist
+  LINE 1: select result_payload from scoring_authority.calcutta_v1_res...
+                 ^
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:136:29)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    result: { status: 3, signal: null, output: [ null, '', 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' ], pid: 94441, stdout: '', stderr: 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' }
+  }
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: current_incompatible_financial (1347.03775ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  column "result_payload" does not exist
+  LINE 1: select result_payload from scoring_authority.calcutta_v1_res...
+                 ^
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:136:29)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    result: { status: 3, signal: null, output: [ null, '', 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' ], pid: 94616, stdout: '', stderr: 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' }
+  }
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: stale_source (1102.647583ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  column "result_payload" does not exist
+  LINE 1: select result_payload from scoring_authority.calcutta_v1_res...
+                 ^
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:136:29)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    result: { status: 3, signal: null, output: [ null, '', 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' ], pid: 94785, stdout: '', stderr: 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' }
+  }
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: stale_result_binding (1193.43625ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  column "result_payload" does not exist
+  LINE 1: select result_payload from scoring_authority.calcutta_v1_res...
+                 ^
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:136:29)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    result: { status: 3, signal: null, output: [ null, '', 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' ], pid: 94981, stdout: '', stderr: 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' }
+  }
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: superseded_result (1083.868917ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  column "result_payload" does not exist
+  LINE 1: select result_payload from scoring_authority.calcutta_v1_res...
+                 ^
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:136:29)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    result: { status: 3, signal: null, output: [ null, '', 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' ], pid: 95188, stdout: '', stderr: 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' }
+  }
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: multiple_receipts (1056.519833ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  column "result_payload" does not exist
+  LINE 1: select result_payload from scoring_authority.calcutta_v1_res...
+                 ^
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:136:29)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    result: { status: 3, signal: null, output: [ null, '', 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' ], pid: 95410, stdout: '', stderr: 'ERROR:  column "result_payload" does not exist\nLINE 1: select result_payload from scoring_authority.calcutta_v1_res...\n               ^\n' }
+  }

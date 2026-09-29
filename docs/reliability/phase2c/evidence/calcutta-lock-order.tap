@@ -1,0 +1,71 @@
+TAP version 13
+# Subtest: Calcutta current-before-job preserves Finalize and exact worker authority
+    # Subtest: claim before: actual Finalize lock graph
+    ok 1 - claim before: actual Finalize lock graph
+      ---
+      duration_ms: 1621.517042
+      type: 'test'
+      ...
+    # Subtest: claim after: actual Finalize lock graph
+    ok 2 - claim after: actual Finalize lock graph
+      ---
+      duration_ms: 536.753791
+      type: 'test'
+      ...
+    # Subtest: complete before: actual Finalize lock graph
+    ok 3 - complete before: actual Finalize lock graph
+      ---
+      duration_ms: 1427.268875
+      type: 'test'
+      ...
+    # Subtest: complete after: actual Finalize lock graph
+    ok 4 - complete after: actual Finalize lock graph
+      ---
+      duration_ms: 448.612666
+      type: 'test'
+      ...
+    # Subtest: fail before: actual Finalize lock graph
+    ok 5 - fail before: actual Finalize lock graph
+      ---
+      duration_ms: 1409.258667
+      type: 'test'
+      ...
+    # Subtest: fail after: actual Finalize lock graph
+    ok 6 - fail after: actual Finalize lock graph
+      ---
+      duration_ms: 429.048958
+      type: 'test'
+      ...
+    # Subtest: all six installed worker bodies retain attributes and bind the ordered locks in the manifest
+    ok 7 - all six installed worker bodies retain attributes and bind the ordered locks in the manifest
+      ---
+      duration_ms: 37.752625
+      type: 'test'
+      ...
+    # Subtest: claim does not wait on an intent held by another bounded materializer
+    ok 8 - claim does not wait on an intent held by another bounded materializer
+      ---
+      duration_ms: 417.559875
+      type: 'test'
+      ...
+    # Subtest: post-Finalize old completion and failure retain42501 without touching replacement work
+    ok 9 - post-Finalize old completion and failure retain42501 without touching replacement work
+      ---
+      duration_ms: 536.811292
+      type: 'test'
+      ...
+    1..9
+ok 1 - Calcutta current-before-job preserves Finalize and exact worker authority
+  ---
+  duration_ms: 16789.76225
+  type: 'test'
+  ...
+1..1
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 16850.484416

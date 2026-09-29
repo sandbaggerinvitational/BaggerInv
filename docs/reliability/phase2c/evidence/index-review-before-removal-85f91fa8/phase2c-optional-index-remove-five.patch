@@ -1,0 +1,21 @@
+--- a/supabase/production_migrations/202609280124_score_derived_delivery_v1.sql
++++ b/supabase/production_migrations/202609280124_score_derived_delivery_v1.sql
+@@ -25,16 +25,14 @@
+       add column delivery_attempts integer not null default 0 check(delivery_attempts between 0 and 5),
+       add column delivery_dead_letter_at timestamptz,
+       add column delivery_error_class text check(delivery_error_class in (''RETRYABLE'',''TERMINAL''))',name);
+-    execute format('create index %I on scoring_authority.%I(tournament_id,delivery_available_at)
+-      where status in (''PENDING'',''FAILED'') and delivery_dead_letter_at is null',name||'_delivery_due',name);
++    if name in ('calcutta_v1_recalculation_jobs','net_skins_v1_recalculation_jobs') then
+     execute format('create index %I on scoring_authority.%I(tournament_id,delivery_dead_letter_at)
+       where delivery_dead_letter_at is not null',name||'_delivery_terminal',name);
++    end if;
+   end loop;
+ end;
+ $columns$;
+ alter table scoring_authority.calcutta_v1_recalculation_jobs add column delivery_score_origin boolean not null default false;
+-create index score_derived_intents_terminal_v1 on scoring_authority.score_derived_intents_v1(tournament_id,intent_id)
+-  where status='DEAD_LETTER';
+ 
+ create table production_control.score_derived_delivery_attempts_v1 (
+   event_id bigint generated always as identity primary key,

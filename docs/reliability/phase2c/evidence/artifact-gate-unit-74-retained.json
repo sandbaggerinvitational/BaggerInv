@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "proofLayer": "UNIT",
+  "environment": "LOCAL_NO_DATABASE",
+  "production": false,
+  "result": "PASS",
+  "counts": {
+    "tests": 74,
+    "pass": 74,
+    "fail": 0
+  },
+  "startedAt": "2026-09-28T19:12:44.008087+00:00",
+  "completedAt": "2026-09-28T19:12:45.951650+00:00",
+  "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "sourcesBefore": [
+    {
+      "file": "tools/reliability/phase2c-certification-gate.py",
+      "sha256": "c770b1744dbb239fd9fb9c8c9de80070512de89ec04992fe38ea062c7a2a32b2"
+    },
+    {
+      "file": "test/reliability-phase2c-certification-gate.test.py",
+      "sha256": "6c8615f908eb5d32afeb6dbb79b51138de679073748b9efd44ebc246e33bfcbb"
+    }
+  ],
+  "sourcesAfter": [
+    {
+      "file": "tools/reliability/phase2c-certification-gate.py",
+      "sha256": "c770b1744dbb239fd9fb9c8c9de80070512de89ec04992fe38ea062c7a2a32b2"
+    },
+    {
+      "file": "test/reliability-phase2c-certification-gate.test.py",
+      "sha256": "6c8615f908eb5d32afeb6dbb79b51138de679073748b9efd44ebc246e33bfcbb"
+    }
+  ],
+  "sourcesStable": true,
+  "rawArtifact": "artifact-gate-unit.log",
+  "rawSha256": "88626987f01a32345a0f1ac37008e455e680687b34307d121f157bb891405e40",
+  "limitations": [
+    "Synthetic evidence-validator positive/negative cases, not database or product runtime proof."
+  ]
+}

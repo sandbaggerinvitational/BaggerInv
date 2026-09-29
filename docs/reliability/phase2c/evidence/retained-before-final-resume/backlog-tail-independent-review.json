@@ -1,0 +1,254 @@
+{
+  "review": "INDEPENDENT_READ_ONLY_BACKLOG_TAIL",
+  "reviewedAt": "2026-09-29T20:36:42.347366+00:00",
+  "verdict": "PASS_FOR_RETAINED_LOCAL_EMPIRICAL_BACKLOG_SCOPE_WITH_ATTRIBUTION_LIMIT",
+  "blockers": [],
+  "artifactAndSourceHashes": [
+    {
+      "file": "docs/reliability/phase2c/evidence/backlog-tail.json",
+      "sha256": "aafb1644ef4c43ab17cac3652c5f548717eb320a1a50d61bb3ac075b58a6d893",
+      "bytes": 172215
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/backlog-tail-results.json",
+      "sha256": "eb86c7b6ab8f16540bb5a9d58ac7bfb8ad59468c2fb7f19f5693a8ca61c0bb42",
+      "bytes": 5469617
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/backlog-tail.tap",
+      "sha256": "6f461046b1d8cb00fc659502496e09f7e19bd5e32649bd756d6f2c672fb568a4",
+      "bytes": 5268
+    },
+    {
+      "file": "test/reliability-phase2c-backlog-tail.integration.test.mjs",
+      "sha256": "f8285682fde446ecc72f53fa7e03cedb63fa2e7a03614119561c7ed824456a54",
+      "bytes": 15090
+    },
+    {
+      "file": "test/support/reliability/phase2c-worker-child.mjs",
+      "sha256": "0b06845de3c464f2d2569b022eb9db0c5585bbb15a8ec051aaacaa278df516ca",
+      "bytes": 9261
+    },
+    {
+      "file": "test/support/reliability/phase2c-worker.mjs",
+      "sha256": "8296bc143395abfc70ef4f1fc71ff9a346cb89b87f69b2505528ca1106ec5d12",
+      "bytes": 7637
+    },
+    {
+      "file": "test/support/reliability/postgres17.mjs",
+      "sha256": "83375c1f10c2da92c58d1ec501cf713f7a2bc5714ba9ae1ec5af16bc574be7ff",
+      "bytes": 11852
+    },
+    {
+      "file": "lib/score-derived-worker.js",
+      "sha256": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+      "bytes": 6779
+    },
+    {
+      "file": "lib/production-calcutta-server.js",
+      "sha256": "73b6d03776ac29216f83ca0088cc95b918a9960539a7fd441b2443fe1bc95b37",
+      "bytes": 38843
+    },
+    {
+      "file": "supabase/production_migrations/202608290056_production_calcutta_v1.sql",
+      "sha256": "cf1987b7e7ad3d69d0836aed214a77c85ac1daa68c19aeab6408d82e0296399f",
+      "bytes": 135172
+    },
+    {
+      "file": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48",
+      "bytes": 76764
+    }
+  ],
+  "verification": {
+    "rawTapHashMatches": true,
+    "receiptSourcesStable": true,
+    "transitiveProvenanceStable": true,
+    "currentTransitiveInputsVerified": 191,
+    "currentSourceDrift": [],
+    "clusterDestroyed": true,
+    "quantilesAndCountsIndependentlyRecomputed": true
+  },
+  "workerFailureClassification": {
+    "observed": "Exactly56 real CALCUTTA/40001/RETRYABLE failures, one per burst, all followed by automatic successful Calcutta processing. No40P01/57014/halt/startup/terminal event recorded.",
+    "classification": "Expected optimistic source-staleness protection strongly supported by source/workload; no observed persistent delivery or score-isolation regression.",
+    "notInjected": true,
+    "causalEvidence": [
+      "The workload advances canonical score revisions while the separate worker claims/calculates/completes; it does not inject40001.",
+      "The unchanged Calcutta completion explicitly compares current canonical source hash with the claimed job source and raises40001 on mismatch. Configuration and auction facts remain fixed; one autonomous child provides the only Calcutta completion actor.",
+      "The processor retains the original failure after exact failure acknowledgement; the classifier treats40001 as retryable. Every burst subsequently proves one current successful Calcutta result at exact canonical source/config/auction and four successful current Competition/Intelligence outputs."
+    ],
+    "attributionLimit": "The local transport retains SQLSTATE only, not SQL exception message or RPC name on failed events. It is not directly proven that each event was PRODUCTION_CALCUTTA_SOURCE_REVISION_CONFLICT rather than another40001 guard. Do not label these serialization/deadlock regressions or error-free operation; call them observed retryable optimistic conflicts consistent with concurrent invalidation.",
+    "retryIdentityLimit": "No per-failure job/attempt ledger is retained in this artifact. Subsequent success may involve newer-source replacement/coalescing; this is convergence proof, not evidence that all56 failures retry the identical job or wait an identical-cycle backoff interval."
+  },
+  "profiles": [
+    {
+      "name": "normal_preload_one_hole",
+      "independentBursts": 28,
+      "qualifiedOrdinaryScores": 1008,
+      "nonqualifyingScores": 0,
+      "quantilesRecomputed": {
+        "lockHeldThroughRpcMs": {
+          "samples": 1008,
+          "p50Ms": 2.125,
+          "p95Ms": 11.268,
+          "p99Ms": 13.337,
+          "maxMs": 18.336
+        },
+        "dbFunctionWallMs": {
+          "samples": 1008,
+          "p50Ms": 2.579,
+          "p95Ms": 14.103,
+          "p99Ms": 16.674,
+          "maxMs": 22.478
+        },
+        "transactionWallUpperMs": {
+          "samples": 1008,
+          "p50Ms": 2.827792000000045,
+          "p95Ms": 15.461041000002297,
+          "p99Ms": 18.53704199999629,
+          "maxMs": 24.017791000005673
+        }
+      },
+      "actualScoreErrors": 0,
+      "workerFailures": {
+        "count": 28,
+        "family": "CALCUTTA",
+        "sqlstate": "40001",
+        "classification": "RETRYABLE",
+        "countPerBurst": 1
+      },
+      "subsequentCalcuttaSuccessDelayMs": {
+        "minimum": 789,
+        "maximum": 840
+      },
+      "allBurstsCurrentAndIdle": true,
+      "allBurstsFinancialConfigurationFactsPublicationCountsUnchanged": true,
+      "allBurstClonesRemoved": true,
+      "resourceSamples": 3031,
+      "sampledMaximaExcludingSampler": {
+        "connections": 7,
+        "active": 7,
+        "idleInTransaction": 0,
+        "lockWaitingSessions": 0,
+        "workerConnections": 1,
+        "scoreConnections": 6,
+        "ungrantedLocks": 0,
+        "blockedSessions": 0
+      },
+      "sampledMaxTotalConnectionsIncludingSampler": 8,
+      "samplesWithLockWait": 0,
+      "samplesWithWorkerConnection": 703,
+      "finalNonautomaticStates": {
+        "netSkins": "WAITING_OWNER",
+        "finalRecap": "WAITING_PUBLISHED_FINAL_GATE"
+      }
+    },
+    {
+      "name": "larger_preload_six_holes",
+      "independentBursts": 28,
+      "qualifiedOrdinaryScores": 1008,
+      "nonqualifyingScores": 0,
+      "quantilesRecomputed": {
+        "lockHeldThroughRpcMs": {
+          "samples": 1008,
+          "p50Ms": 2.135,
+          "p95Ms": 10.645,
+          "p99Ms": 12.22,
+          "maxMs": 14.015
+        },
+        "dbFunctionWallMs": {
+          "samples": 1008,
+          "p50Ms": 2.61,
+          "p95Ms": 13.431,
+          "p99Ms": 15.287,
+          "maxMs": 16.803
+        },
+        "transactionWallUpperMs": {
+          "samples": 1008,
+          "p50Ms": 2.865916999988258,
+          "p95Ms": 14.66349999999511,
+          "p99Ms": 16.728000000002794,
+          "maxMs": 18.18308300001081
+        }
+      },
+      "actualScoreErrors": 0,
+      "workerFailures": {
+        "count": 28,
+        "family": "CALCUTTA",
+        "sqlstate": "40001",
+        "classification": "RETRYABLE",
+        "countPerBurst": 1
+      },
+      "subsequentCalcuttaSuccessDelayMs": {
+        "minimum": 789,
+        "maximum": 860
+      },
+      "allBurstsCurrentAndIdle": true,
+      "allBurstsFinancialConfigurationFactsPublicationCountsUnchanged": true,
+      "allBurstClonesRemoved": true,
+      "resourceSamples": 4526,
+      "sampledMaximaExcludingSampler": {
+        "connections": 8,
+        "active": 7,
+        "idleInTransaction": 0,
+        "lockWaitingSessions": 1,
+        "workerConnections": 1,
+        "scoreConnections": 6,
+        "ungrantedLocks": 0,
+        "blockedSessions": 0
+      },
+      "sampledMaxTotalConnectionsIncludingSampler": 9,
+      "samplesWithLockWait": 1,
+      "samplesWithWorkerConnection": 1167,
+      "finalNonautomaticStates": {
+        "netSkins": "WAITING_OWNER",
+        "finalRecap": "WAITING_PUBLISHED_FINAL_GATE"
+      }
+    }
+  ],
+  "scopeAndClaimLimits": [
+    "1008 accepted ordinaryR1score samples per profile across28 fresh six-group bursts; groups/holes within a burst are correlated. Empirical nearest-rank p99, no confidence interval/providerSLO.",
+    "18/108 initial backlog counts include all intent families; automatic qualification is a separate immediate EXISTS restricted to CALCUTTA/COMPETITION. Do not call18/108 the measured automatic-only depth.",
+    "Qualification proves automatic demand pending immediately before score under a live autonomous runner. It does not prove the worker occupiedCPU/SQL at every exact scoring instant.",
+    "Score function contains a test-only clock after its existing match row lock and is wrapped by a connection-local timing function. Instrumentation/sampler overhead remains in measured times; algorithm/authority is unchanged, but exact production latency is not measured.",
+    "Lock lower measure starts after acquisition and ends before COMMIT; persistent-session response wall time includes acquisition/wrapper/IPC and completed autocommit. These are per-observation lower/upper brackets, not exact lock-duration orCPU percentiles.",
+    "The raw artifact does not retain lastCommitAt; freshIdle.tickStartedAt>lastCommitAt is an executed source assertion, not independently re-evaluable from raw measurement timestamps.",
+    "Resource sampler excludes itself and observes roughly25ms-plus-query intervals; maxima cannot prove continuous maxima orabsence ofbrief waits. Larger profile includes1 observed lock-wait sample despite0 ungranted/blocked samples, whose views need not be atomically consistent.",
+    "NoCPU,IOPS,memory,connection-pool capacity,durable-fsync performance ormatched worker-off overhead comparison is established here. Final profile equality proves tested score/receipt semantics and guarded current-source delivery, not independent financial payout math.",
+    "NetSkinsWAITING_OWNER and FinalRecapWAITING_PUBLICATION remain intentionally unresolved nonautomatic authority states; no implicit approval/publication.",
+    "Read-only review made no PostgreSQL call, ran no test, edited no repository/source, and used no provider/network."
+  ],
+  "sourceReferences": [
+    {
+      "file": "test/reliability-phase2c-backlog-tail.integration.test.mjs",
+      "lines": "45-50,76-80",
+      "supports": "qualification and bounded timing instrumentation"
+    },
+    {
+      "file": "test/reliability-phase2c-backlog-tail.integration.test.mjs",
+      "lines": "107-136",
+      "supports": "ordinary accepted score parity,exactreceipts,freshidle,currentfinancialisolation"
+    },
+    {
+      "file": "test/reliability-phase2c-backlog-tail.integration.test.mjs",
+      "lines": "139-158",
+      "supports": "workerfailures retained and profile quantiles"
+    },
+    {
+      "file": "test/support/reliability/phase2c-worker-child.mjs",
+      "lines": "30-38",
+      "supports": "failedSQL message collapsed toSQLSTATE"
+    },
+    {
+      "file": "supabase/production_migrations/202608290056_production_calcutta_v1.sql",
+      "lines": "2487-2547",
+      "supports": "explicit configuration/auction/source/result40001 guards, retained by later exact-body patches"
+    },
+    {
+      "file": "lib/production-calcutta-server.js",
+      "lines": "832-881",
+      "supports": "actualcalculate/guardedcompletion/failureack and originalerrorpropagation"
+    }
+  ]
+}

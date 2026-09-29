@@ -1,0 +1,21 @@
+▶ Phase2 migration safety and explicitly unresolved annual worker regression
+  ✔ P2-MIG-CLEAN: effective clean schema installs and executes implementation manifest (307.675917ms)
+  ✔ P2-MIG-UPGRADE: synthetic history upgrade preserves canonical data and security attributes (27.370541ms)
+  ✔ P2-MIG-REAPPLY: non-idempotent reapplication rejects atomically (396.056875ms)
+  ✔ P2-MIG-CERTIFICATION: existing annual certification blocks install without changing it (402.773917ms)
+  ✔ P2-MIG-SOURCE-HASH: unexpected installed trigger body rejects all migration changes (425.239458ms)
+  ✔ P2-MIG-MANIFEST: manifest rejects private helper or table privilege drift (706.046334ms)
+  ✔ P2-MIG-CLOSE: pending score demand blocks final handoff without changing emergency stop (360.013333ms)
+  ✔ P2-MIG-GENERATION: obsolete intent generation fails closed without rebinding or score loss (383.898291ms)
+  ✔ P2-MIG-LIFECYCLE-SCOPE: only score transactions defer; actual Lock/Finalize and round triggers retain synchronous work (1668.100333ms)
+  ✔ P2-MIG-ANNUAL-EXPECTED-RED: actual future worker initializers reproduce pre-existing 42883 before and after (48.282959ms)
+  ✔ P2-MIG-SKINS-DEADLOCK: mixed-round worker lock inversion is understood and durably retryable (2520.974458ms)
+✔ Phase2 migration safety and explicitly unresolved annual worker regression (17629.126458ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17700.201833

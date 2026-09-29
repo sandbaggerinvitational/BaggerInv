@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "candidate": "PRE_REMOVAL_HISTORICAL_ONLY",
+  "migrationSHA256": "85f91fa8f13206669e4e622bf7f227f1531577acd7e1790a88fb1e12a5a4c930",
+  "production": false,
+  "files": [
+    {
+      "file": "202609280124_score_derived_delivery_v1.sql",
+      "sha256": "85f91fa8f13206669e4e622bf7f227f1531577acd7e1790a88fb1e12a5a4c930",
+      "bytes": 74143
+    },
+    {
+      "file": "phase2c-optional-index-decision.md",
+      "sha256": "007c63acadbda7a384760c9bc8c53d37df78036b7f9244b5372b605fd20d9585",
+      "bytes": 6867
+    },
+    {
+      "file": "phase2c-optional-index-exists-review-results.json",
+      "sha256": "03bc3b1de336aa759eb0ef0490d23307aacbbbd9f0e1473a6e16a218ad5637c3",
+      "bytes": 230172
+    },
+    {
+      "file": "phase2c-optional-index-exists-review.log",
+      "sha256": "2b9912acbc06afccdf27f8773a8dee1b1ce454d34f2b7d0cd143ef5627af607d",
+      "bytes": 7334
+    },
+    {
+      "file": "phase2c-optional-index-exists-review.mjs",
+      "sha256": "8d42c6452d4bbd15e9892333ae2abe6d3ce4bc684a6f3ba1c8ebb64cf52a9eb9",
+      "bytes": 13910
+    },
+    {
+      "file": "phase2c-optional-index-remove-five.patch",
+      "sha256": "f8f59a7caf71b88eab1e060de4735f6ec01b485ce1e8f417ba41f175c8c68993",
+      "bytes": 1392
+    },
+    {
+      "file": "phase2c-optional-index-remove-four-keep-intent.patch",
+      "sha256": "f561f6875443bc13ce4e301ed1100d6865b6c6f5f3c11b8fc72a299b3dd0edc0",
+      "bytes": 982
+    },
+    {
+      "file": "phase2c-optional-index-remove-three.patch",
+      "sha256": "28323c69422d9d391c33582dd982d57432662cacf761b8125fcb6b287d4ba9a4",
+      "bytes": 1601
+    },
+    {
+      "file": "phase2c-optional-index-review-first-log",
+      "sha256": "bf305b1b95ea0f08a1d45123d51c5b197a03efb82ce9487463a924d832eebb16",
+      "bytes": 3511
+    },
+    {
+      "file": "phase2c-optional-index-review-first-results.json",
+      "sha256": "aa0ef23ea13770872d2f44cdf1b8518377cf173c6963d16e6a9e58e3ad6522ad",
+      "bytes": 34014
+    },
+    {
+      "file": "phase2c-optional-index-review-results.json",
+      "sha256": "848f14b1e657860b37d164ae34d25106f1e3011e5d6bfbba052c2963d478dc6f",
+      "bytes": 220778
+    },
+    {
+      "file": "phase2c-optional-index-review-second-results.json",
+      "sha256": "8afd50eadf90e66e512bec6bcd3e89aec0670d92a6f4cba7fc8108b3a9e4c5cb",
+      "bytes": 81635
+    },
+    {
+      "file": "phase2c-optional-index-review-second.log",
+      "sha256": "40c7707dc0a6e4031e25c4422d1757a17734f57b29a03101b98fdff646dd7d94",
+      "bytes": 3875
+    },
+    {
+      "file": "phase2c-optional-index-review.log",
+      "sha256": "58b85a48ce12aa1f6770bd5f39868b65892a4ef76e1ea368a92c64c7bb8d91ed",
+      "bytes": 7266
+    },
+    {
+      "file": "phase2c-optional-index-review.mjs",
+      "sha256": "fc88713c191c3ae2717e105e6505767f29d752db8a10949c5ef68dae4b7f9510",
+      "bytes": 13722
+    }
+  ]
+}

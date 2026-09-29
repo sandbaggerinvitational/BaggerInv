@@ -1,0 +1,51 @@
+{
+  "proofLayer": "UNIT",
+  "environment": "LOCAL_NO_NETWORK_NO_POSTGRESQL",
+  "timestamp": "2026-09-28T15:42:21.693Z",
+  "cases": [
+    {
+      "input": {
+        "name": "TypeError",
+        "cause": {
+          "code": "ECONNRESET"
+        }
+      },
+      "actual": {
+        "classification": "TERMINAL",
+        "sqlstate": null,
+        "code": "TYPEERROR"
+      },
+      "expectedClass": "RETRYABLE"
+    },
+    {
+      "input": {
+        "name": "TypeError",
+        "cause": {
+          "code": "UND_ERR_SOCKET"
+        }
+      },
+      "actual": {
+        "classification": "TERMINAL",
+        "sqlstate": null,
+        "code": "TYPEERROR"
+      },
+      "expectedClass": "RETRYABLE"
+    },
+    {
+      "input": {
+        "code": "PRODUCTION_SCORING_RPC_FAILED",
+        "status": 503,
+        "diagnostics": {
+          "status": 503,
+          "code": ""
+        }
+      },
+      "actual": {
+        "classification": "TERMINAL",
+        "sqlstate": null,
+        "code": "PRODUCTION_SCORING_RPC_FAILED"
+      },
+      "expectedClass": "RETRYABLE"
+    }
+  ]
+}

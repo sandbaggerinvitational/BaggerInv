@@ -1,0 +1,33 @@
+TAP version 13
+# Subtest: Phase2 durable derived intent behavioral proof
+not ok 1 - Phase2 durable derived intent behavioral proof
+  ---
+  duration_ms: 8042.056042
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2-derived-proof.integration.test.mjs:26:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    /opt/homebrew/opt/postgresql@17/bin/psql
+    ERROR:  canceling statement due to statement timeout
+    CONTEXT:  SQL function "net_skins_entry_field_v1" statement 1
+    PL/pgSQL function production_control.net_skins_entries_projection_v1(text) line 9 at assignment
+    SQL function "net_skins_v1_round_source_revision" statement 1
+    
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+    sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+    seedSyntheticSideGameHistory (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/synthetic-history.mjs:428:3)
+    TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2-derived-proof.integration.test.mjs:29:2)
+    async Test.run (node:internal/test_runner/test:1404:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8245.173625

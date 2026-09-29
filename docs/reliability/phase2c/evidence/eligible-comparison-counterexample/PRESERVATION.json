@@ -1,0 +1,205 @@
+{
+  "preservedAt": "2026-09-29T21:31:09.348733+00:00",
+  "sourceUnchanged": true,
+  "result": "FAIL",
+  "exitCode": 1,
+  "files": [
+    {
+      "path": "evidence/eligible-comparison-counterexample/benchmark-candidate-common.json",
+      "sha256": "1547f03216c08420bb666d74d63a1a00ab058e6f1f27b8f2db51f723e6616292"
+    },
+    {
+      "path": "evidence/eligible-comparison-counterexample/performance-gate.json",
+      "sha256": "ddcd84ed1a5c239bda4432ffcbf37154114c1a7e44c320eb1db8e9a0dc0a94af"
+    },
+    {
+      "path": "evidence/eligible-comparison-counterexample/benchmark-candidate-eligible.json",
+      "sha256": "2e6021594c46ffedd3bc25b3720c70263941f34c3e86664581df2997fbdaa7d9"
+    },
+    {
+      "path": "evidence/eligible-comparison-counterexample/benchmark-baseline-common.json",
+      "sha256": "d26bda42eda2a952193bda67bfeed80622167325496e653a698ec398e262498e"
+    },
+    {
+      "path": "evidence/eligible-comparison-counterexample/benchmark-baseline-eligible.json",
+      "sha256": "082034a7ae6e7060755ea4bbb54c22a69ac6db518a1fc1a5ecab3e0700d4cf14"
+    }
+  ],
+  "purpose": "Preserve final comparison counterevidence before one controlled reproduction; no result discarded; no threshold changes",
+  "referencedPlans": [
+    {
+      "path": "evidence/baseline-common-10x-none-plan.json",
+      "sha256": "af30135b65f87567915890e9cb55e02058263c9cfb7d4663be932d6edafb29ff"
+    },
+    {
+      "path": "evidence/baseline-common-1x-none-plan.json",
+      "sha256": "5d13a91d724c2177d91adb7f79dcb7df656b5c503668f6a3832f70f2b4f1cb16"
+    },
+    {
+      "path": "evidence/baseline-common-2x-none-plan.json",
+      "sha256": "827b7f6827f898061c9c599470b38e48af368bdeb7357ed503c176edfb5dcd0c"
+    },
+    {
+      "path": "evidence/baseline-common-5x-none-plan.json",
+      "sha256": "ad1e12021579b3549ee13bea613fdefe995dc2a56fba0100107b4a73d369ba33"
+    },
+    {
+      "path": "evidence/baseline-eligible-10x-current_compatible-plan.json",
+      "sha256": "4f6c97c050cf64cf55f52d19183ba720a2b0806aad1124a5c9f42e72f0f4af53"
+    },
+    {
+      "path": "evidence/baseline-eligible-10x-current_incompatible_consumed-plan.json",
+      "sha256": "2aae452053d168076bc218f464fbd07e0fb511a915467b3aa843d56a388ef4ce"
+    },
+    {
+      "path": "evidence/baseline-eligible-10x-current_incompatible_financial-plan.json",
+      "sha256": "9c8bbd21fbddacb177889d506d70a577336116a36f008ba3a2a9e74dd2042643"
+    },
+    {
+      "path": "evidence/baseline-eligible-10x-multiple_receipts-plan.json",
+      "sha256": "384074c539ca95a0c36dcca9447864867884ace6dc563806f16aa5bd15e622f8"
+    },
+    {
+      "path": "evidence/baseline-eligible-10x-none-plan.json",
+      "sha256": "1bfb5ecf081727b9d5648ec80946792f84f0a697b94ace5849aff53348e012d0"
+    },
+    {
+      "path": "evidence/baseline-eligible-10x-stale_result_binding-plan.json",
+      "sha256": "41a3a444a0a5e99d05bc8ba907d5bd4f57242fa22da224342e584b5e5b4a955d"
+    },
+    {
+      "path": "evidence/baseline-eligible-10x-stale_source-plan.json",
+      "sha256": "1efb77ecfbd9b77e3a41276bce24abebe9ba3d40c6b4da232b37e482dbe832c0"
+    },
+    {
+      "path": "evidence/baseline-eligible-10x-superseded_result-plan.json",
+      "sha256": "fe2497b9a11084aa110078ecbca32d15cc244954af1fc154d92ee9be936fc072"
+    },
+    {
+      "path": "evidence/baseline-eligible-1x-current_compatible-plan.json",
+      "sha256": "c4314377c626932678c8b22340e7b3550b4a749f80e60b7b27e2caa1ec535b35"
+    },
+    {
+      "path": "evidence/baseline-eligible-1x-current_incompatible_consumed-plan.json",
+      "sha256": "48f61629fbce50e181435c7371fb7b9354231bb23ff3444adc96ae35e946795a"
+    },
+    {
+      "path": "evidence/baseline-eligible-1x-current_incompatible_financial-plan.json",
+      "sha256": "828e5fed63ecf9989e96a37432e0c48bf4eac7c9b21e75331372c2264014bcd2"
+    },
+    {
+      "path": "evidence/baseline-eligible-1x-multiple_receipts-plan.json",
+      "sha256": "d9f83099b2c61f77118c410633723c906b11e3540325e73cd191e2bfad95bb85"
+    },
+    {
+      "path": "evidence/baseline-eligible-1x-none-plan.json",
+      "sha256": "35ea5c8628304def1dbc2c07a6229bfc135ad54c90a932b3bc7e962183c3ebcd"
+    },
+    {
+      "path": "evidence/baseline-eligible-1x-stale_result_binding-plan.json",
+      "sha256": "97e19b0e3a41a9458533e5642eae4f18729be32f68cbd56b929924d77306e46b"
+    },
+    {
+      "path": "evidence/baseline-eligible-1x-stale_source-plan.json",
+      "sha256": "2823b81b2ed6f601bf80607e0d631849b76bb22bf2ae81528d4094f26adf3b91"
+    },
+    {
+      "path": "evidence/baseline-eligible-1x-superseded_result-plan.json",
+      "sha256": "bc1f61c898b9de8132d9bdef8e292f6e197dfa87b136aba226992dc32ad73703"
+    },
+    {
+      "path": "evidence/candidate-common-10x-none-plan.json",
+      "sha256": "0dd6fcffbb2897782af139d1f65aba7a0d91341f67cb86211cf57e833b1079f9"
+    },
+    {
+      "path": "evidence/candidate-common-1x-none-plan.json",
+      "sha256": "0fb1f3fa6f969f23246551d3ceb5f946af8f9291fe9ef752dead059957d82fef"
+    },
+    {
+      "path": "evidence/candidate-common-2x-none-plan.json",
+      "sha256": "7f7fa8c32c3a1b7b2472cfd87bb141876e04cf3cdb57cf9449625a72369f569a"
+    },
+    {
+      "path": "evidence/candidate-common-5x-none-plan.json",
+      "sha256": "afc19d812645b68c824da54a5dce29562d28afeab2eef5bc083c3fd414f61525"
+    },
+    {
+      "path": "evidence/candidate-eligible-10x-current_compatible-plan.json",
+      "sha256": "94395dbf7832f412f823f08745601951309730ed42dd0bfa12a642fac7f4f6ab"
+    },
+    {
+      "path": "evidence/candidate-eligible-10x-current_incompatible_consumed-plan.json",
+      "sha256": "6ea4d151c67d3652c928d2fe64c89e6f9c1654fced30de63bea75044edba3a34"
+    },
+    {
+      "path": "evidence/candidate-eligible-10x-current_incompatible_financial-plan.json",
+      "sha256": "52bf85142135da6626139aba76cdf4a5fde35c30d6b1d317f8a75ed04c1c5dc4"
+    },
+    {
+      "path": "evidence/candidate-eligible-10x-multiple_receipts-plan.json",
+      "sha256": "6965bc3e78dd6ec192c3947409c71a4ba907d72fc70083ef58548f8b5d4741f2"
+    },
+    {
+      "path": "evidence/candidate-eligible-10x-none-plan.json",
+      "sha256": "de281c664f17641eb0bd49bdf96ba8d32a8e4b59e0345ded2f990635005ce092"
+    },
+    {
+      "path": "evidence/candidate-eligible-10x-stale_result_binding-plan.json",
+      "sha256": "a96edee90b0cf4ed923811d9b2bae58d82283b102dc8d41ba4a25755df1dc2e4"
+    },
+    {
+      "path": "evidence/candidate-eligible-10x-stale_source-plan.json",
+      "sha256": "28606ee63918d8b20a3553ad768009d69d3ff5e30ca79ee557050164240518b3"
+    },
+    {
+      "path": "evidence/candidate-eligible-10x-superseded_result-plan.json",
+      "sha256": "bfc28e504ad176089eced04e5aea3703e621bc0646af8d9c3de67c071e6dc175"
+    },
+    {
+      "path": "evidence/candidate-eligible-1x-current_compatible-plan.json",
+      "sha256": "ec83be492373345a1d7f1a62e81801b2b00cac75c78c0d4c249f9bff330572a2"
+    },
+    {
+      "path": "evidence/candidate-eligible-1x-current_incompatible_consumed-plan.json",
+      "sha256": "d539a54664ad5c565c5ab633d08e1e1062888233c475a6b5a2c69716d8bb435b"
+    },
+    {
+      "path": "evidence/candidate-eligible-1x-current_incompatible_financial-plan.json",
+      "sha256": "a0d6cb6c16e74ebf9d8f0804630f0b928eb611dd2bd157aff9d9d93306d85cc0"
+    },
+    {
+      "path": "evidence/candidate-eligible-1x-multiple_receipts-plan.json",
+      "sha256": "40a47e198599d58c0c4a69c91de3c39185d49049d95efb4bdfe2266bc57a6dc3"
+    },
+    {
+      "path": "evidence/candidate-eligible-1x-none-plan.json",
+      "sha256": "d978d80ac9b4d74a656222dc7b2ca3aabc42a03278be29397c3dc3b8cc557907"
+    },
+    {
+      "path": "evidence/candidate-eligible-1x-stale_result_binding-plan.json",
+      "sha256": "15dbdb1aa051ee4fff563427f287e903ecaf66b60a002e253ea52b2337299e33"
+    },
+    {
+      "path": "evidence/candidate-eligible-1x-stale_source-plan.json",
+      "sha256": "20832c71f2febd1692a315d289f9584316c0551e1fe111ddb97334bed9703be0"
+    },
+    {
+      "path": "evidence/candidate-eligible-1x-superseded_result-plan.json",
+      "sha256": "7b9fd4020e8d3a0a93f8813f3a1118660838d11bd5652708406e9a22e74e110e"
+    }
+  ],
+  "plannedReproduction": {
+    "sourceChanged": false,
+    "thresholdChanged": false,
+    "mode": "candidate",
+    "kind": "eligible",
+    "scales": [
+      2,
+      5,
+      1,
+      10
+    ],
+    "purpose": "One complete repeat with flagged scale first; not an uncontrolled run-until-green policy",
+    "newSourceOrThresholdAllowed": false
+  }
+}

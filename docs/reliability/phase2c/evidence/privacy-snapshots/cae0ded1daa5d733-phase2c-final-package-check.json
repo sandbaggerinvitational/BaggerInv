@@ -1,0 +1,23 @@
+{
+  "reviewedAt": "2026-09-29T22:00:12.977695+00:00",
+  "result": "PASS_SCOPED_PACKAGE_CONSISTENCY",
+  "overallPhase2C": "PARTIAL",
+  "checks": {
+    "sourceFiles": 78,
+    "evidenceRecords": 43,
+    "requirements": 314,
+    "requirementCounts": {
+      "COMPLETE": 234,
+      "PARTIAL": 80,
+      "N/A": 0
+    },
+    "proofRows": 33,
+    "requiredDocuments": 29
+  },
+  "failures": [],
+  "limits": [
+    "File/evidence consistency only, not new runtime evidence.",
+    "Google/archive lifecycle and performance repeatability remain unresolved.",
+    "Git commit/push and final privacy snapshot are separate checks."
+  ]
+}

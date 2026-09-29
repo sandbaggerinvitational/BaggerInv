@@ -1,0 +1,41 @@
+✖ Phase2C old aggregate tick and actual match control reciprocal lock graph (9420.45475ms)
+
+Interrupted while running:
+
+⚠ test/reliability-phase2c-worker-lock-order.test.mjs (test/reliability-phase2c-worker-lock-order.test.mjs:1:1)
+✖ test/reliability-phase2c-worker-lock-order.test.mjs (98523.454833ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 1
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 98527.009167
+
+✖ failing tests:
+
+test at test/reliability-phase2c-worker-lock-order.test.mjs:16:1
+✖ Phase2C old aggregate tick and actual match control reciprocal lock graph (9420.45475ms)
+  AssertionError [ERR_ASSERTION]: Owned SQL session already closed
+  
+  true !== false
+  
+      at Object.query (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:290:14)
+      at file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker-lock-order.test.mjs:42:54
+      at Array.map (<anonymous>)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker-lock-order.test.mjs:42:45)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at test/reliability-phase2c-worker-lock-order.test.mjs:1:1
+✖ test/reliability-phase2c-worker-lock-order.test.mjs (98523.454833ms)
+  'Promise resolution is still pending but the event loop has already resolved'

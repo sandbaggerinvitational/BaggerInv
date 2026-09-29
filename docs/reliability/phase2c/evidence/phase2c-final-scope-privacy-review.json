@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "reviewId": "P2C-READONLY-SCOPE-PRIVACY-REVIEW",
+  "reviewedAt": "2026-09-28T17:06:46.096614+00:00",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "checkout": "/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv",
+  "branch": "codex/reliability-phase2c-recovery-delivery",
+  "proofLayer": "SOURCE_REVIEW_AND_PATTERN_SCAN",
+  "verdict": "NO_ACTIONABLE_SECRET_OR_AUTHORIZATION_DEFECT_IDENTIFIED_IN_REVIEWED_SCOPE",
+  "scope": {
+    "enumeration": "git diff --name-only base plus git ls-files --others --exclude-standard; entire file contents scanned",
+    "files": 238,
+    "bytes": 21085456,
+    "binaryFiles": 0,
+    "scopeManifest": "/private/tmp/phase2c-scope-privacy-scan.json",
+    "scopeManifestSha256": "f9dec260e502bd975d3134ca00223d4cf07db276d8f0bea66b4493a3396eb9bc",
+    "candidateAdjudication": "/private/tmp/phase2c-privacy-hit-adjudication.json",
+    "candidateAdjudicationSha256": "eab1c8190b27e6283e9152ee5d516819244ce9e939ee91eb76b04c97eb306339",
+    "mutatedSincePatternScan": [
+      {
+        "file": "docs/reliability/phase2c/ANNUAL-WORKER-42883.md",
+        "scanSha256": "d7829beac47f5699d1a4a8086eadf746098cee60c21193d5955b4fa530536bc5",
+        "currentSha256": "fea394527f8d90f4cec1eb6e876b071112bf13277f9e20869a469bce6eda6abd"
+      },
+      {
+        "file": "docs/reliability/phase2c/DERIVED-DELIVERY.md",
+        "scanSha256": "fc1fb76f445968ae78a79a82d3e98986c938f38a1bcd74d77d8b8329b0a073bd",
+        "currentSha256": "67cd3773b1a2e8af1c600df059246c02e4a142fb385576d42a5d0a92a60bdbf5"
+      },
+      {
+        "file": "docs/reliability/phase2c/DERIVED-WORKER-CONTRACT.md",
+        "scanSha256": "82a5915de6639d6240c6bce334f3b25596091510ad426d5258e25f625974423e",
+        "currentSha256": "6e3769cfeed0394c42be33e81ddc1b729819ab8de8b7d8855c4d16b2aa4f52ac"
+      },
+      {
+        "file": "docs/reliability/phase2c/NET-SKINS-DEADLOCK.md",
+        "scanSha256": "5879b0df7cde832960407b4c47d36175dbbf11507cf1e6a5299b2674d9cdb8d8",
+        "currentSha256": "f24d3decbe92655f9f08a51a68ff7d51c0f9fd472d5e0c836661a697a94ac58e"
+      },
+      {
+        "file": "docs/reliability/phase2c/RELEASE-COMPATIBILITY.md",
+        "scanSha256": "12ce38ffac01e789f3d24b932614baa3236ea5bea2f78f85cf4d839b53df8e71",
+        "currentSha256": "1dcc95a1dfaed741ae07dcd5115c64a1ce724a480b78cde0f8d405cddf98d2cc"
+      },
+      {
+        "file": "docs/reliability/phase2c/evidence/delivery.json",
+        "scanSha256": "ebd9c653313703105a2a6d9c18a2fb59aaaa7bbdc4b4f935607d32e650439185",
+        "currentSha256": "2e1495bafe39704785db2a96ce90b4527945d2e6e4830a90fa638c136999d152"
+      },
+      {
+        "file": "docs/reliability/phase2c/evidence/delivery.tap",
+        "scanSha256": "1ae8faaa208fd974aacf8b74e44ffb5c7aa8abc4fec8093bf7f73d715e1970b9",
+        "currentSha256": "26e016595ade12b8ee1d8666084c475fb27a851523c4fe03802c199505603bcf"
+      },
+      {
+        "file": "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+        "scanSha256": "c458c75469416111a339e2d9fe80095afef015ebf557dd53d736517905089738",
+        "currentSha256": "d935adf104fa09d06582d0c2330e8ac21a12507433a3df9e3904347a58f6637a"
+      },
+      {
+        "file": "lib/score-derived-worker.js",
+        "scanSha256": "3759163ab16a8bbf4a10c698bc062987b9002a35c575ffc6452c9ad709822fe2",
+        "currentSha256": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d"
+      },
+      {
+        "file": "test/reliability-phase2c-worker.test.mjs",
+        "scanSha256": "eb5d82a27b210985244161cc13320a61eacbbb553860dccc5a91980b162a51f0",
+        "currentSha256": "15c2b11e0f70b15ed1d645093ae83dedbf79753f710247ebc9e5e4ce4bf90b40"
+      }
+    ],
+    "omitted": "Ignored files, unrelated baseline files, inaccessible remote/provider state, reports not yet written"
+  },
+  "actionsPerformed": {
+    "productionQueries": 0,
+    "productionMutations": 0,
+    "deployments": 0,
+    "postgresqlOrTestsRun": 0,
+    "repositoryEdits": 0,
+    "localReviewArtifactsWritten": true
+  },
+  "methods": [
+    "Read tracked source diffs and enumerate every nonignored new file; hash full bytes for exact review scope.",
+    "Pattern scan for private keys, JWT/Supabase/GitHub/AWS credential literals, credential-bearing URLs, bearer literals, secret assignments, email and phone candidates; print no candidate secret values.",
+    "Review all matched candidate contexts and trace annual-review AR01 identity to the preexisting synthetic protected-annual fixture.",
+    "Inspect newly added API identity/admission/recovery and migration122 origin binding, private helper grants and annual READ dispatch.",
+    "Inspect migration123 exact constraint hash guard and migration124 worker table/function ACL/RLS; review changed adapter allowances and source mutations.",
+    "Inspect owned PostgreSQL socket construction, identity checks, environment scrub, fixed test suite allowlist, benchmark/reset boundaries, decoder copy/compile driver and Node network fence.",
+    "Search changed/new source for provider calls, direct canonical writes, native shipping paths and operational CLI references; distinguish synthetic fixture DML from accepted score RPC execution.",
+    "Run git diff --check (tracked patch only), read-only; no test execution."
+  ],
+  "observations": [
+    {
+      "id": "PRIV-01",
+      "classification": "PROVEN",
+      "finding": "No credential-pattern literal match in the scanned file bytes. Other secret formats remain possible; this is a scanner result, not universal absence proof."
+    },
+    {
+      "id": "PRIV-02",
+      "classification": "STRONGLY_SUPPORTED",
+      "finding": "Email/phone/auth-header candidates are reserved or explicitly synthetic test values. AR01 annual-review email is inherited from test/fixtures/step13e7b-production-annual-normal-release-rebind.sql and associated with synthetic UUID000...091; no message sender is invoked."
+    },
+    {
+      "id": "SCOPE-01",
+      "classification": "PROVEN",
+      "finding": "No changed shipping native path in the Git scope. Added Swift files are test-only retained DTO/model copies with a manifest and a disposable decoder driver."
+    },
+    {
+      "id": "AUTH-01",
+      "classification": "STRONGLY_SUPPORTED",
+      "finding": "Recovery never opens score permission. Current authenticated identity/membership is rechecked and exact accepted receipt is scoped by match, tournament, actor and immutable originating Auth UUID. Legacy NULL and foreign/no receipt remain UNKNOWN. No auth-before-receipt bypass introduced."
+    },
+    {
+      "id": "AUTH-02",
+      "classification": "STRONGLY_SUPPORTED",
+      "finding": "No new end-user table/function grants or RLS disable found. Migration123 removes only a hash-verified obsolete false-only writer constraint and retains the positive certified writer invariant. This is source review; executed role/RLS evidence is separate."
+    },
+    {
+      "id": "SCORE-01",
+      "classification": "STRONGLY_SUPPORTED",
+      "finding": "No new application/tool path bypasses the canonical score RPC to write competitive authority. Direct synthetic DML in isolated fixture construction and fault injection is identified as such; full-round scores use canonical RPC."
+    },
+    {
+      "id": "SAFE-01",
+      "classification": "STRONGLY_SUPPORTED",
+      "finding": "Benchmark and integration tooling create owned temporary socket-only PostgreSQL clusters and pass validated identity to child transports. Remote provider inputs are not accepted by test/benchmark CLI; provider env is stripped and Node net/tls is fenced. This does not establish an OS network sandbox."
+    },
+    {
+      "id": "SAFE-02",
+      "classification": "PROVEN",
+      "finding": "Operational run-score-derived-worker.mjs intentionally resolves configured current runtime and can mutate derived jobs when separately invoked with credentials. It is not invoked by the Phase2C test runner, benchmark, or package scripts. It must be excluded from local-proof instructions unless supplied a reviewed isolated adapter."
+    },
+    {
+      "id": "DATA-01",
+      "classification": "STRONGLY_SUPPORTED",
+      "finding": "Provider project/workbook IDs and Production hostnames retained in inherited authority/DTO fixtures are nonsecret metadata, not connection instructions executed by these tests. Native decoder uses retained model decoding, not URLSession requests."
+    },
+    {
+      "id": "HYG-01",
+      "classification": "PROVEN",
+      "finding": "Tracked git diff --check completed with exit0. This does not check untracked file whitespace or imply compilation."
+    }
+  ],
+  "actions": [
+    {
+      "priority": "P2",
+      "action": "Make the operational-worker versus proof-only-runner distinction explicit in final run instructions; do not automatically launch the operational worker during certification. Existing separate deployment approval boundary remains required.",
+      "files": [
+        "tools/reliability/run-score-derived-worker.mjs",
+        "docs/reliability/phase2c/DERIVED-DELIVERY.md"
+      ]
+    },
+    {
+      "priority": "P3",
+      "action": "Consider reserved-domain cleanup for inherited AR01 synthetic email in a later fixture-only change. Do not alter the frozen evidence fixture/hash now merely for cosmetics.",
+      "files": [
+        "test/fixtures/step13e7b-production-annual-normal-release-rebind.sql",
+        "test/reliability-phase2c-annual-admission.integration.test.mjs"
+      ]
+    },
+    {
+      "priority": "P3",
+      "action": "Retain the failed worker-history plan evidence and review repository artifact size. The8.7MB raw JSON is evidence, not a secret or binary; do not silently delete it. If moved to durable release storage later retain digest and reference.",
+      "files": [
+        "docs/reliability/phase2c/evidence/worker-history-first-detail.json"
+      ]
+    },
+    {
+      "priority": "REQUIRED_FINALIZATION",
+      "action": "Rerun final scope/secret scan after all source/reports/evidence are frozen; current exact scanned scope must not be claimed to cover later bytes."
+    }
+  ],
+  "gitDiffCheck": {
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "limitations": [
+    "No runtime test or database query executed for this review.",
+    "Source review does not prove every authorization/RLS combination, absence of every data leak, physical native behavior or provider network isolation.",
+    "Pattern scan is not a private-data classifier and cannot identify every real name from arbitrary prose.",
+    "Root final candidate and new reports may change after this timestamp.",
+    "No claim of zero Production actions across other agents is inferred from this review; root must reconcile task execution records."
+  ]
+}

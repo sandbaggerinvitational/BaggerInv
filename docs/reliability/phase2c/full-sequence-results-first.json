@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "environment": "LOCAL_NON_PRODUCTION",
+  "fixture": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "6cee536d12a93d53e6a585784a3b316bdaffbcb24c76d32060a898e83a459eee"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "production": false,
+  "rounds": [],
+  "controls": [],
+  "workerRestarts": 0,
+  "failures": [
+    "Expected values to be strictly equal:\n\nfalse !== true\n"
+  ],
+  "result": "FAIL",
+  "limitations": [
+    "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+    "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+    "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+    "Not a complete Open/Prepare tournament rehearsal",
+    "No owner publication automated",
+    "NetSkins financial processing remains WAITING_OWNER",
+    "Local process-lifetime worker, hosted scheduling NOT_PROVEN"
+  ],
+  "fixtureSetupTimeoutMs": 30000,
+  "scoreTimeoutMs": 1000
+}

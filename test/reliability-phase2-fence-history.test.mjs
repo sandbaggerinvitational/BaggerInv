@@ -41,7 +41,7 @@ function seedRestoredHistory(c,d,count){
   google_value_writes_performed:false,preview_resources_accessed:false,restoration_confirmed:true,certification_passed:true,
   failure_code:null,actor_id:'phase2-synthetic-fence-history',started_at:'2026-01-01T00:01:00Z',
   finished_at:'2026-01-01T00:02:00Z',updated_at:'2026-01-01T00:02:00Z'};
- sql(c,d,`begin;set local session_replication_role=replica;
+ sql(c,d,`begin;set local statement_timeout='180s';set local session_replication_role=replica;
   insert into production_control.${relation}
   select (jsonb_populate_record(null::production_control.${relation},${jsonLiteral(base)}||jsonb_build_object(
    'run_id','90000000-0000-4000-8000-'||lpad(n::text,12,'0'),
@@ -108,7 +108,12 @@ test('Phase2 actual rehearsal guard excludes restored history with candidate par
   limitations:['Synthetic local records, not provider/restoration certification','Nested plan work overlaps, do not sum into request time/unique rows',
    'P99 not proven by30 samples;host scheduling can affect latency','Before plan drops only the candidate index in a disposable database; after reinstalls the exact installed definition'],rows};
  try{
+  const finiteCandidate=process.env.BAGGER_PHASE2C_CANDIDATE==='1';
+  if(finiteCandidate)sql(c,f.database,`alter database ${f.database} set statement_timeout='180s'`,{role:''});
   seedSyntheticSideGameHistory(c,f.database,1);
+  if(finiteCandidate)sql(c,f.database,`alter database ${f.database} set statement_timeout='1s'`,{role:''});
+  evidence.fixtureSetupTimeoutMs=finiteCandidate?180000:null;
+  evidence.measuredStatementTimeoutMs=finiteCandidate?1000:null;
   const installedIndex=sql(c,f.database,`select pg_get_indexdef('production_control.${indexName}'::regclass)`);
   evidence.indexDefinition=installedIndex;
   const original=sql(c,f.database,"select prosrc from pg_proc where oid='production_control.assert_no_unrestored_google_writer_fence_rehearsal()'::regprocedure");

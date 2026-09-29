@@ -1,0 +1,51 @@
+▶ NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue
+  ✔ upgrade preserves121 pending identity, durable demand and prior successful result (7060.005375ms)
+  ✔ migration is chained and delivery administration is unavailable to participants (69.328ms)
+  ✔ a running child discovers a later committed score and completes automatic families (1007.004458ms)
+  ✔ a crash after real claim retains a lease and restart recovers after expiry (2990.607667ms)
+  ✔ COMPETITION actual claim crash survives process restart and expired lease (5016.562292ms)
+  ✔ INTELLIGENCE actual claim crash survives process restart and expired lease (5128.548334ms)
+  ✔ unknown completion acknowledgement leaves one successful canonical result (871.87925ms)
+  ✔ deterministic preclaim failure terminates once, Director requeue preserves exact receipt (395.824334ms)
+  ✔ intelligence-before-claim retains later score demand and converges to canonical source (5198.267208ms)
+  ✔ intelligence-after-claim retains later score demand and converges to canonical source (1271.403833ms)
+  ✔ intelligence-before-write retains later score demand and converges to canonical source (1287.112917ms)
+  ✔ calcutta-before-claim retains later score demand and converges to canonical source (908.977541ms)
+  ✔ score-intent exact-current processing preserves financial output: none (942.53525ms)
+  ✔ score-intent exact-current processing preserves financial output: current_compatible (1048.149208ms)
+  ✔ score-intent exact-current processing preserves financial output: current_incompatible_consumed (1108.758ms)
+  ✔ score-intent exact-current processing preserves financial output: current_incompatible_financial (1029.080541ms)
+  ✔ score-intent exact-current processing preserves financial output: stale_source (1148.4555ms)
+  ✔ score-intent exact-current processing preserves financial output: stale_result_binding (986.066875ms)
+  ✔ score-intent exact-current processing preserves financial output: superseded_result (1049.412167ms)
+  ✔ score-intent exact-current processing preserves financial output: multiple_receipts (1026.818041ms)
+  ✔ real25ms cancellation records each intent attempt across connections and reaches terminal (569.398042ms)
+  ✔ Intelligence delayed, running and terminal siblings suppress automatic thrash (939.294875ms)
+  ✖ lone FinalRecap recovery requires existing final publication and preserves successful siblings (31009.958208ms)
+  ✔ two autonomous workers share claims and converge without a manual tick (1178.135166ms)
+  ✔ closed worker gate stops the autonomous process visibly after one denied tick (456.263625ms)
+  ✔ each automatic family exhausts five durable attempts then exact Director requeue recovers (1585.200625ms)
+  ✔ compatible activation replacement is atomic and rejects late old completion (453.96ms)
+  ✔ compatible activation replaces old pending identity without transferring a lease (455.565708ms)
+✖ NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue (86058.98525ms)
+✔ deterministic global tick failure stops visibly and classifies only known transient errors (0.569416ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 28
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 86146.847667
+
+✖ failing tests:
+
+test at test/reliability-phase2c-worker.test.mjs:227:11
+✖ lone FinalRecap recovery requires existing final publication and preserves successful siblings (31009.958208ms)
+  Error: Local derived child wait exceeded 30000ms: [{"observedAt":1790611594986,"type":"tick","cycle":223,"tickStartedAt":1790611594953,"materialized":0,"terminal":0,"cancelled":false,"statusIncomplete":false,"blockedAutomatic":0,"pendingAutomatic":1,"activeLeases":0,"ready":{"CALCUTTA":false,"COMPETITION":false,"INTELLIGENCE":false},"waitingOwner":0,"waitingPublication":0},{"observedAt":1790611595117,"type":"tick","cycle":224,"tickStartedAt":1790611595087,"materialized":0,"terminal":0,"cancelled":false,"statusIncomplete":false,"blockedAutomatic":0,"pendingAutomatic":1,"activeLeases":0,"ready":{"CALCUTTA":false,"COMPETITION":false,"INTELLIGENCE":false},"waitingOwner":0,"waitingPublication":0},{"observedAt":1790611595249,"type":"tick","cycle":225,"tickStartedAt":1790611595219,"materialized":0,"terminal":0,"cancelled":false,"statusIncomplete":false,"blockedAutomatic":0,"pendingAutomatic":1,"activeLeases":0,"ready":{"CALCUTTA":false,"COMPETITION":false,"INTELLIGENCE":false},"waitingOwner":0,"waitingPublication":0},{"observedAt":1790611595382,"type":"tick","cycle":226,"tickStartedAt":1790611595350,"materialized":0,"terminal":0,"cancelled":false,"statusIncomplete":false,"blockedAutomatic":0,"pendingAutomatic":1,"activeLeases":0,"ready":{"CALCUTTA":false,"COMPETITION":false,"INTELLIGENCE":false},"waitingOwner":0,"waitingPublication":0},{"observedAt":1790611595510,"type":"tick","cycle":227,"tickStartedAt":1790611595483,"materialized":0,"terminal":0,"cancelled":false,"statusIncomplete":false,"blockedAutomatic":0,"pendingAutomatic":1,"activeLeases":0,"ready":{"CALCUTTA":false,"COMPETITION":false,"INTELLIGENCE":false},"waitingOwner":0,"waitingPublication":0},{"observedAt":1790611595631,"type":"tick","cycle":228,"tickStartedAt":1790611595612,"materialized":0,"terminal":0,"cancelled":false,"statusIncomplete":false,"blockedAutomatic":0,"pendingAutomatic":1,"activeLeases":0,"ready":{"CALCUTTA":false,"COMPETITION":false,"INTELLIGENCE":false},"waitingOwner":0,"waitingPublication":0},{"observedAt":1790611595763,"type":"tick","cycle":229,"tickStartedAt":1790611595732,"materialized":0,"terminal":0,"cancelled":false,"statusIncomplete":false,"blockedAutomatic":0,"pendingAutomatic":1,"activeLeases":0,"ready":{"CALCUTTA":false,"COMPETITION":false,"INTELLIGENCE":false},"waitingOwner":0,"waitingPublication":0},{"observedAt":1790611595891,"type":"tick","cycle":230,"tickStartedAt":1790611595864,"materialized":0,"terminal":0,"cancelled":false,"statusIncomplete":false,"blockedAutomatic":0,"pendingAutomatic":1,"activeLeases":0,"ready":{"CALCUTTA":false,"COMPETITION":false,"INTELLIGENCE":false},"waitingOwner":0,"waitingPublication":0},{"observedAt":1790611596021,"type":"tick","cycle":231,"tickStartedAt":1790611595992,"materialized":0,"terminal":0,"cancelled":false,"statusIncomplete":false,"blockedAutomatic":0,"pendingAutomatic":1,"activeLeases":0,"ready":{"CALCUTTA":false,"COMPETITION":false,"INTELLIGENCE":false},"waitingOwner":0,"waitingPublication":0},{"observedAt":1790611596148,"type":"tick","cycle":232,"tickStartedAt":1790611596122,"materialized":0,"terminal":0,"cancelled":false,"statusIncomplete":false,"blockedAutomatic":0,"pendingAutomatic":1,"activeLeases":0,"ready":{"CALCUTTA":false,"COMPETITION":false,"INTELLIGENCE":false},"waitingOwner":0,"waitingPublication":0},{"observedAt":1790611596277,"type":"tick","cycle":233,"tickStartedAt":1790611596249,"materialized":0,"terminal":0,"cancelled":false,"statusIncomplete":false,"blockedAutomatic":0,"pendingAutomatic":1,"activeLeases":0,"ready":{"CALCUTTA":false,"COMPETITION":false,"INTELLIGENCE":false},"waitingOwner":0,"waitingPublication":0},{"observedAt":1790611596407,"type":"tick","cycle":234,"tickStartedAt":1790611596378,"materialized":0,"terminal":0,"cancelled":false,"statusIncomplete":false,"blockedAutomatic":0,"pendingAutomatic":1,"activeLeases":0,"ready":{"CALCUTTA":false,"COMPETITION":false,"INTELLIGENCE":false},"waitingOwner":0,"waitingPublication":0}]
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:43:11)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:250:4)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:227:3)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)

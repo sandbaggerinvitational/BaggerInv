@@ -1,0 +1,916 @@
+{
+  "issue": "P2C-NEW-NETSKINS-OWNER-CONTROL-LOCK",
+  "production": false,
+  "tests": [
+    {
+      "marker": "present",
+      "controlKind": "FINALIZE",
+      "order": "before",
+      "pass": true,
+      "expectedCounterexample": true,
+      "held": [
+        {
+          "pid": 99035,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 99036,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99035
+          ]
+        },
+        {
+          "pid": 99037,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 99035,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 99036,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99035
+          ]
+        },
+        {
+          "pid": 99037,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            99036
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 99035,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 99036,
+          "wait": "transactionid",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99037
+          ]
+        },
+        {
+          "pid": 99037,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            99036
+          ]
+        }
+      ],
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "present",
+      "controlKind": "FINALIZE",
+      "order": "after",
+      "pass": true,
+      "expectedCounterexample": false,
+      "held": [
+        {
+          "pid": 99157,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 99158,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 99156,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99157
+          ]
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 99157,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 99158,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            99156
+          ]
+        },
+        {
+          "pid": 99156,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99157
+          ]
+        }
+      ],
+      "reciprocal": null,
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "present",
+      "controlKind": "SCORING_LOCK",
+      "order": "before",
+      "pass": true,
+      "expectedCounterexample": true,
+      "held": [
+        {
+          "pid": 99214,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 99215,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99214
+          ]
+        },
+        {
+          "pid": 99216,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 99214,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 99215,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99214
+          ]
+        },
+        {
+          "pid": 99216,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            99215
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 99214,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 99215,
+          "wait": "transactionid",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99216
+          ]
+        },
+        {
+          "pid": 99216,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            99215
+          ]
+        }
+      ],
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "present",
+      "controlKind": "SCORING_LOCK",
+      "order": "after",
+      "pass": true,
+      "expectedCounterexample": false,
+      "held": [
+        {
+          "pid": 99279,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 99280,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 99278,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99279
+          ]
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 99279,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 99280,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            99278
+          ]
+        },
+        {
+          "pid": 99278,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99279
+          ]
+        }
+      ],
+      "reciprocal": null,
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "absent",
+      "controlKind": "FINALIZE",
+      "order": "before",
+      "pass": true,
+      "expectedCounterexample": true,
+      "held": [
+        {
+          "pid": 99331,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 99333,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 99332,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99331
+          ]
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 99331,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 99333,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            99332
+          ]
+        },
+        {
+          "pid": 99332,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99331
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 99331,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 99333,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            99332
+          ]
+        },
+        {
+          "pid": 99332,
+          "wait": "transactionid",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99333
+          ]
+        }
+      ],
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "absent",
+      "controlKind": "FINALIZE",
+      "order": "after",
+      "pass": true,
+      "expectedCounterexample": false,
+      "held": [
+        {
+          "pid": 99412,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99413
+          ]
+        },
+        {
+          "pid": 99414,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 99413,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 99412,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99413
+          ]
+        },
+        {
+          "pid": 99414,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            99412
+          ]
+        },
+        {
+          "pid": 99413,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "reciprocal": null,
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "absent",
+      "controlKind": "SCORING_LOCK",
+      "order": "before",
+      "pass": true,
+      "expectedCounterexample": true,
+      "held": [
+        {
+          "pid": 99466,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99465
+          ]
+        },
+        {
+          "pid": 99467,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 99465,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 99466,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99465
+          ]
+        },
+        {
+          "pid": 99467,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            99466
+          ]
+        },
+        {
+          "pid": 99465,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 99466,
+          "wait": "transactionid",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99467
+          ]
+        },
+        {
+          "pid": 99467,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            99466
+          ]
+        },
+        {
+          "pid": 99465,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        }
+      ],
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "absent",
+      "controlKind": "SCORING_LOCK",
+      "order": "after",
+      "pass": true,
+      "expectedCounterexample": false,
+      "held": [
+        {
+          "pid": 99528,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99527
+          ]
+        },
+        {
+          "pid": 99529,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 99527,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 99528,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99527
+          ]
+        },
+        {
+          "pid": 99529,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            99528
+          ]
+        },
+        {
+          "pid": 99527,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "reciprocal": null,
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "case": "absent-marker-rejected-lease",
+      "pass": true,
+      "allRowsReceiptsAuditUnchanged": true
+    },
+    {
+      "case": "absent-marker-rejected-source",
+      "pass": true,
+      "allRowsReceiptsAuditUnchanged": true
+    },
+    {
+      "case": "two-rounds-absent-marker",
+      "pass": true,
+      "wait": [
+        {
+          "pid": 99678,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124202);",
+          "blockedBy": []
+        },
+        {
+          "pid": 99679,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99678
+          ]
+        },
+        {
+          "pid": 99680,
+          "wait": "transactionid",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            99679
+          ]
+        }
+      ],
+      "serialFinancialAndDemandParity": true
+    },
+    {
+      "case": "future2099-present",
+      "pass": true,
+      "actualFutureClaimAndComplete": true,
+      "actualSharedHelper": true,
+      "unchangedFullNetCalculator": true,
+      "financialAndDemandCycleParity": true,
+      "receiptReplayWithoutFootprint": true,
+      "generation": "a2200000-0000-4000-8000-000000000003",
+      "boundary": "Synthetic canonical retarget and authority/resource rows; outer annual certification substituted, original Net resource/generation guards retained"
+    },
+    {
+      "case": "future2099-absent",
+      "pass": true,
+      "actualFutureClaimAndComplete": true,
+      "actualSharedHelper": true,
+      "unchangedFullNetCalculator": true,
+      "financialAndDemandCycleParity": true,
+      "receiptReplayWithoutFootprint": true,
+      "generation": "a2200000-0000-4000-8000-000000000003",
+      "boundary": "Synthetic canonical retarget and authority/resource rows; outer annual certification substituted, original Net resource/generation guards retained"
+    },
+    {
+      "case": "future2099-rejected-lease",
+      "pass": true,
+      "absentMarkerAndAllRowsUnchanged": true,
+      "generationNegativeFixtureFkBypass": false,
+      "actualFutureCompletionGuard": true
+    },
+    {
+      "case": "future2099-rejected-source",
+      "pass": true,
+      "absentMarkerAndAllRowsUnchanged": true,
+      "generationNegativeFixtureFkBypass": false,
+      "actualFutureCompletionGuard": true
+    },
+    {
+      "case": "future2099-rejected-job-generation",
+      "pass": true,
+      "absentMarkerAndAllRowsUnchanged": true,
+      "generationNegativeFixtureFkBypass": true,
+      "actualFutureCompletionGuard": true
+    },
+    {
+      "case": "future2099-prefix-before-config-job",
+      "pass": true,
+      "waiting": [
+        {
+          "pid": 99963,
+          "wait": "ClientRead",
+          "query": "select pg_backend_pid();",
+          "blockedBy": []
+        },
+        {
+          "pid": 99964,
+          "wait": "transactionid",
+          "query": "select public.future_production_complete_net_skins_recalculation_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymq",
+          "blockedBy": [
+            99962
+          ]
+        },
+        {
+          "pid": 99962,
+          "wait": "ClientRead",
+          "query": "select 1 from scoring_authority.competition_recalculation_jobs where tournament_id='2099' and round_number=0 and engine_key='TOURNAMENT_STORYLINES' for update;",
+          "blockedBy": []
+        }
+      ],
+      "configAndJobNowaitSucceededWhileCompletionBlocked": true
+    },
+    {
+      "case": "absent-marker-current-round-max-history-plan",
+      "pass": true,
+      "observations": [
+        {
+          "historyCount": 1000,
+          "currentRoundResultRows": 1,
+          "otherRoundNoncurrentRows": 1000,
+          "planner": "DEFAULT_NO_PLANNER_OVERRIDE",
+          "actualCompletionOk": true,
+          "actualHelperMaxPlans": [
+            {
+              "querySha256": "3cbc2a7040071d29e9e5aa57688f32b325a6bf664a4bd2f3fdf83d69169b7dcc",
+              "instrumentedDurationMs": 0.021,
+              "plan": {
+                "Node Type": "Result",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 8.29,
+                "Total Cost": 8.31,
+                "Plan Rows": 1,
+                "Plan Width": 8,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 3,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Limit",
+                    "Parent Relationship": "InitPlan",
+                    "Subplan Name": "InitPlan 1",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Startup Cost": 0.28,
+                    "Total Cost": 8.29,
+                    "Plan Rows": 1,
+                    "Plan Width": 8,
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Shared Hit Blocks": 3,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Index Only Scan",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Scan Direction": "Forward",
+                        "Index Name": "production_net_skins_v1_result_history",
+                        "Relation Name": "net_skins_v1_result_revisions",
+                        "Alias": "net_skins_v1_result_revisions",
+                        "Startup Cost": 0.28,
+                        "Total Cost": 8.29,
+                        "Plan Rows": 1,
+                        "Plan Width": 8,
+                        "Actual Rows": 1,
+                        "Actual Loops": 1,
+                        "Index Cond": "((tournament_id = '2026'::text) AND (round_number = 1))",
+                        "Rows Removed by Index Recheck": 0,
+                        "Heap Fetches": 1,
+                        "Shared Hit Blocks": 3,
+                        "Shared Read Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "currentFinancialRowsUnchanged": true,
+          "allCheckUniqueFkConstraintsActive": true,
+          "rollbackVerified": true
+        },
+        {
+          "historyCount": 10000,
+          "currentRoundResultRows": 1,
+          "otherRoundNoncurrentRows": 10000,
+          "planner": "DEFAULT_NO_PLANNER_OVERRIDE",
+          "actualCompletionOk": true,
+          "actualHelperMaxPlans": [
+            {
+              "querySha256": "3cbc2a7040071d29e9e5aa57688f32b325a6bf664a4bd2f3fdf83d69169b7dcc",
+              "instrumentedDurationMs": 0.028,
+              "plan": {
+                "Node Type": "Result",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 8.3,
+                "Total Cost": 8.32,
+                "Plan Rows": 1,
+                "Plan Width": 8,
+                "Actual Rows": 1,
+                "Actual Loops": 1,
+                "Shared Hit Blocks": 3,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Limit",
+                    "Parent Relationship": "InitPlan",
+                    "Subplan Name": "InitPlan 1",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Startup Cost": 0.29,
+                    "Total Cost": 8.3,
+                    "Plan Rows": 1,
+                    "Plan Width": 8,
+                    "Actual Rows": 1,
+                    "Actual Loops": 1,
+                    "Shared Hit Blocks": 3,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Plans": [
+                      {
+                        "Node Type": "Index Only Scan",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Scan Direction": "Forward",
+                        "Index Name": "production_net_skins_v1_result_history",
+                        "Relation Name": "net_skins_v1_result_revisions",
+                        "Alias": "net_skins_v1_result_revisions",
+                        "Startup Cost": 0.29,
+                        "Total Cost": 8.3,
+                        "Plan Rows": 1,
+                        "Plan Width": 8,
+                        "Actual Rows": 1,
+                        "Actual Loops": 1,
+                        "Index Cond": "((tournament_id = '2026'::text) AND (round_number = 1))",
+                        "Rows Removed by Index Recheck": 0,
+                        "Heap Fetches": 1,
+                        "Shared Hit Blocks": 3,
+                        "Shared Read Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "currentFinancialRowsUnchanged": true,
+          "allCheckUniqueFkConstraintsActive": true,
+          "rollbackVerified": true
+        }
+      ],
+      "limitations": [
+        "Synthetic terminal jobs and noncurrent other-round results are directly constructed; no historical receipt issuance is claimed.",
+        "Current-round revision growth is not measured; this tests irrelevant other-round result history.",
+        "Minimal linked historical source payloads prove row/index traversal, not realistic historical payload byte volume or issuance.",
+        "Nested instrumented plans are not latency percentiles or write-amplification measurements."
+      ]
+    },
+    {
+      "case": "manifest-security",
+      "pass": true,
+      "futureCoverage": "ACTUAL_COMPLETION_WITH_EXPLICIT_OUTER_CERTIFICATION_SEAM"
+    }
+  ],
+  "installed": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "sources": [
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "hash": "2f3c88b69d9029415a027d28909ead3f9f66bbb5132f1fdb7cd1a07f637d5c6d",
+      "owner": "10",
+      "definer": true,
+      "signature": "complete_production_net_skins_v1_recalculation(jsonb)",
+      "configuration": [
+        "search_path=pg_catalog, production_control, scoring_authority"
+      ]
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "hash": "2d06b882c6ceb32bf5a5fbb5686a44d0a36e1fcbf6c0421f4f65c55bcd8c7f7b",
+      "owner": "10",
+      "definer": true,
+      "signature": "future_production_complete_net_skins_recalculation_v1(jsonb)",
+      "configuration": [
+        "search_path=pg_catalog"
+      ]
+    }
+  ]
+}

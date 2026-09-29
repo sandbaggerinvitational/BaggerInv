@@ -1,0 +1,31 @@
+1 CALCUTTA_DUE {"with":{"indexes":["production_calcutta_v1_claim_queue"],"nodes":["Limit","LockRows","Incremental Sort","Index Scan"],"rowsRemoved":0,"rootHits":3,"rootReads":0,"executionMs":0.043},"without":{"indexes":["production_calcutta_v1_claim_queue"],"nodes":["Limit","LockRows","Incremental Sort","Index Scan"],"rowsRemoved":0,"rootHits":4,"rootReads":0,"executionMs":0.049}}
+1 CALCUTTA_DELAYED {"with":{"indexes":["production_calcutta_v1_claim_queue"],"nodes":["Limit","LockRows","Incremental Sort","Index Scan"],"rowsRemoved":1,"rootHits":3,"rootReads":0,"executionMs":0.039},"without":{"indexes":["production_calcutta_v1_claim_queue"],"nodes":["Limit","LockRows","Incremental Sort","Index Scan"],"rowsRemoved":1,"rootHits":3,"rootReads":0,"executionMs":0.04}}
+file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54
+    const error = new Error([
+                  ^
+
+Error: /opt/homebrew/opt/postgresql@17/bin/psql
+ERROR:  new row for relation "net_skins_v1_recalculation_jobs" violates check constraint "net_skins_v1_recalculation_jobs_configuration_fingerprint_check"
+DETAIL:  Failing row contains (80da4fce-ad46-a103-e8c9-992613521fdf, 2026, 2, ff515b0f-f929-8342-aef4-8c093a7b717d, 3, undefined, {"holes": [], "matches": [{"format": "SC", "status": "LIVE", "ma..., 4820139526381e5bad4b1f15505f34a4b174a757738a396672dbe4420ac157b8, PENDING, SYNTHETIC_HISTORY, reliability-fixture, null, null, 1, null, null, null, null, null, 2026-05-31 19:09:28-05, null, null, 2026-09-28 13:34:22.145496-05, null, 2000-01-01 00:00:00-06, 1, 1, null, null).
+
+    at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+    at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+    at query (file:///private/tmp/phase2c-optional-index-review.mjs:25:22)
+    at file:///private/tmp/phase2c-optional-index-review.mjs:78:24 {
+  result: {
+    status: 3,
+    signal: null,
+    output: [
+      null,
+      '',
+      'ERROR:  new row for relation "net_skins_v1_recalculation_jobs" violates check constraint "net_skins_v1_recalculation_jobs_configuration_fingerprint_check"\n' +
+        'DETAIL:  Failing row contains (80da4fce-ad46-a103-e8c9-992613521fdf, 2026, 2, ff515b0f-f929-8342-aef4-8c093a7b717d, 3, undefined, {"holes": [], "matches": [{"format": "SC", "status": "LIVE", "ma..., 4820139526381e5bad4b1f15505f34a4b174a757738a396672dbe4420ac157b8, PENDING, SYNTHETIC_HISTORY, reliability-fixture, null, null, 1, null, null, null, null, null, 2026-05-31 19:09:28-05, null, null, 2026-09-28 13:34:22.145496-05, null, 2000-01-01 00:00:00-06, 1, 1, null, null).\n'
+    ],
+    pid: 74256,
+    stdout: '',
+    stderr: 'ERROR:  new row for relation "net_skins_v1_recalculation_jobs" violates check constraint "net_skins_v1_recalculation_jobs_configuration_fingerprint_check"\n' +
+      'DETAIL:  Failing row contains (80da4fce-ad46-a103-e8c9-992613521fdf, 2026, 2, ff515b0f-f929-8342-aef4-8c093a7b717d, 3, undefined, {"holes": [], "matches": [{"format": "SC", "status": "LIVE", "ma..., 4820139526381e5bad4b1f15505f34a4b174a757738a396672dbe4420ac157b8, PENDING, SYNTHETIC_HISTORY, reliability-fixture, null, null, 1, null, null, null, null, null, 2026-05-31 19:09:28-05, null, null, 2026-09-28 13:34:22.145496-05, null, 2000-01-01 00:00:00-06, 1, 1, null, null).\n'
+  }
+}
+
+Node.js v26.7.0

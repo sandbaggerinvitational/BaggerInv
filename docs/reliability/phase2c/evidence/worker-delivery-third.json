@@ -1,0 +1,1500 @@
+{
+  "installed": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "cc4bd9d640d17e9f39081f18f7c79c8e7735aadd498d8e87e9edfe2318b31b6a"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "f174597b0b403e1a77cce756a1179cbc39eb029bc54a7d2a2bec143d8f1995fc"
+      }
+    ],
+    "statementTimeoutMs": 5000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "productionQueries": 0,
+  "networkDenied": true,
+  "fixtureSetupTimeoutMs": 30000,
+  "scoreTimeoutMs": 1000,
+  "workerTimeoutMs": 5000,
+  "fsync": false,
+  "outcomes": [
+    {
+      "case": "service-only-chained-manifest",
+      "pass": true
+    },
+    {
+      "case": "autonomous-after-commit",
+      "pass": true,
+      "events": [
+        {
+          "type": "started",
+          "workerId": "phase2c-local-worker"
+        },
+        {
+          "type": "tick",
+          "cycle": 0,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 0,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 1,
+          "materialized": 2,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 5,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": true,
+            "COMPETITION": true,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "COMPETITION",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "CALCUTTA",
+          "empty": false
+        },
+        {
+          "type": "stopped",
+          "cycles": 2
+        }
+      ],
+      "acceptedScores": 1,
+      "calculationResultsAdded": 1,
+      "automaticFamilies": [
+        "CALCUTTA",
+        "COMPETITION",
+        "INTELLIGENCE"
+      ],
+      "netSkins": "WAITING_OWNER"
+    },
+    {
+      "case": "crash-lease-restart",
+      "pass": true,
+      "clockInjectedLeaseExpiry": true,
+      "events": [
+        {
+          "type": "started",
+          "workerId": "phase2c-resumed"
+        },
+        {
+          "type": "tick",
+          "cycle": 0,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 5,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": true,
+            "COMPETITION": true,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "CALCUTTA",
+          "empty": true
+        },
+        {
+          "type": "processed",
+          "family": "COMPETITION",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": false
+        },
+        {
+          "type": "tick",
+          "cycle": 1,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 2,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 3,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 4,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 5,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 6,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 7,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 8,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 9,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 10,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 11,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 12,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 13,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 14,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 15,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 1,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": true,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "CALCUTTA",
+          "empty": false
+        },
+        {
+          "type": "tick",
+          "cycle": 16,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 0,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "stopped",
+          "cycles": 17
+        }
+      ]
+    },
+    {
+      "case": "unknown-completion-ack",
+      "pass": true,
+      "resultsAdded": 1,
+      "events": [
+        {
+          "type": "started",
+          "workerId": "phase2c-local-worker"
+        },
+        {
+          "type": "tick",
+          "cycle": 0,
+          "materialized": 2,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 5,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": true,
+            "COMPETITION": true,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "failed",
+          "family": "CALCUTTA",
+          "classification": "RETRYABLE",
+          "sqlstate": null,
+          "code": "CONNECTION_FAILED"
+        },
+        {
+          "type": "processed",
+          "family": "COMPETITION",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": false
+        },
+        {
+          "type": "tick",
+          "cycle": 1,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 0,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "stopped",
+          "cycles": 2
+        }
+      ]
+    },
+    {
+      "case": "deterministic-terminal-exact-requeue",
+      "pass": true,
+      "terminalAttempts": 1,
+      "recoveryEvents": 1
+    },
+    {
+      "case": "intelligence-before-claim",
+      "pass": true,
+      "postClaimRevalidation": true,
+      "parity": {
+        "exactCanonicalSource": true,
+        "engines": [
+          "TEAM_MOMENTUM",
+          "TOURNAMENT_STORYLINES",
+          "TOURNAMENT_INTELLIGENCE",
+          "PROJECTION_EDITORIAL"
+        ],
+        "calcutta": {
+          "exact": true,
+          "currentCount": 1
+        },
+        "finalRecap": "WAITING_PUBLISHED_FINAL_GATE",
+        "netSkins": "WAITING_OWNER",
+        "proof": "ACTUAL_SQL_READS_AND_UNCHANGED_CALCULATORS"
+      },
+      "events": [
+        {
+          "type": "started",
+          "workerId": "phase2c-local-worker"
+        },
+        {
+          "type": "tick",
+          "cycle": 0,
+          "materialized": 2,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 5,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": true,
+            "COMPETITION": true,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "CALCUTTA",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "COMPETITION",
+          "empty": false
+        },
+        {
+          "type": "injected-score",
+          "operation": "claim_intelligence_derived_bundle",
+          "position": "score-before",
+          "pendingCompetitionIntents": 1
+        },
+        {
+          "type": "failed",
+          "family": "INTELLIGENCE",
+          "classification": "RETRYABLE",
+          "sqlstate": "40001",
+          "code": "INTELLIGENCE_SOURCE_ADVANCED_BEFORE_CLAIM"
+        },
+        {
+          "type": "tick",
+          "cycle": 1,
+          "materialized": 1,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 5,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": true,
+            "COMPETITION": true,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "COMPETITION",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "CALCUTTA",
+          "empty": false
+        },
+        {
+          "type": "tick",
+          "cycle": 2,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 3,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 4,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 5,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 6,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 7,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 8,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 9,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 10,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 11,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 12,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 13,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 14,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 15,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 16,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 17,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 18,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 19,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 20,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 21,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 22,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 23,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": true
+        },
+        {
+          "type": "tick",
+          "cycle": 24,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": true
+        },
+        {
+          "type": "tick",
+          "cycle": 25,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": true
+        },
+        {
+          "type": "tick",
+          "cycle": 26,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": true
+        },
+        {
+          "type": "tick",
+          "cycle": 27,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": true
+        },
+        {
+          "type": "tick",
+          "cycle": 28,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": true
+        },
+        {
+          "type": "tick",
+          "cycle": 29,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 2,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": false
+        },
+        {
+          "type": "tick",
+          "cycle": 30,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 0,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "stopped",
+          "cycles": 31
+        }
+      ]
+    },
+    {
+      "case": "intelligence-after-claim",
+      "pass": true,
+      "postClaimRevalidation": true,
+      "parity": {
+        "exactCanonicalSource": true,
+        "engines": [
+          "TEAM_MOMENTUM",
+          "TOURNAMENT_STORYLINES",
+          "TOURNAMENT_INTELLIGENCE",
+          "PROJECTION_EDITORIAL"
+        ],
+        "calcutta": {
+          "exact": true,
+          "currentCount": 1
+        },
+        "finalRecap": "WAITING_PUBLISHED_FINAL_GATE",
+        "netSkins": "WAITING_OWNER",
+        "proof": "ACTUAL_SQL_READS_AND_UNCHANGED_CALCULATORS"
+      },
+      "events": [
+        {
+          "type": "started",
+          "workerId": "phase2c-local-worker"
+        },
+        {
+          "type": "tick",
+          "cycle": 0,
+          "materialized": 2,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 5,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": true,
+            "COMPETITION": true,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "CALCUTTA",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "COMPETITION",
+          "empty": false
+        },
+        {
+          "type": "injected-score",
+          "operation": "claim_intelligence_derived_bundle",
+          "position": "score-after",
+          "pendingCompetitionIntents": 1
+        },
+        {
+          "type": "failed",
+          "family": "INTELLIGENCE",
+          "classification": "RETRYABLE",
+          "sqlstate": "40001",
+          "code": "INTELLIGENCE_SOURCE_ADVANCED_BEFORE_CLAIM"
+        },
+        {
+          "type": "tick",
+          "cycle": 1,
+          "materialized": 2,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 5,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": true,
+            "COMPETITION": true,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "COMPETITION",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "CALCUTTA",
+          "empty": false
+        },
+        {
+          "type": "tick",
+          "cycle": 2,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 0,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "stopped",
+          "cycles": 3
+        }
+      ]
+    },
+    {
+      "case": "intelligence-before-write",
+      "pass": true,
+      "postClaimRevalidation": false,
+      "parity": {
+        "exactCanonicalSource": true,
+        "engines": [
+          "TEAM_MOMENTUM",
+          "TOURNAMENT_STORYLINES",
+          "TOURNAMENT_INTELLIGENCE",
+          "PROJECTION_EDITORIAL"
+        ],
+        "calcutta": {
+          "exact": true,
+          "currentCount": 1
+        },
+        "finalRecap": "WAITING_PUBLISHED_FINAL_GATE",
+        "netSkins": "WAITING_OWNER",
+        "proof": "ACTUAL_SQL_READS_AND_UNCHANGED_CALCULATORS"
+      },
+      "events": [
+        {
+          "type": "started",
+          "workerId": "phase2c-local-worker"
+        },
+        {
+          "type": "tick",
+          "cycle": 0,
+          "materialized": 2,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 5,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": true,
+            "COMPETITION": true,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "CALCUTTA",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "COMPETITION",
+          "empty": false
+        },
+        {
+          "type": "injected-score",
+          "operation": "write_intelligence_derived_bundle",
+          "position": "score-before",
+          "pendingCompetitionIntents": 1
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": false
+        },
+        {
+          "type": "tick",
+          "cycle": 1,
+          "materialized": 2,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 5,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": true,
+            "COMPETITION": true,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "processed",
+          "family": "COMPETITION",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "CALCUTTA",
+          "empty": false
+        },
+        {
+          "type": "tick",
+          "cycle": 2,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 0,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "tick",
+          "cycle": 3,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 0,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "stopped",
+          "cycles": 4
+        }
+      ]
+    },
+    {
+      "case": "calcutta-before-claim",
+      "pass": true,
+      "postClaimRevalidation": false,
+      "parity": {
+        "exactCanonicalSource": true,
+        "engines": [
+          "TEAM_MOMENTUM",
+          "TOURNAMENT_STORYLINES",
+          "TOURNAMENT_INTELLIGENCE",
+          "PROJECTION_EDITORIAL"
+        ],
+        "calcutta": {
+          "exact": true,
+          "currentCount": 1
+        },
+        "finalRecap": "WAITING_PUBLISHED_FINAL_GATE",
+        "netSkins": "WAITING_OWNER",
+        "proof": "ACTUAL_SQL_READS_AND_UNCHANGED_CALCULATORS"
+      },
+      "events": [
+        {
+          "type": "started",
+          "workerId": "phase2c-local-worker"
+        },
+        {
+          "type": "tick",
+          "cycle": 0,
+          "materialized": 2,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 5,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": true,
+            "COMPETITION": true,
+            "INTELLIGENCE": true
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "injected-score",
+          "operation": "claim_production_calcutta_v1_recalculation",
+          "position": "score-before",
+          "pendingCompetitionIntents": 1
+        },
+        {
+          "type": "processed",
+          "family": "CALCUTTA",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "COMPETITION",
+          "empty": false
+        },
+        {
+          "type": "processed",
+          "family": "INTELLIGENCE",
+          "empty": false
+        },
+        {
+          "type": "tick",
+          "cycle": 1,
+          "materialized": 0,
+          "terminal": 0,
+          "cancelled": false,
+          "statusIncomplete": false,
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 0,
+          "activeLeases": 0,
+          "ready": {
+            "CALCUTTA": false,
+            "COMPETITION": false,
+            "INTELLIGENCE": false
+          },
+          "waitingOwner": 0
+        },
+        {
+          "type": "stopped",
+          "cycles": 2
+        }
+      ]
+    },
+    {
+      "case": "actual57014-durable-budget",
+      "pass": true,
+      "statementTimeoutMs": 25,
+      "attempts": 5,
+      "elapsedMs": [
+        35.05841700000019,
+        33.18916700000045,
+        34.644209000001865,
+        32.96008399999846,
+        33.614957999998296
+      ],
+      "expeditedBackoffClock": true,
+      "newConnectionEachAttempt": true
+    },
+    {
+      "case": "compatible-activation-replacement",
+      "pass": true,
+      "oldJobRetained": true,
+      "leasesTransferred": 0,
+      "replacementCount": 1
+    }
+  ],
+  "limitations": [
+    "Synthetic initial approved financial rules and runtime boundaries",
+    "Hosted scheduler installation is not proven",
+    "Net Skins processing remains owner-controlled",
+    "Crash recovery uses explicit lease clock injection"
+  ]
+}

@@ -1,0 +1,177 @@
+{
+  "recordKind": "INDEPENDENT_SOURCE_AND_RETAINED_EVIDENCE_REVIEW_NOT_NEW_RUNTIME_EXECUTION",
+  "reviewedAt": "2026-09-29T20:34:44.544404+00:00",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "sourceHashes": {
+    "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce",
+    "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0",
+    "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48",
+    "lib/scoring-authority-supabase.js": "4dde49461f6805cccce8b5805a80ab4ba159627abc90e1b321d27d92df941196",
+    "lib/operational-rpc-contract.js": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+    "lib/production-scoring-operations-server.js": "b66b5c083801fc6ab4356d1d26320efb805b22cf2a075cb216db0a592ed2cf70",
+    "lib/scoring-mutation-recovery.js": "0f6b5aa1c5f042f846861cee22e61c113cfb98cd058d160c6982f458d77359b3",
+    "lib/scoring-mutation-recovery-route.js": "0e98f14294d531e33b08cc23493c1f326e796e1107f63c30c7404fcf1a6a4cfb",
+    "app/api/scoring/mutation-status/route.js": "39e35bfe30419eb87ae092e7b17feb5e8164abb963c5dc861ba0a3e585cd0c2a",
+    "app/api/mobile/v1/scoring/mutation-status/route.js": "6d4ffb20d5dd156c8ed4af1fd71a0a275304debdb550d8b477bed470931878d9",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cb18835d2bb540572d6460dc4313b678266560e8f6a56b56376b1ee783a321bd",
+    "lib/competition-derived-supabase.js": "7609a613f538e2252314b383305469317803ff23f384fe298ea24e53d40bb241",
+    "lib/intelligence-derived-supabase.js": "aa3d5b53012176ad3ed8ce681758a97770a68e1c18dd38a5cd210f22c636e5e9",
+    "lib/production-calcutta-server.js": "73b6d03776ac29216f83ca0088cc95b918a9960539a7fd441b2443fe1bc95b37",
+    "lib/production-net-skins-server.js": "087505a35d83ad1fa743374396ea3be1338b2c1e1290d23bba20eb2e734f9a0f",
+    "tools/reliability/run-score-derived-worker.mjs": "65f7ab486d4a7404b1003d180cb08f91405ea3dca518c2f3cdaf27eec3c1e9db"
+  },
+  "currentRuntimeReceipts": {
+    "recovery": {
+      "sha256": "a1a07be4418818eb5f11922ba18ddbb39583200412f5f23f7786c3603325d3ff",
+      "completedAt": "2026-09-29T20:16:08.642Z",
+      "counts": {
+        "tests": 50,
+        "pass": 50,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceVerification": "CURRENT_CAPTURED_DEPENDENCIES"
+    },
+    "annual": {
+      "sha256": "d54a12f7b8fe717791c8fd60a10f21ef01eb70765c99f2b9b4bc3f3c29db1c7e",
+      "completedAt": "2026-09-29T20:17:06.233Z",
+      "counts": {
+        "tests": 26,
+        "pass": 26,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceVerification": "CURRENT_CAPTURED_DEPENDENCIES"
+    },
+    "annual-admission-run": {
+      "sha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d",
+      "completedAt": "2026-09-29T20:17:26.463Z",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceVerification": "CURRENT_CAPTURED_DEPENDENCIES"
+    },
+    "canonical": {
+      "sha256": "ac8d1ffbd689fe8ec0c8bfca7d5cfa2f21e87b1a4703257178eef71145c104de",
+      "completedAt": "2026-09-29T20:22:36.952Z",
+      "counts": {
+        "tests": 31,
+        "pass": 31,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceVerification": "CURRENT_CAPTURED_DEPENDENCIES"
+    },
+    "full-sequence": {
+      "sha256": "4b58ad2d032976a9fa8a6223b798e87baaefe278e1528e0f47d09f7d0d903d92",
+      "completedAt": "2026-09-29T20:25:11.763Z",
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceVerification": "CURRENT_CAPTURED_DEPENDENCIES"
+    },
+    "delivery": {
+      "sha256": "0d6c0225f646507f4ef681a9f94d3954552e7c6ca71f6da3071933ede848c819",
+      "completedAt": "2026-09-29T20:12:07.676Z",
+      "counts": {
+        "tests": 54,
+        "pass": 54,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceVerification": "CURRENT_CAPTURED_DEPENDENCIES"
+    },
+    "deadlock": {
+      "sha256": "5f89462b6e315e93399281b3afe8d06800d0d91866db4babf8688424a9f91334",
+      "completedAt": "2026-09-29T20:18:28.644Z",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceVerification": "CURRENT_CAPTURED_DEPENDENCIES"
+    },
+    "net-owner-lock-order": {
+      "sha256": "1ecf83162c2706daff730ab04641fabcf4ab3a8b103176b83f6f0bf85e5b5069",
+      "completedAt": "2026-09-29T20:14:21.910Z",
+      "counts": {
+        "tests": 20,
+        "pass": 20,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceVerification": "CURRENT_CAPTURED_DEPENDENCIES"
+    },
+    "calcutta-lock-order": {
+      "sha256": "3eb6f6c0f440ddccd52bfb3f633b7ef85dc65ba6e83de0bc30614ce76c7ee087",
+      "completedAt": "2026-09-29T20:12:44.431Z",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceVerification": "CURRENT_CAPTURED_DEPENDENCIES"
+    },
+    "worker-lock-order": {
+      "sha256": "fa74f0125f8d379291c9f1ef161bc97a88ec008d319a2e5cee52bec5fa5fe5bf",
+      "completedAt": "2026-09-29T20:13:18.757Z",
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceVerification": "CURRENT_CAPTURED_DEPENDENCIES"
+    },
+    "worker-failure-lock-order": {
+      "sha256": "b477fc3e194f98eb19d3be2a691282e450f1d83377ab7f2a060b663f94f62b89",
+      "completedAt": "2026-09-29T20:15:02.815Z",
+      "counts": {
+        "tests": 16,
+        "pass": 16,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceVerification": "CURRENT_CAPTURED_DEPENDENCIES"
+    }
+  },
+  "conclusions": {
+    "blockingSourceDefectFound": false,
+    "canonicalGolfFormulaChangeFound": false,
+    "nativeShippingChangesFound": [],
+    "recoveryWriteAuthorityAdded": false,
+    "financialApprovalOrPublicationAutomationAdded": false,
+    "productionOrDatabaseAccessDuringReview": false,
+    "overallCertification": "PENDING_FINAL_PERFORMANCE_AND_PACKAGE_GATES"
+  },
+  "caveats": [
+    "Actual formula and authorization conclusions combine targeted source review with separately captured current runtime receipts; source review alone is not runtime proof.",
+    "Existing annual certificates intentionally block migrations; protected fresh-certificate local admission does not prove an in-place live certified runtime upgrade.",
+    "Legacy null-origin receipts return UNKNOWN; matching current score alone is not mutation provenance.",
+    "Current service endpoints require trusted server transport; inherited service-role authority is not granted to participant clients.",
+    "Supported writers bound current marker keys; future expiry preserves all target/current-generation rows and schema permits additional privileged rows.",
+    "Process runner needs later hosted supervision/credentials/alerts. Autonomous pickup is proven only while the local supported process runs; Net Skins processing/publication stays owner controlled.",
+    "No per-index write amplification or hosted DDL lock duration measured.",
+    "After traffic, preserve receipt origin/delivery events/pending intents and use reviewed compatible forward correction; old worker code may ignore new delay/dead-letter policy."
+  ]
+}

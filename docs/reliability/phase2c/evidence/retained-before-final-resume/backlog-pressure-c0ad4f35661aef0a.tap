@@ -1,0 +1,29 @@
+TAP version 13
+# Subtest: P2C-B-BACKLOG: bounded normal and larger backlog drain while independent groups keep scoring
+    # Subtest: normal_round_burst
+    ok 1 - normal_round_burst
+      ---
+      duration_ms: 1779.570583
+      type: 'test'
+      ...
+    # Subtest: six_hole_larger_backlog
+    ok 2 - six_hole_larger_backlog
+      ---
+      duration_ms: 3291.457292
+      type: 'test'
+      ...
+    1..2
+ok 1 - P2C-B-BACKLOG: bounded normal and larger backlog drain while independent groups keep scoring
+  ---
+  duration_ms: 13519.887375
+  type: 'test'
+  ...
+1..1
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 13575.926792

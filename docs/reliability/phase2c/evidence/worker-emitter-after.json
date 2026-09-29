@@ -1,0 +1,8 @@
+{
+  "proof": "ACTUAL_LOCAL_NODE_CHILD_NO_DATABASE_NO_NETWORK",
+  "sourceSha256": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+  "exitCode": 0,
+  "stdout": "{\"result\":{\"ok\":true,\"cycles\":2},\"calls\":[\"tick\",\"tick\"]}\n",
+  "stderr": "",
+  "production": false
+}

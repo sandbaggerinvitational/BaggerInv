@@ -1,0 +1,29 @@
+{
+  "reason": "Passing prior receipts retained before rerun for changed child fixture dependency; shipping124 unchanged.",
+  "files": [
+    {
+      "file": "net-owner-lock-order.json",
+      "sha256": "471003a4ebc34baa922906e9be7c9d20871b2610e64ff6193b4e03e12dd7d16e"
+    },
+    {
+      "file": "net-owner-lock-order.tap",
+      "sha256": "cee5e68cdde52a9cd0b6f9ec4a2a07d50aea21f7d602ecc744eee775536248a0"
+    },
+    {
+      "file": "net-owner-control-lock-after.json",
+      "sha256": "909e490c58584f33e8b1062e895161576f47fc8daba3851da3e851cc5b284d40"
+    },
+    {
+      "file": "worker-failure-lock-order.json",
+      "sha256": "35777b351186cfb837faba6628ba28b530823c0ca75fb1db747d9b66c422428d"
+    },
+    {
+      "file": "worker-failure-lock-order.tap",
+      "sha256": "bf7fd88f1f8d435b2d0166f5c444ff442312ad5999a365f12f0d9294e80932e7"
+    },
+    {
+      "file": "worker-failure-lock-after.json",
+      "sha256": "3162c5d49a71217363116cb629d9f9e7d6017f33eb09008ced155b0733d40c2c"
+    }
+  ]
+}

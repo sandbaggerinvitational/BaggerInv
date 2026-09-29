@@ -1,0 +1,45 @@
+{
+  "reviewedAt": "2026-09-29T20:32:35.877675+00:00",
+  "proofLayer": "READ_ONLY_ARTIFACT_VALIDATION",
+  "databaseRun": false,
+  "sourceEdited": false,
+  "gateProposalSha256": "a50fa40982a2f742c73ae5795bfeb6720523bd61cf63c2bb82debbcaa66fd698",
+  "actualArtifactSha256": "e83394c28074545af90343bc7a93744f97cb86dc0f346564ae8e221010a34a2a",
+  "wrapperResult": "PASS",
+  "wrapperCounts": {
+    "tests": 33,
+    "pass": 33,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "sourceValidation": "PASS",
+  "actualDetailValidation": {
+    "branches": 32,
+    "samplesPerFamilyOperation": 3,
+    "extremeHistoryRowsWithPlans": 16,
+    "corePlanCaptures": 48,
+    "additionalPlanProfiles": 2,
+    "intermediateRowsTimingOnly": 16,
+    "planScope": "1x/10x all8 variants; final-ready/index comparisons only none1x/10x",
+    "p95": "NOT_PROVEN",
+    "p99": "NOT_PROVEN",
+    "indexQuality": "ENGINEERING_PLAN_REVIEW_REQUIRED"
+  },
+  "status": "PASS_FOR_RETAINED_ARTIFACT",
+  "actualShape": {
+    "rows": 32,
+    "coreCaptures": 48,
+    "timingOnlyRows": 16,
+    "extraPlanRows": [
+      [
+        1,
+        "none"
+      ],
+      [
+        10,
+        "none"
+      ]
+    ]
+  }
+}

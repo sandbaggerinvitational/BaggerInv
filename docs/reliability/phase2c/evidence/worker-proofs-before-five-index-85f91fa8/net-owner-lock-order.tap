@@ -1,0 +1,89 @@
+TAP version 13
+# Subtest: Net Skins owner completion locks exact Storylines before supported controls
+    # Subtest: present FINALIZE before
+    ok 1 - present FINALIZE before
+      ---
+      duration_ms: 2729.544333
+      type: 'test'
+      ...
+    # Subtest: present FINALIZE after
+    ok 2 - present FINALIZE after
+      ---
+      duration_ms: 1474.330833
+      type: 'test'
+      ...
+    # Subtest: present SCORING_LOCK before
+    ok 3 - present SCORING_LOCK before
+      ---
+      duration_ms: 2532.646084
+      type: 'test'
+      ...
+    # Subtest: present SCORING_LOCK after
+    ok 4 - present SCORING_LOCK after
+      ---
+      duration_ms: 1448.194375
+      type: 'test'
+      ...
+    # Subtest: absent FINALIZE before
+    ok 5 - absent FINALIZE before
+      ---
+      duration_ms: 2528.311792
+      type: 'test'
+      ...
+    # Subtest: absent FINALIZE after
+    ok 6 - absent FINALIZE after
+      ---
+      duration_ms: 1473.861375
+      type: 'test'
+      ...
+    # Subtest: absent SCORING_LOCK before
+    ok 7 - absent SCORING_LOCK before
+      ---
+      duration_ms: 3680.330166
+      type: 'test'
+      ...
+    # Subtest: absent SCORING_LOCK after
+    ok 8 - absent SCORING_LOCK after
+      ---
+      duration_ms: 1738.00575
+      type: 'test'
+      ...
+    # Subtest: absent marker rolls back on rejected lease
+    ok 9 - absent marker rolls back on rejected lease
+      ---
+      duration_ms: 2527.793542
+      type: 'test'
+      ...
+    # Subtest: absent marker rolls back on rejected source
+    ok 10 - absent marker rolls back on rejected source
+      ---
+      duration_ms: 2317.815417
+      type: 'test'
+      ...
+    # Subtest: two simultaneous rounds create only unchanged canonical Storylines demand
+    ok 11 - two simultaneous rounds create only unchanged canonical Storylines demand
+      ---
+      duration_ms: 1553.166292
+      type: 'test'
+      ...
+    # Subtest: both completion bodies and private helper are manifest bound without changed authority attributes
+    ok 12 - both completion bodies and private helper are manifest bound without changed authority attributes
+      ---
+      duration_ms: 80.867334
+      type: 'test'
+      ...
+    1..12
+ok 1 - Net Skins owner completion locks exact Storylines before supported controls
+  ---
+  duration_ms: 43418.521708
+  type: 'test'
+  ...
+1..1
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 43578.206792

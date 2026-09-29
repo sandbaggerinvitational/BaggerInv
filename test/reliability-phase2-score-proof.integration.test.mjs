@@ -47,7 +47,7 @@ const outputArgument=process.env.BAGGER_PHASE2_PROOF_OUTPUT;
 let outputPath;
 if(outputArgument){
   outputPath=path.resolve(repositoryRoot,outputArgument);
-  assert.ok(outputPath.startsWith(path.join(repositoryRoot,"docs/reliability/phase2")+path.sep));
+  assert.ok(["phase2","phase2c"].some(phase=>outputPath.startsWith(path.join(repositoryRoot,"docs/reliability",phase)+path.sep)));
   assert.match(outputPath,/\.json$/);
 }
 

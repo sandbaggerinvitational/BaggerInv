@@ -1,0 +1,72 @@
+{
+  "review": "GOOGLE_OUTBOX_DELIVERY_SCOPE",
+  "method": "read-only source and retained artifact inspection; no runtime/provider calls",
+  "production": "NOT_QUERIED",
+  "scopeFinding": "Required automatic external mirror when explicitly admitted; not covered by three-family Phase2C delivery proof",
+  "sourceManifest": [
+    {
+      "path": "lib/scoring-google-outbox.js",
+      "sha256": "094e65cf7b18785fdcbfb3f8e1c2d594c73aad89e835d999c088e88a40a630cc"
+    },
+    {
+      "path": "lib/mobile-v1-scoring-post-commit.js",
+      "sha256": "5c0975248d80a6b4bc6527c9943992a14d3cb64bba6cdbe90df0aa164c1ffc9f"
+    },
+    {
+      "path": "app/api/scoring/current/route.js",
+      "sha256": "51af7a873bc2a0d95b6e4f81bb814900748669d1d02514752f0adfb503635eee"
+    },
+    {
+      "path": "app/api/scoring/matches/[matchId]/route.js",
+      "sha256": "0173cb98ada651cd0e70dd30faaf47d866055a2c4730ba64f758d2cde017dd27"
+    },
+    {
+      "path": "app/api/cron/scoring-google-outbox/route.js",
+      "sha256": "bf41a41d3287e0a881801cf8a497424f8539e11359be73120e249e0afedde2ad"
+    },
+    {
+      "path": "vercel.json",
+      "sha256": "b8cee7e021c0e46637014ed3ff2cce40d0176ed34e5c23015058abdaef989ee5"
+    },
+    {
+      "path": "lib/google-sheets-write.js",
+      "sha256": "1b0383256e6930d06963bd02d0bc2c198994bfcbc16e7b60139ac4c38c989a86"
+    },
+    {
+      "path": "supabase/production_migrations/202608240021_production_scoring_operations.sql",
+      "sha256": "b1c92cb8f763d28fb1923f4a8978f02d7ce01d6f13531282c7c55bfc2ba67a81"
+    },
+    {
+      "path": "supabase/production_migrations/202608300067_production_current_scoring_runtime_v1.sql",
+      "sha256": "fea6478fc720946dab7171413c85fae7fc5d0a3c40c3ca3b62f6b4ffb8d93fb2"
+    },
+    {
+      "path": "supabase/production_migrations/202608300069_production_annual_scoring_authority_v1.sql",
+      "sha256": "697abe93c2f82002e95b01a2c4ef062507a6f56ac4785111f510e3d1b2fe6152"
+    },
+    {
+      "path": "test/support/reliability/synthetic-tournament.mjs",
+      "sha256": "ff89ae3da85532942902ada814dce195585ccecb7b58c0fcc5a3e53ccf9fc90f"
+    },
+    {
+      "path": "docs/reliability/phase2/SCORE-CRITICAL-PATH-AFTER.md",
+      "sha256": "440b522166cb0cf89c6f698946cd34d24a33f93cc792154ef9970305d48e7dbb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-workers.json",
+      "sha256": "5104e402498673fef5f6e697d47f9bf6a8f23018bc878310885d000825ffec78"
+    }
+  ],
+  "report": "docs/reliability/phase2c/GOOGLE-OUTBOX-GAP.md",
+  "reportSha256": "ae4a8da156c004de658f6bbea310a524f70f1e333d8c08d787fd4ee4a5dba205",
+  "storageAndStatusAddendum": {
+    "at": "2026-09-29T21:14:50.361703+00:00",
+    "originalReport": "/private/tmp/phase2c-google-outbox-scope-review.md",
+    "originalReportSha256": "779d82dd433f4c708b3ba1067a965228484593a4a70c6e337a4101a8091a0d27",
+    "changes": [
+      "Moved report reference to durable repository path",
+      "Replaced pending broad rerun text with the actual retained comparison; no expanded delivery claim"
+    ],
+    "sourceManifestReverified": true
+  }
+}

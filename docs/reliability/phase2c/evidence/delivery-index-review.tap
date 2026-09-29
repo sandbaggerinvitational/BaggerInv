@@ -1,0 +1,149 @@
+TAP version 13
+# Subtest: NA-P2C-B current delivery indexes have measured query purposes
+    # Subtest: 1x CALCUTTA_DUE
+    ok 1 - 1x CALCUTTA_DUE
+      ---
+      duration_ms: 50.507417
+      type: 'test'
+      ...
+    # Subtest: 1x CALCUTTA_DELAYED
+    ok 2 - 1x CALCUTTA_DELAYED
+      ---
+      duration_ms: 49.529792
+      type: 'test'
+      ...
+    # Subtest: 1x NET_SKINS_DUE
+    ok 3 - 1x NET_SKINS_DUE
+      ---
+      duration_ms: 58.6015
+      type: 'test'
+      ...
+    # Subtest: 1x NET_SKINS_DELAYED
+    ok 4 - 1x NET_SKINS_DELAYED
+      ---
+      duration_ms: 44.707791
+      type: 'test'
+      ...
+    # Subtest: 1x COMPETITION_DUE
+    ok 5 - 1x COMPETITION_DUE
+      ---
+      duration_ms: 62.160792
+      type: 'test'
+      ...
+    # Subtest: 1x COMPETITION_DELAYED
+    ok 6 - 1x COMPETITION_DELAYED
+      ---
+      duration_ms: 72.435709
+      type: 'test'
+      ...
+    # Subtest: 1x COMPETITION_TERMINAL_COUNT_DUE
+    ok 7 - 1x COMPETITION_TERMINAL_COUNT_DUE
+      ---
+      duration_ms: 41.053875
+      type: 'test'
+      ...
+    # Subtest: 1x COMPETITION_TERMINAL_COUNT_TERMINAL
+    ok 8 - 1x COMPETITION_TERMINAL_COUNT_TERMINAL
+      ---
+      duration_ms: 45.001917
+      type: 'test'
+      ...
+    # Subtest: 1x INTENT_BACKLOG_864_DEAD_0
+    ok 9 - 1x INTENT_BACKLOG_864_DEAD_0
+      ---
+      duration_ms: 78.680333
+      type: 'test'
+      ...
+    # Subtest: 1x INTENT_BACKLOG_864_DEAD_1
+    ok 10 - 1x INTENT_BACKLOG_864_DEAD_1
+      ---
+      duration_ms: 69.941542
+      type: 'test'
+      ...
+    # Subtest: 1x INTENT_BACKLOG_864_DEAD_101
+    ok 11 - 1x INTENT_BACKLOG_864_DEAD_101
+      ---
+      duration_ms: 70.584166
+      type: 'test'
+      ...
+    # Subtest: 10x CALCUTTA_DUE
+    ok 12 - 10x CALCUTTA_DUE
+      ---
+      duration_ms: 68.9875
+      type: 'test'
+      ...
+    # Subtest: 10x CALCUTTA_DELAYED
+    ok 13 - 10x CALCUTTA_DELAYED
+      ---
+      duration_ms: 64.63825
+      type: 'test'
+      ...
+    # Subtest: 10x NET_SKINS_DUE
+    ok 14 - 10x NET_SKINS_DUE
+      ---
+      duration_ms: 48.383792
+      type: 'test'
+      ...
+    # Subtest: 10x NET_SKINS_DELAYED
+    ok 15 - 10x NET_SKINS_DELAYED
+      ---
+      duration_ms: 47.928625
+      type: 'test'
+      ...
+    # Subtest: 10x COMPETITION_DUE
+    ok 16 - 10x COMPETITION_DUE
+      ---
+      duration_ms: 53.178666
+      type: 'test'
+      ...
+    # Subtest: 10x COMPETITION_DELAYED
+    ok 17 - 10x COMPETITION_DELAYED
+      ---
+      duration_ms: 52.481833
+      type: 'test'
+      ...
+    # Subtest: 10x COMPETITION_TERMINAL_COUNT_DUE
+    ok 18 - 10x COMPETITION_TERMINAL_COUNT_DUE
+      ---
+      duration_ms: 35.751375
+      type: 'test'
+      ...
+    # Subtest: 10x COMPETITION_TERMINAL_COUNT_TERMINAL
+    ok 19 - 10x COMPETITION_TERMINAL_COUNT_TERMINAL
+      ---
+      duration_ms: 36.784292
+      type: 'test'
+      ...
+    # Subtest: 10x INTENT_BACKLOG_864_DEAD_0
+    ok 20 - 10x INTENT_BACKLOG_864_DEAD_0
+      ---
+      duration_ms: 67.724041
+      type: 'test'
+      ...
+    # Subtest: 10x INTENT_BACKLOG_864_DEAD_1
+    ok 21 - 10x INTENT_BACKLOG_864_DEAD_1
+      ---
+      duration_ms: 62.914625
+      type: 'test'
+      ...
+    # Subtest: 10x INTENT_BACKLOG_864_DEAD_101
+    ok 22 - 10x INTENT_BACKLOG_864_DEAD_101
+      ---
+      duration_ms: 63.458791
+      type: 'test'
+      ...
+    1..22
+ok 1 - NA-P2C-B current delivery indexes have measured query purposes
+  ---
+  duration_ms: 71430.236042
+  type: 'test'
+  ...
+1..1
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 71494.617167

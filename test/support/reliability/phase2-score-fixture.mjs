@@ -159,7 +159,12 @@ export async function createScoreProofFixture({ candidateSql } = {}) {
         sha256: createHash("sha256").update(await readFile(filename)).digest("hex") };
       sqlFile(cluster, database, filename, { role: "" });
     }
-    return { cluster, database, candidate, counter: 0,
+    let phase2c = null;
+    if (process.env.BAGGER_PHASE2C_CANDIDATE === '1') {
+      const { installPhase2C } = await import('./phase2c-install.mjs');
+      phase2c = await installPhase2C(cluster, database);
+    }
+    return { cluster, database, candidate, phase2c, counter: 0,
       metadata: { fixture: proofFixtureVersion, seed: proofSeed,
         environment: "ISOLATED_LOCAL_POSTGRESQL17", durableCommit: true, fsync: false,
         handicapCases: { plus:-2.5, medium:17.8, high:26.4, veryHigh:40.2,
@@ -174,6 +179,12 @@ export function cloneScoreProofDatabase(fixture, label = "case") {
   const database = `p2_${++fixture.counter}_${label}`;
   assert.match(database, /^[a-z][a-z0-9_]{0,62}$/);
   createDatabase(fixture.cluster, database, { template: fixture.database });
+  // PostgreSQL template cloning does not copy ALTER DATABASE settings.
+  if (fixture.phase2c) {
+    const milliseconds = fixture.phase2c.statementTimeoutMs;
+    assert.ok(Number.isInteger(milliseconds) && milliseconds > 0 && milliseconds <= 5000);
+    sql(fixture.cluster, database, `alter database ${database} set statement_timeout='${milliseconds}ms';alter database ${database} set timezone='UTC'`, { role: '' });
+  }
   return database;
 }
 

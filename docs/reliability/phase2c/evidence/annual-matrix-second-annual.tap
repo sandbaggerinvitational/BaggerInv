@@ -1,0 +1,173 @@
+TAP version 13
+# Subtest: Phase2C actual annual worker SQL corrections
+    # Subtest: P2C-C-BEFORE: all14 installed defects reproduce SQLSTATE42883 before correction
+    ok 1 - P2C-C-BEFORE: all14 installed defects reproduce SQLSTATE42883 before correction
+      ---
+      duration_ms: 394.315667
+      type: 'test'
+      ...
+    # Subtest: P2C-C-BEFORE-WRITER-CHECK: actual eligible writer sync reproduces obsolete false-only CHECK23514
+    ok 2 - P2C-C-BEFORE-WRITER-CHECK: actual eligible writer sync reproduces obsolete false-only CHECK23514
+      ---
+      duration_ms: 316.808666
+      type: 'test'
+      ...
+    # Subtest: P2C-C-INSTALL: upgrade preserves attributes and removes only proven special-expression misuse
+    ok 3 - P2C-C-INSTALL: upgrade preserves attributes and removes only proven special-expression misuse
+      ---
+      duration_ms: 458.696
+      type: 'test'
+      ...
+    # Subtest: P2C-C-AFTER: every corrected initializer executes through its original guard rather than42883
+    ok 4 - P2C-C-AFTER: every corrected initializer executes through its original guard rather than42883
+      ---
+      duration_ms: 697.357625
+      type: 'test'
+      ...
+    # Subtest: P2C-C-COMPETITION: 2099 claim/complete/replay/stale and lease clamp use actual worker SQL
+    ok 5 - P2C-C-COMPETITION: 2099 claim/complete/replay/stale and lease clamp use actual worker SQL
+      ---
+      duration_ms: 1551.58475
+      type: 'test'
+      ...
+    # Subtest: P2C-C-BEFORE-42702: corrected initializer exposes historical annual intelligence variable collision
+    ok 6 - P2C-C-BEFORE-42702: corrected initializer exposes historical annual intelligence variable collision
+      ---
+      duration_ms: 409.018042
+      type: 'test'
+      ...
+    # Subtest: P2C-C-INTELLIGENCE: 2099 bundle claim/complete preserves active lease and expired-lease retry
+    ok 7 - P2C-C-INTELLIGENCE: 2099 bundle claim/complete preserves active lease and expired-lease retry
+      ---
+      duration_ms: 5835.372083
+      type: 'test'
+      ...
+    # Subtest: P2C-C-CALCUTTA: 2099 nonempty Calcutta claim executes lease bounds and same-request replay
+    ok 8 - P2C-C-CALCUTTA: 2099 nonempty Calcutta claim executes lease bounds and same-request replay
+      ---
+      duration_ms: 1610.056708
+      type: 'test'
+      ...
+    # Subtest: P2C-C-GOOGLE-COMPATIBILITY: 2100 pre-activation job claims clamp leases and reclaim an expired lease
+    ok 9 - P2C-C-GOOGLE-COMPATIBILITY: 2100 pre-activation job claims clamp leases and reclaim an expired lease
+      ---
+      duration_ms: 1526.402083
+      type: 'test'
+      ...
+    # Subtest: P2C-C-WRITER-CHECK: writer sync retains certification and prepared-state requirements
+    ok 10 - P2C-C-WRITER-CHECK: writer sync retains certification and prepared-state requirements
+      ---
+      duration_ms: 372.002416
+      type: 'test'
+      ...
+    # Subtest: P2C-C-GOOGLE: 2099 outbox claims and retry delay retain finite bounds and stale-lease rejection
+    ok 11 - P2C-C-GOOGLE: 2099 outbox claims and retry delay retain finite bounds and stale-lease rejection
+      ---
+      duration_ms: 1476.280792
+      type: 'test'
+      ...
+    # Subtest: P2C-C-ARCHIVE: 2099 archive claims and retry delay preserve supersession and finite bounds
+    ok 12 - P2C-C-ARCHIVE: 2099 archive claims and retry delay preserve supersession and finite bounds
+      ---
+      duration_ms: 1629.945417
+      type: 'test'
+      ...
+    # Subtest: P2C-C-ODDS: 2099 actual completion clamps output bytes without publishing or duplicating results
+    ok 13 - P2C-C-ODDS: 2099 actual completion clamps output bytes without publishing or duplicating results
+      ---
+      duration_ms: 1544.229291
+      type: 'test'
+      ...
+    # Subtest: P2C-C-CALCUTTA-MATRIX: annual Calcutta empty, historical, stale-source and expired-lease branches
+    not ok 14 - P2C-C-CALCUTTA-MATRIX: annual Calcutta empty, historical, stale-source and expired-lease branches
+      ---
+      duration_ms: 5998.411083
+      type: 'test'
+      location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-annual-workers.integration.test.mjs:39:29'
+      failureType: 'testCodeFailure'
+      error: |-
+        /opt/homebrew/opt/postgresql@17/bin/psql
+        ERROR:  trailing junk after numeric literal at or near "5where"
+        LINE 2:       ,attempts=5where job_id='a2700000-0000-4000-8000-00000...
+                                ^
+        
+      code: 'ERR_TEST_FAILURE'
+      stack: |-
+        run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+        sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+        write (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-annual-worker-branches.mjs:7:21)
+        change (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-annual-worker-branches.mjs:8:22)
+        file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-annual-worker-branches.mjs:30:5
+        async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-annual-workers.integration.test.mjs:40:19)
+        async Test.run (node:internal/test_runner/test:1404:7)
+        async runAnnualWorkerBranchMatrix (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-annual-worker-branches.mjs:10:2)
+        async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-annual-workers.integration.test.mjs:266:20)
+        async Test.run (node:internal/test_runner/test:1404:7)
+      ...
+    # Subtest: P2C-C-COMPATIBILITY-MATRIX: Google compatibility rejects stale structure and bounds multiple-job selection
+    ok 15 - P2C-C-COMPATIBILITY-MATRIX: Google compatibility rejects stale structure and bounds multiple-job selection
+      ---
+      duration_ms: 1414.0505
+      type: 'test'
+      ...
+    # Subtest: P2C-C-GOOGLE-MATRIX: annual Google exact and queue claims enforce empty, order, lease and terminal states
+    ok 16 - P2C-C-GOOGLE-MATRIX: annual Google exact and queue claims enforce empty, order, lease and terminal states
+      ---
+      duration_ms: 631.9035
+      type: 'test'
+      ...
+    # Subtest: P2C-C-ARCHIVE-MATRIX: annual archive empty, active, expired, retry and blocked branches retain one job authority
+    ok 17 - P2C-C-ARCHIVE-MATRIX: annual archive empty, active, expired, retry and blocked branches retain one job authority
+      ---
+      duration_ms: 491.49925
+      type: 'test'
+      ...
+    # Subtest: P2C-C-ANNUAL-COMPLETION-MATRIX: annual current jobs require exact active claims before completion
+    ok 18 - P2C-C-ANNUAL-COMPLETION-MATRIX: annual current jobs require exact active claims before completion
+      ---
+      duration_ms: 3745.575042
+      type: 'test'
+      ...
+    # Subtest: P2C-C-ODDS-MATRIX: annual Odds completion rejects absent, stale and superseded exact jobs
+    ok 19 - P2C-C-ODDS-MATRIX: annual Odds completion rejects absent, stale and superseded exact jobs
+      ---
+      duration_ms: 2086.455542
+      type: 'test'
+      ...
+    # Subtest: P2C-C-MANIFEST: annual writer manifest retains strict authorship and rejects topology/security drift
+    ok 20 - P2C-C-MANIFEST: annual writer manifest retains strict authorship and rejects topology/security drift
+      ---
+      duration_ms: 758.924583
+      type: 'test'
+      ...
+    # Subtest: P2C-C-REAPPLY: reapplication fails atomically instead of silently accepting unknown source
+    ok 21 - P2C-C-REAPPLY: reapplication fails atomically instead of silently accepting unknown source
+      ---
+      duration_ms: 344.319792
+      type: 'test'
+      ...
+    1..21
+not ok 1 - Phase2C actual annual worker SQL corrections
+  ---
+  duration_ms: 38159.464041
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-annual-workers.integration.test.mjs:31:1'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: P2C-C-CLEAN: effective clean installation executes actual candidate manifest
+ok 2 - P2C-C-CLEAN: effective clean installation executes actual candidate manifest
+  ---
+  duration_ms: 2686.464
+  type: 'test'
+  ...
+1..2
+# tests 23
+# suites 0
+# pass 21
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 40908.97975

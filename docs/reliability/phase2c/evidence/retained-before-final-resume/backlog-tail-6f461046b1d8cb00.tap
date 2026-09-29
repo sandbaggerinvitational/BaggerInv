@@ -1,0 +1,85 @@
+TAP version 13
+# P2C backlog tail normal_preload_one_hole: burst1, qualified36, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst2, qualified72, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst3, qualified108, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst4, qualified144, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst5, qualified180, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst6, qualified216, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst7, qualified252, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst8, qualified288, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst9, qualified324, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst10, qualified360, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst11, qualified396, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst12, qualified432, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst13, qualified468, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst14, qualified504, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst15, qualified540, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst16, qualified576, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst17, qualified612, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst18, qualified648, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst19, qualified684, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst20, qualified720, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst21, qualified756, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst22, qualified792, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst23, qualified828, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst24, qualified864, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst25, qualified900, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst26, qualified936, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst27, qualified972, nonqualifying0
+# P2C backlog tail normal_preload_one_hole: burst28, qualified1008, nonqualifying0
+# Subtest: P2C-B-BACKLOG-TAIL: empirical score and lock bounds during repeated autonomous drain
+    # Subtest: normal_preload_one_hole
+    ok 1 - normal_preload_one_hole
+      ---
+      duration_ms: 104092.839125
+      type: 'test'
+      ...
+# P2C backlog tail larger_preload_six_holes: burst1, qualified36, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst2, qualified72, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst3, qualified108, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst4, qualified144, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst5, qualified180, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst6, qualified216, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst7, qualified252, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst8, qualified288, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst9, qualified324, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst10, qualified360, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst11, qualified396, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst12, qualified432, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst13, qualified468, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst14, qualified504, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst15, qualified540, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst16, qualified576, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst17, qualified612, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst18, qualified648, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst19, qualified684, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst20, qualified720, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst21, qualified756, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst22, qualified792, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst23, qualified828, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst24, qualified864, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst25, qualified900, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst26, qualified936, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst27, qualified972, nonqualifying0
+# P2C backlog tail larger_preload_six_holes: burst28, qualified1008, nonqualifying0
+    # Subtest: larger_preload_six_holes
+    ok 2 - larger_preload_six_holes
+      ---
+      duration_ms: 162710.741083
+      type: 'test'
+      ...
+    1..2
+ok 1 - P2C-B-BACKLOG-TAIL: empirical score and lock bounds during repeated autonomous drain
+  ---
+  duration_ms: 275695.97775
+  type: 'test'
+  ...
+1..1
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 275761.289083

@@ -1,0 +1,583 @@
+{
+  "timestamp": "2026-09-28T14:34:15.630111+00:00",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "branch": "codex/reliability-phase2c-recovery-delivery",
+  "worktree": "/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv",
+  "node": "v26.7.0",
+  "productionQueries": 0,
+  "phase1Available": true,
+  "files": [
+    {
+      "path": "supabase/production_migrations/202608230001_production_control_plane.sql",
+      "sha256": "42c14b75aef5519709a987fa64fca5ca2d4965865d60cf634b83e817f4b8fd74"
+    },
+    {
+      "path": "supabase/production_migrations/202608230002_production_final_domain_schema.sql",
+      "sha256": "7a3b34ee326482f0c3c903cf14f925c30aabd0594cf040ce5db2a10d3d3e9d89"
+    },
+    {
+      "path": "supabase/production_migrations/202608230003_production_history_current_shadow_import.sql",
+      "sha256": "ddbc7b0a5107b1efb4ce0b679a7a5c131cdd8eb50b1250478aa1044398264842"
+    },
+    {
+      "path": "supabase/production_migrations/202608230004_production_projection_imports.sql",
+      "sha256": "103fdd2028529055be373e3643e2aa2c63eac1b7ccd864e6d483b20d8482967d"
+    },
+    {
+      "path": "supabase/production_migrations/202608230005_production_dormant_worker_contracts.sql",
+      "sha256": "64d76c2b066940b7d28a835e0cb53136639595c3460d2878326623a9bbdce350"
+    },
+    {
+      "path": "supabase/production_migrations/202608230006_production_import_evidence_hardening.sql",
+      "sha256": "dbb1aa9a82c70fb2ef1e508b1b7cd7b6d32d897c67e5a7367f3aaac3f32c1da0"
+    },
+    {
+      "path": "supabase/production_migrations/202608230007_production_current_shadow_v2.sql",
+      "sha256": "d58a744477b48409a3d0b838eedb6cd72ba90e219d951242295a60476768bf32"
+    },
+    {
+      "path": "supabase/production_migrations/202608230009_production_published_odds_import_fix.sql",
+      "sha256": "ded65aec90282b7e8b7f5b69349bf55cd63da24c57a63fda3ddcfb80a6adaeea"
+    },
+    {
+      "path": "supabase/production_migrations/202608230010_production_odds_input_bootstrap.sql",
+      "sha256": "313f01e24d71f5af6b1d6899adcdbc4ae630eccd8a681aa11973f1a823b2fe5d"
+    },
+    {
+      "path": "supabase/production_migrations/202608230011_production_candidate_read_views.sql",
+      "sha256": "951abea62adcaee7572f463c1578a6e6284042ba25d1ce8d93977f51254c8bdb"
+    },
+    {
+      "path": "supabase/production_migrations/202608230012_production_auth_director_foundation.sql",
+      "sha256": "4cfa519dd8d93bb82c61b187d33f10470929e1808671ca2a3e3d375399f51017"
+    },
+    {
+      "path": "supabase/production_migrations/202608230013_production_director_identity_bootstrap.sql",
+      "sha256": "276a4c581384dadc63759c099c8d2aff354719b25e82e3cb3fca9b0d340bc4b2"
+    },
+    {
+      "path": "supabase/production_migrations/202608240014_production_auth_otp_request_fix.sql",
+      "sha256": "4e4317ef1c6e4721c3be4a67fd59be81cb61d117f46dcc6d762b287ad8d56344"
+    },
+    {
+      "path": "supabase/production_migrations/202608240015_production_auth_otp_verification_type.sql",
+      "sha256": "591bda79aebb84f0e6cc813c308561d34597e2585ff02badfe1821c3ea34e9fa"
+    },
+    {
+      "path": "supabase/production_migrations/202608240016_production_presentation_shadow_import.sql",
+      "sha256": "51f83799b179134b95f66ccbcd86f971f7a627dac528ad07077ee6665167a6d0"
+    },
+    {
+      "path": "supabase/production_migrations/202608240017_production_auth_provider_rate_limit_observability.sql",
+      "sha256": "9ffa2a4cccc783e14e48ed7d214ca7497101d3a79c9501e8af9356304c44276d"
+    },
+    {
+      "path": "supabase/production_migrations/202608240018_production_step11_scoring_rehearsal.sql",
+      "sha256": "0d2c53f02767a000d43d45071aa837ba5e1ac596386895f893002b1340aff5c2"
+    },
+    {
+      "path": "supabase/production_migrations/202608240019_production_cutover_activation.sql",
+      "sha256": "da7ed17f656e39447156859c30828585eba29d71bfb6516e3797e1187c9c9106"
+    },
+    {
+      "path": "supabase/production_migrations/202608240020_production_participant_identity_cutover.sql",
+      "sha256": "f6a1fe6cb903ed7e0447871879a0b4a4799850e59277e6f7cb9709e8a076e9a2"
+    },
+    {
+      "path": "supabase/production_migrations/202608240021_production_scoring_operations.sql",
+      "sha256": "b1c92cb8f763d28fb1923f4a8978f02d7ce01d6f13531282c7c55bfc2ba67a81"
+    },
+    {
+      "path": "supabase/production_migrations/202608240022_production_cutover_read_sources.sql",
+      "sha256": "ba1db402eab77bf1dfbbb36dfaa36f6df78b8b004206f6adfa54b5b5d9ca4386"
+    },
+    {
+      "path": "supabase/production_migrations/202608240023_production_odds_calculation_orchestration.sql",
+      "sha256": "ca08523d22b8fb69a058fd5adf40b75892701eee46a6d8eb2ec9b2cc64be88d9"
+    },
+    {
+      "path": "supabase/production_migrations/202608240024_production_security_preflight_hardening.sql",
+      "sha256": "f1860d1e27db00cda7bc9f66e6ee19c62efa0d2d7ed22f2c875cea26644a1fe0"
+    },
+    {
+      "path": "supabase/production_migrations/202608240025_production_director_projection_synchronization.sql",
+      "sha256": "5e00f6b2abde097815cd4e4b493cab23279399925c5e5993d7b20c512356341e"
+    },
+    {
+      "path": "supabase/production_migrations/202608240026_production_odds_rehearsal_job_isolation.sql",
+      "sha256": "f998551a8279e6f664acfc90fcea5737966e2c2902d7df91f57ca5662ce199c3"
+    },
+    {
+      "path": "supabase/production_migrations/202608240027_production_step11_completed_history_fixture.sql",
+      "sha256": "2517b2a40fef54512f4f554449b9850a292d9fb7b911abb2454d392e5602087d"
+    },
+    {
+      "path": "supabase/production_migrations/202608240028_production_step11_odds_service_authorization.sql",
+      "sha256": "13f8b62f6a97fe4312b30cddd2cc75fbc70a9a6bb2684923afe7b18ac4fc7c86"
+    },
+    {
+      "path": "supabase/production_migrations/202608240029_production_odds_observation_phase_rebind.sql",
+      "sha256": "6a28035966c9cca9240de340e64031f6fd86bacdae87d6363d9228a825ebb587"
+    },
+    {
+      "path": "supabase/production_migrations/202608240030_production_odds_runtime_transition_nonce.sql",
+      "sha256": "db2054fd36a5d63c4cad89b9dbb2dab0696645ce4a8c40414aadc53e7c8678e4"
+    },
+    {
+      "path": "supabase/production_migrations/202608240031_production_staged_release_abort.sql",
+      "sha256": "e35b847efb10d5bcab18b347eba0ce7dbf6dd08372a39043a321f969bff3788d"
+    },
+    {
+      "path": "supabase/production_migrations/202608240032_production_odds_runtime_input_read.sql",
+      "sha256": "c80570d796e1053f33809b9e11996d2b3e50248e31429721b10c41e01bb6f791"
+    },
+    {
+      "path": "supabase/production_migrations/202608240033_production_precommit_release_abort.sql",
+      "sha256": "941655182ba3e2cc8897aeac6258700935160f73c11925af1cde7615964dd636"
+    },
+    {
+      "path": "supabase/production_migrations/202608260034_production_scoring_admission_fence_v2.sql",
+      "sha256": "71878547ea7537e97f3d4d18324dbc1cdb046f7f6ff5a78e53c64df5690ade35"
+    },
+    {
+      "path": "supabase/production_migrations/202608260035_production_reviewed_post_capture_preview_deployments.sql",
+      "sha256": "59006c3115e2014e6ee8e0a50cfb75593fee0b0a6bda8918e8d78fd3defd1b7d"
+    },
+    {
+      "path": "supabase/production_migrations/202608260036_production_reviewed_post_capture_preview_deployments_v2.sql",
+      "sha256": "9bd71c750583519eb42d2e61ddca2ec08b703d1338cf18fac9dd2712c310fe7c"
+    },
+    {
+      "path": "supabase/production_migrations/202608260037_production_provider_rpc_name_and_inventory_v3.sql",
+      "sha256": "a81ea3d10d5da3c66b89f169d46bd1510ffc806a3bbaeb1dbfe810409d45c9b3"
+    },
+    {
+      "path": "supabase/production_migrations/202608260038_production_provider_preview_target_inventory_v4.sql",
+      "sha256": "32cc5994570aaa77679b19e14a71a917dcc7fe297bc559ebe82dd320bff94c4c"
+    },
+    {
+      "path": "supabase/production_migrations/202608260039_production_all_project_provider_inventory_v3.sql",
+      "sha256": "14f1233ac8c61461ffdeae1df8b8be90a81c1236076d7493168a3542fddcda96"
+    },
+    {
+      "path": "supabase/production_migrations/202608260040_production_provider_inventory_recertification_v4.sql",
+      "sha256": "c2a444dea85aaf432a8a7087521f771f1271ee98d2bb7a7967e2156a07f5afa4"
+    },
+    {
+      "path": "supabase/production_migrations/202608270041_production_rejected_waf_epoch_retirement.sql",
+      "sha256": "cedbb24d66c53e6c664c0026efbe21b28f4786d5d13798c59998eded616ce6cd"
+    },
+    {
+      "path": "supabase/production_migrations/202608270042_production_dormant_scoring_admission_inspection.sql",
+      "sha256": "3bed2e895136e888234a01ded33bc5cfae9e9291a2f292a3e69b2e83f9b16665"
+    },
+    {
+      "path": "supabase/production_migrations/202608270043_production_rejected_waf_epoch_recovery_inspection.sql",
+      "sha256": "7849b1d7545f84c08024222b5963e8bf5d3516f840cbb9f8001e5547154c4077"
+    },
+    {
+      "path": "supabase/production_migrations/202608270044_production_maintenance_window_cutover.sql",
+      "sha256": "3f9e16a6d446fbb1ece569c704d21ff8025125cb2aca32d838f1b5e5bbe23d18"
+    },
+    {
+      "path": "supabase/production_migrations/202608270045_production_maintenance_preprepare_abort.sql",
+      "sha256": "45d857c738765b4d8c08864a70c2aabd008512b96ecb8793320eed4a594b934a"
+    },
+    {
+      "path": "supabase/production_migrations/202608270046_production_staged_release_abort_static_fingerprint.sql",
+      "sha256": "5e873e8940425526e0d03bc9e4d2814b6f5fb137588b9dab35d8fd0de4588baf"
+    },
+    {
+      "path": "supabase/production_migrations/202608270047_production_partial_roster_participant_identity.sql",
+      "sha256": "3b8be15e84a85ddb224b16f6c3f8341e4d980953b9020f69c0ae50bf4b1e1c20"
+    },
+    {
+      "path": "supabase/production_migrations/202608270048_production_current_shadow_semantic_fingerprint.sql",
+      "sha256": "876fc2e493ff96f7c8b3d4082e7c127c548b3cd31b6eccace42682266b26454a"
+    },
+    {
+      "path": "supabase/production_migrations/202608280049_production_maintenance_staging_provenance.sql",
+      "sha256": "bb6b592b14fc2569cfa2c740ec98d0a59cab6d72ee0d68c8d427046eeba5b5d0"
+    },
+    {
+      "path": "supabase/production_migrations/202608280050_production_maintenance_precommit_deployment_rebind.sql",
+      "sha256": "10c67af4ba9ada1887a4731ea2d225cf894d9a198f6bed119462e62688ca35fc"
+    },
+    {
+      "path": "supabase/production_migrations/202608280051_production_maintenance_single_deployment_capability.sql",
+      "sha256": "c117533631cffddb85a6fadc3111abf45312fd29fa91132d56f20ca0d5003365"
+    },
+    {
+      "path": "supabase/production_migrations/202608280052_production_maintenance_precommit_capability_guard.sql",
+      "sha256": "02e196b2fff2adc7905e1d5fbc3fb3df287246817ddb188dc2f33c0af36a8edc"
+    },
+    {
+      "path": "supabase/production_migrations/202608280053_production_postcutover_application_release_rebind.sql",
+      "sha256": "6dd03ed59d116fabc5563a26aca41f36feafef123dd0c440463065410ac20d95"
+    },
+    {
+      "path": "supabase/production_migrations/202608280054_production_postcutover_normal_release_rebind.sql",
+      "sha256": "2110194749661a8300ec8ae67e1df09f56a19717d025aa7f10828fbc3d05890e"
+    },
+    {
+      "path": "supabase/production_migrations/202608290055_production_net_skins_v1.sql",
+      "sha256": "f83950606d77392a8cc853484eb4a5ba37ba657ffda95cbb70ed5318571c1e56"
+    },
+    {
+      "path": "supabase/production_migrations/202608290056_production_calcutta_v1.sql",
+      "sha256": "cf1987b7e7ad3d69d0836aed214a77c85ac1daa68c19aeab6408d82e0296399f"
+    },
+    {
+      "path": "supabase/production_migrations/202608290057_production_odds_publication_authority_v1.sql",
+      "sha256": "c45c3b418539aa9532f9dcfb0fb796318ad2eef5d2e9bc8056439da0048f8dc6"
+    },
+    {
+      "path": "supabase/production_migrations/202608290058_production_handicap_revisions_v1.sql",
+      "sha256": "0ad4e285fb79eafbf945631d19c4d6b921c03ea5a63855a59c1bd21a576c5c59"
+    },
+    {
+      "path": "supabase/production_migrations/202608300059_production_director_private_operations_v1.sql",
+      "sha256": "74cdcc821cb66f8dfaa34aeddc82547f94a1dd62b0e8c16b8ce6a906a9a86ecf"
+    },
+    {
+      "path": "supabase/production_migrations/202608300060_production_players_access_v1.sql",
+      "sha256": "b4f6e97572e0c4ea29f1ffd7b608cc3861bf8e2f7d1af1ee7b0b21ae90685c6c"
+    },
+    {
+      "path": "supabase/production_migrations/202608300061_production_access_governance_v1.sql",
+      "sha256": "fbb14638a4f785588ff6c469d34e289e474fdcd5f4febeae3b791b05c2b73511"
+    },
+    {
+      "path": "supabase/production_migrations/202608300062_initial_owner_adoption_guard_correction.sql",
+      "sha256": "12e0d3ef76c21053b557a967bb4cee74c81352d760875b52d41173164a0a6cd9"
+    },
+    {
+      "path": "supabase/production_migrations/202608300063_production_tournament_setup_v1.sql",
+      "sha256": "b95d80814bc582548562d6838ac282637cdf95e5c4f379acb69727aadb903b1e"
+    },
+    {
+      "path": "supabase/production_migrations/202608300064_production_future_year_administration_v1.sql",
+      "sha256": "efd191d5021e161c14cd570bac22e3d673dbb1b7a7364c6c902953e02d803a71"
+    },
+    {
+      "path": "supabase/production_migrations/202608300065_production_future_year_runtime_role_guard.sql",
+      "sha256": "1855fc6d9ead6fca44dbb2b4443c15ae75c33c8fd9a7770e6b1af5f957d8c725"
+    },
+    {
+      "path": "supabase/production_migrations/202608300066_production_future_runtime_activation_v1.sql",
+      "sha256": "dd8fcec00948d369df4f56a41cba686621d4f162640cafb6bfaebb102067b3ce"
+    },
+    {
+      "path": "supabase/production_migrations/202608300067_production_current_scoring_runtime_v1.sql",
+      "sha256": "fea6478fc720946dab7171413c85fae7fc5d0a3c40c3ca3b62f6b4ffb8d93fb2"
+    },
+    {
+      "path": "supabase/production_migrations/202608300068_production_future_participant_identity_runtime_v1.sql",
+      "sha256": "afcbb22855edd39b96a8df605d689373ca375b1b202a5676219e4ad5bb1efd64"
+    },
+    {
+      "path": "supabase/production_migrations/202608300069_production_annual_scoring_authority_v1.sql",
+      "sha256": "697abe93c2f82002e95b01a2c4ef062507a6f56ac4785111f510e3d1b2fe6152"
+    },
+    {
+      "path": "supabase/production_migrations/202608300070_production_future_identity_mobile_dispatch_v1.sql",
+      "sha256": "7ad4d9b594a9375a7d453f5e5adbba80b5a22fa0328476a731473d4f1e4a8b81"
+    },
+    {
+      "path": "supabase/production_migrations/202608300071_production_annual_reads_workers_v1.sql",
+      "sha256": "02de498eb79ffb0a3f28480c3ef2bb3092c9451bf6931d1d7875c80a72299882"
+    },
+    {
+      "path": "supabase/production_migrations/202608300072_production_annual_google_writer_certification_v1.sql",
+      "sha256": "28bf46565beb68feb49502e10b27fc3d93ee958a221bd3b82422eadcc31ed5ce"
+    },
+    {
+      "path": "supabase/production_migrations/202608300073_production_annual_odds_v1.sql",
+      "sha256": "6bb29413e2791fc1d8647327bf1eb8167413719ada78a0134a0c3948c6fedd7e"
+    },
+    {
+      "path": "supabase/production_migrations/202608300074_production_annual_net_skins_v1.sql",
+      "sha256": "0838084ba8501f234a09e73dd4d2711870e1bdffce2379cfd2d640dbac1617a8"
+    },
+    {
+      "path": "supabase/production_migrations/202608300075_production_annual_calcutta_v1.sql",
+      "sha256": "0b033dd6793965ee5c246531b3b87d831b148477eeec998a47413b7b10bbacd3"
+    },
+    {
+      "path": "supabase/production_migrations/202608300076_production_annual_side_game_activation_v1.sql",
+      "sha256": "21630622adeaf01c19be0579f9e9cda064269b997a20b115658c42b42861b9be"
+    },
+    {
+      "path": "supabase/production_migrations/202608300077_production_annual_derived_worker_close_fence_v1.sql",
+      "sha256": "51b9136652bd84ec1701923ab5c06e1cba4e2269046db852fc654a4271e8d00a"
+    },
+    {
+      "path": "supabase/production_migrations/202608300078_production_annual_normal_release_rebind_v1.sql",
+      "sha256": "0d0ea2694ad315e652eaadc0e266347b94736c9dccbef61293dfb6f15f815f13"
+    },
+    {
+      "path": "supabase/production_migrations/202608300079_production_current_match_authorization_v1.sql",
+      "sha256": "b6a865dab9b3ff3a2c00580414f3caa0015510990446056867f2019a4bf00e19"
+    },
+    {
+      "path": "supabase/production_migrations/202608310080_production_prediction_settings_authoring_v1.sql",
+      "sha256": "8d1cf655ce8009a2581868609a17943a3ea90749ffb69149e2074c2b591f988e"
+    },
+    {
+      "path": "supabase/production_migrations/202608310081_production_draft_authoring_v1.sql",
+      "sha256": "2d3e5e391682666787ac3ed4b122bac42276915211d344d7664cc5247fe16974"
+    },
+    {
+      "path": "supabase/production_migrations/202608310082_production_guide_authoring_v1.sql",
+      "sha256": "77193070ab77cff40fb7ba6a2492fb610dcadf804689a99dc453afb18563c5c5"
+    },
+    {
+      "path": "supabase/production_migrations/202609030083_production_empty_pairings_v1.sql",
+      "sha256": "577ed58e8136da9ad397d3074c915e521991ee8a3fcb62a2703eaec661818c79"
+    },
+    {
+      "path": "supabase/production_migrations/202609040084_production_starting_hole_retirement_v1.sql",
+      "sha256": "775942d3b68cb9e14da3aeb0710f1e0512e7a965a607460f9cac142d2d12983b"
+    },
+    {
+      "path": "supabase/production_migrations/202609040085_production_calcutta_full_course_handicap_v2.sql",
+      "sha256": "43735a10bb4804a123ab0b41865fa02068afc6c2a4359067db1bd411aac68021"
+    },
+    {
+      "path": "supabase/production_migrations/202609040086_production_identical_legacy_course_adoption_v1.sql",
+      "sha256": "4228c17de53907302cfe6e8fd03110b39a6e702f483416014b966f73f2ed26c5"
+    },
+    {
+      "path": "supabase/production_migrations/202609040087_production_odds_publication_withdrawal_v1.sql",
+      "sha256": "46bf52fd6df63cc40b5e409b6c72b478b18a09c7e35165363bf87b32f02a0064"
+    },
+    {
+      "path": "supabase/production_migrations/202609050088_production_odds_legacy_projection_compatibility_v1.sql",
+      "sha256": "b6ed084084e31427140d3b28c48fbfddcf2ff3cf8554fcd2f4a5f4b6bc26c8d7"
+    },
+    {
+      "path": "supabase/production_migrations/202609050089_production_tournament_awards_v1.sql",
+      "sha256": "1bed7020e29b8256fbbc5d2da8c2138e67312cb0312fb1e15116d28a7771194a"
+    },
+    {
+      "path": "supabase/production_migrations/202609050090_production_tournament_awards_service_scope_v1.sql",
+      "sha256": "1b5c91d4827d80ed9714dc5e2007a71b6f79a2bbd5b75bac53c7d0785443bb19"
+    },
+    {
+      "path": "supabase/production_migrations/202609050091_production_ghin_hybrid_foundation_v1.sql",
+      "sha256": "0934ec54e74a3a424c7f5b5e31e0b2cdeb1bf6103a0b61ee93415fb2273489d7"
+    },
+    {
+      "path": "supabase/production_migrations/202609050092_production_handicap_source_bulk_import_v1.sql",
+      "sha256": "912542da6eb7eec714d36018dc38de24b097562a34ae5280c726feab8e741530"
+    },
+    {
+      "path": "supabase/production_migrations/202609070093_production_guide_incremental_drafts_v1.sql",
+      "sha256": "267ac22cc7683dd83436639d914b3fb0a9ddbd7ad512beba0d3da4be50a0a144"
+    },
+    {
+      "path": "supabase/production_migrations/202609080094_production_guide_optional_content_v1.sql",
+      "sha256": "ab2e660d116009bdbbf8afca936704343d1a0f22395d192ace617a7d0027cf45"
+    },
+    {
+      "path": "supabase/production_migrations/202609090095_production_round_pairings_v1.sql",
+      "sha256": "3e70203056f6a6e0f59aa7f06161cc01352057027ec4643e41e92948ebf99919"
+    },
+    {
+      "path": "supabase/production_migrations/202609090096_production_round_pairing_read_envelope_v1.sql",
+      "sha256": "0c2c5894aebe7d1cde4eb7fa9b8ead6c2f246df24f7cfaecd6e24257cba07af7"
+    },
+    {
+      "path": "supabase/production_migrations/202609090097_production_late_r3_initialization_v1.sql",
+      "sha256": "ba6af5585889b956b9d336c02deeff0db8cefdc67a22e1c35175dcb130002109"
+    },
+    {
+      "path": "supabase/production_migrations/202609090098_production_net_skins_entries_v1.sql",
+      "sha256": "a7a3ebca7d552934e3ff0531362098467ac5a7c0c5ee84e9a4bb4869b979c8e8"
+    },
+    {
+      "path": "supabase/production_migrations/202609090099_production_full_net_consumers_v3.sql",
+      "sha256": "0f8524925e62ab21243c81511f258990fb4acee5da7e9dc80193bdf3bcf7d59d"
+    },
+    {
+      "path": "supabase/production_migrations/202609100100_production_native_guide_delivery_context.sql",
+      "sha256": "247d1e47fcc947e092609330d90d9683110eadf09be5e3798aebcbae68b1f3ec"
+    },
+    {
+      "path": "supabase/production_migrations/202609110101_account_deletion_review_access_v1.sql",
+      "sha256": "920bda48ed3ea3ace67da9e412d16e641d1b56062de65fd5f45a8598c0789a41"
+    },
+    {
+      "path": "supabase/production_migrations/202609110102_account_deletion_audit_attribution_v1.sql",
+      "sha256": "2f3a368bcc2ef6088fad55e74608399039f9ca60514af6ec7a7c5bfd2eb1f956"
+    },
+    {
+      "path": "supabase/production_migrations/202609110103_native_published_skins_labels.sql",
+      "sha256": "6018d9f485cc2c9d142d9d58cb265f078e2f3293983944b8f9ebfc2558a26f09"
+    },
+    {
+      "path": "supabase/production_migrations/202609110104_native_review_identity_v1.sql",
+      "sha256": "b1c48c479cfdb3045031aa57e5394c07c69de0906664c09d236a6faf0f9b0a31"
+    },
+    {
+      "path": "supabase/production_migrations/202609110105_native_review_published_calcutta_v1.sql",
+      "sha256": "59614ee423dd8ae5e4c75c0fbdecbc2623efee45d6d6a8300b36f42a269ed172"
+    },
+    {
+      "path": "supabase/production_migrations/202609110106_review_historical_fixture_v1.sql",
+      "sha256": "c50f91fd62ddfda840b26a3e9bb55316403280b4a00d36f3f6ef53ccd8d9a5c4"
+    },
+    {
+      "path": "supabase/production_migrations/202609220107_expired_identity_recovery_v1.sql",
+      "sha256": "dfbd6e4a2c14260654b2b3984208bb788f9e75b189256feed9f2437814e5855e"
+    },
+    {
+      "path": "supabase/production_migrations/202609220108_atomic_round_scoring_v1.sql",
+      "sha256": "8523d3a2b39e12b1810c162db1e3e2b2570a45b53e5b66c2b4b3c3136b9082bc"
+    },
+    {
+      "path": "supabase/production_migrations/202609250118_production_first_write_audit_revision_v1.sql",
+      "sha256": "099158fbf6440090ccc71fc5bf5c6420d53af1aa578f8ebee746de1223a39521"
+    },
+    {
+      "path": "supabase/production_migrations/202609260119_existing_r3_dependency_preserving_preparation_v1.sql",
+      "sha256": "4b8a4e9bd9f1c067ac4ccbd082505d85df685803ca5fdcf9820dfaeef3dbd862"
+    },
+    {
+      "path": "supabase/production_migrations/202609270120_bounded_late_r3_result_compatibility_v1.sql",
+      "sha256": "c8f25f9a15345d32655aed7dcd4f37d646d6cfd21be53224bf76bf8ce2e05b48"
+    },
+    {
+      "path": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+      "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+    },
+    {
+      "path": "test/reliability-phase2-application-comparison.test.mjs",
+      "sha256": "b25bd3cd3bae78881017b9e8d14305fe4cced5ff4f13ba3de114a1cfa67bdbb8"
+    },
+    {
+      "path": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "sha256": "074c3c1df926ae6f8b3e9d0c5929362d60959103b62b2c59f44c95164260a2c3"
+    },
+    {
+      "path": "test/reliability-phase2-eligible-history.test.mjs",
+      "sha256": "916d2056f05364fbfa0fb99a051d2081f75c9f880767fdc88f068b7dd4cc3e3b"
+    },
+    {
+      "path": "test/reliability-phase2-fence-history.test.mjs",
+      "sha256": "bb3096f4991c54c5325081aa9e6daf9d5b17c218ffa4b1be57431268de89e0fd"
+    },
+    {
+      "path": "test/reliability-phase2-migration-safety.integration.test.mjs",
+      "sha256": "ffe9bbba4beb79c6765a1c9a53b36deab0b0d191d3c9a816a7882771f9422306"
+    },
+    {
+      "path": "test/reliability-phase2-performance-gate.test.mjs",
+      "sha256": "3e6c110d08bb4323f8e834e568cc1348fe6ab202574a6a9ecc02c6c9e200d481"
+    },
+    {
+      "path": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "sha256": "88836567509d32376a519ec321d9566c3bc4068efcc9fabe0c92e4a990ccbec4"
+    },
+    {
+      "path": "test/scoring-authority-phase2.test.mjs",
+      "sha256": "316376d16fb343499834e61f6a2e5779c8996b1aee40bb9ec06c4bef42a1419e"
+    },
+    {
+      "path": "test/support/reliability/benchmark-evidence.mjs",
+      "sha256": "23d6a0acf410730f8b34ab932e6f26aa77849caabe4f45ecf3ffe8894ae3fcaa"
+    },
+    {
+      "path": "test/support/reliability/benchmark-fixtures.mjs",
+      "sha256": "ae9c0a79f821e173429d7bda58a89ff5e3f7dbfbd38cc2b382d215826c9c0d14"
+    },
+    {
+      "path": "test/support/reliability/benchmark-operations.mjs",
+      "sha256": "bc0a6e461f92fd4f5d41eef02efc06dcf4083f489debb760adb21cd1a9586a0f"
+    },
+    {
+      "path": "test/support/reliability/benchmark-result-validation.mjs",
+      "sha256": "b7ebaa83eb06bc8efcec61ec0f95d577b9dae1147011ca954d7dc925fd0ab8e0"
+    },
+    {
+      "path": "test/support/reliability/measurement-metadata.mjs",
+      "sha256": "b7fe3ab634e4424e4ffdd6c1c69ac08bc13834e331dd64a2301eb4adf7ce0bf6"
+    },
+    {
+      "path": "test/support/reliability/phase2-eligible-history.mjs",
+      "sha256": "f3aaced4364da3fc3bc85d62e6b7d1678ebd5a68ab7987dbf795a033e3545517"
+    },
+    {
+      "path": "test/support/reliability/phase2-score-fixture.mjs",
+      "sha256": "7bc6b9953e4080d520883bf3ac8db85d41473ba1b630ecf36146df5fd838b733"
+    },
+    {
+      "path": "test/support/reliability/plan-evidence.mjs",
+      "sha256": "0989595749e991e714a3096981e3e7da9b2bb85f6d49f1040da2a928f2160431"
+    },
+    {
+      "path": "test/support/reliability/postgres17.mjs",
+      "sha256": "83375c1f10c2da92c58d1ec501cf713f7a2bc5714ba9ae1ec5af16bc574be7ff"
+    },
+    {
+      "path": "test/support/reliability/release139-schema.mjs",
+      "sha256": "231c8a3b52988ce53055204f4f583446038b33d15c0d2f8d9e24ec2ee4e1e3c8"
+    },
+    {
+      "path": "test/support/reliability/sql-source.mjs",
+      "sha256": "690a9e23572d0841b699548416373961c983765e959819a50d98b94caff6f666"
+    },
+    {
+      "path": "test/support/reliability/synthetic-archived-years.mjs",
+      "sha256": "e0954f174b7a702b79c2dcf87a458e549fc645a7bfa31ad196bf2657d6c22605"
+    },
+    {
+      "path": "test/support/reliability/synthetic-history.mjs",
+      "sha256": "ae665f327ca83cfb2fe87475c2f10dfa99806b1af15e8a990d273450097a63b5"
+    },
+    {
+      "path": "test/support/reliability/synthetic-tournament.mjs",
+      "sha256": "ff89ae3da85532942902ada814dce195585ccecb7b58c0fcc5a3e53ccf9fc90f"
+    },
+    {
+      "path": "tools/reliability/benchmark-phase2-eligible.mjs",
+      "sha256": "8a31b284aeb43b4c8cdaed712bc1b93091d16015efd1a0ba55bc661a0d4505aa"
+    },
+    {
+      "path": "tools/reliability/benchmark-phase2.mjs",
+      "sha256": "25c2846cb5e7fa3cdb445baaa4def0814c6c810a127520af6057e6ab38d62724"
+    },
+    {
+      "path": "tools/reliability/certify-phase2-foundation.mjs",
+      "sha256": "db652dc5bf5a53ba125d42f5fb92d09b8e4662e9047ca87e44a5104028614706"
+    },
+    {
+      "path": "tools/reliability/collect-phase2-evidence.mjs",
+      "sha256": "91b6f0323466564020756e6b2932c88094c4e5fae85f6f85737efdab813dee3a"
+    },
+    {
+      "path": "tools/reliability/measure-phase2-locks.mjs",
+      "sha256": "6440f34e9177af207b5ed65fba83f815fb033604760d63557f4ebce5a878a3b1"
+    },
+    {
+      "path": "tools/reliability/phase2-application-comparison.mjs",
+      "sha256": "302b55a9b8fded4d557a9b2d5651474d47e3368a30864ee1a5261547c6489825"
+    },
+    {
+      "path": "tools/reliability/phase2-network-deny.cjs",
+      "sha256": "48e385b629af2beda571108badbbb4a7cdc81c7c7982ef85cded3caa02046761"
+    },
+    {
+      "path": "tools/reliability/phase2-performance-gate.mjs",
+      "sha256": "1cf94d330f3b92e2dd8acd168f367ad300c317078df6248992e617ab6ca01f7e"
+    },
+    {
+      "path": "tools/reliability/phase2-plan-capture.mjs",
+      "sha256": "439b88d39c09bff113cb9751cb273342d73502fcea0a7790e4625455aedd9828"
+    },
+    {
+      "path": "tools/reliability/run-phase2-application.mjs",
+      "sha256": "27f65f77d2ee7d1733228bded9c3336a268a6b3e652af5bb2831ec71334e665d"
+    }
+  ]
+}

@@ -1,0 +1,5225 @@
+{
+  "schemaVersion": 1,
+  "mode": "baseline",
+  "kind": "eligible",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "generatedAt": "2026-09-28T15:54:15.692Z",
+  "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL17",
+  "production": false,
+  "fixtureVersion": "bagger-r139-synthetic-history-v1+phase2-eligible-history-v2",
+  "seed": "2026-never-again-139",
+  "phase2MigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+  "statementTimeoutMs": 1000,
+  "timeZone": "UTC",
+  "scaleOrder": [
+    5,
+    1,
+    10,
+    2
+  ],
+  "method": "Actual canonical RPC; every ACCEPTED response validated; fresh mutation inside independently rolled-back transaction. Fixed finite statement timeout on every database. Measured RPC only. First fresh-session observation retained separately; not a cold-OS-cache claim.",
+  "limitations": [
+    "Local, fsync disabled; not HTTP, hosted authentication, provider capacity or durable COMMIT latency.",
+    "Nested statement counts include loops and are not network calls or distinct rows.",
+    "P99 at n1000 is a local empirical estimate, not a confidence interval.",
+    "CPU/I/O host activity outside this task is not controlled.",
+    "Intent claim/financial worker/recovery benchmark results are separate."
+  ],
+  "scales": [
+    {
+      "scale": 5,
+      "counts": {
+        "matches": 24,
+        "oddsJobs": 50,
+        "holeScores": 380,
+        "matchHoles": 432,
+        "courseHoles": 54,
+        "calcuttaJobs": 3725,
+        "netSkinsJobs": 2845,
+        "setupReceipts": 240,
+        "scoreMutations": 1635,
+        "calcuttaResults": 2035,
+        "netSkinsResults": 10,
+        "setupAuditEvents": 240,
+        "matchParticipants": 72,
+        "tournamentPlayers": 24,
+        "googleOutboxEvents": 1425,
+        "scoreRevisionHistory": 1635,
+        "oddsPublishedSnapshots": 35,
+        "normalReleaseRebindings": 685,
+        "oddsInputConfigurations": 10,
+        "calcuttaAuctionRevisions": 185,
+        "calcuttaPublicationRevisions": 205,
+        "calcuttaConfigurationRevisions": 10,
+        "netSkinsConfigurationRevisions": 15
+      },
+      "archivedCounts": {
+        "archivedYears": 5,
+        "archivedRounds": 15,
+        "archivedScores": 2160,
+        "archivedMatches": 120,
+        "archivedPlayers": 120,
+        "archivedMatchHoles": 2160,
+        "archivedParticipants": 360
+      },
+      "branches": [
+        {
+          "variant": "none",
+          "binding": {
+            "name": "none",
+            "eligible": false,
+            "compatible": false,
+            "receipts": 0,
+            "resultId": "bfa80fe4-8589-2837-bdea-360a60d689c5"
+          },
+          "firstSessionObservationMs": 13.024,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.187,
+          "p95Ms": 8.732,
+          "p99Ms": null,
+          "maxMs": 9.281,
+          "minMs": 0.583,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.29,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.528,
+              "minMs": 0.584,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.528,
+                1.623,
+                1.539,
+                1.593,
+                1.29,
+                1.621,
+                1.006,
+                0.765,
+                0.612,
+                0.584
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.174,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.281,
+              "minMs": 0.607,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.281,
+                1.61,
+                1.187,
+                1.174,
+                1.212,
+                1.408,
+                0.71,
+                0.778,
+                0.812,
+                0.607
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.143,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.732,
+              "minMs": 0.583,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.732,
+                1.383,
+                1.286,
+                1.321,
+                1.143,
+                1.368,
+                0.602,
+                0.66,
+                0.583,
+                0.605
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 107.74701002047192,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:54:55.695Z",
+            "hostLoadAverage": [
+              3.32763671875,
+              3.8564453125,
+              3.82568359375
+            ],
+            "hostFreeMemoryBytes": 225624064,
+            "database": {
+              "commits": 26,
+              "backends": 1,
+              "blocksHit": 18361,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 77018803,
+              "blocksRead": 797,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:54:55.792Z",
+            "hostLoadAverage": [
+              3.32763671875,
+              3.8564453125,
+              3.82568359375
+            ],
+            "hostFreeMemoryBytes": 254656512,
+            "database": {
+              "commits": 33,
+              "backends": 1,
+              "blocksHit": 39734,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 77199027,
+              "blocksRead": 830,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "current_compatible",
+          "binding": {
+            "name": "current_compatible",
+            "eligible": true,
+            "compatible": true,
+            "receipts": 1,
+            "resultId": "bfa80fe4-8589-2837-bdea-360a60d689c5"
+          },
+          "firstSessionObservationMs": 11.089,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.173,
+          "p95Ms": 8.231,
+          "p99Ms": null,
+          "maxMs": 8.321,
+          "minMs": 0.581,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.187,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.321,
+              "minMs": 0.589,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.321,
+                1.357,
+                1.399,
+                1.256,
+                1.187,
+                1.442,
+                0.739,
+                0.589,
+                0.635,
+                0.599
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.098,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.231,
+              "minMs": 0.581,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.231,
+                1.42,
+                1.199,
+                1.173,
+                1.098,
+                1.36,
+                0.691,
+                0.581,
+                0.593,
+                0.597
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.136,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.033,
+              "minMs": 0.603,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.033,
+                1.251,
+                1.175,
+                1.136,
+                1.301,
+                1.467,
+                0.643,
+                0.636,
+                0.603,
+                0.613
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 120.17786323759164,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:54:56.597Z",
+            "hostLoadAverage": [
+              3.32763671875,
+              3.8564453125,
+              3.82568359375
+            ],
+            "hostFreeMemoryBytes": 342933504,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 32124,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 77117107,
+              "blocksRead": 914,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:54:56.687Z",
+            "hostLoadAverage": [
+              3.32763671875,
+              3.8564453125,
+              3.82568359375
+            ],
+            "hostFreeMemoryBytes": 343982080,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 53495,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 77297331,
+              "blocksRead": 949,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "current_incompatible_consumed",
+          "binding": {
+            "name": "current_incompatible_consumed",
+            "eligible": true,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "bfa80fe4-8589-2837-bdea-360a60d689c5"
+          },
+          "firstSessionObservationMs": 9.44,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.15,
+          "p95Ms": 8.689,
+          "p99Ms": null,
+          "maxMs": 8.914,
+          "minMs": 0.58,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.15,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.689,
+              "minMs": 0.587,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.689,
+                1.357,
+                1.15,
+                1.256,
+                1.282,
+                1.366,
+                0.748,
+                0.657,
+                0.594,
+                0.587
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.157,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.914,
+              "minMs": 0.589,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.914,
+                1.314,
+                1.157,
+                1.408,
+                1.157,
+                1.348,
+                0.719,
+                0.598,
+                0.622,
+                0.589
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.117,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.108,
+              "minMs": 0.58,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.108,
+                1.235,
+                1.122,
+                1.232,
+                1.117,
+                1.292,
+                0.59,
+                0.584,
+                0.637,
+                0.58
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 112.1830827911151,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:54:57.471Z",
+            "hostLoadAverage": [
+              3.32763671875,
+              3.8564453125,
+              3.82568359375
+            ],
+            "hostFreeMemoryBytes": 398393344,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 32143,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 77117107,
+              "blocksRead": 893,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:54:57.564Z",
+            "hostLoadAverage": [
+              3.70166015625,
+              3.9248046875,
+              3.85009765625
+            ],
+            "hostFreeMemoryBytes": 386301952,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 53513,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 77297331,
+              "blocksRead": 929,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "current_incompatible_financial",
+          "binding": {
+            "name": "current_incompatible_financial",
+            "eligible": true,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "bfa80fe4-8589-2837-bdea-360a60d689c5"
+          },
+          "firstSessionObservationMs": 9.213,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.237,
+          "p95Ms": 8.52,
+          "p99Ms": null,
+          "maxMs": 9.058,
+          "minMs": 0.573,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.079,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.52,
+              "minMs": 0.588,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.52,
+                1.354,
+                1.113,
+                1.079,
+                1.25,
+                1.366,
+                0.714,
+                0.786,
+                0.67,
+                0.588
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.237,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.266,
+              "minMs": 0.573,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.266,
+                1.303,
+                1.589,
+                1.322,
+                1.237,
+                1.433,
+                0.731,
+                0.608,
+                0.573,
+                0.608
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.243,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.058,
+              "minMs": 0.639,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.058,
+                1.348,
+                1.548,
+                1.255,
+                1.243,
+                1.448,
+                0.639,
+                0.794,
+                0.92,
+                0.744
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 110.3996467211305,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:54:58.272Z",
+            "hostLoadAverage": [
+              3.70166015625,
+              3.9248046875,
+              3.85009765625
+            ],
+            "hostFreeMemoryBytes": 408911872,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 29932,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 77117107,
+              "blocksRead": 881,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:54:58.367Z",
+            "hostLoadAverage": [
+              3.70166015625,
+              3.9248046875,
+              3.85009765625
+            ],
+            "hostFreeMemoryBytes": 397148160,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 51303,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 77297331,
+              "blocksRead": 916,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "stale_source",
+          "binding": {
+            "name": "stale_source",
+            "eligible": true,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "bfa80fe4-8589-2837-bdea-360a60d689c5"
+          },
+          "firstSessionObservationMs": 10.979,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.214,
+          "p95Ms": 9.4,
+          "p99Ms": null,
+          "maxMs": 10.077,
+          "minMs": 0.632,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.29,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.4,
+              "minMs": 0.681,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.4,
+                1.559,
+                1.29,
+                1.212,
+                1.203,
+                2.168,
+                1.875,
+                1.704,
+                0.782,
+                0.681
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.158,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.886,
+              "minMs": 0.632,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.886,
+                1.464,
+                1.214,
+                1.196,
+                1.158,
+                1.506,
+                0.714,
+                0.632,
+                0.861,
+                0.698
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.372,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 10.077,
+              "minMs": 0.638,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                10.077,
+                2.175,
+                1.387,
+                1.677,
+                1.372,
+                1.497,
+                0.684,
+                0.673,
+                0.659,
+                0.638
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 99.2358836955443,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:54:59.118Z",
+            "hostLoadAverage": [
+              3.70166015625,
+              3.9248046875,
+              3.85009765625
+            ],
+            "hostFreeMemoryBytes": 397148160,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 35367,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 77117107,
+              "blocksRead": 905,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:54:59.225Z",
+            "hostLoadAverage": [
+              3.70166015625,
+              3.9248046875,
+              3.85009765625
+            ],
+            "hostFreeMemoryBytes": 397148160,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 56737,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 77297331,
+              "blocksRead": 941,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "stale_result_binding",
+          "binding": {
+            "name": "stale_result_binding",
+            "eligible": false,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "bfa80fe4-8589-2837-bdea-360a60d689c5"
+          },
+          "firstSessionObservationMs": 9.264,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.173,
+          "p95Ms": 8.754,
+          "p99Ms": null,
+          "maxMs": 8.784,
+          "minMs": 0.58,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.173,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.784,
+              "minMs": 0.597,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.784,
+                1.592,
+                1.202,
+                1.173,
+                1.214,
+                1.411,
+                0.75,
+                0.621,
+                0.657,
+                0.597
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.155,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.18,
+              "minMs": 0.58,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.18,
+                1.27,
+                1.352,
+                1.155,
+                1.291,
+                1.567,
+                0.769,
+                0.644,
+                0.58,
+                0.668
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.106,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.754,
+              "minMs": 0.64,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.754,
+                1.305,
+                1.106,
+                1.19,
+                1.2,
+                1.387,
+                0.649,
+                0.717,
+                0.64,
+                0.652
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 113.84335154826957,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:54:59.818Z",
+            "hostLoadAverage": [
+              3.70166015625,
+              3.9248046875,
+              3.85009765625
+            ],
+            "hostFreeMemoryBytes": 426967040,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 26260,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 77117107,
+              "blocksRead": 867,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:54:59.912Z",
+            "hostLoadAverage": [
+              3.70166015625,
+              3.9248046875,
+              3.85009765625
+            ],
+            "hostFreeMemoryBytes": 404733952,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 47630,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 77297331,
+              "blocksRead": 903,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "superseded_result",
+          "binding": {
+            "name": "superseded_result",
+            "eligible": false,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "6dc24efb-e9d8-1e07-779b-b38e4056eebd"
+          },
+          "firstSessionObservationMs": 9.678,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.203,
+          "p95Ms": 8.444,
+          "p99Ms": null,
+          "maxMs": 8.763,
+          "minMs": 0.568,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.121,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.444,
+              "minMs": 0.613,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.444,
+                1.449,
+                1.366,
+                1.387,
+                1.121,
+                1.41,
+                0.768,
+                0.613,
+                0.621,
+                0.622
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.117,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.763,
+              "minMs": 0.586,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.763,
+                1.577,
+                1.117,
+                1.243,
+                1.344,
+                1.419,
+                0.686,
+                0.612,
+                0.586,
+                0.662
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.203,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.396,
+              "minMs": 0.568,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.396,
+                1.609,
+                1.203,
+                1.273,
+                1.206,
+                1.617,
+                0.696,
+                0.631,
+                0.589,
+                0.568
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 114.11617026132603,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:55:00.996Z",
+            "hostLoadAverage": [
+              3.70166015625,
+              3.9248046875,
+              3.85009765625
+            ],
+            "hostFreeMemoryBytes": 323436544,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 26212,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 77117107,
+              "blocksRead": 913,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:55:01.091Z",
+            "hostLoadAverage": [
+              3.70166015625,
+              3.9248046875,
+              3.85009765625
+            ],
+            "hostFreeMemoryBytes": 317865984,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 47583,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 77297331,
+              "blocksRead": 948,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "multiple_receipts",
+          "binding": {
+            "name": "multiple_receipts",
+            "eligible": true,
+            "compatible": true,
+            "receipts": 2,
+            "resultId": "bfa80fe4-8589-2837-bdea-360a60d689c5"
+          },
+          "firstSessionObservationMs": 12.29,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.317,
+          "p95Ms": 10.553,
+          "p99Ms": null,
+          "maxMs": 14.363,
+          "minMs": 0.649,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.389,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 14.363,
+              "minMs": 0.708,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                14.363,
+                2.033,
+                1.786,
+                1.389,
+                1.692,
+                1.818,
+                1.051,
+                0.775,
+                0.755,
+                0.708
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.21,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 10.553,
+              "minMs": 0.702,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                10.553,
+                1.602,
+                1.438,
+                1.332,
+                1.21,
+                1.66,
+                0.806,
+                0.702,
+                0.759,
+                0.75
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.193,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.245,
+              "minMs": 0.649,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.245,
+                1.51,
+                1.317,
+                1.415,
+                1.193,
+                1.608,
+                0.664,
+                0.649,
+                0.702,
+                0.668
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 69.62333774281139,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:55:02.014Z",
+            "hostLoadAverage": [
+              3.70166015625,
+              3.9248046875,
+              3.85009765625
+            ],
+            "hostFreeMemoryBytes": 366182400,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 34618,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 77158067,
+              "blocksRead": 914,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:55:02.127Z",
+            "hostLoadAverage": [
+              3.70166015625,
+              3.9248046875,
+              3.85009765625
+            ],
+            "hostFreeMemoryBytes": 344686592,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 55988,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 77338291,
+              "blocksRead": 950,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "scale": 1,
+      "counts": {
+        "matches": 24,
+        "oddsJobs": 10,
+        "holeScores": 380,
+        "matchHoles": 432,
+        "courseHoles": 54,
+        "calcuttaJobs": 745,
+        "netSkinsJobs": 569,
+        "setupReceipts": 48,
+        "scoreMutations": 327,
+        "calcuttaResults": 407,
+        "netSkinsResults": 2,
+        "setupAuditEvents": 48,
+        "matchParticipants": 72,
+        "tournamentPlayers": 24,
+        "googleOutboxEvents": 285,
+        "scoreRevisionHistory": 327,
+        "oddsPublishedSnapshots": 7,
+        "normalReleaseRebindings": 137,
+        "oddsInputConfigurations": 2,
+        "calcuttaAuctionRevisions": 37,
+        "calcuttaPublicationRevisions": 41,
+        "calcuttaConfigurationRevisions": 2,
+        "netSkinsConfigurationRevisions": 3
+      },
+      "archivedCounts": {
+        "archivedYears": 1,
+        "archivedRounds": 3,
+        "archivedScores": 432,
+        "archivedMatches": 24,
+        "archivedPlayers": 24,
+        "archivedMatchHoles": 432,
+        "archivedParticipants": 72
+      },
+      "branches": [
+        {
+          "variant": "none",
+          "binding": {
+            "name": "none",
+            "eligible": false,
+            "compatible": false,
+            "receipts": 0,
+            "resultId": "ef3ff4c5-d738-9bd8-ac5a-6450fb14ee2b"
+          },
+          "firstSessionObservationMs": 16.562,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.194,
+          "p95Ms": 8.556,
+          "p99Ms": null,
+          "maxMs": 8.966,
+          "minMs": 0.611,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.194,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.203,
+              "minMs": 0.646,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.203,
+                1.246,
+                1.42,
+                1.243,
+                1.194,
+                1.772,
+                1.049,
+                0.688,
+                0.646,
+                0.651
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.157,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.556,
+              "minMs": 0.611,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.556,
+                1.366,
+                1.163,
+                1.293,
+                1.157,
+                1.324,
+                0.634,
+                0.654,
+                0.611,
+                0.679
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.515,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.966,
+              "minMs": 0.632,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.966,
+                3.067,
+                1.578,
+                1.515,
+                2.559,
+                1.555,
+                0.638,
+                0.764,
+                0.632,
+                0.786
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 111.53245594467991,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:55:10.693Z",
+            "hostLoadAverage": [
+              4.5380859375,
+              4.10546875,
+              3.9150390625
+            ],
+            "hostFreeMemoryBytes": 201359360,
+            "database": {
+              "commits": 26,
+              "backends": 1,
+              "blocksHit": 18053,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 41268915,
+              "blocksRead": 620,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:55:10.793Z",
+            "hostLoadAverage": [
+              4.5380859375,
+              4.10546875,
+              3.9150390625
+            ],
+            "hostFreeMemoryBytes": 208076800,
+            "database": {
+              "commits": 33,
+              "backends": 1,
+              "blocksHit": 39223,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 41465523,
+              "blocksRead": 637,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-1x-none-plan.json"
+        },
+        {
+          "variant": "current_compatible",
+          "binding": {
+            "name": "current_compatible",
+            "eligible": true,
+            "compatible": true,
+            "receipts": 1,
+            "resultId": "ef3ff4c5-d738-9bd8-ac5a-6450fb14ee2b"
+          },
+          "firstSessionObservationMs": 9.774,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.119,
+          "p95Ms": 8.254,
+          "p99Ms": null,
+          "maxMs": 8.533,
+          "minMs": 0.603,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.169,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.533,
+              "minMs": 0.642,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.533,
+                1.303,
+                1.461,
+                1.169,
+                1.189,
+                1.738,
+                0.83,
+                0.642,
+                0.649,
+                0.683
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.119,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.082,
+              "minMs": 0.603,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.082,
+                1.533,
+                1.202,
+                1.119,
+                1.169,
+                1.381,
+                0.851,
+                0.611,
+                0.603,
+                0.606
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.069,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.254,
+              "minMs": 0.636,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.254,
+                1.225,
+                1.133,
+                1.109,
+                1.069,
+                1.705,
+                0.636,
+                0.683,
+                0.679,
+                0.656
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 117.19207781553968,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:55:11.423Z",
+            "hostLoadAverage": [
+              4.5380859375,
+              4.10546875,
+              3.9150390625
+            ],
+            "hostFreeMemoryBytes": 208076800,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 30383,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 41367219,
+              "blocksRead": 694,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:55:11.515Z",
+            "hostLoadAverage": [
+              4.5380859375,
+              4.10546875,
+              3.9150390625
+            ],
+            "hostFreeMemoryBytes": 208076800,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 51549,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 41563827,
+              "blocksRead": 715,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-1x-current_compatible-plan.json"
+        },
+        {
+          "variant": "current_incompatible_consumed",
+          "binding": {
+            "name": "current_incompatible_consumed",
+            "eligible": true,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "ef3ff4c5-d738-9bd8-ac5a-6450fb14ee2b"
+          },
+          "firstSessionObservationMs": 10.542,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.16,
+          "p95Ms": 8.18,
+          "p99Ms": null,
+          "maxMs": 8.186,
+          "minMs": 0.574,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.162,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.135,
+              "minMs": 0.604,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.135,
+                1.275,
+                1.357,
+                1.162,
+                1.241,
+                1.623,
+                0.838,
+                0.611,
+                0.604,
+                0.634
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.118,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.186,
+              "minMs": 0.62,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.186,
+                1.303,
+                1.345,
+                1.118,
+                1.178,
+                1.365,
+                0.64,
+                0.624,
+                0.62,
+                0.705
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.13,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.18,
+              "minMs": 0.574,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.18,
+                1.25,
+                1.179,
+                1.13,
+                1.16,
+                1.35,
+                0.611,
+                0.62,
+                0.595,
+                0.574
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 122.1597849987784,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:55:12.045Z",
+            "hostLoadAverage": [
+              4.5380859375,
+              4.10546875,
+              3.9150390625
+            ],
+            "hostFreeMemoryBytes": 256589824,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 30378,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 41367219,
+              "blocksRead": 697,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:55:12.137Z",
+            "hostLoadAverage": [
+              4.5380859375,
+              4.10546875,
+              3.9150390625
+            ],
+            "hostFreeMemoryBytes": 277282816,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 51544,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 41563827,
+              "blocksRead": 718,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-1x-current_incompatible_consumed-plan.json"
+        },
+        {
+          "variant": "current_incompatible_financial",
+          "binding": {
+            "name": "current_incompatible_financial",
+            "eligible": true,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "ef3ff4c5-d738-9bd8-ac5a-6450fb14ee2b"
+          },
+          "firstSessionObservationMs": 16.027,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.208,
+          "p95Ms": 8.929,
+          "p99Ms": null,
+          "maxMs": 9.136,
+          "minMs": 0.617,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.242,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.929,
+              "minMs": 0.637,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.929,
+                1.512,
+                1.505,
+                1.249,
+                1.242,
+                1.551,
+                0.792,
+                0.672,
+                0.685,
+                0.637
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.197,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.737,
+              "minMs": 0.702,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.737,
+                1.677,
+                1.238,
+                1.495,
+                1.197,
+                1.618,
+                0.791,
+                0.807,
+                0.702,
+                0.739
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.135,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.136,
+              "minMs": 0.617,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.136,
+                1.483,
+                1.208,
+                1.217,
+                1.135,
+                1.562,
+                0.7,
+                0.644,
+                0.629,
+                0.617
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 109.45709281961472,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:55:12.760Z",
+            "hostLoadAverage": [
+              4.25439453125,
+              4.0537109375,
+              3.89794921875
+            ],
+            "hostFreeMemoryBytes": 252231680,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 28458,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 41367219,
+              "blocksRead": 681,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:55:12.862Z",
+            "hostLoadAverage": [
+              4.25439453125,
+              4.0537109375,
+              3.89794921875
+            ],
+            "hostFreeMemoryBytes": 269500416,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 49624,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 41563827,
+              "blocksRead": 702,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-1x-current_incompatible_financial-plan.json"
+        },
+        {
+          "variant": "stale_source",
+          "binding": {
+            "name": "stale_source",
+            "eligible": true,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "ef3ff4c5-d738-9bd8-ac5a-6450fb14ee2b"
+          },
+          "firstSessionObservationMs": 11.524,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.12,
+          "p95Ms": 8.624,
+          "p99Ms": null,
+          "maxMs": 9.341,
+          "minMs": 0.561,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.106,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.341,
+              "minMs": 0.641,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.341,
+                1.434,
+                1.319,
+                1.106,
+                1.234,
+                1.641,
+                0.832,
+                0.641,
+                0.663,
+                0.652
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.081,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.624,
+              "minMs": 0.59,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.624,
+                1.386,
+                1.12,
+                1.193,
+                1.081,
+                1.298,
+                0.645,
+                0.59,
+                0.655,
+                0.666
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.14,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.032,
+              "minMs": 0.561,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.032,
+                1.323,
+                1.188,
+                1.267,
+                1.14,
+                1.381,
+                0.602,
+                0.588,
+                0.561,
+                0.631
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 107.05491917353604,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:55:13.443Z",
+            "hostLoadAverage": [
+              4.25439453125,
+              4.0537109375,
+              3.89794921875
+            ],
+            "hostFreeMemoryBytes": 261046272,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 33370,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 41367219,
+              "blocksRead": 701,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:55:13.535Z",
+            "hostLoadAverage": [
+              4.25439453125,
+              4.0537109375,
+              3.89794921875
+            ],
+            "hostFreeMemoryBytes": 247349248,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 54536,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 41563827,
+              "blocksRead": 722,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-1x-stale_source-plan.json"
+        },
+        {
+          "variant": "stale_result_binding",
+          "binding": {
+            "name": "stale_result_binding",
+            "eligible": false,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "ef3ff4c5-d738-9bd8-ac5a-6450fb14ee2b"
+          },
+          "firstSessionObservationMs": 12.57,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.1,
+          "p95Ms": 8.095,
+          "p99Ms": null,
+          "maxMs": 8.403,
+          "minMs": 0.587,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.121,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.403,
+              "minMs": 0.601,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.403,
+                1.274,
+                1.377,
+                1.154,
+                1.121,
+                1.372,
+                0.713,
+                0.689,
+                0.633,
+                0.601
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.063,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.062,
+              "minMs": 0.614,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.062,
+                1.282,
+                1.08,
+                1.251,
+                1.063,
+                1.292,
+                0.691,
+                0.615,
+                0.692,
+                0.614
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.1,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.095,
+              "minMs": 0.587,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.095,
+                1.36,
+                1.106,
+                1.1,
+                1.212,
+                1.296,
+                0.656,
+                0.622,
+                0.587,
+                0.597
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 119.00511722004046,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:55:14.070Z",
+            "hostLoadAverage": [
+              4.25439453125,
+              4.0537109375,
+              3.89794921875
+            ],
+            "hostFreeMemoryBytes": 247349248,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 25373,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 41367219,
+              "blocksRead": 697,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:55:14.161Z",
+            "hostLoadAverage": [
+              4.25439453125,
+              4.0537109375,
+              3.89794921875
+            ],
+            "hostFreeMemoryBytes": 247349248,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 46539,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 41563827,
+              "blocksRead": 718,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-1x-stale_result_binding-plan.json"
+        },
+        {
+          "variant": "superseded_result",
+          "binding": {
+            "name": "superseded_result",
+            "eligible": false,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "95988798-4c70-67db-f36d-5142503b2e84"
+          },
+          "firstSessionObservationMs": 12.671,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.114,
+          "p95Ms": 8.383,
+          "p99Ms": null,
+          "maxMs": 8.455,
+          "minMs": 0.597,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.264,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.383,
+              "minMs": 0.597,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.383,
+                1.533,
+                1.285,
+                1.264,
+                1.392,
+                1.676,
+                0.789,
+                0.597,
+                0.702,
+                0.625
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.046,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.455,
+              "minMs": 0.601,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.455,
+                1.336,
+                1.114,
+                1.071,
+                1.046,
+                1.307,
+                0.624,
+                0.615,
+                0.601,
+                0.617
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.13,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.081,
+              "minMs": 0.626,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.081,
+                1.255,
+                1.177,
+                1.13,
+                1.14,
+                1.312,
+                0.699,
+                0.717,
+                0.718,
+                0.626
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 118.27321111768184,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:55:14.658Z",
+            "hostLoadAverage": [
+              4.25439453125,
+              4.0537109375,
+              3.89794921875
+            ],
+            "hostFreeMemoryBytes": 309706752,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 25372,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 41367219,
+              "blocksRead": 696,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:55:14.750Z",
+            "hostLoadAverage": [
+              4.25439453125,
+              4.0537109375,
+              3.89794921875
+            ],
+            "hostFreeMemoryBytes": 313131008,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 46538,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 41563827,
+              "blocksRead": 717,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-1x-superseded_result-plan.json"
+        },
+        {
+          "variant": "multiple_receipts",
+          "binding": {
+            "name": "multiple_receipts",
+            "eligible": true,
+            "compatible": true,
+            "receipts": 2,
+            "resultId": "ef3ff4c5-d738-9bd8-ac5a-6450fb14ee2b"
+          },
+          "firstSessionObservationMs": 10.971,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.112,
+          "p95Ms": 8.196,
+          "p99Ms": null,
+          "maxMs": 8.508,
+          "minMs": 0.594,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.139,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.196,
+              "minMs": 0.621,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.196,
+                1.334,
+                1.471,
+                1.319,
+                1.139,
+                1.785,
+                1.039,
+                0.621,
+                0.654,
+                0.675
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.073,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.508,
+              "minMs": 0.612,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.508,
+                1.364,
+                1.137,
+                1.081,
+                1.073,
+                1.349,
+                0.624,
+                0.612,
+                0.617,
+                0.638
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.112,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.154,
+              "minMs": 0.594,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.154,
+                1.278,
+                1.13,
+                1.112,
+                1.314,
+                1.622,
+                0.72,
+                0.658,
+                0.595,
+                0.594
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 117.53643629525153,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:55:15.359Z",
+            "hostLoadAverage": [
+              4.25439453125,
+              4.0537109375,
+              3.89794921875
+            ],
+            "hostFreeMemoryBytes": 331350016,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 32423,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 41408179,
+              "blocksRead": 696,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:55:15.452Z",
+            "hostLoadAverage": [
+              4.25439453125,
+              4.0537109375,
+              3.89794921875
+            ],
+            "hostFreeMemoryBytes": 327974912,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 53590,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 41604787,
+              "blocksRead": 716,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-1x-multiple_receipts-plan.json"
+        }
+      ]
+    },
+    {
+      "scale": 10,
+      "counts": {
+        "matches": 24,
+        "oddsJobs": 100,
+        "holeScores": 380,
+        "matchHoles": 432,
+        "courseHoles": 54,
+        "calcuttaJobs": 7450,
+        "netSkinsJobs": 5690,
+        "setupReceipts": 480,
+        "scoreMutations": 3270,
+        "calcuttaResults": 4070,
+        "netSkinsResults": 20,
+        "setupAuditEvents": 480,
+        "matchParticipants": 72,
+        "tournamentPlayers": 24,
+        "googleOutboxEvents": 2850,
+        "scoreRevisionHistory": 3270,
+        "oddsPublishedSnapshots": 70,
+        "normalReleaseRebindings": 1370,
+        "oddsInputConfigurations": 20,
+        "calcuttaAuctionRevisions": 370,
+        "calcuttaPublicationRevisions": 410,
+        "calcuttaConfigurationRevisions": 20,
+        "netSkinsConfigurationRevisions": 30
+      },
+      "archivedCounts": {
+        "archivedYears": 10,
+        "archivedRounds": 30,
+        "archivedScores": 4320,
+        "archivedMatches": 240,
+        "archivedPlayers": 240,
+        "archivedMatchHoles": 4320,
+        "archivedParticipants": 720
+      },
+      "branches": [
+        {
+          "variant": "multiple_receipts",
+          "binding": {
+            "name": "multiple_receipts",
+            "eligible": true,
+            "compatible": true,
+            "receipts": 2,
+            "resultId": "504a1bdd-4354-68d2-9335-dee188d128fe"
+          },
+          "firstSessionObservationMs": 17.912,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.304,
+          "p95Ms": 9.175,
+          "p99Ms": null,
+          "maxMs": 9.293,
+          "minMs": 0.661,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.411,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.293,
+              "minMs": 0.731,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.293,
+                1.736,
+                1.677,
+                1.411,
+                1.455,
+                1.883,
+                1.304,
+                0.836,
+                0.731,
+                0.81
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.444,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.175,
+              "minMs": 0.826,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.175,
+                1.631,
+                1.505,
+                1.545,
+                1.444,
+                1.664,
+                0.826,
+                0.843,
+                0.852,
+                0.951
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.239,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.755,
+              "minMs": 0.661,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.755,
+                1.519,
+                1.258,
+                1.29,
+                1.239,
+                1.476,
+                0.791,
+                0.672,
+                0.704,
+                0.661
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 107.60787689658883,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:29.567Z",
+            "hostLoadAverage": [
+              4.92333984375,
+              4.2314453125,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 465518592,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 36337,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 121771699,
+              "blocksRead": 1067,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:29.671Z",
+            "hostLoadAverage": [
+              4.92333984375,
+              4.2314453125,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 485130240,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 57812,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 121960115,
+              "blocksRead": 1114,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-10x-multiple_receipts-plan.json"
+        },
+        {
+          "variant": "superseded_result",
+          "binding": {
+            "name": "superseded_result",
+            "eligible": false,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "f26e9cce-dd87-2047-1b9e-1e5ec6e9259d"
+          },
+          "firstSessionObservationMs": 10.071,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.19,
+          "p95Ms": 9.252,
+          "p99Ms": null,
+          "maxMs": 9.582,
+          "minMs": 0.611,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.152,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.252,
+              "minMs": 0.623,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.252,
+                1.576,
+                1.258,
+                1.19,
+                1.152,
+                1.433,
+                0.747,
+                0.664,
+                0.638,
+                0.623
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.16,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.909,
+              "minMs": 0.611,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.909,
+                1.714,
+                1.363,
+                1.369,
+                1.16,
+                1.493,
+                0.646,
+                0.611,
+                0.612,
+                0.649
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.319,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.582,
+              "minMs": 0.653,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.582,
+                1.656,
+                1.319,
+                2.711,
+                2.008,
+                1.593,
+                0.728,
+                0.677,
+                0.653,
+                0.655
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 104.36234606553954,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:30.635Z",
+            "hostLoadAverage": [
+              4.92333984375,
+              4.2314453125,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 462766080,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 26642,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 121730739,
+              "blocksRead": 1066,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:30.740Z",
+            "hostLoadAverage": [
+              4.92333984375,
+              4.2314453125,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 445808640,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 48113,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 121919155,
+              "blocksRead": 1117,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-10x-superseded_result-plan.json"
+        },
+        {
+          "variant": "stale_result_binding",
+          "binding": {
+            "name": "stale_result_binding",
+            "eligible": false,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "504a1bdd-4354-68d2-9335-dee188d128fe"
+          },
+          "firstSessionObservationMs": 20.321,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.098,
+          "p95Ms": 8.57,
+          "p99Ms": null,
+          "maxMs": 8.589,
+          "minMs": 0.586,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.106,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.57,
+              "minMs": 0.586,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.57,
+                1.385,
+                1.106,
+                1.266,
+                1.181,
+                1.347,
+                0.71,
+                0.586,
+                0.589,
+                0.644
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.054,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.124,
+              "minMs": 0.624,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.124,
+                1.307,
+                1.22,
+                1.098,
+                1.054,
+                1.559,
+                0.658,
+                0.7,
+                0.624,
+                0.701
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.032,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.589,
+              "minMs": 0.615,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.589,
+                1.279,
+                1.105,
+                1.129,
+                1.032,
+                1.301,
+                0.69,
+                0.689,
+                0.615,
+                0.646
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 116.42798928862499,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:31.835Z",
+            "hostLoadAverage": [
+              4.92333984375,
+              4.2314453125,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 451756032,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 26671,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 121730739,
+              "blocksRead": 1038,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:31.928Z",
+            "hostLoadAverage": [
+              4.92333984375,
+              4.2314453125,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 456622080,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 48144,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 121919155,
+              "blocksRead": 1087,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-10x-stale_result_binding-plan.json"
+        },
+        {
+          "variant": "stale_source",
+          "binding": {
+            "name": "stale_source",
+            "eligible": true,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "504a1bdd-4354-68d2-9335-dee188d128fe"
+          },
+          "firstSessionObservationMs": 18.635,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.182,
+          "p95Ms": 8.291,
+          "p99Ms": null,
+          "maxMs": 8.552,
+          "minMs": 0.594,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.141,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.552,
+              "minMs": 0.76,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.552,
+                1.807,
+                1.182,
+                1.407,
+                1.141,
+                1.773,
+                1.019,
+                0.824,
+                0.904,
+                0.76
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.078,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 7.909,
+              "minMs": 0.594,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                7.909,
+                1.511,
+                1.386,
+                1.416,
+                1.078,
+                1.523,
+                0.654,
+                0.594,
+                0.785,
+                0.872
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.285,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.291,
+              "minMs": 0.614,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.291,
+                1.285,
+                1.381,
+                1.324,
+                1.291,
+                1.508,
+                0.818,
+                0.62,
+                0.614,
+                0.755
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 116.93171188026193,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:33.203Z",
+            "hostLoadAverage": [
+              4.84912109375,
+              4.2275390625,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 469811200,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 36649,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 121730739,
+              "blocksRead": 1071,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:33.298Z",
+            "hostLoadAverage": [
+              4.84912109375,
+              4.2275390625,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 455507968,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 58123,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 121919155,
+              "blocksRead": 1119,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-10x-stale_source-plan.json"
+        },
+        {
+          "variant": "current_incompatible_financial",
+          "binding": {
+            "name": "current_incompatible_financial",
+            "eligible": true,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "504a1bdd-4354-68d2-9335-dee188d128fe"
+          },
+          "firstSessionObservationMs": 10.929,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.144,
+          "p95Ms": 8.261,
+          "p99Ms": null,
+          "maxMs": 8.625,
+          "minMs": 0.602,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.142,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.625,
+              "minMs": 0.63,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.625,
+                1.54,
+                1.251,
+                1.186,
+                1.142,
+                1.414,
+                0.724,
+                0.704,
+                0.63,
+                0.65
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.144,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.26,
+              "minMs": 0.648,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.26,
+                1.302,
+                1.329,
+                1.144,
+                1.159,
+                1.374,
+                0.782,
+                0.648,
+                0.709,
+                0.652
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.114,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.261,
+              "minMs": 0.602,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.261,
+                1.266,
+                1.217,
+                1.234,
+                1.114,
+                1.365,
+                0.668,
+                0.664,
+                0.602,
+                0.643
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 115.94202898550725,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:34.549Z",
+            "hostLoadAverage": [
+              4.84912109375,
+              4.2275390625,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 467337216,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 30968,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 121730739,
+              "blocksRead": 1062,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:34.642Z",
+            "hostLoadAverage": [
+              4.84912109375,
+              4.2275390625,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 490242048,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 52439,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 121919155,
+              "blocksRead": 1113,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-10x-current_incompatible_financial-plan.json"
+        },
+        {
+          "variant": "current_incompatible_consumed",
+          "binding": {
+            "name": "current_incompatible_consumed",
+            "eligible": true,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "504a1bdd-4354-68d2-9335-dee188d128fe"
+          },
+          "firstSessionObservationMs": 20.046,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.243,
+          "p95Ms": 8.696,
+          "p99Ms": null,
+          "maxMs": 9.318,
+          "minMs": 0.59,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.112,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.696,
+              "minMs": 0.615,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.696,
+                2.128,
+                1.243,
+                1.374,
+                1.112,
+                1.536,
+                1.004,
+                0.659,
+                0.794,
+                0.615
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.262,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.244,
+              "minMs": 0.59,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.244,
+                1.404,
+                1.424,
+                1.468,
+                1.262,
+                1.618,
+                0.641,
+                0.59,
+                0.647,
+                0.94
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.099,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.318,
+              "minMs": 0.704,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.318,
+                1.359,
+                1.327,
+                1.331,
+                1.099,
+                1.501,
+                0.886,
+                0.815,
+                0.704,
+                0.874
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 107.31916720326251,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:35.901Z",
+            "hostLoadAverage": [
+              4.84912109375,
+              4.2275390625,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 445267968,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 33411,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 121730739,
+              "blocksRead": 1067,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:36.000Z",
+            "hostLoadAverage": [
+              4.84912109375,
+              4.2275390625,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 442384384,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 54886,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 121919155,
+              "blocksRead": 1114,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-10x-current_incompatible_consumed-plan.json"
+        },
+        {
+          "variant": "current_compatible",
+          "binding": {
+            "name": "current_compatible",
+            "eligible": true,
+            "compatible": true,
+            "receipts": 1,
+            "resultId": "504a1bdd-4354-68d2-9335-dee188d128fe"
+          },
+          "firstSessionObservationMs": 19.804,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.244,
+          "p95Ms": 8.58,
+          "p99Ms": null,
+          "maxMs": 8.723,
+          "minMs": 0.61,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.302,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.723,
+              "minMs": 0.909,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.723,
+                1.722,
+                1.456,
+                1.334,
+                1.302,
+                1.771,
+                1.115,
+                0.967,
+                0.909,
+                0.918
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.244,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.363,
+              "minMs": 0.646,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.363,
+                1.85,
+                1.244,
+                1.419,
+                1.265,
+                1.497,
+                0.763,
+                0.697,
+                0.646,
+                1.135
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.139,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.58,
+              "minMs": 0.61,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.58,
+                1.423,
+                1.337,
+                1.205,
+                1.139,
+                1.372,
+                0.843,
+                0.663,
+                0.61,
+                0.662
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 114.63945890175397,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:37.152Z",
+            "hostLoadAverage": [
+              4.84912109375,
+              4.2275390625,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 450019328,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 33413,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 121730739,
+              "blocksRead": 1067,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:37.251Z",
+            "hostLoadAverage": [
+              4.84912109375,
+              4.2275390625,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 437157888,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 54887,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 121919155,
+              "blocksRead": 1115,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-10x-current_compatible-plan.json"
+        },
+        {
+          "variant": "none",
+          "binding": {
+            "name": "none",
+            "eligible": false,
+            "compatible": false,
+            "receipts": 0,
+            "resultId": "504a1bdd-4354-68d2-9335-dee188d128fe"
+          },
+          "firstSessionObservationMs": 23.546,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.273,
+          "p95Ms": 8.883,
+          "p99Ms": null,
+          "maxMs": 9.439,
+          "minMs": 0.647,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.206,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.439,
+              "minMs": 0.647,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.439,
+                1.61,
+                1.448,
+                1.282,
+                1.206,
+                1.479,
+                0.771,
+                0.806,
+                0.696,
+                0.647
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.206,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.818,
+              "minMs": 0.668,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.818,
+                1.392,
+                1.386,
+                1.273,
+                1.206,
+                1.526,
+                0.864,
+                0.727,
+                0.668,
+                0.757
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.279,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.883,
+              "minMs": 0.658,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.883,
+                1.359,
+                1.32,
+                1.36,
+                1.279,
+                1.459,
+                0.684,
+                0.688,
+                0.78,
+                0.658
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 105.94342621040364,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:38.146Z",
+            "hostLoadAverage": [
+              4.78076171875,
+              4.2236328125,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 384286720,
+            "database": {
+              "commits": 26,
+              "backends": 1,
+              "blocksHit": 18253,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 121632435,
+              "blocksRead": 1054,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:38.246Z",
+            "hostLoadAverage": [
+              4.78076171875,
+              4.2236328125,
+              3.9736328125
+            ],
+            "hostFreeMemoryBytes": 446726144,
+            "database": {
+              "commits": 33,
+              "backends": 1,
+              "blocksHit": 39726,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 121820851,
+              "blocksRead": 1103,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "nestedSqlExecutions": 88,
+          "derivedRelationsOnScorePath": [
+            "calcutta_v1_current",
+            "net_skins_v1_configuration_current",
+            "net_skins_v1_configuration_revisions"
+          ],
+          "queryPlanArtifact": "evidence/baseline-eligible-10x-none-plan.json"
+        }
+      ]
+    },
+    {
+      "scale": 2,
+      "counts": {
+        "matches": 24,
+        "oddsJobs": 20,
+        "holeScores": 380,
+        "matchHoles": 432,
+        "courseHoles": 54,
+        "calcuttaJobs": 1490,
+        "netSkinsJobs": 1138,
+        "setupReceipts": 96,
+        "scoreMutations": 654,
+        "calcuttaResults": 814,
+        "netSkinsResults": 4,
+        "setupAuditEvents": 96,
+        "matchParticipants": 72,
+        "tournamentPlayers": 24,
+        "googleOutboxEvents": 570,
+        "scoreRevisionHistory": 654,
+        "oddsPublishedSnapshots": 14,
+        "normalReleaseRebindings": 274,
+        "oddsInputConfigurations": 4,
+        "calcuttaAuctionRevisions": 74,
+        "calcuttaPublicationRevisions": 82,
+        "calcuttaConfigurationRevisions": 4,
+        "netSkinsConfigurationRevisions": 6
+      },
+      "archivedCounts": {
+        "archivedYears": 2,
+        "archivedRounds": 6,
+        "archivedScores": 864,
+        "archivedMatches": 48,
+        "archivedPlayers": 48,
+        "archivedMatchHoles": 864,
+        "archivedParticipants": 144
+      },
+      "branches": [
+        {
+          "variant": "multiple_receipts",
+          "binding": {
+            "name": "multiple_receipts",
+            "eligible": true,
+            "compatible": true,
+            "receipts": 2,
+            "resultId": "593fd8a0-2bd8-82ae-6d27-3532957c163c"
+          },
+          "firstSessionObservationMs": 9.839,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.109,
+          "p95Ms": 8.305,
+          "p99Ms": null,
+          "maxMs": 8.614,
+          "minMs": 0.63,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.083,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.614,
+              "minMs": 0.647,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.614,
+                1.372,
+                1.141,
+                1.083,
+                1.243,
+                1.617,
+                0.794,
+                0.647,
+                0.647,
+                0.7
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.044,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.088,
+              "minMs": 0.637,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.088,
+                1.24,
+                1.254,
+                1.129,
+                1.044,
+                1.39,
+                0.733,
+                0.658,
+                0.716,
+                0.637
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.109,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.305,
+              "minMs": 0.63,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.305,
+                1.322,
+                1.23,
+                1.176,
+                1.109,
+                1.323,
+                0.822,
+                0.738,
+                0.671,
+                0.63
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 116.09008590666356,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:54.834Z",
+            "hostLoadAverage": [
+              5.23974609375,
+              4.3447265625,
+              4.0205078125
+            ],
+            "hostFreeMemoryBytes": 195739648,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 33100,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 50402995,
+              "blocksRead": 672,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:54.927Z",
+            "hostLoadAverage": [
+              5.23974609375,
+              4.3447265625,
+              4.0205078125
+            ],
+            "hostFreeMemoryBytes": 208977920,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 54439,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 50583219,
+              "blocksRead": 694,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "superseded_result",
+          "binding": {
+            "name": "superseded_result",
+            "eligible": false,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "aca20669-d991-95bc-6cb1-0d4718b25ce1"
+          },
+          "firstSessionObservationMs": 14.302,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.197,
+          "p95Ms": 8.44,
+          "p99Ms": null,
+          "maxMs": 8.521,
+          "minMs": 0.633,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.283,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.521,
+              "minMs": 0.664,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.521,
+                1.33,
+                1.287,
+                1.283,
+                1.383,
+                1.659,
+                1.014,
+                0.814,
+                0.676,
+                0.664
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.183,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.216,
+              "minMs": 0.633,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.216,
+                1.293,
+                1.197,
+                1.38,
+                1.183,
+                1.429,
+                0.656,
+                0.693,
+                0.646,
+                0.633
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.16,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.44,
+              "minMs": 0.672,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.44,
+                1.444,
+                1.16,
+                1.203,
+                1.239,
+                1.389,
+                0.743,
+                0.743,
+                0.672,
+                0.721
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 117.35711770918905,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:55.519Z",
+            "hostLoadAverage": [
+              5.23974609375,
+              4.3447265625,
+              4.0205078125
+            ],
+            "hostFreeMemoryBytes": 208977920,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 25664,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 50362035,
+              "blocksRead": 755,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:55.613Z",
+            "hostLoadAverage": [
+              5.23974609375,
+              4.3447265625,
+              4.0205078125
+            ],
+            "hostFreeMemoryBytes": 208977920,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 47003,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 50542259,
+              "blocksRead": 777,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "stale_result_binding",
+          "binding": {
+            "name": "stale_result_binding",
+            "eligible": false,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "593fd8a0-2bd8-82ae-6d27-3532957c163c"
+          },
+          "firstSessionObservationMs": 11.969,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.135,
+          "p95Ms": 8.294,
+          "p99Ms": null,
+          "maxMs": 8.639,
+          "minMs": 0.651,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.128,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.294,
+              "minMs": 0.651,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.294,
+                1.591,
+                1.246,
+                1.287,
+                1.128,
+                1.522,
+                0.824,
+                0.679,
+                0.813,
+                0.651
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.135,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.639,
+              "minMs": 0.692,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.639,
+                1.311,
+                1.309,
+                1.288,
+                1.135,
+                1.426,
+                0.731,
+                0.77,
+                0.744,
+                0.692
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.118,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.255,
+              "minMs": 0.655,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.255,
+                1.39,
+                1.193,
+                1.153,
+                1.118,
+                1.567,
+                0.698,
+                0.703,
+                0.655,
+                0.656
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 115.75413821044103,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:56.181Z",
+            "hostLoadAverage": [
+              5.23974609375,
+              4.3447265625,
+              4.0205078125
+            ],
+            "hostFreeMemoryBytes": 292585472,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 25658,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 50362035,
+              "blocksRead": 768,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:56.276Z",
+            "hostLoadAverage": [
+              5.23974609375,
+              4.3447265625,
+              4.0205078125
+            ],
+            "hostFreeMemoryBytes": 294830080,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 46995,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 50542259,
+              "blocksRead": 792,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "stale_source",
+          "binding": {
+            "name": "stale_source",
+            "eligible": true,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "593fd8a0-2bd8-82ae-6d27-3532957c163c"
+          },
+          "firstSessionObservationMs": 10.641,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.154,
+          "p95Ms": 8.069,
+          "p99Ms": null,
+          "maxMs": 8.24,
+          "minMs": 0.612,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.118,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.069,
+              "minMs": 0.612,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.069,
+                1.449,
+                1.484,
+                1.428,
+                1.118,
+                1.634,
+                0.987,
+                0.624,
+                0.711,
+                0.612
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.128,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.24,
+              "minMs": 0.651,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.24,
+                1.582,
+                1.284,
+                1.331,
+                1.128,
+                1.406,
+                0.736,
+                0.651,
+                0.743,
+                0.664
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.154,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8,
+              "minMs": 0.641,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8,
+                1.406,
+                1.198,
+                1.341,
+                1.154,
+                1.384,
+                0.715,
+                0.685,
+                0.71,
+                0.641
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 121.35922330097087,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:56.964Z",
+            "hostLoadAverage": [
+              5.23974609375,
+              4.3447265625,
+              4.0205078125
+            ],
+            "hostFreeMemoryBytes": 361775104,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 34001,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 50362035,
+              "blocksRead": 745,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:57.057Z",
+            "hostLoadAverage": [
+              5.23974609375,
+              4.3447265625,
+              4.0205078125
+            ],
+            "hostFreeMemoryBytes": 363773952,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 55339,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 50542259,
+              "blocksRead": 768,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "current_incompatible_financial",
+          "binding": {
+            "name": "current_incompatible_financial",
+            "eligible": true,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "593fd8a0-2bd8-82ae-6d27-3532957c163c"
+          },
+          "firstSessionObservationMs": 11.831,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.188,
+          "p95Ms": 8.524,
+          "p99Ms": null,
+          "maxMs": 8.732,
+          "minMs": 0.641,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.188,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.732,
+              "minMs": 0.672,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.732,
+                1.396,
+                1.394,
+                1.188,
+                1.233,
+                1.528,
+                0.874,
+                0.72,
+                0.672,
+                0.687
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.2,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.524,
+              "minMs": 0.647,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.524,
+                1.46,
+                1.2,
+                1.299,
+                1.241,
+                1.51,
+                0.841,
+                0.702,
+                0.647,
+                0.72
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.116,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.27,
+              "minMs": 0.641,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.27,
+                1.322,
+                1.195,
+                1.145,
+                1.116,
+                1.399,
+                0.751,
+                0.682,
+                0.692,
+                0.641
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 114.52130096197894,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:57.686Z",
+            "hostLoadAverage": [
+              5.14013671875,
+              4.3388671875,
+              4.02001953125
+            ],
+            "hostFreeMemoryBytes": 379273216,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 28871,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 50362035,
+              "blocksRead": 787,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:57.780Z",
+            "hostLoadAverage": [
+              5.14013671875,
+              4.3388671875,
+              4.02001953125
+            ],
+            "hostFreeMemoryBytes": 401014784,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 50207,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 50542259,
+              "blocksRead": 812,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "current_incompatible_consumed",
+          "binding": {
+            "name": "current_incompatible_consumed",
+            "eligible": true,
+            "compatible": false,
+            "receipts": 1,
+            "resultId": "593fd8a0-2bd8-82ae-6d27-3532957c163c"
+          },
+          "firstSessionObservationMs": 12.31,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.243,
+          "p95Ms": 9.205,
+          "p99Ms": null,
+          "maxMs": 9.556,
+          "minMs": 0.699,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.265,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.556,
+              "minMs": 0.718,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.556,
+                1.653,
+                1.338,
+                1.265,
+                1.296,
+                1.655,
+                1.041,
+                0.769,
+                0.718,
+                0.884
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.249,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 9.205,
+              "minMs": 0.699,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                9.205,
+                1.468,
+                1.427,
+                1.421,
+                1.249,
+                1.581,
+                0.792,
+                0.757,
+                0.739,
+                0.699
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.169,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.905,
+              "minMs": 0.711,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.905,
+                1.468,
+                1.243,
+                1.205,
+                1.169,
+                1.459,
+                0.754,
+                0.832,
+                0.76,
+                0.711
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 104.64629552113855,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:58.490Z",
+            "hostLoadAverage": [
+              5.14013671875,
+              4.3388671875,
+              4.02001953125
+            ],
+            "hostFreeMemoryBytes": 356368384,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 30855,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 50362035,
+              "blocksRead": 783,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:58.595Z",
+            "hostLoadAverage": [
+              5.14013671875,
+              4.3388671875,
+              4.02001953125
+            ],
+            "hostFreeMemoryBytes": 384024576,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 52193,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 50542259,
+              "blocksRead": 806,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "current_compatible",
+          "binding": {
+            "name": "current_compatible",
+            "eligible": true,
+            "compatible": true,
+            "receipts": 1,
+            "resultId": "593fd8a0-2bd8-82ae-6d27-3532957c163c"
+          },
+          "firstSessionObservationMs": 11.288,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.187,
+          "p95Ms": 8.596,
+          "p99Ms": null,
+          "maxMs": 8.703,
+          "minMs": 0.652,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.213,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.703,
+              "minMs": 0.662,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.703,
+                1.526,
+                1.263,
+                1.213,
+                1.32,
+                1.639,
+                0.852,
+                0.662,
+                0.85,
+                0.697
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.237,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.596,
+              "minMs": 0.681,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.596,
+                1.363,
+                1.318,
+                1.256,
+                1.237,
+                1.584,
+                0.745,
+                0.715,
+                0.681,
+                0.699
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.068,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.567,
+              "minMs": 0.652,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.567,
+                1.311,
+                1.187,
+                1.12,
+                1.068,
+                1.351,
+                0.659,
+                0.67,
+                0.67,
+                0.652
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 114.90290704354821,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:59.247Z",
+            "hostLoadAverage": [
+              5.14013671875,
+              4.3388671875,
+              4.02001953125
+            ],
+            "hostFreeMemoryBytes": 402587648,
+            "database": {
+              "commits": 28,
+              "backends": 1,
+              "blocksHit": 30832,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 50362035,
+              "blocksRead": 808,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:56:59.344Z",
+            "hostLoadAverage": [
+              5.14013671875,
+              4.3388671875,
+              4.02001953125
+            ],
+            "hostFreeMemoryBytes": 347734016,
+            "database": {
+              "commits": 35,
+              "backends": 1,
+              "blocksHit": 52168,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 50542259,
+              "blocksRead": 833,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        },
+        {
+          "variant": "none",
+          "binding": {
+            "name": "none",
+            "eligible": false,
+            "compatible": false,
+            "receipts": 0,
+            "resultId": "593fd8a0-2bd8-82ae-6d27-3532957c163c"
+          },
+          "firstSessionObservationMs": 16.9,
+          "samples": 30,
+          "successCount": 30,
+          "failureCount": 0,
+          "p50Ms": 1.165,
+          "p95Ms": 8.807,
+          "p99Ms": null,
+          "maxMs": 10.947,
+          "minMs": 0.646,
+          "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+          "batches": [
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.165,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.807,
+              "minMs": 0.693,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.807,
+                1.361,
+                1.326,
+                1.292,
+                1.165,
+                1.518,
+                1.071,
+                0.837,
+                0.7,
+                0.693
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.16,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 8.652,
+              "minMs": 0.646,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                8.652,
+                1.348,
+                1.214,
+                1.227,
+                1.16,
+                1.392,
+                0.671,
+                0.662,
+                0.667,
+                0.646
+              ]
+            },
+            {
+              "samples": 10,
+              "successCount": 10,
+              "failureCount": 0,
+              "p50Ms": 1.148,
+              "p95Ms": null,
+              "p99Ms": null,
+              "maxMs": 10.947,
+              "minMs": 0.682,
+              "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+              "valuesMs": [
+                10.947,
+                1.698,
+                1.148,
+                1.298,
+                1.533,
+                1.626,
+                0.826,
+                1.128,
+                0.782,
+                0.682
+              ]
+            }
+          ],
+          "rollbackVerified": true,
+          "statementTimeoutMs": 1000,
+          "headroomToMaxRatio": 91.34922809902257,
+          "resourcesBefore": {
+            "observedAt": "2026-09-28T15:56:59.903Z",
+            "hostLoadAverage": [
+              5.14013671875,
+              4.3388671875,
+              4.02001953125
+            ],
+            "hostFreeMemoryBytes": 325976064,
+            "database": {
+              "commits": 26,
+              "backends": 1,
+              "blocksHit": 18115,
+              "deadlocks": 0,
+              "rollbacks": 1,
+              "sizeBytes": 50263731,
+              "blocksRead": 742,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          },
+          "resourcesAfter": {
+            "observedAt": "2026-09-28T15:57:00.045Z",
+            "hostLoadAverage": [
+              5.14013671875,
+              4.3388671875,
+              4.02001953125
+            ],
+            "hostFreeMemoryBytes": 261947392,
+            "database": {
+              "commits": 33,
+              "backends": 1,
+              "blocksHit": 39454,
+              "deadlocks": 0,
+              "rollbacks": 31,
+              "sizeBytes": 50443955,
+              "blocksRead": 764,
+              "statsReset": null,
+              "trackIoTiming": "off",
+              "temporaryBytes": 0,
+              "blockReadTimeMs": 0,
+              "blockWriteTimeMs": 0
+            },
+            "limitations": [
+              "Cumulative database counters can lag; no subtraction across databases.",
+              "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+              "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+              "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "resources": {
+    "scope": "LOCAL_SOCKET_ONLY",
+    "databaseVersion": "17.11 (Homebrew)",
+    "host": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "osRelease": "25.5.0",
+      "nodeVersion": "v26.7.0",
+      "cpuModel": "Apple M5",
+      "logicalCpus": 10,
+      "totalMemoryBytes": 17179869184
+    },
+    "databaseSettings": {
+      "jit": "on",
+      "fsync": "off",
+      "work_mem": "4MB",
+      "shared_buffers": "32MB",
+      "max_connections": "20",
+      "synchronous_commit": "on"
+    },
+    "resourceUtilization": {
+      "cpu": null,
+      "memory": null,
+      "io": null,
+      "connections": null,
+      "status": "UNAVAILABLE_NOT_SAMPLED"
+    },
+    "initialResourceSnapshot": {
+      "observedAt": "2026-09-28T15:54:18.374Z",
+      "hostLoadAverage": [
+        3.80322265625,
+        4,
+        3.87451171875
+      ],
+      "hostFreeMemoryBytes": 289275904,
+      "database": {
+        "commits": 301,
+        "backends": 1,
+        "blocksHit": 723276,
+        "deadlocks": 0,
+        "rollbacks": 0,
+        "sizeBytes": 31798963,
+        "blocksRead": 441,
+        "statsReset": null,
+        "trackIoTiming": "off",
+        "temporaryBytes": 0,
+        "blockReadTimeMs": 0,
+        "blockWriteTimeMs": 0
+      },
+      "limitations": [
+        "Cumulative database counters can lag; no subtraction across databases.",
+        "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+        "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+        "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+      ]
+    },
+    "limitations": [
+      "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+      "This is not a Supabase compute tier or Production capacity measurement.",
+      "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+    ]
+  }
+}

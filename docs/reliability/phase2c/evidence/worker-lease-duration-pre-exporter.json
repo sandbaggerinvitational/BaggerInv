@@ -1,0 +1,553 @@
+{
+  "proof": "DERIVED_FROM_RETAINED_LOCAL_CHILD_EVENT_TIMESTAMPS",
+  "source": "worker-delivery-results.json",
+  "sourceSha256": "c458c75469416111a339e2d9fe80095afef015ebf557dd53d736517905089738",
+  "leaseSeconds": {
+    "CALCUTTA": 60,
+    "COMPETITION": 90,
+    "INTELLIGENCE": 90
+  },
+  "byFamily": {
+    "CALCUTTA": {
+      "samples": 23,
+      "maximumEventSpanMs": 125
+    },
+    "COMPETITION": {
+      "samples": 23,
+      "maximumEventSpanMs": 138
+    },
+    "INTELLIGENCE": {
+      "samples": 19,
+      "maximumEventSpanMs": 109
+    }
+  },
+  "spans": [
+    {
+      "case": "autonomous-after-commit",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790614293261,
+      "to": 1790614293399,
+      "elapsedMs": 138
+    },
+    {
+      "case": "autonomous-after-commit",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614293399,
+      "to": 1790614293508,
+      "elapsedMs": 109
+    },
+    {
+      "case": "autonomous-after-commit",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614293666,
+      "to": 1790614293756,
+      "elapsedMs": 90
+    },
+    {
+      "case": "crash-lease-restart",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790614294737,
+      "to": 1790614294808,
+      "elapsedMs": 71
+    },
+    {
+      "case": "crash-lease-restart",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614294808,
+      "to": 1790614294889,
+      "elapsedMs": 81
+    },
+    {
+      "case": "crash-lease-restart",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614296863,
+      "to": 1790614296944,
+      "elapsedMs": 81
+    },
+    {
+      "case": "competition-claim-crash-restart",
+      "family": "INTELLIGENCE",
+      "previousType": "tick",
+      "from": 1790614297824,
+      "to": 1790614297919,
+      "elapsedMs": 95
+    },
+    {
+      "case": "competition-claim-crash-restart",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790614299873,
+      "to": 1790614299924,
+      "elapsedMs": 51
+    },
+    {
+      "case": "competition-claim-crash-restart",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790614301924,
+      "to": 1790614301966,
+      "elapsedMs": 42
+    },
+    {
+      "case": "intelligence-claim-crash-restart",
+      "family": "INTELLIGENCE",
+      "previousType": "tick",
+      "from": 1790614307096,
+      "to": 1790614307196,
+      "elapsedMs": 100
+    },
+    {
+      "case": "unknown-completion-ack",
+      "family": "COMPETITION",
+      "previousType": "failed",
+      "from": 1790614308014,
+      "to": 1790614308078,
+      "elapsedMs": 64
+    },
+    {
+      "case": "unknown-completion-ack",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614308078,
+      "to": 1790614308160,
+      "elapsedMs": 82
+    },
+    {
+      "case": "competition-completion-ack-loss",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614308808,
+      "to": 1790614308905,
+      "elapsedMs": 97
+    },
+    {
+      "case": "competition-completion-ack-loss",
+      "family": "INTELLIGENCE",
+      "previousType": "failed",
+      "from": 1790614309002,
+      "to": 1790614309094,
+      "elapsedMs": 92
+    },
+    {
+      "case": "intelligence-completion-ack-loss",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614309875,
+      "to": 1790614309972,
+      "elapsedMs": 97
+    },
+    {
+      "case": "intelligence-completion-ack-loss",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790614309972,
+      "to": 1790614310041,
+      "elapsedMs": 69
+    },
+    {
+      "case": "calcutta-failure-isolation",
+      "family": "COMPETITION",
+      "previousType": "failed",
+      "from": 1790614310941,
+      "to": 1790614311013,
+      "elapsedMs": 72
+    },
+    {
+      "case": "calcutta-failure-isolation",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614311013,
+      "to": 1790614311095,
+      "elapsedMs": 82
+    },
+    {
+      "case": "competition-failure-isolation",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614312027,
+      "to": 1790614312124,
+      "elapsedMs": 97
+    },
+    {
+      "case": "competition-failure-isolation",
+      "family": "INTELLIGENCE",
+      "previousType": "failed",
+      "from": 1790614312145,
+      "to": 1790614312227,
+      "elapsedMs": 82
+    },
+    {
+      "case": "intelligence-failure-isolation",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614313228,
+      "to": 1790614313327,
+      "elapsedMs": 99
+    },
+    {
+      "case": "intelligence-failure-isolation",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790614313327,
+      "to": 1790614313397,
+      "elapsedMs": 70
+    },
+    {
+      "case": "intelligence-correction-before-write",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614314847,
+      "to": 1790614314945,
+      "elapsedMs": 98
+    },
+    {
+      "case": "intelligence-correction-before-write",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790614314945,
+      "to": 1790614315008,
+      "elapsedMs": 63
+    },
+    {
+      "case": "intelligence-correction-before-write",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614315008,
+      "to": 1790614315114,
+      "elapsedMs": 106
+    },
+    {
+      "case": "intelligence-correction-before-write",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790614315271,
+      "to": 1790614315331,
+      "elapsedMs": 60
+    },
+    {
+      "case": "intelligence-correction-before-write",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614315331,
+      "to": 1790614315411,
+      "elapsedMs": 80
+    },
+    {
+      "case": "intelligence-correction-before-write",
+      "family": "CALCUTTA",
+      "previousType": "processed",
+      "from": 1790614315411,
+      "to": 1790614315488,
+      "elapsedMs": 77
+    },
+    {
+      "case": "competition-before-claim",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614316140,
+      "to": 1790614316239,
+      "elapsedMs": 99
+    },
+    {
+      "case": "competition-before-claim",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790614316239,
+      "to": 1790614316331,
+      "elapsedMs": 92
+    },
+    {
+      "case": "competition-before-claim",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614316331,
+      "to": 1790614316414,
+      "elapsedMs": 83
+    },
+    {
+      "case": "competition-before-claim",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614316569,
+      "to": 1790614316646,
+      "elapsedMs": 77
+    },
+    {
+      "case": "competition-before-write",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614317397,
+      "to": 1790614317496,
+      "elapsedMs": 99
+    },
+    {
+      "case": "competition-before-write",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790614317496,
+      "to": 1790614317590,
+      "elapsedMs": 94
+    },
+    {
+      "case": "competition-before-write",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614317590,
+      "to": 1790614317677,
+      "elapsedMs": 87
+    },
+    {
+      "case": "competition-before-write",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790614317833,
+      "to": 1790614317897,
+      "elapsedMs": 64
+    },
+    {
+      "case": "competition-before-write",
+      "family": "CALCUTTA",
+      "previousType": "processed",
+      "from": 1790614317897,
+      "to": 1790614317977,
+      "elapsedMs": 80
+    },
+    {
+      "case": "intelligence-before-claim",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614318661,
+      "to": 1790614318759,
+      "elapsedMs": 98
+    },
+    {
+      "case": "intelligence-before-claim",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790614318759,
+      "to": 1790614318824,
+      "elapsedMs": 65
+    },
+    {
+      "case": "intelligence-before-claim",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790614319100,
+      "to": 1790614319159,
+      "elapsedMs": 59
+    },
+    {
+      "case": "intelligence-before-claim",
+      "family": "CALCUTTA",
+      "previousType": "processed",
+      "from": 1790614319159,
+      "to": 1790614319236,
+      "elapsedMs": 77
+    },
+    {
+      "case": "intelligence-before-claim",
+      "family": "INTELLIGENCE",
+      "previousType": "tick",
+      "from": 1790614322983,
+      "to": 1790614323062,
+      "elapsedMs": 79
+    },
+    {
+      "case": "intelligence-after-claim",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614323751,
+      "to": 1790614323858,
+      "elapsedMs": 107
+    },
+    {
+      "case": "intelligence-after-claim",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790614323858,
+      "to": 1790614323956,
+      "elapsedMs": 98
+    },
+    {
+      "case": "intelligence-after-claim",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790614324248,
+      "to": 1790614324309,
+      "elapsedMs": 61
+    },
+    {
+      "case": "intelligence-after-claim",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614324309,
+      "to": 1790614324388,
+      "elapsedMs": 79
+    },
+    {
+      "case": "intelligence-after-claim",
+      "family": "CALCUTTA",
+      "previousType": "processed",
+      "from": 1790614324388,
+      "to": 1790614324463,
+      "elapsedMs": 75
+    },
+    {
+      "case": "intelligence-before-write",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614325169,
+      "to": 1790614325270,
+      "elapsedMs": 101
+    },
+    {
+      "case": "intelligence-before-write",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790614325270,
+      "to": 1790614325337,
+      "elapsedMs": 67
+    },
+    {
+      "case": "intelligence-before-write",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614325337,
+      "to": 1790614325446,
+      "elapsedMs": 109
+    },
+    {
+      "case": "intelligence-before-write",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790614325604,
+      "to": 1790614325667,
+      "elapsedMs": 63
+    },
+    {
+      "case": "intelligence-before-write",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614325667,
+      "to": 1790614325750,
+      "elapsedMs": 83
+    },
+    {
+      "case": "intelligence-before-write",
+      "family": "CALCUTTA",
+      "previousType": "processed",
+      "from": 1790614325750,
+      "to": 1790614325835,
+      "elapsedMs": 85
+    },
+    {
+      "case": "calcutta-before-claim",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614326492,
+      "to": 1790614326617,
+      "elapsedMs": 125
+    },
+    {
+      "case": "calcutta-before-claim",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790614326617,
+      "to": 1790614326681,
+      "elapsedMs": 64
+    },
+    {
+      "case": "calcutta-before-claim",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614326681,
+      "to": 1790614326761,
+      "elapsedMs": 80
+    },
+    {
+      "case": "competition-late-writer-current-pointer",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614327438,
+      "to": 1790614327533,
+      "elapsedMs": 95
+    },
+    {
+      "case": "intelligence-late-writer-current-pointer",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614328932,
+      "to": 1790614329028,
+      "elapsedMs": 96
+    },
+    {
+      "case": "intelligence-late-writer-current-pointer",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790614329028,
+      "to": 1790614329091,
+      "elapsedMs": 63
+    },
+    {
+      "case": "two-workers",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790614342456,
+      "to": 1790614342531,
+      "elapsedMs": 75
+    },
+    {
+      "case": "two-workers",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614342531,
+      "to": 1790614342619,
+      "elapsedMs": 88
+    },
+    {
+      "case": "two-workers",
+      "family": "CALCUTTA",
+      "previousType": "processed",
+      "from": 1790614342599,
+      "to": 1790614342688,
+      "elapsedMs": 89
+    },
+    {
+      "case": "terminal-compatible-activation-requeue",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790614346209,
+      "to": 1790614346306,
+      "elapsedMs": 97
+    },
+    {
+      "case": "terminal-compatible-activation-requeue",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790614346306,
+      "to": 1790614346375,
+      "elapsedMs": 69
+    },
+    {
+      "case": "terminal-compatible-activation-requeue",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790614346375,
+      "to": 1790614346458,
+      "elapsedMs": 83
+    }
+  ],
+  "limitations": [
+    "Local diagnostic, not production percentile or total hosted deadline",
+    "Preceding event includes only the same child event stream",
+    "Only successful nonempty processor invocations; crash/timeout/late-writer cases are retained separately",
+    "SQL statement timeout is not a CPU or whole-process timeout"
+  ],
+  "production": false
+}

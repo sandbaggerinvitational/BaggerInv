@@ -1,0 +1,167 @@
+TAP version 13
+# Subtest: Phase2C actual annual worker SQL corrections
+    # Subtest: P2C-C-BEFORE: all14 installed defects reproduce SQLSTATE42883 before correction
+    ok 1 - P2C-C-BEFORE: all14 installed defects reproduce SQLSTATE42883 before correction
+      ---
+      duration_ms: 702.741875
+      type: 'test'
+      ...
+    # Subtest: P2C-C-BEFORE-WRITER-CHECK: actual eligible writer sync reproduces obsolete false-only CHECK23514
+    ok 2 - P2C-C-BEFORE-WRITER-CHECK: actual eligible writer sync reproduces obsolete false-only CHECK23514
+      ---
+      duration_ms: 521.962458
+      type: 'test'
+      ...
+    # Subtest: P2C-C-INSTALL: upgrade preserves attributes and removes only proven special-expression misuse
+    ok 3 - P2C-C-INSTALL: upgrade preserves attributes and removes only proven special-expression misuse
+      ---
+      duration_ms: 783.510625
+      type: 'test'
+      ...
+    # Subtest: P2C-C-AFTER: every corrected initializer executes through its original guard rather than42883
+    ok 4 - P2C-C-AFTER: every corrected initializer executes through its original guard rather than42883
+      ---
+      duration_ms: 1414.10625
+      type: 'test'
+      ...
+    # Subtest: P2C-C-COMPETITION: 2099 claim/complete/replay/stale and lease clamp use actual worker SQL
+    ok 5 - P2C-C-COMPETITION: 2099 claim/complete/replay/stale and lease clamp use actual worker SQL
+      ---
+      duration_ms: 2553.588083
+      type: 'test'
+      ...
+    # Subtest: P2C-C-BEFORE-42702: corrected initializer exposes historical annual intelligence variable collision
+    ok 6 - P2C-C-BEFORE-42702: corrected initializer exposes historical annual intelligence variable collision
+      ---
+      duration_ms: 806.248958
+      type: 'test'
+      ...
+    # Subtest: P2C-C-INTELLIGENCE: 2099 bundle claim/complete preserves active lease and expired-lease retry
+    ok 7 - P2C-C-INTELLIGENCE: 2099 bundle claim/complete preserves active lease and expired-lease retry
+      ---
+      duration_ms: 6883.857584
+      type: 'test'
+      ...
+    # Subtest: P2C-C-CALCUTTA: 2099 nonempty Calcutta claim executes lease bounds and same-request replay
+    ok 8 - P2C-C-CALCUTTA: 2099 nonempty Calcutta claim executes lease bounds and same-request replay
+      ---
+      duration_ms: 2784.31625
+      type: 'test'
+      ...
+    # Subtest: P2C-C-GOOGLE-COMPATIBILITY: 2100 pre-activation job claims clamp leases and reclaim an expired lease
+    ok 9 - P2C-C-GOOGLE-COMPATIBILITY: 2100 pre-activation job claims clamp leases and reclaim an expired lease
+      ---
+      duration_ms: 2603.937208
+      type: 'test'
+      ...
+    # Subtest: P2C-C-WRITER-CHECK: writer sync retains certification and prepared-state requirements
+    ok 10 - P2C-C-WRITER-CHECK: writer sync retains certification and prepared-state requirements
+      ---
+      duration_ms: 1149.309042
+      type: 'test'
+      ...
+    # Subtest: P2C-C-GOOGLE: 2099 outbox claims and retry delay retain finite bounds and stale-lease rejection
+    ok 11 - P2C-C-GOOGLE: 2099 outbox claims and retry delay retain finite bounds and stale-lease rejection
+      ---
+      duration_ms: 3539.93625
+      type: 'test'
+      ...
+    # Subtest: P2C-C-ARCHIVE: 2099 archive claims and retry delay preserve supersession and finite bounds
+    ok 12 - P2C-C-ARCHIVE: 2099 archive claims and retry delay preserve supersession and finite bounds
+      ---
+      duration_ms: 3730.987792
+      type: 'test'
+      ...
+    # Subtest: P2C-C-ODDS: 2099 actual completion clamps output bytes without publishing or duplicating results
+    ok 13 - P2C-C-ODDS: 2099 actual completion clamps output bytes without publishing or duplicating results
+      ---
+      duration_ms: 2707.323166
+      type: 'test'
+      ...
+    # Subtest: P2C-C-CALCUTTA-MATRIX: annual Calcutta empty, historical, stale-source and expired-lease branches
+    ok 14 - P2C-C-CALCUTTA-MATRIX: annual Calcutta empty, historical, stale-source and expired-lease branches
+      ---
+      duration_ms: 7078.77025
+      type: 'test'
+      ...
+    # Subtest: P2C-C-COMPATIBILITY-MATRIX: Google compatibility rejects stale structure and bounds multiple-job selection
+    ok 15 - P2C-C-COMPATIBILITY-MATRIX: Google compatibility rejects stale structure and bounds multiple-job selection
+      ---
+      duration_ms: 2976.5925
+      type: 'test'
+      ...
+    # Subtest: P2C-C-GOOGLE-MATRIX: annual Google exact and queue claims enforce empty, order, lease and terminal states
+    ok 16 - P2C-C-GOOGLE-MATRIX: annual Google exact and queue claims enforce empty, order, lease and terminal states
+      ---
+      duration_ms: 726.347292
+      type: 'test'
+      ...
+    # Subtest: P2C-C-ARCHIVE-MATRIX: annual archive empty, active, expired, retry and blocked branches retain one job authority
+    ok 17 - P2C-C-ARCHIVE-MATRIX: annual archive empty, active, expired, retry and blocked branches retain one job authority
+      ---
+      duration_ms: 926.287916
+      type: 'test'
+      ...
+    # Subtest: P2C-C-ANNUAL-COMPLETION-MATRIX: annual current jobs require exact active claims before completion
+    ok 18 - P2C-C-ANNUAL-COMPLETION-MATRIX: annual current jobs require exact active claims before completion
+      ---
+      duration_ms: 6347.63225
+      type: 'test'
+      ...
+    # Subtest: P2C-C-ODDS-MATRIX: annual Odds completion rejects absent, stale and superseded exact jobs
+    ok 19 - P2C-C-ODDS-MATRIX: annual Odds completion rejects absent, stale and superseded exact jobs
+      ---
+      duration_ms: 4832.363208
+      type: 'test'
+      ...
+    # Subtest: P2C-C-COMPETITION-RETRY: annual Competition expiration preserves bounded retry and rejects the retired claim
+    ok 20 - P2C-C-COMPETITION-RETRY: annual Competition expiration preserves bounded retry and rejects the retired claim
+      ---
+      duration_ms: 2879.001958
+      type: 'test'
+      ...
+    # Subtest: P2C-C-FROZEN-COMPLETION: supported frozen completion wrappers preserve exact claims and duration bounds
+    ok 21 - P2C-C-FROZEN-COMPLETION: supported frozen completion wrappers preserve exact claims and duration bounds
+      ---
+      duration_ms: 8312.712958
+      type: 'test'
+      ...
+    # Subtest: P2C-C-ANNUAL-MIXED-BUNDLE: annual Intelligence leaves mixed terminal and delayed siblings unchanged
+    ok 22 - P2C-C-ANNUAL-MIXED-BUNDLE: annual Intelligence leaves mixed terminal and delayed siblings unchanged
+      ---
+      duration_ms: 2158.52225
+      type: 'test'
+      ...
+    # Subtest: P2C-C-MANIFEST: annual writer manifest retains strict authorship and rejects topology/security drift
+    ok 23 - P2C-C-MANIFEST: annual writer manifest retains strict authorship and rejects topology/security drift
+      ---
+      duration_ms: 1362.753292
+      type: 'test'
+      ...
+    # Subtest: P2C-C-REAPPLY: reapplication fails atomically instead of silently accepting unknown source
+    ok 24 - P2C-C-REAPPLY: reapplication fails atomically instead of silently accepting unknown source
+      ---
+      duration_ms: 774.211958
+      type: 'test'
+      ...
+    1..24
+ok 1 - Phase2C actual annual worker SQL corrections
+  ---
+  duration_ms: 82003.46425
+  type: 'test'
+  ...
+# Subtest: P2C-C-CLEAN: effective clean installation executes actual candidate manifest
+ok 2 - P2C-C-CLEAN: effective clean installation executes actual candidate manifest
+  ---
+  duration_ms: 5076.464875
+  type: 'test'
+  ...
+1..2
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 87223.097917

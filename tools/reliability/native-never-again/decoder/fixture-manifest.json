@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "pinnedNative": {
+    "version": "1.2",
+    "build": 10,
+    "gitSha": "e7652b9b65595861f4f7cdf0b8326491581a27b8"
+  },
+  "provenance": {
+    "source": "/private/tmp/bagger-build10-promo/PROJECT/capture-source",
+    "report": "/private/tmp/bagger-build10-promo/PROJECT/SOURCE-PROVENANCE.json",
+    "statement": "Preserved report records 495 tracked iOS files compared, only two DEBUG fixture differences; model/service files unchanged",
+    "limitation": "Pinned Git object unavailable for independent re-verification; current byte hashes and preserved independent snapshot matches retained",
+    "claim": "STRONGLY SUPPORTED Build10 attribution; PROVEN byte-exact retained source used"
+  },
+  "files": [
+    {
+      "path": "Vendor/MobileMatchDetailModels.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileMatchDetailModels.swift",
+      "sha256": "cbdaa786b1a30887f7ead127a984aa6db120799fc2f4d2993d25152fafa4cecb"
+    },
+    {
+      "path": "Vendor/MobileModels.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileModels.swift",
+      "sha256": "6d3cdb7836bf5a4b33b945e26e33450fe8be089d68e918cdb07fad97616764d9"
+    },
+    {
+      "path": "Vendor/MobileParticipantContentValidation.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileParticipantContentValidation.swift",
+      "sha256": "1950693cb540a3900929a467e559cd1332a8d7c7eee10b03aacf86c56f9ce018"
+    },
+    {
+      "path": "Vendor/MobilePlayerRoundPerformance.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobilePlayerRoundPerformance.swift",
+      "sha256": "b0119121fd1fa9741a479ae9dd2ab8b122f535c7cb12a1fa44c91329403166b5"
+    },
+    {
+      "path": "Vendor/MobilePlayersIntelligence.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobilePlayersIntelligence.swift",
+      "sha256": "15a10cbbb234f68a0be9716d41b9895bf38b42d1ee9d51d19995c7e2952b2dad"
+    },
+    {
+      "path": "Vendor/MobileR1RoundCompetition.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileR1RoundCompetition.swift",
+      "sha256": "5e77ec76a66ec611f3efcb68c4c3e8b2e04afc7346f0d8b114db8eeda8d2a5f6"
+    },
+    {
+      "path": "Vendor/MobileR2PairCompetition.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileR2PairCompetition.swift",
+      "sha256": "c035e856a9f894cf9179ddfacd5d4ab8f334e71f7764845aaca68a9575233ee5"
+    },
+    {
+      "path": "Vendor/MobileR3RoundCompetition.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileR3RoundCompetition.swift",
+      "sha256": "42db679fbd020cc17dd99fff80fbc7e52fafc79c7b02c02b66ea0068011ead00"
+    },
+    {
+      "path": "Vendor/MobileReadModels.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileReadModels.swift",
+      "sha256": "738cb72710e17f963228f2000f6af38e6341d40d6a059c88d932bfa7cc6d855d"
+    },
+    {
+      "path": "Vendor/MobileRoundScorecard.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileRoundScorecard.swift",
+      "sha256": "7d80c3e043c33573b8926fda2ca9674dd4a71dd014d4d705ea94ef4a251e8c45"
+    },
+    {
+      "path": "Vendor/MobileScoringModels.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileScoringModels.swift",
+      "sha256": "f36c2a50bf74cc7d84ff6730818dfaa198c6f57bcc4d78a82f8dff4dcae3544c"
+    },
+    {
+      "path": "Vendor/NativeEnvironment.swift",
+      "upstreamPath": "ios/BaggerInv/Configuration/NativeEnvironment.swift",
+      "sha256": "30cdd8d29ededb51dfdbe72d967e76541ff48c1c2829b0217e892c51281ebdfa"
+    }
+  ]
+}

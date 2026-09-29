@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-09-29T21:40:11.927846+00:00",
+  "reviewer": "Codex engineering review",
+  "ownerAcceptance": "NOT_PERFORMED",
+  "overallPhase2C": "NOT_ADJUDICATED",
+  "recovery": {
+    "status": "PROVEN_LOCAL",
+    "detail": {
+      "counts": {
+        "tests": 50,
+        "pass": 50,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "proofLayer": [
+        "POSTGRESQL",
+        "API",
+        "INTEGRATION",
+        "FAILURE_INJECTION"
+      ],
+      "providerTransport": "INJECTED_LOCAL_SQL",
+      "physical": false
+    }
+  },
+  "swift": {
+    "status": "PROVEN_LOCAL",
+    "detail": {
+      "modelChecks": 24,
+      "capturedInputs": 17,
+      "inputSourcesStable": true,
+      "proofLayer": "INTEGRATION_SWIFT_MACOS_MODELS",
+      "physical": "NOT_PROVEN",
+      "nativeGitLineage": "STRONGLY_SUPPORTED_NOT_NEWLY_GIT_VERIFIED"
+    }
+  },
+  "postRevocationPerformance": {
+    "status": "PROVEN_LOCAL",
+    "detail": {
+      "cells": 4
+    }
+  },
+  "delivery": {
+    "status": "PROVEN_LOCAL",
+    "detail": {
+      "counts": {
+        "tests": 54,
+        "pass": 54,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "completedAt": "2026-09-29T21:04:00.957Z",
+      "receiptSha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+      "detail": {
+        "behavioralOutcomes": 54,
+        "processingBudget": "5000ms per SQL statement; not total process deadline",
+        "hostedSupervisor": "NOT_PROVEN"
+      },
+      "closesOverallPhase": false
+    }
+  }
+}

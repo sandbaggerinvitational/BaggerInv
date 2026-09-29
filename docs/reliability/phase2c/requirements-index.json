@@ -1,0 +1,1890 @@
+{
+  "schemaVersion": 1,
+  "source": "User-provided seven-part Phase2C request",
+  "requirements": [
+    {
+      "id": "P2C-001",
+      "part": 1,
+      "title": "PREFLIGHT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-002",
+      "part": 2,
+      "title": "CREATE PHASE 2C CHECKPOINT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-003",
+      "part": 3,
+      "title": "REPRODUCE ALL SIX OPEN GATES BEFORE CHANGING CODE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-004",
+      "part": 4,
+      "title": "P0-A FORMAL RECOVERY REQUIREMENT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-005",
+      "part": 5,
+      "title": "SEPARATE MUTATION FROM RECOVERY AUTHORITY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-006",
+      "part": 6,
+      "title": "RECOVERY AUTHORIZATION REQUIREMENTS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-007",
+      "part": 7,
+      "title": "RECOVERY RESPONSE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-008",
+      "part": 8,
+      "title": "POST-REVOCATION RECOVERY TEST MATRIX",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-009",
+      "part": 9,
+      "title": "RECOVERY IDEMPOTENCY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-010",
+      "part": 10,
+      "title": "RECOVERY PERFORMANCE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-011",
+      "part": 11,
+      "title": "RECOVERY FAILURE INJECTION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-012",
+      "part": 12,
+      "title": "P0-A ACCEPTANCE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-013",
+      "part": 13,
+      "title": "P0-B DERIVED DELIVERY INVENTORY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-014",
+      "part": 14,
+      "title": "AUTONOMOUS PICKUP",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-015",
+      "part": 15,
+      "title": "OWNER-APPROVED VS AUTOMATIC WORK",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-016",
+      "part": 16,
+      "title": "DELIVERY TEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-017",
+      "part": 17,
+      "title": "WORKER RESTART",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-018",
+      "part": 18,
+      "title": "WORKER CRASH DURING PROCESSING",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-019",
+      "part": 19,
+      "title": "RETRY POLICY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-020",
+      "part": 20,
+      "title": "BACKOFF",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-021",
+      "part": 21,
+      "title": "ATTEMPT LIMIT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-022",
+      "part": 22,
+      "title": "DEAD-LETTER MODEL",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-023",
+      "part": 23,
+      "title": "DEAD-LETTER RECOVERY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-024",
+      "part": 24,
+      "title": "DUPLICATE DELIVERY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-025",
+      "part": 25,
+      "title": "OUT-OF-ORDER DELIVERY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-026",
+      "part": 26,
+      "title": "BACKLOG RECOVERY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-027",
+      "part": 27,
+      "title": "WORKER LOAD ISOLATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-028",
+      "part": 28,
+      "title": "WORKER CONCURRENCY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-029",
+      "part": 29,
+      "title": "P0-B ACCEPTANCE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-030",
+      "part": 30,
+      "title": "P0-C ANNUAL WORKER 42883 INVENTORY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-031",
+      "part": 31,
+      "title": "REPRODUCE EACH 42883",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-032",
+      "part": 32,
+      "title": "ROOT CAUSE 42883",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-033",
+      "part": 33,
+      "title": "CORRECT 42883 NARROWLY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-034",
+      "part": 34,
+      "title": "STATIC SQL GUARD",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-035",
+      "part": 35,
+      "title": "ANNUAL WORKER RUNTIME REGRESSION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-036",
+      "part": 36,
+      "title": "FUTURE-YEAR FIXTURE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-037",
+      "part": 37,
+      "title": "P0-C NEVER AGAIN",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-038",
+      "part": 38,
+      "title": "P0-C ACCEPTANCE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-039",
+      "part": 39,
+      "title": "P0-D NET SKINS DEADLOCK REPRODUCTION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-040",
+      "part": 40,
+      "title": "DEADLOCK ROOT CAUSE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-041",
+      "part": 41,
+      "title": "DEADLOCK ELIMINATION DESIGN",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-042",
+      "part": 42,
+      "title": "IMPLEMENT MINIMUM DEADLOCK FIX",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-043",
+      "part": 43,
+      "title": "DEADLOCK CONCURRENCY MATRIX",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-044",
+      "part": 44,
+      "title": "AUTOMATIC DEADLOCK RETRY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-045",
+      "part": 45,
+      "title": "NET SKINS RESULT CONSISTENCY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-046",
+      "part": 46,
+      "title": "NET SKINS SCORE ISOLATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-047",
+      "part": 47,
+      "title": "P0-D ACCEPTANCE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-048",
+      "part": 48,
+      "title": "P0-E FINITE STATEMENT-TIMEOUT BASELINE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-049",
+      "part": 49,
+      "title": "FINITE TIMEOUT TEST PROFILE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-050",
+      "part": 50,
+      "title": "FINITE-TIMEOUT PERFORMANCE MATRIX",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-051",
+      "part": 51,
+      "title": "FORCED 57014",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-052",
+      "part": 52,
+      "title": "TIMEOUT AFTER COMMIT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-053",
+      "part": 53,
+      "title": "TIMEOUT HEADROOM REPORT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-054",
+      "part": 54,
+      "title": "P0-E ACCEPTANCE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-055",
+      "part": 55,
+      "title": "P0-F CLIENT COMPATIBILITY INVENTORY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-056",
+      "part": 56,
+      "title": "PWA SCORE CONTRACT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-057",
+      "part": 57,
+      "title": "BUILD 10 BACKEND CONTRACT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-058",
+      "part": 58,
+      "title": "DIRECTOR / RECOVERY CONTRACT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-059",
+      "part": 59,
+      "title": "LOCK INTEGRATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-060",
+      "part": 60,
+      "title": "FINALIZE INTEGRATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-061",
+      "part": 61,
+      "title": "RESUME INTEGRATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-062",
+      "part": 62,
+      "title": "RELEASE / ACTIVATION COMPATIBILITY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-063",
+      "part": 63,
+      "title": "JOB VERSION COMPATIBILITY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-064",
+      "part": 64,
+      "title": "MIGRATION UPGRADE PATH",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-065",
+      "part": 65,
+      "title": "ROLLBACK COMPATIBILITY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-066",
+      "part": 66,
+      "title": "ANNUAL ADMISSION / ATTESTATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-067",
+      "part": 67,
+      "title": "FULL SYNTHETIC SCORE SEQUENCE AFTER FIXES",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-068",
+      "part": 68,
+      "title": "FULL SEQUENCE WITH WORKER INTERRUPTION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-069",
+      "part": 69,
+      "title": "FULL SEQUENCE WITH LOCK/FINALIZE RECOVERY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-070",
+      "part": 70,
+      "title": "FULL SEQUENCE WITH TRANSIENT DEADLOCK",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-071",
+      "part": 71,
+      "title": "FULL SEQUENCE WITH FORCED TIMEOUT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-072",
+      "part": 72,
+      "title": "HISTORY SCALE RE-RUN",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-073",
+      "part": 73,
+      "title": "SCORE LATENCY NON-REGRESSION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-074",
+      "part": 74,
+      "title": "RECOVERY LATENCY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-075",
+      "part": 75,
+      "title": "WORKER LATENCY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-076",
+      "part": 76,
+      "title": "DATABASE QUERY PLAN REVIEW",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-077",
+      "part": 77,
+      "title": "INDEX REVIEW",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-078",
+      "part": 78,
+      "title": "SECURITY TEST MATRIX",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-079",
+      "part": 79,
+      "title": "MUTATION ENUMERATION ATTACK",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-080",
+      "part": 80,
+      "title": "REPLAY ATTACK",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-081",
+      "part": 81,
+      "title": "DEAD-LETTER AUTHORIZATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-082",
+      "part": 82,
+      "title": "FINANCIAL PUBLICATION SAFETY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-083",
+      "part": 83,
+      "title": "OBSERVABILITY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-084",
+      "part": 84,
+      "title": "OPERATION CORRELATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-085",
+      "part": 85,
+      "title": "NO TELEMETRY CRITICALITY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-086",
+      "part": 86,
+      "title": "NEVER AGAIN UPDATES",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-087",
+      "part": 87,
+      "title": "EXPECTED RED NATIVE TESTS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-088",
+      "part": 88,
+      "title": "BROAD REGRESSION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-089",
+      "part": 89,
+      "title": "PHASE 2 SPECIALIZED SUITES",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-090",
+      "part": 90,
+      "title": "BUILD",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-091",
+      "part": 91,
+      "title": "SOURCE HYGIENE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-092",
+      "part": 92,
+      "title": "P0 CLOSURE MATRIX",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-093",
+      "part": 93,
+      "title": "P0-A CLOSURE STANDARD",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-094",
+      "part": 94,
+      "title": "P0-B CLOSURE STANDARD",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-095",
+      "part": 95,
+      "title": "P0-C CLOSURE STANDARD",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-096",
+      "part": 96,
+      "title": "P0-D CLOSURE STANDARD",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-097",
+      "part": 97,
+      "title": "P0-E CLOSURE STANDARD",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-098",
+      "part": 98,
+      "title": "P0-F CLOSURE STANDARD",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-099",
+      "part": 99,
+      "title": "SCORE-PATH P0 VERDICT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-100",
+      "part": 100,
+      "title": "SCORE CRITICAL-PATH RE-RUN",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-101",
+      "part": 101,
+      "title": "PERFORMANCE BEFORE / PHASE 2 / PHASE 2C",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-102",
+      "part": 102,
+      "title": "PERFORMANCE REGRESSION THRESHOLD",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-103",
+      "part": 103,
+      "title": "SCORE LOCK DURATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-104",
+      "part": 104,
+      "title": "RECOVERY DOES NOT ACQUIRE SCORE WRITE LOCK",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-105",
+      "part": 105,
+      "title": "WORKER DOES NOT HOLD SCORE LOCK",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-106",
+      "part": 106,
+      "title": "CURRENT POINTER SAFETY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-107",
+      "part": 107,
+      "title": "SCORE EVENT / INTENT IMMUTABILITY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-108",
+      "part": 108,
+      "title": "CURRENT DATA VS EVENT SNAPSHOT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-109",
+      "part": 109,
+      "title": "FINANCIAL RESULT SAFETY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-110",
+      "part": 110,
+      "title": "NET SKINS RESULT SAFETY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-111",
+      "part": 111,
+      "title": "ODDS RESULT SAFETY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-112",
+      "part": 112,
+      "title": "WORKER CURRENT-POINTER PERFORMANCE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-113",
+      "part": 113,
+      "title": "BACKLOG DATABASE PRESSURE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-114",
+      "part": 114,
+      "title": "WORKER FAIRNESS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-115",
+      "part": 115,
+      "title": "JOB CLAIM INDEXING",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-116",
+      "part": 116,
+      "title": "DEAD-LETTER INDEXING",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-117",
+      "part": 117,
+      "title": "JOB RETENTION PROPOSAL",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-118",
+      "part": 118,
+      "title": "ANNUAL WORKER FUTURE SCALE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-119",
+      "part": 119,
+      "title": "RELEASE TRANSITION WITH BACKLOG",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-120",
+      "part": 120,
+      "title": "RELEASE TRANSITION WITH DEAD LETTER",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-121",
+      "part": 121,
+      "title": "RECOVERY CONTRACT VERSIONING",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-122",
+      "part": 122,
+      "title": "RECOVERY ENDPOINT SECURITY REVIEW",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-123",
+      "part": 123,
+      "title": "RECOVERY RATE LIMIT / ABUSE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-124",
+      "part": 124,
+      "title": "CLIENT FALLBACK SEMANTICS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-125",
+      "part": 125,
+      "title": "PWA CURRENT BEHAVIOR",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-126",
+      "part": 126,
+      "title": "BUILD 10 CURRENT BEHAVIOR",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-127",
+      "part": 127,
+      "title": "DIRECTOR CURRENT BEHAVIOR",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-128",
+      "part": 128,
+      "title": "ROUND CONTROL BOUNDARY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-129",
+      "part": 129,
+      "title": "HOSTED NON-PRODUCTION OPTION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-130",
+      "part": 130,
+      "title": "LOCAL VS HOSTED EVIDENCE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-131",
+      "part": 131,
+      "title": "NO PHYSICAL DEVICE REQUIREMENT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-132",
+      "part": 132,
+      "title": "NO PRODUCTION CAPACITY CLAIM",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-133",
+      "part": 133,
+      "title": "BACKUP / RESTORE REMAINS OPEN",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-134",
+      "part": 134,
+      "title": "DIAGNOSTIC ADMISSION REMAINS OPEN",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-135",
+      "part": 135,
+      "title": "SOURCE CHANGE BOUNDARY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-136",
+      "part": 136,
+      "title": "MIGRATION BOUNDARY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-137",
+      "part": 137,
+      "title": "NO DIRECT SCORE TABLE WRITE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-138",
+      "part": 138,
+      "title": "NO SAFETY-GUARD WEAKENING",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-139",
+      "part": 139,
+      "title": "NO \"RETRY FOREVER\"",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-140",
+      "part": 140,
+      "title": "NO \"SERIALIZE EVERYTHING\"",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-141",
+      "part": 141,
+      "title": "NO TIMEOUT INFLATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-142",
+      "part": 142,
+      "title": "NO PRODUCTION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-143",
+      "part": 143,
+      "title": "NO STAGING PROMOTION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-144",
+      "part": 144,
+      "title": "NO REAL PARTICIPANT COMMUNICATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-145",
+      "part": 145,
+      "title": "PHASE 2C REQUIRED REPORTS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-146",
+      "part": 146,
+      "title": "MACHINE-READABLE ARTIFACTS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-147",
+      "part": 147,
+      "title": "CHANGE SUMMARY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-148",
+      "part": 148,
+      "title": "TRACEABILITY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-149",
+      "part": 149,
+      "title": "NEVER AGAIN CATALOG",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-150",
+      "part": 150,
+      "title": "BROAD TEST COMPARISON",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-151",
+      "part": 151,
+      "title": "SPECIALIZED TEST COUNTS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-152",
+      "part": 152,
+      "title": "FULL-SEQUENCE ACCEPTANCE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-153",
+      "part": 153,
+      "title": "FULL-SEQUENCE INTERRUPTION VARIANT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-154",
+      "part": 154,
+      "title": "POST-REVOCATION GOLDEN TEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-155",
+      "part": 155,
+      "title": "DERIVED-DELIVERY GOLDEN TEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-156",
+      "part": 156,
+      "title": "DEADLOCK GOLDEN TEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-157",
+      "part": 157,
+      "title": "ANNUAL WORKER GOLDEN TEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-158",
+      "part": 158,
+      "title": "FINITE-TIMEOUT GOLDEN TEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-159",
+      "part": 159,
+      "title": "CLIENT COMPATIBILITY GOLDEN TEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-160",
+      "part": 160,
+      "title": "RELEASE COMPATIBILITY GOLDEN TEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-161",
+      "part": 161,
+      "title": "CERTIFICATION PROOF MATRIX",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-162",
+      "part": 162,
+      "title": "CERTIFICATION STATUS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-163",
+      "part": 163,
+      "title": "STAGING READINESS DECISION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-164",
+      "part": 164,
+      "title": "WHAT STAGING MUST PROVE LATER",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-165",
+      "part": 165,
+      "title": "WHAT PRODUCTION MUST PROVE LATER",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-166",
+      "part": 166,
+      "title": "DEPLOYMENT PLAN UPDATE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-167",
+      "part": 167,
+      "title": "ROLLBACK PLAN UPDATE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-168",
+      "part": 168,
+      "title": "FUTURE DEPLOYMENT RISK",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-169",
+      "part": 169,
+      "title": "SECURITY REVIEW VERDICT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-170",
+      "part": 170,
+      "title": "DERIVED DELIVERY VERDICT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-171",
+      "part": 171,
+      "title": "ANNUAL WORKER VERDICT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-172",
+      "part": 172,
+      "title": "NET SKINS DEADLOCK VERDICT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-173",
+      "part": 173,
+      "title": "FINITE TIMEOUT VERDICT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-174",
+      "part": 174,
+      "title": "CLIENT / CONTROL VERDICT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-175",
+      "part": 175,
+      "title": "SCORE-PATH REGRESSION VERDICT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-176",
+      "part": 176,
+      "title": "PERFORMANCE COMPARISON",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-177",
+      "part": 177,
+      "title": "HISTORY-SCALE VERDICT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-178",
+      "part": 178,
+      "title": "FULL-SEQUENCE VERDICT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-179",
+      "part": 179,
+      "title": "BROAD REGRESSION VERDICT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-180",
+      "part": 180,
+      "title": "SOURCE SUMMARY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-181",
+      "part": 181,
+      "title": "COMMITS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-182",
+      "part": 182,
+      "title": "PUSH",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-183",
+      "part": 183,
+      "title": "WORKTREE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-184",
+      "part": 184,
+      "title": "PRODUCTION DECLARATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-185",
+      "part": 185,
+      "title": "COMMUNICATION DECLARATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-186",
+      "part": 186,
+      "title": "COMPETITIVE AUTHORITY DECLARATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-187",
+      "part": 187,
+      "title": "BUILD 11 DECLARATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-188",
+      "part": 188,
+      "title": "P0 AFTER PHASE 2C",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-189",
+      "part": 189,
+      "title": "BUILD 11 ENTRY IMPACT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-190",
+      "part": 190,
+      "title": "NEXT PHASE SELECTION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-191",
+      "part": 191,
+      "title": "NEXT PHASE REPORT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-192",
+      "part": 192,
+      "title": "MODEL RECOMMENDATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-193",
+      "part": 193,
+      "title": "CERTIFICATION LANGUAGE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-194",
+      "part": 194,
+      "title": "OWNER REVIEW",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-195",
+      "part": 195,
+      "title": "ENGINEERING REVIEW",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-196",
+      "part": 196,
+      "title": "BEFORE / AFTER RECOVERY MODEL",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-197",
+      "part": 197,
+      "title": "BEFORE / AFTER DERIVED DELIVERY MODEL",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-198",
+      "part": 198,
+      "title": "BEFORE / AFTER NET SKINS LOCK MODEL",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-199",
+      "part": 199,
+      "title": "BEFORE / AFTER ANNUAL WORKER MODEL",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-200",
+      "part": 200,
+      "title": "BEFORE / AFTER TIMEOUT MODEL",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-201",
+      "part": 201,
+      "title": "DEPLOYMENT CANDIDATE MANIFEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-202",
+      "part": 202,
+      "title": "MIGRATION MANIFEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-203",
+      "part": 203,
+      "title": "WORKER CONTRACT DOCUMENT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-204",
+      "part": 204,
+      "title": "RECOVERY API CONTRACT DOCUMENT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-205",
+      "part": 205,
+      "title": "TRANSIENT DATABASE ERROR CONTRACT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-206",
+      "part": 206,
+      "title": "DETERMINISTIC ERROR CONTRACT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-207",
+      "part": 207,
+      "title": "JOB STATE MACHINE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-208",
+      "part": 208,
+      "title": "RECOVERY STATE MACHINE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-209",
+      "part": 209,
+      "title": "LOCK / FINALIZE SECURITY INVARIANT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-210",
+      "part": 210,
+      "title": "DERIVED WORK INVARIANT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-211",
+      "part": 211,
+      "title": "DEADLOCK INVARIANT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-212",
+      "part": 212,
+      "title": "ANNUAL SQL INVARIANT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-213",
+      "part": 213,
+      "title": "TIMEOUT INVARIANT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-214",
+      "part": 214,
+      "title": "CLIENT COMPATIBILITY INVARIANT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-215",
+      "part": 215,
+      "title": "RELEASE COMPATIBILITY INVARIANT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-216",
+      "part": 216,
+      "title": "STATIC GUARDS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-217",
+      "part": 217,
+      "title": "QUERY PLAN REGRESSION GATES",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-218",
+      "part": 218,
+      "title": "PERFORMANCE GATE UPDATE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-219",
+      "part": 219,
+      "title": "NEVER AGAIN RELEASE-BLOCKING STATUS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-220",
+      "part": 220,
+      "title": "NO FALSE CLOSURE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-221",
+      "part": 221,
+      "title": "NO FALSE AUTOMATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-222",
+      "part": 222,
+      "title": "NO FALSE DEADLOCK FIX",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-223",
+      "part": 223,
+      "title": "NO FALSE CLIENT COMPATIBILITY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-224",
+      "part": 224,
+      "title": "NO FALSE TIMEOUT CERTIFICATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-225",
+      "part": 225,
+      "title": "NO FALSE WORKER CAPACITY CLAIM",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-226",
+      "part": 226,
+      "title": "PHASE 2C PASS STANDARD",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-227",
+      "part": 227,
+      "title": "PHASE 2C FAIL STANDARD",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-228",
+      "part": 228,
+      "title": "PHASE 2C PARTIAL STANDARD",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-229",
+      "part": 229,
+      "title": "STAGING AUTHORIZATION BOUNDARY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-230",
+      "part": 230,
+      "title": "PRODUCTION AUTHORIZATION BOUNDARY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-231",
+      "part": 231,
+      "title": "COMMIT STRUCTURE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-232",
+      "part": 232,
+      "title": "PUSH BOUNDARY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-233",
+      "part": 233,
+      "title": "FINAL WORKTREE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-234",
+      "part": 234,
+      "title": "PHASE 2C README",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-235",
+      "part": 235,
+      "title": "OWNER REVIEW LENGTH",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-236",
+      "part": 236,
+      "title": "EVIDENCE RETENTION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-237",
+      "part": 237,
+      "title": "AUDIT COMPLETENESS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-238",
+      "part": 238,
+      "title": "CROSS-REPORT CONSISTENCY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-239",
+      "part": 239,
+      "title": "EVIDENCE CONFIDENCE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-240",
+      "part": 240,
+      "title": "FINAL RESPONSE FORMAT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-241",
+      "part": 241,
+      "title": "FINAL SELF-AUDIT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-242",
+      "part": 242,
+      "title": "SUCCESS CONDITION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-243",
+      "part": 243,
+      "title": "FINAL EXECUTION ORDER",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-244",
+      "part": 244,
+      "title": "HARD STOP BEFORE STAGING",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-245",
+      "part": 245,
+      "title": "HARD STOP BEFORE BUILD 11",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-246",
+      "part": 246,
+      "title": "HARD STOP BEFORE INFRASTRUCTURE CHANGES",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-247",
+      "part": 247,
+      "title": "HARD STOP ON SECURITY REGRESSION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-248",
+      "part": 248,
+      "title": "HARD STOP ON CANONICAL REGRESSION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-249",
+      "part": 249,
+      "title": "HARD STOP ON DERIVED-WORK LOSS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-250",
+      "part": 250,
+      "title": "HARD STOP ON UNBOUNDED HISTORY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-251",
+      "part": 251,
+      "title": "HARD STOP ON MANUAL \"AUTOMATION\"",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-252",
+      "part": 252,
+      "title": "HARD STOP ON DEADLOCK MASKING",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-253",
+      "part": 253,
+      "title": "HARD STOP ON FALSE NOT_COMMITTED",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-254",
+      "part": 254,
+      "title": "HARD STOP ON FALSE COMMITTED",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-255",
+      "part": 255,
+      "title": "RECOVERY AUTHORITY IS NOT SCORE AUTHORITY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-256",
+      "part": 256,
+      "title": "DERIVED INTENT IS NOT DERIVED RESULT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-257",
+      "part": 257,
+      "title": "DEAD LETTER IS NOT DATA LOSS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-258",
+      "part": 258,
+      "title": "SUPERSESSION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-259",
+      "part": 259,
+      "title": "OWNER-APPROVED SIDE-GAME BOUNDARY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-260",
+      "part": 260,
+      "title": "RECOVERY AFTER ACCOUNT/IDENTITY CHANGE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-261",
+      "part": 261,
+      "title": "RECEIPT RETENTION REQUIREMENT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-262",
+      "part": 262,
+      "title": "RECEIPT LOOKUP INDEX",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-263",
+      "part": 263,
+      "title": "RECOVERY AUDIT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-264",
+      "part": 264,
+      "title": "JOB ATTEMPT AUDIT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-265",
+      "part": 265,
+      "title": "RELEASE VERSION IN JOB ATTEMPTS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-266",
+      "part": 266,
+      "title": "PROCESSOR CONTRACT VERSION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-267",
+      "part": 267,
+      "title": "MIGRATION WITH PENDING OLD JOBS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-268",
+      "part": 268,
+      "title": "MIGRATION WITH EXISTING RECEIPTS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-269",
+      "part": 269,
+      "title": "RECOVERY ACROSS APPLICATION RESTART",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-270",
+      "part": 270,
+      "title": "RECOVERY ACROSS WORKER RESTART",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-271",
+      "part": 271,
+      "title": "RECOVERY ACROSS DATABASE RECONNECT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-272",
+      "part": 272,
+      "title": "MULTI-INSTANCE WORKER TEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-273",
+      "part": 273,
+      "title": "LEASE EXPIRATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-274",
+      "part": 274,
+      "title": "HEARTBEAT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-275",
+      "part": 275,
+      "title": "CLOCK / TIMESTAMP ROBUSTNESS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-276",
+      "part": 276,
+      "title": "RECOVERY CONTRACT MUST NOT DEPEND ON CLIENT CLOCK",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-277",
+      "part": 277,
+      "title": "JOB CONTRACT MUST NOT DEPEND ON CLIENT CLOCK",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-278",
+      "part": 278,
+      "title": "ANNUAL BOUNDARY TIMEZONE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-279",
+      "part": 279,
+      "title": "SCORE FORMAT COVERAGE UNDER RECOVERY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-280",
+      "part": 280,
+      "title": "MULTI-PARTICIPANT SCORE PAYLOAD",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-281",
+      "part": 281,
+      "title": "CORRECTION MUTATION RECOVERY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-282",
+      "part": 282,
+      "title": "FINAL-HOLE RECOVERY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-283",
+      "part": 283,
+      "title": "EARLY MATCH-CONCLUSION RECOVERY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-284",
+      "part": 284,
+      "title": "HALVED MATCH RECOVERY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-285",
+      "part": 285,
+      "title": "SCORE RESULT IMMUTABILITY DURING RECOVERY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-286",
+      "part": 286,
+      "title": "DERIVED RECOMPUTATION SOURCE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-287",
+      "part": 287,
+      "title": "WORKER STALE INPUT TEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-288",
+      "part": 288,
+      "title": "WORKER IDEMPOTENCY KEY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-289",
+      "part": 289,
+      "title": "DEAD-LETTER IDEMPOTENCY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-290",
+      "part": 290,
+      "title": "WORKER UNKNOWN OUTCOME",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-291",
+      "part": 291,
+      "title": "JOB CURRENT-POINTER RACE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-292",
+      "part": 292,
+      "title": "NET SKINS DEADLOCK STRESS COUNT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-293",
+      "part": 293,
+      "title": "DEADLOCK RANDOMIZATION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-294",
+      "part": 294,
+      "title": "ANNUAL WORKER ALL FUNCTIONS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-295",
+      "part": 295,
+      "title": "SQL SPECIAL-FUNCTION STATIC INVENTORY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-296",
+      "part": 296,
+      "title": "FINITE TIMEOUT WORKER TEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-297",
+      "part": 297,
+      "title": "FINITE TIMEOUT RECOVERY LOOKUP",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-298",
+      "part": 298,
+      "title": "FINITE TIMEOUT DEAD-LETTER RECOVERY",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-299",
+      "part": 299,
+      "title": "API PROCESS RESTART TEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-300",
+      "part": 300,
+      "title": "WORKER PROCESS RESTART TEST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-301",
+      "part": 301,
+      "title": "FULL PHASE 2C EVIDENCE LEDGER",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-302",
+      "part": 302,
+      "title": "TEST SEEDS",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-303",
+      "part": 303,
+      "title": "RAW EVIDENCE RETENTION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-304",
+      "part": 304,
+      "title": "NO TEMP-ONLY PROOF",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-305",
+      "part": 305,
+      "title": "PHASE 2C CHANGE IMPACT GRAPH",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-306",
+      "part": 306,
+      "title": "FUTURE BUILD 11 INPUT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-307",
+      "part": 307,
+      "title": "FUTURE DIRECTOR INPUT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-308",
+      "part": 308,
+      "title": "FUTURE OPERATIONS INPUT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-309",
+      "part": 309,
+      "title": "STAGING ENTRY CHECKLIST",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-310",
+      "part": 310,
+      "title": "DO NOT CREATE STAGING DEPLOYMENT",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-311",
+      "part": 311,
+      "title": "FINAL NEXT-PHASE DECISION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-312",
+      "part": 312,
+      "title": "FINAL MODEL CHOICE",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-313",
+      "part": 313,
+      "title": "FINAL OWNER DECISION",
+      "status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "P2C-314",
+      "part": 314,
+      "title": "FINAL WARNING",
+      "status": "NOT_YET_VERIFIED"
+    }
+  ]
+}

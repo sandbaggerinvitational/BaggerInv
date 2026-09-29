@@ -1,0 +1,718 @@
+{
+  "proof": "DERIVED_FROM_RETAINED_LOCAL_CHILD_EVENT_TIMESTAMPS",
+  "source": "worker-delivery-results.json",
+  "sourceSha256": "677ff41ad8983c50cc1e4d8771f041587324f0055c8c7d4ff617c47adeb668a2",
+  "migration124": "85f91fa8f13206669e4e622bf7f227f1531577acd7e1790a88fb1e12a5a4c930",
+  "leaseSeconds": {
+    "CALCUTTA": 60,
+    "COMPETITION": 90,
+    "INTELLIGENCE": 90
+  },
+  "byFamily": {
+    "CALCUTTA": {
+      "samples": 26,
+      "maximumEventSpanMs": 261
+    },
+    "COMPETITION": {
+      "samples": 28,
+      "maximumEventSpanMs": 171
+    },
+    "INTELLIGENCE": {
+      "samples": 22,
+      "maximumEventSpanMs": 224
+    }
+  },
+  "spans": [
+    {
+      "case": "autonomous-after-commit",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790619370068,
+      "to": 1790619370206,
+      "elapsedMs": 138
+    },
+    {
+      "case": "autonomous-after-commit",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619370206,
+      "to": 1790619370361,
+      "elapsedMs": 155
+    },
+    {
+      "case": "autonomous-after-commit",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619370548,
+      "to": 1790619370718,
+      "elapsedMs": 170
+    },
+    {
+      "case": "crash-lease-restart",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619372305,
+      "to": 1790619372449,
+      "elapsedMs": 144
+    },
+    {
+      "case": "crash-lease-restart",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619372449,
+      "to": 1790619372619,
+      "elapsedMs": 170
+    },
+    {
+      "case": "crash-lease-restart",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619374462,
+      "to": 1790619374723,
+      "elapsedMs": 261
+    },
+    {
+      "case": "competition-claim-crash-restart",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "tick",
+      "from": 1790619376253,
+      "to": 1790619376431,
+      "elapsedMs": 178
+    },
+    {
+      "case": "competition-claim-crash-restart",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790619378408,
+      "to": 1790619378508,
+      "elapsedMs": 100
+    },
+    {
+      "case": "competition-claim-crash-restart",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790619380287,
+      "to": 1790619380364,
+      "elapsedMs": 77
+    },
+    {
+      "case": "intelligence-claim-crash-restart",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "tick",
+      "from": 1790619386513,
+      "to": 1790619386690,
+      "elapsedMs": 177
+    },
+    {
+      "case": "unknown-completion-ack",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "failed",
+      "from": 1790619388079,
+      "to": 1790619388209,
+      "elapsedMs": 130
+    },
+    {
+      "case": "unknown-completion-ack",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619388209,
+      "to": 1790619388374,
+      "elapsedMs": 165
+    },
+    {
+      "case": "competition-completion-ack-loss",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619389433,
+      "to": 1790619389620,
+      "elapsedMs": 187
+    },
+    {
+      "case": "competition-completion-ack-loss",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "failed",
+      "from": 1790619389805,
+      "to": 1790619389959,
+      "elapsedMs": 154
+    },
+    {
+      "case": "intelligence-completion-ack-loss",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619391172,
+      "to": 1790619391350,
+      "elapsedMs": 178
+    },
+    {
+      "case": "intelligence-completion-ack-loss",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619391350,
+      "to": 1790619391468,
+      "elapsedMs": 118
+    },
+    {
+      "case": "calcutta-failure-isolation",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "failed",
+      "from": 1790619392868,
+      "to": 1790619393007,
+      "elapsedMs": 139
+    },
+    {
+      "case": "calcutta-failure-isolation",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619393007,
+      "to": 1790619393175,
+      "elapsedMs": 168
+    },
+    {
+      "case": "competition-failure-isolation",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619394604,
+      "to": 1790619394795,
+      "elapsedMs": 191
+    },
+    {
+      "case": "competition-failure-isolation",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "failed",
+      "from": 1790619394839,
+      "to": 1790619395063,
+      "elapsedMs": 224
+    },
+    {
+      "case": "intelligence-failure-isolation",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619396577,
+      "to": 1790619396762,
+      "elapsedMs": 185
+    },
+    {
+      "case": "intelligence-failure-isolation",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619396762,
+      "to": 1790619396884,
+      "elapsedMs": 122
+    },
+    {
+      "case": "intelligence-correction-before-write",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619399133,
+      "to": 1790619399326,
+      "elapsedMs": 193
+    },
+    {
+      "case": "intelligence-correction-before-write",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619399326,
+      "to": 1790619399485,
+      "elapsedMs": 159
+    },
+    {
+      "case": "intelligence-correction-before-write",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619399485,
+      "to": 1790619399705,
+      "elapsedMs": 220
+    },
+    {
+      "case": "intelligence-correction-before-write",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790619399894,
+      "to": 1790619400010,
+      "elapsedMs": 116
+    },
+    {
+      "case": "intelligence-correction-before-write",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619400010,
+      "to": 1790619400168,
+      "elapsedMs": 158
+    },
+    {
+      "case": "intelligence-correction-before-write",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "processed",
+      "from": 1790619400168,
+      "to": 1790619400316,
+      "elapsedMs": 148
+    },
+    {
+      "case": "competition-before-claim",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619401456,
+      "to": 1790619401635,
+      "elapsedMs": 179
+    },
+    {
+      "case": "competition-before-claim",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619401635,
+      "to": 1790619401806,
+      "elapsedMs": 171
+    },
+    {
+      "case": "competition-before-claim",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619401806,
+      "to": 1790619401961,
+      "elapsedMs": 155
+    },
+    {
+      "case": "competition-before-claim",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619402141,
+      "to": 1790619402285,
+      "elapsedMs": 144
+    },
+    {
+      "case": "competition-before-write",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619403408,
+      "to": 1790619403585,
+      "elapsedMs": 177
+    },
+    {
+      "case": "competition-before-write",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619403585,
+      "to": 1790619403751,
+      "elapsedMs": 166
+    },
+    {
+      "case": "competition-before-write",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619403751,
+      "to": 1790619403900,
+      "elapsedMs": 149
+    },
+    {
+      "case": "competition-before-write",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790619404090,
+      "to": 1790619404211,
+      "elapsedMs": 121
+    },
+    {
+      "case": "competition-before-write",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "processed",
+      "from": 1790619404211,
+      "to": 1790619404362,
+      "elapsedMs": 151
+    },
+    {
+      "case": "intelligence-before-claim",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619405597,
+      "to": 1790619405785,
+      "elapsedMs": 188
+    },
+    {
+      "case": "intelligence-before-claim",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619405785,
+      "to": 1790619405914,
+      "elapsedMs": 129
+    },
+    {
+      "case": "intelligence-before-claim",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790619406458,
+      "to": 1790619406570,
+      "elapsedMs": 112
+    },
+    {
+      "case": "intelligence-before-claim",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "processed",
+      "from": 1790619406570,
+      "to": 1790619406718,
+      "elapsedMs": 148
+    },
+    {
+      "case": "intelligence-before-claim",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "tick",
+      "from": 1790619410304,
+      "to": 1790619410463,
+      "elapsedMs": 159
+    },
+    {
+      "case": "intelligence-after-claim",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619411612,
+      "to": 1790619411796,
+      "elapsedMs": 184
+    },
+    {
+      "case": "intelligence-after-claim",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619411796,
+      "to": 1790619411913,
+      "elapsedMs": 117
+    },
+    {
+      "case": "intelligence-after-claim",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790619412317,
+      "to": 1790619412429,
+      "elapsedMs": 112
+    },
+    {
+      "case": "intelligence-after-claim",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619412429,
+      "to": 1790619412586,
+      "elapsedMs": 157
+    },
+    {
+      "case": "intelligence-after-claim",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "processed",
+      "from": 1790619412586,
+      "to": 1790619412729,
+      "elapsedMs": 143
+    },
+    {
+      "case": "intelligence-before-write",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619413844,
+      "to": 1790619414021,
+      "elapsedMs": 177
+    },
+    {
+      "case": "intelligence-before-write",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619414021,
+      "to": 1790619414147,
+      "elapsedMs": 126
+    },
+    {
+      "case": "intelligence-before-write",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619414147,
+      "to": 1790619414359,
+      "elapsedMs": 212
+    },
+    {
+      "case": "intelligence-before-write",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790619414550,
+      "to": 1790619414670,
+      "elapsedMs": 120
+    },
+    {
+      "case": "intelligence-before-write",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619414670,
+      "to": 1790619414828,
+      "elapsedMs": 158
+    },
+    {
+      "case": "intelligence-before-write",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "processed",
+      "from": 1790619414828,
+      "to": 1790619414973,
+      "elapsedMs": 145
+    },
+    {
+      "case": "calcutta-before-claim",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619417036,
+      "to": 1790619417265,
+      "elapsedMs": 229
+    },
+    {
+      "case": "calcutta-before-claim",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619417265,
+      "to": 1790619417388,
+      "elapsedMs": 123
+    },
+    {
+      "case": "calcutta-before-claim",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619417388,
+      "to": 1790619417544,
+      "elapsedMs": 156
+    },
+    {
+      "case": "competition-late-writer-current-pointer",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619418720,
+      "to": 1790619418910,
+      "elapsedMs": 190
+    },
+    {
+      "case": "intelligence-late-writer-current-pointer",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619421590,
+      "to": 1790619421778,
+      "elapsedMs": 188
+    },
+    {
+      "case": "intelligence-late-writer-current-pointer",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619421778,
+      "to": 1790619421904,
+      "elapsedMs": 126
+    },
+    {
+      "case": "calcutta-expired-live-same-source",
+      "stream": "replacementEvents",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619424850,
+      "to": 1790619424989,
+      "elapsedMs": 139
+    },
+    {
+      "case": "calcutta-expired-live-same-source",
+      "stream": "replacementEvents",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619424989,
+      "to": 1790619425153,
+      "elapsedMs": 164
+    },
+    {
+      "case": "calcutta-expired-live-same-source",
+      "stream": "replacementEvents",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619426951,
+      "to": 1790619427109,
+      "elapsedMs": 158
+    },
+    {
+      "case": "competition-expired-live-same-source",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619428806,
+      "to": 1790619428993,
+      "elapsedMs": 187
+    },
+    {
+      "case": "competition-expired-live-same-source",
+      "stream": "replacementEvents",
+      "family": "INTELLIGENCE",
+      "previousType": "tick",
+      "from": 1790619429385,
+      "to": 1790619429564,
+      "elapsedMs": 179
+    },
+    {
+      "case": "competition-expired-live-same-source",
+      "stream": "replacementEvents",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790619431519,
+      "to": 1790619431624,
+      "elapsedMs": 105
+    },
+    {
+      "case": "competition-expired-live-same-source",
+      "stream": "replacementEvents",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790619433453,
+      "to": 1790619433531,
+      "elapsedMs": 78
+    },
+    {
+      "case": "intelligence-expired-live-same-source",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619435224,
+      "to": 1790619435408,
+      "elapsedMs": 184
+    },
+    {
+      "case": "intelligence-expired-live-same-source",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619435408,
+      "to": 1790619435535,
+      "elapsedMs": 127
+    },
+    {
+      "case": "intelligence-expired-live-same-source",
+      "stream": "replacementEvents",
+      "family": "INTELLIGENCE",
+      "previousType": "tick",
+      "from": 1790619440024,
+      "to": 1790619440201,
+      "elapsedMs": 177
+    },
+    {
+      "case": "two-workers",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790619462931,
+      "to": 1790619463078,
+      "elapsedMs": 147
+    },
+    {
+      "case": "two-workers",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619463078,
+      "to": 1790619463251,
+      "elapsedMs": 173
+    },
+    {
+      "case": "two-workers",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619463424,
+      "to": 1790619463651,
+      "elapsedMs": 227
+    },
+    {
+      "case": "two-workers",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "tick",
+      "from": 1790619463391,
+      "to": 1790619463507,
+      "elapsedMs": 116
+    },
+    {
+      "case": "terminal-compatible-activation-requeue",
+      "stream": "events",
+      "family": "CALCUTTA",
+      "previousType": "tick",
+      "from": 1790619470033,
+      "to": 1790619470213,
+      "elapsedMs": 180
+    },
+    {
+      "case": "terminal-compatible-activation-requeue",
+      "stream": "events",
+      "family": "COMPETITION",
+      "previousType": "processed",
+      "from": 1790619470213,
+      "to": 1790619470335,
+      "elapsedMs": 122
+    },
+    {
+      "case": "terminal-compatible-activation-requeue",
+      "stream": "events",
+      "family": "INTELLIGENCE",
+      "previousType": "processed",
+      "from": 1790619470335,
+      "to": 1790619470495,
+      "elapsedMs": 160
+    }
+  ],
+  "limitations": [
+    "Local successful-invocation diagnostic, not production percentile or total hosted deadline",
+    "Preceding timestamped runner event from only the same child stream; includes event scheduling overhead",
+    "Only successful nonempty processor invocations; failed/crashed/held late-writer cases are separately tested",
+    "SQL statement timeout is not a CPU or whole-process timeout"
+  ],
+  "production": false
+}

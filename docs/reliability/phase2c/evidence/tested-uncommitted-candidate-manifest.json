@@ -1,0 +1,449 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-29T21:05:44.520900+00:00",
+  "status": "PARTIAL_NOT_READY_FOR_STAGING",
+  "branch": "codex/reliability-phase2c-recovery-delivery",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "sourceCommit": null,
+  "sourceCommitMeaning": "All listed candidate source bytes match this commit; executions earlier recorded base HEAD plus exact dependency hashes. Later documentation-only commit is packaging, not a different tested implementation.",
+  "sourceManifest": [
+    {
+      "path": "app/api/mobile/v1/scoring/mutation-status/route.js",
+      "sha256": "6d4ffb20d5dd156c8ed4af1fd71a0a275304debdb550d8b477bed470931878d9",
+      "bytes": 225
+    },
+    {
+      "path": "app/api/scoring/mutation-status/route.js",
+      "sha256": "39e35bfe30419eb87ae092e7b17feb5e8164abb963c5dc861ba0a3e585cd0c2a",
+      "bytes": 203
+    },
+    {
+      "path": "lib/competition-derived-supabase.js",
+      "sha256": "7609a613f538e2252314b383305469317803ff23f384fe298ea24e53d40bb241",
+      "bytes": 19804
+    },
+    {
+      "path": "lib/intelligence-derived-supabase.js",
+      "sha256": "aa3d5b53012176ad3ed8ce681758a97770a68e1c18dd38a5cd210f22c636e5e9",
+      "bytes": 12911
+    },
+    {
+      "path": "lib/operational-rpc-contract.js",
+      "sha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+      "bytes": 6959
+    },
+    {
+      "path": "lib/production-calcutta-server.js",
+      "sha256": "cb183d4b5f8159dad552541a72ec5b83e18378c7c50705955c129ec2784be89b",
+      "bytes": 38843
+    },
+    {
+      "path": "lib/production-net-skins-server.js",
+      "sha256": "4007eee4e309d18ae2e2d89f80980c306de29e7e78b5e9fad07f68f408690952",
+      "bytes": 18552
+    },
+    {
+      "path": "lib/production-scoring-operations-server.js",
+      "sha256": "b66b5c083801fc6ab4356d1d26320efb805b22cf2a075cb216db0a592ed2cf70",
+      "bytes": 23183
+    },
+    {
+      "path": "lib/score-derived-delivery.js",
+      "sha256": "cb18835d2bb540572d6460dc4313b678266560e8f6a56b56376b1ee783a321bd",
+      "bytes": 5119
+    },
+    {
+      "path": "lib/score-derived-worker.js",
+      "sha256": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+      "bytes": 6779
+    },
+    {
+      "path": "lib/scoring-authority-supabase.js",
+      "sha256": "4dde49461f6805cccce8b5805a80ab4ba159627abc90e1b321d27d92df941196",
+      "bytes": 31756
+    },
+    {
+      "path": "lib/scoring-mutation-recovery-route.js",
+      "sha256": "0e98f14294d531e33b08cc23493c1f326e796e1107f63c30c7404fcf1a6a4cfb",
+      "bytes": 4830
+    },
+    {
+      "path": "lib/scoring-mutation-recovery.js",
+      "sha256": "0f6b5aa1c5f042f846861cee22e61c113cfb98cd058d160c6982f458d77359b3",
+      "bytes": 3964
+    },
+    {
+      "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce",
+      "bytes": 10000
+    },
+    {
+      "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0",
+      "bytes": 14847
+    },
+    {
+      "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48",
+      "bytes": 76764
+    },
+    {
+      "path": "test/pn2-native-admission.test.mjs",
+      "sha256": "d5acf992a9ba05e1f49c7ee020001d8880b555e46ecba53db3ea8aecc9e17246",
+      "bytes": 27621
+    },
+    {
+      "path": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "sha256": "b645d6580aa3d9d481b5f8832433563106bc47b31ebc6e4ee49a2ba2f137b039",
+      "bytes": 24344
+    },
+    {
+      "path": "test/reliability-phase2-fence-history.test.mjs",
+      "sha256": "4c865bec330acb12819b8dcb45582576166e500b138dbfd09f0c0c334be7d964",
+      "bytes": 12281
+    },
+    {
+      "path": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "sha256": "f9eec62e93e78aa1bd6dc09628dde7bc071a8ab11aa16e77bbb621420526d533",
+      "bytes": 29905
+    },
+    {
+      "path": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+      "sha256": "b7679b475c61d93cfd7b50a2b60f896364c175af4f74208ce633cfc5cfb9adcc",
+      "bytes": 30719
+    },
+    {
+      "path": "test/reliability-phase2c-annual-workers.integration.test.mjs",
+      "sha256": "a69dcdd7cad592f66849b3832fad0e0d08e2746df243604336bcc632553d77bc",
+      "bytes": 34452
+    },
+    {
+      "path": "test/reliability-phase2c-backlog-pressure.integration.test.mjs",
+      "sha256": "c758d9b84ee0db729c735771354890628c5aba1a8cc30dfc452838d014ba08db",
+      "bytes": 15611
+    },
+    {
+      "path": "test/reliability-phase2c-backlog-tail.integration.test.mjs",
+      "sha256": "f8285682fde446ecc72f53fa7e03cedb63fa2e7a03614119561c7ed824456a54",
+      "bytes": 15090
+    },
+    {
+      "path": "test/reliability-phase2c-calcutta-lock-order.test.mjs",
+      "sha256": "9a421f9bcdeeeafa89ca9d76870c2f42feb2ddcc0de96ea26dbc57334ba5f9d4",
+      "bytes": 14665
+    },
+    {
+      "path": "test/reliability-phase2c-certification-gate.test.py",
+      "sha256": "78e3d96f118a1ef1ac53915bebf02d2d2b80ddd22f6d6cc8ad379ca725b0779d",
+      "bytes": 69716
+    },
+    {
+      "path": "test/reliability-phase2c-delivery-index-review.test.mjs",
+      "sha256": "501de7d7234c4af5018878b33c590a8ae8f56c33f3ef23c2c077ad757f58a1a8",
+      "bytes": 16000
+    },
+    {
+      "path": "test/reliability-phase2c-finite-timeout.integration.test.mjs",
+      "sha256": "67dfbf9cda289da68013e9b607ee33d14bbe9ed255804a09b74dc866bb9bdfb5",
+      "bytes": 5451
+    },
+    {
+      "path": "test/reliability-phase2c-full-sequence.integration.test.mjs",
+      "sha256": "4c331874262c48a84396e54f44c3210a29ec1960bf7a3ef0f510f321820fe2da",
+      "bytes": 17140
+    },
+    {
+      "path": "test/reliability-phase2c-net-owner-lock-order.test.mjs",
+      "sha256": "91b9ccd6dbcb4d64eb2a938c1f8eeffca01aa6d1b5d0619683c249cc328649df",
+      "bytes": 38477
+    },
+    {
+      "path": "test/reliability-phase2c-net-skins-deadlock.integration.test.mjs",
+      "sha256": "cf81be12fe61afdc76439e06bccf01a6b3069b78d63e5ba4daa0b2ece28bee13",
+      "bytes": 21709
+    },
+    {
+      "path": "test/reliability-phase2c-performance-gate.test.mjs",
+      "sha256": "4cd09263299aa33599c151dc5d15debac69c581728fc4ce57b7d04707ee8cbee",
+      "bytes": 3346
+    },
+    {
+      "path": "test/reliability-phase2c-recovery-upgrade.integration.test.mjs",
+      "sha256": "f96f9e3a7d0659e7a83e4ea49530cc84923ba9df66b59a6657bbc295a083bf62",
+      "bytes": 7327
+    },
+    {
+      "path": "test/reliability-phase2c-recovery.integration.test.mjs",
+      "sha256": "2b4ab8a0cf2c14c6190f67e1f7108bade794e6f4a27bebef7d3279ef8e6d9fa7",
+      "bytes": 38207
+    },
+    {
+      "path": "test/reliability-phase2c-recovery.test.mjs",
+      "sha256": "a1f9f2137dac4a1d1c36da38bb909638ca2b8c21abfbd1bdcdea9ef8489229b1",
+      "bytes": 13883
+    },
+    {
+      "path": "test/reliability-phase2c-worker-failure-lock-order.test.mjs",
+      "sha256": "eadb95197197a99b293f9a562f5b4356b5aa97721e9c4e2143aec10373577ec7",
+      "bytes": 15557
+    },
+    {
+      "path": "test/reliability-phase2c-worker-history.test.mjs",
+      "sha256": "05564f683ce178a53ae2a1fb4c9b9b7b0b8f9b77bcbeff8518aa40f8bfa4c1d9",
+      "bytes": 12419
+    },
+    {
+      "path": "test/reliability-phase2c-worker-lock-order.test.mjs",
+      "sha256": "69f6748c66c09be72237ff24b81563679a6e5bc92ab01ef55886879b94ac3cfc",
+      "bytes": 9950
+    },
+    {
+      "path": "test/reliability-phase2c-worker.test.mjs",
+      "sha256": "abd2300f16bf4ab387d5fe32fa365588f411ab177ec40424bbb8917f04f6dca0",
+      "bytes": 70376
+    },
+    {
+      "path": "test/reliability-score-history-postgres.integration.test.mjs",
+      "sha256": "b9871ad1cfce80a9b6c374c896b8363b1f913d3698f29e37931511497fcddd84",
+      "bytes": 4077
+    },
+    {
+      "path": "test/support/reliability/phase2-score-fixture.mjs",
+      "sha256": "0f181715ed756090e79e43b40ecacbf591c2df194b7ac178d9ec11bf5e07b8cd",
+      "bytes": 13992
+    },
+    {
+      "path": "test/support/reliability/phase2c-annual-history.mjs",
+      "sha256": "6775d19899ebee60e20edf6b16c74b96dfa15629d20e46de149ee49c254c4f37",
+      "bytes": 10526
+    },
+    {
+      "path": "test/support/reliability/phase2c-annual-worker-branches.mjs",
+      "sha256": "5a20dc082eaf360aec8ac539f9422085332f9e2b5c325fbd5f30da45ae2945de",
+      "bytes": 26871
+    },
+    {
+      "path": "test/support/reliability/phase2c-annual-workers.mjs",
+      "sha256": "b334bfd457774f0bca9f25587d03ff0a3122f256fb38de39a4cb138706350695",
+      "bytes": 21119
+    },
+    {
+      "path": "test/support/reliability/phase2c-audit-index-plans.mjs",
+      "sha256": "d1e52fba0ed57ab89f207dd4f31ce3f2c4a8ebf01c9a0928862f671e0bdc59a8",
+      "bytes": 5625
+    },
+    {
+      "path": "test/support/reliability/phase2c-calculation-crash-hook.mjs",
+      "sha256": "69fc82b9b8a45f9ea60024fa5a064e5950f227c68a269e9e6651f00b7df8b766",
+      "bytes": 3159
+    },
+    {
+      "path": "test/support/reliability/phase2c-delivery-indexes.json",
+      "sha256": "547c7ccd2aaff77bd46e86923b14a806ee4b815b1335f57b1568279203a9ed1b",
+      "bytes": 2068
+    },
+    {
+      "path": "test/support/reliability/phase2c-final-publication-plans.mjs",
+      "sha256": "f8f584d53e7a3824329450d487210352632c7bd119b922a7eca30b2a631a045e",
+      "bytes": 7744
+    },
+    {
+      "path": "test/support/reliability/phase2c-fixture.mjs",
+      "sha256": "05baa6942445a7e3e2c69e81567edc9435108b47e1fe548d3f387c3c72d452e7",
+      "bytes": 670
+    },
+    {
+      "path": "test/support/reliability/phase2c-future-score-fixture.mjs",
+      "sha256": "90c5cae79c3ecf6ce58608d0506ce2e53006a8af7759ebf53e78e25aaf04f9cb",
+      "bytes": 7614
+    },
+    {
+      "path": "test/support/reliability/phase2c-install.mjs",
+      "sha256": "23b859308ea18bca4e17fb3f5126bb0f34ef1bcccec65b5df5740b1dcadaa0e3",
+      "bytes": 2724
+    },
+    {
+      "path": "test/support/reliability/phase2c-recovery-child.mjs",
+      "sha256": "d9aa96e7b926c7d2881aa58dba65cfc25a0f4c1ecb1391c90b7ef7b8a68414c2",
+      "bytes": 5091
+    },
+    {
+      "path": "test/support/reliability/phase2c-worker-child.mjs",
+      "sha256": "0b06845de3c464f2d2569b022eb9db0c5585bbb15a8ec051aaacaa278df516ca",
+      "bytes": 9261
+    },
+    {
+      "path": "test/support/reliability/phase2c-worker.mjs",
+      "sha256": "8296bc143395abfc70ef4f1fc71ff9a346cb89b87f69b2505528ca1106ec5d12",
+      "bytes": 7637
+    },
+    {
+      "path": "tools/reliability/benchmark-phase2c.mjs",
+      "sha256": "e5fc3b6a502eadb9633fd9571aeac92af2aa7dd0918b0058d465527109af2d92",
+      "bytes": 10696
+    },
+    {
+      "path": "tools/reliability/measure-phase2c-locks.mjs",
+      "sha256": "0cb0efae47f29d51353f2dae392801e44dc06c8c613fb3236057430763a404b0",
+      "bytes": 8095
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/README.md",
+      "sha256": "54b86fcffc1a7198673407cdd23f704f5616d7ec168949768fc0d61e83f6128e",
+      "bytes": 1577
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileMatchDetailModels.swift",
+      "sha256": "cbdaa786b1a30887f7ead127a984aa6db120799fc2f4d2993d25152fafa4cecb",
+      "bytes": 30967
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileModels.swift",
+      "sha256": "6d3cdb7836bf5a4b33b945e26e33450fe8be089d68e918cdb07fad97616764d9",
+      "bytes": 12681
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileParticipantContentValidation.swift",
+      "sha256": "1950693cb540a3900929a467e559cd1332a8d7c7eee10b03aacf86c56f9ce018",
+      "bytes": 3224
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobilePlayerRoundPerformance.swift",
+      "sha256": "b0119121fd1fa9741a479ae9dd2ab8b122f535c7cb12a1fa44c91329403166b5",
+      "bytes": 4595
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobilePlayersIntelligence.swift",
+      "sha256": "15a10cbbb234f68a0be9716d41b9895bf38b42d1ee9d51d19995c7e2952b2dad",
+      "bytes": 5303
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileR1RoundCompetition.swift",
+      "sha256": "5e77ec76a66ec611f3efcb68c4c3e8b2e04afc7346f0d8b114db8eeda8d2a5f6",
+      "bytes": 1663
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileR2PairCompetition.swift",
+      "sha256": "c035e856a9f894cf9179ddfacd5d4ab8f334e71f7764845aaca68a9575233ee5",
+      "bytes": 3355
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileR3RoundCompetition.swift",
+      "sha256": "42db679fbd020cc17dd99fff80fbc7e52fafc79c7b02c02b66ea0068011ead00",
+      "bytes": 3451
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileReadModels.swift",
+      "sha256": "738cb72710e17f963228f2000f6af38e6341d40d6a059c88d932bfa7cc6d855d",
+      "bytes": 25004
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileRoundScorecard.swift",
+      "sha256": "7d80c3e043c33573b8926fda2ca9674dd4a71dd014d4d705ea94ef4a251e8c45",
+      "bytes": 5383
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileScoringModels.swift",
+      "sha256": "f36c2a50bf74cc7d84ff6730818dfaa198c6f57bcc4d78a82f8dff4dcae3544c",
+      "bytes": 12704
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/NativeEnvironment.swift",
+      "sha256": "30cdd8d29ededb51dfdbe72d967e76541ff48c1c2829b0217e892c51281ebdfa",
+      "bytes": 4053
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/fixture-manifest.json",
+      "sha256": "5c864a0b2aa3030af488a10c0b62fb7f90f6ab2f93a396d9fc1aaa0a92b433b7",
+      "bytes": 3432
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/main.swift",
+      "sha256": "00d0feb479c6b8483bf557ae8ff8769d84137e0c8403fcabbb405dea3d2521a8",
+      "bytes": 3353
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/run.mjs",
+      "sha256": "e136bfab29c8da7f49d5413609ade40459878863ed907047f3efd3785d3ad929",
+      "bytes": 6292
+    },
+    {
+      "path": "tools/reliability/phase2-plan-capture.mjs",
+      "sha256": "5b3d94ab93924200d95a1d2558610f1915bb5a280896797556088075af48346c",
+      "bytes": 3901
+    },
+    {
+      "path": "tools/reliability/phase2c-certification-gate.py",
+      "sha256": "a50fa40982a2f742c73ae5795bfeb6720523bd61cf63c2bb82debbcaa66fd698",
+      "bytes": 81641
+    },
+    {
+      "path": "tools/reliability/phase2c-performance-gate.mjs",
+      "sha256": "9b308f85190fde7a06cffd68f8b2b7e25db33c7c15905d7b752d3ed4d8ec3212",
+      "bytes": 6747
+    },
+    {
+      "path": "tools/reliability/phase2c-source-provenance.mjs",
+      "sha256": "3c00927b408f14c9adce6a6caaac3e9e055d8c61d9ed63456ff6c6593436e07d",
+      "bytes": 8408
+    },
+    {
+      "path": "tools/reliability/run-phase2c-tests.mjs",
+      "sha256": "e1a4e496e9ba832a1d0511def19d9262f3affaef3a73791485fe19f6eefe7930",
+      "bytes": 8642
+    },
+    {
+      "path": "tools/reliability/run-score-derived-worker.mjs",
+      "sha256": "65f7ab486d4a7404b1003d180cb08f91405ea3dca518c2f3cdaf27eec3c1e9db",
+      "bytes": 830
+    }
+  ],
+  "sourceManifestSha256": "a452f883c3e2b422d0e20f1acc8ef6b2f7026c3d0ff74a5090749a3888f9e987",
+  "migrations": [
+    {
+      "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce",
+      "bytes": 10000
+    },
+    {
+      "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0",
+      "bytes": 14847
+    },
+    {
+      "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48",
+      "bytes": 76764
+    }
+  ],
+  "productionQueried": false,
+  "productionMutated": false,
+  "productionDeployed": false,
+  "stagingDeployedByAgent": false,
+  "build11Implemented": false,
+  "competitiveSemanticsChanged": false,
+  "nativeShippingChanged": false,
+  "ownerAcceptance": "NOT_PERFORMED",
+  "externalGitProviderAutomation": "NOT_INSPECTED",
+  "blockingLocalP0": [
+    "P0-B Google reporting/archive automatic-delivery contract and proof"
+  ],
+  "toolchain": {
+    "node": "26.7.0",
+    "npm": "11.19.0",
+    "postgres": "17.11",
+    "nativeDecoder": "retained Swift models on macOS with explicit UTC; not physical"
+  },
+  "fixtures": {
+    "scoreProofVersion": "bagger-phase2-score-proof-v2",
+    "scoreProofSeed": "2026-canonical-score-path-2",
+    "benchmarkVersion": "bagger-r139-synthetic-history-v1+phase2-eligible-history-v2",
+    "benchmarkSeed": "2026-never-again-139"
+  },
+  "limits": [
+    "Local fsync=off does not prove hosted durability/capacity.",
+    "OverallPARTIAL is independent of the scoped artifact-gate PASS.",
+    "No source execution is attributed retroactively to a future commit."
+  ]
+}

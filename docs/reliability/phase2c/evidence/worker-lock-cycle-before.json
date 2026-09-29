@@ -1,0 +1,248 @@
+{
+  "proof": "ACTUAL_SQL_LOCK_GRAPH",
+  "production": false,
+  "tests": [
+    {
+      "case": "old-cross-family-cycle",
+      "pass": true,
+      "waiting": [
+        {
+          "pid": 35559,
+          "wait": "advisory",
+          "blockedBy": [
+            35558
+          ]
+        },
+        {
+          "pid": 35560,
+          "wait": "ClientRead",
+          "blockedBy": []
+        },
+        {
+          "pid": 35558,
+          "wait": "advisory",
+          "blockedBy": [
+            35560
+          ]
+        }
+      ],
+      "cycle": [
+        {
+          "pid": 35559,
+          "wait": "advisory",
+          "blockedBy": [
+            35558
+          ]
+        },
+        {
+          "pid": 35560,
+          "wait": "ClientRead",
+          "blockedBy": []
+        },
+        {
+          "pid": 35558,
+          "wait": "transactionid",
+          "blockedBy": [
+            35559
+          ]
+        }
+      ],
+      "worker": {
+        "ok": true,
+        "value": {
+          "ok": true,
+          "work": [
+            {
+              "key": "9ffc2dfb-cf78-4088-bc29-de2983a1993f",
+              "cycle": 1,
+              "family": "CALCUTTA",
+              "attempt": 0
+            },
+            {
+              "key": "TEAM_MOMENTUM",
+              "cycle": 1,
+              "family": "COMPETITION",
+              "attempt": 0
+            },
+            {
+              "key": "TOURNAMENT_STORYLINES",
+              "cycle": 1,
+              "family": "COMPETITION",
+              "attempt": 0
+            },
+            {
+              "key": "TOURNAMENT_INTELLIGENCE",
+              "cycle": 1,
+              "family": "INTELLIGENCE",
+              "attempt": 0
+            },
+            {
+              "key": "PROJECTION_EDITORIAL",
+              "cycle": 1,
+              "family": "INTELLIGENCE",
+              "attempt": 0
+            }
+          ],
+          "ready": {
+            "CALCUTTA": true,
+            "COMPETITION": true,
+            "INTELLIGENCE": true
+          },
+          "scope": {
+            "tournamentId": "2026",
+            "runtimeGenerationId": null
+          },
+          "calcutta": {
+            "auctionRevision": 37,
+            "auctionFingerprint": "2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a",
+            "configurationRevision": 2,
+            "configurationFingerprint": "6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474"
+          },
+          "terminal": 0,
+          "cancelled": false,
+          "activeLeases": 0,
+          "materialized": 3,
+          "waitingOwner": {
+            "NET_SKINS": 1
+          },
+          "blockedAutomatic": 0,
+          "pendingAutomatic": 5,
+          "statusIncomplete": false,
+          "terminalTruncated": false,
+          "waitingPublication": {
+            "FINAL_RECAP": 1
+          },
+          "blockedAutomaticLimit": 101,
+          "pendingAutomaticLimit": 101
+        }
+      },
+      "control": {
+        "ok": false,
+        "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  SQL statement \"SELECT pg_catalog.pg_advisory_xact_lock(\n    pg_catalog.hashtextextended(\n      pg_catalog.format(\n        'production-net-skins-v1:enqueue:2026:R%s', target_round_number\n      ), 202608290055\n    )\n  )\"\nPL/pgSQL function enqueue_production_net_skins_v1_round(integer,text,text) line 43 at PERFORM\nSQL statement \"SELECT production_control.enqueue_production_net_skins_v1_round(\n    match_value.round_number,\n    case when tg_table_name = 'hole_scores'\n      then 'CANONICAL_SCORE_CHANGED'\n      else 'CANONICAL_MATCH_LIFECYCLE_CHANGED' end,\n    'production-net-skins-v1-trigger'\n  )\"\nPL/pgSQL function enqueue_production_net_skins_v1_change() line 55 at PERFORM\nSQL statement \"update scoring_authority.matches set\n    status = case when operation = 'MARK_LIVE' then 'LIVE' else status end,\n    scoring_locked = target_locked,\n    match_revision = next_match_revision,\n    permission_revision = next_permission_revision,\n    authority_updated_at = transition_at,\n    updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function public.mutate_production_match_control(jsonb) line 269 at SQL statement\n"
+      },
+      "controlTimeoutMs": 1000,
+      "workerTimeoutMs": 5000,
+      "barrier": "test-only after actual NET_SKINS flush; no fake queue or lock result"
+    }
+  ],
+  "installed": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "6cee536d12a93d53e6a585784a3b316bdaffbcb24c76d32060a898e83a459eee"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "triggerOrder": [
+    {
+      "trigger": "production_annual_derived_v1_match_change",
+      "function": "scoring_authority.enqueue_annual_derived_v1_change"
+    },
+    {
+      "trigger": "production_annual_net_skins_v1_match_lifecycle_recalculation",
+      "function": "scoring_authority.enqueue_annual_net_skins_v1_change"
+    },
+    {
+      "trigger": "production_calcutta_v1_match_lifecycle_recalculation",
+      "function": "scoring_authority.enqueue_production_calcutta_v1_change"
+    },
+    {
+      "trigger": "production_guard_future_unprepared_match_v1",
+      "function": "production_control.guard_future_unprepared_match_v1"
+    },
+    {
+      "trigger": "production_net_skins_v1_match_lifecycle_recalculation",
+      "function": "scoring_authority.enqueue_production_net_skins_v1_change"
+    }
+  ],
+  "pending": [
+    {
+      "ok": true,
+      "value": {
+        "ok": true,
+        "work": [
+          {
+            "key": "9ffc2dfb-cf78-4088-bc29-de2983a1993f",
+            "cycle": 1,
+            "family": "CALCUTTA",
+            "attempt": 0
+          },
+          {
+            "key": "TEAM_MOMENTUM",
+            "cycle": 1,
+            "family": "COMPETITION",
+            "attempt": 0
+          },
+          {
+            "key": "TOURNAMENT_STORYLINES",
+            "cycle": 1,
+            "family": "COMPETITION",
+            "attempt": 0
+          },
+          {
+            "key": "TOURNAMENT_INTELLIGENCE",
+            "cycle": 1,
+            "family": "INTELLIGENCE",
+            "attempt": 0
+          },
+          {
+            "key": "PROJECTION_EDITORIAL",
+            "cycle": 1,
+            "family": "INTELLIGENCE",
+            "attempt": 0
+          }
+        ],
+        "ready": {
+          "CALCUTTA": true,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "scope": {
+          "tournamentId": "2026",
+          "runtimeGenerationId": null
+        },
+        "calcutta": {
+          "auctionRevision": 37,
+          "auctionFingerprint": "2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a",
+          "configurationRevision": 2,
+          "configurationFingerprint": "6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474"
+        },
+        "terminal": 0,
+        "cancelled": false,
+        "activeLeases": 0,
+        "materialized": 3,
+        "waitingOwner": {
+          "NET_SKINS": 1
+        },
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 5,
+        "statusIncomplete": false,
+        "terminalTruncated": false,
+        "waitingPublication": {
+          "FINAL_RECAP": 1
+        },
+        "blockedAutomaticLimit": 101,
+        "pendingAutomaticLimit": 101
+      }
+    },
+    {
+      "ok": false,
+      "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  SQL statement \"SELECT pg_catalog.pg_advisory_xact_lock(\n    pg_catalog.hashtextextended(\n      pg_catalog.format(\n        'production-net-skins-v1:enqueue:2026:R%s', target_round_number\n      ), 202608290055\n    )\n  )\"\nPL/pgSQL function enqueue_production_net_skins_v1_round(integer,text,text) line 43 at PERFORM\nSQL statement \"SELECT production_control.enqueue_production_net_skins_v1_round(\n    match_value.round_number,\n    case when tg_table_name = 'hole_scores'\n      then 'CANONICAL_SCORE_CHANGED'\n      else 'CANONICAL_MATCH_LIFECYCLE_CHANGED' end,\n    'production-net-skins-v1-trigger'\n  )\"\nPL/pgSQL function enqueue_production_net_skins_v1_change() line 55 at PERFORM\nSQL statement \"update scoring_authority.matches set\n    status = case when operation = 'MARK_LIVE' then 'LIVE' else status end,\n    scoring_locked = target_locked,\n    match_revision = next_match_revision,\n    permission_revision = next_permission_revision,\n    authority_updated_at = transition_at,\n    updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function public.mutate_production_match_control(jsonb) line 269 at SQL statement\n"
+    }
+  ]
+}

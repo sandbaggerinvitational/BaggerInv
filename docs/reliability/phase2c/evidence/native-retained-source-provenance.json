@@ -1,0 +1,17 @@
+{
+  "shipping_source_sha": "e7652b9b65595861f4f7cdf0b8326491581a27b8",
+  "shipping_worktree": "CLEAN",
+  "version": "1.2",
+  "build": "10",
+  "tracked_ios_files_compared": 495,
+  "capture_copy_differences": [
+    "ios/BaggerInv/Debug/SpectatorFixtureData.swift",
+    "ios/BaggerInv/Debug/SpectatorUITestFixture.swift"
+  ],
+  "additional_capture_files": [
+    "ios/BaggerInvUITests/PromoCaptureUITests.swift",
+    "ios/BaggerInvTests/PromoFixtureTests.swift",
+    "ios/Config/Preview.xcconfig copied from example"
+  ],
+  "shipping_views_services_assets_project_changes": 0
+}

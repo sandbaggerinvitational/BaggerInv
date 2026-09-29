@@ -1,0 +1,336 @@
+▶ NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue
+  ✔ migration is chained and delivery administration is unavailable to participants (31.643333ms)
+  ✖ a running child discovers a later committed score and completes automatic families (575.961459ms)
+  ✖ a crash after real claim retains a lease and restart recovers after expiry (549.756083ms)
+  ✖ unknown completion acknowledgement leaves one successful canonical result (482.647375ms)
+  ✖ deterministic preclaim failure terminates once, Director requeue preserves exact receipt (412.977208ms)
+  ✖ intelligence-before-claim retains later score demand and converges to canonical source (483.559959ms)
+  ✖ intelligence-after-claim retains later score demand and converges to canonical source (553.65725ms)
+  ✖ intelligence-before-write retains later score demand and converges to canonical source (502.934625ms)
+  ✖ calcutta-before-claim retains later score demand and converges to canonical source (491.945125ms)
+  ✖ score-intent exact-current processing preserves financial output: none (549.774292ms)
+  ✖ score-intent exact-current processing preserves financial output: current_compatible (602.601125ms)
+  ✖ score-intent exact-current processing preserves financial output: current_incompatible_consumed (630.043ms)
+  ✖ score-intent exact-current processing preserves financial output: current_incompatible_financial (552.480333ms)
+  ✖ score-intent exact-current processing preserves financial output: stale_source (609.624292ms)
+  ✖ score-intent exact-current processing preserves financial output: stale_result_binding (564.753042ms)
+  ✖ score-intent exact-current processing preserves financial output: superseded_result (539.082417ms)
+  ✖ score-intent exact-current processing preserves financial output: multiple_receipts (598.532042ms)
+  ✔ real25ms cancellation records each intent attempt across connections and reaches terminal (642.514625ms)
+  ✖ compatible activation replaces old pending identity without transferring a lease (380.871334ms)
+✖ NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue (18787.853375ms)
+✔ deterministic global tick failure stops visibly and classifies only known transient errors (0.5375ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 3
+ℹ fail 18
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 18867.359125
+
+✖ failing tests:
+
+test at test/reliability-phase2c-worker.test.mjs:59:11
+✖ a running child discovers a later committed score and completes automatic families (575.961459ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:63:4)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:59:3)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:73:11
+✖ a crash after real claim retains a lease and restart recovers after expiry (549.756083ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:76:4)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:73:3)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:85:11
+✖ unknown completion acknowledgement leaves one successful canonical result (482.647375ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:88:4)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:85:3)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:92:11
+✖ deterministic preclaim failure terminates once, Director requeue preserves exact receipt (412.977208ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  column "activation_revision" does not exist
+  LINE 42: ...generation_id is not distinct from generation and activation...
+                                                                ^
+  QUERY:  jsonb_build_object('ok',true,'scope',jsonb_build_object('tournamentId',target,'runtimeGenerationId',generation),
+      'cancelled',false,'statusIncomplete',false,'materialized',total,'terminal',terminal_count,'terminalTruncated',terminal_count=101,
+      'pendingAutomatic',(select count(*) from (
+        (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target and runtime_generation_id is not distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)
+        union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation
+          and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision
+          and status in('PENDING','RUNNING') limit 1)
+        union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0
+          and runtime_generation_id is not distinct from generation
+          and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES','TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') and status<>'SUCCEEDED' limit 4)
+        limit 101)bounded),
+      'pendingAutomaticLimit',101,
+      'blockedAutomatic',(select count(*) from (
+        (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target
+          and runtime_generation_id is distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)
+        union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status in('PENDING','RUNNING')
+          and (runtime_generation_id is distinct from generation or activation_revision<>activation
+            or configuration_revision<>calcutta_current.configuration_revision or auction_revision<>calcutta_current.auction_revision) limit 1)
+        union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0
+          and runtime_generation_id is distinct from generation and engine_key<>'TOURNAMENT_FINAL_RECAP' and status<>'SUCCEEDED' limit 4)
+        limit 101)bounded),'blockedAutomaticLimit',101,
+      'activeLeases',(select count(*) from (
+        (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation and status='RUNNING' and lease_expires_at>=clock_timestamp() limit 1)
+        union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation and status='RUNNING'
+          and coalesce(lease_expires_at,started_at+interval '90 seconds')>=clock_timestamp() limit 5)
+      )bounded),
+      'ready',jsonb_build_object(
+        'CALCUTTA',calcutta_current.configuration_revision>0 and calcutta_current.auction_revision>0 and exists(
+          select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target
+            and runtime_generation_id is not distinct from generation
+            and activation_revision=activation
+            and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision
+            and (status='PENDING' or(status='RUNNING' and lease_expires_at<clock_timestamp()))
+            and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),
+        'COMPETITION',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation
+          and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') and status in('PENDING','FAILED')
+          and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),
+        'INTELLIGENCE',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation
+          and engine_key in('TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') and status in('PENDING','FAILED')
+          and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp())),
+      'waitingOwner',jsonb_build_object('NET_SKINS',(select count(*) from scoring_authority.net_skins_v1_recalculation_jobs
+        where tournament_id=target and round_number between 1 and 3 and runtime_generation_id is not distinct from generation and activation_revision=activation and status in('PENDING','RUNNING'))),
+      'work',coalesce((select jsonb_agg(v) from (
+        select 'CALCUTTA'::text as family,job_id::text as key,delivery_cycle as cycle,delivery_attempts as attempt
+        from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status='PENDING'
+          and activation_revision=activation and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision
+          and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()
+        union all select case when engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') then 'COMPETITION' else 'INTELLIGENCE' end,
+          engine_key,delivery_cycle,delivery_attempts from scoring_authority.competition_recalculation_jobs
+          where tournament_id=target and round_number=0 and engine_key<>'TOURNAMENT_FINAL_RECAP' and status in('PENDING','FAILED')
+          and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()
+        limit 5
+      )v),'[]'::jsonb),
+      'calcutta',jsonb_build_object('configurationRevision',calcutta_current.configuration_revision,
+        'configurationFingerprint',calcutta_current.configuration_fingerprint,'auctionRevision',calcutta_current.auction_revision,
+        'auctionFingerprint',calcutta_current.auction_fingerprint))
+  CONTEXT:  PL/pgSQL function public.score_derived_delivery_tick_v1(jsonb) line 42 at RETURN
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at call (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:20:26)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:94:15)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at TestContext.test (node:internal/test_runner/test:399:20)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:92:11)
+      at async Test.run (node:internal/test_runner/test:1404:7) {
+    result: { status: 3, signal: null, output: [ null, '', `ERROR:  column "activation_revision" does not exist\nLINE 42: ...generation_id is not distinct from generation and activation...\n                                                              ^\nQUERY:  jsonb_build_object('ok',true,'scope',jsonb_build_object('tournamentId',target,'runtimeGenerationId',generation),\n    'cancelled',false,'statusIncomplete',false,'materialized',total,'terminal',terminal_count,'terminalTruncated',terminal_count=101,\n    'pendingAutomatic',(select count(*) from (\n      (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target and runtime_generation_id is not distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)\n      union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation\n        and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n        and status in('PENDING','RUNNING') limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0\n        and runtime_generation_id is not distinct from generation\n        and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES','TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') and status<>'SUCCEEDED' limit 4)\n      limit 101)bounded),\n    'pendingAutomaticLimit',101,\n    'blockedAutomatic',(select count(*) from (\n      (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target\n        and runtime_generation_id is distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)\n      union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status in('PENDING','RUNNING')\n        and (runtime_generation_id is distinct from generation or activation_revision<>activation\n          or configuration_revision<>calcutta_current.configuration_revision or auction_revision<>calcutta_current.auction_revision) limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0\n        and runtime_generation_id is distinct from generation and engine_key<>'TOURNAMENT_FINAL_RECAP' and status<>'SUCCEEDED' limit 4)\n      limit 101)bounded),'blockedAutomaticLimit',101,\n    'activeLeases',(select count(*) from (\n      (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation and status='RUNNING' and lease_expires_at>=clock_timestamp() limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation and status='RUNNING'\n        and coalesce(lease_expires_at,started_at+interval '90 seconds')>=clock_timestamp() limit 5)\n    )bounded),\n    'ready',jsonb_build_object(\n      'CALCUTTA',calcutta_current.configuration_revision>0 and calcutta_current.auction_revision>0 and exists(\n        select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target\n          and runtime_generation_id is not distinct from generation\n          and activation_revision=activation\n          and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n          and (status='PENDING' or(status='RUNNING' and lease_expires_at<clock_timestamp()))\n          and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),\n      'COMPETITION',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation\n        and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') and status in('PENDING','FAILED')\n        and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),\n      'INTELLIGENCE',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation\n        and engine_key in('TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') and status in('PENDING','FAILED')\n        and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp())),\n    'waitingOwner',jsonb_build_object('NET_SKINS',(select count(*) from scoring_authority.net_skins_v1_recalculation_jobs\n      where tournament_id=target and round_number between 1 and 3 and runtime_generation_id is not distinct from generation and activation_revision=activation and status in('PENDING','RUNNING'))),\n    'work',coalesce((select jsonb_agg(v) from (\n      select 'CALCUTTA'::text as family,job_id::text as key,delivery_cycle as cycle,delivery_attempts as attempt\n      from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status='PENDING'\n        and activation_revision=activation and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n        and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()\n      union all select case when engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') then 'COMPETITION' else 'INTELLIGENCE' end,\n        engine_key,delivery_cycle,delivery_attempts from scoring_authority.competition_recalculation_jobs\n        where tournament_id=target and round_number=0 and engine_key<>'TOURNAMENT_FINAL_RECAP' and status in('PENDING','FAILED')\n        and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()\n      limit 5\n    )v),'[]'::jsonb),\n    'calcutta',jsonb_build_object('configurationRevision',calcutta_current.configuration_revision,\n      'configurationFingerprint',calcutta_current.configuration_fingerprint,'auctionRevision',calcutta_current.auction_revision,\n      'auctionFingerprint',calcutta_current.auction_fingerprint))\nCONTEXT:  PL/pgSQL function public.score_derived_delivery_tick_v1(jsonb) line 42 at RETURN\n` ], pid: 92217, stdout: '', stderr: `ERROR:  column "activation_revision" does not exist\nLINE 42: ...generation_id is not distinct from generation and activation...\n                                                              ^\nQUERY:  jsonb_build_object('ok',true,'scope',jsonb_build_object('tournamentId',target,'runtimeGenerationId',generation),\n    'cancelled',false,'statusIncomplete',false,'materialized',total,'terminal',terminal_count,'terminalTruncated',terminal_count=101,\n    'pendingAutomatic',(select count(*) from (\n      (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target and runtime_generation_id is not distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)\n      union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation\n        and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n        and status in('PENDING','RUNNING') limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0\n        and runtime_generation_id is not distinct from generation\n        and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES','TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') and status<>'SUCCEEDED' limit 4)\n      limit 101)bounded),\n    'pendingAutomaticLimit',101,\n    'blockedAutomatic',(select count(*) from (\n      (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target\n        and runtime_generation_id is distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)\n      union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status in('PENDING','RUNNING')\n        and (runtime_generation_id is distinct from generation or activation_revision<>activation\n          or configuration_revision<>calcutta_current.configuration_revision or auction_revision<>calcutta_current.auction_revision) limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0\n        and runtime_generation_id is distinct from generation and engine_key<>'TOURNAMENT_FINAL_RECAP' and status<>'SUCCEEDED' limit 4)\n      limit 101)bounded),'blockedAutomaticLimit',101,\n    'activeLeases',(select count(*) from (\n      (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation and status='RUNNING' and lease_expires_at>=clock_timestamp() limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation and status='RUNNING'\n        and coalesce(lease_expires_at,started_at+interval '90 seconds')>=clock_timestamp() limit 5)\n    )bounded),\n    'ready',jsonb_build_object(\n      'CALCUTTA',calcutta_current.configuration_revision>0 and calcutta_current.auction_revision>0 and exists(\n        select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target\n          and runtime_generation_id is not distinct from generation\n          and activation_revision=activation\n          and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n          and (status='PENDING' or(status='RUNNING' and lease_expires_at<clock_timestamp()))\n          and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),\n      'COMPETITION',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation\n        and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') and status in('PENDING','FAILED')\n        and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),\n      'INTELLIGENCE',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation\n        and engine_key in('TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') and status in('PENDING','FAILED')\n        and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp())),\n    'waitingOwner',jsonb_build_object('NET_SKINS',(select count(*) from scoring_authority.net_skins_v1_recalculation_jobs\n      where tournament_id=target and round_number between 1 and 3 and runtime_generation_id is not distinct from generation and activation_revision=activation and status in('PENDING','RUNNING'))),\n    'work',coalesce((select jsonb_agg(v) from (\n      select 'CALCUTTA'::text as family,job_id::text as key,delivery_cycle as cycle,delivery_attempts as attempt\n      from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status='PENDING'\n        and activation_revision=activation and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n        and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()\n      union all select case when engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') then 'COMPETITION' else 'INTELLIGENCE' end,\n        engine_key,delivery_cycle,delivery_attempts from scoring_authority.competition_recalculation_jobs\n        where tournament_id=target and round_number=0 and engine_key<>'TOURNAMENT_FINAL_RECAP' and status in('PENDING','FAILED')\n        and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()\n      limit 5\n    )v),'[]'::jsonb),\n    'calcutta',jsonb_build_object('configurationRevision',calcutta_current.configuration_revision,\n      'configurationFingerprint',calcutta_current.configuration_fingerprint,'auctionRevision',calcutta_current.auction_revision,\n      'auctionFingerprint',calcutta_current.auction_fingerprint))\nCONTEXT:  PL/pgSQL function public.score_derived_delivery_tick_v1(jsonb) line 42 at RETURN\n` }
+  }
+
+test at test/reliability-phase2c-worker.test.mjs:112:14
+✖ intelligence-before-claim retains later score demand and converges to canonical source (483.559959ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:116:19)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:112:6)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:112:14
+✖ intelligence-after-claim retains later score demand and converges to canonical source (553.65725ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:116:19)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:112:6)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:112:14
+✖ intelligence-before-write retains later score demand and converges to canonical source (502.934625ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:116:19)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:112:6)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:112:14
+✖ calcutta-before-claim retains later score demand and converges to canonical source (491.945125ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:116:19)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:112:6)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: none (549.774292ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:134:4)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: current_compatible (602.601125ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:134:4)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: current_incompatible_consumed (630.043ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:134:4)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: current_incompatible_financial (552.480333ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:134:4)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: stale_source (609.624292ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:134:4)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: stale_result_binding (564.753042ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:134:4)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: superseded_result (539.082417ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:134:4)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:122:55
+✖ score-intent exact-current processing preserves financial output: multiple_receipts (598.532042ms)
+  Error: Local derived child exited: {"code":1,"errors":"","events":[{"type":"started","workerId":"phase2c-local-worker"},{"type":"tick-failed","attempt":1,"classification":"TERMINAL","sqlstate":"42703","code":"42703"},{"type":"halted","reason":"TERMINAL_TICK_FAILURE","attempts":1}]}
+      at Object.waitFor (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-worker.mjs:40:71)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:134:4)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:122:47)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker.test.mjs:163:11
+✖ compatible activation replaces old pending identity without transferring a lease (380.871334ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  column "activation_revision" does not exist
+  LINE 42: ...generation_id is not distinct from generation and activation...
+                                                                ^
+  QUERY:  jsonb_build_object('ok',true,'scope',jsonb_build_object('tournamentId',target,'runtimeGenerationId',generation),
+      'cancelled',false,'statusIncomplete',false,'materialized',total,'terminal',terminal_count,'terminalTruncated',terminal_count=101,
+      'pendingAutomatic',(select count(*) from (
+        (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target and runtime_generation_id is not distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)
+        union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation
+          and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision
+          and status in('PENDING','RUNNING') limit 1)
+        union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0
+          and runtime_generation_id is not distinct from generation
+          and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES','TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') and status<>'SUCCEEDED' limit 4)
+        limit 101)bounded),
+      'pendingAutomaticLimit',101,
+      'blockedAutomatic',(select count(*) from (
+        (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target
+          and runtime_generation_id is distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)
+        union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status in('PENDING','RUNNING')
+          and (runtime_generation_id is distinct from generation or activation_revision<>activation
+            or configuration_revision<>calcutta_current.configuration_revision or auction_revision<>calcutta_current.auction_revision) limit 1)
+        union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0
+          and runtime_generation_id is distinct from generation and engine_key<>'TOURNAMENT_FINAL_RECAP' and status<>'SUCCEEDED' limit 4)
+        limit 101)bounded),'blockedAutomaticLimit',101,
+      'activeLeases',(select count(*) from (
+        (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation and status='RUNNING' and lease_expires_at>=clock_timestamp() limit 1)
+        union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation and status='RUNNING'
+          and coalesce(lease_expires_at,started_at+interval '90 seconds')>=clock_timestamp() limit 5)
+      )bounded),
+      'ready',jsonb_build_object(
+        'CALCUTTA',calcutta_current.configuration_revision>0 and calcutta_current.auction_revision>0 and exists(
+          select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target
+            and runtime_generation_id is not distinct from generation
+            and activation_revision=activation
+            and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision
+            and (status='PENDING' or(status='RUNNING' and lease_expires_at<clock_timestamp()))
+            and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),
+        'COMPETITION',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation
+          and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') and status in('PENDING','FAILED')
+          and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),
+        'INTELLIGENCE',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation
+          and engine_key in('TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') and status in('PENDING','FAILED')
+          and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp())),
+      'waitingOwner',jsonb_build_object('NET_SKINS',(select count(*) from scoring_authority.net_skins_v1_recalculation_jobs
+        where tournament_id=target and round_number between 1 and 3 and runtime_generation_id is not distinct from generation and activation_revision=activation and status in('PENDING','RUNNING'))),
+      'work',coalesce((select jsonb_agg(v) from (
+        select 'CALCUTTA'::text as family,job_id::text as key,delivery_cycle as cycle,delivery_attempts as attempt
+        from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status='PENDING'
+          and activation_revision=activation and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision
+          and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()
+        union all select case when engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') then 'COMPETITION' else 'INTELLIGENCE' end,
+          engine_key,delivery_cycle,delivery_attempts from scoring_authority.competition_recalculation_jobs
+          where tournament_id=target and round_number=0 and engine_key<>'TOURNAMENT_FINAL_RECAP' and status in('PENDING','FAILED')
+          and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()
+        limit 5
+      )v),'[]'::jsonb),
+      'calcutta',jsonb_build_object('configurationRevision',calcutta_current.configuration_revision,
+        'configurationFingerprint',calcutta_current.configuration_fingerprint,'auctionRevision',calcutta_current.auction_revision,
+        'auctionFingerprint',calcutta_current.auction_fingerprint))
+  CONTEXT:  PL/pgSQL function public.score_derived_delivery_tick_v1(jsonb) line 42 at RETURN
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at call (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:20:26)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:166:4)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at TestContext.test (node:internal/test_runner/test:399:20)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:163:11)
+      at async Test.run (node:internal/test_runner/test:1404:7) {
+    result: { status: 3, signal: null, output: [ null, '', `ERROR:  column "activation_revision" does not exist\nLINE 42: ...generation_id is not distinct from generation and activation...\n                                                              ^\nQUERY:  jsonb_build_object('ok',true,'scope',jsonb_build_object('tournamentId',target,'runtimeGenerationId',generation),\n    'cancelled',false,'statusIncomplete',false,'materialized',total,'terminal',terminal_count,'terminalTruncated',terminal_count=101,\n    'pendingAutomatic',(select count(*) from (\n      (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target and runtime_generation_id is not distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)\n      union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation\n        and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n        and status in('PENDING','RUNNING') limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0\n        and runtime_generation_id is not distinct from generation\n        and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES','TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') and status<>'SUCCEEDED' limit 4)\n      limit 101)bounded),\n    'pendingAutomaticLimit',101,\n    'blockedAutomatic',(select count(*) from (\n      (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target\n        and runtime_generation_id is distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)\n      union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status in('PENDING','RUNNING')\n        and (runtime_generation_id is distinct from generation or activation_revision<>activation\n          or configuration_revision<>calcutta_current.configuration_revision or auction_revision<>calcutta_current.auction_revision) limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0\n        and runtime_generation_id is distinct from generation and engine_key<>'TOURNAMENT_FINAL_RECAP' and status<>'SUCCEEDED' limit 4)\n      limit 101)bounded),'blockedAutomaticLimit',101,\n    'activeLeases',(select count(*) from (\n      (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation and status='RUNNING' and lease_expires_at>=clock_timestamp() limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation and status='RUNNING'\n        and coalesce(lease_expires_at,started_at+interval '90 seconds')>=clock_timestamp() limit 5)\n    )bounded),\n    'ready',jsonb_build_object(\n      'CALCUTTA',calcutta_current.configuration_revision>0 and calcutta_current.auction_revision>0 and exists(\n        select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target\n          and runtime_generation_id is not distinct from generation\n          and activation_revision=activation\n          and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n          and (status='PENDING' or(status='RUNNING' and lease_expires_at<clock_timestamp()))\n          and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),\n      'COMPETITION',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation\n        and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') and status in('PENDING','FAILED')\n        and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),\n      'INTELLIGENCE',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation\n        and engine_key in('TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') and status in('PENDING','FAILED')\n        and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp())),\n    'waitingOwner',jsonb_build_object('NET_SKINS',(select count(*) from scoring_authority.net_skins_v1_recalculation_jobs\n      where tournament_id=target and round_number between 1 and 3 and runtime_generation_id is not distinct from generation and activation_revision=activation and status in('PENDING','RUNNING'))),\n    'work',coalesce((select jsonb_agg(v) from (\n      select 'CALCUTTA'::text as family,job_id::text as key,delivery_cycle as cycle,delivery_attempts as attempt\n      from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status='PENDING'\n        and activation_revision=activation and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n        and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()\n      union all select case when engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') then 'COMPETITION' else 'INTELLIGENCE' end,\n        engine_key,delivery_cycle,delivery_attempts from scoring_authority.competition_recalculation_jobs\n        where tournament_id=target and round_number=0 and engine_key<>'TOURNAMENT_FINAL_RECAP' and status in('PENDING','FAILED')\n        and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()\n      limit 5\n    )v),'[]'::jsonb),\n    'calcutta',jsonb_build_object('configurationRevision',calcutta_current.configuration_revision,\n      'configurationFingerprint',calcutta_current.configuration_fingerprint,'auctionRevision',calcutta_current.auction_revision,\n      'auctionFingerprint',calcutta_current.auction_fingerprint))\nCONTEXT:  PL/pgSQL function public.score_derived_delivery_tick_v1(jsonb) line 42 at RETURN\n` ], pid: 92765, stdout: '', stderr: `ERROR:  column "activation_revision" does not exist\nLINE 42: ...generation_id is not distinct from generation and activation...\n                                                              ^\nQUERY:  jsonb_build_object('ok',true,'scope',jsonb_build_object('tournamentId',target,'runtimeGenerationId',generation),\n    'cancelled',false,'statusIncomplete',false,'materialized',total,'terminal',terminal_count,'terminalTruncated',terminal_count=101,\n    'pendingAutomatic',(select count(*) from (\n      (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target and runtime_generation_id is not distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)\n      union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation\n        and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n        and status in('PENDING','RUNNING') limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0\n        and runtime_generation_id is not distinct from generation\n        and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES','TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') and status<>'SUCCEEDED' limit 4)\n      limit 101)bounded),\n    'pendingAutomaticLimit',101,\n    'blockedAutomatic',(select count(*) from (\n      (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target\n        and runtime_generation_id is distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)\n      union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status in('PENDING','RUNNING')\n        and (runtime_generation_id is distinct from generation or activation_revision<>activation\n          or configuration_revision<>calcutta_current.configuration_revision or auction_revision<>calcutta_current.auction_revision) limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0\n        and runtime_generation_id is distinct from generation and engine_key<>'TOURNAMENT_FINAL_RECAP' and status<>'SUCCEEDED' limit 4)\n      limit 101)bounded),'blockedAutomaticLimit',101,\n    'activeLeases',(select count(*) from (\n      (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation and status='RUNNING' and lease_expires_at>=clock_timestamp() limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation and status='RUNNING'\n        and coalesce(lease_expires_at,started_at+interval '90 seconds')>=clock_timestamp() limit 5)\n    )bounded),\n    'ready',jsonb_build_object(\n      'CALCUTTA',calcutta_current.configuration_revision>0 and calcutta_current.auction_revision>0 and exists(\n        select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target\n          and runtime_generation_id is not distinct from generation\n          and activation_revision=activation\n          and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n          and (status='PENDING' or(status='RUNNING' and lease_expires_at<clock_timestamp()))\n          and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),\n      'COMPETITION',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation\n        and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') and status in('PENDING','FAILED')\n        and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),\n      'INTELLIGENCE',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation\n        and engine_key in('TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') and status in('PENDING','FAILED')\n        and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp())),\n    'waitingOwner',jsonb_build_object('NET_SKINS',(select count(*) from scoring_authority.net_skins_v1_recalculation_jobs\n      where tournament_id=target and round_number between 1 and 3 and runtime_generation_id is not distinct from generation and activation_revision=activation and status in('PENDING','RUNNING'))),\n    'work',coalesce((select jsonb_agg(v) from (\n      select 'CALCUTTA'::text as family,job_id::text as key,delivery_cycle as cycle,delivery_attempts as attempt\n      from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status='PENDING'\n        and activation_revision=activation and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n        and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()\n      union all select case when engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') then 'COMPETITION' else 'INTELLIGENCE' end,\n        engine_key,delivery_cycle,delivery_attempts from scoring_authority.competition_recalculation_jobs\n        where tournament_id=target and round_number=0 and engine_key<>'TOURNAMENT_FINAL_RECAP' and status in('PENDING','FAILED')\n        and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()\n      limit 5\n    )v),'[]'::jsonb),\n    'calcutta',jsonb_build_object('configurationRevision',calcutta_current.configuration_revision,\n      'configurationFingerprint',calcutta_current.configuration_fingerprint,'auctionRevision',calcutta_current.auction_revision,\n      'auctionFingerprint',calcutta_current.auction_fingerprint))\nCONTEXT:  PL/pgSQL function public.score_derived_delivery_tick_v1(jsonb) line 42 at RETURN\n` }
+  }

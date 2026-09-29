@@ -1,0 +1,39 @@
+▶ NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue
+  ✔ upgrade preserves121 pending identity, durable demand and prior successful result (7052.12475ms)
+  ✔ migration is chained and delivery administration is unavailable to participants (90.513ms)
+  ✔ a running child discovers a later committed score and completes automatic families (939.29325ms)
+  ✔ a crash after real claim retains a lease and restart recovers after expiry (4921.108708ms)
+  ✔ COMPETITION actual claim crash survives process restart and expired lease (5007.519208ms)
+  ✔ INTELLIGENCE actual claim crash survives process restart and expired lease (5164.74575ms)
+  ✔ unknown completion acknowledgement leaves one successful canonical result (880.992167ms)
+  ✔ deterministic preclaim failure terminates once, Director requeue preserves exact receipt (394.300291ms)
+  ✔ intelligence-before-claim retains later score demand and converges to canonical source (5127.575584ms)
+  ✔ intelligence-after-claim retains later score demand and converges to canonical source (1289.961959ms)
+  ✔ intelligence-before-write retains later score demand and converges to canonical source (1270.012292ms)
+  ✔ calcutta-before-claim retains later score demand and converges to canonical source (918.078791ms)
+  ✔ score-intent exact-current processing preserves financial output: none (954.87225ms)
+  ✔ score-intent exact-current processing preserves financial output: current_compatible (1017.719041ms)
+  ✔ score-intent exact-current processing preserves financial output: current_incompatible_consumed (1010.361083ms)
+  ✔ score-intent exact-current processing preserves financial output: current_incompatible_financial (1045.676375ms)
+  ✔ score-intent exact-current processing preserves financial output: stale_source (1003.715958ms)
+  ✔ score-intent exact-current processing preserves financial output: stale_result_binding (1047.03725ms)
+  ✔ score-intent exact-current processing preserves financial output: superseded_result (963.874375ms)
+  ✔ score-intent exact-current processing preserves financial output: multiple_receipts (1015.558834ms)
+  ✔ real25ms cancellation records each intent attempt across connections and reaches terminal (576.387458ms)
+  ✔ Intelligence delayed, running and terminal siblings suppress automatic thrash (964.163708ms)
+  ✔ lone FinalRecap recovery requires existing final publication and preserves successful siblings (1325.036958ms)
+  ✔ two autonomous workers share claims and converge without a manual tick (956.322375ms)
+  ✔ closed worker gate stops the autonomous process visibly after one denied tick (498.594917ms)
+  ✔ each automatic family exhausts five durable attempts then exact Director requeue recovers (1573.831042ms)
+  ✔ compatible activation replacement is atomic and rejects late old completion (507.612125ms)
+  ✔ compatible activation replaces old pending identity without transferring a lease (432.508541ms)
+✔ NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue (57568.212708ms)
+✔ deterministic global tick failure stops visibly and classifies only known transient errors (0.521958ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 57660.796167

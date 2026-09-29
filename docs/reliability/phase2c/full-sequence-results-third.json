@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "environment": "LOCAL_NON_PRODUCTION",
+  "fixture": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "295f3657c710b0b1e7937d603ac8db9c5439afe20734d41dc0e61a2f8e320221"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "production": false,
+  "rounds": [],
+  "controls": [],
+  "workerRestarts": 0,
+  "failures": [
+    "{\"ok\":false,\"code\":\"PRODUCTION_MATCH_NOT_RESUME_READY\",\"reasons\":[{\"code\":\"RESUME_AUTHORITY_BINDING_MISMATCH\"}],\"match_id\":\"2026-R1-1\",\"audit_created\":false,\"google_outbox_created\":false,\"scoring_readiness_contract\":\"production-match-resume-readiness-v1\"}\n\nfalse !== true\n"
+  ],
+  "result": "FAIL",
+  "limitations": [
+    "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+    "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+    "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+    "Not a complete Open/Prepare tournament rehearsal",
+    "No owner publication automated",
+    "NetSkins financial processing remains WAITING_OWNER",
+    "Local process-lifetime worker, hosted scheduling NOT_PROVEN"
+  ],
+  "fixtureSetupTimeoutMs": 30000,
+  "scoreTimeoutMs": 1000,
+  "workerEventsAtFailure": [
+    {
+      "observedAt": 1790613311257,
+      "type": "started",
+      "workerId": "phase2c-full-sequence"
+    },
+    {
+      "observedAt": 1790613311305,
+      "type": "tick",
+      "cycle": 0,
+      "tickStartedAt": 1790613311257,
+      "materialized": 0,
+      "terminal": 0,
+      "cancelled": false,
+      "statusIncomplete": false,
+      "blockedAutomatic": 0,
+      "pendingAutomatic": 0,
+      "activeLeases": 0,
+      "ready": {
+        "CALCUTTA": false,
+        "COMPETITION": false,
+        "INTELLIGENCE": false
+      },
+      "waitingOwner": 0,
+      "waitingPublication": 0
+    },
+    {
+      "observedAt": 1790613311487,
+      "type": "tick",
+      "cycle": 1,
+      "tickStartedAt": 1790613311406,
+      "materialized": 6,
+      "terminal": 0,
+      "cancelled": false,
+      "statusIncomplete": false,
+      "blockedAutomatic": 0,
+      "pendingAutomatic": 5,
+      "activeLeases": 0,
+      "ready": {
+        "CALCUTTA": true,
+        "COMPETITION": true,
+        "INTELLIGENCE": true
+      },
+      "waitingOwner": 1,
+      "waitingPublication": 1
+    },
+    {
+      "observedAt": 1790613311567,
+      "type": "processed",
+      "family": "COMPETITION",
+      "empty": false
+    },
+    {
+      "observedAt": 1790613311658,
+      "type": "processed",
+      "family": "INTELLIGENCE",
+      "empty": false
+    },
+    {
+      "observedAt": 1790613311759,
+      "type": "processed",
+      "family": "CALCUTTA",
+      "empty": false
+    },
+    {
+      "observedAt": 1790613311760,
+      "type": "stopped",
+      "cycles": 2
+    }
+  ]
+}

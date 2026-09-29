@@ -1,0 +1,141 @@
+TAP version 13
+# Subtest: Phase2 durable derived intent behavioral proof
+    # Subtest: P2-DERIVED-ATOMIC: required durable intent append failure rolls back score and receipt
+    ok 1 - P2-DERIVED-ATOMIC: required durable intent append failure rolls back score and receipt
+      ---
+      duration_ms: 818.628416
+      type: 'test'
+      ...
+    # Subtest: P2-DERIVED-COALESCE: one canonical transaction coalesces hole/match trigger intent per family
+    ok 2 - P2-DERIVED-COALESCE: one canonical transaction coalesces hole/match trigger intent per family
+      ---
+      duration_ms: 761.896459
+      type: 'test'
+      ...
+    # Subtest: P2-DERIVED-FAIL-CALCUTTA: CALCUTTA unavailable leaves score Official and durable demand retryable
+    ok 3 - P2-DERIVED-FAIL-CALCUTTA: CALCUTTA unavailable leaves score Official and durable demand retryable
+      ---
+      duration_ms: 722.028084
+      type: 'test'
+      ...
+    # Subtest: P2-DERIVED-FAIL-NET_SKINS: NET_SKINS unavailable leaves score Official and durable demand retryable
+    ok 4 - P2-DERIVED-FAIL-NET_SKINS: NET_SKINS unavailable leaves score Official and durable demand retryable
+      ---
+      duration_ms: 755.437292
+      type: 'test'
+      ...
+    # Subtest: P2-DERIVED-FAIL-COMPETITION: COMPETITION unavailable leaves score Official and durable demand retryable
+    ok 5 - P2-DERIVED-FAIL-COMPETITION: COMPETITION unavailable leaves score Official and durable demand retryable
+      ---
+      duration_ms: 798.842834
+      type: 'test'
+      ...
+    # Subtest: P2-DERIVED-STANDALONE-LOCK: standalone LOCK retains synchronous derived failure and atomic rollback
+    ok 6 - P2-DERIVED-STANDALONE-LOCK: standalone LOCK retains synchronous derived failure and atomic rollback
+      ---
+      duration_ms: 1999.646667
+      type: 'test'
+      ...
+    # Subtest: P2-DERIVED-STANDALONE-FINALIZE: standalone FINALIZE retains synchronous derived failure and atomic rollback
+    ok 7 - P2-DERIVED-STANDALONE-FINALIZE: standalone FINALIZE retains synchronous derived failure and atomic rollback
+      ---
+      duration_ms: 4431.169334
+      type: 'test'
+      ...
+    # Subtest: P2-DERIVED-BACKLOG: 432 pending intents do not block canonical writes; bounded batches catch up
+    ok 8 - P2-DERIVED-BACKLOG: 432 pending intents do not block canonical writes; bounded batches catch up
+      ---
+      duration_ms: 12537.4485
+      type: 'test'
+      ...
+    # Subtest: P2-DERIVED-BURST: 12 independent Singles matches commit concurrently with configured history
+    ok 9 - P2-DERIVED-BURST: 12 independent Singles matches commit concurrently with configured history
+      ---
+      duration_ms: 948.436084
+      type: 'test'
+      ...
+    # Subtest: P2-DERIVED-WORKER-RACE: scoring continues while a derived worker holds shared competition markers
+    ok 10 - P2-DERIVED-WORKER-RACE: scoring continues while a derived worker holds shared competition markers
+      ---
+      duration_ms: 732.61875
+      type: 'test'
+      ...
+    # Subtest: P2-DERIVED-ORDER: older financial demand observes latest canonical source instead of publishing obsolete result
+    ok 11 - P2-DERIVED-ORDER: older financial demand observes latest canonical source instead of publishing obsolete result
+      ---
+      duration_ms: 760.072792
+      type: 'test'
+      ...
+    # Subtest: P2-DERIVED-DEAD-LETTER: bounded repeated consumer failure becomes visible dead letter without changing score
+    ok 12 - P2-DERIVED-DEAD-LETTER: bounded repeated consumer failure becomes visible dead letter without changing score
+      ---
+      duration_ms: 867.782292
+      type: 'test'
+      ...
+    # Subtest: P2-DERIVED-TIMEOUT: 57014 cancels derived work with versioned retry evidence while prior canonical score remains committed
+    not ok 13 - P2-DERIVED-TIMEOUT: 57014 cancels derived work with versioned retry evidence while prior canonical score remains committed
+      ---
+      duration_ms: 889.620291
+      type: 'test'
+      location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2-derived-proof.integration.test.mjs:36:36'
+      failureType: 'testCodeFailure'
+      error: |-
+        Values have same structure but are not reference-equal:
+        
+        {
+          holeNumber: 1,
+          holeRevision: 1,
+          matchRevision: 1,
+          mutationKey: '6e0895fe-b5fc-48fc-8e80-7929ed52eac7'
+        }
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+        holeNumber: 1
+        mutationKey: '6e0895fe-b5fc-48fc-8e80-7929ed52eac7'
+        holeRevision: 1
+        matchRevision: 1
+      actual:
+        holeNumber: 1
+        mutationKey: '6e0895fe-b5fc-48fc-8e80-7929ed52eac7'
+        holeRevision: 1
+        matchRevision: 1
+      operator: 'strictEqual'
+      stack: |-
+        file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2-derived-proof.integration.test.mjs:216:12
+        TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2-derived-proof.integration.test.mjs:38:26)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+        run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2-derived-proof.integration.test.mjs:36:36)
+        TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2-derived-proof.integration.test.mjs:199:9)
+        async Test.run (node:internal/test_runner/test:1404:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+      ...
+    # Subtest: P2-DERIVED-ACL: intent table and private helpers inaccessible to application/client roles
+    ok 14 - P2-DERIVED-ACL: intent table and private helpers inaccessible to application/client roles
+      ---
+      duration_ms: 667.740791
+      type: 'test'
+      ...
+    1..14
+not ok 1 - Phase2 durable derived intent behavioral proof
+  ---
+  duration_ms: 45420.641833
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2-derived-proof.integration.test.mjs:29:1'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 15
+# suites 0
+# pass 13
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 45526.033625

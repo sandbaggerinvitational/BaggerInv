@@ -1,0 +1,40 @@
+1 CALCUTTA_DUE {"with":{"indexes":["production_calcutta_v1_claim_queue"],"nodes":["Limit","LockRows","Incremental Sort","Index Scan"],"rowsRemoved":0,"rootHits":3,"rootReads":0,"executionMs":0.056},"without":{"indexes":["production_calcutta_v1_claim_queue"],"nodes":["Limit","LockRows","Incremental Sort","Index Scan"],"rowsRemoved":0,"rootHits":4,"rootReads":0,"executionMs":0.051}}
+1 CALCUTTA_DELAYED {"with":{"indexes":["production_calcutta_v1_claim_queue"],"nodes":["Limit","LockRows","Incremental Sort","Index Scan"],"rowsRemoved":1,"rootHits":3,"rootReads":0,"executionMs":0.044},"without":{"indexes":["production_calcutta_v1_claim_queue"],"nodes":["Limit","LockRows","Incremental Sort","Index Scan"],"rowsRemoved":1,"rootHits":3,"rootReads":0,"executionMs":0.038}}
+1 NET_SKINS_DUE {"with":{"indexes":["production_net_skins_v1_claim_queue"],"nodes":["Limit","LockRows","Index Scan"],"rowsRemoved":0,"rootHits":3,"rootReads":0,"executionMs":0.03},"without":{"indexes":["production_net_skins_v1_claim_queue"],"nodes":["Limit","LockRows","Index Scan"],"rowsRemoved":0,"rootHits":3,"rootReads":0,"executionMs":0.038}}
+1 NET_SKINS_DELAYED {"with":{"indexes":["production_net_skins_v1_claim_queue"],"nodes":["Limit","LockRows","Index Scan"],"rowsRemoved":2,"rootHits":2,"rootReads":0,"executionMs":0.026},"without":{"indexes":["production_net_skins_v1_claim_queue"],"nodes":["Limit","LockRows","Index Scan"],"rowsRemoved":2,"rootHits":2,"rootReads":0,"executionMs":0.024}}
+1 COMPETITION_DUE {"with":{"indexes":[],"nodes":["Seq Scan"],"rowsRemoved":23,"rootHits":1,"rootReads":0,"executionMs":0.018},"without":{"indexes":[],"nodes":["Seq Scan"],"rowsRemoved":23,"rootHits":1,"rootReads":0,"executionMs":0.017}}
+1 COMPETITION_DELAYED {"with":{"indexes":[],"nodes":["Seq Scan"],"rowsRemoved":25,"rootHits":2,"rootReads":0,"executionMs":0.018},"without":{"indexes":[],"nodes":["Seq Scan"],"rowsRemoved":25,"rootHits":2,"rootReads":0,"executionMs":0.018}}
+1 COMPETITION_TERMINAL_COUNT_DUE {"with":{"indexes":[],"nodes":["Limit","Seq Scan"],"rowsRemoved":25,"rootHits":3,"rootReads":0,"executionMs":0.016},"without":{"indexes":[],"nodes":["Limit","Seq Scan"],"rowsRemoved":25,"rootHits":3,"rootReads":0,"executionMs":0.017}}
+1 COMPETITION_TERMINAL_COUNT_TERMINAL {"with":{"indexes":[],"nodes":["Limit","Seq Scan"],"rowsRemoved":20,"rootHits":3,"rootReads":0,"executionMs":0.019},"without":{"indexes":[],"nodes":["Limit","Seq Scan"],"rowsRemoved":20,"rootHits":4,"rootReads":0,"executionMs":0.017}}
+file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54
+    const error = new Error([
+                  ^
+
+Error: /opt/homebrew/opt/postgresql@17/bin/psql
+ERROR:  trailing junk after numeric literal at or near "864then"
+LINE 3:     case when ordinal>864then 'DEAD_LETTER' else 'PENDING'en...
+                              ^
+
+    at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+    at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+    at query (file:///private/tmp/phase2c-optional-index-review.mjs:25:22)
+    at file:///private/tmp/phase2c-optional-index-review.mjs:78:24 {
+  result: {
+    status: 3,
+    signal: null,
+    output: [
+      null,
+      '',
+      'ERROR:  trailing junk after numeric literal at or near "864then"\n' +
+        "LINE 3:     case when ordinal>864then 'DEAD_LETTER' else 'PENDING'en...\n" +
+        '                              ^\n'
+    ],
+    pid: 75080,
+    stdout: '',
+    stderr: 'ERROR:  trailing junk after numeric literal at or near "864then"\n' +
+      "LINE 3:     case when ordinal>864then 'DEAD_LETTER' else 'PENDING'en...\n" +
+      '                              ^\n'
+  }
+}
+
+Node.js v26.7.0

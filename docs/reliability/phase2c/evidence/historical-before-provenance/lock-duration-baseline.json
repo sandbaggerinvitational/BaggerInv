@@ -1,0 +1,359 @@
+{
+  "schemaVersion": 1,
+  "mode": "baseline",
+  "generatedAt": "2026-09-28T15:57:34.091Z",
+  "fixtureVersion": "bagger-r139-synthetic-history-v1+phase2-eligible-history-v2",
+  "seed": "2026-never-again-139",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "phase2MigrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+  "statementTimeoutMs": 1000,
+  "environment": "LOCAL_SOCKET_ONLY_POSTGRESQL17",
+  "samplesPerBranch": 100,
+  "production": false,
+  "method": "Test-only timestamp after actual match FOR UPDATE and successful FOUND check; database clock at RPC return gives lock-hold lower bound. Persistent local session BEGIN/RPC/ROLLBACK wall time gives whole-transaction upper bound. No other source replacement.",
+  "limitations": [
+    "Additional clock/set_config instrumentation has nonzero overhead; not directly comparable to uninstrumented benchmark.",
+    "No COMMIT fsync/durable storage; rollback transaction.",
+    "Lock released after result and rollback, so measured database lock portion is a lower bound; transaction wall includes socket and client work.",
+    "p99 not proven at n100 per branch; no hosted authority or provider-capacity inference."
+  ],
+  "rows": [
+    {
+      "scale": 1,
+      "variant": "none",
+      "canonicalRollbackDigestVerified": true,
+      "successCount": 100,
+      "failureCount": 0,
+      "transactionWallUpperBound": {
+        "samples": 100,
+        "p50Ms": 0.6747919999997976,
+        "p95Ms": 1.1112919999995938,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.82287499999984,
+        "minMs": 0.6222920000000158
+      },
+      "databaseRpc": {
+        "samples": 100,
+        "p50Ms": 0.569,
+        "p95Ms": 0.948,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.655,
+        "minMs": 0.525
+      },
+      "lockHeldThroughRpcLowerBound": {
+        "samples": 100,
+        "p50Ms": 0.533,
+        "p95Ms": 0.897,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.195,
+        "minMs": 0.493
+      }
+    },
+    {
+      "scale": 1,
+      "variant": "multiple_receipts",
+      "canonicalRollbackDigestVerified": true,
+      "successCount": 100,
+      "failureCount": 0,
+      "transactionWallUpperBound": {
+        "samples": 100,
+        "p50Ms": 0.6473750000004657,
+        "p95Ms": 0.8748340000001917,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.4402909999989788,
+        "minMs": 0.6100000000005821
+      },
+      "databaseRpc": {
+        "samples": 100,
+        "p50Ms": 0.55,
+        "p95Ms": 0.736,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.321,
+        "minMs": 0.525
+      },
+      "lockHeldThroughRpcLowerBound": {
+        "samples": 100,
+        "p50Ms": 0.515,
+        "p95Ms": 0.701,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.07,
+        "minMs": 0.491
+      }
+    },
+    {
+      "scale": 2,
+      "variant": "none",
+      "canonicalRollbackDigestVerified": true,
+      "successCount": 100,
+      "failureCount": 0,
+      "transactionWallUpperBound": {
+        "samples": 100,
+        "p50Ms": 0.6576249999998254,
+        "p95Ms": 0.8473749999975553,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 2.2792499999995925,
+        "minMs": 0.6159580000021379
+      },
+      "databaseRpc": {
+        "samples": 100,
+        "p50Ms": 0.557,
+        "p95Ms": 0.73,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 2.154,
+        "minMs": 0.525
+      },
+      "lockHeldThroughRpcLowerBound": {
+        "samples": 100,
+        "p50Ms": 0.52,
+        "p95Ms": 0.676,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.049,
+        "minMs": 0.49
+      }
+    },
+    {
+      "scale": 2,
+      "variant": "multiple_receipts",
+      "canonicalRollbackDigestVerified": true,
+      "successCount": 100,
+      "failureCount": 0,
+      "transactionWallUpperBound": {
+        "samples": 100,
+        "p50Ms": 0.664082999999664,
+        "p95Ms": 0.8867500000014843,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.4343750000007276,
+        "minMs": 0.6066670000000158
+      },
+      "databaseRpc": {
+        "samples": 100,
+        "p50Ms": 0.564,
+        "p95Ms": 0.736,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.288,
+        "minMs": 0.519
+      },
+      "lockHeldThroughRpcLowerBound": {
+        "samples": 100,
+        "p50Ms": 0.528,
+        "p95Ms": 0.681,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.065,
+        "minMs": 0.486
+      }
+    },
+    {
+      "scale": 5,
+      "variant": "none",
+      "canonicalRollbackDigestVerified": true,
+      "successCount": 100,
+      "failureCount": 0,
+      "transactionWallUpperBound": {
+        "samples": 100,
+        "p50Ms": 0.9422499999927823,
+        "p95Ms": 1.4035420000000158,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 2.31866699999955,
+        "minMs": 0.7089169999962905
+      },
+      "databaseRpc": {
+        "samples": 100,
+        "p50Ms": 0.813,
+        "p95Ms": 1.261,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 2.113,
+        "minMs": 0.622
+      },
+      "lockHeldThroughRpcLowerBound": {
+        "samples": 100,
+        "p50Ms": 0.766,
+        "p95Ms": 1.22,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.678,
+        "minMs": 0.584
+      }
+    },
+    {
+      "scale": 5,
+      "variant": "multiple_receipts",
+      "canonicalRollbackDigestVerified": true,
+      "successCount": 100,
+      "failureCount": 0,
+      "transactionWallUpperBound": {
+        "samples": 100,
+        "p50Ms": 0.6789169999974547,
+        "p95Ms": 0.8574999999982538,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.7072499999922002,
+        "minMs": 0.6390410000021802
+      },
+      "databaseRpc": {
+        "samples": 100,
+        "p50Ms": 0.587,
+        "p95Ms": 0.731,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.592,
+        "minMs": 0.551
+      },
+      "lockHeldThroughRpcLowerBound": {
+        "samples": 100,
+        "p50Ms": 0.551,
+        "p95Ms": 0.69,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.129,
+        "minMs": 0.52
+      }
+    },
+    {
+      "scale": 10,
+      "variant": "none",
+      "canonicalRollbackDigestVerified": true,
+      "successCount": 100,
+      "failureCount": 0,
+      "transactionWallUpperBound": {
+        "samples": 100,
+        "p50Ms": 0.649790999974357,
+        "p95Ms": 1.0819579999952111,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 2.0694169999915175,
+        "minMs": 0.6201669999863952
+      },
+      "databaseRpc": {
+        "samples": 100,
+        "p50Ms": 0.566,
+        "p95Ms": 0.968,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.932,
+        "minMs": 0.535
+      },
+      "lockHeldThroughRpcLowerBound": {
+        "samples": 100,
+        "p50Ms": 0.533,
+        "p95Ms": 0.918,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.433,
+        "minMs": 0.503
+      }
+    },
+    {
+      "scale": 10,
+      "variant": "multiple_receipts",
+      "canonicalRollbackDigestVerified": true,
+      "successCount": 100,
+      "failureCount": 0,
+      "transactionWallUpperBound": {
+        "samples": 100,
+        "p50Ms": 0.8818749999918509,
+        "p95Ms": 1.2634590000088792,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 2.0083750000048894,
+        "minMs": 0.6645000000135042
+      },
+      "databaseRpc": {
+        "samples": 100,
+        "p50Ms": 0.738,
+        "p95Ms": 1.123,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.787,
+        "minMs": 0.585
+      },
+      "lockHeldThroughRpcLowerBound": {
+        "samples": 100,
+        "p50Ms": 0.693,
+        "p95Ms": 1.077,
+        "p99Ms": null,
+        "p99Status": "INSUFFICIENT_SAMPLE",
+        "maxMs": 1.619,
+        "minMs": 0.551
+      }
+    }
+  ],
+  "environmentDetails": {
+    "scope": "LOCAL_SOCKET_ONLY",
+    "databaseVersion": "17.11 (Homebrew)",
+    "host": {
+      "platform": "darwin",
+      "architecture": "arm64",
+      "osRelease": "25.5.0",
+      "nodeVersion": "v26.7.0",
+      "cpuModel": "Apple M5",
+      "logicalCpus": 10,
+      "totalMemoryBytes": 17179869184
+    },
+    "databaseSettings": {
+      "jit": "on",
+      "fsync": "off",
+      "work_mem": "4MB",
+      "shared_buffers": "32MB",
+      "max_connections": "20",
+      "synchronous_commit": "on"
+    },
+    "resourceUtilization": {
+      "cpu": null,
+      "memory": null,
+      "io": null,
+      "connections": null,
+      "status": "UNAVAILABLE_NOT_SAMPLED"
+    },
+    "initialResourceSnapshot": {
+      "observedAt": "2026-09-28T15:57:35.830Z",
+      "hostLoadAverage": [
+        4.40283203125,
+        4.2119140625,
+        3.98388671875
+      ],
+      "hostFreeMemoryBytes": 264060928,
+      "database": {
+        "commits": 301,
+        "backends": 1,
+        "blocksHit": 723276,
+        "deadlocks": 0,
+        "rollbacks": 0,
+        "sizeBytes": 31798963,
+        "blocksRead": 441,
+        "statsReset": null,
+        "trackIoTiming": "off",
+        "temporaryBytes": 0,
+        "blockReadTimeMs": 0,
+        "blockWriteTimeMs": 0
+      },
+      "limitations": [
+        "Cumulative database counters can lag; no subtraction across databases.",
+        "Block counters are PostgreSQL buffer activity, not physical storage IOPS.",
+        "Host load and free memory include unrelated processes; no database CPU or peak memory claim.",
+        "Zero I/O time with track_io_timing off means unavailable, not zero physical I/O."
+      ]
+    },
+    "limitations": [
+      "Unshared local host was not guaranteed; unrelated host processes may introduce noise.",
+      "This is not a Supabase compute tier or Production capacity measurement.",
+      "ROLLBACK samples exclude durable COMMIT/fsync latency and live network transport."
+    ],
+    "statementTimeout": "0",
+    "lockTimeout": "0"
+  }
+}

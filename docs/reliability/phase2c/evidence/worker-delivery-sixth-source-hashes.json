@@ -1,0 +1,13 @@
+{
+  "proof": "SOURCE_HASHES_FOR_SIXTH_DELIVERY_RUN_AND_PENDING_HISTORY",
+  "sha256": {
+    "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql": "6cee536d12a93d53e6a585784a3b316bdaffbcb24c76d32060a898e83a459eee",
+    "lib/score-derived-worker.js": "3759163ab16a8bbf4a10c698bc062987b9002a35c575ffc6452c9ad709822fe2",
+    "lib/score-derived-delivery.js": "02d37d0b793b1ed432f317c4b9a1df71067d476cbf24ee915f3efa5faf944228",
+    "tools/reliability/run-score-derived-worker.mjs": "65f7ab486d4a7404b1003d180cb08f91405ea3dca518c2f3cdaf27eec3c1e9db",
+    "test/support/reliability/phase2c-worker.mjs": "ddf547a4e22eb7d9529ca81f30498031bee5d803d1d7c9a7071425c9a3d93e69",
+    "test/support/reliability/phase2c-worker-child.mjs": "94129852a0d3d901755d96df82b1b1f7d33af5683a6a0989c74870ba6df5ec27",
+    "test/reliability-phase2c-worker.test.mjs": "a99800b3541b85be2b05f9f80d8a03c961f496be0c1601aee835e110fb05e041",
+    "test/reliability-phase2c-worker-history.test.mjs": "46965190f6c52537d49aea511e3bc4598bfba840e4b3a397300e11b56502bd94"
+  }
+}

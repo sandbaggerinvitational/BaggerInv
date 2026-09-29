@@ -1,0 +1,2297 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-29T22:00:12.846211+00:00",
+  "status": "PARTIAL",
+  "columns": [
+    "SOURCE",
+    "UNIT",
+    "POSTGRESQL",
+    "RPC/API",
+    "INTEGRATION",
+    "PERFORMANCE",
+    "FAILURE INJECTION",
+    "CONCURRENCY",
+    "RELEASE COMPATIBILITY",
+    "HOSTED NON-PRODUCTION",
+    "PRODUCTION",
+    "PHYSICAL"
+  ],
+  "rows": [
+    {
+      "capability": "post-revocation recovery",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/recovery.json",
+        "docs/reliability/phase2c/evidence/recovery-proof.json",
+        "docs/reliability/phase2c/benchmark-candidate-recovery.json",
+        "docs/reliability/phase2c/evidence/phase2c-unit.json"
+      ],
+      "exactCases": [
+        "P2C-A-LOCK-BB",
+        "P2C-A-LOCK-SC",
+        "P2C-A-LOCK-SI",
+        "P2C-A-FINAL-BB",
+        "P2C-A-FINAL-SC",
+        "P2C-A-FINAL-SI",
+        "P2C-A-ROUND-LOCK",
+        "P2C-A-NO-WRITE-LOCK",
+        "P2C-A-PROCESS-RESTART",
+        "P2C-A-FINAL-BB/SC/SI: actual PWA final-hole timeout, Finalize, actual status handler COMMITTED, actual PWA new write denied",
+        "P2C-F-MOBILE-BB/SC/SI: actual conflict and blocked canonical RPC57014 mapped by existing mobile error response; Swift CONFLICT_ERROR/SQL_TIMEOUT_ERROR"
+      ],
+      "limitations": [
+        "Four-scale lookup timing requires supported SCORING_LOCK with LIVE+locked state and zero active permissions; every timed response is COMMITTED. Finalize timing is not separately measured. Release transition has its own row. Currentvalididentity required; absent/legacy remainUNKNOWN; immutable receipt is not current corrected hole.",
+        "The current unchanged mobile backend maps actual SQL57014 to generic INTERNAL_ERROR. Decoder compatibility does not improve that error semantics or implement client recovery UI. New status endpoint remains unused by shipping Build10."
+      ],
+      "finalAdjudicationRequired": false,
+      "unitScope": "Named recovery request/identity/projection/handler tests execute with explicit provider test doubles. This UNIT result does not prove hosted Auth or PostgreSQL authority.",
+      "rpcApiScope": "Actual additive recovery handler for its named response/denial cases, with injected identity/provider transport and real local SQL where the integration case states it. Other listed control/scoring operations are SQL RPCs; no hosted HTTP/Auth proof.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "PASS",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "PASS",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "PASS",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery.json",
+          "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery-proof.json",
+          "sha256": "72d034513cf1f7de8f717717671e49de55904523e2eace43eda2cf3df0a74a11",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/recovery.json",
+          "producerSha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3"
+        },
+        {
+          "path": "docs/reliability/phase2c/benchmark-candidate-recovery.json",
+          "sha256": "c2a64c76e17523d8d61eb70509f30539a6162582c1993ea962711bccbb52953e",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/phase2c-unit.json",
+          "sha256": "828120598561f16c060ee9d2f58d38dbb309fd3fdf57b144604c7c3381598fbc",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        }
+      ]
+    },
+    {
+      "capability": "recovery authorization",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/recovery.json",
+        "docs/reliability/phase2c/evidence/recovery-proof.json",
+        "docs/reliability/phase2c/evidence/phase2c-unit.json"
+      ],
+      "exactCases": [
+        "P2C-A-ORIGIN",
+        "P2C-A-ENUMERATION",
+        "P2C-A-DENY-UNLINK",
+        "P2C-A-DENY-UNVERIFY",
+        "P2C-A-DENY-ROLE_REVOKE",
+        "P2C-A-SPOOF",
+        "P2C-A-REASSIGNED",
+        "P2C-A-DELETED",
+        "P2C-A-ACL",
+        "P2C-A-RUNTIME"
+      ],
+      "limitations": [
+        "AuthenticatedUUID is validated by injected local identity transport and bound atomically in actualSQL. HostedAuth is not proven; service_role retains existing trusted receiptSELECT boundary."
+      ],
+      "finalAdjudicationRequired": false,
+      "unitScope": "Named recovery request/identity/projection/handler tests execute with explicit provider test doubles. This UNIT result does not prove hosted Auth or PostgreSQL authority.",
+      "rpcApiScope": "Actual additive recovery handler for its named response/denial cases, with injected identity/provider transport and real local SQL where the integration case states it. Other listed control/scoring operations are SQL RPCs; no hosted HTTP/Auth proof.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "PASS",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "N/A",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery.json",
+          "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery-proof.json",
+          "sha256": "72d034513cf1f7de8f717717671e49de55904523e2eace43eda2cf3df0a74a11",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/recovery.json",
+          "producerSha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/phase2c-unit.json",
+          "sha256": "828120598561f16c060ee9d2f58d38dbb309fd3fdf57b144604c7c3381598fbc",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        }
+      ]
+    },
+    {
+      "capability": "recovery enumeration protection",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/recovery.json",
+        "docs/reliability/phase2c/evidence/recovery-proof.json",
+        "docs/reliability/phase2c/evidence/phase2c-unit.json"
+      ],
+      "exactCases": [
+        "P2C-A-ENUMERATION",
+        "P2C-A-SPOOF",
+        "P2C-A-REASSIGNED"
+      ],
+      "limitations": [
+        "Response-shape nondisclosure proved; no timing side-channel experiment or Production traffic proof."
+      ],
+      "finalAdjudicationRequired": false,
+      "unitScope": "Named recovery request/identity/projection/handler tests execute with explicit provider test doubles. This UNIT result does not prove hosted Auth or PostgreSQL authority.",
+      "rpcApiScope": "Actual additive recovery handler for its named response/denial cases, with injected identity/provider transport and real local SQL where the integration case states it. Other listed control/scoring operations are SQL RPCs; no hosted HTTP/Auth proof.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "PASS",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "NOT PROVEN",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "N/A",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery.json",
+          "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery-proof.json",
+          "sha256": "72d034513cf1f7de8f717717671e49de55904523e2eace43eda2cf3df0a74a11",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/recovery.json",
+          "producerSha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/phase2c-unit.json",
+          "sha256": "828120598561f16c060ee9d2f58d38dbb309fd3fdf57b144604c7c3381598fbc",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        }
+      ]
+    },
+    {
+      "capability": "autonomous pickup",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/delivery.json",
+        "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+        "docs/reliability/phase2c/evidence/worker-history.json"
+      ],
+      "exactCases": [
+        "autonomous-after-commit",
+        "121-pending-upgrade"
+      ],
+      "limitations": [
+        "Actual child worker with real localSQL and untouched calculators. Hosted supervisor/cron not installed. Worker warm timing samples do not establish p95/p99.",
+        "Worker-history timing/runtime covers all32 scale/receipt branches. Nested plans are captured only for tick/competitionTick/claim at1\u00d7/10\u00d7 across all8 variants (48 core captures); final-ready/index counterfactuals only none1\u00d7/10\u00d7. The16 intermediate2\u00d7/5\u00d7 rows are timing-only with plans:null. No intermediate-scale plan proof or worker p95/p99 is inferred.",
+        "No Google reporting outbox or scorecard archive autonomous delivery, terminal/requeue, provider transport, or full-queue emptiness follows from this row."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "PASS",
+        "FAILURE INJECTION": "N/A",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery.json",
+          "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+          "sha256": "6fa44774080a25e1ee0a07f975283bb3b7104f12d5ecacb29c1cac2cf0fdd02b",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/delivery.json",
+          "producerSha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-history.json",
+          "sha256": "d31c74e44e2e73aa506a8e43a56a5b1af4d38c2b7cec9660e6e32bad5fed2633",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        }
+      ],
+      "automaticDeliveryFamilies": [
+        "CALCUTTA",
+        "COMPETITION",
+        "INTELLIGENCE"
+      ],
+      "scope": "Named cases only; automatic delivery claims apply only to Calcutta, Competition and Intelligence."
+    },
+    {
+      "capability": "worker restart",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/delivery.json",
+        "docs/reliability/phase2c/evidence/worker-delivery-results.json"
+      ],
+      "exactCases": [
+        "crash-lease-restart",
+        "competition-claim-crash-restart",
+        "intelligence-claim-crash-restart",
+        "calcutta-during-calculation-process-death",
+        "calcutta-before-completion-process-death",
+        "calcutta-after-result-write-process-death",
+        "competition-during-calculation-process-death",
+        "competition-before-completion-process-death",
+        "competition-after-result-write-process-death",
+        "intelligence-during-calculation-process-death",
+        "intelligence-before-completion-process-death",
+        "intelligence-after-result-write-process-death"
+      ],
+      "limitations": [
+        "Process restart/lease recovery; some lease expiry is deliberately expedited in the fixture. Not provider restart or fsync disaster recovery.",
+        "Nine literal child process deaths supplement the original after-claim cases: SIGKILL during actual calculation and before completion; exit77 after committed result. During-calculation proof inserts one source-hashed test-only barrier after a real calculation step; original shipping files are not changed. Same logical delivery cycle and exact current result recovery are required.",
+        "No Google reporting outbox or scorecard archive autonomous delivery, terminal/requeue, provider transport, or full-queue emptiness follows from this row."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery.json",
+          "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+          "sha256": "6fa44774080a25e1ee0a07f975283bb3b7104f12d5ecacb29c1cac2cf0fdd02b",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/delivery.json",
+          "producerSha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787"
+        }
+      ],
+      "automaticDeliveryFamilies": [
+        "CALCUTTA",
+        "COMPETITION",
+        "INTELLIGENCE"
+      ],
+      "scope": "Named cases only; automatic delivery claims apply only to Calcutta, Competition and Intelligence."
+    },
+    {
+      "capability": "worker crash",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/delivery.json",
+        "docs/reliability/phase2c/evidence/worker-delivery-results.json"
+      ],
+      "exactCases": [
+        "crash-lease-restart",
+        "competition-claim-crash-restart",
+        "intelligence-claim-crash-restart",
+        "activation-atomic-late-completion",
+        "calcutta-during-calculation-process-death",
+        "calcutta-before-completion-process-death",
+        "calcutta-after-result-write-process-death",
+        "competition-during-calculation-process-death",
+        "competition-before-completion-process-death",
+        "competition-after-result-write-process-death",
+        "intelligence-during-calculation-process-death",
+        "intelligence-before-completion-process-death",
+        "intelligence-after-result-write-process-death"
+      ],
+      "limitations": [
+        "Actualchild crash plus transactional activation rollback. No claim about every uninstrumented instruction boundary.",
+        "Nine literal child process deaths supplement the original after-claim cases: SIGKILL during actual calculation and before completion; exit77 after committed result. During-calculation proof inserts one source-hashed test-only barrier after a real calculation step; original shipping files are not changed. Same logical delivery cycle and exact current result recovery are required.",
+        "No Google reporting outbox or scorecard archive autonomous delivery, terminal/requeue, provider transport, or full-queue emptiness follows from this row."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "NOT PROVEN",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery.json",
+          "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+          "sha256": "6fa44774080a25e1ee0a07f975283bb3b7104f12d5ecacb29c1cac2cf0fdd02b",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/delivery.json",
+          "producerSha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787"
+        }
+      ],
+      "automaticDeliveryFamilies": [
+        "CALCUTTA",
+        "COMPETITION",
+        "INTELLIGENCE"
+      ],
+      "scope": "Named cases only; automatic delivery claims apply only to Calcutta, Competition and Intelligence."
+    },
+    {
+      "capability": "retry/backoff",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/delivery.json",
+        "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+        "docs/reliability/phase2c/evidence/full-sequence.json",
+        "docs/reliability/phase2c/full-sequence-results.json",
+        "docs/reliability/phase2c/evidence/worker-failure-lock-order.json",
+        "docs/reliability/phase2c/evidence/worker-failure-lock-after.json"
+      ],
+      "exactCases": [
+        "actual57014-durable-budget",
+        "calcutta-five-attempt-budget",
+        "competition-five-attempt-budget",
+        "intelligence-five-attempt-budget",
+        "WORKER_TRANSIENT_40P01",
+        "expiry-update \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "bundle-failure \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "preclaim-skip-locked \u00d7 SCORING_LOCK/FINALIZE (unchanged counterevidence)",
+        "future-expiry/future-intelligence \u00d7 actual installed match-control trigger \u00d7 before/after"
+      ],
+      "limitations": [
+        "Fullsequence40P01 is an actualSQLSTATE raised at claim, not another real lock-cycle reproduction. Five durable attempts/backoff, logical identity retained.",
+        "Expiry and bundle failure ordering has six actual before-cycle/after-success pairs; unchanged preclaim SKIP LOCKED is counterevidence. Future2099 workers execute the full function with an outer runtime seam and installed trigger DML, not protected annual Director RPC. The broader expiry predicate-preservation check is SOURCE evidence.",
+        "No Google reporting outbox or scorecard archive autonomous delivery, terminal/requeue, provider transport, or full-queue emptiness follows from this row."
+      ],
+      "finalAdjudicationRequired": false,
+      "unitScope": "classifyDerivedFailure handles actual known code values, including40P01; deterministic global tick and optional exporter tests use injected processors. Durable SQL retry is separate integration evidence.",
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "PASS",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "NOT PROVEN",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery.json",
+          "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+          "sha256": "6fa44774080a25e1ee0a07f975283bb3b7104f12d5ecacb29c1cac2cf0fdd02b",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/delivery.json",
+          "producerSha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/full-sequence.json",
+          "sha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/full-sequence-results.json",
+          "sha256": "5d977f60b2b5e21548b053613290cc964eae112c054f883d871e6f91d56d954c",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/full-sequence.json",
+          "producerSha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-failure-lock-order.json",
+          "sha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-failure-lock-after.json",
+          "sha256": "896fa50dba80cdd4228823556a01571b2a8e0633d3dd5755b7ffed653458e13e",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/worker-failure-lock-order.json",
+          "producerSha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18"
+        }
+      ],
+      "automaticDeliveryFamilies": [
+        "CALCUTTA",
+        "COMPETITION",
+        "INTELLIGENCE"
+      ],
+      "scope": "Named cases only; automatic delivery claims apply only to Calcutta, Competition and Intelligence."
+    },
+    {
+      "capability": "dead letter",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/delivery.json",
+        "docs/reliability/phase2c/evidence/worker-delivery-results.json"
+      ],
+      "exactCases": [
+        "actual57014-durable-budget",
+        "calcutta-five-attempt-budget",
+        "competition-five-attempt-budget",
+        "intelligence-five-attempt-budget"
+      ],
+      "limitations": [
+        "Deadletter visibility/attempt limits; noautomaticfinancialpublication.",
+        "No Google reporting outbox or scorecard archive autonomous delivery, terminal/requeue, provider transport, or full-queue emptiness follows from this row."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "N/A",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery.json",
+          "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+          "sha256": "6fa44774080a25e1ee0a07f975283bb3b7104f12d5ecacb29c1cac2cf0fdd02b",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/delivery.json",
+          "producerSha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787"
+        }
+      ],
+      "automaticDeliveryFamilies": [
+        "CALCUTTA",
+        "COMPETITION",
+        "INTELLIGENCE"
+      ],
+      "scope": "Named cases only; automatic delivery claims apply only to Calcutta, Competition and Intelligence."
+    },
+    {
+      "capability": "dead-letter recovery",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/delivery.json",
+        "docs/reliability/phase2c/evidence/worker-delivery-results.json"
+      ],
+      "exactCases": [
+        "deterministic-terminal-exact-requeue",
+        "all-family-requeue-delivery",
+        "terminal-compatible-activation-requeue"
+      ],
+      "limitations": [
+        "Exactscope/generation/source validated service-controlled retry; noDirectorUI built.",
+        "No Google reporting outbox or scorecard archive autonomous delivery, terminal/requeue, provider transport, or full-queue emptiness follows from this row."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "N/A",
+        "RELEASE COMPATIBILITY": "PASS",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery.json",
+          "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+          "sha256": "6fa44774080a25e1ee0a07f975283bb3b7104f12d5ecacb29c1cac2cf0fdd02b",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/delivery.json",
+          "producerSha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787"
+        }
+      ],
+      "automaticDeliveryFamilies": [
+        "CALCUTTA",
+        "COMPETITION",
+        "INTELLIGENCE"
+      ],
+      "scope": "Named cases only; automatic delivery claims apply only to Calcutta, Competition and Intelligence."
+    },
+    {
+      "capability": "duplicate delivery",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/delivery.json",
+        "docs/reliability/phase2c/evidence/worker-delivery-results.json"
+      ],
+      "exactCases": [
+        "unknown-completion-ack",
+        "competition-completion-ack-loss",
+        "intelligence-completion-ack-loss",
+        "two-workers"
+      ],
+      "limitations": [
+        "Duplicate processing and lost completion acknowledgement preserve current authority; not duplicate public financial revisions.",
+        "No Google reporting outbox or scorecard archive autonomous delivery, terminal/requeue, provider transport, or full-queue emptiness follows from this row."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "PASS",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery.json",
+          "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+          "sha256": "6fa44774080a25e1ee0a07f975283bb3b7104f12d5ecacb29c1cac2cf0fdd02b",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/delivery.json",
+          "producerSha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787"
+        }
+      ],
+      "automaticDeliveryFamilies": [
+        "CALCUTTA",
+        "COMPETITION",
+        "INTELLIGENCE"
+      ],
+      "scope": "Named cases only; automatic delivery claims apply only to Calcutta, Competition and Intelligence."
+    },
+    {
+      "capability": "out-of-order delivery",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/delivery.json",
+        "docs/reliability/phase2c/evidence/worker-delivery-results.json"
+      ],
+      "exactCases": [
+        "competition-late-writer-current-pointer",
+        "intelligence-late-writer-current-pointer",
+        "competition-before-write",
+        "intelligence-correction-before-write"
+      ],
+      "limitations": [
+        "Actual old claim/write held, supported correction and newer current result complete, then oldcompletion denied; finite representative interleavings.",
+        "No Google reporting outbox or scorecard archive autonomous delivery, terminal/requeue, provider transport, or full-queue emptiness follows from this row."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "PASS",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery.json",
+          "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+          "sha256": "6fa44774080a25e1ee0a07f975283bb3b7104f12d5ecacb29c1cac2cf0fdd02b",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/delivery.json",
+          "producerSha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787"
+        }
+      ],
+      "automaticDeliveryFamilies": [
+        "CALCUTTA",
+        "COMPETITION",
+        "INTELLIGENCE"
+      ],
+      "scope": "Named cases only; automatic delivery claims apply only to Calcutta, Competition and Intelligence."
+    },
+    {
+      "capability": "backlog drain",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/backlog-pressure.json",
+        "docs/reliability/phase2c/evidence/backlog-pressure-results.json",
+        "docs/reliability/phase2c/evidence/backlog-tail.json",
+        "docs/reliability/phase2c/evidence/backlog-tail-results.json"
+      ],
+      "exactCases": [
+        "P2C-B-BACKLOG:normal_round_burst",
+        "P2C-B-BACKLOG:six_hole_larger_backlog",
+        "P2C-B-BACKLOG-TAIL: normal and larger repeated bursts, at least1000 actual accepted score samples/profile qualified by pending automatic demand before RPC; measured lock-through-RPC lower/autocommit upper bounds"
+      ],
+      "limitations": [
+        "18/108intents with12continuedscores per case. Locks/connections are sampled snapshots, not exact lifetime maxima or CPU/IO. No12samplep99.",
+        "\u00a727scoretails and lockbounds duringdrain require the separately named final-review backlogLoadIsolation artifacts; these are not inferred from the12-score sample.",
+        "No Google reporting outbox or scorecard archive autonomous delivery, terminal/requeue, provider transport, or full-queue emptiness follows from this row."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "PASS",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "PASS",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/backlog-pressure.json",
+          "sha256": "3535067952bedac3f5e9d5d16fb020c566efa87f27173f9bef4603e4ea4105af",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/backlog-pressure-results.json",
+          "sha256": "fd03ce1c7776d9a6022226a08dc88a7f2763353c1a993267264afab2f2b254d9",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/backlog-pressure.json",
+          "producerSha256": "3535067952bedac3f5e9d5d16fb020c566efa87f27173f9bef4603e4ea4105af"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/backlog-tail.json",
+          "sha256": "d88b45611824dead8efb6046d42a696e153f7070f96383c8eb67524b4c175ba2",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/backlog-tail-results.json",
+          "sha256": "69ffc41bbb26ec8632db5ebf02d90868ba594867589b4798923c847e055727cf",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/backlog-tail.json",
+          "producerSha256": "d88b45611824dead8efb6046d42a696e153f7070f96383c8eb67524b4c175ba2"
+        }
+      ],
+      "automaticDeliveryFamilies": [
+        "CALCUTTA",
+        "COMPETITION",
+        "INTELLIGENCE"
+      ],
+      "scope": "Named cases only; automatic delivery claims apply only to Calcutta, Competition and Intelligence."
+    },
+    {
+      "capability": "score isolation",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/delivery.json",
+        "docs/reliability/phase2c/evidence/canonical.json",
+        "docs/reliability/phase2c/evidence/derived.json",
+        "docs/reliability/phase2c/evidence/backlog-pressure.json"
+      ],
+      "exactCases": [
+        "calcutta-failure-isolation",
+        "competition-failure-isolation",
+        "intelligence-failure-isolation",
+        "P2-ATOMIC-AFTER_OUTBOX",
+        "P2C-D-SCORING"
+      ],
+      "limitations": [
+        "Normal score commits minimaldurableintent. Standalone Lock/Finalize retain synchronous derivedhooks; this row does not claim round-control isolation.",
+        "No Google reporting outbox or scorecard archive autonomous delivery, terminal/requeue, provider transport, or full-queue emptiness follows from this row."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "PASS",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "PASS",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery.json",
+          "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/canonical.json",
+          "sha256": "d2cad26397bf031988ac1af8391eaca5a745e8bc3624a7c9ad9ce16a4324036f",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/derived.json",
+          "sha256": "f7587daad3a7ed4b6c694edb13d9d0b501ca62ea92d4722651f537c818e31f84",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/backlog-pressure.json",
+          "sha256": "3535067952bedac3f5e9d5d16fb020c566efa87f27173f9bef4603e4ea4105af",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        }
+      ],
+      "automaticDeliveryFamilies": [
+        "CALCUTTA",
+        "COMPETITION",
+        "INTELLIGENCE"
+      ],
+      "scope": "Named cases only; automatic delivery claims apply only to Calcutta, Competition and Intelligence."
+    },
+    {
+      "capability": "annual worker SQL",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/annual.json",
+        "docs/reliability/phase2c/evidence/annual-workers.json",
+        "docs/reliability/phase2c/evidence/annual-worker-branch-matrix.json"
+      ],
+      "exactCases": [
+        "all14 corrected effectivefunctions exactbranchmap"
+      ],
+      "limitations": [
+        "All14 initializers plus applicable branch states. Focused fixtures declare admission substitutions; real protectedannual admission is separate. Not every unchanged annualservicefunction.",
+        "annual-worker-branch-matrix.json is an engineering coverage index linked to passing C/B case identities. It must be transparently refreshed for the final manifest; it is not itself an independently executed or cryptographically signed runtime receipt."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "The14 listed effective PostgreSQL functions execute through the isolatedSQL harness; some are private frozen cores or future implementation functions. This PASS means those exact SQL entry points and applicable wrappers, not an HTTP API for all14.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "NOT PROVEN",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/annual.json",
+          "sha256": "d54a12f7b8fe717791c8fd60a10f21ef01eb70765c99f2b9b4bc3f3c29db1c7e",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/annual-workers.json",
+          "sha256": "5104e402498673fef5f6e697d47f9bf6a8f23018bc878310885d000825ffec78",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/annual.json",
+          "producerSha256": "d54a12f7b8fe717791c8fd60a10f21ef01eb70765c99f2b9b4bc3f3c29db1c7e"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/annual-worker-branch-matrix.json",
+          "sha256": "c164163faa1f11f6c39b61d6db142442aa083e2cf4207ee26914bbc3d30d72b5",
+          "kind": "ENGINEERING_COVERAGE_INDEX_NOT_RUNTIME_RECEIPT"
+        }
+      ]
+    },
+    {
+      "capability": "future-year worker",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/annual-admission-run.json",
+        "docs/reliability/phase2c/evidence/annual-admission-detail.json",
+        "docs/reliability/phase2c/evidence/annual-history.json"
+      ],
+      "exactCases": [
+        "real2099certifiedruntime",
+        "acceptedscore\u2192DirectorLock\u2192ownedrecovery",
+        "compatibleactivationsequence4",
+        "fourhistoryscales320samples"
+      ],
+      "limitations": [
+        "RealSQLmanifest/activation/tournament/read/write guards, synthetic identities/data, no providerAuth. History samples20/cell no crediblep99.",
+        "The autonomous child/process and all-family result proofs primarily use2026 fixtures. Their success is not transferred to every protected2099 calculator/completion or financial branch.",
+        "No Google reporting outbox or scorecard archive autonomous delivery, terminal/requeue, provider transport, or full-queue emptiness follows from this row."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "Actual protected annual SQL dispatcher and nested original guards, with synthetic generation/certification/identity records. No annual HTTP handler, external Google call or hosted provisioning flow.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "scope": "Protected2099 read/write/worker admission, one Singles accepted score plus replay/Lock/recovery, actual worker dispatch and compatible SQL release transition; not a full future-year financial lifecycle.; automatic delivery claims apply only to Calcutta, Competition and Intelligence.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "PASS",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "PASS",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/annual-admission-run.json",
+          "sha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/annual-admission-detail.json",
+          "sha256": "24b61df24bbcd0526740ced2f212bea1386138e98394a84bc412d54dedc177b2",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/annual-admission-run.json",
+          "producerSha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/annual-history.json",
+          "sha256": "9bf694a6a9d42a187f5f8b607baf93c39d0b0d32dabb5a759d7c47a45dfca5a9",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/annual-admission-run.json",
+          "producerSha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d"
+        }
+      ],
+      "automaticDeliveryFamilies": [
+        "CALCUTTA",
+        "COMPETITION",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "capability": "Net Skins deadlock prevention",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/deadlock.json",
+        "docs/reliability/phase2c/evidence/net-skins-deadlock.json",
+        "docs/reliability/phase2c/evidence/before-migration.json",
+        "docs/reliability/phase2c/evidence/net-owner-lock-order.json",
+        "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json"
+      ],
+      "exactCases": [
+        "P2C-D-ORDER",
+        "P2C-D-STRESS-12",
+        "P2C-D-STRESS-23",
+        "P2C-D-STRESS-13",
+        "P2C-D-STRESS-123",
+        "P2C-D-STRESS-22",
+        "P2C-D-FINANCIAL",
+        "P2C-D-STALE-CURRENT",
+        "P2C-D-SCORING",
+        "present/absent \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "absent-marker-rejected-lease",
+        "absent-marker-rejected-source",
+        "two-rounds-absent-marker",
+        "manifest-security"
+      ],
+      "limitations": [
+        "Actualhistoricaladvisorycycle eliminated with ordered per-round locks;40stressbatches,8staleraces,3roundfinancialparity. The independent CalcuttaFinalizecycle has a separate graph and regression receipt.",
+        "Additional2026 owner-completion/control Storylines cycle has a separate8schedule proof and exact unchanged-serial financial comparison. Annual completion has source/catalog and separate protected-runtime proof; its exact same reciprocal concurrency schedule is not inferred."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "NOT PROVEN",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "PASS",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/deadlock.json",
+          "sha256": "5f89462b6e315e93399281b3afe8d06800d0d91866db4babf8688424a9f91334",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/net-skins-deadlock.json",
+          "sha256": "d506e62d1b1660b97d67a8f22f2df42b26aa8eacce8a4200a199b853b1add8d3",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/deadlock.json",
+          "producerSha256": "5f89462b6e315e93399281b3afe8d06800d0d91866db4babf8688424a9f91334"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/before-migration.json",
+          "sha256": "137c0e8d9e2a35ff10a42289b8ca261d0501a4b48eff32a3e626c4f07777366e",
+          "kind": "HISTORICAL_OR_SOURCE_REVIEW_ARTIFACT_NOT_RUNTIME_RECEIPT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/net-owner-lock-order.json",
+          "sha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json",
+          "sha256": "02cea96e6634a19aa0f4b691b9e08868e91aa71ed060e432fe389e8f49b714c3",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/net-owner-lock-order.json",
+          "producerSha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf"
+        }
+      ]
+    },
+    {
+      "capability": "Net Skins deadlock retry",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/full-sequence.json",
+        "docs/reliability/phase2c/full-sequence-results.json",
+        "docs/reliability/phase2c/evidence/delivery.json"
+      ],
+      "exactCases": [
+        "WORKER_TRANSIENT_40P01",
+        "actual57014-durable-budget",
+        "boundedattemptclassifier unit40P01"
+      ],
+      "limitations": [
+        "Section44 explicitly requires generic40P01 classification with bounded retry, logical identity, backoff and observability. The actual SQL fault is in Calcutta and the classifier is shared; these PASS cells are scoped to that shared policy. They do not prove an autonomous owner-controlled Net Skins financial completion retry. Known Net Skins lock cycles have separate prevention evidence."
+      ],
+      "finalAdjudicationRequired": false,
+      "unitScope": "classifyDerivedFailure handles actual known code values, including40P01; deterministic global tick and optional exporter tests use injected processors. Durable SQL retry is separate integration evidence.",
+      "rpcApiScope": "Actual controlled40P01 is raised in Calcutta claim SQL and recovered by the shared automatic worker retry policy. A Net Skins financial processor is not automatically run or claimed here.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "scope": "Shared transient-deadlock retry policy (\u00a744); Net Skins financial processing remains owner controlled.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "PASS",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "N/A",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/full-sequence.json",
+          "sha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/full-sequence-results.json",
+          "sha256": "5d977f60b2b5e21548b053613290cc964eae112c054f883d871e6f91d56d954c",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/full-sequence.json",
+          "producerSha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery.json",
+          "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        }
+      ]
+    },
+    {
+      "capability": "finite timeout",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/finite.json",
+        "docs/reliability/phase2c/timeout-results.json",
+        "docs/reliability/phase2c/benchmark-candidate-common.json",
+        "docs/reliability/phase2c/benchmark-candidate-eligible.json"
+      ],
+      "exactCases": [
+        "P2C-TIME-001",
+        "all4finite1sscoreprofiles"
+      ],
+      "limitations": [
+        "1s canonical/recovery,5sworker SQL and25msforcedfault are explicit localprofiles; no Productiontimeout change/headroom claim."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "PASS",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/finite.json",
+          "sha256": "b7fc65ac9cf97774189307499eb478b32ae3e6420fe31943342af1f8bc6e320c",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/timeout-results.json",
+          "sha256": "46adacf1a9158064c2a9acd4615d5f999459d2e814cfcccd1d2439445641abb5",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/finite.json",
+          "producerSha256": "b7fc65ac9cf97774189307499eb478b32ae3e6420fe31943342af1f8bc6e320c"
+        },
+        {
+          "path": "docs/reliability/phase2c/benchmark-candidate-common.json",
+          "sha256": "1547f03216c08420bb666d74d63a1a00ab058e6f1f27b8f2db51f723e6616292",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/benchmark-candidate-eligible.json",
+          "sha256": "879021af1133b9ec014cf6a22bf9c2d956f1abedfca54dacba54437fc2051d8a",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        }
+      ]
+    },
+    {
+      "capability": "57014 rollback",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/finite.json",
+        "docs/reliability/phase2c/timeout-results.json",
+        "docs/reliability/phase2c/evidence/derived.json",
+        "docs/reliability/phase2c/evidence/canonical.json"
+      ],
+      "exactCases": [
+        "P2C-TIME-hole_scores",
+        "P2C-TIME-score_mutations",
+        "P2C-TIME-score_derived_intents_v1",
+        "P2C-TIME-LOCK",
+        "P2C-TIME-RECOVERY",
+        "P2-FAIL-57014"
+      ],
+      "limitations": [
+        "Precommitrollback preserves no partialgolf/receipt/intent; absentreceiptUNKNOWN, safe sameIDretry. Querycancellationduringderivedflush leaves priorOfficialscore."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "PASS",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/finite.json",
+          "sha256": "b7fc65ac9cf97774189307499eb478b32ae3e6420fe31943342af1f8bc6e320c",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/timeout-results.json",
+          "sha256": "46adacf1a9158064c2a9acd4615d5f999459d2e814cfcccd1d2439445641abb5",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/finite.json",
+          "producerSha256": "b7fc65ac9cf97774189307499eb478b32ae3e6420fe31943342af1f8bc6e320c"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/derived.json",
+          "sha256": "f7587daad3a7ed4b6c694edb13d9d0b501ca62ea92d4722651f537c818e31f84",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/canonical.json",
+          "sha256": "d2cad26397bf031988ac1af8391eaca5a745e8bc3624a7c9ad9ce16a4324036f",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        }
+      ]
+    },
+    {
+      "capability": "PWA compatibility",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/recovery.json",
+        "docs/reliability/phase2c/evidence/recovery-proof.json"
+      ],
+      "exactCases": [
+        "P2C-F-PWA",
+        "P2C-F-PWA-REPLAY",
+        "P2C-A-FINAL-BB/SC/SI: actual PWA final-hole timeout, Finalize, actual status handler COMMITTED, actual PWA new write denied",
+        "P2C-F-MOBILE-BB/SC/SI: actual conflict and blocked canonical RPC57014 mapped by existing mobile error response; Swift CONFLICT_ERROR/SQL_TIMEOUT_ERROR"
+      ],
+      "limitations": [
+        "Actualshipping persistenceadapter runs againstlocal handler/RPC with injectedidentitytransport. No browser/network/hostedAuth; oldPWA does not automatically call new recoveryendpoint. Client performance/concurrency not separatelycertified.",
+        "The current unchanged mobile backend maps actual SQL57014 to generic INTERNAL_ERROR. Decoder compatibility does not improve that error semantics or implement client recovery UI. New status endpoint remains unused by shipping Build10."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "Actual additive recovery handler for its named response/denial cases, with injected identity/provider transport and real local SQL where the integration case states it. Other listed control/scoring operations are SQL RPCs; no hosted HTTP/Auth proof.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "NOT PROVEN",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery.json",
+          "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery-proof.json",
+          "sha256": "72d034513cf1f7de8f717717671e49de55904523e2eace43eda2cf3df0a74a11",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/recovery.json",
+          "producerSha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3"
+        }
+      ]
+    },
+    {
+      "capability": "Build 10 compatibility",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/native-decoder-proof.json",
+        "docs/reliability/phase2c/evidence/native-retained-source-provenance.json",
+        "docs/reliability/phase2c/evidence/recovery-proof.json"
+      ],
+      "exactCases": [
+        "24unchangedretainedSwiftdecoderchecks including actual conflict/SQLtimeout error DTOs",
+        "P2C-F-MOBILE-BB",
+        "P2C-F-MOBILE-SC",
+        "P2C-F-MOBILE-SI"
+      ],
+      "limitations": [
+        "ActualretainedSwiftmodels decodeexactcandidateDTOs inUTCprofile; source lineageSTRONGLY_SUPPORTED, originalGitobjectabsent. Modelcompatibility only; no fullnativeHTTP/session, simulator,physical or newrecoveryconsumption. NonUTCcounterexample retained.",
+        "The SOURCE and INTEGRATION PASS cells describe retained model bytes and DTO decoding; they do not promote the Build10 lineage confidence label to PROVEN."
+      ],
+      "finalAdjudicationRequired": false,
+      "sourceScope": "Retained MobileScoringModels and dependencies are inspected/hashed test inputs. Attribution to shipping Build10 is STRONGLY SUPPORTED by retained provenance, not verified from the unavailable original Git object.",
+      "integrationScope": "Exact local backend JSON is decoded by retained unchanged Swift model code on macOS. This is cross-language model integration only, not MobileAPIClient, device session, native queue, UI or network transport.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "N/A",
+        "RPC/API": "N/A",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "N/A",
+        "CONCURRENCY": "N/A",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/native-decoder-proof.json",
+          "sha256": "4e40036d52a4f04f944011b359eb47a847a532f2cc19b1c65ac04bd6084a6107",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/native-retained-source-provenance.json",
+          "sha256": "9e4fe63d2f5311ca5a569f436bd54ae88f0de7e0f671b1522a4d4d5812bc7fc0",
+          "kind": "HISTORICAL_OR_SOURCE_REVIEW_ARTIFACT_NOT_RUNTIME_RECEIPT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery-proof.json",
+          "sha256": "72d034513cf1f7de8f717717671e49de55904523e2eace43eda2cf3df0a74a11",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/recovery.json",
+          "producerSha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3"
+        }
+      ]
+    },
+    {
+      "capability": "Director compatibility",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/recovery.json",
+        "docs/reliability/phase2c/evidence/annual-admission-run.json",
+        "docs/reliability/phase2c/evidence/full-sequence.json",
+        "docs/reliability/phase2c/evidence/net-owner-lock-order.json",
+        "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json"
+      ],
+      "exactCases": [
+        "actualDirectorLock/Resume/Finalize",
+        "P2C-A-ROUND-LOCK",
+        "protected2099DirectorLock",
+        "present/absent \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "absent-marker-rejected-lease",
+        "absent-marker-rejected-source",
+        "two-rounds-absent-marker",
+        "manifest-security",
+        "future2099-present",
+        "future2099-absent",
+        "future2099-rejected-lease",
+        "future2099-rejected-source",
+        "future2099-rejected-job-generation",
+        "future2099-prefix-before-config-job",
+        "absent-marker-current-round-max-history-plan"
+      ],
+      "limitations": [
+        "Supported Director/control SQL RPCs and synthetic Director authority, notbrowserUIusability. Newrecoveryroute needs futureUIadoption. The corrected Calcutta worker/Finalize graph and fullsequence supply the previously missing local control interaction.",
+        "Additional2026 owner-completion/control Storylines cycle has a separate8schedule proof and exact unchanged-serial financial comparison. Future2099 completion executes actual claim/calculator/completion/shared helper with an explicitly substituted outer annual certification boundary and original Net resource/generation guards. Its lock-prefix ordering is observed with blocked Storylines plus independent configuration/job NOWAIT probes. This does not substitute for separate protected annual runtime or reproduce the full future Director Lock/Finalize reciprocal schedule."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "Supported match and round-control SQL RPCs execute with synthetic Director/owner authorization, plus protected2099 SQL dispatcher. No Director HTTP handler, browser UI or entire old application artifact executes in these cases.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "NOT PROVEN",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery.json",
+          "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/annual-admission-run.json",
+          "sha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/full-sequence.json",
+          "sha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/net-owner-lock-order.json",
+          "sha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json",
+          "sha256": "02cea96e6634a19aa0f4b691b9e08868e91aa71ed060e432fe389e8f49b714c3",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/net-owner-lock-order.json",
+          "producerSha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf"
+        }
+      ]
+    },
+    {
+      "capability": "Lock interaction",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/recovery.json",
+        "docs/reliability/phase2c/evidence/worker-lock-order.json",
+        "docs/reliability/phase2c/evidence/full-sequence.json",
+        "docs/reliability/phase2c/evidence/canonical.json",
+        "docs/reliability/phase2c/evidence/net-owner-lock-order.json",
+        "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json",
+        "docs/reliability/phase2c/evidence/worker-failure-lock-order.json",
+        "docs/reliability/phase2c/evidence/worker-failure-lock-after.json"
+      ],
+      "exactCases": [
+        "P2C-A-ROUND-LOCK",
+        "P2C-A-NO-WRITE-LOCK",
+        "P2-CONC-LOCK-SCORE",
+        "P2-CONC-LOCK-LOCK",
+        "worker/controlonewaylockgraphs",
+        "present/absent \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "absent-marker-rejected-lease",
+        "absent-marker-rejected-source",
+        "two-rounds-absent-marker",
+        "manifest-security",
+        "future2099-present",
+        "future2099-absent",
+        "future2099-rejected-lease",
+        "future2099-rejected-source",
+        "future2099-rejected-job-generation",
+        "future2099-prefix-before-config-job",
+        "absent-marker-current-round-max-history-plan",
+        "expiry-update \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "bundle-failure \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "preclaim-skip-locked \u00d7 SCORING_LOCK/FINALIZE (unchanged counterevidence)",
+        "future-expiry/future-intelligence \u00d7 actual installed match-control trigger \u00d7 before/after",
+        "fullsequence interruptionAcknowledgements: R1M1H2 discarded ACK\u2192Lock\u2192recovery; R1M1H18 discarded ACK\u2192Finalize\u2192recovery; original mutations, revoked permissions, one receipt each"
+      ],
+      "limitations": [
+        "Independent held-matchwrite-lock recovery, supportedroundLock and normaldeny; separate Calcutta/Competition/Intelligence control workers have current-source local runtime receipts. Lock-duration benchmark measures scoretransaction bounds, notLockRPCexactduration.",
+        "Additional2026 owner-completion/control Storylines cycle has a separate8schedule proof and exact unchanged-serial financial comparison. Future2099 completion executes actual claim/calculator/completion/shared helper with an explicitly substituted outer annual certification boundary and original Net resource/generation guards. Its lock-prefix ordering is observed with blocked Storylines plus independent configuration/job NOWAIT probes. This does not substitute for separate protected annual runtime or reproduce the full future Director Lock/Finalize reciprocal schedule.",
+        "Expiry and bundle failure ordering has six actual before-cycle/after-success pairs; unchanged preclaim SKIP LOCKED is counterevidence. Future2099 workers execute the full function with an outer runtime seam and installed trigger DML, not protected annual Director RPC. The broader expiry predicate-preservation check is SOURCE evidence.",
+        "Any derived-worker quiescence is limited to the new Calcutta/Competition/Intelligence tick and its explicit owner/publication states; it does not establish zero legacy Google/archive demand."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "PASS",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery.json",
+          "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-lock-order.json",
+          "sha256": "6a37b73ca48808e45e854a2c3db786e20c6fc669da3ecbbcad48ba5fc6b1fbf8",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/full-sequence.json",
+          "sha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/canonical.json",
+          "sha256": "d2cad26397bf031988ac1af8391eaca5a745e8bc3624a7c9ad9ce16a4324036f",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/net-owner-lock-order.json",
+          "sha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json",
+          "sha256": "02cea96e6634a19aa0f4b691b9e08868e91aa71ed060e432fe389e8f49b714c3",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/net-owner-lock-order.json",
+          "producerSha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-failure-lock-order.json",
+          "sha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-failure-lock-after.json",
+          "sha256": "896fa50dba80cdd4228823556a01571b2a8e0633d3dd5755b7ffed653458e13e",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/worker-failure-lock-order.json",
+          "producerSha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18"
+        }
+      ]
+    },
+    {
+      "capability": "Finalize interaction",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/recovery.json",
+        "docs/reliability/phase2c/evidence/full-sequence.json",
+        "docs/reliability/phase2c/evidence/canonical.json",
+        "docs/reliability/phase2c/evidence/worker-lock-order.json",
+        "docs/reliability/phase2c/evidence/calcutta-lock-order.json",
+        "docs/reliability/phase2c/evidence/calcutta-current-job-lock-after.json",
+        "docs/reliability/phase2c/evidence/net-owner-lock-order.json",
+        "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json",
+        "docs/reliability/phase2c/evidence/worker-failure-lock-order.json",
+        "docs/reliability/phase2c/evidence/worker-failure-lock-after.json"
+      ],
+      "exactCases": [
+        "P2C-A-FINAL-BB",
+        "P2C-A-FINAL-SC",
+        "P2C-A-FINAL-SI",
+        "P2C-A-HALVED",
+        "P2-CONC-FINALIZE",
+        "newG-B-LOCK_FINALIZEdeterministiccase",
+        "present/absent \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "absent-marker-rejected-lease",
+        "absent-marker-rejected-source",
+        "two-rounds-absent-marker",
+        "manifest-security",
+        "future2099-present",
+        "future2099-absent",
+        "future2099-rejected-lease",
+        "future2099-rejected-source",
+        "future2099-rejected-job-generation",
+        "future2099-prefix-before-config-job",
+        "absent-marker-current-round-max-history-plan",
+        "expiry-update \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "bundle-failure \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "preclaim-skip-locked \u00d7 SCORING_LOCK/FINALIZE (unchanged counterevidence)",
+        "future-expiry/future-intelligence \u00d7 actual installed match-control trigger \u00d7 before/after",
+        "fullsequence interruptionAcknowledgements: R1M1H2 discarded ACK\u2192Lock\u2192recovery; R1M1H18 discarded ACK\u2192Finalize\u2192recovery; original mutations, revoked permissions, one receipt each"
+      ],
+      "limitations": [
+        "The reproduced Finalize\u2194Calcutta job/current inversion57014 is retained; corrected124 claim/complete/fail and held-intent schedules plus fullsequence separately prove the repaired local path. Earlier postFinalize recovery alone was insufficient.",
+        "Additional2026 owner-completion/control Storylines cycle has a separate8schedule proof and exact unchanged-serial financial comparison. Future2099 completion executes actual claim/calculator/completion/shared helper with an explicitly substituted outer annual certification boundary and original Net resource/generation guards. Its lock-prefix ordering is observed with blocked Storylines plus independent configuration/job NOWAIT probes. This does not substitute for separate protected annual runtime or reproduce the full future Director Lock/Finalize reciprocal schedule.",
+        "Expiry and bundle failure ordering has six actual before-cycle/after-success pairs; unchanged preclaim SKIP LOCKED is counterevidence. Future2099 workers execute the full function with an outer runtime seam and installed trigger DML, not protected annual Director RPC. The broader expiry predicate-preservation check is SOURCE evidence.",
+        "Any derived-worker quiescence is limited to the new Calcutta/Competition/Intelligence tick and its explicit owner/publication states; it does not establish zero legacy Google/archive demand."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "PASS",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery.json",
+          "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/full-sequence.json",
+          "sha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/canonical.json",
+          "sha256": "d2cad26397bf031988ac1af8391eaca5a745e8bc3624a7c9ad9ce16a4324036f",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-lock-order.json",
+          "sha256": "6a37b73ca48808e45e854a2c3db786e20c6fc669da3ecbbcad48ba5fc6b1fbf8",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/calcutta-lock-order.json",
+          "sha256": "990cb30fa365d8e43742fdaa60f3775c8ac1d27fc995a6d74e70792444f33831",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/calcutta-current-job-lock-after.json",
+          "sha256": "d69bdcce38f8f0c48406e2b1c8223026d4f169504756ea111a052508a51220dc",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/calcutta-lock-order.json",
+          "producerSha256": "990cb30fa365d8e43742fdaa60f3775c8ac1d27fc995a6d74e70792444f33831"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/net-owner-lock-order.json",
+          "sha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json",
+          "sha256": "02cea96e6634a19aa0f4b691b9e08868e91aa71ed060e432fe389e8f49b714c3",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/net-owner-lock-order.json",
+          "producerSha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-failure-lock-order.json",
+          "sha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-failure-lock-after.json",
+          "sha256": "896fa50dba80cdd4228823556a01571b2a8e0633d3dd5755b7ffed653458e13e",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/worker-failure-lock-order.json",
+          "producerSha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18"
+        }
+      ]
+    },
+    {
+      "capability": "Resume interaction",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/full-sequence.json",
+        "docs/reliability/phase2c/full-sequence-results.json"
+      ],
+      "exactCases": [
+        "supportedLock\u2192Resume\u2192score/readback inchronology"
+      ],
+      "limitations": [
+        "Resume admission behavior proven only by named supportedsequence; it is notwholeroundunknownoutcomeUIredesign. The named final fullsequence is required.",
+        "Any derived-worker quiescence is limited to the new Calcutta/Competition/Intelligence tick and its explicit owner/publication states; it does not establish zero legacy Google/archive demand."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/full-sequence.json",
+          "sha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/full-sequence-results.json",
+          "sha256": "5d977f60b2b5e21548b053613290cc964eae112c054f883d871e6f91d56d954c",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/full-sequence.json",
+          "producerSha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb"
+        }
+      ]
+    },
+    {
+      "capability": "release transition",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/annual-admission-run.json",
+        "docs/reliability/phase2c/evidence/annual-admission-detail.json",
+        "docs/reliability/phase2c/evidence/delivery.json",
+        "docs/reliability/phase2c/evidence/worker-failure-lock-order.json",
+        "docs/reliability/phase2c/evidence/worker-failure-lock-after.json"
+      ],
+      "exactCases": [
+        "supportedsequence4compatibleactivation",
+        "terminal-compatible-activation-requeue",
+        "activation-atomic-late-completion",
+        "compatible-activation-replacement",
+        "expiry-update \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "bundle-failure \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "preclaim-skip-locked \u00d7 SCORING_LOCK/FINALIZE (unchanged counterevidence)",
+        "future-expiry/future-intelligence \u00d7 actual installed match-control trigger \u00d7 before/after"
+      ],
+      "limitations": [
+        "Protectedannualguard+realreleaseRPClocalfixture; 2026delivery scope uses explicitfixturetransition. No hostedrelease/promotion or arbitrarymixedversionworker proof.",
+        "Expiry and bundle failure ordering has six actual before-cycle/after-success pairs; unchanged preclaim SKIP LOCKED is counterevidence. Future2099 workers execute the full function with an outer runtime seam and installed trigger DML, not protected annual Director RPC. The broader expiry predicate-preservation check is SOURCE evidence.",
+        "Any derived-worker quiescence is limited to the new Calcutta/Competition/Intelligence tick and its explicit owner/publication states; it does not establish zero legacy Google/archive demand."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "PASS",
+        "CONCURRENCY": "PASS",
+        "RELEASE COMPATIBILITY": "PASS",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/annual-admission-run.json",
+          "sha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/annual-admission-detail.json",
+          "sha256": "24b61df24bbcd0526740ced2f212bea1386138e98394a84bc412d54dedc177b2",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/annual-admission-run.json",
+          "producerSha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery.json",
+          "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-failure-lock-order.json",
+          "sha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-failure-lock-after.json",
+          "sha256": "896fa50dba80cdd4228823556a01571b2a8e0633d3dd5755b7ffed653458e13e",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/worker-failure-lock-order.json",
+          "producerSha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18"
+        }
+      ]
+    },
+    {
+      "capability": "full R1",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/full-sequence.json",
+        "docs/reliability/phase2c/full-sequence-results.json",
+        "docs/reliability/phase2c/evidence/canonical.json",
+        "docs/reliability/phase2c/evidence/recovery.json"
+      ],
+      "exactCases": [
+        "R1:6matches\u00d718holes",
+        "canonicalgross/strokes/net/holewinner/finalpoints:BestBall",
+        "ownedreceiptpostFinalize",
+        "fullsequence interruptionAcknowledgements: R1M1H2 discarded ACK\u2192Lock\u2192recovery; R1M1H18 discarded ACK\u2192Finalize\u2192recovery; original mutations, revoked permissions, one receipt each"
+      ],
+      "limitations": [
+        "ActualcanonicalRPC/432holechronology withautonomousworker; runtime guards synthetic2026 boundaries declared, protected2099proof separate. Named final fullsequence and independent canonical-format oracle are required. Format-specificallfailure/concurrencylayernotinferredfromgenerictests.",
+        "Any derived-worker quiescence is limited to the new Calcutta/Competition/Intelligence tick and its explicit owner/publication states; it does not establish zero legacy Google/archive demand."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "PASS",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/full-sequence.json",
+          "sha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/full-sequence-results.json",
+          "sha256": "5d977f60b2b5e21548b053613290cc964eae112c054f883d871e6f91d56d954c",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/full-sequence.json",
+          "producerSha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/canonical.json",
+          "sha256": "d2cad26397bf031988ac1af8391eaca5a745e8bc3624a7c9ad9ce16a4324036f",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery.json",
+          "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        }
+      ]
+    },
+    {
+      "capability": "full R2",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/full-sequence.json",
+        "docs/reliability/phase2c/full-sequence-results.json",
+        "docs/reliability/phase2c/evidence/canonical.json",
+        "docs/reliability/phase2c/evidence/recovery.json"
+      ],
+      "exactCases": [
+        "R2:6matches\u00d718holes",
+        "canonicalgross/strokes/net/holewinner/finalpoints:Scramble",
+        "ownedreceiptpostFinalize"
+      ],
+      "limitations": [
+        "ActualcanonicalRPC/432holechronology withautonomousworker; runtime guards synthetic2026 boundaries declared, protected2099proof separate. Named final fullsequence and independent canonical-format oracle are required. Format-specificallfailure/concurrencylayernotinferredfromgenerictests.",
+        "Any derived-worker quiescence is limited to the new Calcutta/Competition/Intelligence tick and its explicit owner/publication states; it does not establish zero legacy Google/archive demand."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "PASS",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/full-sequence.json",
+          "sha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/full-sequence-results.json",
+          "sha256": "5d977f60b2b5e21548b053613290cc964eae112c054f883d871e6f91d56d954c",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/full-sequence.json",
+          "producerSha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/canonical.json",
+          "sha256": "d2cad26397bf031988ac1af8391eaca5a745e8bc3624a7c9ad9ce16a4324036f",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery.json",
+          "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        }
+      ]
+    },
+    {
+      "capability": "full R3",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/full-sequence.json",
+        "docs/reliability/phase2c/full-sequence-results.json",
+        "docs/reliability/phase2c/evidence/canonical.json",
+        "docs/reliability/phase2c/evidence/recovery.json"
+      ],
+      "exactCases": [
+        "R3:12matches\u00d718holes",
+        "canonicalgross/strokes/net/holewinner/finalpoints:Singles",
+        "ownedreceiptpostFinalize"
+      ],
+      "limitations": [
+        "ActualcanonicalRPC/432holechronology withautonomousworker; runtime guards synthetic2026 boundaries declared, protected2099proof separate. Named final fullsequence and independent canonical-format oracle are required. Format-specificallfailure/concurrencylayernotinferredfromgenerictests.",
+        "Any derived-worker quiescence is limited to the new Calcutta/Competition/Intelligence tick and its explicit owner/publication states; it does not establish zero legacy Google/archive demand."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "PASS",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/full-sequence.json",
+          "sha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/full-sequence-results.json",
+          "sha256": "5d977f60b2b5e21548b053613290cc964eae112c054f883d871e6f91d56d954c",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/full-sequence.json",
+          "producerSha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/canonical.json",
+          "sha256": "d2cad26397bf031988ac1af8391eaca5a745e8bc3624a7c9ad9ce16a4324036f",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery.json",
+          "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        }
+      ]
+    },
+    {
+      "capability": "history scale",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/benchmark-candidate-common.json",
+        "docs/reliability/phase2c/benchmark-candidate-eligible.json",
+        "docs/reliability/phase2c/benchmark-candidate-recovery.json",
+        "docs/reliability/phase2c/evidence/worker-history.json",
+        "docs/reliability/phase2c/evidence/annual-history.json",
+        "docs/reliability/phase2c/lock-duration-candidate.json",
+        "docs/reliability/phase2c/certification-gate.json",
+        "docs/reliability/phase2c/evidence/delivery-index-review.json",
+        "docs/reliability/phase2c/evidence/delivery-index-review-detail.json",
+        "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json"
+      ],
+      "exactCases": [
+        "common4\u00d71000",
+        "eligible4\u00d78\u00d730",
+        "recovery4\u00d71000",
+        "worker4\u00d78",
+        "protectedannual4scales",
+        "lock4\u00d72\u00d7100",
+        "22 default-plan index counterfactuals: exact5 retained/3 removed",
+        "absent-marker-current-round-max-history-plan:1000/10000irrelevantotherroundresults",
+        "recovery4\u00d71000 after supported Lock: match LIVE+locked, active permissions0, every timed status COMMITTED"
+      ],
+      "limitations": [
+        "Exactfixture1/2/5/10 ratios localonly. 1000supportsdescriptivep99,30and100notp99. Queryshapes+counterfactualindexes engineering review is separate from the numeric gate.",
+        "Optional-index query proof uses actual extracted selectors, explicit isolated fixture DML and transaction-local index variants; it is not full-RPC throughput or write-amplification proof. FutureNet MAX helper proof covers irrelevant other-round growth, not unlimited current-round revisions.",
+        "Worker-history timing/runtime covers all32 scale/receipt branches. Nested plans are captured only for tick/competitionTick/claim at1\u00d7/10\u00d7 across all8 variants (48 core captures); final-ready/index counterfactuals only none1\u00d7/10\u00d7. The16 intermediate2\u00d7/5\u00d7 rows are timing-only with plans:null. No intermediate-scale plan proof or worker p95/p99 is inferred.",
+        "Any derived-worker quiescence is limited to the new Calcutta/Competition/Intelligence tick and its explicit owner/publication states; it does not establish zero legacy Google/archive demand."
+      ],
+      "finalAdjudicationRequired": false,
+      "rpcApiScope": "SQL RPC/function execution through an isolated Unix socket; no HTTP server, hosted Auth/provider transport or deployed client is inferred.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "N/A",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "PASS",
+        "FAILURE INJECTION": "N/A",
+        "CONCURRENCY": "N/A",
+        "RELEASE COMPATIBILITY": "N/A",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/benchmark-candidate-common.json",
+          "sha256": "1547f03216c08420bb666d74d63a1a00ab058e6f1f27b8f2db51f723e6616292",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/benchmark-candidate-eligible.json",
+          "sha256": "879021af1133b9ec014cf6a22bf9c2d956f1abedfca54dacba54437fc2051d8a",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/benchmark-candidate-recovery.json",
+          "sha256": "c2a64c76e17523d8d61eb70509f30539a6162582c1993ea962711bccbb52953e",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-history.json",
+          "sha256": "d31c74e44e2e73aa506a8e43a56a5b1af4d38c2b7cec9660e6e32bad5fed2633",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/annual-history.json",
+          "sha256": "9bf694a6a9d42a187f5f8b607baf93c39d0b0d32dabb5a759d7c47a45dfca5a9",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/annual-admission-run.json",
+          "producerSha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d"
+        },
+        {
+          "path": "docs/reliability/phase2c/lock-duration-candidate.json",
+          "sha256": "fe1a10eef683e61508f7600b6b832dad9883340266e89be032279e4afff878c0",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/certification-gate.json",
+          "sha256": "47e6ea06660cc2b7dac920df251bdc8bc19950e63cce18a68543adb1a6b2acc7",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery-index-review.json",
+          "sha256": "dd8383437d05d2102b8c79ca9e2ba9758b1be0a57aecb200877f0742fa7d965f",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery-index-review-detail.json",
+          "sha256": "744c097ec53f6e5608113a660197ba9903f09f8ad6db49118e67bc8df49f2080",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/delivery-index-review.json",
+          "producerSha256": "dd8383437d05d2102b8c79ca9e2ba9758b1be0a57aecb200877f0742fa7d965f"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json",
+          "sha256": "02cea96e6634a19aa0f4b691b9e08868e91aa71ed060e432fe389e8f49b714c3",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/net-owner-lock-order.json",
+          "producerSha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf"
+        }
+      ]
+    },
+    {
+      "capability": "security",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/recovery.json",
+        "docs/reliability/phase2c/evidence/delivery.json",
+        "docs/reliability/phase2c/evidence/annual.json",
+        "docs/reliability/phase2c/evidence/annual-admission-run.json",
+        "docs/reliability/phase2c/evidence/canonical.json",
+        "docs/reliability/phase2c/evidence/phase2c-final-scope-privacy-review.json",
+        "docs/reliability/phase2c/evidence/net-owner-lock-order.json",
+        "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json",
+        "docs/reliability/phase2c/evidence/worker-failure-lock-order.json",
+        "docs/reliability/phase2c/evidence/worker-failure-lock-after.json",
+        "docs/reliability/phase2c/evidence/phase2c-unit.json"
+      ],
+      "exactCases": [
+        "P2C-A-ACL",
+        "P2C-A-ENUMERATION",
+        "P2C-A-SPOOF",
+        "P2C-A-REASSIGNED",
+        "service-only-chained-manifest",
+        "protectedruntimeadmissiondeny",
+        "P2-AUTH-001",
+        "present/absent \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "absent-marker-rejected-lease",
+        "absent-marker-rejected-source",
+        "two-rounds-absent-marker",
+        "manifest-security",
+        "future2099-present",
+        "future2099-absent",
+        "future2099-rejected-lease",
+        "future2099-rejected-source",
+        "future2099-rejected-job-generation",
+        "future2099-prefix-before-config-job",
+        "absent-marker-current-round-max-history-plan",
+        "expiry-update \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "bundle-failure \u00d7 SCORING_LOCK/FINALIZE \u00d7 before/after",
+        "preclaim-skip-locked \u00d7 SCORING_LOCK/FINALIZE (unchanged counterevidence)",
+        "future-expiry/future-intelligence \u00d7 actual installed match-control trigger \u00d7 before/after"
+      ],
+      "limitations": [
+        "Realroles/grants and currentidentitychecks tested; noauth/RLSweakening found. No exhaustivealltableRLSmatrix, hostedAuth, provider orprivatefinancialpenetrationtestclaim. Final source/privacy review is recorded for this exact candidate.",
+        "Additional2026 owner-completion/control Storylines cycle has a separate8schedule proof and exact unchanged-serial financial comparison. Future2099 completion executes actual claim/calculator/completion/shared helper with an explicitly substituted outer annual certification boundary and original Net resource/generation guards. Its lock-prefix ordering is observed with blocked Storylines plus independent configuration/job NOWAIT probes. This does not substitute for separate protected annual runtime or reproduce the full future Director Lock/Finalize reciprocal schedule.",
+        "Expiry and bundle failure ordering has six actual before-cycle/after-success pairs; unchanged preclaim SKIP LOCKED is counterevidence. Future2099 workers execute the full function with an outer runtime seam and installed trigger DML, not protected annual Director RPC. The broader expiry predicate-preservation check is SOURCE evidence.",
+        "PostgreSQL/API PASS is limited to named role-denial, actor-binding, service-only and local handler cases. SOURCE review for absence of auth/RLS weakening is not itself a behavioral PASS for every RLS policy."
+      ],
+      "finalAdjudicationRequired": false,
+      "unitScope": "Named recovery request/identity/projection/handler tests execute with explicit provider test doubles. This UNIT result does not prove hosted Auth or PostgreSQL authority.",
+      "rpcApiScope": "Actual additive recovery handler for its named response/denial cases, with injected identity/provider transport and real local SQL where the integration case states it. Other listed control/scoring operations are SQL RPCs; no hosted HTTP/Auth proof.",
+      "sourceScope": "Source inspected for the named local capability only; runtime cells require their own current-source receipts.",
+      "scope": "Changed recovery, worker service privileges, current identity/admission and exact tested role boundaries only; no comprehensive product security certification.",
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "PASS",
+        "POSTGRESQL": "PASS",
+        "RPC/API": "PASS",
+        "INTEGRATION": "PASS",
+        "PERFORMANCE": "N/A",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "NOT PROVEN",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "adjudication": "REVIEWED_BY_CODEX_ENGINEERING; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/recovery.json",
+          "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/delivery.json",
+          "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/annual.json",
+          "sha256": "d54a12f7b8fe717791c8fd60a10f21ef01eb70765c99f2b9b4bc3f3c29db1c7e",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/annual-admission-run.json",
+          "sha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/canonical.json",
+          "sha256": "d2cad26397bf031988ac1af8391eaca5a745e8bc3624a7c9ad9ce16a4324036f",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/phase2c-final-scope-privacy-review.json",
+          "sha256": "f06092f25dccebbd8011cd19f599f1134101671e411582c06f450e4149ab08a9",
+          "kind": "HISTORICAL_OR_SOURCE_REVIEW_ARTIFACT_NOT_RUNTIME_RECEIPT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/net-owner-lock-order.json",
+          "sha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json",
+          "sha256": "02cea96e6634a19aa0f4b691b9e08868e91aa71ed060e432fe389e8f49b714c3",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/net-owner-lock-order.json",
+          "producerSha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-failure-lock-order.json",
+          "sha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/worker-failure-lock-after.json",
+          "sha256": "896fa50dba80cdd4228823556a01571b2a8e0633d3dd5755b7ffed653458e13e",
+          "kind": "STRUCTURED_OUTPUT_REVIEWED_WITH_VALIDATED_PRODUCER",
+          "producerReceipt": "evidence/worker-failure-lock-order.json",
+          "producerSha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18"
+        },
+        {
+          "path": "docs/reliability/phase2c/evidence/phase2c-unit.json",
+          "sha256": "828120598561f16c060ee9d2f58d38dbb309fd3fdf57b144604c7c3381598fbc",
+          "kind": "VALIDATED_EXECUTION_OR_MEASUREMENT_ARTIFACT"
+        }
+      ]
+    },
+    {
+      "capability": "Google reporting outbox automatic delivery",
+      "workClass": "GOOGLE_REPORTING_OUTBOX",
+      "overallStatus": "NOT PROVEN",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/google-outbox-scope-review.json",
+        "docs/reliability/phase2c/GOOGLE-OUTBOX-GAP.md"
+      ],
+      "exactCases": [],
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "NOT PROVEN",
+        "POSTGRESQL": "NOT PROVEN",
+        "RPC/API": "NOT PROVEN",
+        "INTEGRATION": "NOT PROVEN",
+        "PERFORMANCE": "NOT PROVEN",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "NOT PROVEN",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "finalAdjudicationRequired": false,
+      "adjudication": "REVIEWED_SOURCE_GAP; NO_RUNTIME_CLOSURE; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "scope": "Inventory and gap identification only. No local end-to-end autonomous delivery proof is credited.",
+      "sourceScope": "Read-only review of exact current source and retained evidence hashes; SOURCE PASS means the separate work class/gap is identified, not that delivery succeeds.",
+      "limitations": [
+        "Canonical accepted scores atomically create a separate reporting outbox event. The current three-family worker does not consume this queue.",
+        "Existing request-triggered processing and selected actual annual SQL claim/lease/fail cases do not prove autonomous process recovery, bounded attempts, supported exact requeue, transport/checkpoint unknown outcomes, or end-to-end ordering.",
+        "The legacy MATCH_FINALIZED Google writer reaches NetSkins/Calcutta synchronization hooks. A reviewed mirror-only financial boundary is required before new automatic scheduling; no live unauthorized action is inferred.",
+        "Production enablement and external scheduler configuration were not queried. Disabled synthetic admission is not an applicability waiver."
+      ],
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/google-outbox-scope-review.json",
+          "sha256": "874cc5228610157cd138bed16b4634e2d508ed8716d86bc8594d270fa4ec2a44",
+          "kind": "SOURCE_SCOPE_REVIEW_NOT_RUNTIME_RECEIPT"
+        },
+        {
+          "path": "docs/reliability/phase2c/GOOGLE-OUTBOX-GAP.md",
+          "sha256": "ae4a8da156c004de658f6bbea310a524f70f1e333d8c08d787fd4ee4a5dba205",
+          "kind": "SOURCE_SCOPE_REVIEW_NOT_RUNTIME_RECEIPT"
+        }
+      ]
+    },
+    {
+      "capability": "Finalize scorecard archive automatic delivery",
+      "workClass": "SCORECARD_ARCHIVE",
+      "overallStatus": "NOT PROVEN",
+      "requiredFinalReceipts": [
+        "docs/reliability/phase2c/evidence/google-outbox-scope-review.json",
+        "docs/reliability/phase2c/GOOGLE-OUTBOX-GAP.md"
+      ],
+      "exactCases": [],
+      "cells": {
+        "SOURCE": "PASS",
+        "UNIT": "NOT PROVEN",
+        "POSTGRESQL": "NOT PROVEN",
+        "RPC/API": "NOT PROVEN",
+        "INTEGRATION": "NOT PROVEN",
+        "PERFORMANCE": "NOT PROVEN",
+        "FAILURE INJECTION": "NOT PROVEN",
+        "CONCURRENCY": "NOT PROVEN",
+        "RELEASE COMPATIBILITY": "NOT PROVEN",
+        "HOSTED NON-PRODUCTION": "NOT PROVEN",
+        "PRODUCTION": "NOT PROVEN",
+        "PHYSICAL": "NOT PROVEN"
+      },
+      "finalAdjudicationRequired": false,
+      "adjudication": "REVIEWED_SOURCE_GAP; NO_RUNTIME_CLOSURE; OWNER_ACCEPTANCE_NOT_PERFORMED",
+      "scope": "Inventory and gap identification only. No local end-to-end autonomous delivery proof is credited.",
+      "sourceScope": "Read-only review of exact current source and retained evidence hashes; SOURCE PASS means the separate work class/gap is identified, not that delivery succeeds.",
+      "limitations": [
+        "Canonical Finalize captures a snapshot and a distinct scorecard archive job; this is related chronology work rather than an ordinary hole-score intent.",
+        "Selected archive SQL branch tests and native request hooks do not establish an admitted autonomous transport/restart/checkpoint lifecycle.",
+        "Archive work must receive its own reviewed applicability, retry/terminal/recovery, stale/generation/release and external-effect proof; it is not Calcutta or NetSkins financial approval."
+      ],
+      "evidenceManifest": [
+        {
+          "path": "docs/reliability/phase2c/evidence/google-outbox-scope-review.json",
+          "sha256": "874cc5228610157cd138bed16b4634e2d508ed8716d86bc8594d270fa4ec2a44",
+          "kind": "SOURCE_SCOPE_REVIEW_NOT_RUNTIME_RECEIPT"
+        },
+        {
+          "path": "docs/reliability/phase2c/GOOGLE-OUTBOX-GAP.md",
+          "sha256": "ae4a8da156c004de658f6bbea310a524f70f1e333d8c08d787fd4ee4a5dba205",
+          "kind": "SOURCE_SCOPE_REVIEW_NOT_RUNTIME_RECEIPT"
+        }
+      ]
+    }
+  ],
+  "renderingRule": "Final scoped cells are engineering-adjudicated against the exact retained evidence hashes below. Higher layers remain NOT PROVEN. Historical failed runs are retained separately; this matrix provides no owner acceptance or deployment authorization.",
+  "currentFailure": null,
+  "scopeRule": "A PASS cell proves only the named executable path and row scope. RPC/API is a combined requested column: each row specifies RPC-only versus actual local handler. Generic shared policy proof, retained Swift model proof and protected annual admission never substitute for a different subsystem or higher layer.",
+  "namedExecutedScopeStatus": "PASS_FOR_NAMED_VALIDATED_LAYERS",
+  "p0BStatus": "PARTIAL",
+  "requiredScopeGaps": [
+    "GOOGLE_REPORTING_OUTBOX",
+    "SCORECARD_ARCHIVE"
+  ],
+  "originalNamedRowCount": 31,
+  "finalConclusion": "PHASE 2C: PARTIAL \u2014 SCORE-PATH CANDIDATE NOT READY FOR STAGING; REMAINING GATES LISTED ABOVE",
+  "reviewer": "Codex engineering review",
+  "ownerAcceptance": "NOT_PERFORMED",
+  "reviewArtifact": {
+    "path": "docs/reliability/phase2c/evidence/final-review.json",
+    "sha256": "db3d8901d0662db4e405229b05585375932ebc738791d02be3e78c40880aa955"
+  },
+  "migrationSourceManifest": [
+    {
+      "path": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+      "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+    },
+    {
+      "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+    },
+    {
+      "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+    },
+    {
+      "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48"
+    }
+  ],
+  "historicalCounterevidence": [
+    "docs/reliability/phase2c/evidence/full-sequence-finalize-worker-inversion.json",
+    "docs/reliability/phase2c/evidence/net-owner-lock-order-forensic-first.json",
+    "docs/reliability/phase2c/evidence/net-owner-control-lock-forensic-first.json"
+  ],
+  "scopeReviewArtifact": {
+    "path": "docs/reliability/phase2c/evidence/google-outbox-scope-review.json",
+    "sha256": "874cc5228610157cd138bed16b4634e2d508ed8716d86bc8594d270fa4ec2a44"
+  },
+  "performanceRepeatability": {
+    "status": "PARTIAL",
+    "issue": "P2C-NEW-PERF-VARIANCE",
+    "evidence": "docs/reliability/phase2c/evidence/performance-variance-review.json",
+    "limitation": "Finite scoped samples pass; one failed tail comparison and unexplained repeat remain retained."
+  }
+}

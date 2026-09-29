@@ -1,0 +1,359 @@
+{
+  "schemaVersion": 1,
+  "scope": "PHASE2C_LOCAL_PERFORMANCE_DELIVERY_FINITE_ARTIFACT_GATE",
+  "generatedAt": "2026-09-29T21:40:11.101908+00:00",
+  "production": false,
+  "approvedBaseline": false,
+  "checkpoints": {
+    "score": 4000,
+    "eligible": 960,
+    "recovery": 4000,
+    "lockSamples": 800,
+    "calcuttaLock": {
+      "nodeTests": 10,
+      "beforeAfterRpcPairs": 3,
+      "retainedRealWaitCycles": 3,
+      "heldIntentAndStaleLease": true,
+      "sourceCapture": "PRE_POST_SOURCE_STABLE_WRAPPER",
+      "universalDeadlockFreedom": "NOT_PROVEN"
+    },
+    "netOwnerLock": {
+      "nodeTests": 20,
+      "beforeAfterSchedules": 8,
+      "rejectionRollbacks": 2,
+      "twoRoundSerialParity": true,
+      "futureFunctionRuntime": "ACTUAL_CLAIM_CALCULATOR_COMPLETION_WITH_OUTER_CERTIFICATION_SEAM",
+      "futurePrefixLock": "ACTUAL_WAIT_AND_DOWNSTREAM_NOWAIT_PROBES",
+      "futureFunctionConcurrency": "Full future Director Lock/Finalize schedule NOT_PROVEN; protected annual admission is separate",
+      "irrelevantHistoryMaxPlans": [
+        1000,
+        10000
+      ],
+      "financialPublication": "NOT_AUTOMATED"
+    },
+    "expiryBundleLock": {
+      "nodeTests": 16,
+      "runtimeSchedules": 14,
+      "retainedBeforeCycles": 6,
+      "repairedBeforeAfterPairs": 6,
+      "unchangedPreclaimSkipLockedCases": 2,
+      "futureScope": "Actual future worker plus installed match-control trigger; outer runtime seam, not protected annual Director RPC",
+      "universalDeadlockFreedom": "NOT_PROVEN"
+    },
+    "deliveryIndexes": {
+      "nodeTests": 23,
+      "exactRetainedIndexes": [
+        "production_control.score_derived_delivery_attempts_work_v1",
+        "scoring_authority.calcutta_v1_recalculation_jobs_delivery_terminal",
+        "scoring_authority.competition_recalculation_jobs_delivery_due",
+        "scoring_authority.net_skins_v1_recalculation_jobs_delivery_terminal",
+        "scoring_authority.score_derived_intents_terminal_v1"
+      ],
+      "removedOptionalIndexes": [
+        "scoring_authority.calcutta_v1_recalculation_jobs_delivery_due",
+        "scoring_authority.competition_recalculation_jobs_delivery_terminal",
+        "scoring_authority.net_skins_v1_recalculation_jobs_delivery_due"
+      ],
+      "counterfactualCases": 22,
+      "defaultPlanner": true,
+      "scope": "Actual extracted selector plans and semantic equality; not full RPC throughput, capacity, or write-amplification proof",
+      "indexApproval": "SEPARATE_ENGINEERING_REVIEW_REQUIRED"
+    },
+    "delivery": {
+      "behavioralOutcomes": 54,
+      "processingBudget": "5000ms per SQL statement; not total process deadline",
+      "hostedSupervisor": "NOT_PROVEN"
+    },
+    "workerHistory": {
+      "branches": 32,
+      "samplesPerFamilyOperation": 3,
+      "extremeHistoryRowsWithPlans": 16,
+      "corePlanCaptures": 48,
+      "additionalPlanProfiles": 2,
+      "intermediateRowsTimingOnly": 16,
+      "planScope": "1x/10x all8 variants; final-ready/index comparisons only none1x/10x",
+      "p95": "NOT_PROVEN",
+      "p99": "NOT_PROVEN",
+      "indexQuality": "ENGINEERING_PLAN_REVIEW_REQUIRED"
+    },
+    "backlog": {
+      "scenarios": 2,
+      "initialDemand": [
+        18,
+        108
+      ],
+      "continuedCanonicalScores": 24,
+      "resources": "SAMPLED_NOT_LIFETIME_MAXIMA",
+      "providerCapacity": "NOT_PROVEN"
+    },
+    "backlogTail": {
+      "profiles": [
+        {
+          "profile": "normal_preload_one_hole",
+          "qualifiedSamples": 1008,
+          "nonqualifyingSamples": 0,
+          "bursts": 28,
+          "resourceSamples": 3061,
+          "observedWorkerFailures": {
+            "40001": 28
+          },
+          "scoreP99Ms": 16.901834000000235,
+          "lockLowerP99Ms": 12.26,
+          "lockUpperP99Ms": 16.901834000000235
+        },
+        {
+          "profile": "larger_preload_six_holes",
+          "qualifiedSamples": 1008,
+          "nonqualifyingSamples": 0,
+          "bursts": 28,
+          "resourceSamples": 4566,
+          "observedWorkerFailures": {
+            "40001": 28
+          },
+          "scoreP99Ms": 16.974708000023384,
+          "lockLowerP99Ms": 12.803,
+          "lockUpperP99Ms": 16.974708000023384
+        }
+      ],
+      "method": "Repeated identical localBB bursts; ordinary accepted score only; pendingautomatic demand observed immediately beforeRPC",
+      "statisticalLimit": "Empirical1000plus samples perprofile, no confidence interval orProductionSLO",
+      "lockDuration": "Lower/upper bounds, notexactCOMMITtimestamp"
+    },
+    "finite": {
+      "faultCases": 6,
+      "normalScoreMs": 1000,
+      "workerMs": 5000,
+      "injectedMs": 25,
+      "productionHeadroom": "NOT_PROVEN"
+    }
+  },
+  "failures": [],
+  "missing": [],
+  "limitations": [
+    "Retained artifact validation does not run SQL or substitute for runtime tests.",
+    "Independent engineering nested-query/index review, full security/client/golf/regression proof and314requirement adjudication are separate gates.",
+    "Local scheduler noise allowances are proposed engineering checks, notProduction SLOs.",
+    "No deployment authorization, providercapacity, hosted supervision or physical proof."
+  ],
+  "status": "PASS",
+  "inputs": [
+    {
+      "path": "docs/reliability/phase2c/benchmark-baseline-common.json",
+      "sha256": "d26bda42eda2a952193bda67bfeed80622167325496e653a698ec398e262498e"
+    },
+    {
+      "path": "docs/reliability/phase2c/benchmark-baseline-eligible.json",
+      "sha256": "082034a7ae6e7060755ea4bbb54c22a69ac6db518a1fc1a5ecab3e0700d4cf14"
+    },
+    {
+      "path": "docs/reliability/phase2c/benchmark-candidate-common.json",
+      "sha256": "1547f03216c08420bb666d74d63a1a00ab058e6f1f27b8f2db51f723e6616292"
+    },
+    {
+      "path": "docs/reliability/phase2c/benchmark-candidate-eligible.json",
+      "sha256": "879021af1133b9ec014cf6a22bf9c2d956f1abedfca54dacba54437fc2051d8a"
+    },
+    {
+      "path": "docs/reliability/phase2c/benchmark-candidate-recovery.json",
+      "sha256": "c2a64c76e17523d8d61eb70509f30539a6162582c1993ea962711bccbb52953e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/backlog-pressure-results.json",
+      "sha256": "fd03ce1c7776d9a6022226a08dc88a7f2763353c1a993267264afab2f2b254d9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/backlog-pressure.json",
+      "sha256": "3535067952bedac3f5e9d5d16fb020c566efa87f27173f9bef4603e4ea4105af"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/backlog-tail-results.json",
+      "sha256": "69ffc41bbb26ec8632db5ebf02d90868ba594867589b4798923c847e055727cf"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/backlog-tail.json",
+      "sha256": "d88b45611824dead8efb6046d42a696e153f7070f96383c8eb67524b4c175ba2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/calcutta-current-job-lock-after.json",
+      "sha256": "d69bdcce38f8f0c48406e2b1c8223026d4f169504756ea111a052508a51220dc"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/calcutta-lock-order.json",
+      "sha256": "990cb30fa365d8e43742fdaa60f3775c8ac1d27fc995a6d74e70792444f33831"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-common-10x-none-plan.json",
+      "sha256": "0dd6fcffbb2897782af139d1f65aba7a0d91341f67cb86211cf57e833b1079f9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-common-1x-none-plan.json",
+      "sha256": "0fb1f3fa6f969f23246551d3ceb5f946af8f9291fe9ef752dead059957d82fef"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-common-2x-none-plan.json",
+      "sha256": "7f7fa8c32c3a1b7b2472cfd87bb141876e04cf3cdb57cf9449625a72369f569a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-common-5x-none-plan.json",
+      "sha256": "afc19d812645b68c824da54a5dce29562d28afeab2eef5bc083c3fd414f61525"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-current_compatible-plan.json",
+      "sha256": "8804ed68c13d04dbc47e5a9ccf35a5f4ea9181beaa24b9e7184a15d3f1e95532"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-current_incompatible_consumed-plan.json",
+      "sha256": "ebe252c56af6c5a852c79c36eddec8120d712dac8018283683642824d334956b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-current_incompatible_financial-plan.json",
+      "sha256": "626961ee8e230a5ebad45ac06f0c95b5684137df9b07c611fd8ca86d970fb4eb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-multiple_receipts-plan.json",
+      "sha256": "8e2bb9cde316d8d7f66ec2affaa35cf8305a170fa28583d7647205e91e64a24e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-none-plan.json",
+      "sha256": "a9ef2f62f06d47bef1261799bba6aaed12527c31dc90df03283228a6be453d80"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-stale_result_binding-plan.json",
+      "sha256": "62a01cc7466d4c65fb8e57da0dc99f9aade99d8adad728a1515d453d3c34e7a9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-stale_source-plan.json",
+      "sha256": "c480538846825a3c0d50497b4cb7ebd5780bfcda7af37fdcf401479aec473214"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-superseded_result-plan.json",
+      "sha256": "5eac316917ab90f456665c9a0d0a87decdcfb1ded4305d7609c2ae9b70c79813"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-current_compatible-plan.json",
+      "sha256": "6b9759b687acf3fb7c1c374df5cf2a98e27f06b891dbcb8685d7a334f0b8649e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-current_incompatible_consumed-plan.json",
+      "sha256": "be51987061acdf57e4add209c11cde3222f669cd665140ab4dc9caf2a4eeea8c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-current_incompatible_financial-plan.json",
+      "sha256": "0572dd965b73078b18fe05aef088ede68336f5c69ca12f7ea1b7a36010e8dbfb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-multiple_receipts-plan.json",
+      "sha256": "1780966bf9185b719473d800fd21e0e80b766052c25d8e07e7f7af07b979b93e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-none-plan.json",
+      "sha256": "b4a7fd82d944291942eefef9397d8a702f2dfb95e55448f681c55629b433cc56"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-stale_result_binding-plan.json",
+      "sha256": "7d0bba569b729561a13065113fb720fbda5686a9f93339619d483c081436f5ed"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-stale_source-plan.json",
+      "sha256": "15b68d09f6ab4d51046e195d3664f49335c7185f090685c61218cf0111705c88"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-superseded_result-plan.json",
+      "sha256": "ac5f3f45fdf5ed2d544a1ba05d4e802b0a7b50d287d839799c21525d7d288b06"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-recovery-10x-none-plan.json",
+      "sha256": "e9ac722bbadf2b53773c207252ef7ef8972d64d6b31f3e9a850729650faf1170"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-recovery-1x-none-plan.json",
+      "sha256": "ac7078ac70aa8f9fa24df376885ac3928d2d83f4c9ed7b8bbc55eb85759d3b1f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-recovery-2x-none-plan.json",
+      "sha256": "94662998bb20a125aae5e3da4ea81ecf23af459975c6be4da421578302145a45"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-recovery-5x-none-plan.json",
+      "sha256": "0ce5a2e23185e939554e73ca05fe17edff4207a6d5cf9677c9d223f26b76c1d0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-index-review-detail.json",
+      "sha256": "744c097ec53f6e5608113a660197ba9903f09f8ad6db49118e67bc8df49f2080"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-index-review.json",
+      "sha256": "dd8383437d05d2102b8c79ca9e2ba9758b1be0a57aecb200877f0742fa7d965f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery.json",
+      "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/finite.json",
+      "sha256": "b7fc65ac9cf97774189307499eb478b32ae3e6420fe31943342af1f8bc6e320c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json",
+      "sha256": "02cea96e6634a19aa0f4b691b9e08868e91aa71ed060e432fe389e8f49b714c3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-lock-order.json",
+      "sha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+      "sha256": "6fa44774080a25e1ee0a07f975283bb3b7104f12d5ecacb29c1cac2cf0fdd02b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-after.json",
+      "sha256": "896fa50dba80cdd4228823556a01571b2a8e0633d3dd5755b7ffed653458e13e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-order.json",
+      "sha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-detail.json",
+      "sha256": "7ef338e4c667ae32d98f3d71655a474daa3ae1db31fd77b9a3ac057fcd1659fb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history.json",
+      "sha256": "d31c74e44e2e73aa506a8e43a56a5b1af4d38c2b7cec9660e6e32bad5fed2633"
+    },
+    {
+      "path": "docs/reliability/phase2c/lock-duration-baseline.json",
+      "sha256": "76501d5217a1ae52b34d0c02851cb4973a2c086e2dae977beab34f435c162d5d"
+    },
+    {
+      "path": "docs/reliability/phase2c/lock-duration-candidate.json",
+      "sha256": "fe1a10eef683e61508f7600b6b832dad9883340266e89be032279e4afff878c0"
+    },
+    {
+      "path": "docs/reliability/phase2c/performance-gate.json",
+      "sha256": "dc167167a0affa866b185b1a031f7f36792909e763b6565780fe96789185f4d4"
+    },
+    {
+      "path": "docs/reliability/phase2c/timeout-results.json",
+      "sha256": "46adacf1a9158064c2a9acd4615d5f999459d2e814cfcccd1d2439445641abb5"
+    }
+  ],
+  "migrationSourceManifest": [
+    {
+      "path": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+      "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+    },
+    {
+      "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+    },
+    {
+      "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+    },
+    {
+      "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48"
+    }
+  ]
+}

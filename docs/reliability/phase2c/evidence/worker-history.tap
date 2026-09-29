@@ -1,0 +1,209 @@
+TAP version 13
+# Subtest: NA-P2C-B eight-intent materialization and current claim remain finite across irrelevant history
+    # Subtest: 1x none
+    ok 1 - 1x none
+      ---
+      duration_ms: 989.680083
+      type: 'test'
+      ...
+    # Subtest: 1x current_compatible
+    ok 2 - 1x current_compatible
+      ---
+      duration_ms: 948.665666
+      type: 'test'
+      ...
+    # Subtest: 1x current_incompatible_consumed
+    ok 3 - 1x current_incompatible_consumed
+      ---
+      duration_ms: 895.521792
+      type: 'test'
+      ...
+    # Subtest: 1x current_incompatible_financial
+    ok 4 - 1x current_incompatible_financial
+      ---
+      duration_ms: 940.518583
+      type: 'test'
+      ...
+    # Subtest: 1x stale_source
+    ok 5 - 1x stale_source
+      ---
+      duration_ms: 978.526542
+      type: 'test'
+      ...
+    # Subtest: 1x stale_result_binding
+    ok 6 - 1x stale_result_binding
+      ---
+      duration_ms: 1044.019584
+      type: 'test'
+      ...
+    # Subtest: 1x superseded_result
+    ok 7 - 1x superseded_result
+      ---
+      duration_ms: 899.821167
+      type: 'test'
+      ...
+    # Subtest: 1x multiple_receipts
+    ok 8 - 1x multiple_receipts
+      ---
+      duration_ms: 925.583125
+      type: 'test'
+      ...
+    # Subtest: 2x none
+    ok 9 - 2x none
+      ---
+      duration_ms: 941.758708
+      type: 'test'
+      ...
+    # Subtest: 2x current_compatible
+    ok 10 - 2x current_compatible
+      ---
+      duration_ms: 969.775
+      type: 'test'
+      ...
+    # Subtest: 2x current_incompatible_consumed
+    ok 11 - 2x current_incompatible_consumed
+      ---
+      duration_ms: 871.797875
+      type: 'test'
+      ...
+    # Subtest: 2x current_incompatible_financial
+    ok 12 - 2x current_incompatible_financial
+      ---
+      duration_ms: 880.9455
+      type: 'test'
+      ...
+    # Subtest: 2x stale_source
+    ok 13 - 2x stale_source
+      ---
+      duration_ms: 1034.416833
+      type: 'test'
+      ...
+    # Subtest: 2x stale_result_binding
+    ok 14 - 2x stale_result_binding
+      ---
+      duration_ms: 926.28875
+      type: 'test'
+      ...
+    # Subtest: 2x superseded_result
+    ok 15 - 2x superseded_result
+      ---
+      duration_ms: 1086.840666
+      type: 'test'
+      ...
+    # Subtest: 2x multiple_receipts
+    ok 16 - 2x multiple_receipts
+      ---
+      duration_ms: 1018.744833
+      type: 'test'
+      ...
+    # Subtest: 5x none
+    ok 17 - 5x none
+      ---
+      duration_ms: 856.328
+      type: 'test'
+      ...
+    # Subtest: 5x current_compatible
+    ok 18 - 5x current_compatible
+      ---
+      duration_ms: 980.485375
+      type: 'test'
+      ...
+    # Subtest: 5x current_incompatible_consumed
+    ok 19 - 5x current_incompatible_consumed
+      ---
+      duration_ms: 1013.371541
+      type: 'test'
+      ...
+    # Subtest: 5x current_incompatible_financial
+    ok 20 - 5x current_incompatible_financial
+      ---
+      duration_ms: 932.661083
+      type: 'test'
+      ...
+    # Subtest: 5x stale_source
+    ok 21 - 5x stale_source
+      ---
+      duration_ms: 1020.229709
+      type: 'test'
+      ...
+    # Subtest: 5x stale_result_binding
+    ok 22 - 5x stale_result_binding
+      ---
+      duration_ms: 1006.254875
+      type: 'test'
+      ...
+    # Subtest: 5x superseded_result
+    ok 23 - 5x superseded_result
+      ---
+      duration_ms: 859.644833
+      type: 'test'
+      ...
+    # Subtest: 5x multiple_receipts
+    ok 24 - 5x multiple_receipts
+      ---
+      duration_ms: 1090.091167
+      type: 'test'
+      ...
+    # Subtest: 10x none
+    ok 25 - 10x none
+      ---
+      duration_ms: 1659.994625
+      type: 'test'
+      ...
+    # Subtest: 10x current_compatible
+    ok 26 - 10x current_compatible
+      ---
+      duration_ms: 1966.502791
+      type: 'test'
+      ...
+    # Subtest: 10x current_incompatible_consumed
+    ok 27 - 10x current_incompatible_consumed
+      ---
+      duration_ms: 1893.109375
+      type: 'test'
+      ...
+    # Subtest: 10x current_incompatible_financial
+    ok 28 - 10x current_incompatible_financial
+      ---
+      duration_ms: 1764.974375
+      type: 'test'
+      ...
+    # Subtest: 10x stale_source
+    ok 29 - 10x stale_source
+      ---
+      duration_ms: 1702.28875
+      type: 'test'
+      ...
+    # Subtest: 10x stale_result_binding
+    ok 30 - 10x stale_result_binding
+      ---
+      duration_ms: 1439.319375
+      type: 'test'
+      ...
+    # Subtest: 10x superseded_result
+    ok 31 - 10x superseded_result
+      ---
+      duration_ms: 1334.52225
+      type: 'test'
+      ...
+    # Subtest: 10x multiple_receipts
+    ok 32 - 10x multiple_receipts
+      ---
+      duration_ms: 1624.296875
+      type: 'test'
+      ...
+    1..32
+ok 1 - NA-P2C-B eight-intent materialization and current claim remain finite across irrelevant history
+  ---
+  duration_ms: 156208.743416
+  type: 'test'
+  ...
+1..1
+# tests 33
+# suites 0
+# pass 33
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 156286.59825

@@ -1,0 +1,19 @@
+{
+  "observedAt": "2026-09-29T20:56:50.431026+00:00",
+  "result": "NEW_SOURCE_ORDER_REGRESSION_CORRECTED_RERUN_REQUIRED",
+  "files": [
+    {
+      "path": "lib/production-calcutta-server.js",
+      "oldSha256": "73b6d03776ac29216f83ca0088cc95b918a9960539a7fd441b2443fe1bc95b37",
+      "newSha256": "cb183d4b5f8159dad552541a72ec5b83e18378c7c50705955c129ec2784be89b",
+      "change": "Move existing server-only marker before existing classifier import; tests unchanged; no function body changes."
+    },
+    {
+      "path": "lib/production-net-skins-server.js",
+      "oldSha256": "087505a35d83ad1fa743374396ea3be1338b2c1e1290d23bba20eb2e734f9a0f",
+      "newSha256": "4007eee4e309d18ae2e2d89f80980c306de29e7e78b5e9fad07f68f408690952",
+      "change": "Move existing server-only marker before existing classifier import; tests unchanged; no function body changes."
+    }
+  ],
+  "production": false
+}

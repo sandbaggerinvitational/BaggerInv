@@ -1,0 +1,177 @@
+TAP version 13
+# Subtest: NA-P2C-B eight-intent materialization and current claim remain finite across irrelevant history
+    # Subtest: 1x none
+    ok 1 - 1x none
+      ---
+      duration_ms: 1059.363833
+      type: 'test'
+      ...
+    # Subtest: 1x current_compatible
+    ok 2 - 1x current_compatible
+      ---
+      duration_ms: 955.277209
+      type: 'test'
+      ...
+    # Subtest: 1x current_incompatible_consumed
+    ok 3 - 1x current_incompatible_consumed
+      ---
+      duration_ms: 1143.643667
+      type: 'test'
+      ...
+    # Subtest: 1x current_incompatible_financial
+    ok 4 - 1x current_incompatible_financial
+      ---
+      duration_ms: 1120.961209
+      type: 'test'
+      ...
+    # Subtest: 1x stale_source
+    ok 5 - 1x stale_source
+      ---
+      duration_ms: 980.347917
+      type: 'test'
+      ...
+    # Subtest: 1x stale_result_binding
+    ok 6 - 1x stale_result_binding
+      ---
+      duration_ms: 918.377667
+      type: 'test'
+      ...
+    # Subtest: 1x superseded_result
+    ok 7 - 1x superseded_result
+      ---
+      duration_ms: 899.2515
+      type: 'test'
+      ...
+    # Subtest: 1x multiple_receipts
+    ok 8 - 1x multiple_receipts
+      ---
+      duration_ms: 945.795125
+      type: 'test'
+      ...
+    # Subtest: 2x none
+    ok 9 - 2x none
+      ---
+      duration_ms: 868.53325
+      type: 'test'
+      ...
+    # Subtest: 2x current_compatible
+    ok 10 - 2x current_compatible
+      ---
+      duration_ms: 868.425125
+      type: 'test'
+      ...
+    # Subtest: 2x current_incompatible_consumed
+    ok 11 - 2x current_incompatible_consumed
+      ---
+      duration_ms: 910.152583
+      type: 'test'
+      ...
+    # Subtest: 2x current_incompatible_financial
+    ok 12 - 2x current_incompatible_financial
+      ---
+      duration_ms: 992.274708
+      type: 'test'
+      ...
+    # Subtest: 2x stale_source
+    ok 13 - 2x stale_source
+      ---
+      duration_ms: 844.439542
+      type: 'test'
+      ...
+    # Subtest: 2x stale_result_binding
+    ok 14 - 2x stale_result_binding
+      ---
+      duration_ms: 789.2135
+      type: 'test'
+      ...
+    # Subtest: 2x superseded_result
+    ok 15 - 2x superseded_result
+      ---
+      duration_ms: 842.579375
+      type: 'test'
+      ...
+    # Subtest: 2x multiple_receipts
+    ok 16 - 2x multiple_receipts
+      ---
+      duration_ms: 862.248
+      type: 'test'
+      ...
+    # Subtest: 5x none
+    ok 17 - 5x none
+      ---
+      duration_ms: 836.391917
+      type: 'test'
+      ...
+    # Subtest: 5x current_compatible
+    ok 18 - 5x current_compatible
+      ---
+      duration_ms: 1012.962375
+      type: 'test'
+      ...
+    # Subtest: 5x current_incompatible_consumed
+    ok 19 - 5x current_incompatible_consumed
+      ---
+      duration_ms: 958.628917
+      type: 'test'
+      ...
+    # Subtest: 5x current_incompatible_financial
+    ok 20 - 5x current_incompatible_financial
+      ---
+      duration_ms: 1105.562583
+      type: 'test'
+      ...
+    # Subtest: 5x stale_source
+    ok 21 - 5x stale_source
+      ---
+      duration_ms: 998.8985
+      type: 'test'
+      ...
+    # Subtest: 5x stale_result_binding
+    ok 22 - 5x stale_result_binding
+      ---
+      duration_ms: 834.3735
+      type: 'test'
+      ...
+    # Subtest: 5x superseded_result
+    ok 23 - 5x superseded_result
+      ---
+      duration_ms: 970.078458
+      type: 'test'
+      ...
+    # Subtest: 5x multiple_receipts
+    ok 24 - 5x multiple_receipts
+      ---
+      duration_ms: 1104.48125
+      type: 'test'
+      ...
+    1..24
+not ok 1 - NA-P2C-B eight-intent materialization and current claim remain finite across irrelevant history
+  ---
+  duration_ms: 106826.004
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker-history.test.mjs:17:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    /opt/homebrew/opt/postgresql@17/bin/psql
+    ERROR:  canceling statement due to statement timeout
+    CONTEXT:  PL/pgSQL function production_control.net_skins_entries_projection_v1(text) line 11 at SQL statement
+    SQL function "net_skins_v1_round_source_revision" statement 1
+    
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+    sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+    seedSyntheticSideGameHistory (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/synthetic-history.mjs:428:3)
+    TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker-history.test.mjs:26:4)
+    async Test.run (node:internal/test_runner/test:1404:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+1..1
+# tests 25
+# suites 0
+# pass 24
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 106915.989083

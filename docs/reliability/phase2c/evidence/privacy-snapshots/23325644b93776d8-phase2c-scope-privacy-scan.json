@@ -1,0 +1,4079 @@
+{
+  "timestamp": "2026-09-29T22:00:20.239235+00:00",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "scope": "git diff base plus nonignored untracked files; full bytes, not additions only",
+  "files": [
+    {
+      "path": "app/api/mobile/v1/scoring/mutation-status/route.js",
+      "bytes": 225,
+      "sha256": "6d4ffb20d5dd156c8ed4af1fd71a0a275304debdb550d8b477bed470931878d9"
+    },
+    {
+      "path": "app/api/scoring/mutation-status/route.js",
+      "bytes": 203,
+      "sha256": "39e35bfe30419eb87ae092e7b17feb5e8164abb963c5dc861ba0a3e585cd0c2a"
+    },
+    {
+      "path": "docs/reliability/phase2/evidence/phase2c-before-migration.json",
+      "bytes": 10106,
+      "sha256": "137c0e8d9e2a35ff10a42289b8ca261d0501a4b48eff32a3e626c4f07777366e"
+    },
+    {
+      "path": "docs/reliability/phase2/evidence/phase2c-before-score.json",
+      "bytes": 27646,
+      "sha256": "01c03cf5d0f9d5ecb83fb7c79e6c8cb6fbfffc0f607fae540ef7e1eb0a59bc66"
+    },
+    {
+      "path": "docs/reliability/phase2c/ANNUAL-WORKER-42883.md",
+      "bytes": 15449,
+      "sha256": "da366f5079a24e03ecf5b0d9e6a2958e5f5ad823d564e57405ba49bd8ef971b1"
+    },
+    {
+      "path": "docs/reliability/phase2c/AUDIT-COMPLETENESS.md",
+      "bytes": 208551,
+      "sha256": "5ffa7583adfe24d2dfc23ea2c0cf13944bb13d57a3d4af97448eb3cf169e9d35"
+    },
+    {
+      "path": "docs/reliability/phase2c/BEFORE.md",
+      "bytes": 3403,
+      "sha256": "75c9367e35a2dc10bcd6c7246b427ef8550cb392d0f14273ff5c08e7280e1ef7"
+    },
+    {
+      "path": "docs/reliability/phase2c/CANDIDATE-MANIFEST.md",
+      "bytes": 1481,
+      "sha256": "d71bec61a1128958207802ff3907e8909e7027e47ffc59e730d719e17e19f9d9"
+    },
+    {
+      "path": "docs/reliability/phase2c/CERTIFICATION.md",
+      "bytes": 8553,
+      "sha256": "f3c965db2eb7dc89467ae44d23624c4072463b69be095648b0d0698c44818a58"
+    },
+    {
+      "path": "docs/reliability/phase2c/CHANGE-SUMMARY.md",
+      "bytes": 23787,
+      "sha256": "280c9099d024c669716bceaa4a2ddd026a479b55ac5a2f36fcd07a0c1b219b51"
+    },
+    {
+      "path": "docs/reliability/phase2c/CLIENT-COMPATIBILITY.md",
+      "bytes": 7805,
+      "sha256": "c8a48227ba991b70e2e42b7bc9a357978582e626a2971434fb12c1162cf69b9e"
+    },
+    {
+      "path": "docs/reliability/phase2c/DEPLOYMENT-PLAN.md",
+      "bytes": 8156,
+      "sha256": "7241077c4a0e91ca8f068ca0112d090dd8607ebabc4fd1888ce4527beac9931f"
+    },
+    {
+      "path": "docs/reliability/phase2c/DERIVED-DELIVERY.md",
+      "bytes": 29060,
+      "sha256": "1e3eaaffc1259fe7742bde82e1fae3c82980d8e3a84f2417efea05f880bfbf8c"
+    },
+    {
+      "path": "docs/reliability/phase2c/DERIVED-WORKER-CONTRACT.md",
+      "bytes": 14102,
+      "sha256": "d415a1bc9352a6176393d0bef09416d4d101293bc280233911a5610be01c16be"
+    },
+    {
+      "path": "docs/reliability/phase2c/DISCOVERED-ISSUES.md",
+      "bytes": 10286,
+      "sha256": "7045ea16eaa349c113007ba5a9909092e6c47cf5164b2af931d1f42296edadb4"
+    },
+    {
+      "path": "docs/reliability/phase2c/ENGINEERING-REVIEW.md",
+      "bytes": 15609,
+      "sha256": "86c693952cc707d432cff9665b13998c38aa3e9be144b43e0599793a4bddda50"
+    },
+    {
+      "path": "docs/reliability/phase2c/EVIDENCE.md",
+      "bytes": 7734,
+      "sha256": "4c766ad03d58b723cedcf8fc0d47461a62d2407efc5855f3035458963bb38e1f"
+    },
+    {
+      "path": "docs/reliability/phase2c/FAILURE-INJECTION.md",
+      "bytes": 4998,
+      "sha256": "592a2438879a3f0e8c508156dc7a7ee950b0e22393042ea2e2f7a87a2d5dd3ed"
+    },
+    {
+      "path": "docs/reliability/phase2c/FINITE-TIMEOUT.md",
+      "bytes": 2873,
+      "sha256": "ae9fac42db26c572d83290a2ea5b8efb6a3f8c8cf1c6d08a293ee1582e213b6d"
+    },
+    {
+      "path": "docs/reliability/phase2c/FULL-SEQUENCE.md",
+      "bytes": 6387,
+      "sha256": "33657a6d22e41d9517480945b18e1233af46af106ab5b596f6a440678212d7ed"
+    },
+    {
+      "path": "docs/reliability/phase2c/FUTURE-CLIENT-OPERATIONS.md",
+      "bytes": 3604,
+      "sha256": "3ff29c19588723865529408fbe0ec88fbe691b7e42f79d36003bb1e12d30b4e9"
+    },
+    {
+      "path": "docs/reliability/phase2c/FUTURE-STAGING-REQUIREMENTS.md",
+      "bytes": 2060,
+      "sha256": "26a0381dca9f8fa75bf93737cc2fcb69d977ac46de28887fc49fc591a9f97468"
+    },
+    {
+      "path": "docs/reliability/phase2c/GOOGLE-OUTBOX-GAP.md",
+      "bytes": 10230,
+      "sha256": "ae4a8da156c004de658f6bbea310a524f70f1e333d8c08d787fd4ee4a5dba205"
+    },
+    {
+      "path": "docs/reliability/phase2c/MIGRATION-MANIFEST.md",
+      "bytes": 17020,
+      "sha256": "ac24451b20ee3e27fe427658d8fcb61beaa2e64367f4965da236b2744a7f83de"
+    },
+    {
+      "path": "docs/reliability/phase2c/NET-SKINS-DEADLOCK.md",
+      "bytes": 6639,
+      "sha256": "b07637bbc6eeb9e243462b2cb289c538bd0dd6975477ec6cb5b9bd2236e102a2"
+    },
+    {
+      "path": "docs/reliability/phase2c/NEXT-PHASE.md",
+      "bytes": 7260,
+      "sha256": "8730eedbdd1c6c6bdd1fc6fa781d85e5fd5edaa7b0c56d615034752e7db55558"
+    },
+    {
+      "path": "docs/reliability/phase2c/OPERATIONS-BOUNDARIES.md",
+      "bytes": 3394,
+      "sha256": "796eb8db5c29a82652270ee5c15c3ad13e349a488ee0b10abc11683d77403165"
+    },
+    {
+      "path": "docs/reliability/phase2c/OWNER-REVIEW.md",
+      "bytes": 8186,
+      "sha256": "33c8e0f3d5ed66d69921cc8c4c34f04ef24861e087da0dd74b336d64e9eda7c0"
+    },
+    {
+      "path": "docs/reliability/phase2c/P0-CLOSURE.md",
+      "bytes": 3769,
+      "sha256": "fdff106338b79cf41b0af629554f0299828d096139d2d7696e6446a21909ddae"
+    },
+    {
+      "path": "docs/reliability/phase2c/PERFORMANCE.md",
+      "bytes": 25445,
+      "sha256": "a4e99038b6f51bfe9871e13437c8724e393a4d22bd1d08bed2b43f28a8693e76"
+    },
+    {
+      "path": "docs/reliability/phase2c/POST-REVOCATION-RECOVERY-CONTRACT.md",
+      "bytes": 8257,
+      "sha256": "05f6c396e02aad96ad1ae3347b1a7618b5acb684797c13554dcbe861fd7094a7"
+    },
+    {
+      "path": "docs/reliability/phase2c/PROOF-MATRIX.md",
+      "bytes": 56075,
+      "sha256": "9c7cfe20f06432906deea5559dfe5cf8664ff901d1360c9c8af4327a8da7cb38"
+    },
+    {
+      "path": "docs/reliability/phase2c/QUERY-PLANS.md",
+      "bytes": 34923,
+      "sha256": "7d2bcde25eba68ec91717578250325c54225f21c499feda75f89bd28daf5ca1d"
+    },
+    {
+      "path": "docs/reliability/phase2c/README.md",
+      "bytes": 4085,
+      "sha256": "bcd5be67d9783c3daa69920bcce27f86a7c3429b386c0c8039ae3f2ff5389fb4"
+    },
+    {
+      "path": "docs/reliability/phase2c/RECOVERY-API-CONTRACT.md",
+      "bytes": 5715,
+      "sha256": "b62414242fc1a5a51f9cfcb78e198f7beaa39393f72746d36a1d3cb594c3a3b5"
+    },
+    {
+      "path": "docs/reliability/phase2c/RECOVERY-SECURITY.md",
+      "bytes": 5321,
+      "sha256": "efa3e254602242008140d290572b4cab624dccb2a342544b11f19baf876c8471"
+    },
+    {
+      "path": "docs/reliability/phase2c/RELEASE-COMPATIBILITY.md",
+      "bytes": 10623,
+      "sha256": "94960026608ec1dab8fd3ac77d790cc64ab07d09e42ff542a02cae474b9ace74"
+    },
+    {
+      "path": "docs/reliability/phase2c/REPRODUCE.md",
+      "bytes": 12350,
+      "sha256": "2dc8081181a437c1d35adb1f230a09542b41a3f90b93e0d1ec89b6a0b729333d"
+    },
+    {
+      "path": "docs/reliability/phase2c/RETRY-DEAD-LETTER.md",
+      "bytes": 15790,
+      "sha256": "6b26cec6f461cc7aefd3f47295a2b01a3038e0a5f8383c07d7d033903ba45924"
+    },
+    {
+      "path": "docs/reliability/phase2c/SCORE-MUTATION-RECOVERY-CONTRACT.md",
+      "bytes": 8314,
+      "sha256": "9c99d9d763fab4ae980f6ee295a511342d22b73585a7410f8ec1dae9567ef7b6"
+    },
+    {
+      "path": "docs/reliability/phase2c/SCORE-PATH-SCOPE.md",
+      "bytes": 3356,
+      "sha256": "fa821a92d7e499262926faea455690ae857c270b1082424872e37db24c6d0c61"
+    },
+    {
+      "path": "docs/reliability/phase2c/SECURITY.md",
+      "bytes": 2988,
+      "sha256": "96c986910467eb7bf3f86337e60ec85ea765f42f58c3f518a7d8e58de9001d24"
+    },
+    {
+      "path": "docs/reliability/phase2c/STAGING-ENTRY-CHECKLIST.md",
+      "bytes": 1842,
+      "sha256": "5ce5bd04e53862f60f196d3cb8110f4f4baa21495debebe9de7879f2bdd693c8"
+    },
+    {
+      "path": "docs/reliability/phase2c/TELEMETRY-MAPPING.md",
+      "bytes": 3580,
+      "sha256": "646b514d70b95b0e5cf11cd57d5f413405fa772d32a076cddaf1aee6ca3c5c7d"
+    },
+    {
+      "path": "docs/reliability/phase2c/TRACEABILITY.md",
+      "bytes": 20842,
+      "sha256": "f4a8bf9cef19e5736c47a6ed3aaa4c9a203136b6d317ea226ec95445ed5feeb2"
+    },
+    {
+      "path": "docs/reliability/phase2c/benchmark-baseline-common.json",
+      "bytes": 216143,
+      "sha256": "d26bda42eda2a952193bda67bfeed80622167325496e653a698ec398e262498e"
+    },
+    {
+      "path": "docs/reliability/phase2c/benchmark-baseline-eligible.json",
+      "bytes": 265802,
+      "sha256": "082034a7ae6e7060755ea4bbb54c22a69ac6db518a1fc1a5ecab3e0700d4cf14"
+    },
+    {
+      "path": "docs/reliability/phase2c/benchmark-candidate-common.json",
+      "bytes": 218959,
+      "sha256": "1547f03216c08420bb666d74d63a1a00ab058e6f1f27b8f2db51f723e6616292"
+    },
+    {
+      "path": "docs/reliability/phase2c/benchmark-candidate-eligible.json",
+      "bytes": 268426,
+      "sha256": "879021af1133b9ec014cf6a22bf9c2d956f1abedfca54dacba54437fc2051d8a"
+    },
+    {
+      "path": "docs/reliability/phase2c/benchmark-candidate-recovery.json",
+      "bytes": 219503,
+      "sha256": "c2a64c76e17523d8d61eb70509f30539a6162582c1993ea962711bccbb52953e"
+    },
+    {
+      "path": "docs/reliability/phase2c/candidate-manifest.json",
+      "bytes": 17256,
+      "sha256": "1acde9854df58ec8799e5b5e904bf8a05187e8863ead935b7fbc319a9097c712"
+    },
+    {
+      "path": "docs/reliability/phase2c/certification-gate.json",
+      "bytes": 15115,
+      "sha256": "47e6ea06660cc2b7dac920df251bdc8bc19950e63cce18a68543adb1a6b2acc7"
+    },
+    {
+      "path": "docs/reliability/phase2c/change-impact-graph.json",
+      "bytes": 10170,
+      "sha256": "5444a80de1b456fccf84f267078a800910a3f13bc1a82bb97ce6752c3226baa5"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence-ledger.json",
+      "bytes": 34023,
+      "sha256": "d7168e06ffb899ef40013912ba6a1460fe0b5f66b712919cc6badc4954c2946f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-admission-detail.json",
+      "bytes": 69959,
+      "sha256": "24b61df24bbcd0526740ced2f212bea1386138e98394a84bc412d54dedc177b2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-admission-final-plan-fixture-count.json",
+      "bytes": 13852,
+      "sha256": "c20a6722f8b2d7820ebd4625f4a0b5f987f8ddb2ea85208f39d57dc308f65842"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-admission-final-plan-fixture-count.tap",
+      "bytes": 1850,
+      "sha256": "c129d0fe0899f43af7d95e970848d546e95d4c94f12f0a5bce20bd3361b80fad"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-admission-run-pre-final85f9.json",
+      "bytes": 13852,
+      "sha256": "c20a6722f8b2d7820ebd4625f4a0b5f987f8ddb2ea85208f39d57dc308f65842"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-admission-run-pre-final85f9.tap",
+      "bytes": 1850,
+      "sha256": "c129d0fe0899f43af7d95e970848d546e95d4c94f12f0a5bce20bd3361b80fad"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-admission-run.json",
+      "bytes": 103281,
+      "sha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-admission-run.tap",
+      "bytes": 3317,
+      "sha256": "de1e6465da4359b73be6d54be51852bbbf27af109e36845150d494a397e602a7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-admission.json",
+      "bytes": 11800,
+      "sha256": "bc24cf62d4668a4c3f0c06629be3a3d59191be5a675a5d8d2e9d4cf2ada68cdb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-admission.tap",
+      "bytes": 3314,
+      "sha256": "5bb7bd68666959be5b7b014bc4a59dfdcad875c28b164d55aec6bd1857c6ffa5"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-authority-fixture-first-annual-admission-run.json",
+      "bytes": 12833,
+      "sha256": "7d821bfee1d7bcd580b6216f085c53a9d6205f57013e4e3c985ebb26734a3ea5"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-authority-fixture-first-annual-admission-run.tap",
+      "bytes": 3368,
+      "sha256": "2ceec685d32b61d62ccd8f1938c1a53b49f5c65efd238bc5468f1560d27fdcc7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-frozen-fixture-first-annual-workers.json",
+      "bytes": 54207,
+      "sha256": "de5fe24ac7611950f8b18ac77ee96cbd25989f4606a62a915c31c954687da1f3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-frozen-fixture-first-annual.json",
+      "bytes": 12970,
+      "sha256": "610aa9345f2e2a776101cd2dee4064e7cad9f1a2585bdf76734fe66d1310cd73"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-frozen-fixture-first-annual.tap",
+      "bytes": 9305,
+      "sha256": "3f1e0b15829055a6690b0e69a71606279ef44947a188c05e994455b0e8856695"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-history.json",
+      "bytes": 50014,
+      "sha256": "9bf694a6a9d42a187f5f8b607baf93c39d0b0d32dabb5a759d7c47a45dfca5a9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-matrix-first-annual-workers.json",
+      "bytes": 51558,
+      "sha256": "a7ade7a57734926440d8a9d8f6be6f0bd0fac1b0b61200addce123dbe71e4230"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-matrix-first-annual.json",
+      "bytes": 12795,
+      "sha256": "3445ae00028a062e6e205c64dfb35a105a6a74b3b3252a6bea575194303819c4"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-matrix-first-annual.tap",
+      "bytes": 10144,
+      "sha256": "3eaac8d3628431f5b0f38d85ac4aa5a5949c2d747f1444db34b1727407791022"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-matrix-second-annual-workers.json",
+      "bytes": 52074,
+      "sha256": "97f87667a546971aceb75943a65ec37c345d88a5b4c728d5941df0af67b023e7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-matrix-second-annual.json",
+      "bytes": 12794,
+      "sha256": "cd37eadbd9457ae82cb6a8fc5d3006018aedb273fb045b992616758883c1995d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-matrix-second-annual.tap",
+      "bytes": 8784,
+      "sha256": "32b080cda7901f61c25d95ee857fe09a5b853a3331c9c836a3f0df62d193f144"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-pre-final85f9.json",
+      "bytes": 12635,
+      "sha256": "057a37332d91abce15aec90e5b30d31213a79a139afac87d7e77ec31d96710a9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-pre-final85f9.tap",
+      "bytes": 7476,
+      "sha256": "3e986caa4ba581d51ab5a2798755ba244d425b241c94ad5b9ffb74a1fcb73ce5"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-sql-additional-before.json",
+      "bytes": 39876,
+      "sha256": "81ec1614c8d8098f3d1ba131ec020d45e641e5f2786284b21034c342b4643c9a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-sql-before.json",
+      "bytes": 206457,
+      "sha256": "6f569b38c7bda0648e5c12fc68933dff04afd874e6ff07999c4a4e23f39ef117"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-trigger-topology-before-fix.json",
+      "bytes": 10526,
+      "sha256": "0e0ef1e5bbc0c442636cc65f5cbec1cb5d5e1a23d19db831754552983668779c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-trigger-topology.json",
+      "bytes": 10278,
+      "sha256": "905867238b115e52da1b220e5805ead97f49966113d06dcbfe206de5f9110358"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-worker-branch-matrix-historical-18ff387534ee.json",
+      "bytes": 10565,
+      "sha256": "18ff387534ee8f259a9d6659719975ef6fde529fe7e29012a10f9c8bd1d6c5bc"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-worker-branch-matrix.json",
+      "bytes": 22875,
+      "sha256": "c164163faa1f11f6c39b61d6db142442aa083e2cf4207ee26914bbc3d30d72b5"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-workers-first-attempt.json",
+      "bytes": 26704,
+      "sha256": "8622190726654332b7b38a215a501ab4be3d3971c4e6b37952c4ff6fe6977378"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-workers-focused123.json",
+      "bytes": 33606,
+      "sha256": "112e4c7a91f70edcb3fd12ee7b4878d58ac5da679b3e8ded58ddf3289b32cdfb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual-workers.json",
+      "bytes": 56736,
+      "sha256": "5104e402498673fef5f6e697d47f9bf6a8f23018bc878310885d000825ffec78"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual.json",
+      "bytes": 107011,
+      "sha256": "d54a12f7b8fe717791c8fd60a10f21ef01eb70765c99f2b9b4bc3f3c29db1c7e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/annual.tap",
+      "bytes": 7476,
+      "sha256": "bc56ac006d332398efaf6a287b1e091516bf58032ae6e022749e23e9b88cfc40"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/application-comparison.json",
+      "bytes": 2817,
+      "sha256": "700fa01de301b3340a14030e6e0168f78626757582fd7df9fbc0b34af9300937"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/application-first-attempt.json",
+      "bytes": 148473,
+      "sha256": "8c3bc27599d70da507a025c4757c34feb9edfb8fb8e4c1ee2e829ead7176ee2a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+      "bytes": 1668239,
+      "sha256": "d7ac5856ca2bc094959e9a4049c563e150444ea89966cf016a3a9d2abb21e273"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/application.json",
+      "bytes": 2391784,
+      "sha256": "6ad50658761f8503f0966f1f3b1906baa8212bd1e650d7e42e7f8cbd449117da"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/application.tap",
+      "bytes": 1715481,
+      "sha256": "d52dc1402fd82a7410ebe1827833b0a865e9483dbf62373c42e00b0a957dfa9f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/artifact-gate-before-profile-correction/artifact-gate-unit.json",
+      "bytes": 1338,
+      "sha256": "1d2197645ea085a12ba4dcb75c5502aaac48f417c57421627b11462b3a79ac8c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/artifact-gate-before-profile-correction/artifact-gate-unit.log",
+      "bytes": 187,
+      "sha256": "bc1055e2d46b7dff9a7c62161801541de2c7f208a964f91e9d700b0cfa0fc70c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/artifact-gate-before-profile-correction/validator-test.py.txt",
+      "bytes": 65693,
+      "sha256": "9f2fc7c341a1b65bc3ff5b01cc74aff748537bed8311e0ddba82eb63c56f1966"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/artifact-gate-before-profile-correction/validator.py.txt",
+      "bytes": 80699,
+      "sha256": "a694d7f98ed0120ba52b6748afdc891f870d43dc1130fe28a1f962665d217f75"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/artifact-gate-unit-74-retained.json",
+      "bytes": 1338,
+      "sha256": "6178d8d341d609dc3f4ea99435cab80e25c6cc7ebffcc9896124736e20036544"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/artifact-gate-unit-74-retained.log",
+      "bytes": 173,
+      "sha256": "88626987f01a32345a0f1ac37008e455e680687b34307d121f157bb891405e40"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/artifact-gate-unit.json",
+      "bytes": 1467,
+      "sha256": "393fd3853f45342ccb8addfc0ae2ee9b4db66dfed45aaf12654191cc72c4a665"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/artifact-gate-unit.log",
+      "bytes": 200,
+      "sha256": "051ac6ae59d7cb08194e51f90f545cfa9186957815d6f9f88a56c07b1b2d5a83"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/audit-index-plans.json",
+      "bytes": 35250,
+      "sha256": "dc2209d85b9ae47fbf8b17386834500d6d0bdcd45997722d3ee65177a3cd9f67"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/backlog-pressure-results.json",
+      "bytes": 78195,
+      "sha256": "fd03ce1c7776d9a6022226a08dc88a7f2763353c1a993267264afab2f2b254d9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/backlog-pressure.json",
+      "bytes": 172291,
+      "sha256": "3535067952bedac3f5e9d5d16fb020c566efa87f27173f9bef4603e4ea4105af"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/backlog-pressure.tap",
+      "bytes": 666,
+      "sha256": "74e70f95dd2b615549acabc93c63b1e2892f7beedbba730552a093bbf08a7e4e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/backlog-tail-independent-review.json",
+      "bytes": 11884,
+      "sha256": "487bd0e2b150af1248378d62084298b72f2b95f4b865b6b0857cb03b30883845"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/backlog-tail-results.json",
+      "bytes": 5499304,
+      "sha256": "69ffc41bbb26ec8632db5ebf02d90868ba594867589b4798923c847e055727cf"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/backlog-tail.json",
+      "bytes": 172215,
+      "sha256": "d88b45611824dead8efb6046d42a696e153f7070f96383c8eb67524b4c175ba2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/backlog-tail.tap",
+      "bytes": 5268,
+      "sha256": "0ff66c64c93b56b92d6df75f1bc9d0840259409ff1fa8a7e6f7699f06382b078"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-common-10x-none-plan.json",
+      "bytes": 165911,
+      "sha256": "af30135b65f87567915890e9cb55e02058263c9cfb7d4663be932d6edafb29ff"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-common-1x-none-plan.json",
+      "bytes": 165902,
+      "sha256": "5d13a91d724c2177d91adb7f79dcb7df656b5c503668f6a3832f70f2b4f1cb16"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-common-2x-none-plan.json",
+      "bytes": 165570,
+      "sha256": "827b7f6827f898061c9c599470b38e48af368bdeb7357ed503c176edfb5dcd0c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-common-5x-none-plan.json",
+      "bytes": 165912,
+      "sha256": "ad1e12021579b3549ee13bea613fdefe995dc2a56fba0100107b4a73d369ba33"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-common-before-utc-profile.json",
+      "bytes": 119581,
+      "sha256": "febfc3d261ce54e0ff025f8add7be78274ab77b87822c3630a64e811724fa68f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-10x-current_compatible-plan.json",
+      "bytes": 165915,
+      "sha256": "4f6c97c050cf64cf55f52d19183ba720a2b0806aad1124a5c9f42e72f0f4af53"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-10x-current_incompatible_consumed-plan.json",
+      "bytes": 165920,
+      "sha256": "2aae452053d168076bc218f464fbd07e0fb511a915467b3aa843d56a388ef4ce"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-10x-current_incompatible_financial-plan.json",
+      "bytes": 165916,
+      "sha256": "9c8bbd21fbddacb177889d506d70a577336116a36f008ba3a2a9e74dd2042643"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-10x-multiple_receipts-plan.json",
+      "bytes": 165917,
+      "sha256": "384074c539ca95a0c36dcca9447864867884ace6dc563806f16aa5bd15e622f8"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-10x-none-plan.json",
+      "bytes": 165914,
+      "sha256": "1bfb5ecf081727b9d5648ec80946792f84f0a697b94ace5849aff53348e012d0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-10x-stale_result_binding-plan.json",
+      "bytes": 165910,
+      "sha256": "41a3a444a0a5e99d05bc8ba907d5bd4f57242fa22da224342e584b5e5b4a955d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-10x-stale_source-plan.json",
+      "bytes": 165912,
+      "sha256": "1efb77ecfbd9b77e3a41276bce24abebe9ba3d40c6b4da232b37e482dbe832c0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-10x-superseded_result-plan.json",
+      "bytes": 165914,
+      "sha256": "fe2497b9a11084aa110078ecbca32d15cc244954af1fc154d92ee9be936fc072"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-1x-current_compatible-plan.json",
+      "bytes": 165919,
+      "sha256": "c4314377c626932678c8b22340e7b3550b4a749f80e60b7b27e2caa1ec535b35"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-1x-current_incompatible_consumed-plan.json",
+      "bytes": 165921,
+      "sha256": "48f61629fbce50e181435c7371fb7b9354231bb23ff3444adc96ae35e946795a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-1x-current_incompatible_financial-plan.json",
+      "bytes": 165919,
+      "sha256": "828e5fed63ecf9989e96a37432e0c48bf4eac7c9b21e75331372c2264014bcd2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-1x-multiple_receipts-plan.json",
+      "bytes": 165922,
+      "sha256": "d9f83099b2c61f77118c410633723c906b11e3540325e73cd191e2bfad95bb85"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-1x-none-plan.json",
+      "bytes": 165919,
+      "sha256": "35ea5c8628304def1dbc2c07a6229bfc135ad54c90a932b3bc7e962183c3ebcd"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-1x-stale_result_binding-plan.json",
+      "bytes": 165915,
+      "sha256": "97e19b0e3a41a9458533e5642eae4f18729be32f68cbd56b929924d77306e46b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-1x-stale_source-plan.json",
+      "bytes": 165917,
+      "sha256": "2823b81b2ed6f601bf80607e0d631849b76bb22bf2ae81528d4094f26adf3b91"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/baseline-eligible-1x-superseded_result-plan.json",
+      "bytes": 165919,
+      "sha256": "bc1f61c898b9de8132d9bdef8e292f6e197dfa87b136aba226992dc32ad73703"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/before-migration.json",
+      "bytes": 10106,
+      "sha256": "137c0e8d9e2a35ff10a42289b8ca261d0501a4b48eff32a3e626c4f07777366e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/before-migration.tap",
+      "bytes": 1507,
+      "sha256": "93896b3e8b3ebdcd1f73b489a93ddd0cbe588ae311099720ccb01d58fd670116"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/before-score.json",
+      "bytes": 27646,
+      "sha256": "01c03cf5d0f9d5ecb83fb7c79e6c8cb6fbfffc0f607fae540ef7e1eb0a59bc66"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/before-score.tap",
+      "bytes": 3417,
+      "sha256": "c26961a3d107952559b5c3ea0a1db8d7ac8a960a59bd784fc77e42c8ba7a7e9e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/before-source-manifest.json",
+      "bytes": 27690,
+      "sha256": "0e0fec9f9d40ae281c1f03e52ad4870cf1f71cbf2c6008b180983f81130ab3e4"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/build.json",
+      "bytes": 1444612,
+      "sha256": "a8776ba7c28574058756cfc30993a7ab678eff1728db35491a24d56fc65223bb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/build.tap",
+      "bytes": 40056,
+      "sha256": "0535e42f6a0e81ebc0301d64fb76247de6f60a307261bc5a553753fcd6eef49f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/calcutta-current-job-before-definitions.json",
+      "bytes": 54922,
+      "sha256": "f66703f652db01c798bf2bdf8ae0e6f59225ab63c45631564004b6a269715854"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/calcutta-current-job-before.json",
+      "bytes": 10447,
+      "sha256": "57aca70ce1c7d15865c2bfcf3071d3b4b0f6c39c4f22e94c5674b66cd17e3ab1"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/calcutta-current-job-before.tap",
+      "bytes": 5034,
+      "sha256": "202f90d62114c0f139946db0b46ba90e60c3406cd92eb700862046303ab59722"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/calcutta-current-job-lock-after.json",
+      "bytes": 16172,
+      "sha256": "d69bdcce38f8f0c48406e2b1c8223026d4f169504756ea111a052508a51220dc"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/calcutta-current-job-lock-after.tap",
+      "bytes": 2199,
+      "sha256": "2c720accad30f0c07c11feee855a05e416f7e4a5f83a7a48cde4cabcdc449975"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/calcutta-current-job-lock-run.json",
+      "bytes": 1507,
+      "sha256": "0080b1b51e67cfeeed7bfa4c30dd8c350a59ea901170c16113a19f8d7533edd3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/calcutta-lock-order-pre-net-owner-lock.json",
+      "bytes": 14163,
+      "sha256": "b98068a0758db08c4e43dc0d47c00dfbaeaadca8c2fb8c38a845b5e8781a6731"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/calcutta-lock-order-pre-net-owner-lock.tap",
+      "bytes": 2202,
+      "sha256": "86208f1cc36afac34ff5b29d09a1eec5519b8a2d7a381e95705e8e19d4321792"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/calcutta-lock-order.json",
+      "bytes": 173970,
+      "sha256": "990cb30fa365d8e43742fdaa60f3775c8ac1d27fc995a6d74e70792444f33831"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/calcutta-lock-order.tap",
+      "bytes": 2203,
+      "sha256": "d1f26ca2f5ac5dcf6810a4b021643b7a555fc444222cc5c81334d0c85f001710"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-common-10x-none-plan.json",
+      "bytes": 165904,
+      "sha256": "0dd6fcffbb2897782af139d1f65aba7a0d91341f67cb86211cf57e833b1079f9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-common-1x-none-plan.json",
+      "bytes": 165903,
+      "sha256": "0fb1f3fa6f969f23246551d3ceb5f946af8f9291fe9ef752dead059957d82fef"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-common-2x-none-plan.json",
+      "bytes": 165567,
+      "sha256": "7f7fa8c32c3a1b7b2472cfd87bb141876e04cf3cdb57cf9449625a72369f569a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-common-5x-none-plan.json",
+      "bytes": 165910,
+      "sha256": "afc19d812645b68c824da54a5dce29562d28afeab2eef5bc083c3fd414f61525"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-current_compatible-plan.json",
+      "bytes": 165917,
+      "sha256": "8804ed68c13d04dbc47e5a9ccf35a5f4ea9181beaa24b9e7184a15d3f1e95532"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-current_incompatible_consumed-plan.json",
+      "bytes": 165911,
+      "sha256": "ebe252c56af6c5a852c79c36eddec8120d712dac8018283683642824d334956b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-current_incompatible_financial-plan.json",
+      "bytes": 165913,
+      "sha256": "626961ee8e230a5ebad45ac06f0c95b5684137df9b07c611fd8ca86d970fb4eb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-multiple_receipts-plan.json",
+      "bytes": 165915,
+      "sha256": "8e2bb9cde316d8d7f66ec2affaa35cf8305a170fa28583d7647205e91e64a24e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-none-plan.json",
+      "bytes": 165918,
+      "sha256": "a9ef2f62f06d47bef1261799bba6aaed12527c31dc90df03283228a6be453d80"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-stale_result_binding-plan.json",
+      "bytes": 165916,
+      "sha256": "62a01cc7466d4c65fb8e57da0dc99f9aade99d8adad728a1515d453d3c34e7a9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-stale_source-plan.json",
+      "bytes": 165918,
+      "sha256": "c480538846825a3c0d50497b4cb7ebd5780bfcda7af37fdcf401479aec473214"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-10x-superseded_result-plan.json",
+      "bytes": 165915,
+      "sha256": "5eac316917ab90f456665c9a0d0a87decdcfb1ded4305d7609c2ae9b70c79813"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-current_compatible-plan.json",
+      "bytes": 165916,
+      "sha256": "6b9759b687acf3fb7c1c374df5cf2a98e27f06b891dbcb8685d7a334f0b8649e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-current_incompatible_consumed-plan.json",
+      "bytes": 165922,
+      "sha256": "be51987061acdf57e4add209c11cde3222f669cd665140ab4dc9caf2a4eeea8c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-current_incompatible_financial-plan.json",
+      "bytes": 165928,
+      "sha256": "0572dd965b73078b18fe05aef088ede68336f5c69ca12f7ea1b7a36010e8dbfb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-multiple_receipts-plan.json",
+      "bytes": 165928,
+      "sha256": "1780966bf9185b719473d800fd21e0e80b766052c25d8e07e7f7af07b979b93e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-none-plan.json",
+      "bytes": 165922,
+      "sha256": "b4a7fd82d944291942eefef9397d8a702f2dfb95e55448f681c55629b433cc56"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-stale_result_binding-plan.json",
+      "bytes": 165918,
+      "sha256": "7d0bba569b729561a13065113fb720fbda5686a9f93339619d483c081436f5ed"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-stale_source-plan.json",
+      "bytes": 165919,
+      "sha256": "15b68d09f6ab4d51046e195d3664f49335c7185f090685c61218cf0111705c88"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-eligible-1x-superseded_result-plan.json",
+      "bytes": 165916,
+      "sha256": "ac5f3f45fdf5ed2d544a1ba05d4e802b0a7b50d287d839799c21525d7d288b06"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-recovery-10x-none-plan.json",
+      "bytes": 30424,
+      "sha256": "e9ac722bbadf2b53773c207252ef7ef8972d64d6b31f3e9a850729650faf1170"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-recovery-1x-none-plan.json",
+      "bytes": 30440,
+      "sha256": "ac7078ac70aa8f9fa24df376885ac3928d2d83f4c9ed7b8bbc55eb85759d3b1f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-recovery-2x-none-plan.json",
+      "bytes": 30421,
+      "sha256": "94662998bb20a125aae5e3da4ea81ecf23af459975c6be4da421578302145a45"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/candidate-recovery-5x-none-plan.json",
+      "bytes": 30419,
+      "sha256": "0ce5a2e23185e939554e73ca05fe17edff4207a6d5cf9677c9d223f26b76c1d0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/canonical-detail.json",
+      "bytes": 27669,
+      "sha256": "23791347a9e2cb0c0187bed758e318998eaa06cd7d892b92c87a74d3c47825f8"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/canonical.json",
+      "bytes": 101701,
+      "sha256": "d2cad26397bf031988ac1af8391eaca5a745e8bc3624a7c9ad9ce16a4324036f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/canonical.tap",
+      "bytes": 8285,
+      "sha256": "df3b65030f2628b743a362ca23ff8e30216688dba9ebc4ac9f651f2d35d0d87d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/core-report-generation.json",
+      "bytes": 1225,
+      "sha256": "7000504ad587ccde7768125ff36feb2877c71100acf69b16a00d8e125898e94a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/deadlock-pre-final85f9.json",
+      "bytes": 12643,
+      "sha256": "1bf0c8f914a0ffc10bee0241136070e0c3dea722a89bb1c3a43add2851af6c69"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/deadlock-pre-final85f9.tap",
+      "bytes": 2718,
+      "sha256": "fe1a009dd2bd178d79e2c434443e9fd27964cbfbcf81e783fc059d1672d2c390"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/deadlock.json",
+      "bytes": 146469,
+      "sha256": "5f89462b6e315e93399281b3afe8d06800d0d91866db4babf8688424a9f91334"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/deadlock.tap",
+      "bytes": 2717,
+      "sha256": "bb8d7b6516723c922c3a7e21d45999e2c5d2c7d045380d390ddca8d51cf073e3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-index-review-detail.json",
+      "bytes": 233434,
+      "sha256": "744c097ec53f6e5608113a660197ba9903f09f8ad6db49118e67bc8df49f2080"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-index-review.json",
+      "bytes": 172292,
+      "sha256": "dd8383437d05d2102b8c79ca9e2ba9758b1be0a57aecb200877f0742fa7d965f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-index-review.tap",
+      "bytes": 3542,
+      "sha256": "6c29bb33a282867882473dbe6079667289840324495efecd884a494f2d7d0c0b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-literal-death-first/PRESERVATION.json",
+      "bytes": 1684,
+      "sha256": "625da40a9b6ef12a25dc412c66d118a006b49673f6f9bc60883697b112c43002"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-literal-death-first/README.md",
+      "bytes": 1118,
+      "sha256": "8b4ab33e917785f6c6d9378f51db92bbd3a89af4bac28c5682809e5a7fe8e6b2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-literal-death-first/delivery.json",
+      "bytes": 176161,
+      "sha256": "e18d37b7a1969d09c06ba1e504a16b9c37d8058913bab5820f998e479987f919"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-literal-death-first/delivery.tap",
+      "bytes": 22876,
+      "sha256": "ed87b24cb72bb3df708ca7bb374fa2eb788341c057d13262c6a13c12e087e82e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-literal-death-first/phase2c-calculation-crash-hook.mjs",
+      "bytes": 3159,
+      "sha256": "69fc82b9b8a45f9ea60024fa5a064e5950f227c68a269e9e6651f00b7df8b766"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-literal-death-first/phase2c-worker-child.mjs",
+      "bytes": 8779,
+      "sha256": "2aace70cade841b2869de616795c5bcda16fda5dbb49f3f0716611032f39b0d5"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-literal-death-first/phase2c-worker.mjs",
+      "bytes": 7637,
+      "sha256": "8296bc143395abfc70ef4f1fc71ff9a346cb89b87f69b2505528ca1106ec5d12"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-literal-death-first/reliability-phase2c-worker.test.mjs",
+      "bytes": 69442,
+      "sha256": "2bd017f6c15c0264de1abc3ca3691903b7faf0c6adde1697e2ad4acda4eff188"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-literal-death-first/worker-delivery-results.json",
+      "bytes": 406995,
+      "sha256": "0871c2b1f865d7465521f529110076d63b50f0d892e823fd368bfec27b7c06e3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-live-expiry-first.json",
+      "bytes": 14471,
+      "sha256": "81adc1ece53790e8785c313ca296b3553fb49a06b443beda4d0376d471e3429f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-live-expiry-first.tap",
+      "bytes": 13137,
+      "sha256": "276647b89d46b50acc5aa1409d4f062f710aefcdb5c65af47b0394bda181fc29"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-pre-net-owner-lock.json",
+      "bytes": 12619,
+      "sha256": "2e1495bafe39704785db2a96ce90b4527945d2e6e4830a90fa638c136999d152"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery-pre-net-owner-lock.tap",
+      "bytes": 11100,
+      "sha256": "26e016595ade12b8ee1d8666084c475fb27a851523c4fe03802c199505603bcf"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery.json",
+      "bytes": 175817,
+      "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/delivery.tap",
+      "bytes": 14433,
+      "sha256": "3be04671e0a48daf5b23dc1565fb2e7cf10b455b6fe523d69ec7b438cd2a44b3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/derived-detail.json",
+      "bytes": 11512,
+      "sha256": "919918f55abf00a29d60d77e0ebf46518595142302fa14781bfa986924fd3742"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/derived-old-injection-target.json",
+      "bytes": 13139,
+      "sha256": "72862a004137580d1dcfec8861587e5381d7ece3c23ff28823e2965e341f4def"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/derived-old-injection-target.tap",
+      "bytes": 9120,
+      "sha256": "827b074c8f7988bb84f547babe12e3e06080a2179b0a52cc19e81ec556d23e45"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/derived-setup-timeout.json",
+      "bytes": 13994,
+      "sha256": "ed8f20786880e198a8f56c2edb344c3454ab5cb57a04bf39b9d47f89109fd757"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/derived-setup-timeout.tap",
+      "bytes": 1632,
+      "sha256": "9dd8635bbe46965cd8b568f0e50d4c4551c66f2c1e22d566fef05ea9a4391703"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/derived-timeout-test-equality.json",
+      "bytes": 13312,
+      "sha256": "bf93667d50e990c7286733e38512ba5992672b27b13cf1f4f5ff814ceb317695"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/derived-timeout-test-equality.tap",
+      "bytes": 6627,
+      "sha256": "228180a036c448e287d9decb78a5c615303789b74927fa5b5a4d128e47cbda8e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/derived.json",
+      "bytes": 103217,
+      "sha256": "f7587daad3a7ed4b6c694edb13d9d0b501ca62ea92d4722651f537c818e31f84"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/derived.tap",
+      "bytes": 4458,
+      "sha256": "6c2b2e421500955164f562669bab800b0c8c54832ebcb8e80bb224bb698811fe"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/PRESERVATION.json",
+      "bytes": 8386,
+      "sha256": "04afa5fb156a876de80c02ebc9f1f875fe58c5809e454d5bc14a1a13f1be9359"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/benchmark-baseline-common.json",
+      "bytes": 216143,
+      "sha256": "d26bda42eda2a952193bda67bfeed80622167325496e653a698ec398e262498e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/benchmark-baseline-eligible.json",
+      "bytes": 265802,
+      "sha256": "082034a7ae6e7060755ea4bbb54c22a69ac6db518a1fc1a5ecab3e0700d4cf14"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/benchmark-candidate-common.json",
+      "bytes": 218959,
+      "sha256": "1547f03216c08420bb666d74d63a1a00ab058e6f1f27b8f2db51f723e6616292"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/benchmark-candidate-eligible.json",
+      "bytes": 268439,
+      "sha256": "2e6021594c46ffedd3bc25b3720c70263941f34c3e86664581df2997fbdaa7d9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-common-10x-none-plan.json",
+      "bytes": 165911,
+      "sha256": "af30135b65f87567915890e9cb55e02058263c9cfb7d4663be932d6edafb29ff"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-common-1x-none-plan.json",
+      "bytes": 165902,
+      "sha256": "5d13a91d724c2177d91adb7f79dcb7df656b5c503668f6a3832f70f2b4f1cb16"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-common-2x-none-plan.json",
+      "bytes": 165570,
+      "sha256": "827b7f6827f898061c9c599470b38e48af368bdeb7357ed503c176edfb5dcd0c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-common-5x-none-plan.json",
+      "bytes": 165912,
+      "sha256": "ad1e12021579b3549ee13bea613fdefe995dc2a56fba0100107b4a73d369ba33"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-10x-current_compatible-plan.json",
+      "bytes": 165915,
+      "sha256": "4f6c97c050cf64cf55f52d19183ba720a2b0806aad1124a5c9f42e72f0f4af53"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-10x-current_incompatible_consumed-plan.json",
+      "bytes": 165920,
+      "sha256": "2aae452053d168076bc218f464fbd07e0fb511a915467b3aa843d56a388ef4ce"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-10x-current_incompatible_financial-plan.json",
+      "bytes": 165916,
+      "sha256": "9c8bbd21fbddacb177889d506d70a577336116a36f008ba3a2a9e74dd2042643"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-10x-multiple_receipts-plan.json",
+      "bytes": 165917,
+      "sha256": "384074c539ca95a0c36dcca9447864867884ace6dc563806f16aa5bd15e622f8"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-10x-none-plan.json",
+      "bytes": 165914,
+      "sha256": "1bfb5ecf081727b9d5648ec80946792f84f0a697b94ace5849aff53348e012d0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-10x-stale_result_binding-plan.json",
+      "bytes": 165910,
+      "sha256": "41a3a444a0a5e99d05bc8ba907d5bd4f57242fa22da224342e584b5e5b4a955d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-10x-stale_source-plan.json",
+      "bytes": 165912,
+      "sha256": "1efb77ecfbd9b77e3a41276bce24abebe9ba3d40c6b4da232b37e482dbe832c0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-10x-superseded_result-plan.json",
+      "bytes": 165914,
+      "sha256": "fe2497b9a11084aa110078ecbca32d15cc244954af1fc154d92ee9be936fc072"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-1x-current_compatible-plan.json",
+      "bytes": 165919,
+      "sha256": "c4314377c626932678c8b22340e7b3550b4a749f80e60b7b27e2caa1ec535b35"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-1x-current_incompatible_consumed-plan.json",
+      "bytes": 165921,
+      "sha256": "48f61629fbce50e181435c7371fb7b9354231bb23ff3444adc96ae35e946795a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-1x-current_incompatible_financial-plan.json",
+      "bytes": 165919,
+      "sha256": "828e5fed63ecf9989e96a37432e0c48bf4eac7c9b21e75331372c2264014bcd2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-1x-multiple_receipts-plan.json",
+      "bytes": 165922,
+      "sha256": "d9f83099b2c61f77118c410633723c906b11e3540325e73cd191e2bfad95bb85"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-1x-none-plan.json",
+      "bytes": 165919,
+      "sha256": "35ea5c8628304def1dbc2c07a6229bfc135ad54c90a932b3bc7e962183c3ebcd"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-1x-stale_result_binding-plan.json",
+      "bytes": 165915,
+      "sha256": "97e19b0e3a41a9458533e5642eae4f18729be32f68cbd56b929924d77306e46b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-1x-stale_source-plan.json",
+      "bytes": 165917,
+      "sha256": "2823b81b2ed6f601bf80607e0d631849b76bb22bf2ae81528d4094f26adf3b91"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/baseline-eligible-1x-superseded_result-plan.json",
+      "bytes": 165919,
+      "sha256": "bc1f61c898b9de8132d9bdef8e292f6e197dfa87b136aba226992dc32ad73703"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-common-10x-none-plan.json",
+      "bytes": 165904,
+      "sha256": "0dd6fcffbb2897782af139d1f65aba7a0d91341f67cb86211cf57e833b1079f9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-common-1x-none-plan.json",
+      "bytes": 165903,
+      "sha256": "0fb1f3fa6f969f23246551d3ceb5f946af8f9291fe9ef752dead059957d82fef"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-common-2x-none-plan.json",
+      "bytes": 165567,
+      "sha256": "7f7fa8c32c3a1b7b2472cfd87bb141876e04cf3cdb57cf9449625a72369f569a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-common-5x-none-plan.json",
+      "bytes": 165910,
+      "sha256": "afc19d812645b68c824da54a5dce29562d28afeab2eef5bc083c3fd414f61525"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-10x-current_compatible-plan.json",
+      "bytes": 165910,
+      "sha256": "94395dbf7832f412f823f08745601951309730ed42dd0bfa12a642fac7f4f6ab"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-10x-current_incompatible_consumed-plan.json",
+      "bytes": 165915,
+      "sha256": "6ea4d151c67d3652c928d2fe64c89e6f9c1654fced30de63bea75044edba3a34"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-10x-current_incompatible_financial-plan.json",
+      "bytes": 165922,
+      "sha256": "52bf85142135da6626139aba76cdf4a5fde35c30d6b1d317f8a75ed04c1c5dc4"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-10x-multiple_receipts-plan.json",
+      "bytes": 165909,
+      "sha256": "6965bc3e78dd6ec192c3947409c71a4ba907d72fc70083ef58548f8b5d4741f2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-10x-none-plan.json",
+      "bytes": 165916,
+      "sha256": "de281c664f17641eb0bd49bdf96ba8d32a8e4b59e0345ded2f990635005ce092"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-10x-stale_result_binding-plan.json",
+      "bytes": 165916,
+      "sha256": "a96edee90b0cf4ed923811d9b2bae58d82283b102dc8d41ba4a25755df1dc2e4"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-10x-stale_source-plan.json",
+      "bytes": 165918,
+      "sha256": "28606ee63918d8b20a3553ad768009d69d3ff5e30ca79ee557050164240518b3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-10x-superseded_result-plan.json",
+      "bytes": 165914,
+      "sha256": "bfc28e504ad176089eced04e5aea3703e621bc0646af8d9c3de67c071e6dc175"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-1x-current_compatible-plan.json",
+      "bytes": 165917,
+      "sha256": "ec83be492373345a1d7f1a62e81801b2b00cac75c78c0d4c249f9bff330572a2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-1x-current_incompatible_consumed-plan.json",
+      "bytes": 165921,
+      "sha256": "d539a54664ad5c565c5ab633d08e1e1062888233c475a6b5a2c69716d8bb435b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-1x-current_incompatible_financial-plan.json",
+      "bytes": 165923,
+      "sha256": "a0d6cb6c16e74ebf9d8f0804630f0b928eb611dd2bd157aff9d9d93306d85cc0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-1x-multiple_receipts-plan.json",
+      "bytes": 165923,
+      "sha256": "40a47e198599d58c0c4a69c91de3c39185d49049d95efb4bdfe2266bc57a6dc3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-1x-none-plan.json",
+      "bytes": 165919,
+      "sha256": "d978d80ac9b4d74a656222dc7b2ca3aabc42a03278be29397c3dc3b8cc557907"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-1x-stale_result_binding-plan.json",
+      "bytes": 165919,
+      "sha256": "15dbdb1aa051ee4fff563427f287e903ecaf66b60a002e253ea52b2337299e33"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-1x-stale_source-plan.json",
+      "bytes": 165915,
+      "sha256": "20832c71f2febd1692a315d289f9584316c0551e1fe111ddb97334bed9703be0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/evidence/candidate-eligible-1x-superseded_result-plan.json",
+      "bytes": 165917,
+      "sha256": "7b9fd4020e8d3a0a93f8813f3a1118660838d11bd5652708406e9a22e74e110e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/performance-gate.json",
+      "bytes": 11515,
+      "sha256": "ddcd84ed1a5c239bda4432ffcbf37154114c1a7e44c320eb1db8e9a0dc0a94af"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/final-overclaim-review.json",
+      "bytes": 14648,
+      "sha256": "3ce12a0b32ff57a37436c94f8e0e94ff1b7a3427ead62bb6f0d88c6054069424"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/final-overclaim-review.md",
+      "bytes": 4151,
+      "sha256": "edc627afb5ef2b853ba741d9e4cdafdd45bcd6d0c8900c4a3e795d349c5f1211"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/final-publication-plans.json",
+      "bytes": 32176,
+      "sha256": "2c1999019cd75b38566bba0ab7f07f2cd6122f4e3b5e3344950ab705d55f9bc4"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/final-query-index-security-review.json",
+      "bytes": 35299,
+      "sha256": "5fadc9632c54109d4381ac8b409ab845e47875bed43444bef4ded3b362a6612f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/final-query-index-security-review.md",
+      "bytes": 4543,
+      "sha256": "ca48a717a94927fb87bb72b61ca5759582fb5c559d139cf2971bfdf3c2430ff3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/final-review.json",
+      "bytes": 7609,
+      "sha256": "db3d8901d0662db4e405229b05585375932ebc738791d02be3e78c40880aa955"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/finite.json",
+      "bytes": 103937,
+      "sha256": "b7fc65ac9cf97774189307499eb478b32ae3e6420fe31943342af1f8bc6e320c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/finite.tap",
+      "bytes": 1932,
+      "sha256": "9532fa2017b8af39d5aad9c82d2199ae73bbcbe3624286a17a83ab603a5daceb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/foundation-first-attempt.json",
+      "bytes": 5364,
+      "sha256": "f259fc52ef60473bfae0033395fc4991c7a2c604c785c63fbbf1a5808d56f69a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/foundation-first-attempt.tap",
+      "bytes": 23150,
+      "sha256": "287bad84bce0090d4b63f4b320c7d820bd9143c2e491c62a6ecf28ca8e034c9d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/foundation.json",
+      "bytes": 275238,
+      "sha256": "ca76c11fcaa574bdb5441ba8c43850d36c5e33886ad9b5e3dd701cf90fac5005"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/foundation.tap",
+      "bytes": 21990,
+      "sha256": "915f461fb42641cbb295d87fe80162caa33cdc0522316066df7a2ffa472d59d7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-finalize-worker-inversion.json",
+      "bytes": 15540,
+      "sha256": "ba59c10fa0830861326fcc5a3918f354b25f258d89a7b87294c5339df0ce81ba"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-finalize-worker-inversion.tap",
+      "bytes": 2478,
+      "sha256": "b89bd17c3fb8eb28420259197ed2cdfae7ada2e993c9e4c7e73ba9d0d1366873"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-first.json",
+      "bytes": 12822,
+      "sha256": "73396e5f5e35b3a05a5b979c6fe2a24004cc12aba6e4c438e5294a75a1e615d3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-first.tap",
+      "bytes": 1148,
+      "sha256": "577c629648105d4e0c9c1332ef6533fe546ab890ee7ad28c1e6de88e4599958b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-fourth.json",
+      "bytes": 13406,
+      "sha256": "dcd01a4d01a4b486388af0284523be1f6a0b631d5c297fc1d28bbf8f1cfaf1bf"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-fourth.tap",
+      "bytes": 1588,
+      "sha256": "1138c323a863fb6fa507ca0575650db21d6259bc31167c0f7d620f561c9e21d4"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-pre-net-owner-lock.json",
+      "bytes": 13489,
+      "sha256": "e7b0d7593e615132c20144ca2abd7fd538eeebcadc5c93363eefb5ed94d4e0ab"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-pre-net-owner-lock.tap",
+      "bytes": 356,
+      "sha256": "766deea95e3356850ef4c9ba22724718bef45f2ac97d5c14c368618e533fc802"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-results-finalize-worker-inversion.json",
+      "bytes": 16350,
+      "sha256": "1643681918cd0d220934e84c92aaee005092aac3283a37a1f54441bfb7bffea8"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-results-pre-net-owner-lock.json",
+      "bytes": 49964,
+      "sha256": "af00842011acd56441182a76e907ccbe9a5ed4a7913d212674dca75fa696165a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-second.json",
+      "bytes": 14292,
+      "sha256": "18c4d5b967fd373198fa1587fd0ec5f244dc6265d6affb43c90c202e182ea809"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-second.tap",
+      "bytes": 2787,
+      "sha256": "b225149f55d86913f1fcf12fc24daba9bf7d2371617825bd6926126b8c0fd2b9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-third.json",
+      "bytes": 13405,
+      "sha256": "f91ee0a26bcfcf609f46f5c54aa0af688295c22abb8b793b164bbd00aa6ab553"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence-third.tap",
+      "bytes": 1364,
+      "sha256": "53abc89441d66e9e05ed0ffaad0ec212580dfee0fdf5d19b01b454547eecf31e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence.json",
+      "bytes": 217322,
+      "sha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/full-sequence.tap",
+      "bytes": 358,
+      "sha256": "a77fe2008be72a145720239848647ad36b0c9900346a27009bfaee6f57d2158f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/google-outbox-scope-review.json",
+      "bytes": 3059,
+      "sha256": "874cc5228610157cd138bed16b4634e2d508ed8716d86bc8594d270fa4ec2a44"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/MANIFEST.json",
+      "bytes": 7572,
+      "sha256": "d7e9277f804f9455a53d4fdac51a304c788cf09f140f23d4737978f2158ee281"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-common-10x-none-plan.json",
+      "bytes": 165908,
+      "sha256": "653a447d76dfeaf37ffe9417aca2c319846873295c6215ec79cea2de151eb0a1"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-common-1x-none-plan.json",
+      "bytes": 165899,
+      "sha256": "aeaf3b91eb058f1b3717496b5f28d294d90e245fb2337e4b6ba081da18261502"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-common-2x-none-plan.json",
+      "bytes": 165568,
+      "sha256": "b21af97b3ffbec4506a57c994fd655cfb2f123c82a071eee1d13a751896e13dc"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-common-5x-none-plan.json",
+      "bytes": 165915,
+      "sha256": "8cdf771886e8438ba33659c2a648f1c51d142c16c741fb9c2cf03d7d8088f8fc"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-current_compatible-plan.json",
+      "bytes": 165914,
+      "sha256": "1b79b4bd116559d3d4ae549cc4c6989f424fce76fa7405c532080e66b097de4e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-current_incompatible_consumed-plan.json",
+      "bytes": 165918,
+      "sha256": "b6802e7965d6b11b9fe0783f4c7133658a66acfc4e8731ba695633de115634f0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-current_incompatible_financial-plan.json",
+      "bytes": 165911,
+      "sha256": "7d556597ece03b0afabb97fb8546b88fa5c21616ea24dbe92c2315877060c185"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-multiple_receipts-plan.json",
+      "bytes": 165914,
+      "sha256": "15d1ccda3be9bcfbc3071d3fd764e12fd85de10d39889b2e770ddcff66024928"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-none-plan.json",
+      "bytes": 165909,
+      "sha256": "64a91e1694ac979a0b4492a6306c0a3305429cdd094fb095795d6da22bb64f07"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-stale_result_binding-plan.json",
+      "bytes": 165916,
+      "sha256": "d569684b2049a7658f0c85f31ca8772e0ec181ae06843e0460671ce09bfde412"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-stale_source-plan.json",
+      "bytes": 165915,
+      "sha256": "a2f2e2d3a6c4c01cb672bf3d1dc7fec26ef562fe8f96a33fd891b4b1863beea0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-10x-superseded_result-plan.json",
+      "bytes": 165921,
+      "sha256": "fb060b62c67114c5b6862656fccf328deca5cd3236ca9136fbbcd2ea95575ab8"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-current_compatible-plan.json",
+      "bytes": 165919,
+      "sha256": "17656ad51dcef4e8582cd95022333b5fbf425b62642e37c18169a9d2ff5c1301"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-current_incompatible_consumed-plan.json",
+      "bytes": 165922,
+      "sha256": "420100e2a8fbf42fa770e04765c8a53d0e24c0b5f126384ff1ecfa521aa19bd6"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-current_incompatible_financial-plan.json",
+      "bytes": 165916,
+      "sha256": "0cb7d5dc957d3c2d2ca1d2b48314badb0ec15bda4a668f36c93c4036ed77bfe8"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-multiple_receipts-plan.json",
+      "bytes": 165921,
+      "sha256": "c889b18bac2bef2cf5081fdbde1f4fb4f6946173517257c23c79d554e46264ce"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-none-plan.json",
+      "bytes": 165946,
+      "sha256": "e7e52d483d5b999e8952ba19f94e0ba370c228daa3c646804d480e70cef4ac79"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-stale_result_binding-plan.json",
+      "bytes": 165918,
+      "sha256": "2df1e1991bb40c5db4818526735087875cb673f07149ca1c8ca0ef44e3716bf2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-stale_source-plan.json",
+      "bytes": 165922,
+      "sha256": "731a78405f0171725072b5a9aa794ec42d3b5c8ba7af46054bd5dfcfa7ef7400"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/baseline-eligible-1x-superseded_result-plan.json",
+      "bytes": 165921,
+      "sha256": "aff238f6dbecf8a186920614f85c24a1d167f42cd27264a94e79c706d17bfe8d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/benchmark-baseline-common.json",
+      "bytes": 119573,
+      "sha256": "9e0ea27fd7c29ca0750943ae011173475be8deb6e8d3c6c49dc6abe77f64c94c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/benchmark-baseline-eligible.json",
+      "bytes": 169246,
+      "sha256": "62249a5e982c4a1bad8ced4850090fa72a11a908c2a90d390e670f45cd010c66"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/historical-before-provenance/lock-duration-baseline.json",
+      "bytes": 10496,
+      "sha256": "97341f23975e0c892cc6711026575c9e676cb34bd82285dc9b9a9a8968308586"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/history-plan-applicability-review.json",
+      "bytes": 1176,
+      "sha256": "f93047275ad56c12b1051dcf6485898661b4490f91540148e7fb4a81d98863f1"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/import-order-review-addendum.json",
+      "bytes": 172385,
+      "sha256": "484030c542bea7e4f6b01ec1b73c37af288e5ec549297ef4364232fc626b6585"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/import-order-review-addendum.md",
+      "bytes": 2801,
+      "sha256": "95fd493fad294eaf1bbcaac3ac6eb33903372faa3bf7cb48f75545100d7a8ae7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/independent-engineering-review.json",
+      "bytes": 7818,
+      "sha256": "3b7e647ce04e6e73eb8490e5537b9cc2407ec7bb9eb2ae182dac593916b35b72"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/independent-engineering-review.md",
+      "bytes": 7364,
+      "sha256": "bce8975d4e26df94c15b63d0ae435734762404f632b4809487aa33a8427ab9dd"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-restored-fixture-timeout.json",
+      "bytes": 18594,
+      "sha256": "af3d530ffe79dcb82c4b26cdad76798adedcd49f2ffa5e95e362cae89ae7078f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-restored-fixture-timeout.tap",
+      "bytes": 9186,
+      "sha256": "dfd60699bfcaed963630917ad4bdf03af4774076a7c1bf67c7e984fb1580422b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/202609280124_score_derived_delivery_v1.sql",
+      "bytes": 74143,
+      "sha256": "85f91fa8f13206669e4e622bf7f227f1531577acd7e1790a88fb1e12a5a4c930"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/PRESERVATION.json",
+      "bytes": 2855,
+      "sha256": "0bf18dee0fb4191b9f89d42a8819ba1b3003485cf58bb2e8c7d0c87202af0ce5"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/README.md",
+      "bytes": 1415,
+      "sha256": "d5582b72333a1737e190e34bf51248d668f88122fb2e8e4459f63492dd7220db"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-decision.md",
+      "bytes": 6867,
+      "sha256": "007c63acadbda7a384760c9bc8c53d37df78036b7f9244b5372b605fd20d9585"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-exists-review-results.json",
+      "bytes": 230172,
+      "sha256": "03bc3b1de336aa759eb0ef0490d23307aacbbbd9f0e1473a6e16a218ad5637c3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-exists-review.log",
+      "bytes": 7334,
+      "sha256": "2b9912acbc06afccdf27f8773a8dee1b1ce454d34f2b7d0cd143ef5627af607d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-exists-review.mjs",
+      "bytes": 13910,
+      "sha256": "8d42c6452d4bbd15e9892333ae2abe6d3ce4bc684a6f3ba1c8ebb64cf52a9eb9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-remove-five.patch",
+      "bytes": 1392,
+      "sha256": "f8f59a7caf71b88eab1e060de4735f6ec01b485ce1e8f417ba41f175c8c68993"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-remove-four-keep-intent.patch",
+      "bytes": 982,
+      "sha256": "f561f6875443bc13ce4e301ed1100d6865b6c6f5f3c11b8fc72a299b3dd0edc0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-remove-three.patch",
+      "bytes": 1601,
+      "sha256": "28323c69422d9d391c33582dd982d57432662cacf761b8125fcb6b287d4ba9a4"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-review-first-log",
+      "bytes": 3511,
+      "sha256": "bf305b1b95ea0f08a1d45123d51c5b197a03efb82ce9487463a924d832eebb16"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-review-first-results.json",
+      "bytes": 34014,
+      "sha256": "aa0ef23ea13770872d2f44cdf1b8518377cf173c6963d16e6a9e58e3ad6522ad"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-review-results.json",
+      "bytes": 220778,
+      "sha256": "848f14b1e657860b37d164ae34d25106f1e3011e5d6bfbba052c2963d478dc6f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-review-second-results.json",
+      "bytes": 81635,
+      "sha256": "8afd50eadf90e66e512bec6bcd3e89aec0670d92a6f4cba7fc8108b3a9e4c5cb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-review-second.log",
+      "bytes": 3875,
+      "sha256": "40c7707dc0a6e4031e25c4422d1757a17734f57b29a03101b98fdff646dd7d94"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-review.log",
+      "bytes": 7266,
+      "sha256": "58b85a48ce12aa1f6770bd5f39868b65892a4ef76e1ea368a92c64c7bb8d91ed"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/phase2c-optional-index-review.mjs",
+      "bytes": 13722,
+      "sha256": "fc88713c191c3ae2717e105e6505767f29d752db8a10949c5ef68dae4b7f9510"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-setup-timeout.json",
+      "bytes": 14065,
+      "sha256": "8025919430553d2d574bf506bce9b2aed695e460ac9936cf45952c806779a15b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index-setup-timeout.tap",
+      "bytes": 1582,
+      "sha256": "efc5c3050ad5d97305cd45ce74c669c508204b7d83730672bf1ec3dbd4b10446"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index.json",
+      "bytes": 103861,
+      "sha256": "d9f43650fc430c11d0622867cccd969fc796f01f596c1dff189148c8d8bc4206"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/index.tap",
+      "bytes": 10714,
+      "sha256": "372f2fc8f68070995d2a37dee75dcdd54fd9553c21d616bd942b123c00cb51db"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/lock-proofs-before-timestamp-fixture-correction/PRESERVATION.json",
+      "bytes": 996,
+      "sha256": "c21042b756267f18d91f07ed899c3be440d86924518e179831661c36cbca0c4e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/lock-proofs-before-timestamp-fixture-correction/net-owner-control-lock-after.json",
+      "bytes": 31869,
+      "sha256": "909e490c58584f33e8b1062e895161576f47fc8daba3851da3e851cc5b284d40"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/lock-proofs-before-timestamp-fixture-correction/net-owner-lock-order.json",
+      "bytes": 175511,
+      "sha256": "471003a4ebc34baa922906e9be7c9d20871b2610e64ff6193b4e03e12dd7d16e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/lock-proofs-before-timestamp-fixture-correction/net-owner-lock-order.tap",
+      "bytes": 4225,
+      "sha256": "cee5e68cdde52a9cd0b6f9ec4a2a07d50aea21f7d602ecc744eee775536248a0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/lock-proofs-before-timestamp-fixture-correction/worker-failure-lock-after.json",
+      "bytes": 104751,
+      "sha256": "3162c5d49a71217363116cb629d9f9e7d6017f33eb09008ced155b0733d40c2c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/lock-proofs-before-timestamp-fixture-correction/worker-failure-lock-order.json",
+      "bytes": 172867,
+      "sha256": "35777b351186cfb837faba6628ba28b530823c0ca75fb1db747d9b66c422428d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/lock-proofs-before-timestamp-fixture-correction/worker-failure-lock-order.tap",
+      "bytes": 3038,
+      "sha256": "bf7fd88f1f8d435b2d0166f5c444ff442312ad5999a365f12f0d9294e80932e7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/native-decoder-proof.json",
+      "bytes": 15247,
+      "sha256": "4e40036d52a4f04f944011b359eb47a847a532f2cc19b1c65ac04bd6084a6107"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/native-provenance-preservation.json",
+      "bytes": 456,
+      "sha256": "71989a5fef0a2b3b3389c66de171071b7f18511dd5fbeed86876cdcb5f569e78"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/native-retained-source-provenance.json",
+      "bytes": 573,
+      "sha256": "9e4fe63d2f5311ca5a569f436bd54ae88f0de7e0f671b1522a4d4d5812bc7fc0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/native-timezone-counterexample.json",
+      "bytes": 10135,
+      "sha256": "b967d0d6d93426cca35f33dbdb986d53b4db38928fa98033093489cfbb6f49bb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-future-max-forensic-first/PRESERVATION.json",
+      "bytes": 730,
+      "sha256": "2623b84c43f625a1b53ac27e2bde130abc0acf84d0d671746b627a2e02195a1c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-future-max-forensic-first/README.md",
+      "bytes": 885,
+      "sha256": "feba0e62e0a5f33aced820b88ce105016b361cc0ba7243bd68c492433e2bc6f7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-future-max-forensic-first/net-owner-control-lock-after.json",
+      "bytes": 23410,
+      "sha256": "649b5f09093a143260d0456d5031f8d345c6e34c57ff4b73ee92dadc2c9d2454"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-future-max-forensic-first/net-owner-lock-order.json",
+      "bytes": 173604,
+      "sha256": "d557d50c6bed8857c6f4ec8b58bb7859aa383afd8c60cc013b0be82a9cb49ae7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-future-max-forensic-first/net-owner-lock-order.tap",
+      "bytes": 5951,
+      "sha256": "2b4fd2de5e1711e1aeed2920498c66619474007ed766ade9ab47a3392aca0393"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-future-max-forensic-first/reliability-phase2c-net-owner-lock-order.test.mjs",
+      "bytes": 36719,
+      "sha256": "7e0809b9bb554e5c2fd58e7c86103996ce96de495418a71a79f77d2f53762826"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-control-before-definitions.json",
+      "bytes": 25243,
+      "sha256": "98d99428ca74292461a1d0a20faae8afbea4c8b4c12a3a9eba81f38da0fb286d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-control-first.json",
+      "bytes": 9438,
+      "sha256": "132093a5b8cca0d30866ce451ab44e54ae356973190e48ab8757d4d95a626e2c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-control-first.tap",
+      "bytes": 2855,
+      "sha256": "5f1e7a51894784c4e49c5cd45cfe0c34324c13fbf6e4141ded07af7a4ec38da6"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json",
+      "bytes": 31869,
+      "sha256": "02cea96e6634a19aa0f4b691b9e08868e91aa71ed060e432fe389e8f49b714c3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-control-lock-direct-after.json",
+      "bytes": 20784,
+      "sha256": "c91d952523103e9ac9f4b8916e61f8d7cf23d062c7d012e51c730eefb9f84f6f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-control-lock-direct-after.tap",
+      "bytes": 2428,
+      "sha256": "44a74abfff25c33876242fb901bc40f72b3b3c33e7d2f5640db5facf1931dfa9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-control-lock-forensic-first.json",
+      "bytes": 20661,
+      "sha256": "b4490018a8be478f31464e3533bbced074d995a1c32ddd63234cc896f8e0fdb8"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-control-proof-first.json",
+      "bytes": 19574,
+      "sha256": "66cdf6039795914e9c806d181299e632ff5cc57e8927ee3cc3f8e60eb53b3eaf"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-control-proof-first.tap",
+      "bytes": 6521,
+      "sha256": "c0b495e00aa8398fd2da0b03625e18799f5f506338e821ec37f44c8805f7882b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-lock-order-forensic-first.json",
+      "bytes": 14526,
+      "sha256": "2fb13ce928138d3ae1e31f2e5d8fef4708f198667c15d030dcbc73978db03cb1"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-lock-order-forensic-first.tap",
+      "bytes": 4154,
+      "sha256": "1fb13743b305e7b83057f046aa704cfee650814a13be1914fde991e18819939a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-lock-order.json",
+      "bytes": 175511,
+      "sha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-owner-lock-order.tap",
+      "bytes": 4215,
+      "sha256": "51b9d0d1de6cfb1e8f6bbe9e16529d3b67ba4e49e2c75d4ee97961c70cb686fa"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-skins-deadlock-focused123.json",
+      "bytes": 14944,
+      "sha256": "d14aed0602545e18fecad0a7514c9a7b7f64281d6334f0810d970452c6d51b08"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/net-skins-deadlock.json",
+      "bytes": 21065,
+      "sha256": "d506e62d1b1660b97d67a8f22f2df42b26aa8eacce8a4200a199b853b1add8d3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/performance-variance-review.json",
+      "bytes": 2826,
+      "sha256": "bd8b39f3f102df1c8dc2bb76904ffb74696041a6a415addadb85bb0ff4c91416"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/phase1-sql-setup-wall-timeout.json",
+      "bytes": 13894,
+      "sha256": "c13c6bb818b493836df585cef7d161cf11894a236d4e4dae6a951edfb5f4233f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/phase1-sql-setup-wall-timeout.tap",
+      "bytes": 1112,
+      "sha256": "7d67c6433a0b9ca2755b3b4c2835be65a74d1d9e76fcbd08f9b986f98f39977d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/phase1-sql.json",
+      "bytes": 109307,
+      "sha256": "5b2495456d1d60e6d008456f84bc17fbb91b451b05b40b51b19524b20f97bd49"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/phase1-sql.tap",
+      "bytes": 958,
+      "sha256": "a103199c658bdc94b759c2ce8469f1f2a6d9872d0a279141414a6f927453035e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/phase2c-final-scope-privacy-review.json",
+      "bytes": 10763,
+      "sha256": "f06092f25dccebbd8011cd19f599f1134101671e411582c06f450e4149ab08a9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/phase2c-final-scope-privacy-review.md",
+      "bytes": 4255,
+      "sha256": "7450f8f4becbd5ff8ea7d3b5d900866c514c63d94770018bdac5d3773d361ed7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/phase2c-scope-privacy-scan.json",
+      "bytes": 58680,
+      "sha256": "f9dec260e502bd975d3134ca00223d4cf07db276d8f0bea66b4493a3396eb9bc"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/phase2c-unit.json",
+      "bytes": 152053,
+      "sha256": "828120598561f16c060ee9d2f58d38dbb309fd3fdf57b144604c7c3381598fbc"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/phase2c-unit.tap",
+      "bytes": 115235,
+      "sha256": "57fa3d9c45105dd88e9e62c6ad39ef1c848c6eec2d8e5f9edcd79620ac230241"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/pre-utc-baseline-common-10x-none-plan.json",
+      "bytes": 165910,
+      "sha256": "3a54b7e6f6eda74ae91b42b644fb8f3972ee7490cdbe04bfdcda549449cb6872"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/pre-utc-baseline-common-1x-none-plan.json",
+      "bytes": 165907,
+      "sha256": "21e1c8617f45bf61db609cb143b9664bd3c8df23a2880654cff5fc694465fdce"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/pre-utc-baseline-common-2x-none-plan.json",
+      "bytes": 165571,
+      "sha256": "4fa6612b22f6ea7b25cd2b8600c595cb8c62ba8c61a8ab793735e7b0d1246713"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/pre-utc-baseline-common-5x-none-plan.json",
+      "bytes": 165925,
+      "sha256": "613bd22d9f05c4f2a6d6ec11bea73c7a629b5aac9281cd36d79c639926572535"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/pre124-worker-definitions.json",
+      "bytes": 115756,
+      "sha256": "c31939354c581212e64e3415f6e3498af096d27c1e4643ae6473e2c07c7225d3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/privacy-adjudication-prepack.json",
+      "bytes": 36210,
+      "sha256": "92018be718b9bd236440fd638ddd1ee981efd1e258f2ae5ff37c4ff0598bf149"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/privacy-scan-prepack.json",
+      "bytes": 166155,
+      "sha256": "ee4383b4e97a53483f4c31450d2957fcfcf35e895781627348de5d5aa32b9f1d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-122-utc-proof.json",
+      "bytes": 21517,
+      "sha256": "bc56dc315cd59a4dd27e8a30fd3f6b7dec00950973ab8b3148e47c67ffe7baf6"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-122-utc.json",
+      "bytes": 1930,
+      "sha256": "844278b114af01fcea6b6c2cffbf05dea39c23259668d50659415c0a78ff5e92"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-122-utc.tap",
+      "bytes": 126639,
+      "sha256": "f48aca986ce9644a8314809f6cc4350ea637c94cba9810b90dc9afcfddbfc561"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-before-definitions.json",
+      "bytes": 36319,
+      "sha256": "a5b482a631f2463b2269918e02b8bc9277c1043dc66e8963efd53ea6fe01052b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-early-format-fixture.json",
+      "bytes": 18293,
+      "sha256": "e1a628d66fe7fd69f54d112977a16c7a688721f1dbbfbf77540f3ee0bc78d0b9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-early-format-fixture.tap",
+      "bytes": 132633,
+      "sha256": "803822eda8d42fdbf8169f1284ceda0673f588b394aa31313fc286c042fe0d7b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-first-attempt.json",
+      "bytes": 20719,
+      "sha256": "e6b4a179da6a5d82e3780ecca0f4750772174ecd199471c0fdac95a7b7eca076"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-pre-final85f9.json",
+      "bytes": 13808,
+      "sha256": "4021d0d91f9b80f2c786e94a5d2d2db8034625299640227b5e96a246a0b6e3de"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-pre-final85f9.tap",
+      "bytes": 131238,
+      "sha256": "ce809a96a665304ff987823f2269c485e2e028ef55d01f61664a6d94d1185023"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-proof-early-format-fixture.json",
+      "bytes": 26045,
+      "sha256": "eb2b58fe948135e05c6e7346e364536bb6fa829dc60e5c648272912c39886047"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-proof.json",
+      "bytes": 29920,
+      "sha256": "72d034513cf1f7de8f717717671e49de55904523e2eace43eda2cf3df0a74a11"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-scope-review.json",
+      "bytes": 1557,
+      "sha256": "49d139b5707df83ee108b8a54cc8350ad581b69549024b24d0d0c690d517ffec"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-source-review.md",
+      "bytes": 2824,
+      "sha256": "59d4894c42b4bff6f2da08b2c51b67332794e7a9558314aa36a36084d7224616"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery-upgrade-proof.json",
+      "bytes": 3668,
+      "sha256": "0738b21029b1f1ca7702583a23fa3cfdf9d7cf349cc11963da8bd40be8826314"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery.json",
+      "bytes": 217935,
+      "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/recovery.tap",
+      "bytes": 135970,
+      "sha256": "e7396bcec8e752ceed6b9674d96ec6ebeaa97e08a59564fa7d704ed0448f5cc5"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/039d2a46516b64b8-foundation.json",
+      "bytes": 4127,
+      "sha256": "039d2a46516b64b89854f1624615c33f24363d670862cb7d43a4db5247ad7117"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/1334ba201ad66e97-benchmark-candidate-eligible.json",
+      "bytes": 268466,
+      "sha256": "1334ba201ad66e97b1d05ae2f3f47fae4053dbef16b1538056a47c888ea0ecaf"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/39c103607dada9fd-lock-duration-baseline.json",
+      "bytes": 100889,
+      "sha256": "39c103607dada9fdd899ec77a4209256f4723ec7dd5194954ce3b5ec2286ba07"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/4757c98c6e4c6e1c-foundation.tap",
+      "bytes": 22005,
+      "sha256": "4757c98c6e4c6e1cf818c308860d3c1250481aaddcf21a3c6fff0ce57e491695"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+      "bytes": 1715391,
+      "sha256": "4c738dc658b1c02a7d8e2761b17f6e78ad017d1853760bb5cf8e48d49dc7f7b8"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/4dffb8eac14fa65d-lock-duration-candidate.json",
+      "bytes": 103674,
+      "sha256": "4dffb8eac14fa65d5e9ec699d96d2267bb661ad43068abe68ba16f8f13884d7e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/533e0dfb542d4f66-application.json",
+      "bytes": 146355,
+      "sha256": "533e0dfb542d4f66c6bb6233f339cb28e231cb8dece9c18d92a7f9ecf3d22ec6"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/62249a5e982c4a1b-benchmark-baseline-eligible.json",
+      "bytes": 169246,
+      "sha256": "62249a5e982c4a1bad8ced4850090fa72a11a908c2a90d390e670f45cd010c66"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/74db37801184de7f-phase2c-unit.json",
+      "bytes": 12793,
+      "sha256": "74db37801184de7fe27b34f5747a44c998c7c486d83fdb529cdfbb8aff724177"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/7e4c54a93957ba82-benchmark-baseline-common.json",
+      "bytes": 216155,
+      "sha256": "7e4c54a93957ba827fd7195ad1c33a60577d60dcb87c93804563a709aa781649"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/8f2455bf371a1302-benchmark-candidate-recovery.json",
+      "bytes": 219488,
+      "sha256": "8f2455bf371a1302114866c719c9b6165c4de8eec960a8e428704fdebbd782e5"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/97341f23975e0c89-lock-duration-baseline.json",
+      "bytes": 10496,
+      "sha256": "97341f23975e0c892cc6711026575c9e676cb34bd82285dc9b9a9a8968308586"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/9e0ea27fd7c29ca0-benchmark-baseline-common.json",
+      "bytes": 119573,
+      "sha256": "9e0ea27fd7c29ca0750943ae011173475be8deb6e8d3c6c49dc6abe77f64c94c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/annual-6aaf637779914ba0.json",
+      "bytes": 14144,
+      "sha256": "6aaf637779914ba0652873888f6f9716114fc53503757653df201f39ea6fc189"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/annual-9eeb251a99a303d0.tap",
+      "bytes": 7481,
+      "sha256": "9eeb251a99a303d0e48ad3d41f6ac402b903cceea43462a7df6311220976f95d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/annual-admission-run-1738a5b1085c2b5a.tap",
+      "bytes": 3316,
+      "sha256": "1738a5b1085c2b5a5d11865e2f836f5a5d31905c9df55f839e3cbc2842e2e425"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/annual-admission-run-d85f5ae0a8fd2f35.json",
+      "bytes": 14168,
+      "sha256": "d85f5ae0a8fd2f353be592155f253095143379b165f69f1cf554214396b1d418"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+      "bytes": 1807435,
+      "sha256": "71b2693d02a459f9c9699c61b9ccde21039329b322ef7e20b658928cde3e48c9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-7a338ee405dda7b8.json",
+      "bytes": 2402599,
+      "sha256": "7a338ee405dda7b8006916e346ba24bc9a068e08978337a89532e5bdb9b7bf04"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/b4666363708ec9f5-benchmark-baseline-eligible.json",
+      "bytes": 265752,
+      "sha256": "b4666363708ec9f52796891800c30d520396e97d8de3196c01b3a70dcfffe515"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/backlog-pressure-c0ad4f35661aef0a.tap",
+      "bytes": 667,
+      "sha256": "c0ad4f35661aef0af1a1d94b654b65bed1dcb798e5226e30da77be98ef18655d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/backlog-pressure-ddfee396227168cb.json",
+      "bytes": 172291,
+      "sha256": "ddfee396227168cbb636b7657384961f55ca66944c04175ef16af9008606a7ba"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/backlog-tail-6f461046b1d8cb00.tap",
+      "bytes": 5268,
+      "sha256": "6f461046b1d8cb00fc659502496e09f7e19bd5e32649bd756d6f2c672fb568a4"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/backlog-tail-aafb1644ef4c43ab.json",
+      "bytes": 172215,
+      "sha256": "aafb1644ef4c43ab17cac3652c5f548717eb320a1a50d61bb3ac075b58a6d893"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/backlog-tail-independent-review.json",
+      "bytes": 11505,
+      "sha256": "b6f09d1217b365693d01adb0652d7cd460f0046022f8b9d683efc6e066d01946"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/build-48b5b634d3d16160.tap",
+      "bytes": 40061,
+      "sha256": "48b5b634d3d161601995a491ccc36f8f254526f9688ef21d4a6287fdad31f315"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/build-5068c8d3625d178c.json",
+      "bytes": 1439,
+      "sha256": "5068c8d3625d178cfbed0f0e7350614661b76ac7a72a7da6a16133035c30516a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/calcutta-lock-order-3eb6f6c0f440ddcc.json",
+      "bytes": 173970,
+      "sha256": "3eb6f6c0f440ddccd52bfb3f633b7ef85dc65ba6e83de0bc30614ce76c7ee087"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/calcutta-lock-order-432b1bc5a7137dd3.tap",
+      "bytes": 2196,
+      "sha256": "432b1bc5a7137dd3232656c9c6b3fcdf4932034752877cb7a85f2d5a55f64e38"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/canonical-02bbdf119df802b1.tap",
+      "bytes": 8287,
+      "sha256": "02bbdf119df802b1563a30a814a3147b75085f5a521c05b617a12da36eb9725d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/canonical-97b35a7dd71f26cc.tap",
+      "bytes": 8282,
+      "sha256": "97b35a7dd71f26cc9ae092fe3bd28c6156a894bc2eb4369da3e8bd413e4a590f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/canonical-ac8d1ffbd689fe8e.json",
+      "bytes": 101701,
+      "sha256": "ac8d1ffbd689fe8ec0c8bfca7d5cfa2f21e87b1a4703257178eef71145c104de"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/canonical-cbe3db51f770ae28.json",
+      "bytes": 12805,
+      "sha256": "cbe3db51f770ae28fb4723ef0cc82d3060adc8d52998099d21c3ea101c977658"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/d5221d2a29e17d80-phase2c-unit.tap",
+      "bytes": 115229,
+      "sha256": "d5221d2a29e17d8065a7bffafd39bca6d9268c908bc096f02a5d37a11c4eb617"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/deadlock-4467eb01254a473e.json",
+      "bytes": 14152,
+      "sha256": "4467eb01254a473e670af7749f444430d08be637db1233783d768c5d45b379c7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/deadlock-82d18d5dfb0569da.tap",
+      "bytes": 2721,
+      "sha256": "82d18d5dfb0569da424bac5799e8fc78e0b01e72334a34c44acc02d0a17054ba"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/delivery-0d6c0225f646507f.json",
+      "bytes": 175817,
+      "sha256": "0d6c0225f646507f4ef681a9f94d3954552e7c6ca71f6da3071933ede848c819"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/delivery-a91b480e32704e9b.tap",
+      "bytes": 14447,
+      "sha256": "a91b480e32704e9bcdedbb02884c86202d68a0655bc79e5d3556cbdb20e458df"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/delivery-index-review-2e1e80574f56fd1f.json",
+      "bytes": 172292,
+      "sha256": "2e1e80574f56fd1fe98d90fe5be2841896c73275fa6db65ce217f8315b93eb8c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/delivery-index-review-56bcabef970793e1.tap",
+      "bytes": 3536,
+      "sha256": "56bcabef970793e11ba76d4068ca0cda6b5caae883f77a98764e9b09ee08a990"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/derived-283a74da9d356e39.tap",
+      "bytes": 4459,
+      "sha256": "283a74da9d356e39ac9be28083f8b0da0db528e1096b5800057b7e0b8a623e03"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/derived-9498fd1d8d694e34.json",
+      "bytes": 103217,
+      "sha256": "9498fd1d8d694e3430c2175c790b3eb8a52e184d8f232c197486092f7964d816"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/derived-da3c646205ae5737.tap",
+      "bytes": 4462,
+      "sha256": "da3c646205ae5737ca0b3bcfebd26ac4b6ab904a9babf1af3535d7c3bf3da089"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/derived-f768ab13535c088e.json",
+      "bytes": 12977,
+      "sha256": "f768ab13535c088e9610fea955b6cbeae190e87a4fac14fe58a7cc8b1d55ed63"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/f41373d5b657f098-benchmark-candidate-common.json",
+      "bytes": 218893,
+      "sha256": "f41373d5b657f09871a040ee0650a4b522966c47a8d8b8bc65733c2dec026caf"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/finite-3f9b3e792d1aab59.tap",
+      "bytes": 1935,
+      "sha256": "3f9b3e792d1aab59cd7feae042f60becbc85b7a84a5fea6e8af3951964815541"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/finite-6ca5a73e8e5e90b3.json",
+      "bytes": 12284,
+      "sha256": "6ca5a73e8e5e90b378ebb52500b50fe5b5f72fdef5154fd1872fe0c5c32d0b3c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/finite-7e3017f7ed7f226c.tap",
+      "bytes": 1935,
+      "sha256": "7e3017f7ed7f226c29caffde61227802ad8eb2868928b122fda59b95b6a7d100"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/finite-af9eb175c2bb51df.json",
+      "bytes": 103937,
+      "sha256": "af9eb175c2bb51df6fb6d3e4c30d3b363f8b9cfb0f4a1b1d1e447f34ad2648f7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/foundation-4c218bfa2ab48822.tap",
+      "bytes": 21995,
+      "sha256": "4c218bfa2ab48822f65db8e2eb4debb8a6466517654e4d5e391230477d5a6d15"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/foundation-d6d7258027e4c9b9.json",
+      "bytes": 275238,
+      "sha256": "d6d7258027e4c9b93496482ecc2870d68d1d51da38c71bb0dfb0fc650c8c2224"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/full-sequence-4b58ad2d032976a9.json",
+      "bytes": 217322,
+      "sha256": "4b58ad2d032976a9fa8a6223b798e87baaefe278e1528e0f47d09f7d0d903d92"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/full-sequence-766deea95e335685.tap",
+      "bytes": 356,
+      "sha256": "766deea95e3356850ef4c9ba22724718bef45f2ac97d5c14c368618e533fc802"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/full-sequence-c67be023aba9331c.tap",
+      "bytes": 358,
+      "sha256": "c67be023aba9331cd48c733c0e682d58381cb2e9321c2ed7ead12916840fe238"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/full-sequence-e7b0d7593e615132.json",
+      "bytes": 13489,
+      "sha256": "e7b0d7593e615132c20144ca2abd7fd538eeebcadc5c93363eefb5ed94d4e0ab"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/index-4978af7ab12a5d39.json",
+      "bytes": 13119,
+      "sha256": "4978af7ab12a5d394e7def822b2ae192e8e09349b5b125022f9f372c63b1f6ea"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/index-648c948b438cbcc7.tap",
+      "bytes": 10739,
+      "sha256": "648c948b438cbcc73956f0ec93dae7628d3d0b79c336fafa5ca23066472699a7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/index-93aa701e78b37b20.tap",
+      "bytes": 10736,
+      "sha256": "93aa701e78b37b204810c03e9e238800c19e3486f2833ec3e40f3c4f279c9203"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/index-cc08f4a46c4081b6.json",
+      "bytes": 103861,
+      "sha256": "cc08f4a46c4081b61e284e6d53fbb8aaf90a6ce8d3526af9b58a3b5543922af9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/net-owner-lock-order-18ad44820f74c129.tap",
+      "bytes": 4216,
+      "sha256": "18ad44820f74c1295726bf6bae1145fcad4b60bd7555074717b3310394364b22"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/net-owner-lock-order-1ecf83162c2706da.json",
+      "bytes": 175511,
+      "sha256": "1ecf83162c2706daff730ab04641fabcf4ab3a8b103176b83f6f0bf85e5b5069"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/phase1-sql-57da1042cedf4ce3.json",
+      "bytes": 13665,
+      "sha256": "57da1042cedf4ce3b3508d95859c6e22f581d98a50a713f45787a8c344b9effe"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/phase1-sql-5cf7d09a32ae49e7.tap",
+      "bytes": 961,
+      "sha256": "5cf7d09a32ae49e7b90c982cacff28193d84024ed1fe57bcb84c6049ef8ff3e8"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/phase1-sql-a5745c34363c060c.tap",
+      "bytes": 964,
+      "sha256": "a5745c34363c060cd45e472c5aece3a7b9fdd6f63222b022fa42a35892f6e62e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/phase1-sql-cfe7aa085d8d88db.json",
+      "bytes": 109307,
+      "sha256": "cfe7aa085d8d88dbe3cd47f3aed87a8134ee1a0cab2718f0e542d2a21dd5a679"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/phase2c-unit-4619c58c8047d0f2.tap",
+      "bytes": 115231,
+      "sha256": "4619c58c8047d0f2fe948e765a72eb56918314e93dfb4b716929211b607c274f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/phase2c-unit-b387bc41864584fe.json",
+      "bytes": 152053,
+      "sha256": "b387bc41864584fe21395e27ec5958b311aa3dfbb82b2a85efc826a74c5e2d38"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/recovery-6917520072b4928e.json",
+      "bytes": 14474,
+      "sha256": "6917520072b4928e3de9577770eec45b3802a26d2a116410abab6ba7b5aac771"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/recovery-912e6c5850673cd6.tap",
+      "bytes": 131227,
+      "sha256": "912e6c5850673cd633ce134e4c42a7a7c48babfce73dc37bd093fc502a443468"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/recovery-a1a07be4418818eb.json",
+      "bytes": 217935,
+      "sha256": "a1a07be4418818eb5f11922ba18ddbb39583200412f5f23f7786c3603325d3ff"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/recovery-d93403d13e29acd2.tap",
+      "bytes": 135961,
+      "sha256": "d93403d13e29acd2683e68a89302521cc2556ba7e758cd719d54d0fb06956dff"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/worker-failure-lock-order-50e33718c497ad0a.tap",
+      "bytes": 3039,
+      "sha256": "50e33718c497ad0a8ee1263fdff0af1ae0f4071a39ecc808feb3c20e8a5c4761"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/worker-failure-lock-order-b477fc3e194f98eb.json",
+      "bytes": 174962,
+      "sha256": "b477fc3e194f98eb19d3be2a691282e450f1d83377ab7f2a060b663f94f62b89"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/worker-history-5524c69411f8c6f3.json",
+      "bytes": 12639,
+      "sha256": "5524c69411f8c6f35ca9649f22cdbd7efd1a624e6582f6cb2a4af388afc5053e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/worker-history-9e35bce7561cbad1.tap",
+      "bytes": 4918,
+      "sha256": "9e35bce7561cbad1e0aee24bf2cd568afc69e3cbeb6109901c0d029d3ff29af8"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/worker-history-ad30f4ef383f1b36.tap",
+      "bytes": 4905,
+      "sha256": "ad30f4ef383f1b36f5d7cc0c90df05f8b737c4f2edb505dba768bdb24273723b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/worker-history-bff8bf1227e91382.json",
+      "bytes": 175841,
+      "sha256": "bff8bf1227e9138224514f791b0d1c7562faf36d8c260e29cedf352cb628276b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/worker-lease-duration-diagnostic.json",
+      "bytes": 22178,
+      "sha256": "e6b571a70896e05cbbe7714e116e7bf61f74acd36eae52b41f965b2e0e151da0"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/worker-lock-order-d32a863f554f8254.tap",
+      "bytes": 1358,
+      "sha256": "d32a863f554f8254c24d60ee58be37d4da6f433da8a0ad4631b9cc8577994fd8"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/retained-before-final-resume/worker-lock-order-fa74f0125f8d3792.json",
+      "bytes": 174376,
+      "sha256": "fa74f0125f8d379291c9f1ef161bc97a88ec008d319a2e5cee52bec5fa5fe5bf"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/server-only-order-regression/application.json",
+      "bytes": 2402599,
+      "sha256": "7a338ee405dda7b8006916e346ba24bc9a068e08978337a89532e5bdb9b7bf04"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+      "bytes": 1807435,
+      "sha256": "71b2693d02a459f9c9699c61b9ccde21039329b322ef7e20b658928cde3e48c9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/server-only-order-regression/correction.json",
+      "bytes": 898,
+      "sha256": "ecb18b6b84d42f402caded6b01f23e9baa1e72b5107dd7c852c05de0df6cab09"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/server-only-order-regression/production-calcutta-server.js.before.txt",
+      "bytes": 38843,
+      "sha256": "73b6d03776ac29216f83ca0088cc95b918a9960539a7fd441b2443fe1bc95b37"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/server-only-order-regression/production-net-skins-server.js.before.txt",
+      "bytes": 18552,
+      "sha256": "087505a35d83ad1fa743374396ea3be1338b2c1e1290d23bba20eb2e734f9a0f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/tested-uncommitted-candidate-manifest.json",
+      "bytes": 17256,
+      "sha256": "1acde9854df58ec8799e5b5e904bf8a05187e8863ead935b7fbc319a9097c712"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-fifth.json",
+      "bytes": 103647,
+      "sha256": "21a7b5410378f00a536bb68bfb8a8e4ab0a17d7f99d25bd824cf6d282876d844"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-fifth.tap",
+      "bytes": 8165,
+      "sha256": "c0b20f665a2577d80ed857b0b0a7947df1e18a73caaf9b39188dfbc2e3a66fee"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-first.json",
+      "bytes": 15964,
+      "sha256": "0f41137382995abad4c2f770105e108d09483a828926fa0e2344751f24405a34"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-first.tap",
+      "bytes": 1112,
+      "sha256": "fbedc8bd45fe265f5cf8a66f3fce26f289d0ffc4564fa4a22ef55d689c2d8538"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-fourth.json",
+      "bytes": 106717,
+      "sha256": "8c53db4e2c26334b29e478f5fdce5f830f77a3a16520b572f11413b3ba5e8262"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-fourth.tap",
+      "bytes": 9056,
+      "sha256": "f1bd8f7ed15a9f6f092412f2ee35a68767025a74c51944f2c39ba63c1fe414ca"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-pre-current-job-lock-124.sql",
+      "bytes": 63416,
+      "sha256": "295f3657c710b0b1e7937d603ac8db9c5439afe20734d41dc0e61a2f8e320221"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-pre-exporter-results.json",
+      "bytes": 290297,
+      "sha256": "c458c75469416111a339e2d9fe80095afef015ebf557dd53d736517905089738"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-pre-exporter-run.json",
+      "bytes": 12443,
+      "sha256": "ebd9c653313703105a2a6d9c18a2fb59aaaa7bbdc4b4f935607d32e650439185"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-pre-exporter.tap",
+      "bytes": 10833,
+      "sha256": "1ae8faaa208fd974aacf8b74e44ffb5c7aa8abc4fec8093bf7f73d715e1970b9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-pre-isolation-124.sql",
+      "bytes": 62743,
+      "sha256": "6cee536d12a93d53e6a585784a3b316bdaffbcb24c76d32060a898e83a459eee"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-pre-net-owner-lock-124.sql",
+      "bytes": 67814,
+      "sha256": "c3bf7090d8ebc20c2039f60848176f6a6e6ef88db846477e575a702affb13fb3"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-results-live-expiry-first.json",
+      "bytes": 365254,
+      "sha256": "9e4b066c6958749883a4b6caf7240959ea2f39c6d2009ff31e394fb265dbdf46"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-results-pre-net-owner-lock.json",
+      "bytes": 300111,
+      "sha256": "d935adf104fa09d06582d0c2330e8ac21a12507433a3df9e3904347a58f6637a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+      "bytes": 492928,
+      "sha256": "6fa44774080a25e1ee0a07f975283bb3b7104f12d5ecacb29c1cac2cf0fdd02b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-second.json",
+      "bytes": 1919,
+      "sha256": "2f9fb9af195933785e3bf4dd7e91057ffb57bda5c41bda8f591ec16a7593ab92"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-second.tap",
+      "bytes": 61357,
+      "sha256": "4de9c16417c4ed45af842aaf6fed6489565eaf6a5bb7ff8b7e62183086966c16"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-sixth-source-hashes.json",
+      "bytes": 1055,
+      "sha256": "09450c137e932c37f30301aec2cbe8dc00d2c5edcccc90f652faa37cc6ae9b72"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-sixth.json",
+      "bytes": 284777,
+      "sha256": "b77c10f12076a4effb6409a56ed02cf569ac6f5db24fe98bbc9e3e9eb377664a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-sixth.tap",
+      "bytes": 3309,
+      "sha256": "a2f446be5d48988815c5bb8f8c1ca3e1a15a3e609b4e635e4a7248cda060beb7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-source-hashes.json",
+      "bytes": 1235,
+      "sha256": "c968385afadd097ab6bfa0cfbc6881d590d6a57b4bd2196d4e4ad7c38e27dda7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-third.json",
+      "bytes": 38779,
+      "sha256": "ad8ba3f0555c5616de808c7b2ff4cfff3e3163dbd334d00bbf21ffaad94a667d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-delivery-third.tap",
+      "bytes": 15073,
+      "sha256": "8c92b0fc072a9fb29a0cc1835f97178d0233975e5f5fd54b7e848b97b0a158a5"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-emitter-after.json",
+      "bytes": 293,
+      "sha256": "ad1a78c0e55a967da741e845cfe8319a68e5710b8cd96c0ff6f451ea01fa1445"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-emitter-counterexample.json",
+      "bytes": 2281,
+      "sha256": "2a97caea8a20fda91c53978dc7c0cfb4f8967b9febd962c0fa0d0ceda0f674b9"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-after.json",
+      "bytes": 104750,
+      "sha256": "896fa50dba80cdd4228823556a01571b2a8e0633d3dd5755b7ffed653458e13e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/202609280124_score_derived_delivery_v1.sql",
+      "bytes": 74463,
+      "sha256": "9bd77498ad3ea0d54c2af2adfba5609fd1951e6ee910d564b35cb621a890bcf6"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/PRESERVATION.json",
+      "bytes": 1834,
+      "sha256": "3bd2f893e251ffa0334de6563db1a3639967b6d3571ab4afc69c9cc795433640"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/README.md",
+      "bytes": 912,
+      "sha256": "6574a3eb0591222d50ce4a0cb42d72738a57fb499f8c09d0d40c8a2a2b65ab7e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/phase2c-capture-worker-failure-before.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/phase2c-capture-worker-failure-before.mjs",
+      "bytes": 1672,
+      "sha256": "7e43c0b8b654821a8c7c75bbb9a412dfbde727f794eba3bbb39566b21cb4cad7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/phase2c-future-worker-lock-review-results.json",
+      "bytes": 11190,
+      "sha256": "69e2777b504b5c104ab14d9e946662ddf990d2693414475e2d1f3049aaedb0d6"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/phase2c-future-worker-lock-review.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/phase2c-future-worker-lock-review.mjs",
+      "bytes": 11527,
+      "sha256": "5a05190bd666ca88bc95396b50fa2395282664c4be33f7a2c2c6928784d477e1"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/phase2c-worker-failure-before-definitions.json",
+      "bytes": 112630,
+      "sha256": "d77b4dff574ba0c70ff9c5c5a0c63de7a147abdbe059f12b3413054d96acd2f7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/phase2c-worker-failure-lock-review-results.json",
+      "bytes": 19274,
+      "sha256": "c4019f64252ad6e1332e1dc2566664dad5c1e002de577278c6941985d2109c09"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/phase2c-worker-failure-lock-review.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-before-9bd77498/phase2c-worker-failure-lock-review.mjs",
+      "bytes": 10215,
+      "sha256": "f993bd5214b9641e7ddfdc784577609ca5d2a4239eb8f5a2dafa4fea9ff9e56b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-order.json",
+      "bytes": 174962,
+      "sha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-failure-lock-order.tap",
+      "bytes": 3041,
+      "sha256": "692edfd9f09a1d2b09dbb779e51d7b6b5c3aed33ad895a9fab2662d1082c2a3a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-295f.json",
+      "bytes": 12639,
+      "sha256": "5524c69411f8c6f35ca9649f22cdbd7efd1a624e6582f6cb2a4af388afc5053e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-295f.tap",
+      "bytes": 4905,
+      "sha256": "ad30f4ef383f1b36f5d7cc0c90df05f8b737c4f2edb505dba768bdb24273723b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-detail-295f.json",
+      "bytes": 17382021,
+      "sha256": "08d8503642d952ab3b79cc54b6b654ebd2416d8d8e145c8c84c6d4d6ee84d511"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-detail.json",
+      "bytes": 17552650,
+      "sha256": "7ef338e4c667ae32d98f3d71655a474daa3ae1db31fd77b9a3ac057fcd1659fb"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-first-detail.json",
+      "bytes": 8730134,
+      "sha256": "0eab3a0b0b3c5e46be7324a537768beedc50e7c899654a0377795fc55fe582de"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-first.json",
+      "bytes": 13630,
+      "sha256": "cf247bd5b391215e266ea8dd1d35f85207427a6441015c1404c0b7cc261d7f7c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-first.tap",
+      "bytes": 5033,
+      "sha256": "99e60b76b91e92a17534c47f2a763f07418e22490d591c6cb5b835f346747cc4"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-interrupted-index-review.json",
+      "bytes": 731,
+      "sha256": "7ad6e839b2fdc4bd3a1978c8cd24027b463c21a0c69f1240d085c9c4b3b9323a"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-pre-final85f9.json",
+      "bytes": 12639,
+      "sha256": "5524c69411f8c6f35ca9649f22cdbd7efd1a624e6582f6cb2a4af388afc5053e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-pre-final85f9.tap",
+      "bytes": 4905,
+      "sha256": "ad30f4ef383f1b36f5d7cc0c90df05f8b737c4f2edb505dba768bdb24273723b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history.json",
+      "bytes": 175841,
+      "sha256": "d31c74e44e2e73aa506a8e43a56a5b1af4d38c2b7cec9660e6e32bad5fed2633"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history.tap",
+      "bytes": 4915,
+      "sha256": "7d67b94148377e89d359eb2131702cebaa5c928b7530facb1d73b839fc267697"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lease-duration-diagnostic-295f.json",
+      "bytes": 13847,
+      "sha256": "c861a311da597b1b169b05245b4149948f57e896e6ad7f0d1b25a461e80542ec"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lease-duration-diagnostic.json",
+      "bytes": 24316,
+      "sha256": "2cfcb358806c320b8c704b026fe94c64b1842bcb2443d6f3a73f1b4eab7ba645"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lease-duration-pre-exporter.json",
+      "bytes": 13855,
+      "sha256": "8724c4d5d517a269a9edf3e64a8e148838236fa330bce3b43a3a477f20862f58"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-cycle-before-second.tap",
+      "bytes": 210,
+      "sha256": "ddec777563b33a3b686d03fe079e64b11ae8498d286e55131900e14a02f59e16"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-cycle-before-test.mjs.txt",
+      "bytes": 5537,
+      "sha256": "9613aeeba5aa7b2508ae3598721d574bc822cc6f492d9abbf0ea76b5f4f0974d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-cycle-before.json",
+      "bytes": 9424,
+      "sha256": "90e0b9325ae5bc8964e08ac007598942da2b8c458587b41d4d2e76031fcf354b"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-cycle-before.tap",
+      "bytes": 1808,
+      "sha256": "c793bb0cb5988472f3c7ef70874b28d701bec5e35f941f7431df3799267ca3cf"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-isolation-after.json",
+      "bytes": 12297,
+      "sha256": "9baf40ffa71a8c4861cbcb8e9323d9766b6a1b145807600dd6fef42974555d4c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-isolation-first.json",
+      "bytes": 6243,
+      "sha256": "209ef6c385130f416988a579a8e051c4d6b630e47278031105edabc2729dea7c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-isolation-first.tap",
+      "bytes": 5544,
+      "sha256": "77366658dc00ce2e4ebf242be19a023be78370c7bcefa4e3fe84ede44e569bc2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-isolation-pre-net-owner-lock.json",
+      "bytes": 12325,
+      "sha256": "78f9e40a0b21a2f1dd3e03f7109ba8058fbf093187ac99f734805d28aad9e9b7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-isolation-second.json",
+      "bytes": 9279,
+      "sha256": "ddb8095e1c7385a1376ac1906b104afb735b57baea92bd0cd9cfccc0b109d799"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-isolation-second.tap",
+      "bytes": 2575,
+      "sha256": "d3506cb7c3a2296c792043877bf92157d50a5d181aceaf312e2772a9168c4d0d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-order-pre-net-owner-lock.json",
+      "bytes": 14155,
+      "sha256": "bfd2377a64622afd6e72e66ba331491cf7da16cdf813f5210687c0635df3593e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-order-pre-net-owner-lock.tap",
+      "bytes": 1357,
+      "sha256": "249c108406b9e80890214a451fde93b820e1e5f3aebda60a7f7613cbacf6ecb2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-order.json",
+      "bytes": 174376,
+      "sha256": "6a37b73ca48808e45e854a2c3db786e20c6fc669da3ecbbcad48ba5fc6b1fbf8"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-lock-order.tap",
+      "bytes": 1360,
+      "sha256": "0097049ba7d384a44b365853914f25f3afa788878cb91be454c9dd4fa7822d5d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/PRESERVATION.json",
+      "bytes": 1919,
+      "sha256": "0a2ef3633b53dec2843d880665b0c075de8060367c8f9b50dcdef5698dc58e50"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/calcutta-current-job-lock-after.json",
+      "bytes": 16172,
+      "sha256": "d75d3bc5c612da95d1407d0398cc1fdd4f739a40231d34f1efeac4e303af440c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/calcutta-lock-order.json",
+      "bytes": 14163,
+      "sha256": "b98068a0758db08c4e43dc0d47c00dfbaeaadca8c2fb8c38a845b5e8781a6731"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/calcutta-lock-order.tap",
+      "bytes": 2202,
+      "sha256": "86208f1cc36afac34ff5b29d09a1eec5519b8a2d7a381e95705e8e19d4321792"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/delivery.json",
+      "bytes": 14128,
+      "sha256": "972663e283df75a13d80602a9c4fc931a8e378721acccda329bc8640ce70201d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/delivery.tap",
+      "bytes": 11874,
+      "sha256": "0874a6dc268827579105a08fb688c2b4dfea5ce6117ed08056cc9b8b34577064"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/net-owner-control-lock-after.json",
+      "bytes": 20784,
+      "sha256": "d57c0906893dee5d513acd6259234e6a2a5370ece52f82a536f74ac9006098fc"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/net-owner-lock-order.json",
+      "bytes": 14166,
+      "sha256": "dc35389fe29212981f61287a712658781382fff202f81c8ab9385c1817308b60"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/net-owner-lock-order.tap",
+      "bytes": 2428,
+      "sha256": "083f9fabd0c708b53594b87d92627d072efc25bd71743200ca8cdb20e20bf6ab"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/worker-delivery-results.json",
+      "bytes": 348506,
+      "sha256": "677ff41ad8983c50cc1e4d8771f041587324f0055c8c7d4ff617c47adeb668a2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/worker-lease-duration-diagnostic.json",
+      "bytes": 18370,
+      "sha256": "6fc0e94c90bf598d7f3b47d0344b65af26631e736287bf40b3cc9acecb792e59"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/worker-lock-isolation-after.json",
+      "bytes": 12325,
+      "sha256": "78f9e40a0b21a2f1dd3e03f7109ba8058fbf093187ac99f734805d28aad9e9b7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/worker-lock-order.json",
+      "bytes": 14155,
+      "sha256": "bfd2377a64622afd6e72e66ba331491cf7da16cdf813f5210687c0635df3593e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-five-index-85f91fa8/worker-lock-order.tap",
+      "bytes": 1357,
+      "sha256": "249c108406b9e80890214a451fde93b820e1e5f3aebda60a7f7613cbacf6ecb2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-literal-death-69821b9d/PRESERVATION.json",
+      "bytes": 1817,
+      "sha256": "227579de9e76aeb9290b75760de691c2f037397b042db9bccd7291402f692460"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-literal-death-69821b9d/calcutta-current-job-lock-after.json",
+      "bytes": 16172,
+      "sha256": "d75d3bc5c612da95d1407d0398cc1fdd4f739a40231d34f1efeac4e303af440c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-literal-death-69821b9d/calcutta-lock-order.json",
+      "bytes": 14163,
+      "sha256": "b98068a0758db08c4e43dc0d47c00dfbaeaadca8c2fb8c38a845b5e8781a6731"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-literal-death-69821b9d/calcutta-lock-order.tap",
+      "bytes": 2202,
+      "sha256": "86208f1cc36afac34ff5b29d09a1eec5519b8a2d7a381e95705e8e19d4321792"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-literal-death-69821b9d/delivery.json",
+      "bytes": 14128,
+      "sha256": "972663e283df75a13d80602a9c4fc931a8e378721acccda329bc8640ce70201d"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-literal-death-69821b9d/delivery.tap",
+      "bytes": 11874,
+      "sha256": "0874a6dc268827579105a08fb688c2b4dfea5ce6117ed08056cc9b8b34577064"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-literal-death-69821b9d/net-owner-control-lock-after.json",
+      "bytes": 31868,
+      "sha256": "389a5fd1540a44da2b1f1048046782dce9054a73e251ef07278720a33570d641"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-literal-death-69821b9d/net-owner-lock-order.json",
+      "bytes": 173416,
+      "sha256": "5adb2554173030f4edefeb7f59b6e4c222a207e02336d4b26056d4e4c9bbf898"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-literal-death-69821b9d/net-owner-lock-order.tap",
+      "bytes": 4218,
+      "sha256": "3e43e97981abfd5a681359eb22b521dda9a392136af682dabf96eac173329d35"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-literal-death-69821b9d/worker-delivery-results.json",
+      "bytes": 348506,
+      "sha256": "677ff41ad8983c50cc1e4d8771f041587324f0055c8c7d4ff617c47adeb668a2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-literal-death-69821b9d/worker-lock-isolation-after.json",
+      "bytes": 12325,
+      "sha256": "78f9e40a0b21a2f1dd3e03f7109ba8058fbf093187ac99f734805d28aad9e9b7"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-literal-death-69821b9d/worker-lock-order.json",
+      "bytes": 14155,
+      "sha256": "bfd2377a64622afd6e72e66ba331491cf7da16cdf813f5210687c0635df3593e"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-proofs-before-literal-death-69821b9d/worker-lock-order.tap",
+      "bytes": 1357,
+      "sha256": "249c108406b9e80890214a451fde93b820e1e5f3aebda60a7f7613cbacf6ecb2"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-transport-classifier-after.tap",
+      "bytes": 222,
+      "sha256": "74e37ce87570cc98789535e3ea6490c83e59b848250943042225ee370d18d1bf"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-transport-classifier-counterexample.json",
+      "bytes": 1072,
+      "sha256": "a34bb5d42777c5f0e2cf0dd8b5f8cc3bbfcacf8b7939caa4d150237bbe74d68b"
+    },
+    {
+      "path": "docs/reliability/phase2c/full-sequence-results-first.json",
+      "bytes": 1795,
+      "sha256": "bbbefa1f0aee5172d51ee1b0e8e5cbaf2b91ed8bc844e3852b74a7be42c1b027"
+    },
+    {
+      "path": "docs/reliability/phase2c/full-sequence-results-fourth.json",
+      "bytes": 69875,
+      "sha256": "29eededb59b17bde90170ab82a0610f33e4b909b2467376adf820f5798846ffd"
+    },
+    {
+      "path": "docs/reliability/phase2c/full-sequence-results-second.json",
+      "bytes": 3018,
+      "sha256": "afcf3a7d1e1ae17a1ed7d376a6f93e697f8d2259c6156c65ad6b66e4b1ff4b25"
+    },
+    {
+      "path": "docs/reliability/phase2c/full-sequence-results-third.json",
+      "bytes": 3616,
+      "sha256": "9b4d9b8c5ab31f947924c63d12fb847e4f8051a14226046a54c9d1fb266ee951"
+    },
+    {
+      "path": "docs/reliability/phase2c/full-sequence-results.json",
+      "bytes": 50898,
+      "sha256": "5d977f60b2b5e21548b053613290cc964eae112c054f883d871e6f91d56d954c"
+    },
+    {
+      "path": "docs/reliability/phase2c/lock-duration-baseline.json",
+      "bytes": 100893,
+      "sha256": "76501d5217a1ae52b34d0c02851cb4973a2c086e2dae977beab34f435c162d5d"
+    },
+    {
+      "path": "docs/reliability/phase2c/lock-duration-candidate.json",
+      "bytes": 103663,
+      "sha256": "fe1a10eef683e61508f7600b6b832dad9883340266e89be032279e4afff878c0"
+    },
+    {
+      "path": "docs/reliability/phase2c/migration-manifest.json",
+      "bytes": 9100,
+      "sha256": "56def69cffd898c0af5138f58969ec812136e6317a99764a6f26d5d935e662a1"
+    },
+    {
+      "path": "docs/reliability/phase2c/never-again-catalog.json",
+      "bytes": 29032,
+      "sha256": "a747fff2d04d6534c77250cf4418199040310479a957d0e51282347396e46566"
+    },
+    {
+      "path": "docs/reliability/phase2c/performance-gate.json",
+      "bytes": 11374,
+      "sha256": "dc167167a0affa866b185b1a031f7f36792909e763b6565780fe96789185f4d4"
+    },
+    {
+      "path": "docs/reliability/phase2c/proof-matrix.json",
+      "bytes": 122281,
+      "sha256": "f300f57c6e5f1504541188da82a0e9904fd79ace881fe34e27e9db447c075638"
+    },
+    {
+      "path": "docs/reliability/phase2c/requirement-dispositions.json",
+      "bytes": 4332214,
+      "sha256": "0c95d07930b9e5fef1575a586cda238237108d503169927ea707a3c9b5f6faac"
+    },
+    {
+      "path": "docs/reliability/phase2c/requirements-index.json",
+      "bytes": 41853,
+      "sha256": "7b4a2b399de750f8c3254cfc923f2d85dbe913dc12721601b114e8f9deefbb25"
+    },
+    {
+      "path": "docs/reliability/phase2c/timeout-results.json",
+      "bytes": 4100,
+      "sha256": "46adacf1a9158064c2a9acd4615d5f999459d2e814cfcccd1d2439445641abb5"
+    },
+    {
+      "path": "lib/competition-derived-supabase.js",
+      "bytes": 19804,
+      "sha256": "7609a613f538e2252314b383305469317803ff23f384fe298ea24e53d40bb241"
+    },
+    {
+      "path": "lib/intelligence-derived-supabase.js",
+      "bytes": 12911,
+      "sha256": "aa3d5b53012176ad3ed8ce681758a97770a68e1c18dd38a5cd210f22c636e5e9"
+    },
+    {
+      "path": "lib/operational-rpc-contract.js",
+      "bytes": 6959,
+      "sha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9"
+    },
+    {
+      "path": "lib/production-calcutta-server.js",
+      "bytes": 38843,
+      "sha256": "cb183d4b5f8159dad552541a72ec5b83e18378c7c50705955c129ec2784be89b"
+    },
+    {
+      "path": "lib/production-net-skins-server.js",
+      "bytes": 18552,
+      "sha256": "4007eee4e309d18ae2e2d89f80980c306de29e7e78b5e9fad07f68f408690952"
+    },
+    {
+      "path": "lib/production-scoring-operations-server.js",
+      "bytes": 23183,
+      "sha256": "b66b5c083801fc6ab4356d1d26320efb805b22cf2a075cb216db0a592ed2cf70"
+    },
+    {
+      "path": "lib/score-derived-delivery.js",
+      "bytes": 5119,
+      "sha256": "cb18835d2bb540572d6460dc4313b678266560e8f6a56b56376b1ee783a321bd"
+    },
+    {
+      "path": "lib/score-derived-worker.js",
+      "bytes": 6779,
+      "sha256": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d"
+    },
+    {
+      "path": "lib/scoring-authority-supabase.js",
+      "bytes": 31756,
+      "sha256": "4dde49461f6805cccce8b5805a80ab4ba159627abc90e1b321d27d92df941196"
+    },
+    {
+      "path": "lib/scoring-mutation-recovery-route.js",
+      "bytes": 4830,
+      "sha256": "0e98f14294d531e33b08cc23493c1f326e796e1107f63c30c7404fcf1a6a4cfb"
+    },
+    {
+      "path": "lib/scoring-mutation-recovery.js",
+      "bytes": 3964,
+      "sha256": "0f6b5aa1c5f042f846861cee22e61c113cfb98cd058d160c6982f458d77359b3"
+    },
+    {
+      "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "bytes": 10000,
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+    },
+    {
+      "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "bytes": 14847,
+      "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+    },
+    {
+      "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "bytes": 76764,
+      "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48"
+    },
+    {
+      "path": "test/pn2-native-admission.test.mjs",
+      "bytes": 27621,
+      "sha256": "d5acf992a9ba05e1f49c7ee020001d8880b555e46ecba53db3ea8aecc9e17246"
+    },
+    {
+      "path": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "bytes": 24344,
+      "sha256": "b645d6580aa3d9d481b5f8832433563106bc47b31ebc6e4ee49a2ba2f137b039"
+    },
+    {
+      "path": "test/reliability-phase2-fence-history.test.mjs",
+      "bytes": 12281,
+      "sha256": "4c865bec330acb12819b8dcb45582576166e500b138dbfd09f0c0c334be7d964"
+    },
+    {
+      "path": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "bytes": 29905,
+      "sha256": "f9eec62e93e78aa1bd6dc09628dde7bc071a8ab11aa16e77bbb621420526d533"
+    },
+    {
+      "path": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+      "bytes": 30719,
+      "sha256": "b7679b475c61d93cfd7b50a2b60f896364c175af4f74208ce633cfc5cfb9adcc"
+    },
+    {
+      "path": "test/reliability-phase2c-annual-workers.integration.test.mjs",
+      "bytes": 34452,
+      "sha256": "a69dcdd7cad592f66849b3832fad0e0d08e2746df243604336bcc632553d77bc"
+    },
+    {
+      "path": "test/reliability-phase2c-backlog-pressure.integration.test.mjs",
+      "bytes": 15611,
+      "sha256": "c758d9b84ee0db729c735771354890628c5aba1a8cc30dfc452838d014ba08db"
+    },
+    {
+      "path": "test/reliability-phase2c-backlog-tail.integration.test.mjs",
+      "bytes": 15090,
+      "sha256": "f8285682fde446ecc72f53fa7e03cedb63fa2e7a03614119561c7ed824456a54"
+    },
+    {
+      "path": "test/reliability-phase2c-calcutta-lock-order.test.mjs",
+      "bytes": 14665,
+      "sha256": "9a421f9bcdeeeafa89ca9d76870c2f42feb2ddcc0de96ea26dbc57334ba5f9d4"
+    },
+    {
+      "path": "test/reliability-phase2c-certification-gate.test.py",
+      "bytes": 69716,
+      "sha256": "78e3d96f118a1ef1ac53915bebf02d2d2b80ddd22f6d6cc8ad379ca725b0779d"
+    },
+    {
+      "path": "test/reliability-phase2c-delivery-index-review.test.mjs",
+      "bytes": 16000,
+      "sha256": "501de7d7234c4af5018878b33c590a8ae8f56c33f3ef23c2c077ad757f58a1a8"
+    },
+    {
+      "path": "test/reliability-phase2c-finite-timeout.integration.test.mjs",
+      "bytes": 5451,
+      "sha256": "67dfbf9cda289da68013e9b607ee33d14bbe9ed255804a09b74dc866bb9bdfb5"
+    },
+    {
+      "path": "test/reliability-phase2c-full-sequence.integration.test.mjs",
+      "bytes": 17140,
+      "sha256": "4c331874262c48a84396e54f44c3210a29ec1960bf7a3ef0f510f321820fe2da"
+    },
+    {
+      "path": "test/reliability-phase2c-net-owner-lock-order.test.mjs",
+      "bytes": 38477,
+      "sha256": "91b9ccd6dbcb4d64eb2a938c1f8eeffca01aa6d1b5d0619683c249cc328649df"
+    },
+    {
+      "path": "test/reliability-phase2c-net-skins-deadlock.integration.test.mjs",
+      "bytes": 21709,
+      "sha256": "cf81be12fe61afdc76439e06bccf01a6b3069b78d63e5ba4daa0b2ece28bee13"
+    },
+    {
+      "path": "test/reliability-phase2c-performance-gate.test.mjs",
+      "bytes": 3346,
+      "sha256": "4cd09263299aa33599c151dc5d15debac69c581728fc4ce57b7d04707ee8cbee"
+    },
+    {
+      "path": "test/reliability-phase2c-recovery-upgrade.integration.test.mjs",
+      "bytes": 7327,
+      "sha256": "f96f9e3a7d0659e7a83e4ea49530cc84923ba9df66b59a6657bbc295a083bf62"
+    },
+    {
+      "path": "test/reliability-phase2c-recovery.integration.test.mjs",
+      "bytes": 38207,
+      "sha256": "2b4ab8a0cf2c14c6190f67e1f7108bade794e6f4a27bebef7d3279ef8e6d9fa7"
+    },
+    {
+      "path": "test/reliability-phase2c-recovery.test.mjs",
+      "bytes": 13883,
+      "sha256": "a1f9f2137dac4a1d1c36da38bb909638ca2b8c21abfbd1bdcdea9ef8489229b1"
+    },
+    {
+      "path": "test/reliability-phase2c-worker-failure-lock-order.test.mjs",
+      "bytes": 15557,
+      "sha256": "eadb95197197a99b293f9a562f5b4356b5aa97721e9c4e2143aec10373577ec7"
+    },
+    {
+      "path": "test/reliability-phase2c-worker-history.test.mjs",
+      "bytes": 12419,
+      "sha256": "05564f683ce178a53ae2a1fb4c9b9b7b0b8f9b77bcbeff8518aa40f8bfa4c1d9"
+    },
+    {
+      "path": "test/reliability-phase2c-worker-lock-order.test.mjs",
+      "bytes": 9950,
+      "sha256": "69f6748c66c09be72237ff24b81563679a6e5bc92ab01ef55886879b94ac3cfc"
+    },
+    {
+      "path": "test/reliability-phase2c-worker.test.mjs",
+      "bytes": 70376,
+      "sha256": "abd2300f16bf4ab387d5fe32fa365588f411ab177ec40424bbb8917f04f6dca0"
+    },
+    {
+      "path": "test/reliability-score-history-postgres.integration.test.mjs",
+      "bytes": 4077,
+      "sha256": "b9871ad1cfce80a9b6c374c896b8363b1f913d3698f29e37931511497fcddd84"
+    },
+    {
+      "path": "test/support/reliability/phase2-score-fixture.mjs",
+      "bytes": 13992,
+      "sha256": "0f181715ed756090e79e43b40ecacbf591c2df194b7ac178d9ec11bf5e07b8cd"
+    },
+    {
+      "path": "test/support/reliability/phase2c-annual-history.mjs",
+      "bytes": 10526,
+      "sha256": "6775d19899ebee60e20edf6b16c74b96dfa15629d20e46de149ee49c254c4f37"
+    },
+    {
+      "path": "test/support/reliability/phase2c-annual-worker-branches.mjs",
+      "bytes": 26871,
+      "sha256": "5a20dc082eaf360aec8ac539f9422085332f9e2b5c325fbd5f30da45ae2945de"
+    },
+    {
+      "path": "test/support/reliability/phase2c-annual-workers.mjs",
+      "bytes": 21119,
+      "sha256": "b334bfd457774f0bca9f25587d03ff0a3122f256fb38de39a4cb138706350695"
+    },
+    {
+      "path": "test/support/reliability/phase2c-audit-index-plans.mjs",
+      "bytes": 5625,
+      "sha256": "d1e52fba0ed57ab89f207dd4f31ce3f2c4a8ebf01c9a0928862f671e0bdc59a8"
+    },
+    {
+      "path": "test/support/reliability/phase2c-calculation-crash-hook.mjs",
+      "bytes": 3159,
+      "sha256": "69fc82b9b8a45f9ea60024fa5a064e5950f227c68a269e9e6651f00b7df8b766"
+    },
+    {
+      "path": "test/support/reliability/phase2c-delivery-indexes.json",
+      "bytes": 2068,
+      "sha256": "547c7ccd2aaff77bd46e86923b14a806ee4b815b1335f57b1568279203a9ed1b"
+    },
+    {
+      "path": "test/support/reliability/phase2c-final-publication-plans.mjs",
+      "bytes": 7744,
+      "sha256": "f8f584d53e7a3824329450d487210352632c7bd119b922a7eca30b2a631a045e"
+    },
+    {
+      "path": "test/support/reliability/phase2c-fixture.mjs",
+      "bytes": 670,
+      "sha256": "05baa6942445a7e3e2c69e81567edc9435108b47e1fe548d3f387c3c72d452e7"
+    },
+    {
+      "path": "test/support/reliability/phase2c-future-score-fixture.mjs",
+      "bytes": 7614,
+      "sha256": "90c5cae79c3ecf6ce58608d0506ce2e53006a8af7759ebf53e78e25aaf04f9cb"
+    },
+    {
+      "path": "test/support/reliability/phase2c-install.mjs",
+      "bytes": 2724,
+      "sha256": "23b859308ea18bca4e17fb3f5126bb0f34ef1bcccec65b5df5740b1dcadaa0e3"
+    },
+    {
+      "path": "test/support/reliability/phase2c-recovery-child.mjs",
+      "bytes": 5091,
+      "sha256": "d9aa96e7b926c7d2881aa58dba65cfc25a0f4c1ecb1391c90b7ef7b8a68414c2"
+    },
+    {
+      "path": "test/support/reliability/phase2c-worker-child.mjs",
+      "bytes": 9261,
+      "sha256": "0b06845de3c464f2d2569b022eb9db0c5585bbb15a8ec051aaacaa278df516ca"
+    },
+    {
+      "path": "test/support/reliability/phase2c-worker.mjs",
+      "bytes": 7637,
+      "sha256": "8296bc143395abfc70ef4f1fc71ff9a346cb89b87f69b2505528ca1106ec5d12"
+    },
+    {
+      "path": "tools/reliability/benchmark-phase2c.mjs",
+      "bytes": 10696,
+      "sha256": "e5fc3b6a502eadb9633fd9571aeac92af2aa7dd0918b0058d465527109af2d92"
+    },
+    {
+      "path": "tools/reliability/measure-phase2c-locks.mjs",
+      "bytes": 8095,
+      "sha256": "0cb0efae47f29d51353f2dae392801e44dc06c8c613fb3236057430763a404b0"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/README.md",
+      "bytes": 1577,
+      "sha256": "54b86fcffc1a7198673407cdd23f704f5616d7ec168949768fc0d61e83f6128e"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileMatchDetailModels.swift",
+      "bytes": 30967,
+      "sha256": "cbdaa786b1a30887f7ead127a984aa6db120799fc2f4d2993d25152fafa4cecb"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileModels.swift",
+      "bytes": 12681,
+      "sha256": "6d3cdb7836bf5a4b33b945e26e33450fe8be089d68e918cdb07fad97616764d9"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileParticipantContentValidation.swift",
+      "bytes": 3224,
+      "sha256": "1950693cb540a3900929a467e559cd1332a8d7c7eee10b03aacf86c56f9ce018"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobilePlayerRoundPerformance.swift",
+      "bytes": 4595,
+      "sha256": "b0119121fd1fa9741a479ae9dd2ab8b122f535c7cb12a1fa44c91329403166b5"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobilePlayersIntelligence.swift",
+      "bytes": 5303,
+      "sha256": "15a10cbbb234f68a0be9716d41b9895bf38b42d1ee9d51d19995c7e2952b2dad"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileR1RoundCompetition.swift",
+      "bytes": 1663,
+      "sha256": "5e77ec76a66ec611f3efcb68c4c3e8b2e04afc7346f0d8b114db8eeda8d2a5f6"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileR2PairCompetition.swift",
+      "bytes": 3355,
+      "sha256": "c035e856a9f894cf9179ddfacd5d4ab8f334e71f7764845aaca68a9575233ee5"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileR3RoundCompetition.swift",
+      "bytes": 3451,
+      "sha256": "42db679fbd020cc17dd99fff80fbc7e52fafc79c7b02c02b66ea0068011ead00"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileReadModels.swift",
+      "bytes": 25004,
+      "sha256": "738cb72710e17f963228f2000f6af38e6341d40d6a059c88d932bfa7cc6d855d"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileRoundScorecard.swift",
+      "bytes": 5383,
+      "sha256": "7d80c3e043c33573b8926fda2ca9674dd4a71dd014d4d705ea94ef4a251e8c45"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/MobileScoringModels.swift",
+      "bytes": 12704,
+      "sha256": "f36c2a50bf74cc7d84ff6730818dfaa198c6f57bcc4d78a82f8dff4dcae3544c"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/Vendor/NativeEnvironment.swift",
+      "bytes": 4053,
+      "sha256": "30cdd8d29ededb51dfdbe72d967e76541ff48c1c2829b0217e892c51281ebdfa"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/fixture-manifest.json",
+      "bytes": 3432,
+      "sha256": "5c864a0b2aa3030af488a10c0b62fb7f90f6ab2f93a396d9fc1aaa0a92b433b7"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/main.swift",
+      "bytes": 3353,
+      "sha256": "00d0feb479c6b8483bf557ae8ff8769d84137e0c8403fcabbb405dea3d2521a8"
+    },
+    {
+      "path": "tools/reliability/native-never-again/decoder/run.mjs",
+      "bytes": 6292,
+      "sha256": "e136bfab29c8da7f49d5413609ade40459878863ed907047f3efd3785d3ad929"
+    },
+    {
+      "path": "tools/reliability/phase2-plan-capture.mjs",
+      "bytes": 3901,
+      "sha256": "5b3d94ab93924200d95a1d2558610f1915bb5a280896797556088075af48346c"
+    },
+    {
+      "path": "tools/reliability/phase2c-certification-gate.py",
+      "bytes": 81641,
+      "sha256": "a50fa40982a2f742c73ae5795bfeb6720523bd61cf63c2bb82debbcaa66fd698"
+    },
+    {
+      "path": "tools/reliability/phase2c-performance-gate.mjs",
+      "bytes": 6747,
+      "sha256": "9b308f85190fde7a06cffd68f8b2b7e25db33c7c15905d7b752d3ed4d8ec3212"
+    },
+    {
+      "path": "tools/reliability/phase2c-source-provenance.mjs",
+      "bytes": 8408,
+      "sha256": "3c00927b408f14c9adce6a6caaac3e9e055d8c61d9ed63456ff6c6593436e07d"
+    },
+    {
+      "path": "tools/reliability/run-phase2c-tests.mjs",
+      "bytes": 8642,
+      "sha256": "e1a4e496e9ba832a1d0511def19d9262f3affaef3a73791485fe19f6eefe7930"
+    },
+    {
+      "path": "tools/reliability/run-score-derived-worker.mjs",
+      "bytes": 830,
+      "sha256": "65f7ab486d4a7404b1003d180cb08f91405ea3dca518c2f3cdaf27eec3c1e9db"
+    }
+  ],
+  "fileCount": 672,
+  "totalBytes": 112515048,
+  "binaryFiles": [],
+  "largeFiles": [
+    {
+      "path": "docs/reliability/phase2c/evidence/backlog-tail-results.json",
+      "bytes": 5499304
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-detail-295f.json",
+      "bytes": 17382021
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-detail.json",
+      "bytes": 17552650
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/worker-history-first-detail.json",
+      "bytes": 8730134
+    }
+  ],
+  "patternCounts": {
+    "EMAIL": 62,
+    "PHONE_CANDIDATE": 30,
+    "SECRET_ASSIGNMENT_CANDIDATE": 5
+  },
+  "candidateHits": [
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.json",
+      "line": 2047,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.json",
+      "line": 2047,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.json",
+      "line": 2047,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.json",
+      "line": 2047,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.json",
+      "line": 2047,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+      "line": 10090,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+      "line": 10093,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+      "line": 10107,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+      "line": 10112,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+      "line": 10115,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+      "line": 30895,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+      "line": 30896,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+      "line": 30901,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+      "line": 30902,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+      "line": 30907,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "1a2d415d4fef1dfafe57e0d98af15bbad8cc4bd8ca8ac66e89f2e0ef3941d500",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application-first-attempt.tap",
+      "line": 30908,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "1a2d415d4fef1dfafe57e0d98af15bbad8cc4bd8ca8ac66e89f2e0ef3941d500",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.tap",
+      "line": 10090,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.tap",
+      "line": 10093,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.tap",
+      "line": 10107,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.tap",
+      "line": 10112,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.tap",
+      "line": 10115,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.tap",
+      "line": 30885,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.tap",
+      "line": 30886,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.tap",
+      "line": 30891,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.tap",
+      "line": 30892,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.tap",
+      "line": 30897,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "1a2d415d4fef1dfafe57e0d98af15bbad8cc4bd8ca8ac66e89f2e0ef3941d500",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/application.tap",
+      "line": 30898,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "1a2d415d4fef1dfafe57e0d98af15bbad8cc4bd8ca8ac66e89f2e0ef3941d500",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+      "line": 10090,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+      "line": 10093,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+      "line": 10107,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+      "line": 10112,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+      "line": 10115,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+      "line": 30885,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+      "line": 30886,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+      "line": 30891,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+      "line": 30892,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+      "line": 30897,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "1a2d415d4fef1dfafe57e0d98af15bbad8cc4bd8ca8ac66e89f2e0ef3941d500",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/4c738dc658b1c02a-application.tap",
+      "line": 30898,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "1a2d415d4fef1dfafe57e0d98af15bbad8cc4bd8ca8ac66e89f2e0ef3941d500",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/533e0dfb542d4f66-application.json",
+      "line": 2047,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/533e0dfb542d4f66-application.json",
+      "line": 2047,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/533e0dfb542d4f66-application.json",
+      "line": 2047,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/533e0dfb542d4f66-application.json",
+      "line": 2047,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/533e0dfb542d4f66-application.json",
+      "line": 2047,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+      "line": 10090,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+      "line": 10093,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+      "line": 10107,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+      "line": 10112,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+      "line": 10115,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+      "line": 33052,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+      "line": 33053,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+      "line": 33058,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+      "line": 33059,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+      "line": 33064,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "1a2d415d4fef1dfafe57e0d98af15bbad8cc4bd8ca8ac66e89f2e0ef3941d500",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-71b2693d02a459f9.tap",
+      "line": 33065,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "1a2d415d4fef1dfafe57e0d98af15bbad8cc4bd8ca8ac66e89f2e0ef3941d500",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-7a338ee405dda7b8.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-7a338ee405dda7b8.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-7a338ee405dda7b8.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-7a338ee405dda7b8.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/retained-before-final-resume/application-7a338ee405dda7b8.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.json",
+      "line": 64331,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+      "line": 10090,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+      "line": 10093,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+      "line": 10107,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+      "line": 10112,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+      "line": 10115,
+      "class": "EMAIL",
+      "valueSha256": "2bc6329dc17428848b9098664fcbc139ba57350d6a295d402c8599522903d686",
+      "length": 20
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+      "line": 33052,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+      "line": 33053,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+      "line": 33058,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+      "line": 33059,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "d5ab8b77e69a81dfc634c3556c620d5d6753df6fc28c73c88c79a9332b705382",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+      "line": 33064,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "1a2d415d4fef1dfafe57e0d98af15bbad8cc4bd8ca8ac66e89f2e0ef3941d500",
+      "length": 12
+    },
+    {
+      "file": "docs/reliability/phase2c/evidence/server-only-order-regression/application.tap",
+      "line": 33065,
+      "class": "PHONE_CANDIDATE",
+      "valueSha256": "1a2d415d4fef1dfafe57e0d98af15bbad8cc4bd8ca8ac66e89f2e0ef3941d500",
+      "length": 12
+    },
+    {
+      "file": "test/pn2-native-admission.test.mjs",
+      "line": 262,
+      "class": "EMAIL",
+      "valueSha256": "37733ca908ecc9bf5c8c230f60bfdf209e9a55aaacfe389b77abb569e8e85c5b",
+      "length": 22
+    },
+    {
+      "file": "test/pn2-native-admission.test.mjs",
+      "line": 287,
+      "class": "EMAIL",
+      "valueSha256": "37733ca908ecc9bf5c8c230f60bfdf209e9a55aaacfe389b77abb569e8e85c5b",
+      "length": 22
+    },
+    {
+      "file": "test/pn2-native-admission.test.mjs",
+      "line": 295,
+      "class": "EMAIL",
+      "valueSha256": "37733ca908ecc9bf5c8c230f60bfdf209e9a55aaacfe389b77abb569e8e85c5b",
+      "length": 22
+    },
+    {
+      "file": "test/pn2-native-admission.test.mjs",
+      "line": 31,
+      "class": "SECRET_ASSIGNMENT_CANDIDATE",
+      "valueSha256": "7a48631611725d33b4e55b59872cc495504dd691c6f1daff81c6da84c188846f",
+      "length": 33
+    },
+    {
+      "file": "test/pn2-native-admission.test.mjs",
+      "line": 181,
+      "class": "SECRET_ASSIGNMENT_CANDIDATE",
+      "valueSha256": "7a48631611725d33b4e55b59872cc495504dd691c6f1daff81c6da84c188846f",
+      "length": 33
+    },
+    {
+      "file": "test/pn2-native-admission.test.mjs",
+      "line": 273,
+      "class": "SECRET_ASSIGNMENT_CANDIDATE",
+      "valueSha256": "7a48631611725d33b4e55b59872cc495504dd691c6f1daff81c6da84c188846f",
+      "length": 33
+    },
+    {
+      "file": "test/pn2-native-admission.test.mjs",
+      "line": 320,
+      "class": "SECRET_ASSIGNMENT_CANDIDATE",
+      "valueSha256": "7a48631611725d33b4e55b59872cc495504dd691c6f1daff81c6da84c188846f",
+      "length": 33
+    },
+    {
+      "file": "test/reliability-phase2-fence-history.test.mjs",
+      "line": 30,
+      "class": "EMAIL",
+      "valueSha256": "6cb87fc0119d96cf7a8fe79050cc92160e8a96ad48f0fe26b68dc221ed4e4b59",
+      "length": 71
+    },
+    {
+      "file": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+      "line": 131,
+      "class": "EMAIL",
+      "valueSha256": "d2403a8ee49a441bd446a86df99d00a4cd4e3fa9d8d21b6f3fae52d56a8ceb8b",
+      "length": 27
+    },
+    {
+      "file": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+      "line": 134,
+      "class": "EMAIL",
+      "valueSha256": "d2403a8ee49a441bd446a86df99d00a4cd4e3fa9d8d21b6f3fae52d56a8ceb8b",
+      "length": 27
+    },
+    {
+      "file": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+      "line": 147,
+      "class": "EMAIL",
+      "valueSha256": "d2403a8ee49a441bd446a86df99d00a4cd4e3fa9d8d21b6f3fae52d56a8ceb8b",
+      "length": 27
+    },
+    {
+      "file": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+      "line": 147,
+      "class": "EMAIL",
+      "valueSha256": "d2403a8ee49a441bd446a86df99d00a4cd4e3fa9d8d21b6f3fae52d56a8ceb8b",
+      "length": 27
+    },
+    {
+      "file": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+      "line": 152,
+      "class": "EMAIL",
+      "valueSha256": "d2403a8ee49a441bd446a86df99d00a4cd4e3fa9d8d21b6f3fae52d56a8ceb8b",
+      "length": 27
+    },
+    {
+      "file": "test/reliability-phase2c-recovery.integration.test.mjs",
+      "line": 274,
+      "class": "EMAIL",
+      "valueSha256": "a18a21057d1a81ab59d21e6b48685d5c6d6b75195ee171e6de1d7fb164e67aae",
+      "length": 29
+    },
+    {
+      "file": "test/reliability-phase2c-recovery.integration.test.mjs",
+      "line": 279,
+      "class": "EMAIL",
+      "valueSha256": "a18a21057d1a81ab59d21e6b48685d5c6d6b75195ee171e6de1d7fb164e67aae",
+      "length": 29
+    },
+    {
+      "file": "test/reliability-phase2c-recovery.test.mjs",
+      "line": 26,
+      "class": "EMAIL",
+      "valueSha256": "8b4a7779bef2b85974d9d58f56440bc80edd41c777de9c71e7c2f32652d8ff49",
+      "length": 19
+    },
+    {
+      "file": "test/reliability-phase2c-recovery.test.mjs",
+      "line": 101,
+      "class": "SECRET_ASSIGNMENT_CANDIDATE",
+      "valueSha256": "e925cac40d762c211d0f094a375d0d5b674dbc344529047fb7463904b80719ac",
+      "length": 32
+    }
+  ],
+  "secretValuesPrinted": false,
+  "limitations": [
+    "Pattern scan requires review; absence of a hit does not prove absence of every secret.",
+    "Source/evidence still being finalized; root must rescan final candidate."
+  ]
+}

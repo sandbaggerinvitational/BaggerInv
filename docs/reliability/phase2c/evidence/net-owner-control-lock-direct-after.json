@@ -1,0 +1,648 @@
+{
+  "issue": "P2C-NEW-NETSKINS-OWNER-CONTROL-LOCK",
+  "production": false,
+  "tests": [
+    {
+      "marker": "present",
+      "controlKind": "FINALIZE",
+      "order": "before",
+      "pass": true,
+      "expectedCounterexample": true,
+      "held": [
+        {
+          "pid": 39335,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 39336,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 39337,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39336
+          ]
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 39335,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            39337
+          ]
+        },
+        {
+          "pid": 39336,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 39337,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39336
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 39335,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            39337
+          ]
+        },
+        {
+          "pid": 39336,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 39337,
+          "wait": "transactionid",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39335
+          ]
+        }
+      ],
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "present",
+      "controlKind": "FINALIZE",
+      "order": "after",
+      "pass": true,
+      "expectedCounterexample": false,
+      "held": [
+        {
+          "pid": 39407,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39406
+          ]
+        },
+        {
+          "pid": 39408,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 39406,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 39407,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39406
+          ]
+        },
+        {
+          "pid": 39408,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            39407
+          ]
+        },
+        {
+          "pid": 39406,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "reciprocal": null,
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "present",
+      "controlKind": "SCORING_LOCK",
+      "order": "before",
+      "pass": true,
+      "expectedCounterexample": true,
+      "held": [
+        {
+          "pid": 39453,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 39455,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39453
+          ]
+        },
+        {
+          "pid": 39454,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 39453,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 39455,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39453
+          ]
+        },
+        {
+          "pid": 39454,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            39455
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 39453,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 39455,
+          "wait": "transactionid",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39454
+          ]
+        },
+        {
+          "pid": 39454,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            39455
+          ]
+        }
+      ],
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "present",
+      "controlKind": "SCORING_LOCK",
+      "order": "after",
+      "pass": true,
+      "expectedCounterexample": false,
+      "held": [
+        {
+          "pid": 39517,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 39518,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39516
+          ]
+        },
+        {
+          "pid": 39516,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 39517,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            39518
+          ]
+        },
+        {
+          "pid": 39518,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39516
+          ]
+        },
+        {
+          "pid": 39516,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "reciprocal": null,
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "absent",
+      "controlKind": "FINALIZE",
+      "order": "before",
+      "pass": true,
+      "expectedCounterexample": true,
+      "held": [
+        {
+          "pid": 39576,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39575
+          ]
+        },
+        {
+          "pid": 39575,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 39574,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 39576,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39575
+          ]
+        },
+        {
+          "pid": 39575,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 39574,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            39576
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 39576,
+          "wait": "transactionid",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39574
+          ]
+        },
+        {
+          "pid": 39575,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 39574,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            39576
+          ]
+        }
+      ],
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "absent",
+      "controlKind": "FINALIZE",
+      "order": "after",
+      "pass": true,
+      "expectedCounterexample": false,
+      "held": [
+        {
+          "pid": 39651,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 39650,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 39652,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39650
+          ]
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 39651,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            39652
+          ]
+        },
+        {
+          "pid": 39650,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 39652,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39650
+          ]
+        }
+      ],
+      "reciprocal": null,
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "absent",
+      "controlKind": "SCORING_LOCK",
+      "order": "before",
+      "pass": true,
+      "expectedCounterexample": true,
+      "held": [
+        {
+          "pid": 39707,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 39705,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 39706,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39705
+          ]
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 39707,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            39706
+          ]
+        },
+        {
+          "pid": 39705,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        },
+        {
+          "pid": 39706,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39705
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 39707,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            39706
+          ]
+        },
+        {
+          "pid": 39705,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 39706,
+          "wait": "transactionid",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39707
+          ]
+        }
+      ],
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "marker": "absent",
+      "controlKind": "SCORING_LOCK",
+      "order": "after",
+      "pass": true,
+      "expectedCounterexample": false,
+      "held": [
+        {
+          "pid": 39774,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39776
+          ]
+        },
+        {
+          "pid": 39775,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 39776,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 39774,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39776
+          ]
+        },
+        {
+          "pid": 39775,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            39774
+          ]
+        },
+        {
+          "pid": 39776,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124201);",
+          "blockedBy": []
+        }
+      ],
+      "reciprocal": null,
+      "semanticParityWithUnchangedSerial": true,
+      "controlBudgetMs": 1000,
+      "ownerBudgetMs": 5000
+    },
+    {
+      "case": "absent-marker-rejected-lease",
+      "pass": true,
+      "allRowsReceiptsAuditUnchanged": true
+    },
+    {
+      "case": "absent-marker-rejected-source",
+      "pass": true,
+      "allRowsReceiptsAuditUnchanged": true
+    },
+    {
+      "case": "two-rounds-absent-marker",
+      "pass": true,
+      "wait": [
+        {
+          "pid": 39915,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124202);",
+          "blockedBy": []
+        },
+        {
+          "pid": 39916,
+          "wait": "advisory",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39915
+          ]
+        },
+        {
+          "pid": 39917,
+          "wait": "transactionid",
+          "query": "select public.complete_production_net_skins_v1_recalculation('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxayw",
+          "blockedBy": [
+            39916
+          ]
+        }
+      ],
+      "serialFinancialAndDemandParity": true
+    },
+    {
+      "case": "manifest-security",
+      "pass": true,
+      "futureCoverage": "CATALOG_ONLY_ANNUAL_RUNTIME_SEPARATE"
+    }
+  ],
+  "installed": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "85f91fa8f13206669e4e622bf7f227f1531577acd7e1790a88fb1e12a5a4c930"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "sources": [
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "hash": "2f3c88b69d9029415a027d28909ead3f9f66bbb5132f1fdb7cd1a07f637d5c6d",
+      "owner": "10",
+      "definer": true,
+      "signature": "complete_production_net_skins_v1_recalculation(jsonb)",
+      "configuration": [
+        "search_path=pg_catalog, production_control, scoring_authority"
+      ]
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "hash": "2d06b882c6ceb32bf5a5fbb5686a44d0a36e1fcbf6c0421f4f65c55bcd8c7f7b",
+      "owner": "10",
+      "definer": true,
+      "signature": "future_production_complete_net_skins_recalculation_v1(jsonb)",
+      "configuration": [
+        "search_path=pg_catalog"
+      ]
+    }
+  ]
+}

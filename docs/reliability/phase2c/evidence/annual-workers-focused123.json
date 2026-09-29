@@ -1,0 +1,913 @@
+{
+  "schemaVersion": 1,
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "fixture": "phase2c-annual-workers-v1",
+  "seed": "2099-worker-contracts-v1",
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "timestamp": "2026-09-28T15:08:19.930Z",
+  "migration": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+  "migrationSha256": "cb9f35a414a816305871043b570fb669854e2c41485bcadfe0703ab3592697aa",
+  "statementTimeoutMs": 5000,
+  "tests": [
+    {
+      "id": "P2C-C-BEFORE",
+      "title": "all14 installed defects reproduce SQLSTATE42883 before correction",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "failures": [
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_dispatch_odds_pre_withdrawal_v1(jsonb)",
+            "sqlstate": "42883",
+            "partialWrite": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-C-INSTALL",
+      "title": "upgrade preserves attributes and removes only proven special-expression misuse",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "functions": 14,
+        "attributesPreserved": true,
+        "invalidInstalledExpressions": 0
+      }
+    },
+    {
+      "id": "P2C-C-AFTER",
+      "title": "every corrected initializer executes through its original guard rather than42883",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "calls": [
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": null,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": -1,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 0,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 60,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 301,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": null,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": -1,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 0,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 60,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 301,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          }
+        ],
+        "scope": "Initializer runtime and original guard only; successful claims/completions below"
+      }
+    },
+    {
+      "id": "P2C-C-COMPETITION",
+      "title": "2099 claim/complete/replay/stale and lease clamp use actual worker SQL",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "results": [
+          {
+            "lease": null,
+            "actualLeaseSeconds": 90,
+            "completed": true,
+            "replay": "STALE_DERIVED_JOB",
+            "snapshots": 1
+          },
+          {
+            "lease": -1,
+            "actualLeaseSeconds": 15,
+            "completed": true,
+            "replay": "STALE_DERIVED_JOB",
+            "snapshots": 1
+          },
+          {
+            "lease": 60,
+            "actualLeaseSeconds": 60,
+            "completed": true,
+            "replay": "STALE_DERIVED_JOB",
+            "snapshots": 1
+          },
+          {
+            "lease": 999,
+            "actualLeaseSeconds": 300,
+            "completed": true,
+            "replay": "STALE_DERIVED_JOB",
+            "snapshots": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-C-BEFORE-42702",
+      "title": "corrected initializer exposes historical annual intelligence variable collision",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "issue": "P2C-NEW-ANNUAL-42702",
+        "sqlstate": "42702",
+        "partialSnapshot": false,
+        "error": "ERROR:  42702: column reference \"configuration_fingerprint\" is ambiguous\nLINE 10:     ) on conflict (\n                           ^\nDETAIL:  It could refer to either a PL/pgSQL variable or a table column.\nQUERY:  insert into scoring_authority.competition_derived_runs (\n      tournament_id, round_number, engine_key, engine_version,\n      configuration_fingerprint, source_fingerprint, payload_hash, status,\n      calculated_by, started_at, completed_at, duration_ms\n    ) values (\n      target, 0, key_value, target_engine_version,\n      configuration_fingerprint, target_source, target_payload_hash,\n      'SUCCEEDED', target_actor, target_claim,\n      pg_catalog.clock_timestamp(), target_duration\n    ) on conflict (\n      tournament_id, round_number, engine_key, engine_version,\n      configuration_fingerprint, source_fingerprint, payload_hash, status\n    ) do update set\n      completed_at = pg_catalog.clock_timestamp(),\n      duration_ms = excluded.duration_ms,\n      calculated_by = excluded.calculated_by\nCONTEXT:  PL/pgSQL function public.future_production_write_intelligence_derived_bundle_v1(jsonb) line 122 at SQL statement\nLOCATION:  plpgsql_post_column_ref, pl_comp.c:1138\n"
+      }
+    },
+    {
+      "id": "P2C-C-INTELLIGENCE",
+      "title": "2099 bundle claim/complete preserves active lease and expired-lease retry",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "results": [
+          {
+            "lease": null,
+            "actualLeaseSeconds": 90,
+            "completed": 2,
+            "replay": "STALE_INTELLIGENCE_WORKER",
+            "expiredLeaseReclaimed": true
+          },
+          {
+            "lease": -1,
+            "actualLeaseSeconds": 15,
+            "completed": 2,
+            "replay": "STALE_INTELLIGENCE_WORKER",
+            "expiredLeaseReclaimed": true
+          },
+          {
+            "lease": 60,
+            "actualLeaseSeconds": 60,
+            "completed": 2,
+            "replay": "STALE_INTELLIGENCE_WORKER",
+            "expiredLeaseReclaimed": true
+          },
+          {
+            "lease": 999,
+            "actualLeaseSeconds": 300,
+            "completed": 2,
+            "replay": "STALE_INTELLIGENCE_WORKER",
+            "expiredLeaseReclaimed": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-C-GOOGLE",
+      "title": "2099 outbox claims and retry delay retain finite bounds and stale-lease rejection",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "rows": [
+          {
+            "lease": null,
+            "leaseSeconds": 30,
+            "retryAfter": null,
+            "retryDelaySeconds": 1,
+            "exactIdClaim": true,
+            "staleFailDenied": true
+          },
+          {
+            "lease": -1,
+            "leaseSeconds": 5,
+            "retryAfter": -1,
+            "retryDelaySeconds": 1,
+            "exactIdClaim": true,
+            "staleFailDenied": true
+          },
+          {
+            "lease": 60,
+            "leaseSeconds": 60,
+            "retryAfter": 20,
+            "retryDelaySeconds": 20,
+            "exactIdClaim": true,
+            "staleFailDenied": true
+          },
+          {
+            "lease": 999,
+            "leaseSeconds": 300,
+            "retryAfter": 999,
+            "retryDelaySeconds": 300,
+            "exactIdClaim": true,
+            "staleFailDenied": true
+          }
+        ],
+        "scope": "Outbox metadata claim/lease/failure; no Google transport or verified mirror"
+      }
+    },
+    {
+      "id": "P2C-C-ARCHIVE",
+      "title": "2099 archive claims and retry delay preserve supersession and finite bounds",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "rows": [
+          {
+            "lease": null,
+            "leaseSeconds": 60,
+            "retryAfter": null,
+            "retryDelaySeconds": 30,
+            "supersededRevision": 1,
+            "currentRevision": 2,
+            "staleFailDenied": true
+          },
+          {
+            "lease": -1,
+            "leaseSeconds": 15,
+            "retryAfter": -1,
+            "retryDelaySeconds": 2,
+            "supersededRevision": 1,
+            "currentRevision": 2,
+            "staleFailDenied": true
+          },
+          {
+            "lease": 60,
+            "leaseSeconds": 60,
+            "retryAfter": 20,
+            "retryDelaySeconds": 20,
+            "supersededRevision": 1,
+            "currentRevision": 2,
+            "staleFailDenied": true
+          },
+          {
+            "lease": 999,
+            "leaseSeconds": 300,
+            "retryAfter": 9999,
+            "retryDelaySeconds": 3600,
+            "supersededRevision": 1,
+            "currentRevision": 2,
+            "staleFailDenied": true
+          }
+        ],
+        "scope": "Archive queue metadata and lease/failure only; not scorecard rendering/storage/Google delivery"
+      }
+    },
+    {
+      "id": "P2C-C-ODDS",
+      "title": "2099 actual completion clamps output bytes without publishing or duplicating results",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "rows": [
+          {
+            "bytes": null,
+            "state": {
+              "bytes": 0,
+              "status": "SUCCEEDED",
+              "payload": {
+                "year": 2099,
+                "phase": "Pre-Tournament"
+              },
+              "publication": "READY"
+            }
+          },
+          {
+            "bytes": -1,
+            "state": {
+              "bytes": 0,
+              "status": "SUCCEEDED",
+              "payload": {
+                "year": 2099,
+                "phase": "Pre-Tournament"
+              },
+              "publication": "READY"
+            }
+          },
+          {
+            "bytes": 123,
+            "state": {
+              "bytes": 123,
+              "status": "SUCCEEDED",
+              "payload": {
+                "year": 2099,
+                "phase": "Pre-Tournament"
+              },
+              "publication": "READY"
+            }
+          },
+          {
+            "bytes": 2147483647,
+            "state": {
+              "bytes": 2147483647,
+              "status": "SUCCEEDED",
+              "payload": {
+                "year": 2099,
+                "phase": "Pre-Tournament"
+              },
+              "publication": "READY"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-C-REAPPLY",
+      "title": "reapplication fails atomically instead of silently accepting unknown source",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "reapplication": "REJECTED_ATOMICALLY"
+      }
+    },
+    {
+      "id": "P2C-C-CLEAN",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "effectiveCleanInstall": true,
+        "manifestExecuted": true,
+        "fullCandidate122And124": "SEPARATE_COMPOSITION_SUITE"
+      }
+    }
+  ],
+  "limitations": [
+    "Synthetic 2099 authority/current-pointer rows and explicit assert_future runtime substitution; not protected annual admission proof",
+    "Odds completion additionally substitutes annual runtime, exact job scope, and current-input boundary; actual completion SQL/constraints execute",
+    "No Google/Archive network delivery, Production, financial publication, or real participant identity"
+  ],
+  "completedAt": "2026-09-28T15:08:32.999Z",
+  "counts": {
+    "pass": 11,
+    "fail": 0
+  }
+}

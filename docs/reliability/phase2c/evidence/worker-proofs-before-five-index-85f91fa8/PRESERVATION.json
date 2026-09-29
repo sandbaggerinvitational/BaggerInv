@@ -1,0 +1,57 @@
+{
+  "purpose": "Completed85f9 candidate before five-index DDL and future Net extension",
+  "files": [
+    {
+      "file": "net-owner-lock-order.json",
+      "sha256": "dc35389fe29212981f61287a712658781382fff202f81c8ab9385c1817308b60"
+    },
+    {
+      "file": "net-owner-lock-order.tap",
+      "sha256": "083f9fabd0c708b53594b87d92627d072efc25bd71743200ca8cdb20e20bf6ab"
+    },
+    {
+      "file": "net-owner-control-lock-after.json",
+      "sha256": "d57c0906893dee5d513acd6259234e6a2a5370ece52f82a536f74ac9006098fc"
+    },
+    {
+      "file": "delivery.json",
+      "sha256": "972663e283df75a13d80602a9c4fc931a8e378721acccda329bc8640ce70201d"
+    },
+    {
+      "file": "delivery.tap",
+      "sha256": "0874a6dc268827579105a08fb688c2b4dfea5ce6117ed08056cc9b8b34577064"
+    },
+    {
+      "file": "worker-delivery-results.json",
+      "sha256": "677ff41ad8983c50cc1e4d8771f041587324f0055c8c7d4ff617c47adeb668a2"
+    },
+    {
+      "file": "calcutta-lock-order.json",
+      "sha256": "b98068a0758db08c4e43dc0d47c00dfbaeaadca8c2fb8c38a845b5e8781a6731"
+    },
+    {
+      "file": "calcutta-lock-order.tap",
+      "sha256": "86208f1cc36afac34ff5b29d09a1eec5519b8a2d7a381e95705e8e19d4321792"
+    },
+    {
+      "file": "calcutta-current-job-lock-after.json",
+      "sha256": "d75d3bc5c612da95d1407d0398cc1fdd4f739a40231d34f1efeac4e303af440c"
+    },
+    {
+      "file": "worker-lock-order.json",
+      "sha256": "bfd2377a64622afd6e72e66ba331491cf7da16cdf813f5210687c0635df3593e"
+    },
+    {
+      "file": "worker-lock-order.tap",
+      "sha256": "249c108406b9e80890214a451fde93b820e1e5f3aebda60a7f7613cbacf6ecb2"
+    },
+    {
+      "file": "worker-lock-isolation-after.json",
+      "sha256": "78f9e40a0b21a2f1dd3e03f7109ba8058fbf093187ac99f734805d28aad9e9b7"
+    },
+    {
+      "file": "worker-lease-duration-diagnostic.json",
+      "sha256": "6fc0e94c90bf598d7f3b47d0344b65af26631e736287bf40b3cc9acecb792e59"
+    }
+  ]
+}

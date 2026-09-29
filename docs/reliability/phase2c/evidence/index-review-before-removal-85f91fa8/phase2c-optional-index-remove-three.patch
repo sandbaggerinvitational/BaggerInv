@@ -1,0 +1,23 @@
+--- a/supabase/production_migrations/202609280124_score_derived_delivery_v1.sql
++++ b/supabase/production_migrations/202609280124_score_derived_delivery_v1.sql
+@@ -25,10 +25,16 @@
+       add column delivery_attempts integer not null default 0 check(delivery_attempts between 0 and 5),
+       add column delivery_dead_letter_at timestamptz,
+       add column delivery_error_class text check(delivery_error_class in (''RETRYABLE'',''TERMINAL''))',name);
+-    execute format('create index %I on scoring_authority.%I(tournament_id,delivery_available_at)
+-      where status in (''PENDING'',''FAILED'') and delivery_dead_letter_at is null',name||'_delivery_due',name);
+-    execute format('create index %I on scoring_authority.%I(tournament_id,delivery_dead_letter_at)
+-      where delivery_dead_letter_at is not null',name||'_delivery_terminal',name);
++    -- Current financial claims already have constrained active-job indexes.
++    -- The Competition due selector benefits from its current tournament prefix
++    -- under the default planner; terminal Competition rows are bounded by its key.
++    if name='competition_recalculation_jobs' then
++      execute format('create index %I on scoring_authority.%I(tournament_id,delivery_available_at)
++        where status in (''PENDING'',''FAILED'') and delivery_dead_letter_at is null',name||'_delivery_due',name);
++    else
++      execute format('create index %I on scoring_authority.%I(tournament_id,delivery_dead_letter_at)
++        where delivery_dead_letter_at is not null',name||'_delivery_terminal',name);
++    end if;
+   end loop;
+ end;
+ $columns$;

@@ -1,0 +1,68 @@
+▶ Phase2C delivery transaction boundaries preserve actual owner/control lock order
+  ✔ match-control has one-way waiting and commits inside its existing timeout (624.428583ms)
+  ✖ owner-net-completion has one-way waiting and commits inside its existing timeout (403.83125ms)
+  ✖ Intelligence old-lexicographic prefix has the expected actual control graph (1220.346375ms)
+  ✖ Intelligence inherited-control prefix has the expected actual control graph (437.070167ms)
+✖ Phase2C delivery transaction boundaries preserve actual owner/control lock order (11323.766583ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 1
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11404.7885
+
+✖ failing tests:
+
+test at test/reliability-phase2c-worker-lock-order.test.mjs:28:74
+✖ owner-net-completion has one-way waiting and commits inside its existing timeout (403.83125ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  RELIABILITY_LOCAL_RUNTIME_SCOPE_DENIED
+  CONTEXT:  PL/pgSQL function production_control.assert_production_scoring_runtime(jsonb,text) line 8 at RAISE
+  SQL statement "SELECT production_control.assert_production_scoring_runtime(input, null)"
+  PL/pgSQL function assert_production_net_skins_v1_runtime(jsonb) line 9 at PERFORM
+  SQL statement "SELECT production_control.assert_production_net_skins_v1_runtime(input)"
+  PL/pgSQL function public.claim_production_net_skins_v1_recalculation(jsonb) line 17 at PERFORM
+  
+      at run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker-lock-order.test.mjs:35:28)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at TestContext.test (node:internal/test_runner/test:399:20)
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker-lock-order.test.mjs:28:74)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    result: { status: 3, signal: null, output: [ null, '', 'ERROR:  RELIABILITY_LOCAL_RUNTIME_SCOPE_DENIED\nCONTEXT:  PL/pgSQL function production_control.assert_production_scoring_runtime(jsonb,text) line 8 at RAISE\nSQL statement "SELECT production_control.assert_production_scoring_runtime(input, null)"\nPL/pgSQL function assert_production_net_skins_v1_runtime(jsonb) line 9 at PERFORM\nSQL statement "SELECT production_control.assert_production_net_skins_v1_runtime(input)"\nPL/pgSQL function public.claim_production_net_skins_v1_recalculation(jsonb) line 17 at PERFORM\n' ], pid: 36872, stdout: '', stderr: 'ERROR:  RELIABILITY_LOCAL_RUNTIME_SCOPE_DENIED\nCONTEXT:  PL/pgSQL function production_control.assert_production_scoring_runtime(jsonb,text) line 8 at RAISE\nSQL statement "SELECT production_control.assert_production_scoring_runtime(input, null)"\nPL/pgSQL function assert_production_net_skins_v1_runtime(jsonb) line 9 at PERFORM\nSQL statement "SELECT production_control.assert_production_net_skins_v1_runtime(input)"\nPL/pgSQL function public.claim_production_net_skins_v1_recalculation(jsonb) line 17 at PERFORM\n' }
+  }
+
+test at test/reliability-phase2c-worker-lock-order.test.mjs:53:72
+✖ Intelligence old-lexicographic prefix has the expected actual control graph (1220.346375ms)
+  Error: Expected lock graph not observed
+      at waitGraph (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker-lock-order.test.mjs:17:177)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker-lock-order.test.mjs:65:30)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker-lock-order.test.mjs:53:64)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at test/reliability-phase2c-worker-lock-order.test.mjs:53:72
+✖ Intelligence inherited-control prefix has the expected actual control graph (437.070167ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker-lock-order.test.mjs:66:40)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker-lock-order.test.mjs:53:64)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

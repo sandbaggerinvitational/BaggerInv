@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: Phase2 actual rehearsal guard excludes restored history with candidate partial index
+    # Subtest: 0 restored rehearsal records
+    ok 1 - 0 restored rehearsal records
+      ---
+      duration_ms: 1233.575583
+      type: 'test'
+      ...
+    # Subtest: 100 restored rehearsal records
+    ok 2 - 100 restored rehearsal records
+      ---
+      duration_ms: 1136.823417
+      type: 'test'
+      ...
+    # Subtest: 1000 restored rehearsal records
+    not ok 3 - 1000 restored rehearsal records
+      ---
+      duration_ms: 1599.639375
+      type: 'test'
+      location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2-fence-history.test.mjs:121:43'
+      failureType: 'testCodeFailure'
+      error: |-
+        /opt/homebrew/opt/postgresql@17/bin/psql
+        ERROR:  canceling statement due to statement timeout
+        
+      code: 'ERR_TEST_FAILURE'
+      stack: |-
+        run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+        sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+        seedRestoredHistory (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2-fence-history.test.mjs:44:2)
+        TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2-fence-history.test.mjs:122:56)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+        TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2-fence-history.test.mjs:121:43)
+        async Test.run (node:internal/test_runner/test:1404:7)
+      ...
+    1..3
+not ok 1 - Phase2 actual rehearsal guard excludes restored history with candidate partial index
+  ---
+  duration_ms: 21153.550709
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2-fence-history.test.mjs:102:1'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# {"schemaVersion":1,"fixture":"phase2-fence-history-v2","environment":"OWNED_LOCAL_POSTGRESQL17","candidate":{"path":"supabase/production_migrations/202609280121_score_derived_intents_v1.sql","sha256":"cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"},"production":false,"shippingMigrationChanged":false,"method":"Actual installed guard and accepted score RPC; default planner;30 rollback timing samples; nested auto_explain separate from timing","fixtureBoundary":"CHECK/NOT NULL/UNIQUE-valid RESTORED records; only provider quiesce FK prerequisite omitted with replica mode during fixture INSERT","limitations":["Synthetic local records, not provider/restoration certification","Nested plan work overlaps, do not sum into request time/unique rows","P99 not proven by30 samples;host scheduling can affect latency","Before plan drops only the candidate index in a disposable database; after reinstalls the exact installed definition"],"rows":[{"restoredRows":0,"before":{"guardPlan":{"statements":2,"scans":[{"querySha256":"458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9","nodeType":"Seq Scan","index":null,"actualRows":0,"actualLoops":1,"rowsRemovedByFilter":0,"sharedHitBlocks":0,"sharedReadBlocks":0,"heapFetches":null,"instrumentedStatementMs":0.004}]},"scorePlan":{"statements":88,"scans":[{"querySha256":"458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9","nodeType":"Seq Scan","index":null,"actualRows":0,"actualLoops":1,"rowsRemovedByFilter":0,"sharedHitBlocks":0,"sharedReadBlocks":0,"heapFetches":null,"instrumentedStatementMs":0.003}]},"guard":{"samples":30,"p50Ms":0.026,"p95Ms":0.047,"maxMs":1.574,"values":[1.574,0.037,0.028,0.041,0.035,0.03,0.029,0.029,0.03,0.039,0.047,0.025,0.026,0.025,0.027,0.025,0.028,0.026,0.025,0.024,0.024,0.022,0.026,0.025,0.026,0.024,0.024,0.024,0.023,0.025]},"score":{"samples":30,"p50Ms":1.157,"p95Ms":2.972,"maxMs":15.415,"values":[15.415,2.629,2.448,2.338,2.307,2.972,1.322,1.188,1.179,1.181,1.117,1.127,1.199,1.287,1.297,1.33,1.117,1.13,1.098,1.089,1.142,1.157,1.144,1.122,1.097,1.098,1.098,1.104,1.166,1.096]}},"after":{"guardPlan":{"statements":2,"scans":[{"querySha256":"458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9","nodeType":"Seq Scan","index":null,"actualRows":0,"actualLoops":1,"rowsRemovedByFilter":0,"sharedHitBlocks":0,"sharedReadBlocks":0,"heapFetches":null,"instrumentedStatementMs":0.004}]},"scorePlan":{"statements":88,"scans":[{"querySha256":"458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9","nodeType":"Seq Scan","index":null,"actualRows":0,"actualLoops":1,"rowsRemovedByFilter":0,"sharedHitBlocks":0,"sharedReadBlocks":0,"heapFetches":null,"instrumentedStatementMs":0.002}]},"guard":{"samples":30,"p50Ms":0.026,"p95Ms":0.04,"maxMs":1.695,"values":[1.695,0.034,0.028,0.03,0.033,0.04,0.029,0.03,0.03,0.026,0.024,0.026,0.023,0.022,0.026,0.025,0.025,0.025,0.025,0.025,0.026,0.024,0.026,0.026,0.023,0.026,0.024,0.025,0.024,0.026]},"score":{"samples":30,"p50Ms":1.162,"p95Ms":2.665,"maxMs":15.679,"values":[15.679,2.663,2.446,2.665,2.435,2.65,1.242,1.425,1.331,1.229,1.153,1.139,1.116,1.125,1.162,1.103,1.156,1.111,1.13,1.081,1.297,1.145,1.184,1.088,1.1,1.264,1.214,1.172,1.113,1.129]}},"indexBuild":{"databaseMs":1.55,"clientWallMs":14.466165999998339,"definition":"CREATE INDEX google_writer_fence_rehearsals_unrestored_idx ON production_control.google_writer_fence_rehearsals USING btree (run_id) WHERE ((status = 'RUNNING'::text) OR ((status = 'FAILED'::text) AND (NOT restoration_confirmed)))"}},{"restoredRows":100,"before":{"guardPlan":{"statements":2,"scans":[{"querySha256":"458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9","nodeType":"Seq Scan","index":null,"actualRows":0,"actualLoops":1,"rowsRemovedByFilter":100,"sharedHitBlocks":25,"sharedReadBlocks":0,"heapFetches":null,"instrumentedStatementMs":0.078}]},"scorePlan":{"statements":88,"scans":[{"querySha256":"458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9","nodeType":"Seq Scan","index":null,"actualRows":0,"actualLoops":1,"rowsRemovedByFilter":100,"sharedHitBlocks":25,"sharedReadBlocks":0,"heapFetches":null,"instrumentedStatementMs":0.063}]},"guard":{"samples":30,"p50Ms":0.066,"p95Ms":0.11,"maxMs":1.609,"values":[1.609,0.078,0.08,0.063,0.056,0.07,0.06,0.068,0.067,0.066,0.06,0.053,0.052,0.063,0.058,0.063,0.11,0.067,0.056,0.067,0.057,0.091,0.099,0.074,0.057,0.067,0.072,0.087,0.061,0.06]},"score":{"samples":30,"p50Ms":1.201,"p95Ms":2.842,"maxMs":15.159,"values":[15.159,2.661,2.214,2.286,2.746,2.842,1.201,1.176,1.189,1.139,1.135,1.328,1.364,1.12,1.11,1.432,1.226,1.342,1.194,1.229,1.174,1.155,1.124,1.347,1.146,1.188,1.134,1.176,1.235,1.525]}},"after":{"guardPlan":{"statements":2,"scans":[{"querySha256":"458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9","nodeType":"Index Only Scan","index":"google_writer_fence_rehearsals_unrestored_idx","actualRows":0,"actualLoops":1,"rowsRemovedByFilter":0,"sharedHitBlocks":1,"sharedReadBlocks":0,"heapFetches":0,"instrumentedStatementMs":0.006}]},"scorePlan":{"statements":88,"scans":[{"querySha256":"458f2a03496acde17d496323bb688ea1a65d7ca3ee88b89ddc1e19294a0581a9","nodeType":"Index Only Scan","index":"google_writer_fence_rehearsals_unrestored_idx","actualRows":0,"actualLoops":1,"rowsRemovedByFilter":0,"sharedHitBlocks":1,"sharedReadBlocks":0,"heapFetches":0,"instrumentedStatementMs":0.001}]},"guard":{"samples":30,"p50Ms":0.025,"p95Ms":0.064,"maxMs":1.694,"values":[1.694,0.034,0.026,0.024,0.064,0.053,0.025,0.026,0.036,0.029,0.031,0.026,0.023,0.022,0.024,0.027,0.023,0.025,0.022,0.025,0.024,0.024,0.025,0.024,0.025,0.027,0.022,0.025,0.025,0.022]},"score":{"samples":30,"p50Ms":1.13,"p95Ms":2.801,"maxMs":16.584,"values":[16.584,2.684,2.281,2.538,2.186,2.801,1.245,1.323,1.194,1.127,1.116,1.124,1.121,1.13,1.114,1.101,1.089,1.341,1.241,1.112,1.112,1.087,1.454,1.093,1.124,1.235,1.206,1.143,1.109,1.078]}},"indexBuild":{"databaseMs":2.055,"clientWallMs":14.2712500000016,"definition":"CREATE INDEX google_writer_fence_rehearsals_unrestored_idx ON production_control.google_writer_fence_rehearsals USING btree (run_id) WHERE ((status = 'RUNNING'::text) OR ((status = 'FAILED'::text) AND (NOT restoration_confirmed)))"}}],"fixtureSetupTimeoutMs":180000,"measuredStatementTimeoutMs":1000,"indexDefinition":"CREATE INDEX google_writer_fence_rehearsals_unrestored_idx ON production_control.google_writer_fence_rehearsals USING btree (run_id) WHERE ((status = 'RUNNING'::text) OR ((status = 'FAILED'::text) AND (NOT restoration_confirmed)))","guardSourceSha256":"11f0a46a64bad31372178c0db60a6662b0ab79f50770720141b34375283d8105"}
+1..1
+# tests 4
+# suites 0
+# pass 2
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 21259.945917

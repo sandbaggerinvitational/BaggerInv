@@ -11,15 +11,20 @@ import { seedSyntheticSideGameHistory } from "./support/reliability/synthetic-hi
 import { reusableScoreInput } from "./support/reliability/benchmark-operations.mjs";
 import { extractSqlFunction } from "./support/reliability/sql-source.mjs";
 
-test("NA-2026-019 canonical score avoids irrelevant historical fingerprint execution under Release139", { timeout: 120000 }, async () => {
+test("NA-2026-019 canonical score avoids irrelevant historical fingerprint execution under Release139", { timeout: process.env.BAGGER_RELIABILITY_EXTENDED_SETUP === "1" ? 600000 : 120000 }, async () => {
   const cluster = await createIsolatedCluster();
   try {
     createDatabase(cluster, "na019");
     await installRelease139Schema(cluster, "na019");
     installRelease139FunctionCandidates(cluster, "na019");
     seedSyntheticTournament(cluster, "na019");
+    const setupStarted = Date.now();
     seedSyntheticSideGameHistory(cluster, "na019", 10);
     installCertifiedSqlRepairs(cluster, "na019");
+    if (process.env.BAGGER_RELIABILITY_EXTENDED_SETUP === "1") {
+      sql(cluster, "na019", "alter database na019 set statement_timeout='1s'", { role: "" });
+      console.log(JSON.stringify({ fixtureSetupMs: Date.now()-setupStarted, measuredStatementTimeoutMs: 1000, scope: "NA019_10X_SYNTHETIC_SETUP_NOT_SCORE_LATENCY" }));
+    }
     assert.equal(sql(cluster, "na019", "select count(*) from scoring_authority.calcutta_v1_recalculation_jobs"), "7450");
     assert.equal(sql(cluster, "na019", "select count(*) from production_control.late_r3_calcutta_compatibility_v1"), "0");
     // A failure-injection spy, not a candidate function change. It turns any

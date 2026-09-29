@@ -1,0 +1,3476 @@
+{
+  "recordKind": "INDEPENDENT_IMPORT_ORDER_SOURCE_REVIEW_ADDENDUM_NOT_RUNTIME_EXECUTION",
+  "reviewedAt": "2026-09-29T21:06:12.197669+00:00",
+  "reviewer": "Codex engineering review (score_proof_design)",
+  "ownerAcceptance": "NOT_PERFORMED",
+  "checkout": "/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "originalReview": {
+    "path": "docs/reliability/phase2c/evidence/independent-engineering-review.json",
+    "sha256": "3b7e647ce04e6e73eb8490e5537b9cc2407ec7bb9eb2ae182dac593916b35b72",
+    "reviewedAt": "2026-09-29T20:34:44.544404+00:00",
+    "relationship": "Preserve original review as historical; replace its 17-file manifest with current manifest for this addendum only. Do not backfill original runtime freshness."
+  },
+  "correctionRecord": {
+    "path": "docs/reliability/phase2c/evidence/server-only-order-regression/correction.json",
+    "sha256": "ecb18b6b84d42f402caded6b01f23e9baa1e72b5107dd7c852c05de0df6cab09"
+  },
+  "proofLayer": "SOURCE_BYTE_COMPARISON_AND_RETAINED_PROVENANCE_REVIEW",
+  "classification": "PROVEN (the exact byte comparisons and hashes only)",
+  "sourceHashes": {
+    "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce",
+    "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0",
+    "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48",
+    "lib/scoring-authority-supabase.js": "4dde49461f6805cccce8b5805a80ab4ba159627abc90e1b321d27d92df941196",
+    "lib/operational-rpc-contract.js": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+    "lib/production-scoring-operations-server.js": "b66b5c083801fc6ab4356d1d26320efb805b22cf2a075cb216db0a592ed2cf70",
+    "lib/scoring-mutation-recovery.js": "0f6b5aa1c5f042f846861cee22e61c113cfb98cd058d160c6982f458d77359b3",
+    "lib/scoring-mutation-recovery-route.js": "0e98f14294d531e33b08cc23493c1f326e796e1107f63c30c7404fcf1a6a4cfb",
+    "app/api/scoring/mutation-status/route.js": "39e35bfe30419eb87ae092e7b17feb5e8164abb963c5dc861ba0a3e585cd0c2a",
+    "app/api/mobile/v1/scoring/mutation-status/route.js": "6d4ffb20d5dd156c8ed4af1fd71a0a275304debdb550d8b477bed470931878d9",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cb18835d2bb540572d6460dc4313b678266560e8f6a56b56376b1ee783a321bd",
+    "lib/competition-derived-supabase.js": "7609a613f538e2252314b383305469317803ff23f384fe298ea24e53d40bb241",
+    "lib/intelligence-derived-supabase.js": "aa3d5b53012176ad3ed8ce681758a97770a68e1c18dd38a5cd210f22c636e5e9",
+    "lib/production-calcutta-server.js": "cb183d4b5f8159dad552541a72ec5b83e18378c7c50705955c129ec2784be89b",
+    "lib/production-net-skins-server.js": "4007eee4e309d18ae2e2d89f80980c306de29e7e78b5e9fad07f68f408690952",
+    "tools/reliability/run-score-derived-worker.mjs": "65f7ab486d4a7404b1003d180cb08f91405ea3dca518c2f3cdaf27eec3c1e9db"
+  },
+  "sourceCount": 17,
+  "unchangedSourceCount": 15,
+  "changedSources": [
+    {
+      "path": "lib/production-calcutta-server.js",
+      "preservedBefore": "docs/reliability/phase2c/evidence/server-only-order-regression/production-calcutta-server.js.before.txt",
+      "beforeSha256": "73b6d03776ac29216f83ca0088cc95b918a9960539a7fd441b2443fe1bc95b37",
+      "beforeMatchesOriginalReview": true,
+      "afterSha256": "cb183d4b5f8159dad552541a72ec5b83e18378c7c50705955c129ec2784be89b",
+      "onlyFirstTwoImportsSwapped": true,
+      "afterFirstTwoLinesIdentical": true,
+      "unchangedTailSha256": "1eea42dd4485dfe52540093f721b5853be26f08bba820fd76f796470b07d8406",
+      "oldFirstTwoLines": [
+        "import { derivedFailureCode } from './score-derived-worker.js';",
+        "import \"server-only\";"
+      ],
+      "newFirstTwoLines": [
+        "import \"server-only\";",
+        "import { derivedFailureCode } from './score-derived-worker.js';"
+      ]
+    },
+    {
+      "path": "lib/production-net-skins-server.js",
+      "preservedBefore": "docs/reliability/phase2c/evidence/server-only-order-regression/production-net-skins-server.js.before.txt",
+      "beforeSha256": "087505a35d83ad1fa743374396ea3be1338b2c1e1290d23bba20eb2e734f9a0f",
+      "beforeMatchesOriginalReview": true,
+      "afterSha256": "4007eee4e309d18ae2e2d89f80980c306de29e7e78b5e9fad07f68f408690952",
+      "onlyFirstTwoImportsSwapped": true,
+      "afterFirstTwoLinesIdentical": true,
+      "unchangedTailSha256": "12f94d5b3b189f50de71d590460ec41f68e69c69d4fcb93c41e4bb8321ec4d9e",
+      "oldFirstTwoLines": [
+        "import { derivedFailureCode } from './score-derived-worker.js';",
+        "import \"server-only\";"
+      ],
+      "newFirstTwoLines": [
+        "import \"server-only\";",
+        "import { derivedFailureCode } from './score-derived-worker.js';"
+      ]
+    }
+  ],
+  "testIntegrity": {
+    "reference": "docs/reliability/phase2c/evidence/server-only-order-regression/application.json",
+    "referenceSha256": "7a338ee405dda7b8006916e346ba24bc9a068e08978337a89532e5bdb9b7bf04",
+    "referenceCompletedAt": "2026-09-29T20:54:31.274Z",
+    "directTestFilesChecked": 493,
+    "capturedTestAndSupportFilesChecked": 557,
+    "changedCount": 0,
+    "files": [
+      {
+        "file": "test/account-deletion-completion-worker.test.mjs",
+        "capturedSha256": "7fa6acdeee2fde3721bd659ea851249ab86aef4a79ecbde94d34b5fd2525bc5e",
+        "currentSha256": "7fa6acdeee2fde3721bd659ea851249ab86aef4a79ecbde94d34b5fd2525bc5e",
+        "unchanged": true
+      },
+      {
+        "file": "test/account-deletion-policy.test.mjs",
+        "capturedSha256": "ce8e3613fe362cb34da76af2a9f32820f2e778deeed3e19be170bcbd5960f5a1",
+        "currentSha256": "ce8e3613fe362cb34da76af2a9f32820f2e778deeed3e19be170bcbd5960f5a1",
+        "unchanged": true
+      },
+      {
+        "file": "test/account-deletion-scheduled-worker.test.mjs",
+        "capturedSha256": "4b3b990af012d830e397ff1a090fc03f8589e37125e1e38c5e35d2e55d00c016",
+        "currentSha256": "4b3b990af012d830e397ff1a090fc03f8589e37125e1e38c5e35d2e55d00c016",
+        "unchanged": true
+      },
+      {
+        "file": "test/admin-cms-config.test.mjs",
+        "capturedSha256": "04828d55ed9981095de50fca777acdd8ba7d6a0d3f4d8d6f8cbc7cfb9f09d7f1",
+        "currentSha256": "04828d55ed9981095de50fca777acdd8ba7d6a0d3f4d8d6f8cbc7cfb9f09d7f1",
+        "unchanged": true
+      },
+      {
+        "file": "test/advisory-prediction-symmetry.test.mjs",
+        "capturedSha256": "389191eae74a3175ce70d865365e5abf79e05d232fa1522127344c0243b3be9d",
+        "currentSha256": "389191eae74a3175ce70d865365e5abf79e05d232fa1522127344c0243b3be9d",
+        "unchanged": true
+      },
+      {
+        "file": "test/app-store-information-pages.test.mjs",
+        "capturedSha256": "62b53be267caf52d1ac8f90d14d6862086449d820389691d5a8d358838fcb522",
+        "currentSha256": "62b53be267caf52d1ac8f90d14d6862086449d820389691d5a8d358838fcb522",
+        "unchanged": true
+      },
+      {
+        "file": "test/approved-mobile-enrollment-client.test.mjs",
+        "capturedSha256": "c8f0090e3d0e48a7068545cc7d97a01dd9eabe69bc87f4228af8b904de4fcb02",
+        "currentSha256": "c8f0090e3d0e48a7068545cc7d97a01dd9eabe69bc87f4228af8b904de4fcb02",
+        "unchanged": true
+      },
+      {
+        "file": "test/asset-paths.test.mjs",
+        "capturedSha256": "0b88530b21b95718300e1c4e428218bfa725428b8e157fdb83c045b05e57ac4e",
+        "currentSha256": "0b88530b21b95718300e1c4e428218bfa725428b8e157fdb83c045b05e57ac4e",
+        "unchanged": true
+      },
+      {
+        "file": "test/atomic-round-scoring-contract.test.mjs",
+        "capturedSha256": "6222600cf7e088804842a0cc06e27898fecdd7620e5c7b4cdb0f16567a51141f",
+        "currentSha256": "6222600cf7e088804842a0cc06e27898fecdd7620e5c7b4cdb0f16567a51141f",
+        "unchanged": true
+      },
+      {
+        "file": "test/best-ball-decimal-handicap-display.test.mjs",
+        "capturedSha256": "532829534502b6c754a7babec030cf3407ff091fab8711cc32286a53a8efd67d",
+        "currentSha256": "532829534502b6c754a7babec030cf3407ff091fab8711cc32286a53a8efd67d",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta-candidate-integrity.test.mjs",
+        "capturedSha256": "4f615cc26482044b1f0304b4a958624e4401428de1b71fb4c8eff34839318e96",
+        "currentSha256": "4f615cc26482044b1f0304b4a958624e4401428de1b71fb4c8eff34839318e96",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta-clear-server.test.mjs",
+        "capturedSha256": "5f2ad7b749b07592c4d4a7125b7fad909a1901a999dbadd7caffa052971d797c",
+        "currentSha256": "5f2ad7b749b07592c4d4a7125b7fad909a1901a999dbadd7caffa052971d797c",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta-clear-ui.test.mjs",
+        "capturedSha256": "44233c3276080c0d172af17076f8f0a8ad515e0b2c6989d142d8f5590e9391ba",
+        "currentSha256": "44233c3276080c0d172af17076f8f0a8ad515e0b2c6989d142d8f5590e9391ba",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta-full-course-handicap-v2.test.mjs",
+        "capturedSha256": "d406b2079731d68060d82d26e99a0917d89f165135a0e981a8b87f0298b3d726",
+        "currentSha256": "d406b2079731d68060d82d26e99a0917d89f165135a0e981a8b87f0298b3d726",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta-leaderboards-regression.test.mjs",
+        "capturedSha256": "02363f7269ffd882c20ce29d39212c3d4e0fef202e6f48988d272ed6ba40ec38",
+        "currentSha256": "02363f7269ffd882c20ce29d39212c3d4e0fef202e6f48988d272ed6ba40ec38",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta-leaderboards.test.mjs",
+        "capturedSha256": "994e34ade90f12b374a083c271f892dde31447d55bb6d80eff863b7845ea33f5",
+        "currentSha256": "994e34ade90f12b374a083c271f892dde31447d55bb6d80eff863b7845ea33f5",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta-management-server.test.mjs",
+        "capturedSha256": "17048fb160e649e6c8d84c73d1f6057931500cc9094be2338ba6673990fb43ab",
+        "currentSha256": "17048fb160e649e6c8d84c73d1f6057931500cc9094be2338ba6673990fb43ab",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta-management.test.mjs",
+        "capturedSha256": "e89d2b18c0d08d0d0215fc0d3b93d3d35a331ea68574fbe03133b3842d1f08da",
+        "currentSha256": "e89d2b18c0d08d0d0215fc0d3b93d3d35a331ea68574fbe03133b3842d1f08da",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta-recovery-source-boundary.test.mjs",
+        "capturedSha256": "61db701171a6d8c86b253e359ae8fb8d7c7a309662cb138b07fcb0d9ee6cb6a5",
+        "currentSha256": "61db701171a6d8c86b253e359ae8fb8d7c7a309662cb138b07fcb0d9ee6cb6a5",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta-scramble-team-placement.test.mjs",
+        "capturedSha256": "e3480bd1de942a16266991bfab2ca3d70151648d7375e9bf817a128e1fc78f8c",
+        "currentSha256": "e3480bd1de942a16266991bfab2ca3d70151648d7375e9bf817a128e1fc78f8c",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta-supabase.test.mjs",
+        "capturedSha256": "51091c7d45e5575c4b4bae4222ef15c9baf2d2df5a6b6256d3890b2142817a43",
+        "currentSha256": "51091c7d45e5575c4b4bae4222ef15c9baf2d2df5a6b6256d3890b2142817a43",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta-tie-metadata.test.mjs",
+        "capturedSha256": "873b9b7bb795a4868b3fa18b82c9a66d37cc7b0115036f89f8178b3d4dab00c0",
+        "currentSha256": "873b9b7bb795a4868b3fa18b82c9a66d37cc7b0115036f89f8178b3d4dab00c0",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta-ux-clarity.test.mjs",
+        "capturedSha256": "8c35c5e3d6cb4709d9d52316b9a88b74d99270ef7e7de30c52fd4493ba8c5149",
+        "currentSha256": "8c35c5e3d6cb4709d9d52316b9a88b74d99270ef7e7de30c52fd4493ba8c5149",
+        "unchanged": true
+      },
+      {
+        "file": "test/calcutta.test.mjs",
+        "capturedSha256": "6dbebd5db475635c942bed60a8440decacc52599d865b8673ae22bfb8f3777fa",
+        "currentSha256": "6dbebd5db475635c942bed60a8440decacc52599d865b8673ae22bfb8f3777fa",
+        "unchanged": true
+      },
+      {
+        "file": "test/canonical-projection-audit.test.mjs",
+        "capturedSha256": "57507b5c9343f4cbcb7b45e709b80eefc865a7350a89bfa6e22f5dd477514842",
+        "currentSha256": "57507b5c9343f4cbcb7b45e709b80eefc865a7350a89bfa6e22f5dd477514842",
+        "unchanged": true
+      },
+      {
+        "file": "test/championship-odds-format.test.mjs",
+        "capturedSha256": "b5213765c43f6175e1a9b3fcf785a2eb875104dbd6b36545ac920dbf7a129ed2",
+        "currentSha256": "b5213765c43f6175e1a9b3fcf785a2eb875104dbd6b36545ac920dbf7a129ed2",
+        "unchanged": true
+      },
+      {
+        "file": "test/championship-odds-insights.test.mjs",
+        "capturedSha256": "004244d043af1c7b75bfd49ab3ed282c960977554537602e1386e595c6cb4ad9",
+        "currentSha256": "004244d043af1c7b75bfd49ab3ed282c960977554537602e1386e595c6cb4ad9",
+        "unchanged": true
+      },
+      {
+        "file": "test/championship-odds-resilience.test.mjs",
+        "capturedSha256": "dedf43ce6ede79b5edcd7d4e93a737708a26ddaeddf5b5278b4a48236d62886d",
+        "currentSha256": "dedf43ce6ede79b5edcd7d4e93a737708a26ddaeddf5b5278b4a48236d62886d",
+        "unchanged": true
+      },
+      {
+        "file": "test/championship-odds-supabase-inputs.test.mjs",
+        "capturedSha256": "9acf3ddf2063f41bb11d642eac7d5781daa60ee321e53febe11b497d8284d9b1",
+        "currentSha256": "9acf3ddf2063f41bb11d642eac7d5781daa60ee321e53febe11b497d8284d9b1",
+        "unchanged": true
+      },
+      {
+        "file": "test/championship-projection-lifecycle.test.mjs",
+        "capturedSha256": "27e23e9c0852044c0413a93f14788aa054076b8df522c09b5f1b5a21183eb4c9",
+        "currentSha256": "27e23e9c0852044c0413a93f14788aa054076b8df522c09b5f1b5a21183eb4c9",
+        "unchanged": true
+      },
+      {
+        "file": "test/client-cache-hydration-safety.test.mjs",
+        "capturedSha256": "c97bddb4ee4f51d248628705777c999b4cb3a414df8edf8ed95aebaedfc087e1",
+        "currentSha256": "c97bddb4ee4f51d248628705777c999b4cb3a414df8edf8ed95aebaedfc087e1",
+        "unchanged": true
+      },
+      {
+        "file": "test/client-mutation-operation-identity.test.mjs",
+        "capturedSha256": "04d73ad7cf90dab2ea4b6739131b6f7474c8ad89e4f3a8fd21b5a1b88b57eaa8",
+        "currentSha256": "04d73ad7cf90dab2ea4b6739131b6f7474c8ad89e4f3a8fd21b5a1b88b57eaa8",
+        "unchanged": true
+      },
+      {
+        "file": "test/cms-save-transaction.test.mjs",
+        "capturedSha256": "0cc0c5ee0a620d254e4e3c3028797c1bf554fd99ac6983f6d83825530e27b3e8",
+        "currentSha256": "0cc0c5ee0a620d254e4e3c3028797c1bf554fd99ac6983f6d83825530e27b3e8",
+        "unchanged": true
+      },
+      {
+        "file": "test/competition-derived-supabase.test.mjs",
+        "capturedSha256": "099b25fe2affd3c9aa8e94d0891213669f1ca384ccbaf2c2cf1075d49e811c45",
+        "currentSha256": "099b25fe2affd3c9aa8e94d0891213669f1ca384ccbaf2c2cf1075d49e811c45",
+        "unchanged": true
+      },
+      {
+        "file": "test/context-navigation.test.mjs",
+        "capturedSha256": "7e42b947a2830c721096156ab65fdd7cacbb0265393a2b90e5e90a8d24fd554a",
+        "currentSha256": "7e42b947a2830c721096156ab65fdd7cacbb0265393a2b90e5e90a8d24fd554a",
+        "unchanged": true
+      },
+      {
+        "file": "test/course-archive-organization.test.mjs",
+        "capturedSha256": "73976a9b42f0905d776f452aa1562ebb423ac12b7d985746f54a704b589b57c9",
+        "currentSha256": "73976a9b42f0905d776f452aa1562ebb423ac12b7d985746f54a704b589b57c9",
+        "unchanged": true
+      },
+      {
+        "file": "test/course-detail-app.test.mjs",
+        "capturedSha256": "998dde109ea245a1c88aa09c26dca62a1e49f995cc345aca09abd24f21b64810",
+        "currentSha256": "998dde109ea245a1c88aa09c26dca62a1e49f995cc345aca09abd24f21b64810",
+        "unchanged": true
+      },
+      {
+        "file": "test/course-holes-schema.test.mjs",
+        "capturedSha256": "489238a34545ddfb8688c4c6bd6ee8b9bffa7abc1bab848f6cb5d0299ff8402e",
+        "currentSha256": "489238a34545ddfb8688c4c6bd6ee8b9bffa7abc1bab848f6cb5d0299ff8402e",
+        "unchanged": true
+      },
+      {
+        "file": "test/director-capability-cookie.test.mjs",
+        "capturedSha256": "d5799f98c4b6c1f8e5730b973c99e17e10a9438bcfc2cf3f6e1651ea67ff70a3",
+        "currentSha256": "d5799f98c4b6c1f8e5730b973c99e17e10a9438bcfc2cf3f6e1651ea67ff70a3",
+        "unchanged": true
+      },
+      {
+        "file": "test/director-course-tees.test.mjs",
+        "capturedSha256": "a3eee9298fae66c9512e201da96dea4ef7e43f261a900cbfdafc6f8b58d329ae",
+        "currentSha256": "a3eee9298fae66c9512e201da96dea4ef7e43f261a900cbfdafc6f8b58d329ae",
+        "unchanged": true
+      },
+      {
+        "file": "test/director-guide-refresh.test.mjs",
+        "capturedSha256": "6f82e34a80969e95fa8350fd6bcaf79529c113bf80774b4658d2d9bb27bcf1ff",
+        "currentSha256": "6f82e34a80969e95fa8350fd6bcaf79529c113bf80774b4658d2d9bb27bcf1ff",
+        "unchanged": true
+      },
+      {
+        "file": "test/director-odds-history-v1-1.test.mjs",
+        "capturedSha256": "63dbbdfa89071c8b6d90ac29e8421f848adb1930fa36266d78d8d62709f74d71",
+        "currentSha256": "63dbbdfa89071c8b6d90ac29e8421f848adb1930fa36266d78d8d62709f74d71",
+        "unchanged": true
+      },
+      {
+        "file": "test/director-operations-console.test.mjs",
+        "capturedSha256": "fd86f927238fd38c2e2e1de5657560edd5e8a4f02dc14066a9ecc7f89222157e",
+        "currentSha256": "fd86f927238fd38c2e2e1de5657560edd5e8a4f02dc14066a9ecc7f89222157e",
+        "unchanged": true
+      },
+      {
+        "file": "test/director-readback-verification.test.mjs",
+        "capturedSha256": "a5f4634cd8c98c5f993f8480761e7fee2cf734dec9b58729a66b79dc53f31351",
+        "currentSha256": "a5f4634cd8c98c5f993f8480761e7fee2cf734dec9b58729a66b79dc53f31351",
+        "unchanged": true
+      },
+      {
+        "file": "test/director-transaction-pipeline.test.mjs",
+        "capturedSha256": "b9a803b67b97e1825d5e290adbd91c65417d0b18917c9324e4d53a2b0955fce2",
+        "currentSha256": "b9a803b67b97e1825d5e290adbd91c65417d0b18917c9324e4d53a2b0955fce2",
+        "unchanged": true
+      },
+      {
+        "file": "test/draft-analytics.test.mjs",
+        "capturedSha256": "059f6b82cf79f401deaffc490a60f2dc86917639904b6f2f4b1cdbf495b7097d",
+        "currentSha256": "059f6b82cf79f401deaffc490a60f2dc86917639904b6f2f4b1cdbf495b7097d",
+        "unchanged": true
+      },
+      {
+        "file": "test/draft-state.test.mjs",
+        "capturedSha256": "4763eafcc5d21eea307dcc3a0fb6f2f1552375bdaa709ae972f80fef8824788f",
+        "currentSha256": "4763eafcc5d21eea307dcc3a0fb6f2f1552375bdaa709ae972f80fef8824788f",
+        "unchanged": true
+      },
+      {
+        "file": "test/draft-supabase-projection.test.mjs",
+        "capturedSha256": "ec6dbb01bc08af675d85b6dbb9b3854774a2e89dd02bec6b78e03747c865e006",
+        "currentSha256": "ec6dbb01bc08af675d85b6dbb9b3854774a2e89dd02bec6b78e03747c865e006",
+        "unchanged": true
+      },
+      {
+        "file": "test/draft-value.test.mjs",
+        "capturedSha256": "3a7fa83097c98a6cf717bcdb91c96c00a34591a54a88ee92c4f614e465a2cfdc",
+        "currentSha256": "3a7fa83097c98a6cf717bcdb91c96c00a34591a54a88ee92c4f614e465a2cfdc",
+        "unchanged": true
+      },
+      {
+        "file": "test/expanded-spectator.test.mjs",
+        "capturedSha256": "bfd01e3dbe65f881f2ef8bcb6ad846783e60159d0e5f80216fbe1aa81b80badf",
+        "currentSha256": "bfd01e3dbe65f881f2ef8bcb6ad846783e60159d0e5f80216fbe1aa81b80badf",
+        "unchanged": true
+      },
+      {
+        "file": "test/expired-identity-recovery.test.mjs",
+        "capturedSha256": "b51831b8e6364681c38a658b7ec5cc3c6a57b8a7236d6ad3d73ec25810763dd9",
+        "currentSha256": "b51831b8e6364681c38a658b7ec5cc3c6a57b8a7236d6ad3d73ec25810763dd9",
+        "unchanged": true
+      },
+      {
+        "file": "test/finalized-match-archive.test.mjs",
+        "capturedSha256": "e6dfed339fd993450afbbfaa3b47c32735b613eb26076df04c7feebdfa426f36",
+        "currentSha256": "e6dfed339fd993450afbbfaa3b47c32735b613eb26076df04c7feebdfa426f36",
+        "unchanged": true
+      },
+      {
+        "file": "test/first-write-audit-revision.test.mjs",
+        "capturedSha256": "706cfad7f4e83db86165e753a55e3079aa68076dc41fd3c00ad92af19a342946",
+        "currentSha256": "706cfad7f4e83db86165e753a55e3079aa68076dc41fd3c00ad92af19a342946",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/best-ball-decimal-handicaps.mjs",
+        "capturedSha256": "3d521e848b66ea15f94f7871d006ba7b910e1af3e5430f7107570138d6c97d47",
+        "currentSha256": "3d521e848b66ea15f94f7871d006ba7b910e1af3e5430f7107570138d6c97d47",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/calcutta-tie-metadata.mjs",
+        "capturedSha256": "ccbfaa976b226267d3428483b611d8f8a0e9c00a735879726c001efb32aa55c7",
+        "currentSha256": "ccbfaa976b226267d3428483b611d8f8a0e9c00a735879726c001efb32aa55c7",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/championship-odds-resilience.mjs",
+        "capturedSha256": "00f05505c1d7bf8711d90427b9be00242cdc76f07edd6b6407a7a07bd2b48dd2",
+        "currentSha256": "00f05505c1d7bf8711d90427b9be00242cdc76f07edd6b6407a7a07bd2b48dd2",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/director-behavior.mjs",
+        "capturedSha256": "15bb3f7e27dcc7904cfd5d891eb806c78cf2e9d0b4b77af8d6d16f39869a6e0a",
+        "currentSha256": "15bb3f7e27dcc7904cfd5d891eb806c78cf2e9d0b4b77af8d6d16f39869a6e0a",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/expanded-spectator/guide.mjs",
+        "capturedSha256": "3abe97683bfc16ed45c2e4ee9ff8c3d6011dad09aaa3a271bbab3fd7d717f762",
+        "currentSha256": "3abe97683bfc16ed45c2e4ee9ff8c3d6011dad09aaa3a271bbab3fd7d717f762",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/expanded-spectator/passport.mjs",
+        "capturedSha256": "8d50723605a40c95a1ec429ce0158f3ab5256c9e757f49f31c83626b4f801add",
+        "currentSha256": "8d50723605a40c95a1ec429ce0158f3ab5256c9e757f49f31c83626b4f801add",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/history-2026.mjs",
+        "capturedSha256": "26f0e9e218f0eb55a5febcbfab621367347334dcfc45772a3300138729c61e63",
+        "currentSha256": "26f0e9e218f0eb55a5febcbfab621367347334dcfc45772a3300138729c61e63",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/match-center-handicaps.mjs",
+        "capturedSha256": "e1e1001ee668fd37aafcfc1dd47786ba98a9f94f097b73156f4af482d436d2ab",
+        "currentSha256": "e1e1001ee668fd37aafcfc1dd47786ba98a9f94f097b73156f4af482d436d2ab",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/native-full-net-source.mjs",
+        "capturedSha256": "7ae080fff6e0111b6c4c320ccf53069b011276221304fa6aca5d0bac57193d31",
+        "currentSha256": "7ae080fff6e0111b6c4c320ccf53069b011276221304fa6aca5d0bac57193d31",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/odds-review.mjs",
+        "capturedSha256": "c392e050766803484ebfd1cdec47e88c8a7b040e648c1cb96720df34f2a0afdb",
+        "currentSha256": "c392e050766803484ebfd1cdec47e88c8a7b040e648c1cb96720df34f2a0afdb",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/pn1-mobile.mjs",
+        "capturedSha256": "fdf7fa9d3bd51a9b1d13233d38c7b94157235668f3016b6e9ee4c402cdd36991",
+        "currentSha256": "fdf7fa9d3bd51a9b1d13233d38c7b94157235668f3016b6e9ee4c402cdd36991",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/pn2-native.mjs",
+        "capturedSha256": "780160323d88bde6d2ea66bde3c02c1e9aa07ce1f882e1f812e771b653c76129",
+        "currentSha256": "780160323d88bde6d2ea66bde3c02c1e9aa07ce1f882e1f812e771b653c76129",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/pwa-production-phone-env.mjs",
+        "capturedSha256": "43a101b506022962363428ff0425977f973faaf0bfec8cead20eca33d0970feb",
+        "currentSha256": "43a101b506022962363428ff0425977f973faaf0bfec8cead20eca33d0970feb",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/pwa-side-games.mjs",
+        "capturedSha256": "da5c3e0fb1acab426fcf430cee877d9a8cd4555b210e09426e6dc5a51f4c2e7a",
+        "currentSha256": "da5c3e0fb1acab426fcf430cee877d9a8cd4555b210e09426e6dc5a51f4c2e7a",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/release-gate-behavior.mjs",
+        "capturedSha256": "258101cc2198c142088a9b609827ad327ddad22a428195fc674a200812064a58",
+        "currentSha256": "258101cc2198c142088a9b609827ad327ddad22a428195fc674a200812064a58",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/reviewed-authority-extension.mjs",
+        "capturedSha256": "908171eddc5ddb500ff38fe1182299355863328330fa341388e9af5b15aea58e",
+        "currentSha256": "908171eddc5ddb500ff38fe1182299355863328330fa341388e9af5b15aea58e",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/reviewer-context.mjs",
+        "capturedSha256": "f9711f72f0568a99ebf0a68b8378afd0dc9d24ee7f3bad2425b44ddce1ae1f14",
+        "currentSha256": "f9711f72f0568a99ebf0a68b8378afd0dc9d24ee7f3bad2425b44ddce1ae1f14",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/reviewer-history.mjs",
+        "capturedSha256": "f23a9a8807bcf9b0b28ff7f2e16e6f1ebd3d58268801b1b4f4654434d4b3d9b9",
+        "currentSha256": "f23a9a8807bcf9b0b28ff7f2e16e6f1ebd3d58268801b1b4f4654434d4b3d9b9",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/round-read-envelope.mjs",
+        "capturedSha256": "70d93d815cc9691e486141d362e04f7d24a1b18d2f678d1515295c522746354a",
+        "currentSha256": "70d93d815cc9691e486141d362e04f7d24a1b18d2f678d1515295c522746354a",
+        "unchanged": true
+      },
+      {
+        "file": "test/fixtures/spectator/current.json",
+        "capturedSha256": "a3cbdb17167156fb7ccb0c56465c95f6dcdcaeee373723c40c561c2859a58a9c",
+        "currentSha256": "a3cbdb17167156fb7ccb0c56465c95f6dcdcaeee373723c40c561c2859a58a9c",
+        "unchanged": true
+      },
+      {
+        "file": "test/format-handicap.test.mjs",
+        "capturedSha256": "9f92a8beb68adf7298bc77665125c01811e7e9ba85106d21d2ba3d96c44a3868",
+        "currentSha256": "9f92a8beb68adf7298bc77665125c01811e7e9ba85106d21d2ba3d96c44a3868",
+        "unchanged": true
+      },
+      {
+        "file": "test/game-center-final-lineup-freeze.test.mjs",
+        "capturedSha256": "9e0a0bf5b8dd16e586b8da719a17747f1399927385506e0db54b532baacfea88",
+        "currentSha256": "9e0a0bf5b8dd16e586b8da719a17747f1399927385506e0db54b532baacfea88",
+        "unchanged": true
+      },
+      {
+        "file": "test/game-center-readiness-page.test.mjs",
+        "capturedSha256": "11fa75a57d2276d92db0cc6d2c2b2d3da531b3ef6e7067eceb463cdcb34f76cb",
+        "currentSha256": "11fa75a57d2276d92db0cc6d2c2b2d3da531b3ef6e7067eceb463cdcb34f76cb",
+        "unchanged": true
+      },
+      {
+        "file": "test/game-center-supabase.test.mjs",
+        "capturedSha256": "d284d46170afa7323f1e1593dbaae68c773e791242687a7a077fe9cb3cf8a547",
+        "currentSha256": "d284d46170afa7323f1e1593dbaae68c773e791242687a7a077fe9cb3cf8a547",
+        "unchanged": true
+      },
+      {
+        "file": "test/game-center.test.mjs",
+        "capturedSha256": "8a6120ad9337a842fefbd72ce9be1f8d0db8258a58c047c2419fb40fa5f48882",
+        "currentSha256": "8a6120ad9337a842fefbd72ce9be1f8d0db8258a58c047c2419fb40fa5f48882",
+        "unchanged": true
+      },
+      {
+        "file": "test/ghin-hybrid-phase-2a.test.mjs",
+        "capturedSha256": "da43f5eb50308fa89c5bc675038970eadd9c8b7e48a92dc02d030dae07de0540",
+        "currentSha256": "da43f5eb50308fa89c5bc675038970eadd9c8b7e48a92dc02d030dae07de0540",
+        "unchanged": true
+      },
+      {
+        "file": "test/ghost-match.test.mjs",
+        "capturedSha256": "32c4ed458d9f5dfd1c9eadaf5eafa8171dd952388e96e48cfdf91db431472c95",
+        "currentSha256": "32c4ed458d9f5dfd1c9eadaf5eafa8171dd952388e96e48cfdf91db431472c95",
+        "unchanged": true
+      },
+      {
+        "file": "test/google-sheet-field-types.test.mjs",
+        "capturedSha256": "617f40f7439fda7cc420dd37bd993d850f45634813d90af0a98860eb770e6270",
+        "currentSha256": "617f40f7439fda7cc420dd37bd993d850f45634813d90af0a98860eb770e6270",
+        "unchanged": true
+      },
+      {
+        "file": "test/guide-api-security.test.mjs",
+        "capturedSha256": "b8101fb080f135ce6fe543ea9c21c0bc361838b63e2711e897a7202b29be2cb0",
+        "currentSha256": "b8101fb080f135ce6fe543ea9c21c0bc361838b63e2711e897a7202b29be2cb0",
+        "unchanged": true
+      },
+      {
+        "file": "test/guide-history-mobile-polish.test.mjs",
+        "capturedSha256": "c90548bc5725979572e0e7eef370de2bda7b59e5249afe73e28f06fd22650a03",
+        "currentSha256": "c90548bc5725979572e0e7eef370de2bda7b59e5249afe73e28f06fd22650a03",
+        "unchanged": true
+      },
+      {
+        "file": "test/guide-participant-adapter.test.mjs",
+        "capturedSha256": "710d967588cc4de29b5eda747dccb51f417c114a24e4961258bb57b02760a126",
+        "currentSha256": "710d967588cc4de29b5eda747dccb51f417c114a24e4961258bb57b02760a126",
+        "unchanged": true
+      },
+      {
+        "file": "test/guide-service-layer.test.mjs",
+        "capturedSha256": "bbe3224df2c5bcef39dfc4019066cbbca4d7a21777c0dcfba3b9357a71a171fa",
+        "currentSha256": "bbe3224df2c5bcef39dfc4019066cbbca4d7a21777c0dcfba3b9357a71a171fa",
+        "unchanged": true
+      },
+      {
+        "file": "test/helpers/advisory-symmetry-certification.mjs",
+        "capturedSha256": "37d6e9019d9cf3d51630001a1fc248f55f805aacbcbacbb97f03c2e0b0c74378",
+        "currentSha256": "37d6e9019d9cf3d51630001a1fc248f55f805aacbcbacbb97f03c2e0b0c74378",
+        "unchanged": true
+      },
+      {
+        "file": "test/historical-captains.test.mjs",
+        "capturedSha256": "8b092c01ee6cd98647d32a8655c834ee09f3fe3e1e4f019ac1ae00f9f946be5d",
+        "currentSha256": "8b092c01ee6cd98647d32a8655c834ee09f3fe3e1e4f019ac1ae00f9f946be5d",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-2026-supabase.test.mjs",
+        "capturedSha256": "0c0140c30e6bd2973432426785f0613e5f063ead11f8315f4df87aadd63cfcc6",
+        "currentSha256": "0c0140c30e6bd2973432426785f0613e5f063ead11f8315f4df87aadd63cfcc6",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-analytics-reuse.test.mjs",
+        "capturedSha256": "f69658204ab38790e585f16616fb928dc98cf67bcff1dfb60489a0c97a029edf",
+        "currentSha256": "f69658204ab38790e585f16616fb928dc98cf67bcff1dfb60489a0c97a029edf",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-champions-player-avatar-resolution.test.mjs",
+        "capturedSha256": "3fb576994459ec9104668721c3c7859f8584e269b0aa3544f2f279ac093c510f",
+        "currentSha256": "3fb576994459ec9104668721c3c7859f8584e269b0aa3544f2f279ac093c510f",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-final-2024-2025-round-statistics.test.mjs",
+        "capturedSha256": "cf117f90e3e75c3891c914ff4f672071951ffe724d836ca84f5487d39f84230a",
+        "currentSha256": "cf117f90e3e75c3891c914ff4f672071951ffe724d836ca84f5487d39f84230a",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-final-2024-2025-tournament-record-presentation.test.mjs",
+        "capturedSha256": "d1b1edeab8f09f403718376730534a609b0bd282225d248073ee0fe039c3a622",
+        "currentSha256": "d1b1edeab8f09f403718376730534a609b0bd282225d248073ee0fe039c3a622",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-final-content-ia.test.mjs",
+        "capturedSha256": "37beab4a91cd3936faaab245d636a77bbf312b9e9a4449815ec51485d2071cc1",
+        "currentSha256": "37beab4a91cd3936faaab245d636a77bbf312b9e9a4449815ec51485d2071cc1",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-handicaps-captains.test.mjs",
+        "capturedSha256": "2ddff3175eb6a2e03eabd837dd8ba3f8d62107871ce563654bdba0f8cd6832b3",
+        "currentSha256": "2ddff3175eb6a2e03eabd837dd8ba3f8d62107871ce563654bdba0f8cd6832b3",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-hole-winner-summary-cleanup.test.mjs",
+        "capturedSha256": "6601148a1078e95183c071f82d2941a832e902f6fdee9db9aa5da68c869e58cb",
+        "currentSha256": "6601148a1078e95183c071f82d2941a832e902f6fdee9db9aa5da68c869e58cb",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-physical-correction.test.mjs",
+        "capturedSha256": "03f506e57b0c4f047d8657487cc6f9ecb0fce73468d6494e544bae7b43bc7897",
+        "currentSha256": "03f506e57b0c4f047d8657487cc6f9ecb0fce73468d6494e544bae7b43bc7897",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-scorecard-derived-row-labels.test.mjs",
+        "capturedSha256": "03d874502a36cfb0dc3d9adc39b3f5258a2afc8eba9c676397d396870fca41ef",
+        "currentSha256": "03d874502a36cfb0dc3d9adc39b3f5258a2afc8eba9c676397d396870fca41ef",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step1c-captain-import.test.mjs",
+        "capturedSha256": "05a84c4e25df03e0d64cf40601a1735376d3fa55ce144b68c0ab18392dd3c3f8",
+        "currentSha256": "05a84c4e25df03e0d64cf40601a1735376d3fa55ce144b68c0ab18392dd3c3f8",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step2a-legacy-player-identity.test.mjs",
+        "capturedSha256": "d79540e60be3b5e9d1a8ba7d52cfb5551d4dd735fa4e4d6a63eecf7076677a3e",
+        "currentSha256": "d79540e60be3b5e9d1a8ba7d52cfb5551d4dd735fa4e4d6a63eecf7076677a3e",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step2b-scorecard-coverage.test.mjs",
+        "capturedSha256": "78f58bc5c79c52e93e52d582398b94568e39445cf6594f63874a18d2acb49242",
+        "currentSha256": "78f58bc5c79c52e93e52d582398b94568e39445cf6594f63874a18d2acb49242",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step2c-honors-duplication.test.mjs",
+        "capturedSha256": "9911735fa0d9244a51a096e1fa5ec2cade57121c38da808b3ef2e9b963c53e13",
+        "currentSha256": "9911735fa0d9244a51a096e1fa5ec2cade57121c38da808b3ef2e9b963c53e13",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3a-completed-year-2025.test.mjs",
+        "capturedSha256": "539bd36cc27b02519d3814d7a4f47232c7650a854809fb7be4bc4b362e624386",
+        "currentSha256": "539bd36cc27b02519d3814d7a4f47232c7650a854809fb7be4bc4b362e624386",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3a10-2025-master.test.mjs",
+        "capturedSha256": "46d9cc543000082f6edfc2bc3c1dc9d62a523706eaa8484c0e0e38880b8bbcc9",
+        "currentSha256": "46d9cc543000082f6edfc2bc3c1dc9d62a523706eaa8484c0e0e38880b8bbcc9",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3a2-tournament-records.test.mjs",
+        "capturedSha256": "8fb944bdc437463c6a2f31a8826e342d410e34bcbe15b199c49ba7fd8cfdbd10",
+        "currentSha256": "8fb944bdc437463c6a2f31a8826e342d410e34bcbe15b199c49ba7fd8cfdbd10",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3a3-final-ux-cleanup.test.mjs",
+        "capturedSha256": "d03db6508499ebc29c8820f17ab838c66e3b538e6dbe611e68550882998ad23b",
+        "currentSha256": "d03db6508499ebc29c8820f17ab838c66e3b538e6dbe611e68550882998ad23b",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3a4-navigation-scramble.test.mjs",
+        "capturedSha256": "4f23d148fdd44c33bebfb884fe70a7e7cc9bd4ecfad4002c2a7e0513f08eee21",
+        "currentSha256": "4f23d148fdd44c33bebfb884fe70a7e7cc9bd4ecfad4002c2a7e0513f08eee21",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3a5-final-round-polish.test.mjs",
+        "capturedSha256": "2bd43ef534f1365fa195a782e0e3b0c3d556ca3b77f38eed69ad4b2a5acea614",
+        "currentSha256": "2bd43ef534f1365fa195a782e0e3b0c3d556ca3b77f38eed69ad4b2a5acea614",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3a6-completed-navigation.test.mjs",
+        "capturedSha256": "8fcdd05dbf0022a5df8df8c842c0d33f6d1c4464bab49041d6fe5d68564574d8",
+        "currentSha256": "8fcdd05dbf0022a5df8df8c842c0d33f6d1c4464bab49041d6fe5d68564574d8",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3a7-2026-parity.test.mjs",
+        "capturedSha256": "de2ae80f519733e41c2fc16d07c5140996329fafa48004a9ec70025a6519681c",
+        "currentSha256": "de2ae80f519733e41c2fc16d07c5140996329fafa48004a9ec70025a6519681c",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3a8-round-correctness.test.mjs",
+        "capturedSha256": "e76b03405ea7c056fc34c6cdf4c4e143f11483e33c2974cf510ab86beb277843",
+        "currentSha256": "e76b03405ea7c056fc34c6cdf4c4e143f11483e33c2974cf510ab86beb277843",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3a8a-visual-cleanup.test.mjs",
+        "capturedSha256": "5e63e971b76242e1f60007950e9dbd245926f0aa6293755edcbbbfe239100f03",
+        "currentSha256": "5e63e971b76242e1f60007950e9dbd245926f0aa6293755edcbbbfe239100f03",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3a9-scorecard-parity.test.mjs",
+        "capturedSha256": "7153fabfdeb536928b75fbcb92a7555d2ed6478224eb42c6f1c6c43db7689f5b",
+        "currentSha256": "7153fabfdeb536928b75fbcb92a7555d2ed6478224eb42c6f1c6c43db7689f5b",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3b1-2024-migration.test.mjs",
+        "capturedSha256": "06ea1bc1f553286e9bbcae1ca234b047d5b436809e1b74a3f365af4aa956ced6",
+        "currentSha256": "06ea1bc1f553286e9bbcae1ca234b047d5b436809e1b74a3f365af4aa956ced6",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3b1a-2024-net-semantics.test.mjs",
+        "capturedSha256": "a46a7c2e48d2ccff8b078cd38c9094ef9ce872ae2a49055b3f04cc8fa5d8e1f6",
+        "currentSha256": "a46a7c2e48d2ccff8b078cd38c9094ef9ce872ae2a49055b3f04cc8fa5d8e1f6",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3b2-2023-migration.test.mjs",
+        "capturedSha256": "48e6c1ea8b54aabe195fe3d638598b1927d40bbc19db556e54e1e06b15eefbd8",
+        "currentSha256": "48e6c1ea8b54aabe195fe3d638598b1927d40bbc19db556e54e1e06b15eefbd8",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step3b2a-2023-reconciliation.test.mjs",
+        "capturedSha256": "afd1cb05d9be1171b4b35cd7087864e2adc6117adbe65a8f662e8d619b862efb",
+        "currentSha256": "afd1cb05d9be1171b4b35cd7087864e2adc6117adbe65a8f662e8d619b862efb",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step4a-player-context.test.mjs",
+        "capturedSha256": "bc803c1e199b25e5a6ef0b781edc9da4346d2a58ff1cf1101fde1cea96224737",
+        "currentSha256": "bc803c1e199b25e5a6ef0b781edc9da4346d2a58ff1cf1101fde1cea96224737",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step4a1-career-pwa.test.mjs",
+        "capturedSha256": "8ab850c9fd3ea7762cb238b9ce93fa8d6a292d2cf02314e6b924dab93a062f52",
+        "currentSha256": "8ab850c9fd3ea7762cb238b9ce93fa8d6a292d2cf02314e6b924dab93a062f52",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step4b-archive-integration.test.mjs",
+        "capturedSha256": "75291a42d00255487743a8e23da2a3b0803680508641c318d37605b985580a7a",
+        "currentSha256": "75291a42d00255487743a8e23da2a3b0803680508641c318d37605b985580a7a",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step5-read-cutover.test.mjs",
+        "capturedSha256": "235b00c30ef7e04dd193940cb38f9c49b7b27a80ed1a1dd33d1542d0ee630337",
+        "currentSha256": "235b00c30ef7e04dd193940cb38f9c49b7b27a80ed1a1dd33d1542d0ee630337",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step5c-delivery.test.mjs",
+        "capturedSha256": "47a91639549309e8de2a1e598f480dcf1ad9ec0607fc0066e3e5c563d896c378",
+        "currentSha256": "47a91639549309e8de2a1e598f480dcf1ad9ec0607fc0066e3e5c563d896c378",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step5c1-shell-scorecard.test.mjs",
+        "capturedSha256": "1cb3a4596ac34dfb84b76b3869578ccd29c18639cfd853e9f29773ad78d738c3",
+        "currentSha256": "1cb3a4596ac34dfb84b76b3869578ccd29c18639cfd853e9f29773ad78d738c3",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step6a-completed-foundation.test.mjs",
+        "capturedSha256": "3a7513772c257adebff2a80651f1ab9ca257cba33f3e8401b7685dd74f6afaf5",
+        "currentSha256": "3a7513772c257adebff2a80651f1ab9ca257cba33f3e8401b7685dd74f6afaf5",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step6b-read-cutover.test.mjs",
+        "capturedSha256": "baf9d6bde4ddcd31e73c60e31c10c8bbde5b203372b96d097860c2bd67b100c5",
+        "currentSha256": "baf9d6bde4ddcd31e73c60e31c10c8bbde5b203372b96d097860c2bd67b100c5",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step6c1-secondary-consumers.test.mjs",
+        "capturedSha256": "5e56b4c789a525d6a05dbdfa019102f37acfc07644299912906c907d09dcd1c8",
+        "currentSha256": "5e56b4c789a525d6a05dbdfa019102f37acfc07644299912906c907d09dcd1c8",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step6c2-secondary-consumers.test.mjs",
+        "capturedSha256": "9543aa00a0c777a4ed6d967aa27f54a8cdf9867992221445188ca823843c918c",
+        "currentSha256": "9543aa00a0c777a4ed6d967aa27f54a8cdf9867992221445188ca823843c918c",
+        "unchanged": true
+      },
+      {
+        "file": "test/history-step6d-historical-courses.test.mjs",
+        "capturedSha256": "bb03fd431a946d879da8e82d3143a2d75bb4d3bd79cf0c20b5a4cd92c2cd1c4e",
+        "currentSha256": "bb03fd431a946d879da8e82d3143a2d75bb4d3bd79cf0c20b5a4cd92c2cd1c4e",
+        "unchanged": true
+      },
+      {
+        "file": "test/hole-by-hole-analytics.test.mjs",
+        "capturedSha256": "3d7d5a581725184f7f748702d1a48bc8fc5cb049945a231481c8c9fc49764c81",
+        "currentSha256": "3d7d5a581725184f7f748702d1a48bc8fc5cb049945a231481c8c9fc49764c81",
+        "unchanged": true
+      },
+      {
+        "file": "test/home-command-center-polish.test.mjs",
+        "capturedSha256": "e362e730037253e1f52b8fa06744ece3bc5f0b9fca1094f06ff0a835fd61da45",
+        "currentSha256": "e362e730037253e1f52b8fa06744ece3bc5f0b9fca1094f06ff0a835fd61da45",
+        "unchanged": true
+      },
+      {
+        "file": "test/home-dashboard.test.mjs",
+        "capturedSha256": "86f43f9a90bc0709d9f89796ca8e7220e061c408aa37c296a97d69fc9aa73430",
+        "currentSha256": "86f43f9a90bc0709d9f89796ca8e7220e061c408aa37c296a97d69fc9aa73430",
+        "unchanged": true
+      },
+      {
+        "file": "test/home-final-visual-finish.test.mjs",
+        "capturedSha256": "96afe319d1bb0caeded330030abacb21a73e0e90a902d3d5a9d89acf26e9c460",
+        "currentSha256": "96afe319d1bb0caeded330030abacb21a73e0e90a902d3d5a9d89acf26e9c460",
+        "unchanged": true
+      },
+      {
+        "file": "test/home-personality-assets.test.mjs",
+        "capturedSha256": "4783ea689d1590e5246b53e687a977772dbd621db5d3efd47bab9a0b2c9b5832",
+        "currentSha256": "4783ea689d1590e5246b53e687a977772dbd621db5d3efd47bab9a0b2c9b5832",
+        "unchanged": true
+      },
+      {
+        "file": "test/home-progressive-rendering.test.mjs",
+        "capturedSha256": "a4995e1382013ce7a48d2aee06ae3fa9a8cbce52b09fe50e075724da0cfaf871",
+        "currentSha256": "a4995e1382013ce7a48d2aee06ae3fa9a8cbce52b09fe50e075724da0cfaf871",
+        "unchanged": true
+      },
+      {
+        "file": "test/home-supabase-read.test.mjs",
+        "capturedSha256": "7b3dba396c696403c8e99078327a195bbcbe3cf2a0e05c2234ea329e541eb87c",
+        "currentSha256": "7b3dba396c696403c8e99078327a195bbcbe3cf2a0e05c2234ea329e541eb87c",
+        "unchanged": true
+      },
+      {
+        "file": "test/home-visual-consistency.test.mjs",
+        "capturedSha256": "00af360ee7e7916471522e0bf7c9b8e52791501bc9adfddd6a5b0765880c9743",
+        "currentSha256": "00af360ee7e7916471522e0bf7c9b8e52791501bc9adfddd6a5b0765880c9743",
+        "unchanged": true
+      },
+      {
+        "file": "test/homepage-current-supabase.test.mjs",
+        "capturedSha256": "5cb3f59e42104994751c8a594e73a1ddd2b31ea96d3b6056ad83d0f76cef4072",
+        "currentSha256": "5cb3f59e42104994751c8a594e73a1ddd2b31ea96d3b6056ad83d0f76cef4072",
+        "unchanged": true
+      },
+      {
+        "file": "test/icons.test.mjs",
+        "capturedSha256": "affd7c5f1cbe6ab867665f9b9d090343d1014e65ea214889626c0db26498745c",
+        "currentSha256": "affd7c5f1cbe6ab867665f9b9d090343d1014e65ea214889626c0db26498745c",
+        "unchanged": true
+      },
+      {
+        "file": "test/identical-legacy-course-adoption.test.mjs",
+        "capturedSha256": "7e3919a9419c90a3aacd63eca245bf62b96015add36483bb144859a3d4aecff0",
+        "currentSha256": "7e3919a9419c90a3aacd63eca245bf62b96015add36483bb144859a3d4aecff0",
+        "unchanged": true
+      },
+      {
+        "file": "test/intelligence-derived-supabase.test.mjs",
+        "capturedSha256": "9e244f2b461281034a2b26663dd0b4f8a4a957345506ecf77e0d2473494e6f4c",
+        "currentSha256": "9e244f2b461281034a2b26663dd0b4f8a4a957345506ecf77e0d2473494e6f4c",
+        "unchanged": true
+      },
+      {
+        "file": "test/leaderboard-detail-consistency.test.mjs",
+        "capturedSha256": "49dc10d59062ea7bfa1d8d3bf0d8751c6a27a7677bb0aed914e38765a120d46c",
+        "currentSha256": "49dc10d59062ea7bfa1d8d3bf0d8751c6a27a7677bb0aed914e38765a120d46c",
+        "unchanged": true
+      },
+      {
+        "file": "test/leaderboard-navigation-performance.test.mjs",
+        "capturedSha256": "1737b0916b0a61fa8fcf31d58f3a0d0f7d889a5352a2fadb3916c2e36b00263c",
+        "currentSha256": "1737b0916b0a61fa8fcf31d58f3a0d0f7d889a5352a2fadb3916c2e36b00263c",
+        "unchanged": true
+      },
+      {
+        "file": "test/leaderboard-round-breakdown.test.mjs",
+        "capturedSha256": "d81abe661ed79f52b9eb166566cd5d259ae844f5cc257f94d20b898441145ac2",
+        "currentSha256": "d81abe661ed79f52b9eb166566cd5d259ae844f5cc257f94d20b898441145ac2",
+        "unchanged": true
+      },
+      {
+        "file": "test/leaderboard-visual-standardization.test.mjs",
+        "capturedSha256": "b5e1ae7c4e34311e69334d319fcf805ca8c133a14077a4816ad56fc370d6c526",
+        "currentSha256": "b5e1ae7c4e34311e69334d319fcf805ca8c133a14077a4816ad56fc370d6c526",
+        "unchanged": true
+      },
+      {
+        "file": "test/leaderboards-core-supabase.test.mjs",
+        "capturedSha256": "c7ddd5268083e083a3b02f9c47a30c895a43472a5508ccdd8a7684d5f7c6f258",
+        "currentSha256": "c7ddd5268083e083a3b02f9c47a30c895a43472a5508ccdd8a7684d5f7c6f258",
+        "unchanged": true
+      },
+      {
+        "file": "test/leaderboards-mobile-polish.test.mjs",
+        "capturedSha256": "4e8ce4d593fc13ef1e8bc2fd3ec44c3042eba23bb38d643d08e408649dbbbce5",
+        "currentSha256": "4e8ce4d593fc13ef1e8bc2fd3ec44c3042eba23bb38d643d08e408649dbbbce5",
+        "unchanged": true
+      },
+      {
+        "file": "test/legacy-participant-access-cleanup.test.mjs",
+        "capturedSha256": "c653d3bf23c69de7ab350e51bd344df088bc2bf1c941913e10711370f21dfbcb",
+        "currentSha256": "c653d3bf23c69de7ab350e51bd344df088bc2bf1c941913e10711370f21dfbcb",
+        "unchanged": true
+      },
+      {
+        "file": "test/lineup-optimizer.test.mjs",
+        "capturedSha256": "ea370f38b239255968cf6991129cbc0be7b1941d1e67c313918e5b9be2f58d41",
+        "currentSha256": "ea370f38b239255968cf6991129cbc0be7b1941d1e67c313918e5b9be2f58d41",
+        "unchanged": true
+      },
+      {
+        "file": "test/live-command-center.test.mjs",
+        "capturedSha256": "a256eae492f7c35a74b42f421498853439349ccc27c1df29ad5f9dd1120305c4",
+        "currentSha256": "a256eae492f7c35a74b42f421498853439349ccc27c1df29ad5f9dd1120305c4",
+        "unchanged": true
+      },
+      {
+        "file": "test/live-hole-scoring.test.mjs",
+        "capturedSha256": "82bb5ab84db254258221388ba41262cd847539a318b298d3514216375b26c38a",
+        "currentSha256": "82bb5ab84db254258221388ba41262cd847539a318b298d3514216375b26c38a",
+        "unchanged": true
+      },
+      {
+        "file": "test/live-match-pairing.test.mjs",
+        "capturedSha256": "b2f930a3d30d193f756a0a128c099eb391277d89387d85e6795a862bedf70fc9",
+        "currentSha256": "b2f930a3d30d193f756a0a128c099eb391277d89387d85e6795a862bedf70fc9",
+        "unchanged": true
+      },
+      {
+        "file": "test/live-match-schema.test.mjs",
+        "capturedSha256": "26b4bd48055982d9f19a79c5b660065053c36a5abb851ba396b7544e4925e263",
+        "currentSha256": "26b4bd48055982d9f19a79c5b660065053c36a5abb851ba396b7544e4925e263",
+        "unchanged": true
+      },
+      {
+        "file": "test/live-scoring-native-types.test.mjs",
+        "capturedSha256": "dccf904e7445cca13554557f5449036ed738660cee83af20ee8689f7a11453c5",
+        "currentSha256": "dccf904e7445cca13554557f5449036ed738660cee83af20ee8689f7a11453c5",
+        "unchanged": true
+      },
+      {
+        "file": "test/live-scoring-ui.test.mjs",
+        "capturedSha256": "5f965ef2d7d9d37e118da613b1a087be83d61ca785e7b574c43d797ae2950c0d",
+        "currentSha256": "5f965ef2d7d9d37e118da613b1a087be83d61ca785e7b574c43d797ae2950c0d",
+        "unchanged": true
+      },
+      {
+        "file": "test/live-tournament.test.mjs",
+        "capturedSha256": "38a4c0d12c60ccea04f133b22c991ffbfe7178dbd95b26a853ccc2306980bb40",
+        "currentSha256": "38a4c0d12c60ccea04f133b22c991ffbfe7178dbd95b26a853ccc2306980bb40",
+        "unchanged": true
+      },
+      {
+        "file": "test/live-ux-foundation.test.mjs",
+        "capturedSha256": "813c6a52c9e48ec2c7de688e1cd74de2a93b283944e9930cf65181a49f99802a",
+        "currentSha256": "813c6a52c9e48ec2c7de688e1cd74de2a93b283944e9930cf65181a49f99802a",
+        "unchanged": true
+      },
+      {
+        "file": "test/match-authorization-supabase.test.mjs",
+        "capturedSha256": "35c39343dbd16d97f901f8989f3d249c86af0b50ce226f60d4af4782131eb97b",
+        "currentSha256": "35c39343dbd16d97f901f8989f3d249c86af0b50ce226f60d4af4782131eb97b",
+        "unchanged": true
+      },
+      {
+        "file": "test/match-center-handicap-presentation.test.mjs",
+        "capturedSha256": "34df880bb44c9c9d798a877db4dbafadccf4931c874792613d21948b68685375",
+        "currentSha256": "34df880bb44c9c9d798a877db4dbafadccf4931c874792613d21948b68685375",
+        "unchanged": true
+      },
+      {
+        "file": "test/match-intelligence.test.mjs",
+        "capturedSha256": "b45921852a672339d039c185cb40e00e32cea04e4f1d1dbd93be2898a4d852b3",
+        "currentSha256": "b45921852a672339d039c185cb40e00e32cea04e4f1d1dbd93be2898a4d852b3",
+        "unchanged": true
+      },
+      {
+        "file": "test/match-progression.test.mjs",
+        "capturedSha256": "955aac4b9a4f4e949588fda7af9b570b238890102d310e143072ebc0977cccd3",
+        "currentSha256": "955aac4b9a4f4e949588fda7af9b570b238890102d310e143072ebc0977cccd3",
+        "unchanged": true
+      },
+      {
+        "file": "test/match-simulator.test.mjs",
+        "capturedSha256": "4fbfd4ba3c70d5f5a96acce4947ad513e22fc1b67424e8a0ac58ebb9e8281bb6",
+        "currentSha256": "4fbfd4ba3c70d5f5a96acce4947ad513e22fc1b67424e8a0ac58ebb9e8281bb6",
+        "unchanged": true
+      },
+      {
+        "file": "test/me-player-identity.test.mjs",
+        "capturedSha256": "65b44d3d428a263e4e9834b143beea5c0f669291f36df1c2aa00a4eed3268a96",
+        "currentSha256": "65b44d3d428a263e4e9834b143beea5c0f669291f36df1c2aa00a4eed3268a96",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-account-deletion.test.mjs",
+        "capturedSha256": "ca0b632543438bb240684d30f9af7b2d57b8f149f8f9078c4acadcde7d980f39",
+        "currentSha256": "ca0b632543438bb240684d30f9af7b2d57b8f149f8f9078c4acadcde7d980f39",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-api-v1-routes.test.mjs",
+        "capturedSha256": "29484c6077dcfde8ae3daa33141a2b7bdf4ab0ba6d3d4db1332a7152ab51f2a7",
+        "currentSha256": "29484c6077dcfde8ae3daa33141a2b7bdf4ab0ba6d3d4db1332a7152ab51f2a7",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-api-v1.test.mjs",
+        "capturedSha256": "7ba59913adb579908df8ff944d635acf7ff17e17c5b0b399d8efe69df3a6f18c",
+        "currentSha256": "7ba59913adb579908df8ff944d635acf7ff17e17c5b0b399d8efe69df3a6f18c",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-completed-result-parity.test.mjs",
+        "capturedSha256": "bd931df395f0a12675d12380feb121b20a38e86606e6998d7fc71edf74642d39",
+        "currentSha256": "bd931df395f0a12675d12380feb121b20a38e86606e6998d7fc71edf74642d39",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-course-handicap.test.mjs",
+        "capturedSha256": "5fe65d8cacbe00864ccf9003027f54376408f0e594bafe3da6fe3e72a0192356",
+        "currentSha256": "5fe65d8cacbe00864ccf9003027f54376408f0e594bafe3da6fe3e72a0192356",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-leaderboards.test.mjs",
+        "capturedSha256": "fd5c6b87da9911c3b4eb1c397808d41aea8d8aaa1f82673e597139b7ff6db1c1",
+        "currentSha256": "fd5c6b87da9911c3b4eb1c397808d41aea8d8aaa1f82673e597139b7ff6db1c1",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-native-certification.test.mjs",
+        "capturedSha256": "4e08d1d76621b01eb1eeaa777c7547a86d33fbffd0b9dd4621bfb9098d85fa1a",
+        "currentSha256": "4e08d1d76621b01eb1eeaa777c7547a86d33fbffd0b9dd4621bfb9098d85fa1a",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-native-development-host-boundary.test.mjs",
+        "capturedSha256": "82c589639e94c4b83b1ba0dd267771389a53efc0eccabe8a13d9193175d85533",
+        "currentSha256": "82c589639e94c4b83b1ba0dd267771389a53efc0eccabe8a13d9193175d85533",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-opaque-match-id-route.test.mjs",
+        "capturedSha256": "17dcffff2cca4db6c74c33c411847cb5829ce3fac9d81933e2bac2ffd0e90697",
+        "currentSha256": "17dcffff2cca4db6c74c33c411847cb5829ce3fac9d81933e2bac2ffd0e90697",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-opaque-match-id.test.mjs",
+        "capturedSha256": "76ab5fa9a714048bc817e741f05b438e215da3b55c54486f126a19ae1c5a48d6",
+        "currentSha256": "76ab5fa9a714048bc817e741f05b438e215da3b55c54486f126a19ae1c5a48d6",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-portrait-policy.test.mjs",
+        "capturedSha256": "02808fd806c8546604da943e32a157fa338f51b394202062bab8ba7ab4fc3a2e",
+        "currentSha256": "02808fd806c8546604da943e32a157fa338f51b394202062bab8ba7ab4fc3a2e",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-production-cross-match-read.test.mjs",
+        "capturedSha256": "461bf04fa8069a00b71f7ad35b86f68699b7547e35bd70f84a14ae39306381fb",
+        "currentSha256": "461bf04fa8069a00b71f7ad35b86f68699b7547e35bd70f84a14ae39306381fb",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-reviewer-history.test.mjs",
+        "capturedSha256": "eddf278db889423b22dd5032114e9b2b910018f7d5d50678da593ea2efaff324",
+        "currentSha256": "eddf278db889423b22dd5032114e9b2b910018f7d5d50678da593ea2efaff324",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-reviewer-security.test.mjs",
+        "capturedSha256": "153e3260588b8d66815cafc631a18a508477ad595a105780526c5562fe505994",
+        "currentSha256": "153e3260588b8d66815cafc631a18a508477ad595a105780526c5562fe505994",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-scoring-authority-recovery.test.mjs",
+        "capturedSha256": "5f537b03d7cf1f93ec6cf421af96c886472698e1184188ade34644e7066833ed",
+        "currentSha256": "5f537b03d7cf1f93ec6cf421af96c886472698e1184188ade34644e7066833ed",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-calcutta-presentation.test.mjs",
+        "capturedSha256": "a9a2c88f21b3c9991a2792699388c364203c91b07dd9108682e9815c32860e70",
+        "currentSha256": "a9a2c88f21b3c9991a2792699388c364203c91b07dd9108682e9815c32860e70",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-calcutta.test.mjs",
+        "capturedSha256": "451aa8ce544cddaac3cd019e5651aa6cdf872d708665b822a3304f00d5175e14",
+        "currentSha256": "451aa8ce544cddaac3cd019e5651aa6cdf872d708665b822a3304f00d5175e14",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-guide-route.test.mjs",
+        "capturedSha256": "83cccf1199988e4d909183e59c2ed27553e7ac4f80fca464349d47c15887a6af",
+        "currentSha256": "83cccf1199988e4d909183e59c2ed27553e7ac4f80fca464349d47c15887a6af",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-guide.test.mjs",
+        "capturedSha256": "2ddd8573b25e86d389106a946d354e68985c42681601a3b40e7797ab1cfcbeb2",
+        "currentSha256": "2ddd8573b25e86d389106a946d354e68985c42681601a3b40e7797ab1cfcbeb2",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-match-detail-contract.test.mjs",
+        "capturedSha256": "47e667238de9013f6869257c63ef3e034a5829a9ca763820fdc5ffcfaf7198d1",
+        "currentSha256": "47e667238de9013f6869257c63ef3e034a5829a9ca763820fdc5ffcfaf7198d1",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-match-detail-pwa-parity.test.mjs",
+        "capturedSha256": "b73beece48bc613de386554781aa8812ce381645fbe0c50d936ae0e891b6622a",
+        "currentSha256": "b73beece48bc613de386554781aa8812ce381645fbe0c50d936ae0e891b6622a",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-match-detail.test.mjs",
+        "capturedSha256": "1cb33925dc95b59167cea39091b3d7e7872d64437f6972f064801733b3972026",
+        "currentSha256": "1cb33925dc95b59167cea39091b3d7e7872d64437f6972f064801733b3972026",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-matches-contract.test.mjs",
+        "capturedSha256": "8dbcc0efe0c10cb731e135cb7b348f3c157785d6e95a8891f2ede9a16450ce61",
+        "currentSha256": "8dbcc0efe0c10cb731e135cb7b348f3c157785d6e95a8891f2ede9a16450ce61",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-native-auth.test.mjs",
+        "capturedSha256": "1e6d69bf5aa97b0122ffe7a9b54dcf82950372051fb5acae8568361d74602c71",
+        "currentSha256": "1e6d69bf5aa97b0122ffe7a9b54dcf82950372051fb5acae8568361d74602c71",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-net-skins-presentation.test.mjs",
+        "capturedSha256": "5b02157a48717e97e33b2205e74123b3926484e7decc359085fb898488199981",
+        "currentSha256": "5b02157a48717e97e33b2205e74123b3926484e7decc359085fb898488199981",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-net-skins.test.mjs",
+        "capturedSha256": "0fe887a3b5ae75e5f4efaf48b4781951528d27c4177e2266b3bc63871fd9eb43",
+        "currentSha256": "0fe887a3b5ae75e5f4efaf48b4781951528d27c4177e2266b3bc63871fd9eb43",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-odds-team-identity.test.mjs",
+        "capturedSha256": "ae674346847f90b290ac67d199f6577b6a47c3f4ee9c9defe5035a3313458807",
+        "currentSha256": "ae674346847f90b290ac67d199f6577b6a47c3f4ee9c9defe5035a3313458807",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-participant-content-fixtures.test.mjs",
+        "capturedSha256": "8d79a6fc38cb6a2329af931991a966745c87a398dbbd23fe0d4b662d32b91146",
+        "currentSha256": "8d79a6fc38cb6a2329af931991a966745c87a398dbbd23fe0d4b662d32b91146",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-participant-content-routes.test.mjs",
+        "capturedSha256": "06d696dc356d1ebe9bf930931899e7aacf25eff64988ab4a129be8b4723d0f56",
+        "currentSha256": "06d696dc356d1ebe9bf930931899e7aacf25eff64988ab4a129be8b4723d0f56",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-participant-content.test.mjs",
+        "capturedSha256": "a1c4a478099cd45b71dc4c359936175c702ab01bf25df72bc0f9f23054a5445b",
+        "currentSha256": "a1c4a478099cd45b71dc4c359936175c702ab01bf25df72bc0f9f23054a5445b",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-passport.test.mjs",
+        "capturedSha256": "ad335f86cc0b42181af875362e1f9c130be36c85f5f0ea893acdd3defd207380",
+        "currentSha256": "ad335f86cc0b42181af875362e1f9c130be36c85f5f0ea893acdd3defd207380",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-preview-leaders-products.test.mjs",
+        "capturedSha256": "518e93a9d621b9c9c49d3cb69c73c801cb0132d67402fada01db76489b5fdd14",
+        "currentSha256": "518e93a9d621b9c9c49d3cb69c73c801cb0132d67402fada01db76489b5fdd14",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-production-player-leaders.test.mjs",
+        "capturedSha256": "7585e846a18efcf60a5d8a73843ff91b109e46cb2da61c799d088a979a535f3c",
+        "currentSha256": "7585e846a18efcf60a5d8a73843ff91b109e46cb2da61c799d088a979a535f3c",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-scoring-contracts.test.mjs",
+        "capturedSha256": "aecfbefd92eadd38f5cab2ab6a8d16de152660706e55006afc47eea1f3351912",
+        "currentSha256": "aecfbefd92eadd38f5cab2ab6a8d16de152660706e55006afc47eea1f3351912",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-scoring-routes.test.mjs",
+        "capturedSha256": "3ed900b17b8facdf825d1076449da575917a4d791213fb7574bc5ef747dd9ab1",
+        "currentSha256": "3ed900b17b8facdf825d1076449da575917a4d791213fb7574bc5ef747dd9ab1",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-scoring.test.mjs",
+        "capturedSha256": "7eb48c8cb68319d65aa56adf12043db4a09cd90fd03735b301a247d27545ed30",
+        "currentSha256": "7eb48c8cb68319d65aa56adf12043db4a09cd90fd03735b301a247d27545ed30",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-tournament-reads.test.mjs",
+        "capturedSha256": "2003204ae665923dd0af0d382a4a5867c43d7ed616d0c52cddc4e2a37cbe8c4e",
+        "currentSha256": "2003204ae665923dd0af0d382a4a5867c43d7ed616d0c52cddc4e2a37cbe8c4e",
+        "unchanged": true
+      },
+      {
+        "file": "test/mobile-v1-tournament-routes.test.mjs",
+        "capturedSha256": "72c315eaf02c720496cc61a78d5c0446d4e7beb274a27a43d4b445b8c5e690a7",
+        "currentSha256": "72c315eaf02c720496cc61a78d5c0446d4e7beb274a27a43d4b445b8c5e690a7",
+        "unchanged": true
+      },
+      {
+        "file": "test/mock-navigation-passport.test.mjs",
+        "capturedSha256": "29e02a34d91de8c05b5a00d5684baf9db03c36c7b5bb654eca541ec5412f4010",
+        "currentSha256": "29e02a34d91de8c05b5a00d5684baf9db03c36c7b5bb654eca541ec5412f4010",
+        "unchanged": true
+      },
+      {
+        "file": "test/mock-tournament-integration.test.mjs",
+        "capturedSha256": "9fe805f756c3c59660039f99e42327219c92654b2176d90071b68db25f0a5e5f",
+        "currentSha256": "9fe805f756c3c59660039f99e42327219c92654b2176d90071b68db25f0a5e5f",
+        "unchanged": true
+      },
+      {
+        "file": "test/my-match-dashboard.test.mjs",
+        "capturedSha256": "27b48e691f6e391409749516300afc1470ba06883289da84d1a13858ea60b564",
+        "currentSha256": "27b48e691f6e391409749516300afc1470ba06883289da84d1a13858ea60b564",
+        "unchanged": true
+      },
+      {
+        "file": "test/my-match-game-center-final-micro-polish.test.mjs",
+        "capturedSha256": "f5a96697450296b9b2e95971c0136d69e8573605645c3eee942f670121ab18f0",
+        "currentSha256": "f5a96697450296b9b2e95971c0136d69e8573605645c3eee942f670121ab18f0",
+        "unchanged": true
+      },
+      {
+        "file": "test/my-match-game-center-role-polish.test.mjs",
+        "capturedSha256": "3aa7a66a6c5e3202eaf473214f9c876a5b5b13b9435a456b4489a2ad6b3f04c2",
+        "currentSha256": "3aa7a66a6c5e3202eaf473214f9c876a5b5b13b9435a456b4489a2ad6b3f04c2",
+        "unchanged": true
+      },
+      {
+        "file": "test/my-match-supabase.test.mjs",
+        "capturedSha256": "9f6898b1a96060bbcbf95942b5664ab2ff814c70cb8821c4f4af3b2e0a329e85",
+        "currentSha256": "9f6898b1a96060bbcbf95942b5664ab2ff814c70cb8821c4f4af3b2e0a329e85",
+        "unchanged": true
+      },
+      {
+        "file": "test/native-session14.test.mjs",
+        "capturedSha256": "970d59e9f2f48335315666ceb892fc9f26b66768f475fd1bfe934b693ee2d612",
+        "currentSha256": "970d59e9f2f48335315666ceb892fc9f26b66768f475fd1bfe934b693ee2d612",
+        "unchanged": true
+      },
+      {
+        "file": "test/native-spectator-companion.test.mjs",
+        "capturedSha256": "1c965535663a0d0427c43d18ba9b6869b3d35fe391924f583901b23e4824119a",
+        "currentSha256": "1c965535663a0d0427c43d18ba9b6869b3d35fe391924f583901b23e4824119a",
+        "unchanged": true
+      },
+      {
+        "file": "test/native-text-handoff.test.mjs",
+        "capturedSha256": "ea38b35dc87c47a3083b9b9e9b4df9d1cc31f993682430b6e9a0ad55f5807520",
+        "currentSha256": "ea38b35dc87c47a3083b9b9e9b4df9d1cc31f993682430b6e9a0ad55f5807520",
+        "unchanged": true
+      },
+      {
+        "file": "test/navigation-ia-polish.test.mjs",
+        "capturedSha256": "bf8eaa2f1acf325a2b32545af7385be113d7b82d2775257edf98d37f2350af7f",
+        "currentSha256": "bf8eaa2f1acf325a2b32545af7385be113d7b82d2775257edf98d37f2350af7f",
+        "unchanged": true
+      },
+      {
+        "file": "test/net-skins-configuration-readiness.test.mjs",
+        "capturedSha256": "d92c05192fa5a727c61c21e61f729d1b6633d3973978dd5247f499d5ed9e5bfd",
+        "currentSha256": "d92c05192fa5a727c61c21e61f729d1b6633d3973978dd5247f499d5ed9e5bfd",
+        "unchanged": true
+      },
+      {
+        "file": "test/net-skins-entries-server.test.mjs",
+        "capturedSha256": "ba4b4ac5aeb66b0b62134d6baff987fc14d1b3e15ea5a2421d04a9bdf066d970",
+        "currentSha256": "ba4b4ac5aeb66b0b62134d6baff987fc14d1b3e15ea5a2421d04a9bdf066d970",
+        "unchanged": true
+      },
+      {
+        "file": "test/net-skins-entry-clarity.test.mjs",
+        "capturedSha256": "37916be4735abab071ce2a8cc52a206ae110dcaa93f18f720e0bd43ef933c6e0",
+        "currentSha256": "37916be4735abab071ce2a8cc52a206ae110dcaa93f18f720e0bd43ef933c6e0",
+        "unchanged": true
+      },
+      {
+        "file": "test/net-skins-production-v1-app.test.mjs",
+        "capturedSha256": "c641d626e61d5822e7f6ef7a74581179bd869490d23ff8d1f58818052f1c780b",
+        "currentSha256": "c641d626e61d5822e7f6ef7a74581179bd869490d23ff8d1f58818052f1c780b",
+        "unchanged": true
+      },
+      {
+        "file": "test/net-skins-ranking-polish.test.mjs",
+        "capturedSha256": "d7723276252062e3e1a07dd33e58e194132d5b72054535ec71d4fa6e31424100",
+        "currentSha256": "d7723276252062e3e1a07dd33e58e194132d5b72054535ec71d4fa6e31424100",
+        "unchanged": true
+      },
+      {
+        "file": "test/net-skins-sql-source-boundary.test.mjs",
+        "capturedSha256": "55234564087701063b3993aadbfbcdfcf6d31c99fe7d2de1882f199d0bdc178c",
+        "currentSha256": "55234564087701063b3993aadbfbcdfcf6d31c99fe7d2de1882f199d0bdc178c",
+        "unchanged": true
+      },
+      {
+        "file": "test/net-skins-supabase.test.mjs",
+        "capturedSha256": "c1230d3464eb03656899a8941df923f13176d26665f6bdf424cc6794d0864dfe",
+        "currentSha256": "c1230d3464eb03656899a8941df923f13176d26665f6bdf424cc6794d0864dfe",
+        "unchanged": true
+      },
+      {
+        "file": "test/net-skins.test.mjs",
+        "capturedSha256": "b4fb6bf507bc99fdd845eb62195f03a369582aad864a3406e1bd18fac3265a5a",
+        "currentSha256": "b4fb6bf507bc99fdd845eb62195f03a369582aad864a3406e1bd18fac3265a5a",
+        "unchanged": true
+      },
+      {
+        "file": "test/notification-infrastructure.test.mjs",
+        "capturedSha256": "f39cc313326d28a206c15f98fc28b7b25c7104e20328da56b255b5161a7715a9",
+        "currentSha256": "f39cc313326d28a206c15f98fc28b7b25c7104e20328da56b255b5161a7715a9",
+        "unchanged": true
+      },
+      {
+        "file": "test/odds-center-freshness.test.mjs",
+        "capturedSha256": "41ff573e1b91b952f02ff59eda6fabc3e79cedb9d232e75510cd5c31e547eb2f",
+        "currentSha256": "41ff573e1b91b952f02ff59eda6fabc3e79cedb9d232e75510cd5c31e547eb2f",
+        "unchanged": true
+      },
+      {
+        "file": "test/odds-official-pairing-source.test.mjs",
+        "capturedSha256": "06514eba8c2c926a72f3266ba5e7ff1138a79d8ca8d6ce6d5c8ede0418be51e6",
+        "currentSha256": "06514eba8c2c926a72f3266ba5e7ff1138a79d8ca8d6ce6d5c8ede0418be51e6",
+        "unchanged": true
+      },
+      {
+        "file": "test/odds-publication-rehearsal.test.mjs",
+        "capturedSha256": "1fdd81e29ab22b936cfe6362fc4f95839b463c0bfbc26017b2154d4520dda3c4",
+        "currentSha256": "1fdd81e29ab22b936cfe6362fc4f95839b463c0bfbc26017b2154d4520dda3c4",
+        "unchanged": true
+      },
+      {
+        "file": "test/odds-publication-transaction.test.mjs",
+        "capturedSha256": "a0bc3ced0eaae14b625df04fdd18410ee3d57a79742b89b71fc04d716db77cbf",
+        "currentSha256": "a0bc3ced0eaae14b625df04fdd18410ee3d57a79742b89b71fc04d716db77cbf",
+        "unchanged": true
+      },
+      {
+        "file": "test/odds-publication-withdrawal-v1-1.test.mjs",
+        "capturedSha256": "e4f2599b0703a55cb21f1937d6f5e7bb73b8ba213285fc57597ff846c5dfef0e",
+        "currentSha256": "e4f2599b0703a55cb21f1937d6f5e7bb73b8ba213285fc57597ff846c5dfef0e",
+        "unchanged": true
+      },
+      {
+        "file": "test/odds-publication-withdrawal-v1.test.mjs",
+        "capturedSha256": "0e6181fb237abcb046811b598d7a259843b75ff6e60fbf4388795f6644ca4fae",
+        "currentSha256": "0e6181fb237abcb046811b598d7a259843b75ff6e60fbf4388795f6644ca4fae",
+        "unchanged": true
+      },
+      {
+        "file": "test/odds-snapshot-review.test.mjs",
+        "capturedSha256": "38b15c417058c30598d9bc68b1aaf4be9661a0fad02c2d987357d1b997f601a5",
+        "currentSha256": "38b15c417058c30598d9bc68b1aaf4be9661a0fad02c2d987357d1b997f601a5",
+        "unchanged": true
+      },
+      {
+        "file": "test/odds-workbook-persistence.test.mjs",
+        "capturedSha256": "cca0cc70bcb513c21b4d1c5f21fca64ef060aa0aca5f85b58bfb71e477ccbde8",
+        "currentSha256": "cca0cc70bcb513c21b4d1c5f21fca64ef060aa0aca5f85b58bfb71e477ccbde8",
+        "unchanged": true
+      },
+      {
+        "file": "test/option2-production-maintenance-control-plane.test.mjs",
+        "capturedSha256": "ee276146da79e9566d1eb420fefb7099389ceba0bdd0e0a39fa1c8b0dcf46b09",
+        "currentSha256": "ee276146da79e9566d1eb420fefb7099389ceba0bdd0e0a39fa1c8b0dcf46b09",
+        "unchanged": true
+      },
+      {
+        "file": "test/option2-production-maintenance-precommit-deployment-rebind.test.mjs",
+        "capturedSha256": "d743f63705e99aa2e8604bd847c30875825d7c8aea1aaa9de669c79882a3b008",
+        "currentSha256": "d743f63705e99aa2e8604bd847c30875825d7c8aea1aaa9de669c79882a3b008",
+        "unchanged": true
+      },
+      {
+        "file": "test/option2-production-maintenance-preprepare-abort.test.mjs",
+        "capturedSha256": "b2987d46495b36af6ff56ecbb5a6091e49366ac6f042d802c26c3055c6e7aa4a",
+        "currentSha256": "b2987d46495b36af6ff56ecbb5a6091e49366ac6f042d802c26c3055c6e7aa4a",
+        "unchanged": true
+      },
+      {
+        "file": "test/option2-production-maintenance-staging-provenance.test.mjs",
+        "capturedSha256": "ae798560307a2033b6a15fa71e6b9e21cec01ee6170e5505d4700c48d6ecae5a",
+        "currentSha256": "ae798560307a2033b6a15fa71e6b9e21cec01ee6170e5505d4700c48d6ecae5a",
+        "unchanged": true
+      },
+      {
+        "file": "test/option2-production-postcutover-application-release-rebind.test.mjs",
+        "capturedSha256": "c48020dd81d84d8b89b7bf06cc1705aa4da83ded3e8b459290ca77f0e9ddd409",
+        "currentSha256": "c48020dd81d84d8b89b7bf06cc1705aa4da83ded3e8b459290ca77f0e9ddd409",
+        "unchanged": true
+      },
+      {
+        "file": "test/option2-production-postcutover-normal-release-rebind.test.mjs",
+        "capturedSha256": "1ab2b87d109c6bd8bec6ea376d2f7558edbd5986a6c3417e680b35cdeb351c4c",
+        "currentSha256": "1ab2b87d109c6bd8bec6ea376d2f7558edbd5986a6c3417e680b35cdeb351c4c",
+        "unchanged": true
+      },
+      {
+        "file": "test/option2-production-scoring-maintenance-ux.test.mjs",
+        "capturedSha256": "e3ca9381def8ee04aec6c59082ce698596325bbd0cea79f1fbdc0ac8d080814a",
+        "currentSha256": "e3ca9381def8ee04aec6c59082ce698596325bbd0cea79f1fbdc0ac8d080814a",
+        "unchanged": true
+      },
+      {
+        "file": "test/participant-auth-product.test.mjs",
+        "capturedSha256": "47ebd0bcdb1d916964023840f427c8412b8393446733d767f49f2621c1f703a6",
+        "currentSha256": "47ebd0bcdb1d916964023840f427c8412b8393446733d767f49f2621c1f703a6",
+        "unchanged": true
+      },
+      {
+        "file": "test/participant-auth-rehearsal.test.mjs",
+        "capturedSha256": "3eb47ea676f909f7e8db6cfc5afe5390a1d9363bf6cc4490e4a5b4d3c7b61daf",
+        "currentSha256": "3eb47ea676f909f7e8db6cfc5afe5390a1d9363bf6cc4490e4a5b4d3c7b61daf",
+        "unchanged": true
+      },
+      {
+        "file": "test/participant-identity-cutover.test.mjs",
+        "capturedSha256": "412c63f00b542d982b6e44b7b1e84b143eab984361f62858db4dbd3793ef3832",
+        "currentSha256": "412c63f00b542d982b6e44b7b1e84b143eab984361f62858db4dbd3793ef3832",
+        "unchanged": true
+      },
+      {
+        "file": "test/participant-identity-foundation.test.mjs",
+        "capturedSha256": "7be666cddf3539d12000e1f4b430da980780117bed46c0fc941a4b9819d1e1ac",
+        "currentSha256": "7be666cddf3539d12000e1f4b430da980780117bed46c0fc941a4b9819d1e1ac",
+        "unchanged": true
+      },
+      {
+        "file": "test/participant-initialization-cache.test.mjs",
+        "capturedSha256": "0a9c14bdf1a56721d590f557adc3e070a117711b8385b563ecfade73e1e8ddd0",
+        "currentSha256": "0a9c14bdf1a56721d590f557adc3e070a117711b8385b563ecfade73e1e8ddd0",
+        "unchanged": true
+      },
+      {
+        "file": "test/participant-initialization.test.mjs",
+        "capturedSha256": "bc58be859562315141df70486d6569ecf3b6d170b34bf520e204183db71deef3",
+        "currentSha256": "bc58be859562315141df70486d6569ecf3b6d170b34bf520e204183db71deef3",
+        "unchanged": true
+      },
+      {
+        "file": "test/participant-phone-auth-link-consistency.test.mjs",
+        "capturedSha256": "a73959dc747f4563695f8e0cb5c243c799caae656fc86c40503ff4e9f7dcf4a0",
+        "currentSha256": "a73959dc747f4563695f8e0cb5c243c799caae656fc86c40503ff4e9f7dcf4a0",
+        "unchanged": true
+      },
+      {
+        "file": "test/participant-phone-otp-controlled-preview.test.mjs",
+        "capturedSha256": "0dbc5da803114fcc9e1a0879bb7d1d16fe9feace7591706715b00212ca1f18df",
+        "currentSha256": "0dbc5da803114fcc9e1a0879bb7d1d16fe9feace7591706715b00212ca1f18df",
+        "unchanged": true
+      },
+      {
+        "file": "test/participant-phone-ownership-foundation.test.mjs",
+        "capturedSha256": "bf13f99f0fb34fe6440e8b039706b6ab8fa6759b46223de4c2946990745c5aeb",
+        "currentSha256": "bf13f99f0fb34fe6440e8b039706b6ab8fa6759b46223de4c2946990745c5aeb",
+        "unchanged": true
+      },
+      {
+        "file": "test/participant-scorekeeper-access.test.mjs",
+        "capturedSha256": "548063fbffe9c9777b48dc4d822ad338042518f1eaf99add40866ff7661c97db",
+        "currentSha256": "548063fbffe9c9777b48dc4d822ad338042518f1eaf99add40866ff7661c97db",
+        "unchanged": true
+      },
+      {
+        "file": "test/participant-session-client.test.mjs",
+        "capturedSha256": "6b73bd0515a1987d9ea23bf5808fd118bcbcf50155b5efab352f70957c8229c4",
+        "currentSha256": "6b73bd0515a1987d9ea23bf5808fd118bcbcf50155b5efab352f70957c8229c4",
+        "unchanged": true
+      },
+      {
+        "file": "test/participant-shell-fallback-regression.test.mjs",
+        "capturedSha256": "53544a67aba8f0daa3a7e37b4db840651b94711d51b41fb64402db1c9171340b",
+        "currentSha256": "53544a67aba8f0daa3a7e37b4db840651b94711d51b41fb64402db1c9171340b",
+        "unchanged": true
+      },
+      {
+        "file": "test/phase-8-environment.test.mjs",
+        "capturedSha256": "2fe7c66fcce732092e5ee98d17b8429f4d61e6cd2532d3466b4dae34aecf8a5b",
+        "currentSha256": "2fe7c66fcce732092e5ee98d17b8429f4d61e6cd2532d3466b4dae34aecf8a5b",
+        "unchanged": true
+      },
+      {
+        "file": "test/phase-b1-production-starting-hole-retirement.test.mjs",
+        "capturedSha256": "d3265ceae55bc1c001136aadd08fbda0a32b27d7477acb4d2a09797307b426df",
+        "currentSha256": "d3265ceae55bc1c001136aadd08fbda0a32b27d7477acb4d2a09797307b426df",
+        "unchanged": true
+      },
+      {
+        "file": "test/player-avatar.test.mjs",
+        "capturedSha256": "b75109f62630ef612b2400c5658082e739d91d0fec9d1dab5d65d68cfdf47395",
+        "currentSha256": "b75109f62630ef612b2400c5658082e739d91d0fec9d1dab5d65d68cfdf47395",
+        "unchanged": true
+      },
+      {
+        "file": "test/player-career.test.mjs",
+        "capturedSha256": "f81a937c2b06ca903be2db0bbb1675710537023fccb0deb30e0758c656d3953f",
+        "currentSha256": "f81a937c2b06ca903be2db0bbb1675710537023fccb0deb30e0758c656d3953f",
+        "unchanged": true
+      },
+      {
+        "file": "test/player-comparison.test.mjs",
+        "capturedSha256": "a8aabe2172b1a6086e8ba50ae27b2d19bf0e05dd2fab78631c21d07ceddcce55",
+        "currentSha256": "a8aabe2172b1a6086e8ba50ae27b2d19bf0e05dd2fab78631c21d07ceddcce55",
+        "unchanged": true
+      },
+      {
+        "file": "test/player-format-match-history.test.mjs",
+        "capturedSha256": "18b0510bc2406ce48efa3eb597830a5a1d7212445c416234fbbfeab2ad9afc93",
+        "currentSha256": "18b0510bc2406ce48efa3eb597830a5a1d7212445c416234fbbfeab2ad9afc93",
+        "unchanged": true
+      },
+      {
+        "file": "test/player-home.test.mjs",
+        "capturedSha256": "2f6609dab3632817050105ab002c00536674d9c0e6c598041b0055db8d00b080",
+        "currentSha256": "2f6609dab3632817050105ab002c00536674d9c0e6c598041b0055db8d00b080",
+        "unchanged": true
+      },
+      {
+        "file": "test/player-intelligence.test.mjs",
+        "capturedSha256": "144fb1ff3fde25172fd8017b9f8c9d6e3a339f24943bdec191e80d096b4741aa",
+        "currentSha256": "144fb1ff3fde25172fd8017b9f8c9d6e3a339f24943bdec191e80d096b4741aa",
+        "unchanged": true
+      },
+      {
+        "file": "test/player-leaderboards-competition.test.mjs",
+        "capturedSha256": "7256bc685695058910e8b06e2a6f0f9a2c7287ee9b41e4be817eb09547a93687",
+        "currentSha256": "7256bc685695058910e8b06e2a6f0f9a2c7287ee9b41e4be817eb09547a93687",
+        "unchanged": true
+      },
+      {
+        "file": "test/player-leaderboards-freeze.test.mjs",
+        "capturedSha256": "ba729a6edf83a35fc13093f93587dd72524bae83b0cfe13e84ba157cebc8ea67",
+        "currentSha256": "ba729a6edf83a35fc13093f93587dd72524bae83b0cfe13e84ba157cebc8ea67",
+        "unchanged": true
+      },
+      {
+        "file": "test/player-passport.test.mjs",
+        "capturedSha256": "b997137ee68c6ae13dd5b90417b2a91a8892f1e8d6d3806752620cb11e7e9d98",
+        "currentSha256": "b997137ee68c6ae13dd5b90417b2a91a8892f1e8d6d3806752620cb11e7e9d98",
+        "unchanged": true
+      },
+      {
+        "file": "test/pn1-production-mobile-boundary.test.mjs",
+        "capturedSha256": "e3dfe077363f8981f0651f4e1e1746944beb8280bb42ac44327cc70927d72cf9",
+        "currentSha256": "e3dfe077363f8981f0651f4e1e1746944beb8280bb42ac44327cc70927d72cf9",
+        "unchanged": true
+      },
+      {
+        "file": "test/pn1-production-mobile-reads.test.mjs",
+        "capturedSha256": "eaa93fc99ac51904227858b2eb9a442fa10f51f487dffc01409a1363cc1e9685",
+        "currentSha256": "eaa93fc99ac51904227858b2eb9a442fa10f51f487dffc01409a1363cc1e9685",
+        "unchanged": true
+      },
+      {
+        "file": "test/pn2-native-admission.test.mjs",
+        "capturedSha256": "d5acf992a9ba05e1f49c7ee020001d8880b555e46ecba53db3ea8aecc9e17246",
+        "currentSha256": "d5acf992a9ba05e1f49c7ee020001d8880b555e46ecba53db3ea8aecc9e17246",
+        "unchanged": true
+      },
+      {
+        "file": "test/pn6b-guide-reconciliation.test.mjs",
+        "capturedSha256": "2a3a7bc1a4087c22abaec8cfe2b3cb1d34c3d2d31910a67f58a145222630928f",
+        "currentSha256": "2a3a7bc1a4087c22abaec8cfe2b3cb1d34c3d2d31910a67f58a145222630928f",
+        "unchanged": true
+      },
+      {
+        "file": "test/pn7a-today-cache.test.mjs",
+        "capturedSha256": "f2766b6374332435c767da7a92ead5a7afb84d885232cfe9dd8f8145bc002a0e",
+        "currentSha256": "f2766b6374332435c767da7a92ead5a7afb84d885232cfe9dd8f8145bc002a0e",
+        "unchanged": true
+      },
+      {
+        "file": "test/pn8a-auth-integration.test.mjs",
+        "capturedSha256": "1be63efcdfa1fd0eb065dda221ba5c9985e51f9279486439563504aef7cf7742",
+        "currentSha256": "1be63efcdfa1fd0eb065dda221ba5c9985e51f9279486439563504aef7cf7742",
+        "unchanged": true
+      },
+      {
+        "file": "test/post-reset-stability.test.mjs",
+        "capturedSha256": "df745abe96bdf2daa8e1668adc1bc4b9a546b8d1c6fba07594234cbf840e06b6",
+        "currentSha256": "df745abe96bdf2daa8e1668adc1bc4b9a546b8d1c6fba07594234cbf840e06b6",
+        "unchanged": true
+      },
+      {
+        "file": "test/post-step14-director-odds-side-games.test.mjs",
+        "capturedSha256": "f3c1046385f11eeba2fcd2c611d042dc7e7bf5171d7f99ac34f3cdbbbd4efbc2",
+        "currentSha256": "f3c1046385f11eeba2fcd2c611d042dc7e7bf5171d7f99ac34f3cdbbbd4efbc2",
+        "unchanged": true
+      },
+      {
+        "file": "test/post-step14-draft-team-intelligence.test.mjs",
+        "capturedSha256": "4df61a908e554b56b541712ecd91f7dafef7c445f7010688a97071eb975cfccd",
+        "currentSha256": "4df61a908e554b56b541712ecd91f7dafef7c445f7010688a97071eb975cfccd",
+        "unchanged": true
+      },
+      {
+        "file": "test/post-step14-production-empty-pairings-sql-contract.test.mjs",
+        "capturedSha256": "7f694d0effee9eda7624ccc52fac45e82caaef5cc48f071e8e579317ecd994d7",
+        "currentSha256": "7f694d0effee9eda7624ccc52fac45e82caaef5cc48f071e8e579317ecd994d7",
+        "unchanged": true
+      },
+      {
+        "file": "test/prediction-engine.test.mjs",
+        "capturedSha256": "118eaec394079cf3d256426fed07d25d9a3c68cb2a11ab07c6dc8953974d67cd",
+        "currentSha256": "118eaec394079cf3d256426fed07d25d9a3c68cb2a11ab07c6dc8953974d67cd",
+        "unchanged": true
+      },
+      {
+        "file": "test/prediction-input-bundle.test.mjs",
+        "capturedSha256": "188d2db9beb97bf1f94969334d9b04e405dae4f3523c78c0a969e4063336d1b9",
+        "currentSha256": "188d2db9beb97bf1f94969334d9b04e405dae4f3523c78c0a969e4063336d1b9",
+        "unchanged": true
+      },
+      {
+        "file": "test/prediction-settings-projection.test.mjs",
+        "capturedSha256": "37c911de872dd18ced63691c84062faafd545cd6405f064fc28f15057b0aee12",
+        "currentSha256": "37c911de872dd18ced63691c84062faafd545cd6405f064fc28f15057b0aee12",
+        "unchanged": true
+      },
+      {
+        "file": "test/prediction-workbook-portability.test.mjs",
+        "capturedSha256": "4ad41b6e5e7d3fb652b9411d1a66c318213b7b804eb16371499e695972b136e3",
+        "currentSha256": "4ad41b6e5e7d3fb652b9411d1a66c318213b7b804eb16371499e695972b136e3",
+        "unchanged": true
+      },
+      {
+        "file": "test/prelaunch-corrections.test.mjs",
+        "capturedSha256": "a65e72392297d8a2e017c024f2e36a7dba3a730a58827667bec5e958517152f3",
+        "currentSha256": "a65e72392297d8a2e017c024f2e36a7dba3a730a58827667bec5e958517152f3",
+        "unchanged": true
+      },
+      {
+        "file": "test/preview-director-entitlement.test.mjs",
+        "capturedSha256": "ce16ec8dd75bdca010e22aaa1e0c9e7caa28ed9a70edd9fa6fc8145a9549dd6b",
+        "currentSha256": "ce16ec8dd75bdca010e22aaa1e0c9e7caa28ed9a70edd9fa6fc8145a9549dd6b",
+        "unchanged": true
+      },
+      {
+        "file": "test/preview-impersonation-lease-security.test.mjs",
+        "capturedSha256": "d475737f6e0fd4075cf67aada477638c0e75aa2c0a8805522d7cb3426aed3f3f",
+        "currentSha256": "d475737f6e0fd4075cf67aada477638c0e75aa2c0a8805522d7cb3426aed3f3f",
+        "unchanged": true
+      },
+      {
+        "file": "test/preview-mobile-secondary-leaderboards-v1-sql-contract.test.mjs",
+        "capturedSha256": "15c0aa02d1622ba660cc1682010fb817cbbcb5dfc71d939ef4c3820ed4a69ec4",
+        "currentSha256": "15c0aa02d1622ba660cc1682010fb817cbbcb5dfc71d939ef4c3820ed4a69ec4",
+        "unchanged": true
+      },
+      {
+        "file": "test/preview-player-impersonation.test.mjs",
+        "capturedSha256": "10672c9a051079f53e016cb345bda88e935760039b9930803cb6c00685e6417d",
+        "currentSha256": "10672c9a051079f53e016cb345bda88e935760039b9930803cb6c00685e6417d",
+        "unchanged": true
+      },
+      {
+        "file": "test/preview-projection-runtime.test.mjs",
+        "capturedSha256": "c0ca485b9c456aa746acae431a9b95626cefa0da66f56af5bb4cced2e648fad1",
+        "currentSha256": "c0ca485b9c456aa746acae431a9b95626cefa0da66f56af5bb4cced2e648fad1",
+        "unchanged": true
+      },
+      {
+        "file": "test/preview-reliability.test.mjs",
+        "capturedSha256": "bf0ad0f68c2ae75f611d9682cb4aa53694eb79725a95d8c9301609678d048dc8",
+        "currentSha256": "bf0ad0f68c2ae75f611d9682cb4aa53694eb79725a95d8c9301609678d048dc8",
+        "unchanged": true
+      },
+      {
+        "file": "test/preview-tournament-reset.test.mjs",
+        "capturedSha256": "518e9b3fa5f9bbe86d2d778efe9a01e2b107622af9461e4c1c65da2db1476049",
+        "currentSha256": "518e9b3fa5f9bbe86d2d778efe9a01e2b107622af9461e4c1c65da2db1476049",
+        "unchanged": true
+      },
+      {
+        "file": "test/production-approved-sms-hook-route.test.mjs",
+        "capturedSha256": "7e119d24ab36ab55f6b14a2d223fb463da4a52ab12c9ec402fa68706a36fdffa",
+        "currentSha256": "7e119d24ab36ab55f6b14a2d223fb463da4a52ab12c9ec402fa68706a36fdffa",
+        "unchanged": true
+      },
+      {
+        "file": "test/production-approved-sms-hook.test.mjs",
+        "capturedSha256": "439ea9cf074690ee029716900ede0e86d12a38f0215e60550dc773348d97f4fb",
+        "currentSha256": "439ea9cf074690ee029716900ede0e86d12a38f0215e60550dc773348d97f4fb",
+        "unchanged": true
+      },
+      {
+        "file": "test/production-calcutta-v1-app.test.mjs",
+        "capturedSha256": "a3c409ca673762bad477e84d9ee92b50c83e291294149fa3242d69308fcb558a",
+        "currentSha256": "a3c409ca673762bad477e84d9ee92b50c83e291294149fa3242d69308fcb558a",
+        "unchanged": true
+      },
+      {
+        "file": "test/production-calcutta-v1-server.test.mjs",
+        "capturedSha256": "b2196380a867a978459de71ff289b713e72a07df9afa41dffe128561cea74cf3",
+        "currentSha256": "b2196380a867a978459de71ff289b713e72a07df9afa41dffe128561cea74cf3",
+        "unchanged": true
+      },
+      {
+        "file": "test/production-completed-history-homepage-read.test.mjs",
+        "capturedSha256": "b5b9d485728af8c14113680c1024b1f29f18663c520f7fc15646e1d56689968d",
+        "currentSha256": "b5b9d485728af8c14113680c1024b1f29f18663c520f7fc15646e1d56689968d",
+        "unchanged": true
+      },
+      {
+        "file": "test/production-current-shadow-semantic-parity.test.mjs",
+        "capturedSha256": "3d831a99ddbbed3cb911aded7def8e673b380152d3141f2cb134c647d63aab4e",
+        "currentSha256": "3d831a99ddbbed3cb911aded7def8e673b380152d3141f2cb134c647d63aab4e",
+        "unchanged": true
+      },
+      {
+        "file": "test/production-net-skins-v1-server.test.mjs",
+        "capturedSha256": "ba59a6b28dc978032117ab755c78d23f7c10574366eb39d35c3793ad4911d950",
+        "currentSha256": "ba59a6b28dc978032117ab755c78d23f7c10574366eb39d35c3793ad4911d950",
+        "unchanged": true
+      },
+      {
+        "file": "test/production-phone-enrollment-route.test.mjs",
+        "capturedSha256": "889c57288aa4a9732fda180154e5c1f50baac827205b929911b35cc850600b81",
+        "currentSha256": "889c57288aa4a9732fda180154e5c1f50baac827205b929911b35cc850600b81",
+        "unchanged": true
+      },
+      {
+        "file": "test/production-phone-enrollment.test.mjs",
+        "capturedSha256": "f1a5e79553448a95aac3c542b97b9f9b70cadee49af0c314b4635c3975f62cbd",
+        "currentSha256": "f1a5e79553448a95aac3c542b97b9f9b70cadee49af0c314b4635c3975f62cbd",
+        "unchanged": true
+      },
+      {
+        "file": "test/projection-editorial.test.mjs",
+        "capturedSha256": "d6911f1715f859457c6ed16d0b1f4a2bfc17120e190537590ec2061a3921ffb3",
+        "currentSha256": "d6911f1715f859457c6ed16d0b1f4a2bfc17120e190537590ec2061a3921ffb3",
+        "unchanged": true
+      },
+      {
+        "file": "test/projection-mission-control.test.mjs",
+        "capturedSha256": "ef2608c6780a7e96917f4666194d77ac707d0d16e495cfd8aee467ea050369ef",
+        "currentSha256": "ef2608c6780a7e96917f4666194d77ac707d0d16e495cfd8aee467ea050369ef",
+        "unchanged": true
+      },
+      {
+        "file": "test/projection-publication-client-contract.test.mjs",
+        "capturedSha256": "73713cb0bf8a94f198ea975411756de2a498ccbd2b65dc68e2b6ff26ec43ce53",
+        "currentSha256": "73713cb0bf8a94f198ea975411756de2a498ccbd2b65dc68e2b6ff26ec43ce53",
+        "unchanged": true
+      },
+      {
+        "file": "test/projection-publication-diagnostics.test.mjs",
+        "capturedSha256": "29a694f880d76a53c715b3d8ee3fe6518617a57716536d62b7ee5fe7fa7aee4f",
+        "currentSha256": "29a694f880d76a53c715b3d8ee3fe6518617a57716536d62b7ee5fe7fa7aee4f",
+        "unchanged": true
+      },
+      {
+        "file": "test/projection-sheet-scroll.test.mjs",
+        "capturedSha256": "eb72cf95999c502efdcd3572c9c99b71d0ac49d1b880f08fb4952b30f971d20e",
+        "currentSha256": "eb72cf95999c502efdcd3572c9c99b71d0ac49d1b880f08fb4952b30f971d20e",
+        "unchanged": true
+      },
+      {
+        "file": "test/public-courses-guide-restoration.test.mjs",
+        "capturedSha256": "6a506028f6c599ccc30a02651d408f083ddd20f65282388fbdc43ca01ef4a31e",
+        "currentSha256": "6a506028f6c599ccc30a02651d408f083ddd20f65282388fbdc43ca01ef4a31e",
+        "unchanged": true
+      },
+      {
+        "file": "test/public-history-restoration.test.mjs",
+        "capturedSha256": "8cdf1723ac2a356b1281f4a0a98755f67c0ba1576023ea485c81c2aac9ffed26",
+        "currentSha256": "8cdf1723ac2a356b1281f4a0a98755f67c0ba1576023ea485c81c2aac9ffed26",
+        "unchanged": true
+      },
+      {
+        "file": "test/public-homepage-history-cards.test.mjs",
+        "capturedSha256": "7c7887ee49d283a56cf9cfccfb30a5f8e499eb9ab27ac315b6817c015093f099",
+        "currentSha256": "7c7887ee49d283a56cf9cfccfb30a5f8e499eb9ab27ac315b6817c015093f099",
+        "unchanged": true
+      },
+      {
+        "file": "test/public-player-profile-restoration.test.mjs",
+        "capturedSha256": "0af9cbd20acb470a52191fd68674e8b16046de616729b4230c66ec670751a0a2",
+        "currentSha256": "0af9cbd20acb470a52191fd68674e8b16046de616729b4230c66ec670751a0a2",
+        "unchanged": true
+      },
+      {
+        "file": "test/public-website-shell-restoration.test.mjs",
+        "capturedSha256": "3f821fd0b41015b879ea80065d256618e0438257b748f3055154ef63bdf69509",
+        "currentSha256": "3f821fd0b41015b879ea80065d256618e0438257b748f3055154ef63bdf69509",
+        "unchanged": true
+      },
+      {
+        "file": "test/published-odds-supabase.test.mjs",
+        "capturedSha256": "e0230bbcb114beeaf58f5d09549f5cc767565a128699fc81a4fe4d01dfc71d33",
+        "currentSha256": "e0230bbcb114beeaf58f5d09549f5cc767565a128699fc81a4fe4d01dfc71d33",
+        "unchanged": true
+      },
+      {
+        "file": "test/pwa-email-text-contract.test.mjs",
+        "capturedSha256": "c374e875195a1222291163b9a0f9d73ad16d7ffe96b6517fc3477200724fdb70",
+        "currentSha256": "c374e875195a1222291163b9a0f9d73ad16d7ffe96b6517fc3477200724fdb70",
+        "unchanged": true
+      },
+      {
+        "file": "test/pwa-installability.test.mjs",
+        "capturedSha256": "288468d49c62b83a670af4a82d4722c3fdcc542fa68709f0188a68ebf4c252de",
+        "currentSha256": "288468d49c62b83a670af4a82d4722c3fdcc542fa68709f0188a68ebf4c252de",
+        "unchanged": true
+      },
+      {
+        "file": "test/pwa-launch-splash.test.mjs",
+        "capturedSha256": "1ca2377ce2aad4fe7333cba0af861044b4858ad41f8dbc3a996e063d65bb5851",
+        "currentSha256": "1ca2377ce2aad4fe7333cba0af861044b4858ad41f8dbc3a996e063d65bb5851",
+        "unchanged": true
+      },
+      {
+        "file": "test/pwa-native-shell.test.mjs",
+        "capturedSha256": "96a434297809766884686110891570030cf5a9f17039aae6053bc698b8c98080",
+        "currentSha256": "96a434297809766884686110891570030cf5a9f17039aae6053bc698b8c98080",
+        "unchanged": true
+      },
+      {
+        "file": "test/pwa-phase4-polish.test.mjs",
+        "capturedSha256": "c5e80493e64d3a879d864471311dfe1699daf89da6761ebe477a113cfe7cd116",
+        "currentSha256": "c5e80493e64d3a879d864471311dfe1699daf89da6761ebe477a113cfe7cd116",
+        "unchanged": true
+      },
+      {
+        "file": "test/pwa-phone-route.test.mjs",
+        "capturedSha256": "d71721a757c81c3c27af7db98eefb2fabd387fb14d448ce18e955a7090f2ad7d",
+        "currentSha256": "d71721a757c81c3c27af7db98eefb2fabd387fb14d448ce18e955a7090f2ad7d",
+        "unchanged": true
+      },
+      {
+        "file": "test/pwa-session-regression.test.mjs",
+        "capturedSha256": "f8568a5a12a23be47cacb89eec605d3c251486e30d0d43de470a81b8af5ffbc7",
+        "currentSha256": "f8568a5a12a23be47cacb89eec605d3c251486e30d0d43de470a81b8af5ffbc7",
+        "unchanged": true
+      },
+      {
+        "file": "test/pwa-side-games.test.mjs",
+        "capturedSha256": "6d75915cbf0d26e03b68c72183cd415faf4f27d217cdc4da8a37039f3d5eb49a",
+        "currentSha256": "6d75915cbf0d26e03b68c72183cd415faf4f27d217cdc4da8a37039f3d5eb49a",
+        "unchanged": true
+      },
+      {
+        "file": "test/pwa-standalone-contract.test.mjs",
+        "capturedSha256": "e8e5cbf3ea1def27623c3ce7e53a1d08b529f15d7e909c4113abda33c7f48200",
+        "currentSha256": "e8e5cbf3ea1def27623c3ce7e53a1d08b529f15d7e909c4113abda33c7f48200",
+        "unchanged": true
+      },
+      {
+        "file": "test/pwa-visible-presentation-boundary.test.mjs",
+        "capturedSha256": "18d5eb44ffedffd84a863c0cc3b29aec2e4e64076def472e1504efd5932fefda",
+        "currentSha256": "18d5eb44ffedffd84a863c0cc3b29aec2e4e64076def472e1504efd5932fefda",
+        "unchanged": true
+      },
+      {
+        "file": "test/r3-existing-preparation-contract.test.mjs",
+        "capturedSha256": "58265af37a4531cf75003e0bfb17e18570a977bc961260952fa2d7e90bb8f92e",
+        "currentSha256": "58265af37a4531cf75003e0bfb17e18570a977bc961260952fa2d7e90bb8f92e",
+        "unchanged": true
+      },
+      {
+        "file": "test/r3-score-timeout-boundary.test.mjs",
+        "capturedSha256": "414c3872a45a732bf46655e887dc398367386eeda613418032f3693db8cb0653",
+        "currentSha256": "414c3872a45a732bf46655e887dc398367386eeda613418032f3693db8cb0653",
+        "unchanged": true
+      },
+      {
+        "file": "test/rate-limit.test.mjs",
+        "capturedSha256": "41e94a20a5c0daa86fc5ecfadf4c5771ec6b39c486ab65f1d1ce8a32490758c5",
+        "currentSha256": "41e94a20a5c0daa86fc5ecfadf4c5771ec6b39c486ab65f1d1ce8a32490758c5",
+        "unchanged": true
+      },
+      {
+        "file": "test/record-holder-authority.test.mjs",
+        "capturedSha256": "20a1ad82562b39830c58efad1642f8bd91fc450e6c962c6ef29e53bd0ff68a9c",
+        "currentSha256": "20a1ad82562b39830c58efad1642f8bd91fc450e6c962c6ef29e53bd0ff68a9c",
+        "unchanged": true
+      },
+      {
+        "file": "test/release-b-full-net.test.mjs",
+        "capturedSha256": "392c704bd050a2a9f9f754b7a4b5feb5afda0e828684c863f62cd55e8bf68005",
+        "currentSha256": "392c704bd050a2a9f9f754b7a4b5feb5afda0e828684c863f62cd55e8bf68005",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2-derived-proof.integration.test.mjs",
+        "capturedSha256": "b645d6580aa3d9d481b5f8832433563106bc47b31ebc6e4ee49a2ba2f137b039",
+        "currentSha256": "b645d6580aa3d9d481b5f8832433563106bc47b31ebc6e4ee49a2ba2f137b039",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2-fence-history.test.mjs",
+        "capturedSha256": "4c865bec330acb12819b8dcb45582576166e500b138dbfd09f0c0c334be7d964",
+        "currentSha256": "4c865bec330acb12819b8dcb45582576166e500b138dbfd09f0c0c334be7d964",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2-score-proof.integration.test.mjs",
+        "capturedSha256": "f9eec62e93e78aa1bd6dc09628dde7bc071a8ab11aa16e77bbb621420526d533",
+        "currentSha256": "f9eec62e93e78aa1bd6dc09628dde7bc071a8ab11aa16e77bbb621420526d533",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+        "capturedSha256": "b7679b475c61d93cfd7b50a2b60f896364c175af4f74208ce633cfc5cfb9adcc",
+        "currentSha256": "b7679b475c61d93cfd7b50a2b60f896364c175af4f74208ce633cfc5cfb9adcc",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-annual-workers.integration.test.mjs",
+        "capturedSha256": "a69dcdd7cad592f66849b3832fad0e0d08e2746df243604336bcc632553d77bc",
+        "currentSha256": "a69dcdd7cad592f66849b3832fad0e0d08e2746df243604336bcc632553d77bc",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-backlog-pressure.integration.test.mjs",
+        "capturedSha256": "c758d9b84ee0db729c735771354890628c5aba1a8cc30dfc452838d014ba08db",
+        "currentSha256": "c758d9b84ee0db729c735771354890628c5aba1a8cc30dfc452838d014ba08db",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-backlog-tail.integration.test.mjs",
+        "capturedSha256": "f8285682fde446ecc72f53fa7e03cedb63fa2e7a03614119561c7ed824456a54",
+        "currentSha256": "f8285682fde446ecc72f53fa7e03cedb63fa2e7a03614119561c7ed824456a54",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-calcutta-lock-order.test.mjs",
+        "capturedSha256": "9a421f9bcdeeeafa89ca9d76870c2f42feb2ddcc0de96ea26dbc57334ba5f9d4",
+        "currentSha256": "9a421f9bcdeeeafa89ca9d76870c2f42feb2ddcc0de96ea26dbc57334ba5f9d4",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-certification-gate.test.py",
+        "capturedSha256": "78e3d96f118a1ef1ac53915bebf02d2d2b80ddd22f6d6cc8ad379ca725b0779d",
+        "currentSha256": "78e3d96f118a1ef1ac53915bebf02d2d2b80ddd22f6d6cc8ad379ca725b0779d",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-delivery-index-review.test.mjs",
+        "capturedSha256": "501de7d7234c4af5018878b33c590a8ae8f56c33f3ef23c2c077ad757f58a1a8",
+        "currentSha256": "501de7d7234c4af5018878b33c590a8ae8f56c33f3ef23c2c077ad757f58a1a8",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-finite-timeout.integration.test.mjs",
+        "capturedSha256": "67dfbf9cda289da68013e9b607ee33d14bbe9ed255804a09b74dc866bb9bdfb5",
+        "currentSha256": "67dfbf9cda289da68013e9b607ee33d14bbe9ed255804a09b74dc866bb9bdfb5",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-full-sequence.integration.test.mjs",
+        "capturedSha256": "4c331874262c48a84396e54f44c3210a29ec1960bf7a3ef0f510f321820fe2da",
+        "currentSha256": "4c331874262c48a84396e54f44c3210a29ec1960bf7a3ef0f510f321820fe2da",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-net-owner-lock-order.test.mjs",
+        "capturedSha256": "91b9ccd6dbcb4d64eb2a938c1f8eeffca01aa6d1b5d0619683c249cc328649df",
+        "currentSha256": "91b9ccd6dbcb4d64eb2a938c1f8eeffca01aa6d1b5d0619683c249cc328649df",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-net-skins-deadlock.integration.test.mjs",
+        "capturedSha256": "cf81be12fe61afdc76439e06bccf01a6b3069b78d63e5ba4daa0b2ece28bee13",
+        "currentSha256": "cf81be12fe61afdc76439e06bccf01a6b3069b78d63e5ba4daa0b2ece28bee13",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-performance-gate.test.mjs",
+        "capturedSha256": "4cd09263299aa33599c151dc5d15debac69c581728fc4ce57b7d04707ee8cbee",
+        "currentSha256": "4cd09263299aa33599c151dc5d15debac69c581728fc4ce57b7d04707ee8cbee",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-recovery-upgrade.integration.test.mjs",
+        "capturedSha256": "f96f9e3a7d0659e7a83e4ea49530cc84923ba9df66b59a6657bbc295a083bf62",
+        "currentSha256": "f96f9e3a7d0659e7a83e4ea49530cc84923ba9df66b59a6657bbc295a083bf62",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-recovery.integration.test.mjs",
+        "capturedSha256": "2b4ab8a0cf2c14c6190f67e1f7108bade794e6f4a27bebef7d3279ef8e6d9fa7",
+        "currentSha256": "2b4ab8a0cf2c14c6190f67e1f7108bade794e6f4a27bebef7d3279ef8e6d9fa7",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-recovery.test.mjs",
+        "capturedSha256": "a1f9f2137dac4a1d1c36da38bb909638ca2b8c21abfbd1bdcdea9ef8489229b1",
+        "currentSha256": "a1f9f2137dac4a1d1c36da38bb909638ca2b8c21abfbd1bdcdea9ef8489229b1",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-worker-failure-lock-order.test.mjs",
+        "capturedSha256": "eadb95197197a99b293f9a562f5b4356b5aa97721e9c4e2143aec10373577ec7",
+        "currentSha256": "eadb95197197a99b293f9a562f5b4356b5aa97721e9c4e2143aec10373577ec7",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-worker-history.test.mjs",
+        "capturedSha256": "05564f683ce178a53ae2a1fb4c9b9b7b0b8f9b77bcbeff8518aa40f8bfa4c1d9",
+        "currentSha256": "05564f683ce178a53ae2a1fb4c9b9b7b0b8f9b77bcbeff8518aa40f8bfa4c1d9",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-worker-lock-order.test.mjs",
+        "capturedSha256": "69f6748c66c09be72237ff24b81563679a6e5bc92ab01ef55886879b94ac3cfc",
+        "currentSha256": "69f6748c66c09be72237ff24b81563679a6e5bc92ab01ef55886879b94ac3cfc",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-phase2c-worker.test.mjs",
+        "capturedSha256": "abd2300f16bf4ab387d5fe32fa365588f411ab177ec40424bbb8917f04f6dca0",
+        "currentSha256": "abd2300f16bf4ab387d5fe32fa365588f411ab177ec40424bbb8917f04f6dca0",
+        "unchanged": true
+      },
+      {
+        "file": "test/reliability-score-history-postgres.integration.test.mjs",
+        "capturedSha256": "b9871ad1cfce80a9b6c374c896b8363b1f913d3698f29e37931511497fcddd84",
+        "currentSha256": "b9871ad1cfce80a9b6c374c896b8363b1f913d3698f29e37931511497fcddd84",
+        "unchanged": true
+      },
+      {
+        "file": "test/responsive-player-badge.test.mjs",
+        "capturedSha256": "f4c320a5b287eba764115a867ef59a644db7da4b286a5e3600e949fa0fe06583",
+        "currentSha256": "f4c320a5b287eba764115a867ef59a644db7da4b286a5e3600e949fa0fe06583",
+        "unchanged": true
+      },
+      {
+        "file": "test/roster-team-handicap-presentation.test.mjs",
+        "capturedSha256": "911b9004275986f0a39cff074fa14380112674ed503c787a2d4e3d3685edf975",
+        "currentSha256": "911b9004275986f0a39cff074fa14380112674ed503c787a2d4e3d3685edf975",
+        "unchanged": true
+      },
+      {
+        "file": "test/round-pairing-read-envelope.test.mjs",
+        "capturedSha256": "ad3a8b056580e869a40b0fb0c188f814a26d0feb902a524d4e76792937d5dc7c",
+        "currentSha256": "ad3a8b056580e869a40b0fb0c188f814a26d0feb902a524d4e76792937d5dc7c",
+        "unchanged": true
+      },
+      {
+        "file": "test/round-pairing-workspace.test.mjs",
+        "capturedSha256": "e4c4ab0753eab054cc69eb4ecee896331d3e07c8a7cb9c50ea1ae46c857a847b",
+        "currentSha256": "e4c4ab0753eab054cc69eb4ecee896331d3e07c8a7cb9c50ea1ae46c857a847b",
+        "unchanged": true
+      },
+      {
+        "file": "test/round-pairings.test.mjs",
+        "capturedSha256": "28ee40e55f7de47f96770af2ee724912adee8ee40b73dbd3507cc9ae01328d90",
+        "currentSha256": "28ee40e55f7de47f96770af2ee724912adee8ee40b73dbd3507cc9ae01328d90",
+        "unchanged": true
+      },
+      {
+        "file": "test/round-scorecards-archive.test.mjs",
+        "capturedSha256": "a311f369cefdf7a7f60babbe9a6f77694eb5cc2f1c0f7d9e5afca2227c3f1fec",
+        "currentSha256": "a311f369cefdf7a7f60babbe9a6f77694eb5cc2f1c0f7d9e5afca2227c3f1fec",
+        "unchanged": true
+      },
+      {
+        "file": "test/rules-format-summary.test.mjs",
+        "capturedSha256": "da418756dfcdf1d78dded013cce0b1c31e4ff123b8bcd63e5b172df9e0df7913",
+        "currentSha256": "da418756dfcdf1d78dded013cce0b1c31e4ff123b8bcd63e5b172df9e0df7913",
+        "unchanged": true
+      },
+      {
+        "file": "test/runtime-performance.test.mjs",
+        "capturedSha256": "b959f94aeb1c5de95f6d9930aa1390eba3d17b5b52467b7296822ab1da750893",
+        "currentSha256": "b959f94aeb1c5de95f6d9930aa1390eba3d17b5b52467b7296822ab1da750893",
+        "unchanged": true
+      },
+      {
+        "file": "test/score-typography.test.mjs",
+        "capturedSha256": "f559418aff51f958bf01141635fe619888ed0b73913b559c8c04de65f301c1b9",
+        "currentSha256": "f559418aff51f958bf01141635fe619888ed0b73913b559c8c04de65f301c1b9",
+        "unchanged": true
+      },
+      {
+        "file": "test/scorecard-analytics.test.mjs",
+        "capturedSha256": "3bfb1173bf53cf1eea05aa88d47d0b986919d9e631f59a7b25512e76deff676c",
+        "currentSha256": "3bfb1173bf53cf1eea05aa88d47d0b986919d9e631f59a7b25512e76deff676c",
+        "unchanged": true
+      },
+      {
+        "file": "test/scorecard-calibration.test.mjs",
+        "capturedSha256": "59095a16260c1c9e6490056d4c912ec10a405d10b858b60a4c2329987f2010cb",
+        "currentSha256": "59095a16260c1c9e6490056d4c912ec10a405d10b858b60a4c2329987f2010cb",
+        "unchanged": true
+      },
+      {
+        "file": "test/scorecard-intelligence.test.mjs",
+        "capturedSha256": "c82e742c36caa68d7e34b35fdde2f660979994b325311a8a0bb498e75cbcbb8d",
+        "currentSha256": "c82e742c36caa68d7e34b35fdde2f660979994b325311a8a0bb498e75cbcbb8d",
+        "unchanged": true
+      },
+      {
+        "file": "test/scorecard-net.test.mjs",
+        "capturedSha256": "046e8289072ec6c33f65c38a59d559dc039fa5d17767b0d6a2287e72f05b284a",
+        "currentSha256": "046e8289072ec6c33f65c38a59d559dc039fa5d17767b0d6a2287e72f05b284a",
+        "unchanged": true
+      },
+      {
+        "file": "test/scorecard-public-integration.test.mjs",
+        "capturedSha256": "dfad77abe9251146ea6b906c996fc18ee94695c8648e8f6b680d897b90d9b059",
+        "currentSha256": "dfad77abe9251146ea6b906c996fc18ee94695c8648e8f6b680d897b90d9b059",
+        "unchanged": true
+      },
+      {
+        "file": "test/scorecard-record-leaderboards.test.mjs",
+        "capturedSha256": "8d1845877930bd931f00cefb01af5c6818136d99e04b1c407cd392430079169f",
+        "currentSha256": "8d1845877930bd931f00cefb01af5c6818136d99e04b1c407cd392430079169f",
+        "unchanged": true
+      },
+      {
+        "file": "test/scored-match-resume-contract.test.mjs",
+        "capturedSha256": "ca4940016c8001a2f7b7d2536215ba7535048539a20d53e3c312228173119372",
+        "currentSha256": "ca4940016c8001a2f7b7d2536215ba7535048539a20d53e3c312228173119372",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-access.test.mjs",
+        "capturedSha256": "cd770d96bfe0c397ef4120b088f89f73623c701d814d0a031cb675bb0eb22853",
+        "currentSha256": "cd770d96bfe0c397ef4120b088f89f73623c701d814d0a031cb675bb0eb22853",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-authority-dry-run.test.mjs",
+        "capturedSha256": "8d4778d47d73180057e10de94adfed73a006c1ce8aaf65f573a2a74a2c8a59f8",
+        "currentSha256": "8d4778d47d73180057e10de94adfed73a006c1ce8aaf65f573a2a74a2c8a59f8",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-authority-no-change.test.mjs",
+        "capturedSha256": "c9a4531efe1f26c260c4564a50bc2506a13edffa300f1c7c41c3a3b172bc3fac",
+        "currentSha256": "c9a4531efe1f26c260c4564a50bc2506a13edffa300f1c7c41c3a3b172bc3fac",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-authority-phase2.test.mjs",
+        "capturedSha256": "316376d16fb343499834e61f6a2e5779c8996b1aee40bb9ec06c4bef42a1419e",
+        "currentSha256": "316376d16fb343499834e61f6a2e5779c8996b1aee40bb9ec06c4bef42a1419e",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-authority-specific-provider.test.mjs",
+        "capturedSha256": "c4c53deab3fab9c26ace63204d795602a70f96459bfb885719db622034a0100a",
+        "currentSha256": "c4c53deab3fab9c26ace63204d795602a70f96459bfb885719db622034a0100a",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-client-diagnostics.test.mjs",
+        "capturedSha256": "fc280a64aa708d8158004ae444723030da5c314728dde9cf6b577dece0f71454",
+        "currentSha256": "fc280a64aa708d8158004ae444723030da5c314728dde9cf6b577dece0f71454",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-experience.test.mjs",
+        "capturedSha256": "96498ae369254f967cea345d00c5d3e56c19b753fedb27145d55a3d903ebf88b",
+        "currentSha256": "96498ae369254f967cea345d00c5d3e56c19b753fedb27145d55a3d903ebf88b",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-identity-row-refinement.test.mjs",
+        "capturedSha256": "9dffd3be4d38801e87954bb127753a46cd4ddfd5458af58c90c3ca4635acb9f0",
+        "currentSha256": "9dffd3be4d38801e87954bb127753a46cd4ddfd5458af58c90c3ca4635acb9f0",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-keypad-ux.test.mjs",
+        "capturedSha256": "2c1c7c5575ba877d9a3a587a974131765ed4fd1ba99974056e192958134eb82e",
+        "currentSha256": "2c1c7c5575ba877d9a3a587a974131765ed4fd1ba99974056e192958134eb82e",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-lifecycle.test.mjs",
+        "capturedSha256": "eaeef17471230429775039b6e1e7cb00a2972a253c55e680f6cc55d5ce299af2",
+        "currentSha256": "eaeef17471230429775039b6e1e7cb00a2972a253c55e680f6cc55d5ce299af2",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-mobile-layout-refinement.test.mjs",
+        "capturedSha256": "ed88281620cf7d20d1e97b592cbf712cd389df1384850b387d0ea984c993f23c",
+        "currentSha256": "ed88281620cf7d20d1e97b592cbf712cd389df1384850b387d0ea984c993f23c",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-read-supabase.test.mjs",
+        "capturedSha256": "5c102215559bbaef0bd93cf22a720ba7eac7867a11345ba532e8f88af348a19e",
+        "currentSha256": "5c102215559bbaef0bd93cf22a720ba7eac7867a11345ba532e8f88af348a19e",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-reopen-lifecycle-hardening.test.mjs",
+        "capturedSha256": "140a0b119465e63fa9d6a7754680c2ff890e19c6571ef7d0ea1a1ed4810f27c2",
+        "currentSha256": "140a0b119465e63fa9d6a7754680c2ff890e19c6571ef7d0ea1a1ed4810f27c2",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-revision-handoff.test.mjs",
+        "capturedSha256": "7896cdab412a86ebb5fd25873588416bc6588f78f6db41aa875e4bcaf7b6a75b",
+        "currentSha256": "7896cdab412a86ebb5fd25873588416bc6588f78f6db41aa875e4bcaf7b6a75b",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-shadow-phase-1.test.mjs",
+        "capturedSha256": "5ce15325e3b11d60f44f39da7942ab36986366655bd79241d3f38b0744af98b6",
+        "currentSha256": "5ce15325e3b11d60f44f39da7942ab36986366655bd79241d3f38b0744af98b6",
+        "unchanged": true
+      },
+      {
+        "file": "test/scoring-sync-queue.test.mjs",
+        "capturedSha256": "e1d2ab4f938d1cc33c73d5a2846cb8af3dc1e48bf0c29d25f676a468325ca85e",
+        "currentSha256": "e1d2ab4f938d1cc33c73d5a2846cb8af3dc1e48bf0c29d25f676a468325ca85e",
+        "unchanged": true
+      },
+      {
+        "file": "test/scramble-leaderboard-experience.test.mjs",
+        "capturedSha256": "7e39ab41ba6589381297bf2f37b03d348cfcc9281ef26774494a3d699944b960",
+        "currentSha256": "7e39ab41ba6589381297bf2f37b03d348cfcc9281ef26774494a3d699944b960",
+        "unchanged": true
+      },
+      {
+        "file": "test/seo.test.mjs",
+        "capturedSha256": "d1322ce2393f31a09aae7b0a8d713cec81f8c80be1e32aad0332c4b9c931fc64",
+        "currentSha256": "d1322ce2393f31a09aae7b0a8d713cec81f8c80be1e32aad0332c4b9c931fc64",
+        "unchanged": true
+      },
+      {
+        "file": "test/session-isolation.test.mjs",
+        "capturedSha256": "2c9ee6acccc93cd86a07fb602c1784e9f40110ad9456fb7828d916fd9b78406a",
+        "currentSha256": "2c9ee6acccc93cd86a07fb602c1784e9f40110ad9456fb7828d916fd9b78406a",
+        "unchanged": true
+      },
+      {
+        "file": "test/sitemap-safety.test.mjs",
+        "capturedSha256": "511122f85c64997bfc73b06d11662149b938e660b3a3de0444520c7f5ba13eca",
+        "currentSha256": "511122f85c64997bfc73b06d11662149b938e660b3a3de0444520c7f5ba13eca",
+        "unchanged": true
+      },
+      {
+        "file": "test/sms-hook-acceptance.test.mjs",
+        "capturedSha256": "14dc3726284772c1abb5599bec44e4de8866bc4419ae701e101c47ec366d7212",
+        "currentSha256": "14dc3726284772c1abb5599bec44e4de8866bc4419ae701e101c47ec366d7212",
+        "unchanged": true
+      },
+      {
+        "file": "test/spectator-match-navigation.test.mjs",
+        "capturedSha256": "d41120c11407c846f9133b7ff72278f2ea6d19c6b40a46773267c7e4b18bf598",
+        "currentSha256": "d41120c11407c846f9133b7ff72278f2ea6d19c6b40a46773267c7e4b18bf598",
+        "unchanged": true
+      },
+      {
+        "file": "test/spectator-routes.test.mjs",
+        "capturedSha256": "0d62026f8fcdb72e7803c7690bbc3fe1c65820095a2fba91ac9e39fd01175b58",
+        "currentSha256": "0d62026f8fcdb72e7803c7690bbc3fe1c65820095a2fba91ac9e39fd01175b58",
+        "unchanged": true
+      },
+      {
+        "file": "test/spectator-service.test.mjs",
+        "capturedSha256": "1f6c584b8ff213cd10fa9884e5003bae2673eb19040b4b584c1abdbfbe3f44b4",
+        "currentSha256": "1f6c584b8ff213cd10fa9884e5003bae2673eb19040b4b584c1abdbfbe3f44b4",
+        "unchanged": true
+      },
+      {
+        "file": "test/spectator.test.mjs",
+        "capturedSha256": "efdcf1b462c6a6cde3c3d4d36c11ca331274b0eff3270b21a72022d101b6c0db",
+        "currentSha256": "efdcf1b462c6a6cde3c3d4d36c11ca331274b0eff3270b21a72022d101b6c0db",
+        "unchanged": true
+      },
+      {
+        "file": "test/status-badge.test.mjs",
+        "capturedSha256": "5f7419314c347cef7e99137407c31e4b7d243725d1dc3321e6b7fad46e519034",
+        "currentSha256": "5f7419314c347cef7e99137407c31e4b7d243725d1dc3321e6b7fad46e519034",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10a-production-dormant-workers.test.mjs",
+        "capturedSha256": "bd7a1ab8e433aa38d58ef914e43b87809759fc9ed16006957003cd4a8058a2a7",
+        "currentSha256": "bd7a1ab8e433aa38d58ef914e43b87809759fc9ed16006957003cd4a8058a2a7",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10a-production-foundation-resources.test.mjs",
+        "capturedSha256": "9a6cdfe663cd0cc9b1548dcfc2051118257ac7f7c5eb4e657d24e9221da1caa0",
+        "currentSha256": "9a6cdfe663cd0cc9b1548dcfc2051118257ac7f7c5eb4e657d24e9221da1caa0",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10a-production-import-evidence-hardening.test.mjs",
+        "capturedSha256": "423ff6daf90e2f59728a8e65885142b94e51a76747d4982cf82fe97b5bd25d20",
+        "currentSha256": "423ff6daf90e2f59728a8e65885142b94e51a76747d4982cf82fe97b5bd25d20",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10a-production-projection-imports.test.mjs",
+        "capturedSha256": "5fca1969cd2d184e89dbc3abf0bd9e71972fa9866ea24322e1628b9e95b9c303",
+        "currentSha256": "5fca1969cd2d184e89dbc3abf0bd9e71972fa9866ea24322e1628b9e95b9c303",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10a-production-projection-preparation.test.mjs",
+        "capturedSha256": "5cbe63abd04a1c9824e6c7fa65f6fda376971146d680e74489bc7b7e757e5697",
+        "currentSha256": "5cbe63abd04a1c9824e6c7fa65f6fda376971146d680e74489bc7b7e757e5697",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10a-production-schema-baseline.test.mjs",
+        "capturedSha256": "72d92c120ec591f515f34e970ed04f6807e0fceb1a144b28fcd2ff6a76d0184a",
+        "currentSha256": "72d92c120ec591f515f34e970ed04f6807e0fceb1a144b28fcd2ff6a76d0184a",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10a-production-shadow-imports.test.mjs",
+        "capturedSha256": "99c133bfe0a19d3fc20e74492ec7678781e8af297e968fc45f48e78f5fdc4a44",
+        "currentSha256": "99c133bfe0a19d3fc20e74492ec7678781e8af297e968fc45f48e78f5fdc4a44",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10a-production-shadow-payload-preparation.test.mjs",
+        "capturedSha256": "0853693641a319e46572028cb6a915743b97676493121b6e6e26168cfafebeb3",
+        "currentSha256": "0853693641a319e46572028cb6a915743b97676493121b6e6e26168cfafebeb3",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10b-production-auth-otp-request-fix.test.mjs",
+        "capturedSha256": "883c67bd3daa144f8033e9f48e2e83e4287fc82f2520fe6eed1fc3ead5209dba",
+        "currentSha256": "883c67bd3daa144f8033e9f48e2e83e4287fc82f2520fe6eed1fc3ead5209dba",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10b-production-auth-otp-verification-type.test.mjs",
+        "capturedSha256": "09a34c67a14bbd07a96444a642bc3e9e47ddd8d5fdf7541bb07299e0536d8229",
+        "currentSha256": "09a34c67a14bbd07a96444a642bc3e9e47ddd8d5fdf7541bb07299e0536d8229",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10b-production-auth-provider-observability.test.mjs",
+        "capturedSha256": "e712869830ec5783c5a370a844d6ae4b7b239daba3608b7e7f55b75e2a8cff1a",
+        "currentSha256": "e712869830ec5783c5a370a844d6ae4b7b239daba3608b7e7f55b75e2a8cff1a",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10b-production-current-shadow-v2.test.mjs",
+        "capturedSha256": "2aa2930838c7850285c20b96a5d75ad42b6619d711661105998f5cb1c11a5840",
+        "currentSha256": "2aa2930838c7850285c20b96a5d75ad42b6619d711661105998f5cb1c11a5840",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10b-production-director-identity-bootstrap.test.mjs",
+        "capturedSha256": "69ea6ae9667f3b79f04aabd2038a3e11945739d53afecf886439743cb41dc33b",
+        "currentSha256": "69ea6ae9667f3b79f04aabd2038a3e11945739d53afecf886439743cb41dc33b",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10b-production-odds-input-bootstrap.test.mjs",
+        "capturedSha256": "1b5592b2ad6772d089c401d6902a750096ba412fd5d86a1755a38017a4253cc7",
+        "currentSha256": "1b5592b2ad6772d089c401d6902a750096ba412fd5d86a1755a38017a4253cc7",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10b-production-presentation-shadow.test.mjs",
+        "capturedSha256": "fa294bb588e69693762167d381726aa021bcc346d2d4ef57a9cb20176881d8bf",
+        "currentSha256": "fa294bb588e69693762167d381726aa021bcc346d2d4ef57a9cb20176881d8bf",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10b-production-published-odds-import.test.mjs",
+        "capturedSha256": "48cedaf7fd870c716476320a451b478f0fc8d2197e390e477b951107c9b5686e",
+        "currentSha256": "48cedaf7fd870c716476320a451b478f0fc8d2197e390e477b951107c9b5686e",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10b-production-shadow-auth-boundary.test.mjs",
+        "capturedSha256": "b40028becc081856e51bd23c02f0443481e338e64504440757771cd34577f5d6",
+        "currentSha256": "b40028becc081856e51bd23c02f0443481e338e64504440757771cd34577f5d6",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10b-production-shadow-candidate-adapters.test.mjs",
+        "capturedSha256": "a602c554237b03af91c7295a682e26138276d2a5079c26790296d93348c322bc",
+        "currentSha256": "a602c554237b03af91c7295a682e26138276d2a5079c26790296d93348c322bc",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10b-production-shadow-read-routing.test.mjs",
+        "capturedSha256": "b05db12651af8e65ed9b291f1c9160e538a6aa6c2d5059a911c908ffd6de573f",
+        "currentSha256": "b05db12651af8e65ed9b291f1c9160e538a6aa6c2d5059a911c908ffd6de573f",
+        "unchanged": true
+      },
+      {
+        "file": "test/step10b-production-shadow-scoring-read-only.test.mjs",
+        "capturedSha256": "c288e1f161c8d9bf07f38f9f769359cc06a237a87169817006ce80464eee2b8e",
+        "currentSha256": "c288e1f161c8d9bf07f38f9f769359cc06a237a87169817006ce80464eee2b8e",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-acl-v2-acceptance-generator.test.mjs",
+        "capturedSha256": "9210ab15d2a47a72560d4c0eb685d968f11fe680a133aa231991c15980d2ac3e",
+        "currentSha256": "9210ab15d2a47a72560d4c0eb685d968f11fe680a133aa231991c15980d2ac3e",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-candidate-control-authorization.test.mjs",
+        "capturedSha256": "ecfa20065765c4cecab27317b7d13f4e92ae0476bf7166044fa4a5a9e4b5c9bc",
+        "currentSha256": "ecfa20065765c4cecab27317b7d13f4e92ae0476bf7166044fa4a5a9e4b5c9bc",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-dormant-scoring-admission-inspection.test.mjs",
+        "capturedSha256": "449c5c7d7802b966558f604e87e1d2c71f7f327c9a522e8d4958f13b7efdc237",
+        "currentSha256": "449c5c7d7802b966558f604e87e1d2c71f7f327c9a522e8d4958f13b7efdc237",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-drive-acl-rehearsal-surface.test.mjs",
+        "capturedSha256": "070ab0a9baffe28000b5b836b089fc94405a039e67f43879cc0f8631369ea64c",
+        "currentSha256": "070ab0a9baffe28000b5b836b089fc94405a039e67f43879cc0f8631369ea64c",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-historical-production-google-writer-scope.test.mjs",
+        "capturedSha256": "77e0b90f759db297372abd852aae6393614176f0eff4335d8ea2b4e781448d24",
+        "currentSha256": "77e0b90f759db297372abd852aae6393614176f0eff4335d8ea2b4e781448d24",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-historical-safe-method-google-writer-evidence.test.mjs",
+        "capturedSha256": "1d15e32889131dddd69b57e01ca30d8c2fb9f75206fd0e8ef1239094e596b59c",
+        "currentSha256": "1d15e32889131dddd69b57e01ca30d8c2fb9f75206fd0e8ef1239094e596b59c",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-legacy-google-mutation-inventory.test.mjs",
+        "capturedSha256": "6dfd215909f3199e65054d5f723fa16e85c0fab8124f7d876662ece96f98f6a5",
+        "currentSha256": "6dfd215909f3199e65054d5f723fa16e85c0fab8124f7d876662ece96f98f6a5",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-production-google-credential-confinement.test.mjs",
+        "capturedSha256": "3960f5d8774a57b28ff86b949547f11880f492af0c79f84ef16d585335d45e4a",
+        "currentSha256": "3960f5d8774a57b28ff86b949547f11880f492af0c79f84ef16d585335d45e4a",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-production-google-writer-boundary.test.mjs",
+        "capturedSha256": "5a4f1d3b830cf74a9c0afae0021db7fab427a43a0156a20f665e7de8ee5f2175",
+        "currentSha256": "5a4f1d3b830cf74a9c0afae0021db7fab427a43a0156a20f665e7de8ee5f2175",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-production-google-writer-critical-window-waf.test.mjs",
+        "capturedSha256": "18dfb72c3459a0d86973d95eb9bb704a5ddbe58cec0fea6d365e66127657fbb7",
+        "currentSha256": "18dfb72c3459a0d86973d95eb9bb704a5ddbe58cec0fea6d365e66127657fbb7",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-production-google-writer-fence-rehearsal.test.mjs",
+        "capturedSha256": "7519921ca1626cf77f8e7b60214eb051b75e6c56353f3cf56fdb25a802a7645b",
+        "currentSha256": "7519921ca1626cf77f8e7b60214eb051b75e6c56353f3cf56fdb25a802a7645b",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-production-google-writer-quiesce.test.mjs",
+        "capturedSha256": "170e13ecbd1da6448c5fd36a115c2be72a79dd90a71def60ac30fad7eba32eda",
+        "currentSha256": "170e13ecbd1da6448c5fd36a115c2be72a79dd90a71def60ac30fad7eba32eda",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-production-origin-inventory-v3.test.mjs",
+        "capturedSha256": "71c29aed9b0558b2503afaa3990b652d55d3a78f7a2e89fbbcae88fcf4883820",
+        "currentSha256": "71c29aed9b0558b2503afaa3990b652d55d3a78f7a2e89fbbcae88fcf4883820",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-production-origin-inventory-v4.test.mjs",
+        "capturedSha256": "fbd582bd76ed575cff68a368d270d110ca08918b9b3485ec2a0e9d76592d226e",
+        "currentSha256": "fbd582bd76ed575cff68a368d270d110ca08918b9b3485ec2a0e9d76592d226e",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-provider-attestation-client.test.mjs",
+        "capturedSha256": "a20c0029cf1215942622d90e1630bd5e7b3962e79b9cb5cb9d21a9d8f50b0e5a",
+        "currentSha256": "a20c0029cf1215942622d90e1630bd5e7b3962e79b9cb5cb9d21a9d8f50b0e5a",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-rejected-waf-recovery-inspection.test.mjs",
+        "capturedSha256": "16fb16e57febdcffb3044581f08d90f031a93e354ccf51931f2e0dfcdecab82a",
+        "currentSha256": "16fb16e57febdcffb3044581f08d90f031a93e354ccf51931f2e0dfcdecab82a",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-vercel-environment-resource-review.test.mjs",
+        "capturedSha256": "1af50b49644b07c8a2a456d8647f92ec10765bfd6ba2578e3cc00cf0b026555a",
+        "currentSha256": "1af50b49644b07c8a2a456d8647f92ec10765bfd6ba2578e3cc00cf0b026555a",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-vercel-provider-attestation.test.mjs",
+        "capturedSha256": "1e83d9bf5febf4a6ac56356ef2c5ae66884063a34caa1dcfce0e6080b2751247",
+        "currentSha256": "1e83d9bf5febf4a6ac56356ef2c5ae66884063a34caa1dcfce0e6080b2751247",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-vercel-waf-provider-executor.test.mjs",
+        "capturedSha256": "cbc9984f7e846f3e05f50c90a9befc2e89de09eb9e52dc7a2449f3855602db16",
+        "currentSha256": "cbc9984f7e846f3e05f50c90a9befc2e89de09eb9e52dc7a2449f3855602db16",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-6-waf-critical-epoch-receipt-server.test.mjs",
+        "capturedSha256": "a55ce3310f1e8ebf772deae0cc32fd12604ca4af724864cdba341216e3ee96d7",
+        "currentSha256": "a55ce3310f1e8ebf772deae0cc32fd12604ca4af724864cdba341216e3ee96d7",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-direct-vercel-hostname.test.mjs",
+        "capturedSha256": "827f2b03c1a168307f67f0cc5b240acdeca944a1fa959bcbedb13a982336e5e6",
+        "currentSha256": "827f2b03c1a168307f67f0cc5b240acdeca944a1fa959bcbedb13a982336e5e6",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-activation-safety.test.mjs",
+        "capturedSha256": "5a5cb4b99afd59b9465f698946bf29330712593b739c6b322ce725e4f28add9a",
+        "currentSha256": "5a5cb4b99afd59b9465f698946bf29330712593b739c6b322ce725e4f28add9a",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-cutover-activation-migration.test.mjs",
+        "capturedSha256": "bc56231655e01bae0755cc288f219d44a5dd5ac1bc94a8b29ff9d3832b73914e",
+        "currentSha256": "bc56231655e01bae0755cc288f219d44a5dd5ac1bc94a8b29ff9d3832b73914e",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-cutover-read-sources.test.mjs",
+        "capturedSha256": "7c4bafe2061fe00e06152fe52d74f559ab0234ff5b6b144e296ae511a8cab51c",
+        "currentSha256": "7c4bafe2061fe00e06152fe52d74f559ab0234ff5b6b144e296ae511a8cab51c",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-director-projection-synchronization.test.mjs",
+        "capturedSha256": "7c9af2ae8142cbb55568f7ebc8671d5d2635e5e223cd30520ae2d84eec9840d9",
+        "currentSha256": "7c9af2ae8142cbb55568f7ebc8671d5d2635e5e223cd30520ae2d84eec9840d9",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-google-credentials.test.mjs",
+        "capturedSha256": "361eae00f32592b1822a7049d197020f909420943f9b1f1cc54479721abde577",
+        "currentSha256": "361eae00f32592b1822a7049d197020f909420943f9b1f1cc54479721abde577",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-odds-calculation.test.mjs",
+        "capturedSha256": "3b362edb9ea70ea84b546c688bfa21918e0b702938c9fe8b73a299a691789e82",
+        "currentSha256": "3b362edb9ea70ea84b546c688bfa21918e0b702938c9fe8b73a299a691789e82",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-odds-observation-phase.test.mjs",
+        "capturedSha256": "b03d286b32ca80169f69c69310baa97664b8033007f8ccb8c87417f5bc998971",
+        "currentSha256": "b03d286b32ca80169f69c69310baa97664b8033007f8ccb8c87417f5bc998971",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-odds-rehearsal-fixture.test.mjs",
+        "capturedSha256": "161d91647d950ef0e8d42aa8e690e84b305c4aa9df501b2deca2806ff6ebd630",
+        "currentSha256": "161d91647d950ef0e8d42aa8e690e84b305c4aa9df501b2deca2806ff6ebd630",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-odds-runtime-input-read.test.mjs",
+        "capturedSha256": "c072d49c9e320ceaa5cca4f5c32a913126735aaa970e862b8bdef52c819932cc",
+        "currentSha256": "c072d49c9e320ceaa5cca4f5c32a913126735aaa970e862b8bdef52c819932cc",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-odds-runtime-transition-nonce.test.mjs",
+        "capturedSha256": "1315ebbea6fecdffd8f89da52672ba87bdae365b3f0988dfceb2b5d3683e0d14",
+        "currentSha256": "1315ebbea6fecdffd8f89da52672ba87bdae365b3f0988dfceb2b5d3683e0d14",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-odds-service-authorization.test.mjs",
+        "capturedSha256": "a0fce60e2f9a0dfa3186bd0aef7aa9dc06e1ea517fec4c67a14551f0752384eb",
+        "currentSha256": "a0fce60e2f9a0dfa3186bd0aef7aa9dc06e1ea517fec4c67a14551f0752384eb",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-participant-auth-cutover.test.mjs",
+        "capturedSha256": "c15755d0f07b1948539507aea0c5e191f96a8de9199c6a4a0656463637ec9376",
+        "currentSha256": "c15755d0f07b1948539507aea0c5e191f96a8de9199c6a4a0656463637ec9376",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-precommit-release-abort.test.mjs",
+        "capturedSha256": "e646344f4a8c3770c62b9f5a605d7f64e21ddb238fc03a2e14cbb8c2051296ab",
+        "currentSha256": "e646344f4a8c3770c62b9f5a605d7f64e21ddb238fc03a2e14cbb8c2051296ab",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-reviewed-post-capture-preview-deployments.test.mjs",
+        "capturedSha256": "7c5f984cfa66a7e3d8a616152d15c245def539b120d529f826f0c3cf9fea5bcc",
+        "currentSha256": "7c5f984cfa66a7e3d8a616152d15c245def539b120d529f826f0c3cf9fea5bcc",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-scoring-admission-fence-v2.test.mjs",
+        "capturedSha256": "5bac1477603121b3de5c308cb8f5946a6211f543d9535f298884fc9038b9b63d",
+        "currentSha256": "5bac1477603121b3de5c308cb8f5946a6211f543d9535f298884fc9038b9b63d",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-scoring-completed-history-fixture.test.mjs",
+        "capturedSha256": "4718b07d9f2a931bbdbe1042d687485b46be3deec6c1126224a1977910610514",
+        "currentSha256": "4718b07d9f2a931bbdbe1042d687485b46be3deec6c1126224a1977910610514",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-scoring-operations.test.mjs",
+        "capturedSha256": "1b06b25564966a2c8c8d5b10bcc2801f04d1558b8a65a5ecc33b31b4253d01be",
+        "currentSha256": "1b06b25564966a2c8c8d5b10bcc2801f04d1558b8a65a5ecc33b31b4253d01be",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-scoring-rehearsal-route.test.mjs",
+        "capturedSha256": "8fa44c7e18dd711fbeec1b1007faa3fac454f9da7bef0810409adc032cbb7e41",
+        "currentSha256": "8fa44c7e18dd711fbeec1b1007faa3fac454f9da7bef0810409adc032cbb7e41",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-scoring-rehearsal.test.mjs",
+        "capturedSha256": "cdaf89942c382347616e3f0267d91a3337725f1503c33aa911167e3c6afeeb5f",
+        "currentSha256": "cdaf89942c382347616e3f0267d91a3337725f1503c33aa911167e3c6afeeb5f",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-security-preflight-hardening.test.mjs",
+        "capturedSha256": "39db41c3da9eb75b69f199ecde8bce88b5b708af28f17578028056200ca57c16",
+        "currentSha256": "39db41c3da9eb75b69f199ecde8bce88b5b708af28f17578028056200ca57c16",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-production-staged-release-abort.test.mjs",
+        "capturedSha256": "fbb62a39d8b19e0e2d57a553371fd21ebc36edc90da87b3bdce4063df0c4290b",
+        "currentSha256": "fbb62a39d8b19e0e2d57a553371fd21ebc36edc90da87b3bdce4063df0c4290b",
+        "unchanged": true
+      },
+      {
+        "file": "test/step11-pwa-network-boundaries.test.mjs",
+        "capturedSha256": "c0de5480dbe7379ca149b04a4980ddce9bea4a505cd808abcaad0f52f614607e",
+        "currentSha256": "c0de5480dbe7379ca149b04a4980ddce9bea4a505cd808abcaad0f52f614607e",
+        "unchanged": true
+      },
+      {
+        "file": "test/step12-production-google-drive-acl-fence.test.mjs",
+        "capturedSha256": "b8ef6b0315b81010304118b10e86c74492dd392f43239739f9b3088dbc2a4117",
+        "currentSha256": "b8ef6b0315b81010304118b10e86c74492dd392f43239739f9b3088dbc2a4117",
+        "unchanged": true
+      },
+      {
+        "file": "test/step12-production-participant-identity-partial-roster.test.mjs",
+        "capturedSha256": "54db9774ae1a87ee5db37aa9e0750935612512855a21b3185c61f5f3f6aa3f0a",
+        "currentSha256": "54db9774ae1a87ee5db37aa9e0750935612512855a21b3185c61f5f3f6aa3f0a",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13a-production-net-skins-v1.test.mjs",
+        "capturedSha256": "a6d90b7c7b7c1abe354a61344c42e71d71d0f4c1208d3da160d5f3ce862feabb",
+        "currentSha256": "a6d90b7c7b7c1abe354a61344c42e71d71d0f4c1208d3da160d5f3ce862feabb",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13b-production-calcutta-v1.test.mjs",
+        "capturedSha256": "1913e02482019d830136242fc55700766ede589df5cb8987907c02e7c93b4811",
+        "currentSha256": "1913e02482019d830136242fc55700766ede589df5cb8987907c02e7c93b4811",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13c-odds-publication-migration.test.mjs",
+        "capturedSha256": "4de6e73f73120bf7a080368cf8f0dd454b0c22cbb0771beef11f842213435f06",
+        "currentSha256": "4de6e73f73120bf7a080368cf8f0dd454b0c22cbb0771beef11f842213435f06",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13c-odds-publication-runtime.test.mjs",
+        "capturedSha256": "fa254f34137c4c132c258951112c0bd34c4c276959a6fe0436ffe24973b5b6a3",
+        "currentSha256": "fa254f34137c4c132c258951112c0bd34c4c276959a6fe0436ffe24973b5b6a3",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e1-production-director-console-foundation.test.mjs",
+        "capturedSha256": "d3d1d7f86863032877fbce46b79f7e02e1ee24a8fd47e4e0aa35bbef0947ad86",
+        "currentSha256": "d3d1d7f86863032877fbce46b79f7e02e1ee24a8fd47e4e0aa35bbef0947ad86",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e1-production-handicap-management.test.mjs",
+        "capturedSha256": "9798bd4f1d1cf1bb1ce17ab17cec7822a891eeab37885430f445f907a0f7fb90",
+        "currentSha256": "9798bd4f1d1cf1bb1ce17ab17cec7822a891eeab37885430f445f907a0f7fb90",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e1-production-handicap-migration.test.mjs",
+        "capturedSha256": "c956235a007a60a1167c640468de8dc707ac2233dc00686f8f3e977d246690d9",
+        "currentSha256": "c956235a007a60a1167c640468de8dc707ac2233dc00686f8f3e977d246690d9",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e1-weekly-handicap-ui.test.mjs",
+        "capturedSha256": "1d770a9572e83fc1bb0ba26db9eea15efd31c7879e6322207712cc2eadc0b277",
+        "currentSha256": "1d770a9572e83fc1bb0ba26db9eea15efd31c7879e6322207712cc2eadc0b277",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e2-production-director-operations.test.mjs",
+        "capturedSha256": "5378eb2d00912b85a4451f76428e4332154a75244015c6f14e20d95165ab596b",
+        "currentSha256": "5378eb2d00912b85a4451f76428e4332154a75244015c6f14e20d95165ab596b",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e3-production-director-private-operations.test.mjs",
+        "capturedSha256": "4af6e352aee5a384652d02c3382c2ab55a808777642b198aa2d0409163249020",
+        "currentSha256": "4af6e352aee5a384652d02c3382c2ab55a808777642b198aa2d0409163249020",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e4-production-director-players-access-ui.test.mjs",
+        "capturedSha256": "67268226ff2a49204c4a95dd78ae2fa71d0c364aacd5c826d97f6430e6aeb663",
+        "currentSha256": "67268226ff2a49204c4a95dd78ae2fa71d0c364aacd5c826d97f6430e6aeb663",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e4-production-player-access-contract.test.mjs",
+        "capturedSha256": "b08e1248e865bc0eb559434ae17b7490d828b1dbe8a6f503d018699f73cd7302",
+        "currentSha256": "b08e1248e865bc0eb559434ae17b7490d828b1dbe8a6f503d018699f73cd7302",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e4-production-player-access-security.test.mjs",
+        "capturedSha256": "fa231aa7116bf8b3ffc9dedb9d785e552d56936f4d7885140940d627a31b6fea",
+        "currentSha256": "fa231aa7116bf8b3ffc9dedb9d785e552d56936f4d7885140940d627a31b6fea",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e5-production-access-governance-contract.test.mjs",
+        "capturedSha256": "da5fc5b5cff976cbe1da319204d14c709e6cde417ce4cddefe8437a59060ab95",
+        "currentSha256": "da5fc5b5cff976cbe1da319204d14c709e6cde417ce4cddefe8437a59060ab95",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e5-production-access-governance.test.mjs",
+        "capturedSha256": "2d9f83edb7450361f1d5301185d867a64278f2bac9cc1c5f405436a5ee277558",
+        "currentSha256": "2d9f83edb7450361f1d5301185d867a64278f2bac9cc1c5f405436a5ee277558",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e5a1-initial-owner-adoption-guard.test.mjs",
+        "capturedSha256": "78e2b421313d3dbe33517f0dbe8847d46165475bf164650d48c6bfbb55c9e658",
+        "currentSha256": "78e2b421313d3dbe33517f0dbe8847d46165475bf164650d48c6bfbb55c9e658",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e6-production-tournament-setup-application.test.mjs",
+        "capturedSha256": "1cda10177cfd8a20ff9729d09195fc8150f536967941e3905a64419175a16dfc",
+        "currentSha256": "1cda10177cfd8a20ff9729d09195fc8150f536967941e3905a64419175a16dfc",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e6-production-tournament-setup-sql-contract.test.mjs",
+        "capturedSha256": "1c928bb8d862525787ddc382cd56a28e787c4b0e3b20f6da29ead96f08bd6717",
+        "currentSha256": "1c928bb8d862525787ddc382cd56a28e787c4b0e3b20f6da29ead96f08bd6717",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7-production-future-year-administration-application.test.mjs",
+        "capturedSha256": "33c58adf0d5d63870ce099bbd6256e4aa44dc23a6d7ec4770645e83ab989fdec",
+        "currentSha256": "33c58adf0d5d63870ce099bbd6256e4aa44dc23a6d7ec4770645e83ab989fdec",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7-production-future-year-administration-sql-contract.test.mjs",
+        "capturedSha256": "a284699b37d0214f805eb180b81a847d247fa9f5ae9763504e180c09b0a92030",
+        "currentSha256": "a284699b37d0214f805eb180b81a847d247fa9f5ae9763504e180c09b0a92030",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7-production-future-year-administration-ui.test.mjs",
+        "capturedSha256": "aa50dd724df9c2e66f1cb7ed64e5dc9af528716c9f96db8416f658aff949a5c1",
+        "currentSha256": "aa50dd724df9c2e66f1cb7ed64e5dc9af528716c9f96db8416f658aff949a5c1",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7a-future-match-google-compatibility-worker.test.mjs",
+        "capturedSha256": "b7f14307bf9b8cb834127e3234818d7e41767e79ed8cb7e0507bd38162c39832",
+        "currentSha256": "b7f14307bf9b8cb834127e3234818d7e41767e79ed8cb7e0507bd38162c39832",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7a-production-annual-projection-sync.test.mjs",
+        "capturedSha256": "36acf3185b435fbc5f4c0243c785dc9faaa756e70d2e3100bbe1ff324fd94773",
+        "currentSha256": "36acf3185b435fbc5f4c0243c785dc9faaa756e70d2e3100bbe1ff324fd94773",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7a-production-current-scoring-runtime-sql-contract.test.mjs",
+        "capturedSha256": "69c51a63d038481cfab433d32f8d29854196ac45d4f3697f41fe8f7ca903ec50",
+        "currentSha256": "69c51a63d038481cfab433d32f8d29854196ac45d4f3697f41fe8f7ca903ec50",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7a-production-current-tournament-runtime.test.mjs",
+        "capturedSha256": "8b3fff1a799dbce31d29edebc98931df98226c4597aefed4a9f2b9c1b9c1928e",
+        "currentSha256": "8b3fff1a799dbce31d29edebc98931df98226c4597aefed4a9f2b9c1b9c1928e",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7a-production-future-identity-runtime.test.mjs",
+        "capturedSha256": "1cb408632edf46e9e46788d78412c5dce1ccdcef989fa7770668bd86acb4d074",
+        "currentSha256": "1cb408632edf46e9e46788d78412c5dce1ccdcef989fa7770668bd86acb4d074",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7a-production-future-runtime-application.test.mjs",
+        "capturedSha256": "4fe52ec5f056b1af76fdfe9c04c945b9353a4bc85b2e7f9c78b8b520af7f6ec7",
+        "currentSha256": "4fe52ec5f056b1af76fdfe9c04c945b9353a4bc85b2e7f9c78b8b520af7f6ec7",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7b-production-annual-google-writer-certification.test.mjs",
+        "capturedSha256": "156c3d7e4fa3e039a7b9d0df6e0d9330266de5ebb2de8434455a7b5b06d3db47",
+        "currentSha256": "156c3d7e4fa3e039a7b9d0df6e0d9330266de5ebb2de8434455a7b5b06d3db47",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7b-production-annual-reads-workers.test.mjs",
+        "capturedSha256": "dda3f55672b7406d830e0a3a2ed378ad0a72f56761d66adbb8f103d1e3c0366c",
+        "currentSha256": "dda3f55672b7406d830e0a3a2ed378ad0a72f56761d66adbb8f103d1e3c0366c",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7b-production-annual-scoring-dispatch.test.mjs",
+        "capturedSha256": "f763676cd03704b8b97bda71bd0d56f855e5d5b1341198e496447e6931d3bda6",
+        "currentSha256": "f763676cd03704b8b97bda71bd0d56f855e5d5b1341198e496447e6931d3bda6",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7b-production-current-match-authorization.test.mjs",
+        "capturedSha256": "796ff840ee3bda7e969767fb9257aaf8e4f5804f54c68b59aa6f0e8f3070932e",
+        "currentSha256": "796ff840ee3bda7e969767fb9257aaf8e4f5804f54c68b59aa6f0e8f3070932e",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7b-production-future-identity-mobile.test.mjs",
+        "capturedSha256": "d0e618dbaf20f59337bc099ea0a8bd5ef22e871f185b8a2c3bbe1bf89a22d49b",
+        "currentSha256": "d0e618dbaf20f59337bc099ea0a8bd5ef22e871f185b8a2c3bbe1bf89a22d49b",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7b1-production-annual-calcutta.test.mjs",
+        "capturedSha256": "a9c5d4e4ca94e28e82dee32edf2f1ff71a039614d40e6b6c9d710d0b4ec9f31c",
+        "currentSha256": "a9c5d4e4ca94e28e82dee32edf2f1ff71a039614d40e6b6c9d710d0b4ec9f31c",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7b1-production-annual-net-skins.test.mjs",
+        "capturedSha256": "92ff6d9055136585730f1b424b70f2f7e5bfd33f0f2318781db851641691c681",
+        "currentSha256": "92ff6d9055136585730f1b424b70f2f7e5bfd33f0f2318781db851641691c681",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7b1-production-annual-odds.test.mjs",
+        "capturedSha256": "116ce6935f154fda970d1d9e292c81cfabeac2d2db95481f2cc971c44eb971fe",
+        "currentSha256": "116ce6935f154fda970d1d9e292c81cfabeac2d2db95481f2cc971c44eb971fe",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e7b1-production-annual-side-game-activation.test.mjs",
+        "capturedSha256": "672bf74f9a4498abb287b4799f02ec3ad4acbd2b38e8a355459a5b4c13921845",
+        "currentSha256": "672bf74f9a4498abb287b4799f02ec3ad4acbd2b38e8a355459a5b4c13921845",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e8a-production-prediction-settings-boundaries.test.mjs",
+        "capturedSha256": "800c0208de824f199a284a3fefad09a0d07d4c6e031f301e6a6555053bad75d1",
+        "currentSha256": "800c0208de824f199a284a3fefad09a0d07d4c6e031f301e6a6555053bad75d1",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e8a-production-prediction-settings.test.mjs",
+        "capturedSha256": "fe7630ae48a70c63d82f5b9116119497367e9d7ae8f504273dbd677a5f1b4a0b",
+        "currentSha256": "fe7630ae48a70c63d82f5b9116119497367e9d7ae8f504273dbd677a5f1b4a0b",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e8b-production-draft-boundaries.test.mjs",
+        "capturedSha256": "53c7115481747d6a46f6e9a9e0707cec3454d26e669f4660dbd92e00ae2b3dee",
+        "currentSha256": "53c7115481747d6a46f6e9a9e0707cec3454d26e669f4660dbd92e00ae2b3dee",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e8b-production-draft-ui.test.mjs",
+        "capturedSha256": "873c2d2a9bbe5121bd9dca19b22711f99d8b5043524cc8e11b1ee0d49a777687",
+        "currentSha256": "873c2d2a9bbe5121bd9dca19b22711f99d8b5043524cc8e11b1ee0d49a777687",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e8b-runtime-draft-authoring.test.mjs",
+        "capturedSha256": "395ce84374f9350bef08295e898296a32ccc1e9226305419eace286e6c678c8b",
+        "currentSha256": "395ce84374f9350bef08295e898296a32ccc1e9226305419eace286e6c678c8b",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e8c-production-guide-retirement.test.mjs",
+        "capturedSha256": "848674b8cfe731f375e6e37aecee31a885f97d6e991f6176dd43928ef3a86c05",
+        "currentSha256": "848674b8cfe731f375e6e37aecee31a885f97d6e991f6176dd43928ef3a86c05",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e8c-production-guide-ui.test.mjs",
+        "capturedSha256": "9644fe8aa901caf6ddbc851cd24e7e9e4a08459917343743cf4db5ff53f182d9",
+        "currentSha256": "9644fe8aa901caf6ddbc851cd24e7e9e4a08459917343743cf4db5ff53f182d9",
+        "unchanged": true
+      },
+      {
+        "file": "test/step13e8c-runtime-guide-authoring.test.mjs",
+        "capturedSha256": "c92dc9d0f57ed4727570ee1e3d6a6549be7780b82afe153ba2bdc7a6ffeb8786",
+        "currentSha256": "c92dc9d0f57ed4727570ee1e3d6a6549be7780b82afe153ba2bdc7a6ffeb8786",
+        "unchanged": true
+      },
+      {
+        "file": "test/step14a-participant-route-availability.test.mjs",
+        "capturedSha256": "8962d67ef5c1a9f023afa93f3a442adbe09bf219d04bc432d436e28a6493c05b",
+        "currentSha256": "8962d67ef5c1a9f023afa93f3a442adbe09bf219d04bc432d436e28a6493c05b",
+        "unchanged": true
+      },
+      {
+        "file": "test/step14b-public-navigation.test.mjs",
+        "capturedSha256": "36ff63f408f18e1d45f314b6fb6d3907b9ee0a27f1cb6dc44506849423b970ba",
+        "currentSha256": "36ff63f408f18e1d45f314b6fb6d3907b9ee0a27f1cb6dc44506849423b970ba",
+        "unchanged": true
+      },
+      {
+        "file": "test/step14c-advanced-analytics-tables.test.mjs",
+        "capturedSha256": "1b9a74813476d1d7fd13b9d7e6cc441ad225f1815d11cf6d3c1a910fa626f20c",
+        "currentSha256": "1b9a74813476d1d7fd13b9d7e6cc441ad225f1815d11cf6d3c1a910fa626f20c",
+        "unchanged": true
+      },
+      {
+        "file": "test/step14d-read-path-performance.test.mjs",
+        "capturedSha256": "ba440509a623524fb8da3331875c26ef0544e92b3d86d2cecbd30b043c0840da",
+        "currentSha256": "ba440509a623524fb8da3331875c26ef0544e92b3d86d2cecbd30b043c0840da",
+        "unchanged": true
+      },
+      {
+        "file": "test/step14e-live-draft-guide-polish.test.mjs",
+        "capturedSha256": "e51639babb8b89f7d6c6c5ec92792fade4ad3b65eb46005069a334d85dc11f8a",
+        "currentSha256": "e51639babb8b89f7d6c6c5ec92792fade4ad3b65eb46005069a334d85dc11f8a",
+        "unchanged": true
+      },
+      {
+        "file": "test/step14f-seo-metadata-accessibility.test.mjs",
+        "capturedSha256": "077c388055a8b20ac0b8c0f98b6ed5c911d5fe14d2047dff4178fff0c6222606",
+        "currentSha256": "077c388055a8b20ac0b8c0f98b6ed5c911d5fe14d2047dff4178fff0c6222606",
+        "unchanged": true
+      },
+      {
+        "file": "test/step14g-legacy-human-ui-cleanup.test.mjs",
+        "capturedSha256": "26b033505da4bc81900408565d55658d334f73581a635bae72e7b284c592af4d",
+        "currentSha256": "26b033505da4bc81900408565d55658d334f73581a635bae72e7b284c592af4d",
+        "unchanged": true
+      },
+      {
+        "file": "test/step14h-pwa-installability-retirement.test.mjs",
+        "capturedSha256": "cccc6d425d530834b40f8e14b550db9fd76e6e7ef7464e9d84db0ddf9ef1bc0a",
+        "currentSha256": "cccc6d425d530834b40f8e14b550db9fd76e6e7ef7464e9d84db0ddf9ef1bc0a",
+        "unchanged": true
+      },
+      {
+        "file": "test/step9-1-authority-selectors.test.mjs",
+        "capturedSha256": "3acc780240236262e13e39944ddfbfe135130bca9078d7043ee0172aeabb2246",
+        "currentSha256": "3acc780240236262e13e39944ddfbfe135130bca9078d7043ee0172aeabb2246",
+        "unchanged": true
+      },
+      {
+        "file": "test/step9-1-data-authority-request.test.mjs",
+        "capturedSha256": "399edcb9a1c4b37d87d371cb4155a05d4657276a4eb4b2eb6caab97912510c44",
+        "currentSha256": "399edcb9a1c4b37d87d371cb4155a05d4657276a4eb4b2eb6caab97912510c44",
+        "unchanged": true
+      },
+      {
+        "file": "test/step9-1-director-mutation-authority.test.mjs",
+        "capturedSha256": "3bbec36479f7b10199eaa8ccab76bbce0450d1f3b7259eaf793c231715877dce",
+        "currentSha256": "3bbec36479f7b10199eaa8ccab76bbce0450d1f3b7259eaf793c231715877dce",
+        "unchanged": true
+      },
+      {
+        "file": "test/step9-1-network-certification-route.test.mjs",
+        "capturedSha256": "d6812371329dc5923e4d34a909cf90e703a0c028bc903b6246635c17f132dd94",
+        "currentSha256": "d6812371329dc5923e4d34a909cf90e703a0c028bc903b6246635c17f132dd94",
+        "unchanged": true
+      },
+      {
+        "file": "test/step9-data-authority-cleanup.test.mjs",
+        "capturedSha256": "78d66469b16c9d62571e8aa4572611162ea4bcd2f1260190e3556728955a6749",
+        "currentSha256": "78d66469b16c9d62571e8aa4572611162ea4bcd2f1260190e3556728955a6749",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/canonical-projection-audit.mjs",
+        "capturedSha256": "336a356f578c369ac559dbf5b6a6569783771476452627a7ac896c67c3c82544",
+        "currentSha256": "336a356f578c369ac559dbf5b6a6569783771476452627a7ac896c67c3c82544",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/mobile-opaque-match-id-cases.mjs",
+        "capturedSha256": "0d501e7bacd071faefd4780f6f0c77a4dde2610cff27f2fe49b71919256e1e5a",
+        "currentSha256": "0d501e7bacd071faefd4780f6f0c77a4dde2610cff27f2fe49b71919256e1e5a",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/mobile-v1-schema-validator.mjs",
+        "capturedSha256": "85661fe36fd4887c22333120bf8d5400db3efd56e4496c07343c251633a1d9bd",
+        "currentSha256": "85661fe36fd4887c22333120bf8d5400db3efd56e4496c07343c251633a1d9bd",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/player-round-performance-fixture.mjs",
+        "capturedSha256": "aaef67b2a8041d130a3445d9885d27fc3aa7f633021d3b6019068d27f8597563",
+        "currentSha256": "aaef67b2a8041d130a3445d9885d27fc3aa7f633021d3b6019068d27f8597563",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/benchmark-result-validation.mjs",
+        "capturedSha256": "b7ebaa83eb06bc8efcec61ec0f95d577b9dae1147011ca954d7dc925fd0ab8e0",
+        "currentSha256": "b7ebaa83eb06bc8efcec61ec0f95d577b9dae1147011ca954d7dc925fd0ab8e0",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2-score-fixture.mjs",
+        "capturedSha256": "0f181715ed756090e79e43b40ecacbf591c2df194b7ac178d9ec11bf5e07b8cd",
+        "currentSha256": "0f181715ed756090e79e43b40ecacbf591c2df194b7ac178d9ec11bf5e07b8cd",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2c-annual-history.mjs",
+        "capturedSha256": "6775d19899ebee60e20edf6b16c74b96dfa15629d20e46de149ee49c254c4f37",
+        "currentSha256": "6775d19899ebee60e20edf6b16c74b96dfa15629d20e46de149ee49c254c4f37",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2c-annual-worker-branches.mjs",
+        "capturedSha256": "5a20dc082eaf360aec8ac539f9422085332f9e2b5c325fbd5f30da45ae2945de",
+        "currentSha256": "5a20dc082eaf360aec8ac539f9422085332f9e2b5c325fbd5f30da45ae2945de",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2c-annual-workers.mjs",
+        "capturedSha256": "b334bfd457774f0bca9f25587d03ff0a3122f256fb38de39a4cb138706350695",
+        "currentSha256": "b334bfd457774f0bca9f25587d03ff0a3122f256fb38de39a4cb138706350695",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2c-audit-index-plans.mjs",
+        "capturedSha256": "d1e52fba0ed57ab89f207dd4f31ce3f2c4a8ebf01c9a0928862f671e0bdc59a8",
+        "currentSha256": "d1e52fba0ed57ab89f207dd4f31ce3f2c4a8ebf01c9a0928862f671e0bdc59a8",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2c-calculation-crash-hook.mjs",
+        "capturedSha256": "69fc82b9b8a45f9ea60024fa5a064e5950f227c68a269e9e6651f00b7df8b766",
+        "currentSha256": "69fc82b9b8a45f9ea60024fa5a064e5950f227c68a269e9e6651f00b7df8b766",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2c-delivery-indexes.json",
+        "capturedSha256": "547c7ccd2aaff77bd46e86923b14a806ee4b815b1335f57b1568279203a9ed1b",
+        "currentSha256": "547c7ccd2aaff77bd46e86923b14a806ee4b815b1335f57b1568279203a9ed1b",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2c-final-publication-plans.mjs",
+        "capturedSha256": "f8f584d53e7a3824329450d487210352632c7bd119b922a7eca30b2a631a045e",
+        "currentSha256": "f8f584d53e7a3824329450d487210352632c7bd119b922a7eca30b2a631a045e",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2c-fixture.mjs",
+        "capturedSha256": "05baa6942445a7e3e2c69e81567edc9435108b47e1fe548d3f387c3c72d452e7",
+        "currentSha256": "05baa6942445a7e3e2c69e81567edc9435108b47e1fe548d3f387c3c72d452e7",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2c-future-score-fixture.mjs",
+        "capturedSha256": "90c5cae79c3ecf6ce58608d0506ce2e53006a8af7759ebf53e78e25aaf04f9cb",
+        "currentSha256": "90c5cae79c3ecf6ce58608d0506ce2e53006a8af7759ebf53e78e25aaf04f9cb",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2c-install.mjs",
+        "capturedSha256": "23b859308ea18bca4e17fb3f5126bb0f34ef1bcccec65b5df5740b1dcadaa0e3",
+        "currentSha256": "23b859308ea18bca4e17fb3f5126bb0f34ef1bcccec65b5df5740b1dcadaa0e3",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2c-recovery-child.mjs",
+        "capturedSha256": "d9aa96e7b926c7d2881aa58dba65cfc25a0f4c1ecb1391c90b7ef7b8a68414c2",
+        "currentSha256": "d9aa96e7b926c7d2881aa58dba65cfc25a0f4c1ecb1391c90b7ef7b8a68414c2",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2c-worker-child.mjs",
+        "capturedSha256": "0b06845de3c464f2d2569b022eb9db0c5585bbb15a8ec051aaacaa278df516ca",
+        "currentSha256": "0b06845de3c464f2d2569b022eb9db0c5585bbb15a8ec051aaacaa278df516ca",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/phase2c-worker.mjs",
+        "capturedSha256": "8296bc143395abfc70ef4f1fc71ff9a346cb89b87f69b2505528ca1106ec5d12",
+        "currentSha256": "8296bc143395abfc70ef4f1fc71ff9a346cb89b87f69b2505528ca1106ec5d12",
+        "unchanged": true
+      },
+      {
+        "file": "test/support/reliability/postgres17.mjs",
+        "capturedSha256": "83375c1f10c2da92c58d1ec501cf713f7a2bc5714ba9ae1ec5af16bc574be7ff",
+        "currentSha256": "83375c1f10c2da92c58d1ec501cf713f7a2bc5714ba9ae1ec5af16bc574be7ff",
+        "unchanged": true
+      },
+      {
+        "file": "test/team-intelligence-lineup-runtime.test.mjs",
+        "capturedSha256": "2bbec8d158aa811dfd11888c970fb1f245576514495224e002341a7aef3b906a",
+        "currentSha256": "2bbec8d158aa811dfd11888c970fb1f245576514495224e002341a7aef3b906a",
+        "unchanged": true
+      },
+      {
+        "file": "test/team-intelligence-ui.test.mjs",
+        "capturedSha256": "087c5936947b7e143ce0f18f1d408b4ee928e52a851ffb546f206b78a4c0c9f3",
+        "currentSha256": "087c5936947b7e143ce0f18f1d408b4ee928e52a851ffb546f206b78a4c0c9f3",
+        "unchanged": true
+      },
+      {
+        "file": "test/team-intelligence.test.mjs",
+        "capturedSha256": "5efe0c0e44dc89aeb043647ba2699bbdaa1bd068ea8a970aa66fed673883c392",
+        "currentSha256": "5efe0c0e44dc89aeb043647ba2699bbdaa1bd068ea8a970aa66fed673883c392",
+        "unchanged": true
+      },
+      {
+        "file": "test/team-round-recap.test.mjs",
+        "capturedSha256": "99a8074330447cfaee7fe516d6ebe718cf39d4bba26aea325594d610340f76be",
+        "currentSha256": "99a8074330447cfaee7fe516d6ebe718cf39d4bba26aea325594d610340f76be",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-branding.test.mjs",
+        "capturedSha256": "d5e770f4365a792211015843a3917190de89e04fa92d00d991997c91912df52a",
+        "currentSha256": "d5e770f4365a792211015843a3917190de89e04fa92d00d991997c91912df52a",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-countdown.test.mjs",
+        "capturedSha256": "dca9fb98b592098e1791fd012efdd47b44ac6793ce2c11e34b0d99b687952802",
+        "currentSha256": "dca9fb98b592098e1791fd012efdd47b44ac6793ce2c11e34b0d99b687952802",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-dashboard.test.mjs",
+        "capturedSha256": "a3f59da0de91ae845453dafbb65c370d3521b48c49fdd5141e22f25dd86f4e57",
+        "currentSha256": "a3f59da0de91ae845453dafbb65c370d3521b48c49fdd5141e22f25dd86f4e57",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-director.test.mjs",
+        "capturedSha256": "f309f59158c57ae6b446b10eae10d1d956153a905916ebbf36841b2220214f8a",
+        "currentSha256": "f309f59158c57ae6b446b10eae10d1d956153a905916ebbf36841b2220214f8a",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-foundation-supabase.test.mjs",
+        "capturedSha256": "baaadac8e9a7ae959952bb06f316108ae197648adc5a12a401638459af0743f1",
+        "currentSha256": "baaadac8e9a7ae959952bb06f316108ae197648adc5a12a401638459af0743f1",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-guide-annual-template.test.mjs",
+        "capturedSha256": "7adb6b14344eb4b1cbc60c4de80004cc85ac5cb455cecfb8649194dacb9b34df",
+        "currentSha256": "7adb6b14344eb4b1cbc60c4de80004cc85ac5cb455cecfb8649194dacb9b34df",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-guide-app.test.mjs",
+        "capturedSha256": "25a71b02ddf1b470993211428be830efc7a449273725346ad0486beb1ae978f1",
+        "currentSha256": "25a71b02ddf1b470993211428be830efc7a449273725346ad0486beb1ae978f1",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-guide-contacts.test.mjs",
+        "capturedSha256": "c3a79c5fb5cb00d45ea86c938c4ee524de4af29339189518d52dbc489d19e58d",
+        "currentSha256": "c3a79c5fb5cb00d45ea86c938c4ee524de4af29339189518d52dbc489d19e58d",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-guide-dining.test.mjs",
+        "capturedSha256": "c3d47bdde5e2bc21072b63b204385bee59b7856c233858c258597a099b6f73f0",
+        "currentSha256": "c3d47bdde5e2bc21072b63b204385bee59b7856c233858c258597a099b6f73f0",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-guide-local.test.mjs",
+        "capturedSha256": "b13a1b8ff33e1022b0856861af3d3948aa0b02fe83f0011032a78f782068f19c",
+        "currentSha256": "b13a1b8ff33e1022b0856861af3d3948aa0b02fe83f0011032a78f782068f19c",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-guide-projection.test.mjs",
+        "capturedSha256": "48727d2ff3b9a6194a8da28ac96b9c43af5d006aa4370c14626b832df0e907d1",
+        "currentSha256": "48727d2ff3b9a6194a8da28ac96b9c43af5d006aa4370c14626b832df0e907d1",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-guide-schedule.test.mjs",
+        "capturedSha256": "f1ade649ff2bfaca38f7204e861307aa3ded1541fbb5e738c1fdf06c77cb7d25",
+        "currentSha256": "f1ade649ff2bfaca38f7204e861307aa3ded1541fbb5e738c1fdf06c77cb7d25",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-guide.test.mjs",
+        "capturedSha256": "223f1b1c828320515d7b734cc79bf48583cf821f97c6040b6db68c228249cfd0",
+        "currentSha256": "223f1b1c828320515d7b734cc79bf48583cf821f97c6040b6db68c228249cfd0",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-hub.test.mjs",
+        "capturedSha256": "3c4c9ace0e10712a97f859d460afb54b725278444ef51579e6f5c56996f0bf93",
+        "currentSha256": "3c4c9ace0e10712a97f859d460afb54b725278444ef51579e6f5c56996f0bf93",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-identifiers.test.mjs",
+        "capturedSha256": "fb283a5b8cbca1f4f6cb5693da9f056b66bab987853daa3c7e19899643005802",
+        "currentSha256": "fb283a5b8cbca1f4f6cb5693da9f056b66bab987853daa3c7e19899643005802",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-intelligence-storylines.test.mjs",
+        "capturedSha256": "27ef6cf25a4132c3130b98b59dd2506fa914819b82deb7cfb35809c8f4931bc7",
+        "currentSha256": "27ef6cf25a4132c3130b98b59dd2506fa914819b82deb7cfb35809c8f4931bc7",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-odds.test.mjs",
+        "capturedSha256": "a6447256551615a9e7857fc0f7901736ca4d12be60897da782ae62330bb1e8c0",
+        "currentSha256": "a6447256551615a9e7857fc0f7901736ca4d12be60897da782ae62330bb1e8c0",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-readiness.test.mjs",
+        "capturedSha256": "78c7ed8b8d81fbd1dbded73a25b6439c00f5e908c4f9d0e6611eb3dbcebd79f9",
+        "currentSha256": "78c7ed8b8d81fbd1dbded73a25b6439c00f5e908c4f9d0e6611eb3dbcebd79f9",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-recap-intelligence.test.mjs",
+        "capturedSha256": "86f5468af352e91579093221a64a9fc1c0ebc92414637fd92b2325277d455eed",
+        "currentSha256": "86f5468af352e91579093221a64a9fc1c0ebc92414637fd92b2325277d455eed",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-storylines.test.mjs",
+        "capturedSha256": "0af2dfc775f5b74a3e8333eebef46baee4e4e4e3c9d5efc45b8b670c3bbf6339",
+        "currentSha256": "0af2dfc775f5b74a3e8333eebef46baee4e4e4e3c9d5efc45b8b670c3bbf6339",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-supabase-read.test.mjs",
+        "capturedSha256": "c8bf2acf35444a3c6bc0d6f56a31b01c1a015fb50aeab1f853f38d5834282bd9",
+        "currentSha256": "c8bf2acf35444a3c6bc0d6f56a31b01c1a015fb50aeab1f853f38d5834282bd9",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-time-freeze.test.mjs",
+        "capturedSha256": "1346de37383161a3efda35e8ae4526518fed15d8179636341a5f7df7d0cca15e",
+        "currentSha256": "1346de37383161a3efda35e8ae4526518fed15d8179636341a5f7df7d0cca15e",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-timeline.test.mjs",
+        "capturedSha256": "379bc2dce6790e87d40f5ad312f4a7514758bd150fbaee44adcb3b5a4587fb0b",
+        "currentSha256": "379bc2dce6790e87d40f5ad312f4a7514758bd150fbaee44adcb3b5a4587fb0b",
+        "unchanged": true
+      },
+      {
+        "file": "test/tournament-workbook-initialization.test.mjs",
+        "capturedSha256": "48de0d1514b096561d44a80f65631d0ebda527cc3575e18f9a4c4d1ef07012d5",
+        "currentSha256": "48de0d1514b096561d44a80f65631d0ebda527cc3575e18f9a4c4d1ef07012d5",
+        "unchanged": true
+      },
+      {
+        "file": "test/unified-player-leaderboards.test.mjs",
+        "capturedSha256": "de3f9f3fb589bbc5b94ce7a1dad4a2af180c138f196d988b4a4bfe4b96884e3d",
+        "currentSha256": "de3f9f3fb589bbc5b94ce7a1dad4a2af180c138f196d988b4a4bfe4b96884e3d",
+        "unchanged": true
+      },
+      {
+        "file": "test/verify-customcode.test.mjs",
+        "capturedSha256": "f2ee37e8b19a41346276e57d4fb965c71c81f451e9513cd9811378c0d602005c",
+        "currentSha256": "f2ee37e8b19a41346276e57d4fb965c71c81f451e9513cd9811378c0d602005c",
+        "unchanged": true
+      },
+      {
+        "file": "test/war-room-calculation-parity.test.mjs",
+        "capturedSha256": "5848ee93aa8fb63889f3416d0047bd86c1f20c0ddcfdf0a54c33c99111af9d2f",
+        "currentSha256": "5848ee93aa8fb63889f3416d0047bd86c1f20c0ddcfdf0a54c33c99111af9d2f",
+        "unchanged": true
+      },
+      {
+        "file": "test/war-room-input-dual-path.test.mjs",
+        "capturedSha256": "15246a46d12c5fe834848c5f0560168e282dfc04691c23252dd17b966578ca3d",
+        "currentSha256": "15246a46d12c5fe834848c5f0560168e282dfc04691c23252dd17b966578ca3d",
+        "unchanged": true
+      },
+      {
+        "file": "test/website-guide-supabase-transition.test.mjs",
+        "capturedSha256": "4c87f0b15340e5a460b57802b52a1f3e91269cec2a638d873e5b2d1d45497eb1",
+        "currentSha256": "4c87f0b15340e5a460b57802b52a1f3e91269cec2a638d873e5b2d1d45497eb1",
+        "unchanged": true
+      },
+      {
+        "file": "test/website-pwa-route-boundary.test.mjs",
+        "capturedSha256": "7bd806cb7b3c0289f6797298421b913c183e0bd7172ec72debb949b00f8dfe77",
+        "currentSha256": "7bd806cb7b3c0289f6797298421b913c183e0bd7172ec72debb949b00f8dfe77",
+        "unchanged": true
+      },
+      {
+        "file": "test/website-time-team-logo-polish.test.mjs",
+        "capturedSha256": "53a9497fd0421b3594cf775a998727e2a58b88d48c5b92fe96262e22e3729f05",
+        "currentSha256": "53a9497fd0421b3594cf775a998727e2a58b88d48c5b92fe96262e22e3729f05",
+        "unchanged": true
+      },
+      {
+        "file": "test/workbook-protection.test.mjs",
+        "capturedSha256": "b03fcf2f2acd620bc4d17adea491ed0cc18f0c7a7bab6ceda1fc8218a9d9b09c",
+        "currentSha256": "b03fcf2f2acd620bc4d17adea491ed0cc18f0c7a7bab6ceda1fc8218a9d9b09c",
+        "unchanged": true
+      },
+      {
+        "file": "test/workbook-write-fidelity.test.mjs",
+        "capturedSha256": "ad6defec9afa927af1a2bec256d97c2e40cd3886cd08f0c15c0448dbaa74a8a7",
+        "currentSha256": "ad6defec9afa927af1a2bec256d97c2e40cd3886cd08f0c15c0448dbaa74a8a7",
+        "unchanged": true
+      }
+    ],
+    "scope": "All test/ files captured in the preserved application sources, implementation manifest and dependency closure; not an assertion about unrecorded files."
+  },
+  "preCorrectionImplementationManifestComparison": {
+    "filesChecked": 78,
+    "changedFiles": [
+      "lib/production-calcutta-server.js",
+      "lib/production-net-skins-server.js"
+    ]
+  },
+  "conclusions": {
+    "onlyTwoFirstImportSwaps": true,
+    "functionBodyChangesInCorrection": false,
+    "golfFormulaChangesInCorrection": false,
+    "authorizationLogicChangesInCorrection": false,
+    "testAssertionChangesInCapturedFiles": false,
+    "moduleEvaluationOrderChanged": true,
+    "runtimeEquivalenceClaimed": false,
+    "runtimeReruns": "PENDING_PARENT_VERIFICATION; no new runtime process executed and no inherited receipt is relabeled current by this review",
+    "overallCertification": "PARTIAL \u2014 existing Google reporting/export delivery proof and financial side-effect contract remain unresolved",
+    "deploymentRecommendation": "NOT READY \u2014 continue Phase 2C; no staging or Production authorization"
+  },
+  "retainedBlocker": {
+    "id": "P2C-OPEN-GOOGLE-DELIVERY",
+    "sourceReview": "docs/reliability/phase2c/evidence/google-outbox-scope-review.json",
+    "sourceReviewSha256": "db6aad2c30828b98f5440af59545b7047c4e34b8b04a117211ca647cd62f1ba0",
+    "classification": "PROVEN source-level missing coverage and legacy coupling; actual hosted state UNKNOWN",
+    "description": "Canonical score and Finalize retain legacy durable Google reporting/export work. The three automatic Phase 2C derived families do not prove autonomous external outbox/archive delivery. Legacy MATCH_FINALIZED export invokes side-game synchronization, including an independently gated Calcutta publication path. Do not activate generic automatic delivery without the mirror-only/owner-publication contract and isolated actual-SQL/fake-sink proof. Source coupling is not proof that unauthorized publication occurred."
+  },
+  "limitations": [
+    "Moving server-only before another import intentionally changes module dependency ordering. Exact source identity after the first two lines is not runtime-equivalence proof.",
+    "Original review was limited to 17 source files and named evidence; this addendum does not promote it into exhaustive completeness or approval.",
+    "The original review conclusion blockingSourceDefectFound:false is historical and must not be used to dismiss the separately discovered Google delivery/financial-contract blocker.",
+    "No PostgreSQL, API, build, application test or provider action was executed during this review.",
+    "All local runtime and source-dependency reruns after the import correction require their own fresh receipts. Unrelated historical receipts remain historical, not retroactively rewritten.",
+    "No Production, native physical, hosted supervisor, capacity, backup, full tournament or owner acceptance proof follows."
+  ],
+  "actions": {
+    "repositoryEdits": false,
+    "databaseAccess": false,
+    "networkAccess": false,
+    "productionQueries": false,
+    "productionMutation": false,
+    "deployment": false,
+    "testProcesses": false,
+    "temporaryReviewArtifactsOnly": true
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "proof": "FINAL_DELIVERY_SOURCE_HASHES",
+  "completeChangedSourceManifest": "delivery.json:implementationSourceManifest",
+  "sha256": {
+    "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql": "295f3657c710b0b1e7937d603ac8db9c5439afe20734d41dc0e61a2f8e320221",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cb18835d2bb540572d6460dc4313b678266560e8f6a56b56376b1ee783a321bd",
+    "tools/reliability/run-score-derived-worker.mjs": "65f7ab486d4a7404b1003d180cb08f91405ea3dca518c2f3cdaf27eec3c1e9db",
+    "test/support/reliability/phase2c-worker.mjs": "ddf547a4e22eb7d9529ca81f30498031bee5d803d1d7c9a7071425c9a3d93e69",
+    "test/support/reliability/phase2c-worker-child.mjs": "97e47f786a1ced812391a45b3dff05a4300d3903c2789ea669d1f5019e060683",
+    "test/reliability-phase2c-worker.test.mjs": "15c2b11e0f70b15ed1d645093ae83dedbf79753f710247ebc9e5e4ce4bf90b40",
+    "test/reliability-phase2c-worker-history.test.mjs": "33f23f9e92c9f8a7d98361b4cbe83e630b7fc9aa8371623e7c0b595e156c89a0",
+    "test/reliability-phase2c-worker-lock-order.test.mjs": "460db930e7c60e5085d1d2a022486d96c006c62fa635f78d5244bb715192b723"
+  }
+}

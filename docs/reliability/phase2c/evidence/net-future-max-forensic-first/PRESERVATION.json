@@ -1,0 +1,24 @@
+{
+  "files": [
+    {
+      "file": "README.md",
+      "sha256": "feba0e62e0a5f33aced820b88ce105016b361cc0ba7243bd68c492433e2bc6f7"
+    },
+    {
+      "file": "net-owner-control-lock-after.json",
+      "sha256": "649b5f09093a143260d0456d5031f8d345c6e34c57ff4b73ee92dadc2c9d2454"
+    },
+    {
+      "file": "net-owner-lock-order.json",
+      "sha256": "d557d50c6bed8857c6f4ec8b58bb7859aa383afd8c60cc013b0be82a9cb49ae7"
+    },
+    {
+      "file": "net-owner-lock-order.tap",
+      "sha256": "2b4fd2de5e1711e1aeed2920498c66619474007ed766ade9ab47a3392aca0393"
+    },
+    {
+      "file": "reliability-phase2c-net-owner-lock-order.test.mjs",
+      "sha256": "7e0809b9bb554e5c2fd58e7c86103996ce96de495418a71a79f77d2f53762826"
+    }
+  ]
+}

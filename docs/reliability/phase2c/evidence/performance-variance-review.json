@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "issueId": "P2C-NEW-PERF-VARIANCE",
+  "severity": "P1",
+  "status": "OPEN_CAUSE_UNKNOWN",
+  "confidence": "PROVEN observations; UNKNOWN causal attribution",
+  "environment": "LOCAL disposable PostgreSQL17.11, Unix socket, fsync=off",
+  "reviewedAt": "2026-09-29T21:41:41.575602+00:00",
+  "failedObservation": {
+    "scale": 2,
+    "branch": "current_compatible",
+    "samples": 30,
+    "p50Ms": 2.908,
+    "p95Ms": 27.137,
+    "maxMs": 31.633,
+    "gate": "FAIL"
+  },
+  "singleControlledRepeat": {
+    "sourceChanged": false,
+    "thresholdsChanged": false,
+    "scaleOrder": [
+      2,
+      5,
+      1,
+      10
+    ],
+    "flaggedBranch": {
+      "samples": 30,
+      "p50Ms": 1.129,
+      "p95Ms": 8.126,
+      "maxMs": 8.214
+    },
+    "gate": "PASS"
+  },
+  "interpretation": "One unchanged-code repeat did not reproduce the tail regression. This is counterevidence to a deterministic code regression, not proof of a host cause, a fix, or universal latency non-regression. No further run-until-green performed.",
+  "requirement73": "PARTIAL \u2014 comparative tail repeatability remains unexplained",
+  "finiteHeadroom": "All scores in both eligible runs succeeded below the unchanged local1000ms statement budget; original31.633ms is retained for worst-observed headroom. Production capacity NOT PROVEN.",
+  "nextAction": "Repeatability investigation on a controlled isolated host with resource observations before approving a replacement performance baseline. Do not relax thresholds or discard failed run.",
+  "artifacts": [
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/PRESERVATION.json",
+      "sha256": "04afa5fb156a876de80c02ebc9f1f875fe58c5809e454d5bc14a1a13f1be9359"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/performance-gate.json",
+      "sha256": "ddcd84ed1a5c239bda4432ffcbf37154114c1a7e44c320eb1db8e9a0dc0a94af"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/benchmark-candidate-eligible.json",
+      "sha256": "2e6021594c46ffedd3bc25b3720c70263941f34c3e86664581df2997fbdaa7d9"
+    },
+    {
+      "path": "docs/reliability/phase2c/benchmark-candidate-eligible.json",
+      "sha256": "879021af1133b9ec014cf6a22bf9c2d956f1abedfca54dacba54437fc2051d8a"
+    },
+    {
+      "path": "docs/reliability/phase2c/performance-gate.json",
+      "sha256": "dc167167a0affa866b185b1a031f7f36792909e763b6565780fe96789185f4d4"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/tested-uncommitted-candidate-manifest.json",
+      "sha256": "1acde9854df58ec8799e5b5e904bf8a05187e8863ead935b7fbc319a9097c712",
+      "binding": "IMMUTABLE_TESTED_SOURCE_SNAPSHOT_BEFORE_COMMIT; source bytes later matched to Git commit separately"
+    }
+  ]
+}

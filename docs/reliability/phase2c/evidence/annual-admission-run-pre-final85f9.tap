@@ -1,0 +1,50 @@
+TAP version 13
+# Subtest: migration 078 rebinds future annual normal releases without mutating annual state
+    # Subtest: future annual authorization, replay, stale and invariance
+    not ok 1 - future annual authorization, replay, stale and invariance
+      ---
+      duration_ms: 33714.482
+      type: 'test'
+      location: 'phase2c-protected-annual-admission-generated.mjs:27:13'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected values to be strictly equal:
+        
+        1 !== 24
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: 24
+      actual: 1
+      operator: 'strictEqual'
+      stack: |-
+        captureFinalPublicationHistoryPlans (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2c-final-publication-plans.mjs:14:89)
+        phase2c-protected-annual-admission-generated.mjs:2672:50
+        Array.map (<anonymous>)
+        TestContext.<anonymous> (phase2c-protected-annual-admission-generated.mjs:2672:39)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+        context.test (phase2c-protected-annual-admission-generated.mjs:27:13)
+        phase2c-protected-annual-admission-generated.mjs:1717:15
+      ...
+    1..1
+not ok 1 - migration 078 rebinds future annual normal releases without mutating annual state
+  ---
+  duration_ms: 37024.68775
+  type: 'test'
+  location: 'phase2c-protected-annual-admission-generated.mjs:20:10'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 37143.773875

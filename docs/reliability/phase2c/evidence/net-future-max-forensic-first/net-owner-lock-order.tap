@@ -1,0 +1,153 @@
+TAP version 13
+# Subtest: Net Skins owner completion locks exact Storylines before supported controls
+    # Subtest: present FINALIZE before
+    ok 1 - present FINALIZE before
+      ---
+      duration_ms: 2736.152
+      type: 'test'
+      ...
+    # Subtest: present FINALIZE after
+    ok 2 - present FINALIZE after
+      ---
+      duration_ms: 1444.062209
+      type: 'test'
+      ...
+    # Subtest: present SCORING_LOCK before
+    ok 3 - present SCORING_LOCK before
+      ---
+      duration_ms: 2493.001042
+      type: 'test'
+      ...
+    # Subtest: present SCORING_LOCK after
+    ok 4 - present SCORING_LOCK after
+      ---
+      duration_ms: 1704.750541
+      type: 'test'
+      ...
+    # Subtest: absent FINALIZE before
+    ok 5 - absent FINALIZE before
+      ---
+      duration_ms: 2746.72325
+      type: 'test'
+      ...
+    # Subtest: absent FINALIZE after
+    ok 6 - absent FINALIZE after
+      ---
+      duration_ms: 2103.352083
+      type: 'test'
+      ...
+    # Subtest: absent SCORING_LOCK before
+    ok 7 - absent SCORING_LOCK before
+      ---
+      duration_ms: 2727.473125
+      type: 'test'
+      ...
+    # Subtest: absent SCORING_LOCK after
+    ok 8 - absent SCORING_LOCK after
+      ---
+      duration_ms: 1466.663583
+      type: 'test'
+      ...
+    # Subtest: absent marker rolls back on rejected lease
+    ok 9 - absent marker rolls back on rejected lease
+      ---
+      duration_ms: 3572.252041
+      type: 'test'
+      ...
+    # Subtest: absent marker rolls back on rejected source
+    ok 10 - absent marker rolls back on rejected source
+      ---
+      duration_ms: 2341.752791
+      type: 'test'
+      ...
+    # Subtest: two simultaneous rounds create only unchanged canonical Storylines demand
+    ok 11 - two simultaneous rounds create only unchanged canonical Storylines demand
+      ---
+      duration_ms: 1580.705709
+      type: 'test'
+      ...
+    # Subtest: future2099 present marker actual claim/calculator/completion matches unchanged serial body
+    ok 12 - future2099 present marker actual claim/calculator/completion matches unchanged serial body
+      ---
+      duration_ms: 1514.20375
+      type: 'test'
+      ...
+    # Subtest: future2099 absent marker actual claim/calculator/completion matches unchanged serial body
+    ok 13 - future2099 absent marker actual claim/calculator/completion matches unchanged serial body
+      ---
+      duration_ms: 1520.303584
+      type: 'test'
+      ...
+    # Subtest: future2099 absent marker rejects lease without provisional footprint
+    ok 14 - future2099 absent marker rejects lease without provisional footprint
+      ---
+      duration_ms: 922.438042
+      type: 'test'
+      ...
+    # Subtest: future2099 absent marker rejects source without provisional footprint
+    ok 15 - future2099 absent marker rejects source without provisional footprint
+      ---
+      duration_ms: 810.507417
+      type: 'test'
+      ...
+    # Subtest: future2099 absent marker rejects job-generation without provisional footprint
+    ok 16 - future2099 absent marker rejects job-generation without provisional footprint
+      ---
+      duration_ms: 831.777
+      type: 'test'
+      ...
+    # Subtest: future2099 completion waits for Storylines before taking configuration or job lock
+    ok 17 - future2099 completion waits for Storylines before taking configuration or job lock
+      ---
+      duration_ms: 851.386667
+      type: 'test'
+      ...
+    # Subtest: actual absent-marker max lookup remains indexed with irrelevant result history
+    not ok 18 - actual absent-marker max lookup remains indexed with irrelevant result history
+      ---
+      duration_ms: 23282.153333
+      type: 'test'
+      location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:271:11'
+      failureType: 'testCodeFailure'
+      error: |-
+        /opt/homebrew/opt/postgresql@17/bin/psql
+        ERROR:  canceling statement due to statement timeout
+        
+      code: 'ERR_TEST_FAILURE'
+      stack: |-
+        run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+        sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+        fingerprint (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:34:26)
+        TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:299:17)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+        TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:271:11)
+        async Test.run (node:internal/test_runner/test:1404:7)
+      ...
+    # Subtest: both completion bodies and private helper are manifest bound without changed authority attributes
+    ok 19 - both completion bodies and private helper are manifest bound without changed authority attributes
+      ---
+      duration_ms: 146.706791
+      type: 'test'
+      ...
+    1..19
+not ok 1 - Net Skins owner completion locks exact Storylines before supported controls
+  ---
+  duration_ms: 75707.532875
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-net-owner-lock-order.test.mjs:186:1'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 20
+# suites 0
+# pass 18
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 75863.829916

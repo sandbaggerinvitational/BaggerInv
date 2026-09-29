@@ -1,0 +1,304 @@
+TAP version 13
+# Subtest: NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue
+    # Subtest: upgrade preserves121 pending identity, durable demand and prior successful result
+    ok 1 - upgrade preserves121 pending identity, durable demand and prior successful result
+      ---
+      duration_ms: 14341.452042
+      type: 'test'
+      ...
+    # Subtest: migration is chained and delivery administration is unavailable to participants
+    ok 2 - migration is chained and delivery administration is unavailable to participants
+      ---
+      duration_ms: 155.618417
+      type: 'test'
+      ...
+    # Subtest: a running child discovers a later committed score and completes automatic families
+    ok 3 - a running child discovers a later committed score and completes automatic families
+      ---
+      duration_ms: 2104.484084
+      type: 'test'
+      ...
+    # Subtest: a crash after real claim retains a lease and restart recovers after expiry
+    ok 4 - a crash after real claim retains a lease and restart recovers after expiry
+      ---
+      duration_ms: 5744.875
+      type: 'test'
+      ...
+    # Subtest: COMPETITION actual claim crash survives process restart and expired lease
+    ok 5 - COMPETITION actual claim crash survives process restart and expired lease
+      ---
+      duration_ms: 5916.303083
+      type: 'test'
+      ...
+    # Subtest: INTELLIGENCE actual claim crash survives process restart and expired lease
+    ok 6 - INTELLIGENCE actual claim crash survives process restart and expired lease
+      ---
+      duration_ms: 6347.654084
+      type: 'test'
+      ...
+    # Subtest: unknown completion acknowledgement leaves one successful canonical result
+    ok 7 - unknown completion acknowledgement leaves one successful canonical result
+      ---
+      duration_ms: 1535.112167
+      type: 'test'
+      ...
+    # Subtest: COMPETITION actual completion acknowledgement loss converges without duplicate snapshots
+    ok 8 - COMPETITION actual completion acknowledgement loss converges without duplicate snapshots
+      ---
+      duration_ms: 2324.376708
+      type: 'test'
+      ...
+    # Subtest: INTELLIGENCE actual completion acknowledgement loss converges without duplicate snapshots
+    ok 9 - INTELLIGENCE actual completion acknowledgement loss converges without duplicate snapshots
+      ---
+      duration_ms: 1800.697458
+      type: 'test'
+      ...
+    # Subtest: CALCUTTA deterministic claim failure does not prevent other families completing
+    ok 10 - CALCUTTA deterministic claim failure does not prevent other families completing
+      ---
+      duration_ms: 1747.5155
+      type: 'test'
+      ...
+    # Subtest: COMPETITION deterministic claim failure does not prevent other families completing
+    ok 11 - COMPETITION deterministic claim failure does not prevent other families completing
+      ---
+      duration_ms: 1856.407375
+      type: 'test'
+      ...
+    # Subtest: INTELLIGENCE deterministic claim failure does not prevent other families completing
+    ok 12 - INTELLIGENCE deterministic claim failure does not prevent other families completing
+      ---
+      duration_ms: 1795.545125
+      type: 'test'
+      ...
+    # Subtest: deterministic preclaim failure terminates once, Director requeue preserves exact receipt
+    ok 13 - deterministic preclaim failure terminates once, Director requeue preserves exact receipt
+      ---
+      duration_ms: 722.740125
+      type: 'test'
+      ...
+    # Subtest: intelligence-correction-before-write retains later score demand and converges to canonical source
+    ok 14 - intelligence-correction-before-write retains later score demand and converges to canonical source
+      ---
+      duration_ms: 2538.209416
+      type: 'test'
+      ...
+    # Subtest: competition-before-claim retains later score demand and converges to canonical source
+    ok 15 - competition-before-claim retains later score demand and converges to canonical source
+      ---
+      duration_ms: 2031.413667
+      type: 'test'
+      ...
+    # Subtest: competition-before-write retains later score demand and converges to canonical source
+    ok 16 - competition-before-write retains later score demand and converges to canonical source
+      ---
+      duration_ms: 2107.222958
+      type: 'test'
+      ...
+    # Subtest: intelligence-before-claim retains later score demand and converges to canonical source
+    ok 17 - intelligence-before-claim retains later score demand and converges to canonical source
+      ---
+      duration_ms: 5978.2675
+      type: 'test'
+      ...
+    # Subtest: intelligence-after-claim retains later score demand and converges to canonical source
+    ok 18 - intelligence-after-claim retains later score demand and converges to canonical source
+      ---
+      duration_ms: 2428.405125
+      type: 'test'
+      ...
+    # Subtest: intelligence-before-write retains later score demand and converges to canonical source
+    ok 19 - intelligence-before-write retains later score demand and converges to canonical source
+      ---
+      duration_ms: 2298.471458
+      type: 'test'
+      ...
+    # Subtest: calcutta-before-claim retains later score demand and converges to canonical source
+    ok 20 - calcutta-before-claim retains later score demand and converges to canonical source
+      ---
+      duration_ms: 1675.006
+      type: 'test'
+      ...
+    # Subtest: COMPETITION stale writer cannot replace a newer canonical current result
+    ok 21 - COMPETITION stale writer cannot replace a newer canonical current result
+      ---
+      duration_ms: 2662.074667
+      type: 'test'
+      ...
+    # Subtest: INTELLIGENCE stale writer cannot replace a newer canonical current result
+    ok 22 - INTELLIGENCE stale writer cannot replace a newer canonical current result
+      ---
+      duration_ms: 2790.330042
+      type: 'test'
+      ...
+    # Subtest: CALCUTTA expired live worker cannot overwrite a same-source replacement claim
+    ok 23 - CALCUTTA expired live worker cannot overwrite a same-source replacement claim
+      ---
+      duration_ms: 6454.7285
+      type: 'test'
+      ...
+    # Subtest: COMPETITION expired live worker cannot overwrite a same-source replacement claim
+    not ok 24 - COMPETITION expired live worker cannot overwrite a same-source replacement claim
+      ---
+      duration_ms: 5912.079833
+      type: 'test'
+      location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:246:13'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected values to be strictly equal:
+        
+        1 !== 2
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: 2
+      actual: 1
+      operator: 'strictEqual'
+      stack: |-
+        TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:273:168)
+        process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+        async Test.run (node:internal/test_runner/test:1404:7)
+        async TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:246:5)
+        async Test.run (node:internal/test_runner/test:1404:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+      ...
+    # Subtest: INTELLIGENCE expired live worker cannot overwrite a same-source replacement claim
+    ok 25 - INTELLIGENCE expired live worker cannot overwrite a same-source replacement claim
+      ---
+      duration_ms: 6829.596167
+      type: 'test'
+      ...
+    # Subtest: score-intent exact-current processing preserves financial output: none
+    ok 26 - score-intent exact-current processing preserves financial output: none
+      ---
+      duration_ms: 2544.159417
+      type: 'test'
+      ...
+    # Subtest: score-intent exact-current processing preserves financial output: current_compatible
+    ok 27 - score-intent exact-current processing preserves financial output: current_compatible
+      ---
+      duration_ms: 1793.713459
+      type: 'test'
+      ...
+    # Subtest: score-intent exact-current processing preserves financial output: current_incompatible_consumed
+    ok 28 - score-intent exact-current processing preserves financial output: current_incompatible_consumed
+      ---
+      duration_ms: 1819.744583
+      type: 'test'
+      ...
+    # Subtest: score-intent exact-current processing preserves financial output: current_incompatible_financial
+    ok 29 - score-intent exact-current processing preserves financial output: current_incompatible_financial
+      ---
+      duration_ms: 1837.8985
+      type: 'test'
+      ...
+    # Subtest: score-intent exact-current processing preserves financial output: stale_source
+    ok 30 - score-intent exact-current processing preserves financial output: stale_source
+      ---
+      duration_ms: 1895.629375
+      type: 'test'
+      ...
+    # Subtest: score-intent exact-current processing preserves financial output: stale_result_binding
+    ok 31 - score-intent exact-current processing preserves financial output: stale_result_binding
+      ---
+      duration_ms: 1852.946125
+      type: 'test'
+      ...
+    # Subtest: score-intent exact-current processing preserves financial output: superseded_result
+    ok 32 - score-intent exact-current processing preserves financial output: superseded_result
+      ---
+      duration_ms: 1886.794333
+      type: 'test'
+      ...
+    # Subtest: score-intent exact-current processing preserves financial output: multiple_receipts
+    ok 33 - score-intent exact-current processing preserves financial output: multiple_receipts
+      ---
+      duration_ms: 1850.040292
+      type: 'test'
+      ...
+    # Subtest: real25ms cancellation records each intent attempt across connections and reaches terminal
+    ok 34 - real25ms cancellation records each intent attempt across connections and reaches terminal
+      ---
+      duration_ms: 870.09425
+      type: 'test'
+      ...
+    # Subtest: Intelligence delayed, running and terminal siblings suppress automatic thrash
+    ok 35 - Intelligence delayed, running and terminal siblings suppress automatic thrash
+      ---
+      duration_ms: 2195.56075
+      type: 'test'
+      ...
+    # Subtest: lone FinalRecap recovery requires existing final publication and preserves successful siblings
+    ok 36 - lone FinalRecap recovery requires existing final publication and preserves successful siblings
+      ---
+      duration_ms: 3808.45675
+      type: 'test'
+      ...
+    # Subtest: two autonomous workers share claims and converge without a manual tick
+    ok 37 - two autonomous workers share claims and converge without a manual tick
+      ---
+      duration_ms: 5795.654583
+      type: 'test'
+      ...
+    # Subtest: closed worker gate stops the autonomous process visibly after one denied tick
+    ok 38 - closed worker gate stops the autonomous process visibly after one denied tick
+      ---
+      duration_ms: 726.78925
+      type: 'test'
+      ...
+    # Subtest: each automatic family exhausts five durable attempts then exact Director requeue recovers
+    ok 39 - each automatic family exhausts five durable attempts then exact Director requeue recovers
+      ---
+      duration_ms: 4641.064834
+      type: 'test'
+      ...
+    # Subtest: terminal Calcutta work survives compatible activation and exact supported recovery
+    ok 40 - terminal Calcutta work survives compatible activation and exact supported recovery
+      ---
+      duration_ms: 1834.560834
+      type: 'test'
+      ...
+    # Subtest: compatible activation replacement is atomic and rejects late old completion
+    ok 41 - compatible activation replacement is atomic and rejects late old completion
+      ---
+      duration_ms: 931.960083
+      type: 'test'
+      ...
+    # Subtest: compatible activation replaces old pending identity without transferring a lease
+    ok 42 - compatible activation replaces old pending identity without transferring a lease
+      ---
+      duration_ms: 861.873334
+      type: 'test'
+      ...
+    1..42
+not ok 1 - NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue
+  ---
+  duration_ms: 148149.400625
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-worker.test.mjs:51:1'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: deterministic global tick failure stops visibly and classifies only known transient errors
+ok 2 - deterministic global tick failure stops visibly and classifies only known transient errors
+  ---
+  duration_ms: 1.6945
+  type: 'test'
+  ...
+# Subtest: optional synchronous and asynchronous exporter failures preserve worker execution and retry
+ok 3 - optional synchronous and asynchronous exporter failures preserve worker execution and retry
+  ---
+  duration_ms: 34.7335
+  type: 'test'
+  ...
+1..3
+# tests 45
+# suites 0
+# pass 43
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 148348.705708

@@ -1,0 +1,321 @@
+{
+  "schemaVersion": 1,
+  "suite": "index",
+  "sourcesStable": true,
+  "implementationSourceManifest": [
+    {
+      "file": "app/api/mobile/v1/scoring/mutation-status/route.js",
+      "sha256": "6d4ffb20d5dd156c8ed4af1fd71a0a275304debdb550d8b477bed470931878d9"
+    },
+    {
+      "file": "app/api/scoring/mutation-status/route.js",
+      "sha256": "39e35bfe30419eb87ae092e7b17feb5e8164abb963c5dc861ba0a3e585cd0c2a"
+    },
+    {
+      "file": "lib/competition-derived-supabase.js",
+      "sha256": "7609a613f538e2252314b383305469317803ff23f384fe298ea24e53d40bb241"
+    },
+    {
+      "file": "lib/intelligence-derived-supabase.js",
+      "sha256": "aa3d5b53012176ad3ed8ce681758a97770a68e1c18dd38a5cd210f22c636e5e9"
+    },
+    {
+      "file": "lib/operational-rpc-contract.js",
+      "sha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9"
+    },
+    {
+      "file": "lib/production-calcutta-server.js",
+      "sha256": "73b6d03776ac29216f83ca0088cc95b918a9960539a7fd441b2443fe1bc95b37"
+    },
+    {
+      "file": "lib/production-net-skins-server.js",
+      "sha256": "087505a35d83ad1fa743374396ea3be1338b2c1e1290d23bba20eb2e734f9a0f"
+    },
+    {
+      "file": "lib/production-scoring-operations-server.js",
+      "sha256": "b66b5c083801fc6ab4356d1d26320efb805b22cf2a075cb216db0a592ed2cf70"
+    },
+    {
+      "file": "lib/score-derived-delivery.js",
+      "sha256": "cb18835d2bb540572d6460dc4313b678266560e8f6a56b56376b1ee783a321bd"
+    },
+    {
+      "file": "lib/score-derived-worker.js",
+      "sha256": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d"
+    },
+    {
+      "file": "lib/scoring-authority-supabase.js",
+      "sha256": "4dde49461f6805cccce8b5805a80ab4ba159627abc90e1b321d27d92df941196"
+    },
+    {
+      "file": "lib/scoring-mutation-recovery-route.js",
+      "sha256": "0e98f14294d531e33b08cc23493c1f326e796e1107f63c30c7404fcf1a6a4cfb"
+    },
+    {
+      "file": "lib/scoring-mutation-recovery.js",
+      "sha256": "0f6b5aa1c5f042f846861cee22e61c113cfb98cd058d160c6982f458d77359b3"
+    },
+    {
+      "file": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+    },
+    {
+      "file": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+    },
+    {
+      "file": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "295f3657c710b0b1e7937d603ac8db9c5439afe20734d41dc0e61a2f8e320221"
+    },
+    {
+      "file": "test/pn2-native-admission.test.mjs",
+      "sha256": "d5acf992a9ba05e1f49c7ee020001d8880b555e46ecba53db3ea8aecc9e17246"
+    },
+    {
+      "file": "test/reliability-phase2-derived-proof.integration.test.mjs",
+      "sha256": "b645d6580aa3d9d481b5f8832433563106bc47b31ebc6e4ee49a2ba2f137b039"
+    },
+    {
+      "file": "test/reliability-phase2-fence-history.test.mjs",
+      "sha256": "4c865bec330acb12819b8dcb45582576166e500b138dbfd09f0c0c334be7d964"
+    },
+    {
+      "file": "test/reliability-phase2-score-proof.integration.test.mjs",
+      "sha256": "f9eec62e93e78aa1bd6dc09628dde7bc071a8ab11aa16e77bbb621420526d533"
+    },
+    {
+      "file": "test/reliability-phase2c-annual-admission.integration.test.mjs",
+      "sha256": "b7679b475c61d93cfd7b50a2b60f896364c175af4f74208ce633cfc5cfb9adcc"
+    },
+    {
+      "file": "test/reliability-phase2c-annual-workers.integration.test.mjs",
+      "sha256": "a69dcdd7cad592f66849b3832fad0e0d08e2746df243604336bcc632553d77bc"
+    },
+    {
+      "file": "test/reliability-phase2c-backlog-pressure.integration.test.mjs",
+      "sha256": "c758d9b84ee0db729c735771354890628c5aba1a8cc30dfc452838d014ba08db"
+    },
+    {
+      "file": "test/reliability-phase2c-finite-timeout.integration.test.mjs",
+      "sha256": "67dfbf9cda289da68013e9b607ee33d14bbe9ed255804a09b74dc866bb9bdfb5"
+    },
+    {
+      "file": "test/reliability-phase2c-full-sequence.integration.test.mjs",
+      "sha256": "38f55b7ff5ef22a844754a3a1a2ec65884c40ca3d335f077e8a6d89e8ce9c4d8"
+    },
+    {
+      "file": "test/reliability-phase2c-net-skins-deadlock.integration.test.mjs",
+      "sha256": "cf81be12fe61afdc76439e06bccf01a6b3069b78d63e5ba4daa0b2ece28bee13"
+    },
+    {
+      "file": "test/reliability-phase2c-performance-gate.test.mjs",
+      "sha256": "4cd09263299aa33599c151dc5d15debac69c581728fc4ce57b7d04707ee8cbee"
+    },
+    {
+      "file": "test/reliability-phase2c-recovery-upgrade.integration.test.mjs",
+      "sha256": "f96f9e3a7d0659e7a83e4ea49530cc84923ba9df66b59a6657bbc295a083bf62"
+    },
+    {
+      "file": "test/reliability-phase2c-recovery.integration.test.mjs",
+      "sha256": "3e77ee07c2d4ca86b27e65c6c249a5f6c7a22a4cb5d997168f28b6717a208f5f"
+    },
+    {
+      "file": "test/reliability-phase2c-recovery.test.mjs",
+      "sha256": "a1f9f2137dac4a1d1c36da38bb909638ca2b8c21abfbd1bdcdea9ef8489229b1"
+    },
+    {
+      "file": "test/reliability-phase2c-worker-history.test.mjs",
+      "sha256": "33f23f9e92c9f8a7d98361b4cbe83e630b7fc9aa8371623e7c0b595e156c89a0"
+    },
+    {
+      "file": "test/reliability-phase2c-worker-lock-order.test.mjs",
+      "sha256": "460db930e7c60e5085d1d2a022486d96c006c62fa635f78d5244bb715192b723"
+    },
+    {
+      "file": "test/reliability-phase2c-worker.test.mjs",
+      "sha256": "15c2b11e0f70b15ed1d645093ae83dedbf79753f710247ebc9e5e4ce4bf90b40"
+    },
+    {
+      "file": "test/support/reliability/phase2-score-fixture.mjs",
+      "sha256": "0f181715ed756090e79e43b40ecacbf591c2df194b7ac178d9ec11bf5e07b8cd"
+    },
+    {
+      "file": "test/support/reliability/phase2c-annual-history.mjs",
+      "sha256": "6775d19899ebee60e20edf6b16c74b96dfa15629d20e46de149ee49c254c4f37"
+    },
+    {
+      "file": "test/support/reliability/phase2c-annual-worker-branches.mjs",
+      "sha256": "5a20dc082eaf360aec8ac539f9422085332f9e2b5c325fbd5f30da45ae2945de"
+    },
+    {
+      "file": "test/support/reliability/phase2c-annual-workers.mjs",
+      "sha256": "b334bfd457774f0bca9f25587d03ff0a3122f256fb38de39a4cb138706350695"
+    },
+    {
+      "file": "test/support/reliability/phase2c-audit-index-plans.mjs",
+      "sha256": "b8b1dd0666591f75b1bee5f78d34d4d3f123ffc435b1fc5c11b8471105b106e5"
+    },
+    {
+      "file": "test/support/reliability/phase2c-final-publication-plans.mjs",
+      "sha256": "64017ce4a27a2947d31d26badaf3d0db44c6b34a6f52a345af9d510456f30d2f"
+    },
+    {
+      "file": "test/support/reliability/phase2c-fixture.mjs",
+      "sha256": "05baa6942445a7e3e2c69e81567edc9435108b47e1fe548d3f387c3c72d452e7"
+    },
+    {
+      "file": "test/support/reliability/phase2c-future-score-fixture.mjs",
+      "sha256": "90c5cae79c3ecf6ce58608d0506ce2e53006a8af7759ebf53e78e25aaf04f9cb"
+    },
+    {
+      "file": "test/support/reliability/phase2c-install.mjs",
+      "sha256": "23b859308ea18bca4e17fb3f5126bb0f34ef1bcccec65b5df5740b1dcadaa0e3"
+    },
+    {
+      "file": "test/support/reliability/phase2c-recovery-child.mjs",
+      "sha256": "d9aa96e7b926c7d2881aa58dba65cfc25a0f4c1ecb1391c90b7ef7b8a68414c2"
+    },
+    {
+      "file": "test/support/reliability/phase2c-worker-child.mjs",
+      "sha256": "97e47f786a1ced812391a45b3dff05a4300d3903c2789ea669d1f5019e060683"
+    },
+    {
+      "file": "test/support/reliability/phase2c-worker.mjs",
+      "sha256": "ddf547a4e22eb7d9529ca81f30498031bee5d803d1d7c9a7071425c9a3d93e69"
+    },
+    {
+      "file": "tools/reliability/benchmark-phase2c.mjs",
+      "sha256": "e7777d432286334d9f9b1b4de7ee910e437c4bd2d923a63f0121444512a2edf5"
+    },
+    {
+      "file": "tools/reliability/measure-phase2c-locks.mjs",
+      "sha256": "ec8007bc85ec795c0cb1632b8c012551c11a93840beaafdebcf41c6d89b666a4"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/README.md",
+      "sha256": "54b86fcffc1a7198673407cdd23f704f5616d7ec168949768fc0d61e83f6128e"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/Vendor/MobileMatchDetailModels.swift",
+      "sha256": "cbdaa786b1a30887f7ead127a984aa6db120799fc2f4d2993d25152fafa4cecb"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/Vendor/MobileModels.swift",
+      "sha256": "6d3cdb7836bf5a4b33b945e26e33450fe8be089d68e918cdb07fad97616764d9"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/Vendor/MobileParticipantContentValidation.swift",
+      "sha256": "1950693cb540a3900929a467e559cd1332a8d7c7eee10b03aacf86c56f9ce018"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/Vendor/MobilePlayerRoundPerformance.swift",
+      "sha256": "b0119121fd1fa9741a479ae9dd2ab8b122f535c7cb12a1fa44c91329403166b5"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/Vendor/MobilePlayersIntelligence.swift",
+      "sha256": "15a10cbbb234f68a0be9716d41b9895bf38b42d1ee9d51d19995c7e2952b2dad"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/Vendor/MobileR1RoundCompetition.swift",
+      "sha256": "5e77ec76a66ec611f3efcb68c4c3e8b2e04afc7346f0d8b114db8eeda8d2a5f6"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/Vendor/MobileR2PairCompetition.swift",
+      "sha256": "c035e856a9f894cf9179ddfacd5d4ab8f334e71f7764845aaca68a9575233ee5"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/Vendor/MobileR3RoundCompetition.swift",
+      "sha256": "42db679fbd020cc17dd99fff80fbc7e52fafc79c7b02c02b66ea0068011ead00"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/Vendor/MobileReadModels.swift",
+      "sha256": "738cb72710e17f963228f2000f6af38e6341d40d6a059c88d932bfa7cc6d855d"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/Vendor/MobileRoundScorecard.swift",
+      "sha256": "7d80c3e043c33573b8926fda2ca9674dd4a71dd014d4d705ea94ef4a251e8c45"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/Vendor/MobileScoringModels.swift",
+      "sha256": "f36c2a50bf74cc7d84ff6730818dfaa198c6f57bcc4d78a82f8dff4dcae3544c"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/Vendor/NativeEnvironment.swift",
+      "sha256": "30cdd8d29ededb51dfdbe72d967e76541ff48c1c2829b0217e892c51281ebdfa"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/fixture-manifest.json",
+      "sha256": "5c864a0b2aa3030af488a10c0b62fb7f90f6ab2f93a396d9fc1aaa0a92b433b7"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/main.swift",
+      "sha256": "5887b6935f2dff8a909b4b3978561660aec9658e4084b4547123018a6b22f6cf"
+    },
+    {
+      "file": "tools/reliability/native-never-again/decoder/run.mjs",
+      "sha256": "010b10a80bd5851428fe9217a1fc2b398a5115742541642f5ebc16087a6e9730"
+    },
+    {
+      "file": "tools/reliability/phase2-plan-capture.mjs",
+      "sha256": "5b3d94ab93924200d95a1d2558610f1915bb5a280896797556088075af48346c"
+    },
+    {
+      "file": "tools/reliability/phase2c-performance-gate.mjs",
+      "sha256": "9b308f85190fde7a06cffd68f8b2b7e25db33c7c15905d7b752d3ed4d8ec3212"
+    },
+    {
+      "file": "tools/reliability/run-phase2c-tests.mjs",
+      "sha256": "3a4ad164957939ecd1d5adefcc3fab721fb0fe038a9510c4379c557c97deef18"
+    },
+    {
+      "file": "tools/reliability/run-score-derived-worker.mjs",
+      "sha256": "65f7ab486d4a7404b1003d180cb08f91405ea3dca518c2f3cdaf27eec3c1e9db"
+    }
+  ],
+  "startedAt": "2026-09-28T17:29:12.261Z",
+  "completedAt": "2026-09-28T17:29:34.818Z",
+  "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "remoteNetwork": "DENIED_AT_NET_TLS_SOCKET",
+  "credentials": "REMOVED_FROM_CHILD_ENV",
+  "production": false,
+  "sources": [
+    {
+      "file": "test/reliability-phase2-fence-history.test.mjs",
+      "sha256": "4c865bec330acb12819b8dcb45582576166e500b138dbfd09f0c0c334be7d964"
+    },
+    {
+      "file": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+      "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+    },
+    {
+      "file": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+    },
+    {
+      "file": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+    },
+    {
+      "file": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "295f3657c710b0b1e7937d603ac8db9c5439afe20734d41dc0e61a2f8e320221"
+    }
+  ],
+  "counts": {
+    "tests": 4,
+    "pass": 4,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "exitCode": 0,
+  "error": null,
+  "result": "PASS",
+  "failures": [],
+  "rawArtifact": "index.tap",
+  "rawSha256": "648c948b438cbcc73956f0ec93dae7628d3d0b79c336fafa5ca23066472699a7",
+  "limitations": [
+    "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+  ]
+}

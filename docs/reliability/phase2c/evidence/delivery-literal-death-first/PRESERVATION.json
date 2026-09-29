@@ -1,0 +1,42 @@
+{
+  "status": "FAIL49_OF54",
+  "sourceStable": true,
+  "classification": "Pending review: three lease-shape oracle assumptions and one timestamp-claim hook arming assumption. Shipping source unchanged.",
+  "files": [
+    {
+      "original": "docs/reliability/phase2c/evidence/delivery.json",
+      "file": "delivery.json",
+      "sha256": "e18d37b7a1969d09c06ba1e504a16b9c37d8058913bab5820f998e479987f919"
+    },
+    {
+      "original": "docs/reliability/phase2c/evidence/delivery.tap",
+      "file": "delivery.tap",
+      "sha256": "ed87b24cb72bb3df708ca7bb374fa2eb788341c057d13262c6a13c12e087e82e"
+    },
+    {
+      "original": "docs/reliability/phase2c/evidence/worker-delivery-results.json",
+      "file": "worker-delivery-results.json",
+      "sha256": "0871c2b1f865d7465521f529110076d63b50f0d892e823fd368bfec27b7c06e3"
+    },
+    {
+      "original": "test/reliability-phase2c-worker.test.mjs",
+      "file": "reliability-phase2c-worker.test.mjs",
+      "sha256": "2bd017f6c15c0264de1abc3ca3691903b7faf0c6adde1697e2ad4acda4eff188"
+    },
+    {
+      "original": "test/support/reliability/phase2c-worker-child.mjs",
+      "file": "phase2c-worker-child.mjs",
+      "sha256": "2aace70cade841b2869de616795c5bcda16fda5dbb49f3f0716611032f39b0d5"
+    },
+    {
+      "original": "test/support/reliability/phase2c-worker.mjs",
+      "file": "phase2c-worker.mjs",
+      "sha256": "8296bc143395abfc70ef4f1fc71ff9a346cb89b87f69b2505528ca1106ec5d12"
+    },
+    {
+      "original": "test/support/reliability/phase2c-calculation-crash-hook.mjs",
+      "file": "phase2c-calculation-crash-hook.mjs",
+      "sha256": "69fc82b9b8a45f9ea60024fa5a064e5950f227c68a269e9e6651f00b7df8b766"
+    }
+  ]
+}

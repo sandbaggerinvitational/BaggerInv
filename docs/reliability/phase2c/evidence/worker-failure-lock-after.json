@@ -1,0 +1,2009 @@
+{
+  "schemaVersion": 1,
+  "environment": "OWNED_LOCAL_SOCKET_ONLY_POSTGRESQL17",
+  "production": false,
+  "tests": [
+    {
+      "scenario": "expiry-update",
+      "control": "SCORING_LOCK",
+      "order": "before",
+      "tournamentId": "2026",
+      "function": "score_derived_delivery_tick_v1",
+      "functionSHA256": "47caef0923b1a6daf35969de9a61c333b12fc9176ab6215d76c3e2d21a0ee9a7",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 12479,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 12480,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12478,
+          "wait": "advisory",
+          "query": "select public.score_derived_delivery_tick_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12480
+          ]
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 12479,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            12478
+          ]
+        },
+        {
+          "pid": 12480,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12478,
+          "wait": "advisory",
+          "query": "select public.score_derived_delivery_tick_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12480
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 12479,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            12478
+          ]
+        },
+        {
+          "pid": 12480,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 12478,
+          "wait": "transactionid",
+          "query": "select public.score_derived_delivery_tick_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12479
+          ]
+        }
+      ],
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "work": [],
+            "ready": {
+              "CALCUTTA": false,
+              "COMPETITION": false,
+              "INTELLIGENCE": false
+            },
+            "scope": {
+              "tournamentId": "2026",
+              "runtimeGenerationId": null
+            },
+            "calcutta": {
+              "auctionRevision": 37,
+              "auctionFingerprint": "2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a",
+              "configurationRevision": 2,
+              "configurationFingerprint": "6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474"
+            },
+            "terminal": 0,
+            "cancelled": false,
+            "activeLeases": 0,
+            "materialized": 0,
+            "waitingOwner": {
+              "NET_SKINS": 0
+            },
+            "blockedAutomatic": 0,
+            "pendingAutomatic": 2,
+            "statusIncomplete": false,
+            "terminalTruncated": false,
+            "waitingPublication": {
+              "FINAL_RECAP": 0
+            },
+            "blockedAutomaticLimit": 101,
+            "pendingAutomaticLimit": 101
+          }
+        },
+        "control": {
+          "ok": false,
+          "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (5,26) in relation \"competition_recalculation_jobs\"\nSQL statement \"insert into scoring_authority.competition_recalculation_jobs (\n      tournament_id, round_number, engine_key, status,\n      requested_source_revision, requested_at, started_at, completed_at,\n      last_error_code, last_error_safe, runtime_generation_id,\n      claim_token, claimed_by, lease_expires_at, updated_at\n    ) values (\n      target_tournament, 0, engine_value, 'PENDING',\n      pg_catalog.jsonb_build_object(\n        'reason', reason_value, 'revision', revision_value,\n        'transactional', true\n      ), pg_catalog.clock_timestamp(), null, null, null, null,\n      runtime_generation, null, null, null, pg_catalog.clock_timestamp()\n    ) on conflict (tournament_id, round_number, engine_key) do update set\n      status = 'PENDING',\n      requested_source_revision = excluded.requested_source_revision,\n      requested_at = excluded.requested_at,\n      started_at = null, completed_at = null,\n      last_error_code = null, last_error_safe = null,\n      runtime_generation_id = excluded.runtime_generation_id,\n      claim_token = null, claimed_by = null, lease_expires_at = null,\n      updated_at = excluded.updated_at\"\nPL/pgSQL function scoring_authority.enqueue_annual_derived_v1_change() line 132 at SQL statement\nSQL statement \"update scoring_authority.matches set\n    status = case when operation = 'MARK_LIVE' then 'LIVE' else status end,\n    scoring_locked = target_locked,\n    match_revision = next_match_revision,\n    permission_revision = next_permission_revision,\n    authority_updated_at = transition_at,\n    updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function public.mutate_production_match_control(jsonb) line 269 at SQL statement\n"
+        }
+      },
+      "sameControlRetry": true,
+      "expectedCounterexample": true,
+      "canonicalHolesUnchanged": 18
+    },
+    {
+      "scenario": "expiry-update",
+      "control": "SCORING_LOCK",
+      "order": "after",
+      "tournamentId": "2026",
+      "function": "score_derived_delivery_tick_v1",
+      "functionSHA256": "12c7784ef6af5f69d8cc4a93b27c91777a12c40265048f99c40fc0b1538cca6b",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 12525,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 12526,
+          "wait": "advisory",
+          "query": "select public.score_derived_delivery_tick_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12524
+          ]
+        },
+        {
+          "pid": 12524,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 12525,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            12526
+          ]
+        },
+        {
+          "pid": 12526,
+          "wait": "advisory",
+          "query": "select public.score_derived_delivery_tick_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12524
+          ]
+        },
+        {
+          "pid": 12524,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        }
+      ],
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "work": [],
+            "ready": {
+              "CALCUTTA": false,
+              "COMPETITION": false,
+              "INTELLIGENCE": false
+            },
+            "scope": {
+              "tournamentId": "2026",
+              "runtimeGenerationId": null
+            },
+            "calcutta": {
+              "auctionRevision": 37,
+              "auctionFingerprint": "2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a",
+              "configurationRevision": 2,
+              "configurationFingerprint": "6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474"
+            },
+            "terminal": 0,
+            "cancelled": false,
+            "activeLeases": 0,
+            "materialized": 0,
+            "waitingOwner": {
+              "NET_SKINS": 0
+            },
+            "blockedAutomatic": 0,
+            "pendingAutomatic": 2,
+            "statusIncomplete": false,
+            "terminalTruncated": false,
+            "waitingPublication": {
+              "FINAL_RECAP": 0
+            },
+            "blockedAutomaticLimit": 101,
+            "pendingAutomaticLimit": 101
+          }
+        },
+        "control": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "code": "SCORING_LOCK",
+            "status": "LIVE",
+            "match_id": "2026-R1-1",
+            "updated_at": "2026-09-29T21:05:17.821197+00:00",
+            "access_active": false,
+            "audit_created": true,
+            "match_revision": 19,
+            "scoring_locked": true,
+            "permission_revision": 2,
+            "scoring_context_hash": null,
+            "google_outbox_created": true,
+            "permission_transition": {
+              "after": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P01",
+                  "revoked_at": "2026-09-29T21:05:17.821197+00:00",
+                  "updated_at": "2026-09-29T21:05:17.821197+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P02",
+                  "revoked_at": "2026-09-29T21:05:17.821197+00:00",
+                  "updated_at": "2026-09-29T21:05:17.821197+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P13",
+                  "revoked_at": "2026-09-29T21:05:17.821197+00:00",
+                  "updated_at": "2026-09-29T21:05:17.821197+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P14",
+                  "revoked_at": "2026-09-29T21:05:17.821197+00:00",
+                  "updated_at": "2026-09-29T21:05:17.821197+00:00",
+                  "permission_revision": 2
+                }
+              ],
+              "before": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P01",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P02",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P13",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P14",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                }
+              ]
+            },
+            "google_target_match_id": "2026-R1-1",
+            "previous_permission_revision": 1
+          }
+        }
+      },
+      "expectedCounterexample": false,
+      "canonicalHolesUnchanged": 18
+    },
+    {
+      "scenario": "expiry-update",
+      "control": "FINALIZE",
+      "order": "before",
+      "tournamentId": "2026",
+      "function": "score_derived_delivery_tick_v1",
+      "functionSHA256": "47caef0923b1a6daf35969de9a61c333b12fc9176ab6215d76c3e2d21a0ee9a7",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 12568,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12569,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 12570,
+          "wait": "advisory",
+          "query": "select public.score_derived_delivery_tick_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12568
+          ]
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 12568,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12569,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            12570
+          ]
+        },
+        {
+          "pid": 12570,
+          "wait": "advisory",
+          "query": "select public.score_derived_delivery_tick_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12568
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 12568,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 12569,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            12570
+          ]
+        },
+        {
+          "pid": 12570,
+          "wait": "transactionid",
+          "query": "select public.score_derived_delivery_tick_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12569
+          ]
+        }
+      ],
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "work": [],
+            "ready": {
+              "CALCUTTA": false,
+              "COMPETITION": false,
+              "INTELLIGENCE": false
+            },
+            "scope": {
+              "tournamentId": "2026",
+              "runtimeGenerationId": null
+            },
+            "calcutta": {
+              "auctionRevision": 37,
+              "auctionFingerprint": "2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a",
+              "configurationRevision": 2,
+              "configurationFingerprint": "6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474"
+            },
+            "terminal": 0,
+            "cancelled": false,
+            "activeLeases": 0,
+            "materialized": 0,
+            "waitingOwner": {
+              "NET_SKINS": 0
+            },
+            "blockedAutomatic": 0,
+            "pendingAutomatic": 2,
+            "statusIncomplete": false,
+            "terminalTruncated": false,
+            "waitingPublication": {
+              "FINAL_RECAP": 0
+            },
+            "blockedAutomaticLimit": 101,
+            "pendingAutomaticLimit": 101
+          }
+        },
+        "control": {
+          "ok": false,
+          "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (5,26) in relation \"competition_recalculation_jobs\"\nSQL statement \"insert into scoring_authority.competition_recalculation_jobs (\n      tournament_id, round_number, engine_key, status,\n      requested_source_revision, requested_at, started_at, completed_at,\n      last_error_code, last_error_safe, runtime_generation_id,\n      claim_token, claimed_by, lease_expires_at, updated_at\n    ) values (\n      target_tournament, 0, engine_value, 'PENDING',\n      pg_catalog.jsonb_build_object(\n        'reason', reason_value, 'revision', revision_value,\n        'transactional', true\n      ), pg_catalog.clock_timestamp(), null, null, null, null,\n      runtime_generation, null, null, null, pg_catalog.clock_timestamp()\n    ) on conflict (tournament_id, round_number, engine_key) do update set\n      status = 'PENDING',\n      requested_source_revision = excluded.requested_source_revision,\n      requested_at = excluded.requested_at,\n      started_at = null, completed_at = null,\n      last_error_code = null, last_error_safe = null,\n      runtime_generation_id = excluded.runtime_generation_id,\n      claim_token = null, claimed_by = null, lease_expires_at = null,\n      updated_at = excluded.updated_at\"\nPL/pgSQL function scoring_authority.enqueue_annual_derived_v1_change() line 132 at SQL statement\nSQL statement \"update scoring_authority.matches set\n    status = 'FINAL', scoring_locked = true, match_revision = next_revision,\n    permission_revision = next_permission_revision, finalized_at = transition_at,\n    authority_updated_at = transition_at, updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function public.finalize_production_match(jsonb) line 77 at SQL statement\n"
+        }
+      },
+      "sameControlRetry": true,
+      "expectedCounterexample": true,
+      "canonicalHolesUnchanged": 18
+    },
+    {
+      "scenario": "expiry-update",
+      "control": "FINALIZE",
+      "order": "after",
+      "tournamentId": "2026",
+      "function": "score_derived_delivery_tick_v1",
+      "functionSHA256": "12c7784ef6af5f69d8cc4a93b27c91777a12c40265048f99c40fc0b1538cca6b",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 12645,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12644,
+          "wait": "advisory",
+          "query": "select public.score_derived_delivery_tick_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12645
+          ]
+        },
+        {
+          "pid": 12646,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 12645,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12644,
+          "wait": "advisory",
+          "query": "select public.score_derived_delivery_tick_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12645
+          ]
+        },
+        {
+          "pid": 12646,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            12644
+          ]
+        }
+      ],
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "work": [],
+            "ready": {
+              "CALCUTTA": false,
+              "COMPETITION": false,
+              "INTELLIGENCE": false
+            },
+            "scope": {
+              "tournamentId": "2026",
+              "runtimeGenerationId": null
+            },
+            "calcutta": {
+              "auctionRevision": 37,
+              "auctionFingerprint": "2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a",
+              "configurationRevision": 2,
+              "configurationFingerprint": "6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474"
+            },
+            "terminal": 0,
+            "cancelled": false,
+            "activeLeases": 0,
+            "materialized": 0,
+            "waitingOwner": {
+              "NET_SKINS": 0
+            },
+            "blockedAutomatic": 0,
+            "pendingAutomatic": 2,
+            "statusIncomplete": false,
+            "terminalTruncated": false,
+            "waitingPublication": {
+              "FINAL_RECAP": 0
+            },
+            "blockedAutomaticLimit": 101,
+            "pendingAutomaticLimit": 101
+          }
+        },
+        "control": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "code": "FINALIZED",
+            "match": {
+              "clinched": false,
+              "back_winner": "Team 1",
+              "current_hole": 18,
+              "front_winner": "Team 1",
+              "scored_holes": 18,
+              "result_winner": "Team 1",
+              "team_1_points": 3,
+              "team_2_points": 0,
+              "overall_winner": "Team 1",
+              "running_result": "Team 1 16 UP through 18",
+              "holes_remaining": 0,
+              "team_1_holes_won": 16,
+              "team_2_holes_won": 0,
+              "scorecard_complete": true
+            },
+            "match_id": "2026-R1-1",
+            "updated_at": "2026-09-29T21:05:20.016024+00:00",
+            "scored_holes": 18,
+            "access_active": false,
+            "audit_created": true,
+            "result_winner": "Team 1",
+            "team_1_points": 3,
+            "team_2_points": 0,
+            "match_revision": 19,
+            "scoring_locked": true,
+            "scorecard_archive": {
+              "ok": true,
+              "created": true,
+              "snapshot_id": "bbb3397b-6893-4581-927e-d78ba240c52a",
+              "payload_hash": "69c21c48c778a56daae104a2d5926e5416a780a4e09ee1ba37ca0e502059dece",
+              "match_revision": 19,
+              "snapshot_revision": 1,
+              "source_fingerprint": "a61e1b80d81f2737440dc402c1134764e51d9a4180879602a83b6d2abd71ab0e"
+            },
+            "scorecard_complete": true,
+            "permission_revision": 2,
+            "google_outbox_created": true,
+            "permission_transition": {
+              "after": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P01",
+                  "revoked_at": "2026-09-29T21:05:20.016024+00:00",
+                  "updated_at": "2026-09-29T21:05:20.016024+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P02",
+                  "revoked_at": "2026-09-29T21:05:20.016024+00:00",
+                  "updated_at": "2026-09-29T21:05:20.016024+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P13",
+                  "revoked_at": "2026-09-29T21:05:20.016024+00:00",
+                  "updated_at": "2026-09-29T21:05:20.016024+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P14",
+                  "revoked_at": "2026-09-29T21:05:20.016024+00:00",
+                  "updated_at": "2026-09-29T21:05:20.016024+00:00",
+                  "permission_revision": 2
+                }
+              ],
+              "before": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P01",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P02",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P13",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P14",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                }
+              ]
+            },
+            "google_target_match_id": "2026-R1-1",
+            "previous_permission_revision": 1
+          }
+        }
+      },
+      "expectedCounterexample": false,
+      "canonicalHolesUnchanged": 18
+    },
+    {
+      "scenario": "bundle-failure",
+      "control": "SCORING_LOCK",
+      "order": "before",
+      "tournamentId": "2026",
+      "function": "fail_intelligence_derived_bundle_v1",
+      "functionSHA256": "2170ab1d5a36bd5d63bddf9b2b7b48bdcbb52380209e232b9fc36790749f8bd4",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 12686,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12687,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 12688,
+          "wait": "advisory",
+          "query": "select public.fail_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.",
+          "blockedBy": [
+            12686
+          ]
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 12686,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12687,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            12688
+          ]
+        },
+        {
+          "pid": 12688,
+          "wait": "advisory",
+          "query": "select public.fail_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.",
+          "blockedBy": [
+            12686
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 12686,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 12687,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            12688
+          ]
+        },
+        {
+          "pid": 12688,
+          "wait": "transactionid",
+          "query": "select public.fail_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.",
+          "blockedBy": [
+            12687
+          ]
+        }
+      ],
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "marked": 2,
+            "superseded": false
+          }
+        },
+        "control": {
+          "ok": false,
+          "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (5,26) in relation \"competition_recalculation_jobs\"\nSQL statement \"insert into scoring_authority.competition_recalculation_jobs (\n      tournament_id, round_number, engine_key, status,\n      requested_source_revision, requested_at, started_at, completed_at,\n      last_error_code, last_error_safe, runtime_generation_id,\n      claim_token, claimed_by, lease_expires_at, updated_at\n    ) values (\n      target_tournament, 0, engine_value, 'PENDING',\n      pg_catalog.jsonb_build_object(\n        'reason', reason_value, 'revision', revision_value,\n        'transactional', true\n      ), pg_catalog.clock_timestamp(), null, null, null, null,\n      runtime_generation, null, null, null, pg_catalog.clock_timestamp()\n    ) on conflict (tournament_id, round_number, engine_key) do update set\n      status = 'PENDING',\n      requested_source_revision = excluded.requested_source_revision,\n      requested_at = excluded.requested_at,\n      started_at = null, completed_at = null,\n      last_error_code = null, last_error_safe = null,\n      runtime_generation_id = excluded.runtime_generation_id,\n      claim_token = null, claimed_by = null, lease_expires_at = null,\n      updated_at = excluded.updated_at\"\nPL/pgSQL function scoring_authority.enqueue_annual_derived_v1_change() line 132 at SQL statement\nSQL statement \"update scoring_authority.matches set\n    status = case when operation = 'MARK_LIVE' then 'LIVE' else status end,\n    scoring_locked = target_locked,\n    match_revision = next_match_revision,\n    permission_revision = next_permission_revision,\n    authority_updated_at = transition_at,\n    updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function public.mutate_production_match_control(jsonb) line 269 at SQL statement\n"
+        }
+      },
+      "sameControlRetry": true,
+      "expectedCounterexample": true,
+      "canonicalHolesUnchanged": 18
+    },
+    {
+      "scenario": "bundle-failure",
+      "control": "SCORING_LOCK",
+      "order": "after",
+      "tournamentId": "2026",
+      "function": "fail_intelligence_derived_bundle_v1",
+      "functionSHA256": "d31ffd2a6b0cde4b5a34685a35da6af49da74e4ca25d89d5df4cc1545a167796",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 12743,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 12741,
+          "wait": "advisory",
+          "query": "select public.fail_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.",
+          "blockedBy": [
+            12742
+          ]
+        },
+        {
+          "pid": 12742,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 12743,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            12741
+          ]
+        },
+        {
+          "pid": 12741,
+          "wait": "advisory",
+          "query": "select public.fail_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.",
+          "blockedBy": [
+            12742
+          ]
+        },
+        {
+          "pid": 12742,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        }
+      ],
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "marked": 2,
+            "superseded": false
+          }
+        },
+        "control": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "code": "SCORING_LOCK",
+            "status": "LIVE",
+            "match_id": "2026-R1-1",
+            "updated_at": "2026-09-29T21:05:21.998965+00:00",
+            "access_active": false,
+            "audit_created": true,
+            "match_revision": 19,
+            "scoring_locked": true,
+            "permission_revision": 2,
+            "scoring_context_hash": null,
+            "google_outbox_created": true,
+            "permission_transition": {
+              "after": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P01",
+                  "revoked_at": "2026-09-29T21:05:21.998965+00:00",
+                  "updated_at": "2026-09-29T21:05:21.998965+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P02",
+                  "revoked_at": "2026-09-29T21:05:21.998965+00:00",
+                  "updated_at": "2026-09-29T21:05:21.998965+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P13",
+                  "revoked_at": "2026-09-29T21:05:21.998965+00:00",
+                  "updated_at": "2026-09-29T21:05:21.998965+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P14",
+                  "revoked_at": "2026-09-29T21:05:21.998965+00:00",
+                  "updated_at": "2026-09-29T21:05:21.998965+00:00",
+                  "permission_revision": 2
+                }
+              ],
+              "before": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P01",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P02",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P13",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P14",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                }
+              ]
+            },
+            "google_target_match_id": "2026-R1-1",
+            "previous_permission_revision": 1
+          }
+        }
+      },
+      "expectedCounterexample": false,
+      "canonicalHolesUnchanged": 18
+    },
+    {
+      "scenario": "bundle-failure",
+      "control": "FINALIZE",
+      "order": "before",
+      "tournamentId": "2026",
+      "function": "fail_intelligence_derived_bundle_v1",
+      "functionSHA256": "2170ab1d5a36bd5d63bddf9b2b7b48bdcbb52380209e232b9fc36790749f8bd4",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 12789,
+          "wait": "advisory",
+          "query": "select public.fail_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.",
+          "blockedBy": [
+            12790
+          ]
+        },
+        {
+          "pid": 12790,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12791,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 12789,
+          "wait": "advisory",
+          "query": "select public.fail_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.",
+          "blockedBy": [
+            12790
+          ]
+        },
+        {
+          "pid": 12790,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12791,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            12789
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 12789,
+          "wait": "transactionid",
+          "query": "select public.fail_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.",
+          "blockedBy": [
+            12791
+          ]
+        },
+        {
+          "pid": 12790,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 12791,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            12789
+          ]
+        }
+      ],
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "marked": 2,
+            "superseded": false
+          }
+        },
+        "control": {
+          "ok": false,
+          "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (5,26) in relation \"competition_recalculation_jobs\"\nSQL statement \"insert into scoring_authority.competition_recalculation_jobs (\n      tournament_id, round_number, engine_key, status,\n      requested_source_revision, requested_at, started_at, completed_at,\n      last_error_code, last_error_safe, runtime_generation_id,\n      claim_token, claimed_by, lease_expires_at, updated_at\n    ) values (\n      target_tournament, 0, engine_value, 'PENDING',\n      pg_catalog.jsonb_build_object(\n        'reason', reason_value, 'revision', revision_value,\n        'transactional', true\n      ), pg_catalog.clock_timestamp(), null, null, null, null,\n      runtime_generation, null, null, null, pg_catalog.clock_timestamp()\n    ) on conflict (tournament_id, round_number, engine_key) do update set\n      status = 'PENDING',\n      requested_source_revision = excluded.requested_source_revision,\n      requested_at = excluded.requested_at,\n      started_at = null, completed_at = null,\n      last_error_code = null, last_error_safe = null,\n      runtime_generation_id = excluded.runtime_generation_id,\n      claim_token = null, claimed_by = null, lease_expires_at = null,\n      updated_at = excluded.updated_at\"\nPL/pgSQL function scoring_authority.enqueue_annual_derived_v1_change() line 132 at SQL statement\nSQL statement \"update scoring_authority.matches set\n    status = 'FINAL', scoring_locked = true, match_revision = next_revision,\n    permission_revision = next_permission_revision, finalized_at = transition_at,\n    authority_updated_at = transition_at, updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function public.finalize_production_match(jsonb) line 77 at SQL statement\n"
+        }
+      },
+      "sameControlRetry": true,
+      "expectedCounterexample": true,
+      "canonicalHolesUnchanged": 18
+    },
+    {
+      "scenario": "bundle-failure",
+      "control": "FINALIZE",
+      "order": "after",
+      "tournamentId": "2026",
+      "function": "fail_intelligence_derived_bundle_v1",
+      "functionSHA256": "d31ffd2a6b0cde4b5a34685a35da6af49da74e4ca25d89d5df4cc1545a167796",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 12847,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 12848,
+          "wait": "advisory",
+          "query": "select public.fail_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.",
+          "blockedBy": [
+            12846
+          ]
+        },
+        {
+          "pid": 12846,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 12847,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            12848
+          ]
+        },
+        {
+          "pid": 12848,
+          "wait": "advisory",
+          "query": "select public.fail_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.",
+          "blockedBy": [
+            12846
+          ]
+        },
+        {
+          "pid": 12846,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        }
+      ],
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "marked": 2,
+            "superseded": false
+          }
+        },
+        "control": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "code": "FINALIZED",
+            "match": {
+              "clinched": false,
+              "back_winner": "Team 1",
+              "current_hole": 18,
+              "front_winner": "Team 1",
+              "scored_holes": 18,
+              "result_winner": "Team 1",
+              "team_1_points": 3,
+              "team_2_points": 0,
+              "overall_winner": "Team 1",
+              "running_result": "Team 1 16 UP through 18",
+              "holes_remaining": 0,
+              "team_1_holes_won": 16,
+              "team_2_holes_won": 0,
+              "scorecard_complete": true
+            },
+            "match_id": "2026-R1-1",
+            "updated_at": "2026-09-29T21:05:24.091746+00:00",
+            "scored_holes": 18,
+            "access_active": false,
+            "audit_created": true,
+            "result_winner": "Team 1",
+            "team_1_points": 3,
+            "team_2_points": 0,
+            "match_revision": 19,
+            "scoring_locked": true,
+            "scorecard_archive": {
+              "ok": true,
+              "created": true,
+              "snapshot_id": "b1f35fea-1800-40e5-bf36-273f3b9620f3",
+              "payload_hash": "8163a29ee431d773f014eb945e7f59aaec057924c21099b65dff2d72017442fe",
+              "match_revision": 19,
+              "snapshot_revision": 1,
+              "source_fingerprint": "95df995d5ed914d3b12586480c98b78bce94037f551b3bd5365a4b1f23fd8896"
+            },
+            "scorecard_complete": true,
+            "permission_revision": 2,
+            "google_outbox_created": true,
+            "permission_transition": {
+              "after": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P01",
+                  "revoked_at": "2026-09-29T21:05:24.091746+00:00",
+                  "updated_at": "2026-09-29T21:05:24.091746+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P02",
+                  "revoked_at": "2026-09-29T21:05:24.091746+00:00",
+                  "updated_at": "2026-09-29T21:05:24.091746+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P13",
+                  "revoked_at": "2026-09-29T21:05:24.091746+00:00",
+                  "updated_at": "2026-09-29T21:05:24.091746+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P14",
+                  "revoked_at": "2026-09-29T21:05:24.091746+00:00",
+                  "updated_at": "2026-09-29T21:05:24.091746+00:00",
+                  "permission_revision": 2
+                }
+              ],
+              "before": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P01",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P02",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P13",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P14",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                }
+              ]
+            },
+            "google_target_match_id": "2026-R1-1",
+            "previous_permission_revision": 1
+          }
+        }
+      },
+      "expectedCounterexample": false,
+      "canonicalHolesUnchanged": 18
+    },
+    {
+      "scenario": "preclaim-skip-locked",
+      "control": "SCORING_LOCK",
+      "order": "after",
+      "tournamentId": "2026",
+      "function": "fail_score_derived_preclaim_v1",
+      "functionSHA256": "6abcd333cc3a0c7e379e7cdf06622883df3f7f9854bcfcd3edeb0dfd564dcd51",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 12894,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 12893,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12895,
+          "wait": "advisory",
+          "query": "select public.fail_score_derived_preclaim_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12893
+          ]
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 12894,
+          "wait": "transactionid",
+          "query": "select public.mutate_production_match_control('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supa",
+          "blockedBy": [
+            12895
+          ]
+        },
+        {
+          "pid": 12893,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12895,
+          "wait": "advisory",
+          "query": "select public.fail_score_derived_preclaim_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12893
+          ]
+        }
+      ],
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "marked": 1
+          }
+        },
+        "control": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "code": "SCORING_LOCK",
+            "status": "LIVE",
+            "match_id": "2026-R1-1",
+            "updated_at": "2026-09-29T21:05:24.583577+00:00",
+            "access_active": false,
+            "audit_created": true,
+            "match_revision": 19,
+            "scoring_locked": true,
+            "permission_revision": 2,
+            "scoring_context_hash": null,
+            "google_outbox_created": true,
+            "permission_transition": {
+              "after": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P01",
+                  "revoked_at": "2026-09-29T21:05:24.583577+00:00",
+                  "updated_at": "2026-09-29T21:05:24.583577+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P02",
+                  "revoked_at": "2026-09-29T21:05:24.583577+00:00",
+                  "updated_at": "2026-09-29T21:05:24.583577+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P13",
+                  "revoked_at": "2026-09-29T21:05:24.583577+00:00",
+                  "updated_at": "2026-09-29T21:05:24.583577+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P14",
+                  "revoked_at": "2026-09-29T21:05:24.583577+00:00",
+                  "updated_at": "2026-09-29T21:05:24.583577+00:00",
+                  "permission_revision": 2
+                }
+              ],
+              "before": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P01",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P02",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P13",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P14",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                }
+              ]
+            },
+            "google_target_match_id": "2026-R1-1",
+            "previous_permission_revision": 1
+          }
+        }
+      },
+      "expectedCounterexample": false,
+      "canonicalHolesUnchanged": 18
+    },
+    {
+      "scenario": "preclaim-skip-locked",
+      "control": "FINALIZE",
+      "order": "after",
+      "tournamentId": "2026",
+      "function": "fail_score_derived_preclaim_v1",
+      "functionSHA256": "6abcd333cc3a0c7e379e7cdf06622883df3f7f9854bcfcd3edeb0dfd564dcd51",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 12935,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 12934,
+          "wait": "advisory",
+          "query": "select public.fail_score_derived_preclaim_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12933
+          ]
+        },
+        {
+          "pid": 12933,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 12935,
+          "wait": "transactionid",
+          "query": "select public.finalize_production_match('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supabase.c",
+          "blockedBy": [
+            12934
+          ]
+        },
+        {
+          "pid": 12934,
+          "wait": "advisory",
+          "query": "select public.fail_score_derived_preclaim_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhhtxaywtqllynrmxe.supab",
+          "blockedBy": [
+            12933
+          ]
+        },
+        {
+          "pid": 12933,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        }
+      ],
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "marked": 1
+          }
+        },
+        "control": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "code": "FINALIZED",
+            "match": {
+              "clinched": false,
+              "back_winner": "Team 1",
+              "current_hole": 18,
+              "front_winner": "Team 1",
+              "scored_holes": 18,
+              "result_winner": "Team 1",
+              "team_1_points": 3,
+              "team_2_points": 0,
+              "overall_winner": "Team 1",
+              "running_result": "Team 1 16 UP through 18",
+              "holes_remaining": 0,
+              "team_1_holes_won": 16,
+              "team_2_holes_won": 0,
+              "scorecard_complete": true
+            },
+            "match_id": "2026-R1-1",
+            "updated_at": "2026-09-29T21:05:25.017483+00:00",
+            "scored_holes": 18,
+            "access_active": false,
+            "audit_created": true,
+            "result_winner": "Team 1",
+            "team_1_points": 3,
+            "team_2_points": 0,
+            "match_revision": 19,
+            "scoring_locked": true,
+            "scorecard_archive": {
+              "ok": true,
+              "created": true,
+              "snapshot_id": "e685074e-176b-4917-8a51-8fb4b683b654",
+              "payload_hash": "f04aaebbfbba5ee25a159a55d4e7ea59063263e50eb9ebc73976609c119de714",
+              "match_revision": 19,
+              "snapshot_revision": 1,
+              "source_fingerprint": "1495c5687f2ebc85ff02c60a75bbc06a8b4310e8b651ce974788702af95f911e"
+            },
+            "scorecard_complete": true,
+            "permission_revision": 2,
+            "google_outbox_created": true,
+            "permission_transition": {
+              "after": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P01",
+                  "revoked_at": "2026-09-29T21:05:25.017483+00:00",
+                  "updated_at": "2026-09-29T21:05:25.017483+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P02",
+                  "revoked_at": "2026-09-29T21:05:25.017483+00:00",
+                  "updated_at": "2026-09-29T21:05:25.017483+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P13",
+                  "revoked_at": "2026-09-29T21:05:25.017483+00:00",
+                  "updated_at": "2026-09-29T21:05:25.017483+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P14",
+                  "revoked_at": "2026-09-29T21:05:25.017483+00:00",
+                  "updated_at": "2026-09-29T21:05:25.017483+00:00",
+                  "permission_revision": 2
+                }
+              ],
+              "before": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P01",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P02",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P13",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P14",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-29T21:05:08.680058+00:00",
+                  "permission_revision": 1
+                }
+              ]
+            },
+            "google_target_match_id": "2026-R1-1",
+            "previous_permission_revision": 1
+          }
+        }
+      },
+      "expectedCounterexample": false,
+      "canonicalHolesUnchanged": 18
+    },
+    {
+      "scenario": "future-expiry",
+      "control": "INSTALLED_MATCH_CONTROL_TRIGGER",
+      "order": "before",
+      "tournamentId": "2099",
+      "function": "future_production_claim_competition_derived_jobs_v1",
+      "functionSHA256": "34455c9c344c8f5bce5ba45f1ffe4d4fe1a8e3a7fba62a906c070884c7c0ee3f",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 12983,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        },
+        {
+          "pid": 12982,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12981,
+          "wait": "advisory",
+          "query": "select public.future_production_claim_competition_derived_jobs_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhh",
+          "blockedBy": [
+            12982
+          ]
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 12983,
+          "wait": "transactionid",
+          "query": "update scoring_authority.matches set scoring_locked=true,match_revision=match_revision+1,authority_updated_at=clock_timestamp(),updated_at=clock_timestamp()wher",
+          "blockedBy": [
+            12981
+          ]
+        },
+        {
+          "pid": 12982,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 12981,
+          "wait": "advisory",
+          "query": "select public.future_production_claim_competition_derived_jobs_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhh",
+          "blockedBy": [
+            12982
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 12983,
+          "wait": "transactionid",
+          "query": "update scoring_authority.matches set scoring_locked=true,match_revision=match_revision+1,authority_updated_at=clock_timestamp(),updated_at=clock_timestamp()wher",
+          "blockedBy": [
+            12981
+          ]
+        },
+        {
+          "pid": 12982,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 12981,
+          "wait": "transactionid",
+          "query": "select public.future_production_claim_competition_derived_jobs_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhh",
+          "blockedBy": [
+            12983
+          ]
+        }
+      ],
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "claims": []
+          }
+        },
+        "control": {
+          "ok": false,
+          "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (5,30) in relation \"competition_recalculation_jobs\"\nSQL statement \"insert into scoring_authority.competition_recalculation_jobs (\n      tournament_id, round_number, engine_key, status,\n      requested_source_revision, requested_at, started_at, completed_at,\n      last_error_code, last_error_safe, runtime_generation_id,\n      claim_token, claimed_by, lease_expires_at, updated_at\n    ) values (\n      target_tournament, 0, engine_value, 'PENDING',\n      pg_catalog.jsonb_build_object(\n        'reason', reason_value, 'revision', revision_value,\n        'transactional', true\n      ), pg_catalog.clock_timestamp(), null, null, null, null,\n      runtime_generation, null, null, null, pg_catalog.clock_timestamp()\n    ) on conflict (tournament_id, round_number, engine_key) do update set\n      status = 'PENDING',\n      requested_source_revision = excluded.requested_source_revision,\n      requested_at = excluded.requested_at,\n      started_at = null, completed_at = null,\n      last_error_code = null, last_error_safe = null,\n      runtime_generation_id = excluded.runtime_generation_id,\n      claim_token = null, claimed_by = null, lease_expires_at = null,\n      updated_at = excluded.updated_at\"\nPL/pgSQL function scoring_authority.enqueue_annual_derived_v1_change() line 132 at SQL statement\n"
+        }
+      },
+      "sameControlRetry": true,
+      "expectedCounterexample": true,
+      "canonicalHolesUnchanged": 18
+    },
+    {
+      "scenario": "future-expiry",
+      "control": "INSTALLED_MATCH_CONTROL_TRIGGER",
+      "order": "after",
+      "tournamentId": "2099",
+      "function": "future_production_claim_competition_derived_jobs_v1",
+      "functionSHA256": "77819f088f886b8d43bb37397976c0bc05bb931411010cdd302134e7e1d33d21",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 13025,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 13026,
+          "wait": "advisory",
+          "query": "select public.future_production_claim_competition_derived_jobs_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhh",
+          "blockedBy": [
+            13025
+          ]
+        },
+        {
+          "pid": 13027,
+          "wait": "ClientRead",
+          "query": "set deadlock_timeout='5s';",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 13025,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 13026,
+          "wait": "advisory",
+          "query": "select public.future_production_claim_competition_derived_jobs_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ymqhh",
+          "blockedBy": [
+            13025
+          ]
+        },
+        {
+          "pid": 13027,
+          "wait": "transactionid",
+          "query": "update scoring_authority.matches set scoring_locked=true,match_revision=match_revision+1,authority_updated_at=clock_timestamp(),updated_at=clock_timestamp()wher",
+          "blockedBy": [
+            13026
+          ]
+        }
+      ],
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "claims": []
+          }
+        },
+        "control": {
+          "ok": true,
+          "value": {
+            "ok": true
+          }
+        }
+      },
+      "expectedCounterexample": false,
+      "canonicalHolesUnchanged": 18
+    },
+    {
+      "scenario": "future-intelligence",
+      "control": "INSTALLED_MATCH_CONTROL_TRIGGER",
+      "order": "before",
+      "tournamentId": "2099",
+      "function": "future_production_claim_intelligence_derived_bundle_v1",
+      "functionSHA256": "b06ab7783b0e5526f9c48cd28dd74d9c69dddf3ff5e063b52230adbceab7227c",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 13065,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 13064,
+          "wait": "advisory",
+          "query": "update scoring_authority.matches set scoring_locked=true,match_revision=match_revision+1,authority_updated_at=clock_timestamp(),updated_at=clock_timestamp()wher",
+          "blockedBy": [
+            13065
+          ]
+        },
+        {
+          "pid": 13063,
+          "wait": "ClientRead",
+          "query": "set bagger.isolated_failure_worker='no';",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 13065,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        },
+        {
+          "pid": 13064,
+          "wait": "advisory",
+          "query": "update scoring_authority.matches set scoring_locked=true,match_revision=match_revision+1,authority_updated_at=clock_timestamp(),updated_at=clock_timestamp()wher",
+          "blockedBy": [
+            13065
+          ]
+        },
+        {
+          "pid": 13063,
+          "wait": "transactionid",
+          "query": "select public.future_production_claim_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ym",
+          "blockedBy": [
+            13064
+          ]
+        }
+      ],
+      "workerManualPrelock": false,
+      "reciprocal": [
+        {
+          "pid": 13065,
+          "wait": "ClientRead",
+          "query": "commit;",
+          "blockedBy": []
+        },
+        {
+          "pid": 13064,
+          "wait": "transactionid",
+          "query": "update scoring_authority.matches set scoring_locked=true,match_revision=match_revision+1,authority_updated_at=clock_timestamp(),updated_at=clock_timestamp()wher",
+          "blockedBy": [
+            13063
+          ]
+        },
+        {
+          "pid": 13063,
+          "wait": "transactionid",
+          "query": "select public.future_production_claim_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ym",
+          "blockedBy": [
+            13064
+          ]
+        }
+      ],
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "worker_id": "failure-lock-worker",
+            "claim_token": "09551ddf-8098-4063-b165-1b4005e78eed",
+            "claim_started_at": "2026-09-29T21:05:27.39464+00:00",
+            "runtime_generation_id": "a2200000-0000-4000-8000-000000000003"
+          }
+        },
+        "control": {
+          "ok": false,
+          "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (5,30) in relation \"competition_recalculation_jobs\"\nSQL statement \"insert into scoring_authority.competition_recalculation_jobs (\n      tournament_id, round_number, engine_key, status,\n      requested_source_revision, requested_at, started_at, completed_at,\n      last_error_code, last_error_safe, runtime_generation_id,\n      claim_token, claimed_by, lease_expires_at, updated_at\n    ) values (\n      target_tournament, 0, engine_value, 'PENDING',\n      pg_catalog.jsonb_build_object(\n        'reason', reason_value, 'revision', revision_value,\n        'transactional', true\n      ), pg_catalog.clock_timestamp(), null, null, null, null,\n      runtime_generation, null, null, null, pg_catalog.clock_timestamp()\n    ) on conflict (tournament_id, round_number, engine_key) do update set\n      status = 'PENDING',\n      requested_source_revision = excluded.requested_source_revision,\n      requested_at = excluded.requested_at,\n      started_at = null, completed_at = null,\n      last_error_code = null, last_error_safe = null,\n      runtime_generation_id = excluded.runtime_generation_id,\n      claim_token = null, claimed_by = null, lease_expires_at = null,\n      updated_at = excluded.updated_at\"\nPL/pgSQL function scoring_authority.enqueue_annual_derived_v1_change() line 132 at SQL statement\n"
+        }
+      },
+      "sameControlRetry": true,
+      "expectedCounterexample": true,
+      "canonicalHolesUnchanged": 18
+    },
+    {
+      "scenario": "future-intelligence",
+      "control": "INSTALLED_MATCH_CONTROL_TRIGGER",
+      "order": "after",
+      "tournamentId": "2099",
+      "function": "future_production_claim_intelligence_derived_bundle_v1",
+      "functionSHA256": "9d2ac11f2084f4c368c587ebe01fc5a796559f9af54305033468af54ace3b90c",
+      "controlBudgetMs": 1000,
+      "workerBudgetMs": 5000,
+      "pass": true,
+      "barrier": [
+        {
+          "pid": 13109,
+          "wait": "ClientRead",
+          "query": "set bagger.isolated_failure_worker='no';",
+          "blockedBy": []
+        },
+        {
+          "pid": 13108,
+          "wait": "advisory",
+          "query": "update scoring_authority.matches set scoring_locked=true,match_revision=match_revision+1,authority_updated_at=clock_timestamp(),updated_at=clock_timestamp()wher",
+          "blockedBy": [
+            13107
+          ]
+        },
+        {
+          "pid": 13107,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        }
+      ],
+      "oneWay": [
+        {
+          "pid": 13109,
+          "wait": "transactionid",
+          "query": "select public.future_production_claim_intelligence_derived_bundle_v1('{\"environment\":\"PRODUCTION\",\"project_ref\":\"ymqhhtxaywtqllynrmxe\",\"project_url\":\"https://ym",
+          "blockedBy": [
+            13108
+          ]
+        },
+        {
+          "pid": 13108,
+          "wait": "advisory",
+          "query": "update scoring_authority.matches set scoring_locked=true,match_revision=match_revision+1,authority_updated_at=clock_timestamp(),updated_at=clock_timestamp()wher",
+          "blockedBy": [
+            13107
+          ]
+        },
+        {
+          "pid": 13107,
+          "wait": "ClientRead",
+          "query": "select pg_advisory_xact_lock(284124991);",
+          "blockedBy": []
+        }
+      ],
+      "workerManualPrelock": false,
+      "results": {
+        "worker": {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "worker_id": "failure-lock-worker",
+            "claim_token": "d12a303e-9939-412d-9d30-13c206f591e5",
+            "claim_started_at": "2026-09-29T21:05:28.825871+00:00",
+            "runtime_generation_id": "a2200000-0000-4000-8000-000000000003"
+          }
+        },
+        "control": {
+          "ok": true,
+          "value": {
+            "ok": true
+          }
+        }
+      },
+      "expectedCounterexample": false,
+      "canonicalHolesUnchanged": 18
+    }
+  ],
+  "beforeDefinitionSHA256": "d77b4dff574ba0c70ff9c5c5a0c63de7a147abdbe059f12b3413054d96acd2f7",
+  "startedAt": "2026-09-29T21:05:06.406Z",
+  "limitations": [
+    "Actual worker/control function bodies execute unchanged apart from restoring the captured historical body in BEFORE cases.",
+    "Fixture-only BEFORE UPDATE barrier pauses after one real worker row lock. Marker rows are legally reinserted in a different physical order; no planner settings are forced.",
+    "Future2099 cases use an explicit outer runtime seam and the actual installed match-control trigger through synthetic DML. They are not protected annual Director RPC certification.",
+    "Future Intelligence pauses the actual control trigger after its Intel row lock, then starts the complete unchanged claim; no worker key is manually prelocked.",
+    "CONTROL1s and WORKER5s budgets are local mechanism proof, not provider capacity."
+  ],
+  "installed": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "futureExpiryDomain": {
+    "proofLayer": "SOURCE",
+    "exactTargetAndGeneration": true,
+    "nonRoundZeroNotExcluded": true,
+    "existingUpdatePredicatesUnchanged": true
+  },
+  "attributes": [
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "owner": "10",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "source": "\ndeclare target text; generation uuid; activation bigint; final_ready boolean:=false; result_value jsonb; total integer:=0; terminal_count integer;\n  family_value text; calcutta_current scoring_authority.calcutta_v1_current%rowtype;\n  worker text:=btrim(coalesce(input->>'worker_id',''));\nbegin\n  target:=production_control.assert_score_derived_delivery_scope_v1(input);\n  if worker !~ '^[A-Za-z0-9_.:-]{1,160}$' or input->>'operation_id' is null then\n    raise exception using errcode='22023',message='DERIVED_DELIVERY_WORKER_REQUIRED';\n  end if;\n  if target<>'2026' then select runtime_generation_id into strict generation\n    from production_control.annual_scoring_runtime_authorities_v1 where tournament_id=target and authority_status='ACTIVE'; end if;\n  select activation_revision into strict activation from production_control.cutover_activation_state where scope_key='BAGGER_INV_PRODUCTION';\n  -- One family per transaction. Combining financial and Competition queue locks\n  -- here inverts existing match controls and owner Net Skins completion order.\n  -- The supported adapter calls all three families in separate RPC transactions.\n  family_value:=input->>'materialization_family';\n  if family_value is null or family_value not in('NET_SKINS','CALCUTTA','COMPETITION') then\n    raise exception using errcode='22023',message='DERIVED_MATERIALIZATION_FAMILY_REQUIRED'; end if;\n  -- Preserve123's ordered Net Skins prefix within its isolated transaction.\n  begin\n    result_value:=production_control.flush_score_derived_intents_v1(target,family_value,8);\n    total:=total+coalesce((result_value->>'processed')::integer,0);\n    if coalesce((result_value->>'cancelled')::boolean,false) then\n      -- The timeout receipt is durable when this RPC commits. Do no more database\n      -- traversal after cancellation; incomplete status cannot be mistaken for idle.\n      return jsonb_build_object('ok',true,'cancelled',true,'statusIncomplete',true,\n        'materialized',total,'pendingAutomatic',1,'blockedAutomatic',0,'activeLeases',0,'terminal',0,\n        'ready',jsonb_build_object('CALCUTTA',false,'COMPETITION',false,'INTELLIGENCE',false),\n        'work','[]'::jsonb,'waitingOwner',jsonb_build_object('NET_SKINS',0));\n    end if;\n  end;\n  if family_value='CALCUTTA' then perform production_control.recover_derived_calcutta_activation_v1(target); end if;\n  -- Existing annual leases plus a bounded expiry for frozen2026 timestamp claims.\n  if family_value='COMPETITION' then\n  -- Lock the complete bounded marker set before testing a changing lease clock.\n  -- This matches controls even if another marker expires while locks are awaited.\n  perform 1 from scoring_authority.competition_recalculation_jobs\n    where tournament_id=target and round_number=0 and engine_key in\n      ('TEAM_MOMENTUM','TOURNAMENT_STORYLINES','TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL','TOURNAMENT_FINAL_RECAP')\n    order by case engine_key when 'TEAM_MOMENTUM' then 1 when 'TOURNAMENT_STORYLINES' then 2\n      when 'TOURNAMENT_INTELLIGENCE' then 3 when 'PROJECTION_EDITORIAL' then 4 when 'TOURNAMENT_FINAL_RECAP' then 5 end for update;\n  update scoring_authority.competition_recalculation_jobs set status='FAILED',completed_at=clock_timestamp(),\n    last_error_code='DERIVED_LEASE_EXPIRED',last_error_safe='Derived work will be retried.',\n    claim_token=null,claimed_by=null,lease_expires_at=null\n    where tournament_id=target and round_number=0 and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES','TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL','TOURNAMENT_FINAL_RECAP')\n      and runtime_generation_id is not distinct from generation and status='RUNNING'\n      and coalesce(lease_expires_at,started_at+interval '90 seconds')<clock_timestamp();\n  end if;\n  select * into calcutta_current from scoring_authority.calcutta_v1_current where tournament_id=target;\n  final_ready:=production_control.derived_final_recap_ready_v1(target);\n  select count(*) into terminal_count from (\n    (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target and status='DEAD_LETTER' limit 101)\n    union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and delivery_dead_letter_at is not null limit 101)\n    union all (select 1 from scoring_authority.net_skins_v1_recalculation_jobs where tournament_id=target and delivery_dead_letter_at is not null limit 101)\n    union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and delivery_dead_letter_at is not null limit 5)\n    limit 101\n  ) bounded;\n  return jsonb_build_object('ok',true,'scope',jsonb_build_object('tournamentId',target,'runtimeGenerationId',generation),\n    'cancelled',false,'statusIncomplete',false,'materialized',total,'terminal',terminal_count,'terminalTruncated',terminal_count=101,\n    'pendingAutomatic',(select count(*) from (\n      (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target and runtime_generation_id is not distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)\n      union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation\n        and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n        and status in('PENDING','RUNNING') limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0\n        and runtime_generation_id is not distinct from generation\n        and (engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES','TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL')\n          or (final_ready and engine_key='TOURNAMENT_FINAL_RECAP')) and status<>'SUCCEEDED' limit 5)\n      limit 101)bounded),\n    'pendingAutomaticLimit',101,\n    'blockedAutomatic',(select count(*) from (\n      (select 1 from scoring_authority.score_derived_intents_v1 where tournament_id=target\n        and runtime_generation_id is distinct from generation and family in('CALCUTTA','COMPETITION') and status<>'SUCCEEDED' limit 101)\n      union all (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status in('PENDING','RUNNING')\n        and (runtime_generation_id is distinct from generation or activation_revision<>activation\n          or configuration_revision<>calcutta_current.configuration_revision or auction_revision<>calcutta_current.auction_revision) limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0\n        and runtime_generation_id is distinct from generation and (engine_key<>'TOURNAMENT_FINAL_RECAP' or final_ready) and status<>'SUCCEEDED' limit 5)\n      limit 101)bounded),'blockedAutomaticLimit',101,\n    'activeLeases',(select count(*) from (\n      (select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and runtime_generation_id is not distinct from generation and activation_revision=activation and status='RUNNING' and lease_expires_at>=clock_timestamp() limit 1)\n      union all (select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation and status='RUNNING'\n        and coalesce(lease_expires_at,started_at+interval '90 seconds')>=clock_timestamp() limit 5)\n    )bounded),\n    'ready',jsonb_build_object(\n      'CALCUTTA',calcutta_current.configuration_revision>0 and calcutta_current.auction_revision>0 and exists(\n        select 1 from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target\n          and runtime_generation_id is not distinct from generation\n          and activation_revision=activation\n          and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n          and (status='PENDING' or(status='RUNNING' and lease_expires_at<clock_timestamp()))\n          and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),\n      'COMPETITION',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation\n        and engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') and status in('PENDING','FAILED')\n        and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()),\n      'INTELLIGENCE',exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0 and runtime_generation_id is not distinct from generation\n        and (engine_key in('TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') or (final_ready and engine_key='TOURNAMENT_FINAL_RECAP'))\n        and status in('PENDING','FAILED') and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp())\n        and not exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0\n          and (engine_key in('TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') or (final_ready and engine_key='TOURNAMENT_FINAL_RECAP'))\n          and (runtime_generation_id is distinct from generation or delivery_dead_letter_at is not null or (delivery_attempts>=5 and status<>'SUCCEEDED')\n            or delivery_available_at>clock_timestamp() or(status='RUNNING' and coalesce(lease_expires_at,started_at+interval '90 seconds')>=clock_timestamp())))\n        and not exists(select 1 from scoring_authority.competition_recalculation_jobs sibling\n          where sibling.tournament_id=target and sibling.round_number=0\n            and (sibling.engine_key in('TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') or(final_ready and sibling.engine_key='TOURNAMENT_FINAL_RECAP'))\n            and sibling.requested_source_revision is distinct from (select demand.requested_source_revision\n              from scoring_authority.competition_recalculation_jobs demand where demand.tournament_id=target and demand.round_number=0\n                and (demand.engine_key in('TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL') or(final_ready and demand.engine_key='TOURNAMENT_FINAL_RECAP'))\n                and demand.status in('PENDING','FAILED') order by demand.engine_key limit 1))),\n    'waitingPublication',jsonb_build_object('FINAL_RECAP',(select count(*) from scoring_authority.competition_recalculation_jobs\n      where tournament_id=target and round_number=0 and engine_key='TOURNAMENT_FINAL_RECAP' and status<>'SUCCEEDED'\n        and runtime_generation_id is not distinct from generation and not final_ready)),\n    'waitingOwner',jsonb_build_object('NET_SKINS',(select count(*) from scoring_authority.net_skins_v1_recalculation_jobs\n      where tournament_id=target and round_number between 1 and 3 and runtime_generation_id is not distinct from generation\n        and configuration_revision=(select configuration_revision from scoring_authority.net_skins_v1_configuration_current where tournament_id=target) and status in('PENDING','RUNNING'))),\n    'work',coalesce((select jsonb_agg(v) from (\n      select 'CALCUTTA'::text as family,job_id::text as key,delivery_cycle as cycle,delivery_attempts as attempt\n      from scoring_authority.calcutta_v1_recalculation_jobs where tournament_id=target and status='PENDING'\n        and activation_revision=activation and configuration_revision=calcutta_current.configuration_revision and auction_revision=calcutta_current.auction_revision\n        and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()\n      union all select case when engine_key in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') then 'COMPETITION' else 'INTELLIGENCE' end,\n        engine_key,delivery_cycle,delivery_attempts from scoring_authority.competition_recalculation_jobs\n        where tournament_id=target and round_number=0 and (engine_key<>'TOURNAMENT_FINAL_RECAP' or final_ready) and status in('PENDING','FAILED')\n        and runtime_generation_id is not distinct from generation and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp()\n      limit 6\n    )v),'[]'::jsonb),\n    'calcutta',jsonb_build_object('configurationRevision',calcutta_current.configuration_revision,\n      'configurationFingerprint',calcutta_current.configuration_fingerprint,'auctionRevision',calcutta_current.auction_revision,\n      'auctionFingerprint',calcutta_current.auction_fingerprint));\nend;\n",
+      "signature": "score_derived_delivery_tick_v1(jsonb)",
+      "volatility": "v",
+      "securityDefiner": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "owner": "10",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "source": "\ndeclare target text; affected integer;\nbegin\n target:=production_control.assert_score_derived_delivery_scope_v1(input);\n -- Failure acknowledgement follows the same marker order as claim and controls.\n -- Preserve the existing status, timestamp and token predicates on the UPDATE.\n perform 1 from scoring_authority.competition_recalculation_jobs\n   where tournament_id=target and round_number=0 and engine_key in\n     ('TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL','TOURNAMENT_FINAL_RECAP')\n   order by case engine_key when 'TOURNAMENT_INTELLIGENCE' then 3\n     when 'PROJECTION_EDITORIAL' then 4 when 'TOURNAMENT_FINAL_RECAP' then 5 end for update;\n update scoring_authority.competition_recalculation_jobs set status='FAILED',completed_at=clock_timestamp(),\n  last_error_code=left(coalesce(input->>'error_code','INTELLIGENCE_CALCULATION_FAILED'),120),\n  last_error_safe='Prepared intelligence is temporarily unavailable.',claim_token=null,claimed_by=null,lease_expires_at=null,\n  updated_at=clock_timestamp()\n where tournament_id=target and round_number=0 and engine_key in('TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL','TOURNAMENT_FINAL_RECAP')\n  and status='RUNNING' and started_at=(input->>'claim_started_at')::timestamptz\n  and (target='2026' or (claim_token=(input->>'claim_token')::uuid and claimed_by=input->>'worker_id'));\n get diagnostics affected=row_count;\n return jsonb_build_object('ok',true,'marked',affected,'superseded',affected=0);\nend;\n",
+      "signature": "fail_intelligence_derived_bundle_v1(jsonb)",
+      "volatility": "v",
+      "securityDefiner": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "owner": "10",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "source": "\ndeclare target text; generation uuid; activation bigint; item jsonb; family_value text:=input->>'family'; table_name text; predicate text; retained jsonb;\n  affected integer:=0; code_value text:=left(coalesce(input->>'error_code','DERIVED_INPUT_FAILED'),120);\nbegin\n target:=production_control.assert_score_derived_delivery_scope_v1(input);\n if family_value not in('CALCUTTA','COMPETITION','INTELLIGENCE') or jsonb_typeof(input->'work')<>'array'\n   or jsonb_array_length(input->'work')>5 or btrim(coalesce(input->>'worker_id',''))='' then\n  raise exception using errcode='22023',message='DERIVED_PRECLAIM_SCOPE_REQUIRED'; end if;\n if target<>'2026' then select runtime_generation_id into strict generation from production_control.annual_scoring_runtime_authorities_v1\n  where tournament_id=target and authority_status='ACTIVE'; end if;\n select activation_revision into strict activation from production_control.cutover_activation_state where scope_key='BAGGER_INV_PRODUCTION';\n table_name:=case when family_value='CALCUTTA' then 'calcutta_v1_recalculation_jobs' else 'competition_recalculation_jobs' end;\n predicate:=case when family_value='CALCUTTA' then 'job_id=$2::uuid' else 'engine_key=$2 and round_number=0' end;\n for item in select value from jsonb_array_elements(input->'work') loop\n  if item->>'family'<>family_value then continue; end if;\n  if family_value='CALCUTTA' and coalesce(item->>'key','') !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$' then\n   raise exception using errcode='22023',message='DERIVED_PRECLAIM_IDENTITY_INVALID'; end if;\n  execute format('select to_jsonb(v) from scoring_authority.%I v where tournament_id=$1 and %s\n    and status in(''PENDING'',''FAILED'') and delivery_cycle=$3 and delivery_attempts=$4\n    and delivery_dead_letter_at is null and delivery_available_at<=clock_timestamp() for update skip locked',table_name,predicate)\n   into retained using target,item->>'key',(item->>'cycle')::bigint,(item->>'attempt')::integer;\n  if retained is null or nullif(retained->>'runtime_generation_id','')::uuid is distinct from generation then continue; end if;\n  if family_value='CALCUTTA' then\n   if (retained->>'activation_revision')::bigint is distinct from activation or not exists(\n    select 1 from scoring_authority.calcutta_v1_current c where c.tournament_id=target\n      and c.configuration_revision=(retained->>'configuration_revision')::bigint\n      and c.auction_revision=(retained->>'auction_revision')::bigint) then continue; end if;\n  elsif (case when retained->>'engine_key' in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') then 'COMPETITION'\n    when retained->>'engine_key' in('TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL','TOURNAMENT_FINAL_RECAP') then 'INTELLIGENCE' end) is distinct from family_value then continue;\n  end if;\n  if retained->>'engine_key'='TOURNAMENT_FINAL_RECAP' and not production_control.derived_final_recap_ready_v1(target) then continue; end if;\n  execute format('update scoring_authority.%I set status=''RUNNING'',attempts=attempts+1,started_at=clock_timestamp(),\n   completed_at=null,claim_token=extensions.gen_random_uuid(),claimed_by=$3,lease_expires_at=clock_timestamp()+interval ''60 seconds''\n   where tournament_id=$1 and %s',table_name,predicate) using target,item->>'key',input->>'worker_id';\n  execute format('update scoring_authority.%I set status=''FAILED'',completed_at=clock_timestamp(),last_error_code=$3,\n   last_error_safe=''Derived input is temporarily unavailable.'',claim_token=null,claimed_by=null,lease_expires_at=null\n   where tournament_id=$1 and %s',table_name,predicate) using target,item->>'key',code_value;\n  affected:=affected+1;\n end loop;\n return jsonb_build_object('ok',true,'marked',affected);\nend;\n",
+      "signature": "fail_score_derived_preclaim_v1(jsonb)",
+      "volatility": "v",
+      "securityDefiner": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "owner": "10",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "source": "\ndeclare\n  target text;\n  generation_id uuid;\n  engine_values text[];\n  worker text := pg_catalog.left(pg_catalog.btrim(coalesce(\n    input->>'worker_id', ''\n  )), 160);\n  lease_seconds integer := greatest(15, least(\n    coalesce((input->>'lease_seconds')::integer, 90), 300\n  ));\n  token uuid := extensions.gen_random_uuid();\n  claims jsonb;\nbegin\n  target := production_control.assert_future_production_scoring_runtime_v1(input);\n  generation_id := (input->>'expected_runtime_generation_id')::uuid;\n  if worker = '' or pg_catalog.jsonb_typeof(input->'engine_keys') <> 'array' then\n    return pg_catalog.jsonb_build_object(\n      'ok', false, 'code', 'COMPLETE_DERIVED_CLAIM_REQUIRED'\n    );\n  end if;\n  select pg_catalog.array_agg(pg_catalog.upper(pg_catalog.btrim(value)))\n    into engine_values\n  from pg_catalog.jsonb_array_elements_text(input->'engine_keys') value;\n  if engine_values is null or pg_catalog.cardinality(engine_values) = 0\n     or exists (select 1 from pg_catalog.unnest(engine_values) value\n       where value not in ('TEAM_MOMENTUM', 'TOURNAMENT_STORYLINES')) then\n    return pg_catalog.jsonb_build_object(\n      'ok', false, 'code', 'DERIVED_ENGINE_NOT_SUPPORTED'\n    );\n  end if;\n  perform production_control.flush_score_derived_intents_v1(target, 'COMPETITION', 8);\n  -- Preserve the inherited expiry domain, including any non-round0 current-\n  -- generation rows. Acquire its keys before clock-dependent eligibility changes.\n  perform 1 from scoring_authority.competition_recalculation_jobs value\n  where value.tournament_id=target and value.runtime_generation_id=generation_id\n  order by value.round_number,\n    case value.engine_key when 'TEAM_MOMENTUM' then 1 when 'TOURNAMENT_STORYLINES' then 2\n      when 'TOURNAMENT_INTELLIGENCE' then 3 when 'PROJECTION_EDITORIAL' then 4\n      when 'TOURNAMENT_FINAL_RECAP' then 5 else 6 end,value.engine_key\n  for update;\n  update scoring_authority.competition_recalculation_jobs value set\n    status = 'FAILED', claim_token = null, claimed_by = null,\n    lease_expires_at = null, completed_at = pg_catalog.clock_timestamp(),\n    last_error_code = 'DERIVED_LEASE_EXPIRED',\n    last_error_safe = 'Derived work will be retried.',\n    updated_at = pg_catalog.clock_timestamp()\n  where value.tournament_id = target\n    and value.runtime_generation_id = generation_id\n    and value.status = 'RUNNING'\n    and value.lease_expires_at < pg_catalog.clock_timestamp();\n  with candidates as (\n    select value.tournament_id, value.round_number, value.engine_key\n    from scoring_authority.competition_recalculation_jobs value\n    where value.tournament_id = target and value.round_number = 0\n      and value.runtime_generation_id = generation_id\n      and value.engine_key = any(engine_values)\n      and value.status in ('PENDING', 'FAILED') and value.delivery_dead_letter_at is null\n      and value.delivery_attempts<5 and value.delivery_available_at<=clock_timestamp()\n    order by value.engine_key for update skip locked\n  ), claimed as (\n    update scoring_authority.competition_recalculation_jobs value set\n      status = 'RUNNING', attempts = value.attempts + 1,\n      started_at = pg_catalog.clock_timestamp(), completed_at = null,\n      claim_token = token, claimed_by = worker,\n      lease_expires_at = pg_catalog.clock_timestamp()\n        + pg_catalog.make_interval(secs => lease_seconds),\n      last_error_code = null, last_error_safe = null,\n      updated_at = pg_catalog.clock_timestamp()\n    from candidates candidate\n    where value.tournament_id = candidate.tournament_id\n      and value.round_number = candidate.round_number\n      and value.engine_key = candidate.engine_key\n    returning value.engine_key, value.started_at, value.requested_at,\n      value.requested_source_revision, value.attempts, value.claim_token,\n      value.runtime_generation_id, value.lease_expires_at\n  )\n  select coalesce(pg_catalog.jsonb_agg(pg_catalog.jsonb_build_object(\n    'engine_key', engine_key, 'claim_started_at', started_at,\n    'requested_at', requested_at,\n    'requested_source_revision', requested_source_revision,\n    'attempt', attempts, 'claim_token', claim_token,\n    'runtime_generation_id', runtime_generation_id,\n    'lease_expires_at', lease_expires_at\n  ) order by engine_key), '[]'::jsonb) into claims from claimed;\n  return pg_catalog.jsonb_build_object('ok', true, 'claims', claims);\nend;\n",
+      "signature": "future_production_claim_competition_derived_jobs_v1(jsonb)",
+      "volatility": "v",
+      "securityDefiner": true
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "owner": "10",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "source": "\ndeclare\n  target text;\n  generation_id uuid;\n  key_value text;\n  engine_values text[];\n  claim_time timestamptz := pg_catalog.clock_timestamp();\n  token uuid := extensions.gen_random_uuid();\n  worker text := pg_catalog.left(pg_catalog.btrim(coalesce(\n    input->>'worker_id', ''\n  )), 160);\n  lease_seconds integer := greatest(15, least(\n    coalesce((input->>'lease_seconds')::integer, 90), 300\n  ));\nbegin\n  target := production_control.assert_future_production_scoring_runtime_v1(input);\n  generation_id := (input->>'expected_runtime_generation_id')::uuid;\n  if worker = '' or pg_catalog.jsonb_typeof(input->'engine_keys') <> 'array' then\n    return pg_catalog.jsonb_build_object(\n      'ok', false, 'code', 'COMPLETE_INTELLIGENCE_CLAIM_REQUIRED'\n    );\n  end if;\n  select pg_catalog.array_agg(pg_catalog.upper(pg_catalog.btrim(value)))\n    into engine_values\n  from pg_catalog.jsonb_array_elements_text(input->'engine_keys') value;\n  if engine_values is null or pg_catalog.cardinality(engine_values) = 0\n     or exists (\n       select 1 from pg_catalog.unnest(engine_values) value\n       where value not in (\n      'TOURNAMENT_INTELLIGENCE', 'PROJECTION_EDITORIAL',\n      'TOURNAMENT_FINAL_RECAP'\n       )\n     ) then\n    return pg_catalog.jsonb_build_object(\n      'ok', false, 'code', 'DERIVED_ENGINE_NOT_SUPPORTED'\n    );\n  end if;\n  perform production_control.flush_score_derived_intents_v1(target, 'COMPETITION', 8);\n  perform 1\n  from scoring_authority.competition_recalculation_jobs value\n  where value.tournament_id = target and value.round_number = 0\n    and value.engine_key = any(engine_values)\n  order by case value.engine_key when 'TOURNAMENT_INTELLIGENCE' then 3\n    when 'PROJECTION_EDITORIAL' then 4 when 'TOURNAMENT_FINAL_RECAP' then 5 end\n  for update;\n  if exists (\n    select 1 from scoring_authority.competition_recalculation_jobs value\n    where value.tournament_id = target and value.round_number = 0\n      and value.engine_key = any(engine_values)\n      and value.runtime_generation_id = generation_id\n      and value.status = 'RUNNING'\n      and value.lease_expires_at >= pg_catalog.clock_timestamp()\n  ) then\n    return pg_catalog.jsonb_build_object(\n      'ok', false, 'code', 'INTELLIGENCE_LEASE_ACTIVE'\n    );\n  end if;\n  if not production_control.intelligence_delivery_ready_v1(target,input->'engine_keys') then\n    return jsonb_build_object('ok',true,'empty',true,'code','NO_PENDING_INTELLIGENCE');\n  end if;\n  foreach key_value in array engine_values loop\n    insert into scoring_authority.competition_recalculation_jobs (\n      tournament_id, round_number, engine_key, status,\n      requested_source_revision, attempts, requested_at, started_at,\n      runtime_generation_id, claim_token, claimed_by, lease_expires_at,\n      updated_at\n    ) values (\n      target, 0, key_value, 'RUNNING',\n      pg_catalog.jsonb_build_object('requestedBy', input->>'requested_by'),\n      1, claim_time, claim_time, generation_id, token, worker,\n      claim_time + pg_catalog.make_interval(secs => lease_seconds),\n      pg_catalog.clock_timestamp()\n    ) on conflict (tournament_id, round_number, engine_key) do update set\n      status = 'RUNNING',\n      requested_source_revision = scoring_authority.competition_recalculation_jobs.requested_source_revision,\n      attempts = scoring_authority.competition_recalculation_jobs.attempts + 1,\n      requested_at = claim_time, started_at = claim_time,\n      completed_at = null, runtime_generation_id = generation_id,\n      claim_token = token, claimed_by = worker,\n      lease_expires_at = excluded.lease_expires_at,\n      last_error_code = null, last_error_safe = null,\n      updated_at = pg_catalog.clock_timestamp();\n  end loop;\n  return pg_catalog.jsonb_build_object(\n    'ok', true, 'claim_started_at', claim_time,\n    'claim_token', token, 'worker_id', worker,\n    'runtime_generation_id', generation_id\n  );\nend;\n",
+      "signature": "future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+      "volatility": "v",
+      "securityDefiner": true
+    }
+  ],
+  "clusterDestroyed": true,
+  "completedAt": "2026-09-29T21:05:29.486Z"
+}

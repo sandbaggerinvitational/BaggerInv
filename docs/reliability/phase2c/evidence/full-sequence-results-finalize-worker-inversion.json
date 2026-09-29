@@ -1,0 +1,575 @@
+{
+  "schemaVersion": 1,
+  "environment": "LOCAL_NON_PRODUCTION",
+  "fixture": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "295f3657c710b0b1e7937d603ac8db9c5439afe20734d41dc0e61a2f8e320221"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "production": false,
+  "rounds": [
+    {
+      "round": 1,
+      "holes": 108,
+      "matches": 6,
+      "finals": [
+        {
+          "matchId": "2026-R1-1",
+          "holes": 18,
+          "expectedWinner": "Team 2",
+          "actualWinner": "Team 2",
+          "team1Points": 0.5,
+          "team2Points": 2.5,
+          "recoveryAfterFinalize": "COMMITTED",
+          "access": "REVOKED"
+        },
+        {
+          "matchId": "2026-R1-2",
+          "holes": 18,
+          "expectedWinner": "Team 1",
+          "actualWinner": "Team 1",
+          "team1Points": 2,
+          "team2Points": 1,
+          "recoveryAfterFinalize": "COMMITTED",
+          "access": "REVOKED"
+        },
+        {
+          "matchId": "2026-R1-3",
+          "holes": 18,
+          "expectedWinner": "Team 2",
+          "actualWinner": "Team 2",
+          "team1Points": 0.5,
+          "team2Points": 2.5,
+          "recoveryAfterFinalize": "COMMITTED",
+          "access": "REVOKED"
+        },
+        {
+          "matchId": "2026-R1-4",
+          "holes": 18,
+          "expectedWinner": "Team 1",
+          "actualWinner": "Team 1",
+          "team1Points": 2,
+          "team2Points": 1,
+          "recoveryAfterFinalize": "COMMITTED",
+          "access": "REVOKED"
+        },
+        {
+          "matchId": "2026-R1-5",
+          "holes": 18,
+          "expectedWinner": "Team 2",
+          "actualWinner": "Team 2",
+          "team1Points": 0.5,
+          "team2Points": 2.5,
+          "recoveryAfterFinalize": "COMMITTED",
+          "access": "REVOKED"
+        },
+        {
+          "matchId": "2026-R1-6",
+          "holes": 18,
+          "expectedWinner": "Team 2",
+          "actualWinner": "Team 2",
+          "team1Points": 0,
+          "team2Points": 3,
+          "recoveryAfterFinalize": "COMMITTED",
+          "access": "REVOKED"
+        }
+      ],
+      "latency": {
+        "samples": 108,
+        "p50Ms": 3.262624999999389,
+        "p95Ms": 17.268667000000278,
+        "p99Ms": null,
+        "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+        "maxMs": 89.14170800000284
+      },
+      "failures": 0
+    },
+    {
+      "round": 2,
+      "holes": 108,
+      "matches": 6,
+      "finals": [
+        {
+          "matchId": "2026-R2-1",
+          "holes": 18,
+          "expectedWinner": "Team 1",
+          "actualWinner": "Team 1",
+          "team1Points": 3,
+          "team2Points": 0,
+          "recoveryAfterFinalize": "COMMITTED",
+          "access": "REVOKED"
+        },
+        {
+          "matchId": "2026-R2-2",
+          "holes": 18,
+          "expectedWinner": "Team 1",
+          "actualWinner": "Team 1",
+          "team1Points": 3,
+          "team2Points": 0,
+          "recoveryAfterFinalize": "COMMITTED",
+          "access": "REVOKED"
+        },
+        {
+          "matchId": "2026-R2-3",
+          "holes": 18,
+          "expectedWinner": "Team 1",
+          "actualWinner": "Team 1",
+          "team1Points": 3,
+          "team2Points": 0,
+          "recoveryAfterFinalize": "COMMITTED",
+          "access": "REVOKED"
+        },
+        {
+          "matchId": "2026-R2-4",
+          "holes": 18,
+          "expectedWinner": "Team 1",
+          "actualWinner": "Team 1",
+          "team1Points": 3,
+          "team2Points": 0,
+          "recoveryAfterFinalize": "COMMITTED",
+          "access": "REVOKED"
+        },
+        {
+          "matchId": "2026-R2-5",
+          "holes": 18,
+          "expectedWinner": "Team 1",
+          "actualWinner": "Team 1",
+          "team1Points": 3,
+          "team2Points": 0,
+          "recoveryAfterFinalize": "COMMITTED",
+          "access": "REVOKED"
+        },
+        {
+          "matchId": "2026-R2-6",
+          "holes": 18,
+          "expectedWinner": "Team 2",
+          "actualWinner": "Team 2",
+          "team1Points": 0,
+          "team2Points": 3,
+          "recoveryAfterFinalize": "COMMITTED",
+          "access": "REVOKED"
+        }
+      ],
+      "latency": {
+        "samples": 108,
+        "p50Ms": 3.6157920000005106,
+        "p95Ms": 16.541207999998733,
+        "p99Ms": null,
+        "p99Status": "NOT_PROVEN_INSUFFICIENT_SAMPLE",
+        "maxMs": 24.77662500000224
+      },
+      "failures": 0
+    }
+  ],
+  "controls": [
+    {
+      "operation": "LOCK_RECOVER_RESUME",
+      "result": "PASS",
+      "newWritesWhileLocked": "DENIED"
+    },
+    {
+      "operation": "FORCED_SCORE_TIMEOUT",
+      "sqlstate": "57014",
+      "timeoutMs": 25,
+      "delayMs": 100,
+      "rollback": "COMPLETE",
+      "retry": "SAME_MUTATION"
+    }
+  ],
+  "workerRestarts": 1,
+  "failures": [
+    "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (96,6) in relation \"calcutta_v1_recalculation_jobs\"\nSQL statement \"update scoring_authority.calcutta_v1_recalculation_jobs\n  set status = 'SUPERSEDED', claimed_by = null, claim_token = null,\n      lease_expires_at = null, completed_at = pg_catalog.now(),\n      updated_at = pg_catalog.now()\n  where tournament_id = '2026' and status in ('PENDING', 'RUNNING')\"\nPL/pgSQL function enqueue_production_calcutta_v1(text,text,boolean,text,text) line 86 at SQL statement\nSQL statement \"SELECT production_control.enqueue_production_calcutta_v1(\n      case\n        when tg_table_name = 'hole_scores' then 'CANONICAL_SCORE_CHANGED'\n        when tg_table_name = 'rounds'\n          then 'CANONICAL_ROUND_LIFECYCLE_CHANGED'\n        else 'CANONICAL_MATCH_LIFECYCLE_CHANGED'\n      end,\n      'production-calcutta-v1-trigger', false, null, null\n    )\"\nPL/pgSQL function scoring_authority.enqueue_production_calcutta_v1_change() line 71 at PERFORM\nSQL statement \"update scoring_authority.matches set\n    status = 'FINAL', scoring_locked = true, match_revision = next_revision,\n    permission_revision = next_permission_revision, finalized_at = transition_at,\n    authority_updated_at = transition_at, updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function public.finalize_production_match(jsonb) line 77 at SQL statement\n"
+  ],
+  "result": "FAIL",
+  "limitations": [
+    "Synthetic initial Live/prepared authority; not Open/Prepare proof",
+    "Actual actor/RPC/security predicates; no hosted identity/admission proof",
+    "Real PostgreSQL COMMIT and cross-connection visibility; fsync disabled, no power-loss durability proof",
+    "Not a complete Open/Prepare tournament rehearsal",
+    "No owner publication automated",
+    "NetSkins financial processing remains WAITING_OWNER",
+    "Local process-lifetime worker, hosted scheduling NOT_PROVEN"
+  ],
+  "fixtureSetupTimeoutMs": 30000,
+  "scoreTimeoutMs": 1000,
+  "initialAccess": {
+    "operation": "ACCESS_ACTIVATE",
+    "canonicalReceipt": true,
+    "contextBinding": "6d573a3b7262022af12556392328db224aa34cde80155463e9fdcfab2233d945"
+  },
+  "workerEventsBeforeRestart": [
+    {
+      "observedAt": 1790616987931,
+      "type": "started",
+      "workerId": "phase2c-full-sequence"
+    },
+    {
+      "observedAt": 1790616988017,
+      "type": "tick",
+      "cycle": 0,
+      "tickStartedAt": 1790616987931,
+      "materialized": 0,
+      "terminal": 0,
+      "cancelled": false,
+      "statusIncomplete": false,
+      "blockedAutomatic": 0,
+      "pendingAutomatic": 5,
+      "activeLeases": 0,
+      "ready": {
+        "CALCUTTA": true,
+        "COMPETITION": true,
+        "INTELLIGENCE": true
+      },
+      "waitingOwner": 1,
+      "waitingPublication": 1
+    },
+    {
+      "observedAt": 1790616988284,
+      "type": "failed",
+      "family": "CALCUTTA",
+      "classification": "TERMINAL",
+      "sqlstate": "42501",
+      "code": "42501"
+    },
+    {
+      "observedAt": 1790616988439,
+      "type": "processed",
+      "family": "COMPETITION",
+      "empty": false
+    },
+    {
+      "observedAt": 1790616988614,
+      "type": "failed",
+      "family": "INTELLIGENCE",
+      "classification": "RETRYABLE",
+      "sqlstate": "40001",
+      "code": "INTELLIGENCE_SOURCE_ADVANCED_BEFORE_CLAIM"
+    },
+    {
+      "observedAt": 1790616988960,
+      "type": "tick",
+      "cycle": 1,
+      "tickStartedAt": 1790616988716,
+      "materialized": 24,
+      "terminal": 0,
+      "cancelled": false,
+      "statusIncomplete": false,
+      "blockedAutomatic": 0,
+      "pendingAutomatic": 35,
+      "activeLeases": 0,
+      "ready": {
+        "CALCUTTA": true,
+        "COMPETITION": true,
+        "INTELLIGENCE": true
+      },
+      "waitingOwner": 1,
+      "waitingPublication": 1
+    },
+    {
+      "observedAt": 1790616989077,
+      "type": "processed",
+      "family": "COMPETITION",
+      "empty": false
+    },
+    {
+      "observedAt": 1790616989248,
+      "type": "failed",
+      "family": "INTELLIGENCE",
+      "classification": "RETRYABLE",
+      "sqlstate": "40001",
+      "code": "INTELLIGENCE_SOURCE_ADVANCED_BEFORE_CLAIM"
+    },
+    {
+      "observedAt": 1790616989480,
+      "type": "failed",
+      "family": "CALCUTTA",
+      "classification": "RETRYABLE",
+      "sqlstate": "40001",
+      "code": "40001"
+    },
+    {
+      "observedAt": 1790616989962,
+      "type": "tick",
+      "cycle": 2,
+      "tickStartedAt": 1790616989582,
+      "materialized": 24,
+      "terminal": 0,
+      "cancelled": false,
+      "statusIncomplete": false,
+      "blockedAutomatic": 0,
+      "pendingAutomatic": 57,
+      "activeLeases": 0,
+      "ready": {
+        "CALCUTTA": true,
+        "COMPETITION": true,
+        "INTELLIGENCE": true
+      },
+      "waitingOwner": 1,
+      "waitingPublication": 1
+    },
+    {
+      "observedAt": 1790616990176,
+      "type": "failed",
+      "family": "INTELLIGENCE",
+      "classification": "RETRYABLE",
+      "sqlstate": "40001",
+      "code": "INTELLIGENCE_SOURCE_ADVANCED_BEFORE_CLAIM"
+    },
+    {
+      "observedAt": 1790616990449,
+      "type": "processed",
+      "family": "CALCUTTA",
+      "empty": false
+    },
+    {
+      "observedAt": 1790616990611,
+      "type": "processed",
+      "family": "COMPETITION",
+      "empty": false
+    },
+    {
+      "observedAt": 1790616990966,
+      "type": "tick",
+      "cycle": 3,
+      "tickStartedAt": 1790616990712,
+      "materialized": 24,
+      "terminal": 0,
+      "cancelled": false,
+      "statusIncomplete": false,
+      "blockedAutomatic": 0,
+      "pendingAutomatic": 79,
+      "activeLeases": 0,
+      "ready": {
+        "CALCUTTA": true,
+        "COMPETITION": true,
+        "INTELLIGENCE": true
+      },
+      "waitingOwner": 1,
+      "waitingPublication": 1
+    },
+    {
+      "observedAt": 1790616991784,
+      "type": "failed",
+      "family": "CALCUTTA",
+      "classification": "RETRYABLE",
+      "sqlstate": "40001",
+      "code": "40001"
+    },
+    {
+      "observedAt": 1790616992045,
+      "type": "processed",
+      "family": "COMPETITION",
+      "empty": false
+    },
+    {
+      "observedAt": 1790616992501,
+      "type": "failed",
+      "family": "INTELLIGENCE",
+      "classification": "RETRYABLE",
+      "sqlstate": "40001",
+      "code": "INTELLIGENCE_SOURCE_ADVANCED_BEFORE_CLAIM"
+    },
+    {
+      "observedAt": 1790616992521,
+      "type": "stopped",
+      "cycles": 4
+    }
+  ],
+  "backlogWhileStopped": 179,
+  "workerEventsAtFailure": [
+    {
+      "observedAt": 1790616993329,
+      "type": "started",
+      "workerId": "phase2c-full-sequence"
+    },
+    {
+      "observedAt": 1790616994467,
+      "type": "tick",
+      "cycle": 0,
+      "tickStartedAt": 1790616993330,
+      "materialized": 24,
+      "terminal": 0,
+      "cancelled": false,
+      "statusIncomplete": false,
+      "blockedAutomatic": 0,
+      "pendingAutomatic": 81,
+      "activeLeases": 0,
+      "ready": {
+        "CALCUTTA": true,
+        "COMPETITION": true,
+        "INTELLIGENCE": true
+      },
+      "waitingOwner": 1,
+      "waitingPublication": 1
+    },
+    {
+      "observedAt": 1790616994996,
+      "type": "failed",
+      "family": "CALCUTTA",
+      "classification": "RETRYABLE",
+      "sqlstate": "40P01",
+      "code": "40P01"
+    },
+    {
+      "observedAt": 1790616995439,
+      "type": "failed",
+      "family": "COMPETITION",
+      "classification": "TERMINAL",
+      "sqlstate": null,
+      "code": "STALE_DERIVED_JOB"
+    },
+    {
+      "observedAt": 1790616995626,
+      "type": "failed",
+      "family": "INTELLIGENCE",
+      "classification": "RETRYABLE",
+      "sqlstate": "40001",
+      "code": "INTELLIGENCE_SOURCE_ADVANCED_BEFORE_CLAIM"
+    },
+    {
+      "observedAt": 1790616996057,
+      "type": "tick",
+      "cycle": 1,
+      "tickStartedAt": 1790616995727,
+      "materialized": 24,
+      "terminal": 0,
+      "cancelled": false,
+      "statusIncomplete": false,
+      "blockedAutomatic": 0,
+      "pendingAutomatic": 101,
+      "activeLeases": 0,
+      "ready": {
+        "CALCUTTA": true,
+        "COMPETITION": true,
+        "INTELLIGENCE": true
+      },
+      "waitingOwner": 2,
+      "waitingPublication": 1
+    },
+    {
+      "observedAt": 1790616996179,
+      "type": "processed",
+      "family": "COMPETITION",
+      "empty": false
+    },
+    {
+      "observedAt": 1790616996359,
+      "type": "failed",
+      "family": "INTELLIGENCE",
+      "classification": "RETRYABLE",
+      "sqlstate": "40001",
+      "code": "INTELLIGENCE_SOURCE_ADVANCED_BEFORE_CLAIM"
+    },
+    {
+      "observedAt": 1790616996747,
+      "type": "failed",
+      "family": "CALCUTTA",
+      "classification": "TERMINAL",
+      "sqlstate": "42501",
+      "code": "42501"
+    },
+    {
+      "observedAt": 1790616997391,
+      "type": "tick",
+      "cycle": 2,
+      "tickStartedAt": 1790616996849,
+      "materialized": 24,
+      "terminal": 0,
+      "cancelled": false,
+      "statusIncomplete": false,
+      "blockedAutomatic": 0,
+      "pendingAutomatic": 101,
+      "activeLeases": 0,
+      "ready": {
+        "CALCUTTA": true,
+        "COMPETITION": true,
+        "INTELLIGENCE": true
+      },
+      "waitingOwner": 2,
+      "waitingPublication": 1
+    },
+    {
+      "observedAt": 1790616997551,
+      "type": "processed",
+      "family": "INTELLIGENCE",
+      "empty": false
+    },
+    {
+      "observedAt": 1790616998084,
+      "type": "failed",
+      "family": "CALCUTTA",
+      "classification": "TERMINAL",
+      "sqlstate": "42501",
+      "code": "42501"
+    },
+    {
+      "observedAt": 1790616998209,
+      "type": "processed",
+      "family": "COMPETITION",
+      "empty": false
+    },
+    {
+      "observedAt": 1790616998675,
+      "type": "tick",
+      "cycle": 3,
+      "tickStartedAt": 1790616998310,
+      "materialized": 24,
+      "terminal": 0,
+      "cancelled": false,
+      "statusIncomplete": false,
+      "blockedAutomatic": 0,
+      "pendingAutomatic": 101,
+      "activeLeases": 0,
+      "ready": {
+        "CALCUTTA": true,
+        "COMPETITION": true,
+        "INTELLIGENCE": true
+      },
+      "waitingOwner": 2,
+      "waitingPublication": 1
+    },
+    {
+      "observedAt": 1790617000210,
+      "type": "failed",
+      "family": "CALCUTTA",
+      "classification": "RETRYABLE",
+      "sqlstate": "40001",
+      "code": "40001"
+    },
+    {
+      "observedAt": 1790617000353,
+      "type": "processed",
+      "family": "COMPETITION",
+      "empty": false
+    },
+    {
+      "observedAt": 1790617000522,
+      "type": "processed",
+      "family": "INTELLIGENCE",
+      "empty": false
+    },
+    {
+      "observedAt": 1790617000523,
+      "type": "stopped",
+      "cycles": 4
+    }
+  ]
+}

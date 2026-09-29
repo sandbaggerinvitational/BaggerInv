@@ -1,0 +1,40 @@
+{
+  "reviewedAt": "2026-09-29T22:01:24.142129+00:00",
+  "status": "REVIEWED_PARTIAL_CHECKPOINT",
+  "sourceFiles": 78,
+  "runtimeSourceDrift": false,
+  "documentationRequired": 29,
+  "evidenceRecords": 43,
+  "proofRows": 33,
+  "requirementCounts": {
+    "COMPLETE": 234,
+    "PARTIAL": 80
+  },
+  "privacyScannedFiles": 672,
+  "privacyUnresolvedFindings": 0,
+  "retainedReceipts": [
+    {
+      "path": "docs/reliability/phase2c/evidence/privacy-snapshots/23325644b93776d8-phase2c-scope-privacy-scan.json",
+      "sha256": "23325644b93776d8b000d33b93f31d26e2baab0b3408264769ca0ee7af1b2150"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/privacy-snapshots/386221a5a7d29f84-phase2c-privacy-adjudication-updated.json",
+      "sha256": "386221a5a7d29f840462e6cefb9d51fd5da2e3eba0566c982c2499bbf2873f8c"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/privacy-snapshots/cae0ded1daa5d733-phase2c-final-package-check.json",
+      "sha256": "cae0ded1daa5d7330735a39cfec77e4a208194f8ace0adba23b6fb7e7a6658eb"
+    }
+  ],
+  "generatedReportExclusions": [
+    "docs/reliability/phase2c/evidence/privacy-snapshots/23325644b93776d8-phase2c-scope-privacy-scan.json",
+    "docs/reliability/phase2c/evidence/privacy-snapshots/386221a5a7d29f84-phase2c-privacy-adjudication-updated.json",
+    "docs/reliability/phase2c/evidence/privacy-snapshots/cae0ded1daa5d733-phase2c-final-package-check.json",
+    "docs/reliability/phase2c/evidence/precommit-review.json"
+  ],
+  "exclusionReason": "These newly retained reports contain reviewed path/hash/count/provenance metadata; their own files cannot be included in their input snapshot. No raw secret values are added. Later Git metadata is reviewed separately.",
+  "productionActions": false,
+  "build11Implemented": false,
+  "candidateReadyForStaging": false,
+  "remaining": "Google/archive delivery and financial isolation P0; performance repeatability P1; later hosted/physical/capacity proof."
+}

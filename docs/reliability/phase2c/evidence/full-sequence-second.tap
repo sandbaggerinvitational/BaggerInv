@@ -1,0 +1,56 @@
+TAP version 13
+# Subtest: Phase2C full432hole chronological score sequence with autonomous derived delivery
+not ok 1 - Phase2C full432hole chronological score sequence with autonomous derived delivery
+  ---
+  duration_ms: 10351.506084
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-full-sequence.integration.test.mjs:43:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    /opt/homebrew/opt/postgresql@17/bin/psql
+    ERROR:  canceling statement due to statement timeout
+    CONTEXT:  SQL statement "SELECT pg_catalog.pg_advisory_xact_lock(
+        pg_catalog.hashtextextended(
+          pg_catalog.format(
+            'production-net-skins-v1:enqueue:2026:R%s', target_round_number
+          ), 202608290055
+        )
+      )"
+    PL/pgSQL function enqueue_production_net_skins_v1_round(integer,text,text) line 43 at PERFORM
+    SQL statement "SELECT production_control.enqueue_production_net_skins_v1_round(
+        match_value.round_number,
+        case when tg_table_name = 'hole_scores'
+          then 'CANONICAL_SCORE_CHANGED'
+          else 'CANONICAL_MATCH_LIFECYCLE_CHANGED' end,
+        'production-net-skins-v1-trigger'
+      )"
+    PL/pgSQL function enqueue_production_net_skins_v1_change() line 55 at PERFORM
+    SQL statement "update scoring_authority.matches set
+        status = case when operation = 'MARK_LIVE' then 'LIVE' else status end,
+        scoring_locked = target_locked,
+        match_revision = next_match_revision,
+        permission_revision = next_permission_revision,
+        authority_updated_at = transition_at,
+        updated_at = transition_at
+      where match_id = target_match returning *"
+    PL/pgSQL function public.mutate_production_match_control(jsonb) line 269 at SQL statement
+    
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:54:19)
+    sql (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/postgres17.mjs:182:10)
+    rpc (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/phase2-score-fixture.mjs:25:21)
+    TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c-full-sequence.integration.test.mjs:89:120)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async Test.run (node:internal/test_runner/test:1404:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 10450.224333

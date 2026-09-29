@@ -1,0 +1,20 @@
+# Phase2C — score recovery and derived delivery
+
+**PARTIAL. The score-path candidate is not ready for staging.** Current-source local proofs pass for the named recovery and three-family delivery paths. Required admitted Google reporting and related Finalize archive lifecycle are not covered by those proofs. No owner approval, Production query/deployment/schema/data change, participant communication, staging deployment or Build11 implementation occurred.
+
+Phase2 had reduced synchronous scoring work but left six critical gaps: post-Lock/Finalize recovery, autonomous derived delivery, annual SQL execution, mixed-round NetSkins deadlocks, finite timeout proof, and supported-client/control/release integration. This candidate has executed local proof for the named recovery, three-family delivery, SQL, concurrency, finite-timeout and client/control paths. The full automatic-work inventory exposes a remaining P0-B Google/archive delivery gap. The existing proofs preserve server-owned golf calculations, authorization, atomic receipts, idempotency and publication approval within their declared scope.
+
+The score transaction retains canonical/security/audit work and bounded current-authority eligibility reads. It adds immutable receipt origin. Historical calculators and worker success remain outside score commit. The separate worker consumes existing Calcutta, Competition and Intelligence demand; a completed intent means materialization, not a current result. Google reporting outbox and scorecard archive jobs are distinct queues and are not drained or counted by its tick. New tests independently verify current results after processing.
+
+Recovery is a read of the caller's original accepted receipt. Lock/Finalize still deny new writes. Unknown, missing, legacy and foreign receipts remain UNKNOWN. The new Calcutta/Competition/Intelligence worker uses bounded retry/leases, visible terminal state and exact authorized requeue. That policy does not govern the legacy Google/archive queues. Their autonomous lifecycle and financial isolation remain NOT PROVEN. NetSkins processing and publication decisions are not newly authorized by this candidate.
+
+[Owner review](OWNER-REVIEW.md) is the starting point. [Certification](CERTIFICATION.md) states exact counts and limits. [P0 closure](P0-CLOSURE.md), [proof matrix](PROOF-MATRIX.md), [performance](PERFORMANCE.md), [query plans](QUERY-PLANS.md), [full sequence](FULL-SEQUENCE.md), [finite timeouts](FINITE-TIMEOUT.md), [recovery contract](POST-REVOCATION-RECOVERY-CONTRACT.md), [worker contract](DERIVED-WORKER-CONTRACT.md), [annual functions](ANNUAL-WORKER-42883.md), [deadlocks](NET-SKINS-DEADLOCK.md), [client compatibility](CLIENT-COMPATIBILITY.md), [release compatibility](RELEASE-COMPATIBILITY.md), [security](SECURITY.md), [engineering review](ENGINEERING-REVIEW.md), [change summary](CHANGE-SUMMARY.md), [traceability](TRACEABILITY.md), [evidence](EVIDENCE.md), [completeness](AUDIT-COMPLETENESS.md), [manifest](CANDIDATE-MANIFEST.md), [deployment plan](DEPLOYMENT-PLAN.md) and [next phase](NEXT-PHASE.md) form the review package.
+
+See [Google/archive gap](GOOGLE-OUTBOX-GAP.md) for the required local follow-up and exact source boundaries. Production capacity, hosted worker availability, physical native scoring, complete Director UX, backup restore and full 2027 chronology also remain unproven. The candidate is not permission to deploy or start Build11. Supabase harden/measure-first remains the recommendation.
+
+
+## Performance counterevidence
+
+P2C-NEW-PERF-VARIANCE remains OPEN (P1). An unchanged-source eligible2× compatible batch failed the fixed tail gate (p95 27.137 ms, max31.633 ms); one controlled repeat passed (p95 8.126 ms, max8.214 ms). Cause UNKNOWN. Both are retained in [variance review](evidence/performance-variance-review.json). Finite local headroom passed in both; unconditional latency non-regression and an approved replacement baseline are NOT PROVEN. Requirement73 remains PARTIAL.
+
+PHASE 2C: PARTIAL — SCORE-PATH CANDIDATE NOT READY FOR STAGING; REMAINING GATES LISTED ABOVE

@@ -1,0 +1,857 @@
+{
+  "review": "INDEPENDENT_FINAL_LOCAL_QUERY_INDEX_SECURITY_SCOPE",
+  "reviewedAt": "2026-09-29T21:48:28.978255+00:00",
+  "reviewer": "Codex engineering review (score_proof_design)",
+  "ownerAcceptance": "NOT_PERFORMED",
+  "verdict": "SUPPORTED_SCOPED_LOCAL_QUERY_AND_INDEX_CLAIMS; DOCUMENT_FRESHNESS_FALSE_POSITIVE_CORRECTED",
+  "overallPhase2C": "PARTIAL \u2014 Google/export/archive proof and financial isolation remain unresolved",
+  "sourceHashes": {
+    "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce",
+    "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0",
+    "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48",
+    "lib/scoring-authority-supabase.js": "4dde49461f6805cccce8b5805a80ab4ba159627abc90e1b321d27d92df941196",
+    "lib/operational-rpc-contract.js": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+    "lib/production-scoring-operations-server.js": "b66b5c083801fc6ab4356d1d26320efb805b22cf2a075cb216db0a592ed2cf70",
+    "lib/scoring-mutation-recovery.js": "0f6b5aa1c5f042f846861cee22e61c113cfb98cd058d160c6982f458d77359b3",
+    "lib/scoring-mutation-recovery-route.js": "0e98f14294d531e33b08cc23493c1f326e796e1107f63c30c7404fcf1a6a4cfb",
+    "app/api/scoring/mutation-status/route.js": "39e35bfe30419eb87ae092e7b17feb5e8164abb963c5dc861ba0a3e585cd0c2a",
+    "app/api/mobile/v1/scoring/mutation-status/route.js": "6d4ffb20d5dd156c8ed4af1fd71a0a275304debdb550d8b477bed470931878d9",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cb18835d2bb540572d6460dc4313b678266560e8f6a56b56376b1ee783a321bd",
+    "lib/competition-derived-supabase.js": "7609a613f538e2252314b383305469317803ff23f384fe298ea24e53d40bb241",
+    "lib/intelligence-derived-supabase.js": "aa3d5b53012176ad3ed8ce681758a97770a68e1c18dd38a5cd210f22c636e5e9",
+    "lib/production-calcutta-server.js": "cb183d4b5f8159dad552541a72ec5b83e18378c7c50705955c129ec2784be89b",
+    "lib/production-net-skins-server.js": "4007eee4e309d18ae2e2d89f80980c306de29e7e78b5e9fad07f68f408690952",
+    "tools/reliability/run-score-derived-worker.mjs": "65f7ab486d4a7404b1003d180cb08f91405ea3dca518c2f3cdaf27eec3c1e9db"
+  },
+  "artifactHashes": {
+    "docs/reliability/phase2c/benchmark-candidate-common.json": "1547f03216c08420bb666d74d63a1a00ab058e6f1f27b8f2db51f723e6616292",
+    "docs/reliability/phase2c/evidence/candidate-common-5x-none-plan.json": "afc19d812645b68c824da54a5dce29562d28afeab2eef5bc083c3fd414f61525",
+    "docs/reliability/phase2c/evidence/candidate-common-1x-none-plan.json": "0fb1f3fa6f969f23246551d3ceb5f946af8f9291fe9ef752dead059957d82fef",
+    "docs/reliability/phase2c/evidence/candidate-common-10x-none-plan.json": "0dd6fcffbb2897782af139d1f65aba7a0d91341f67cb86211cf57e833b1079f9",
+    "docs/reliability/phase2c/evidence/candidate-common-2x-none-plan.json": "7f7fa8c32c3a1b7b2472cfd87bb141876e04cf3cdb57cf9449625a72369f569a",
+    "docs/reliability/phase2c/benchmark-candidate-recovery.json": "c2a64c76e17523d8d61eb70509f30539a6162582c1993ea962711bccbb52953e",
+    "docs/reliability/phase2c/evidence/candidate-recovery-5x-none-plan.json": "0ce5a2e23185e939554e73ca05fe17edff4207a6d5cf9677c9d223f26b76c1d0",
+    "docs/reliability/phase2c/evidence/candidate-recovery-1x-none-plan.json": "ac7078ac70aa8f9fa24df376885ac3928d2d83f4c9ed7b8bbc55eb85759d3b1f",
+    "docs/reliability/phase2c/evidence/candidate-recovery-10x-none-plan.json": "e9ac722bbadf2b53773c207252ef7ef8972d64d6b31f3e9a850729650faf1170",
+    "docs/reliability/phase2c/evidence/candidate-recovery-2x-none-plan.json": "94662998bb20a125aae5e3da4ea81ecf23af459975c6be4da421578302145a45",
+    "docs/reliability/phase2c/benchmark-candidate-eligible.json": "879021af1133b9ec014cf6a22bf9c2d956f1abedfca54dacba54437fc2051d8a",
+    "docs/reliability/phase2c/evidence/candidate-eligible-1x-none-plan.json": "b4a7fd82d944291942eefef9397d8a702f2dfb95e55448f681c55629b433cc56",
+    "docs/reliability/phase2c/evidence/candidate-eligible-1x-current_compatible-plan.json": "6b9759b687acf3fb7c1c374df5cf2a98e27f06b891dbcb8685d7a334f0b8649e",
+    "docs/reliability/phase2c/evidence/candidate-eligible-1x-current_incompatible_consumed-plan.json": "be51987061acdf57e4add209c11cde3222f669cd665140ab4dc9caf2a4eeea8c",
+    "docs/reliability/phase2c/evidence/candidate-eligible-1x-current_incompatible_financial-plan.json": "0572dd965b73078b18fe05aef088ede68336f5c69ca12f7ea1b7a36010e8dbfb",
+    "docs/reliability/phase2c/evidence/candidate-eligible-1x-stale_source-plan.json": "15b68d09f6ab4d51046e195d3664f49335c7185f090685c61218cf0111705c88",
+    "docs/reliability/phase2c/evidence/candidate-eligible-1x-stale_result_binding-plan.json": "7d0bba569b729561a13065113fb720fbda5686a9f93339619d483c081436f5ed",
+    "docs/reliability/phase2c/evidence/candidate-eligible-1x-superseded_result-plan.json": "ac5f3f45fdf5ed2d544a1ba05d4e802b0a7b50d287d839799c21525d7d288b06",
+    "docs/reliability/phase2c/evidence/candidate-eligible-1x-multiple_receipts-plan.json": "1780966bf9185b719473d800fd21e0e80b766052c25d8e07e7f7af07b979b93e",
+    "docs/reliability/phase2c/evidence/candidate-eligible-10x-multiple_receipts-plan.json": "8e2bb9cde316d8d7f66ec2affaa35cf8305a170fa28583d7647205e91e64a24e",
+    "docs/reliability/phase2c/evidence/candidate-eligible-10x-superseded_result-plan.json": "5eac316917ab90f456665c9a0d0a87decdcfb1ded4305d7609c2ae9b70c79813",
+    "docs/reliability/phase2c/evidence/candidate-eligible-10x-stale_result_binding-plan.json": "62a01cc7466d4c65fb8e57da0dc99f9aade99d8adad728a1515d453d3c34e7a9",
+    "docs/reliability/phase2c/evidence/candidate-eligible-10x-stale_source-plan.json": "c480538846825a3c0d50497b4cb7ebd5780bfcda7af37fdcf401479aec473214",
+    "docs/reliability/phase2c/evidence/candidate-eligible-10x-current_incompatible_financial-plan.json": "626961ee8e230a5ebad45ac06f0c95b5684137df9b07c611fd8ca86d970fb4eb",
+    "docs/reliability/phase2c/evidence/candidate-eligible-10x-current_incompatible_consumed-plan.json": "ebe252c56af6c5a852c79c36eddec8120d712dac8018283683642824d334956b",
+    "docs/reliability/phase2c/evidence/candidate-eligible-10x-current_compatible-plan.json": "8804ed68c13d04dbc47e5a9ccf35a5f4ea9181beaa24b9e7184a15d3f1e95532",
+    "docs/reliability/phase2c/evidence/candidate-eligible-10x-none-plan.json": "a9ef2f62f06d47bef1261799bba6aaed12527c31dc90df03283228a6be453d80",
+    "docs/reliability/phase2c/evidence/delivery-index-review-detail.json": "744c097ec53f6e5608113a660197ba9903f09f8ad6db49118e67bc8df49f2080",
+    "docs/reliability/phase2c/evidence/worker-history-detail.json": "7ef338e4c667ae32d98f3d71655a474daa3ae1db31fd77b9a3ac057fcd1659fb",
+    "docs/reliability/phase2c/evidence/annual-admission-run.json": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d",
+    "docs/reliability/phase2c/evidence/annual-history.json": "9bf694a6a9d42a187f5f8b607baf93c39d0b0d32dabb5a759d7c47a45dfca5a9",
+    "docs/reliability/phase2c/evidence/final-publication-plans.json": "2c1999019cd75b38566bba0ab7f07f2cd6122f4e3b5e3344950ab705d55f9bc4",
+    "docs/reliability/phase2c/evidence/audit-index-plans.json": "dc2209d85b9ae47fbf8b17386834500d6d0bdcd45997722d3ee65177a3cd9f67",
+    "docs/reliability/phase2c/evidence/net-owner-control-lock-after.json": "02cea96e6634a19aa0f4b691b9e08868e91aa71ed060e432fe389e8f49b714c3",
+    "docs/reliability/phase2c/evidence/eligible-comparison-counterexample/benchmark-candidate-eligible.json": "2e6021594c46ffedd3bc25b3720c70263941f34c3e86664581df2997fbdaa7d9",
+    "docs/reliability/phase2c/evidence/recovery.json": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+    "docs/reliability/phase2c/evidence/annual.json": "d54a12f7b8fe717791c8fd60a10f21ef01eb70765c99f2b9b4bc3f3c29db1c7e",
+    "docs/reliability/phase2c/evidence/canonical.json": "d2cad26397bf031988ac1af8391eaca5a745e8bc3624a7c9ad9ce16a4324036f",
+    "docs/reliability/phase2c/evidence/derived.json": "f7587daad3a7ed4b6c694edb13d9d0b501ca62ea92d4722651f537c818e31f84",
+    "docs/reliability/phase2c/evidence/deadlock.json": "5f89462b6e315e93399281b3afe8d06800d0d91866db4babf8688424a9f91334",
+    "docs/reliability/phase2c/evidence/delivery.json": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+    "docs/reliability/phase2c/evidence/net-owner-lock-order.json": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf",
+    "docs/reliability/phase2c/evidence/calcutta-lock-order.json": "990cb30fa365d8e43742fdaa60f3775c8ac1d27fc995a6d74e70792444f33831",
+    "docs/reliability/phase2c/evidence/worker-failure-lock-order.json": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18",
+    "docs/reliability/phase2c/evidence/delivery-index-review.json": "dd8383437d05d2102b8c79ca9e2ba9758b1be0a57aecb200877f0742fa7d965f",
+    "docs/reliability/phase2c/evidence/worker-history.json": "d31c74e44e2e73aa506a8e43a56a5b1af4d38c2b7cec9660e6e32bad5fed2633",
+    "docs/reliability/phase2c/evidence/full-sequence.json": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+    "docs/reliability/phase2c/evidence/recovery-proof.json": "72d034513cf1f7de8f717717671e49de55904523e2eace43eda2cf3df0a74a11",
+    "docs/reliability/phase2c/evidence/import-order-review-addendum.json": "484030c542bea7e4f6b01ec1b73c37af288e5ec549297ef4364232fc626b6585",
+    "test/support/reliability/phase2c-delivery-indexes.json": "547c7ccd2aaff77bd46e86923b14a806ee4b815b1335f57b1568279203a9ed1b",
+    "tools/reliability/phase2c-certification-gate.py": "a50fa40982a2f742c73ae5795bfeb6720523bd61cf63c2bb82debbcaa66fd698"
+  },
+  "runtimeReceiptReview": {
+    "recovery": {
+      "sha256": "f63d00453fd4da7725537db4f3e08e51c534970c1c2f3bf624aa3b422f6cdce3",
+      "rawSha256": "e7396bcec8e752ceed6b9674d96ec6ebeaa97e08a59564fa7d704ed0448f5cc5",
+      "completedAt": "2026-09-29T21:01:49.939Z",
+      "counts": {
+        "tests": 50,
+        "pass": 50,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "freshness": {
+        "capturedInputs": 228,
+        "drift": []
+      }
+    },
+    "annual": {
+      "sha256": "d54a12f7b8fe717791c8fd60a10f21ef01eb70765c99f2b9b4bc3f3c29db1c7e",
+      "rawSha256": "bc56ac006d332398efaf6a287b1e091516bf58032ae6e022749e23e9b88cfc40",
+      "completedAt": "2026-09-29T20:17:06.233Z",
+      "counts": {
+        "tests": 26,
+        "pass": 26,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "freshness": {
+        "capturedInputs": 132,
+        "drift": []
+      }
+    },
+    "annual-admission-run": {
+      "sha256": "f4a1de5924ec26faf3d39fb2cacaca930afc20d529ebc9d9489ed832d1549d8d",
+      "rawSha256": "de1e6465da4359b73be6d54be51852bbbf27af109e36845150d494a397e602a7",
+      "completedAt": "2026-09-29T20:17:26.463Z",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "freshness": {
+        "capturedInputs": 129,
+        "drift": []
+      }
+    },
+    "canonical": {
+      "sha256": "d2cad26397bf031988ac1af8391eaca5a745e8bc3624a7c9ad9ce16a4324036f",
+      "rawSha256": "df3b65030f2628b743a362ca23ff8e30216688dba9ebc4ac9f651f2d35d0d87d",
+      "completedAt": "2026-09-29T21:09:40.752Z",
+      "counts": {
+        "tests": 31,
+        "pass": 31,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "freshness": {
+        "capturedInputs": 129,
+        "drift": []
+      }
+    },
+    "derived": {
+      "sha256": "f7587daad3a7ed4b6c694edb13d9d0b501ca62ea92d4722651f537c818e31f84",
+      "rawSha256": "6c2b2e421500955164f562669bab800b0c8c54832ebcb8e80bb224bb698811fe",
+      "completedAt": "2026-09-29T21:10:04.232Z",
+      "counts": {
+        "tests": 15,
+        "pass": 15,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "freshness": {
+        "capturedInputs": 130,
+        "drift": []
+      }
+    },
+    "deadlock": {
+      "sha256": "5f89462b6e315e93399281b3afe8d06800d0d91866db4babf8688424a9f91334",
+      "rawSha256": "bb8d7b6516723c922c3a7e21d45999e2c5d2c7d045380d390ddca8d51cf073e3",
+      "completedAt": "2026-09-29T20:18:28.644Z",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "freshness": {
+        "capturedInputs": 173,
+        "drift": []
+      }
+    },
+    "delivery": {
+      "sha256": "3729c6e91afa21161aa2a89d72126ef70314a737f1c80680c10d270f2a388787",
+      "rawSha256": "3be04671e0a48daf5b23dc1565fb2e7cf10b455b6fe523d69ec7b438cd2a44b3",
+      "completedAt": "2026-09-29T21:04:00.957Z",
+      "counts": {
+        "tests": 54,
+        "pass": 54,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "freshness": {
+        "capturedInputs": 193,
+        "drift": []
+      }
+    },
+    "net-owner-lock-order": {
+      "sha256": "0ad340c8252e533920ec9904822250aaf92f9e0bea09b3bf995347969d200aaf",
+      "rawSha256": "51b9d0d1de6cfb1e8f6bbe9e16529d3b67ba4e49e2c75d4ee97961c70cb686fa",
+      "completedAt": "2026-09-29T21:05:05.993Z",
+      "counts": {
+        "tests": 20,
+        "pass": 20,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "freshness": {
+        "capturedInputs": 193,
+        "drift": []
+      }
+    },
+    "calcutta-lock-order": {
+      "sha256": "990cb30fa365d8e43742fdaa60f3775c8ac1d27fc995a6d74e70792444f33831",
+      "rawSha256": "d1f26ca2f5ac5dcf6810a4b021643b7a555fc444222cc5c81334d0c85f001710",
+      "completedAt": "2026-09-29T21:04:30.223Z",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "freshness": {
+        "capturedInputs": 192,
+        "drift": []
+      }
+    },
+    "worker-failure-lock-order": {
+      "sha256": "1ccab1f12984e9a108bced7c2174dc59e346d0a5cf2caac9e8dfa63da10b5f18",
+      "rawSha256": "692edfd9f09a1d2b09dbb779e51d7b6b5c3aed33ad895a9fab2662d1082c2a3a",
+      "completedAt": "2026-09-29T21:05:29.612Z",
+      "counts": {
+        "tests": 16,
+        "pass": 16,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "freshness": {
+        "capturedInputs": 193,
+        "drift": []
+      }
+    },
+    "delivery-index-review": {
+      "sha256": "dd8383437d05d2102b8c79ca9e2ba9758b1be0a57aecb200877f0742fa7d965f",
+      "rawSha256": "6c29bb33a282867882473dbe6079667289840324495efecd884a494f2d7d0c0b",
+      "completedAt": "2026-09-29T21:09:18.330Z",
+      "counts": {
+        "tests": 23,
+        "pass": 23,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "freshness": {
+        "capturedInputs": 192,
+        "drift": []
+      }
+    },
+    "worker-history": {
+      "sha256": "d31c74e44e2e73aa506a8e43a56a5b1af4d38c2b7cec9660e6e32bad5fed2633",
+      "rawSha256": "7d67b94148377e89d359eb2131702cebaa5c928b7530facb1d73b839fc267697",
+      "completedAt": "2026-09-29T21:08:06.354Z",
+      "counts": {
+        "tests": 33,
+        "pass": 33,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "freshness": {
+        "capturedInputs": 194,
+        "drift": []
+      }
+    },
+    "full-sequence": {
+      "sha256": "29f12d23152df575aed117b426005ab3d8ae5b123ee8c7daf392d78fcee1befb",
+      "rawSha256": "a77fe2008be72a145720239848647ad36b0c9900346a27009bfaee6f57d2158f",
+      "completedAt": "2026-09-29T21:12:09.988Z",
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "freshness": {
+        "capturedInputs": 229,
+        "drift": []
+      }
+    }
+  },
+  "queryPlanChecks": [
+    {
+      "kind": "common",
+      "scale": 5,
+      "variant": "none",
+      "plan": "evidence/candidate-common-5x-none-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "common",
+      "scale": 1,
+      "variant": "none",
+      "plan": "evidence/candidate-common-1x-none-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "common",
+      "scale": 10,
+      "variant": "none",
+      "plan": "evidence/candidate-common-10x-none-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "common",
+      "scale": 2,
+      "variant": "none",
+      "plan": "evidence/candidate-common-2x-none-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "recovery",
+      "scale": 5,
+      "variant": "none",
+      "plan": "evidence/candidate-recovery-5x-none-plan.json",
+      "nestedExecutions": 7,
+      "derivedRelations": [],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "recovery",
+      "scale": 1,
+      "variant": "none",
+      "plan": "evidence/candidate-recovery-1x-none-plan.json",
+      "nestedExecutions": 7,
+      "derivedRelations": [],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "recovery",
+      "scale": 10,
+      "variant": "none",
+      "plan": "evidence/candidate-recovery-10x-none-plan.json",
+      "nestedExecutions": 7,
+      "derivedRelations": [],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "recovery",
+      "scale": 2,
+      "variant": "none",
+      "plan": "evidence/candidate-recovery-2x-none-plan.json",
+      "nestedExecutions": 7,
+      "derivedRelations": [],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 1,
+      "variant": "none",
+      "plan": "evidence/candidate-eligible-1x-none-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 1,
+      "variant": "current_compatible",
+      "plan": "evidence/candidate-eligible-1x-current_compatible-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 1,
+      "variant": "current_incompatible_consumed",
+      "plan": "evidence/candidate-eligible-1x-current_incompatible_consumed-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 1,
+      "variant": "current_incompatible_financial",
+      "plan": "evidence/candidate-eligible-1x-current_incompatible_financial-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 1,
+      "variant": "stale_source",
+      "plan": "evidence/candidate-eligible-1x-stale_source-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 1,
+      "variant": "stale_result_binding",
+      "plan": "evidence/candidate-eligible-1x-stale_result_binding-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 1,
+      "variant": "superseded_result",
+      "plan": "evidence/candidate-eligible-1x-superseded_result-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 1,
+      "variant": "multiple_receipts",
+      "plan": "evidence/candidate-eligible-1x-multiple_receipts-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 10,
+      "variant": "multiple_receipts",
+      "plan": "evidence/candidate-eligible-10x-multiple_receipts-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 10,
+      "variant": "superseded_result",
+      "plan": "evidence/candidate-eligible-10x-superseded_result-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 10,
+      "variant": "stale_result_binding",
+      "plan": "evidence/candidate-eligible-10x-stale_result_binding-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 10,
+      "variant": "stale_source",
+      "plan": "evidence/candidate-eligible-10x-stale_source-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 10,
+      "variant": "current_incompatible_financial",
+      "plan": "evidence/candidate-eligible-10x-current_incompatible_financial-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 10,
+      "variant": "current_incompatible_consumed",
+      "plan": "evidence/candidate-eligible-10x-current_incompatible_consumed-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 10,
+      "variant": "current_compatible",
+      "plan": "evidence/candidate-eligible-10x-current_compatible-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    },
+    {
+      "kind": "eligible",
+      "scale": 10,
+      "variant": "none",
+      "plan": "evidence/candidate-eligible-10x-none-plan.json",
+      "nestedExecutions": 88,
+      "derivedRelations": [
+        "calcutta_v1_current",
+        "net_skins_v1_configuration_current",
+        "net_skins_v1_configuration_revisions"
+      ],
+      "maxTemporaryWrittenBlocks": 0
+    }
+  ],
+  "optionalIndexCases": [
+    {
+      "scale": 1,
+      "case": "CALCUTTA_DUE",
+      "candidateInstalled": false,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 1,
+      "case": "CALCUTTA_DELAYED",
+      "candidateInstalled": false,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 1,
+      "case": "NET_SKINS_DUE",
+      "candidateInstalled": false,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 1,
+      "case": "NET_SKINS_DELAYED",
+      "candidateInstalled": false,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 1,
+      "case": "COMPETITION_DUE",
+      "candidateInstalled": true,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 1,
+      "case": "COMPETITION_DELAYED",
+      "candidateInstalled": true,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 1,
+      "case": "COMPETITION_TERMINAL_COUNT_DUE",
+      "candidateInstalled": false,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 1,
+      "case": "COMPETITION_TERMINAL_COUNT_TERMINAL",
+      "candidateInstalled": false,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 1,
+      "case": "INTENT_BACKLOG_864_DEAD_0",
+      "candidateInstalled": true,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 1,
+      "case": "INTENT_BACKLOG_864_DEAD_1",
+      "candidateInstalled": true,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 1,
+      "case": "INTENT_BACKLOG_864_DEAD_101",
+      "candidateInstalled": true,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 10,
+      "case": "CALCUTTA_DUE",
+      "candidateInstalled": false,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 10,
+      "case": "CALCUTTA_DELAYED",
+      "candidateInstalled": false,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 10,
+      "case": "NET_SKINS_DUE",
+      "candidateInstalled": false,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 10,
+      "case": "NET_SKINS_DELAYED",
+      "candidateInstalled": false,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 10,
+      "case": "COMPETITION_DUE",
+      "candidateInstalled": true,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 10,
+      "case": "COMPETITION_DELAYED",
+      "candidateInstalled": true,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 10,
+      "case": "COMPETITION_TERMINAL_COUNT_DUE",
+      "candidateInstalled": false,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 10,
+      "case": "COMPETITION_TERMINAL_COUNT_TERMINAL",
+      "candidateInstalled": false,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 10,
+      "case": "INTENT_BACKLOG_864_DEAD_0",
+      "candidateInstalled": true,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 10,
+      "case": "INTENT_BACKLOG_864_DEAD_1",
+      "candidateInstalled": true,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    },
+    {
+      "scale": 10,
+      "case": "INTENT_BACKLOG_864_DEAD_101",
+      "candidateInstalled": true,
+      "semanticEquality": true,
+      "rollbackVerified": true
+    }
+  ],
+  "indexDecision": {
+    "retainedNonunique": [
+      "scoring_authority.calcutta_v1_recalculation_jobs_delivery_terminal",
+      "scoring_authority.net_skins_v1_recalculation_jobs_delivery_terminal",
+      "scoring_authority.competition_recalculation_jobs_delivery_due",
+      "scoring_authority.score_derived_intents_terminal_v1",
+      "production_control.score_derived_delivery_attempts_work_v1"
+    ],
+    "removedOptional": [
+      "scoring_authority.calcutta_v1_recalculation_jobs_delivery_due",
+      "scoring_authority.net_skins_v1_recalculation_jobs_delivery_due",
+      "scoring_authority.competition_recalculation_jobs_delivery_terminal"
+    ],
+    "correctnessIndexes": 2,
+    "confidence": "PROVEN measured selectors and schema; RECOMMENDATION to retain scoped five-index candidate",
+    "qualifiers": [
+      "No universal win: small/current and delayed Competition counterexamples remain.",
+      "Exact-work attempt index supports a proposed privileged forensic query, not a shipped hot path.",
+      "Index write amplification, WAL/storage, hosted installation locks and provider workload mix are NOT PROVEN."
+    ]
+  },
+  "workerPlanCoverage": {
+    "timedBranches": 32,
+    "extremeScalePlanRows": 16,
+    "corePlanCaptures": 48,
+    "noneBranchExtraProfiles": 2,
+    "interiorScales": "timing/runtime only; plans null"
+  },
+  "annualFreshness": {
+    "originalCompletedAt": "2026-09-29T20:17:26.463Z",
+    "dependencyClosure": {
+      "capturedInputs": 129,
+      "drift": []
+    },
+    "directInputs": 5,
+    "unrelatedGlobalSnapshotDrift": [
+      "lib/production-calcutta-server.js",
+      "lib/production-net-skins-server.js",
+      "test/reliability-phase2c-certification-gate.test.py",
+      "tools/reliability/phase2c-certification-gate.py"
+    ],
+    "statement": "The report inferred staleness from global, nonexecuted module hashes. All actual recorded annual dependencies are current.",
+    "gateAssessment": "NO MATERIAL BYPASS FOUND. verify_source_provenance checks all actual captured files; verify_receipt focused handling excludes unrelated broad global snapshot files. The gate has no source-hash exception shortcut. The limited aggregate performance gate does not itself certify all annual/security/golf proofs; core report generation additionally invokes verify_receipt for annual-admission.",
+    "risk": "Import order can change module evaluation; representative affected runtime suites were rerun. Annual SQL reuse does not prove that module-loading behavior."
+  },
+  "retainedPerformanceCounterevidence": {
+    "initial": {
+      "file": "evidence/eligible-comparison-counterexample/benchmark-candidate-eligible.json",
+      "scale": 2,
+      "variant": "current_compatible",
+      "samples": 30,
+      "p95Ms": 27.137,
+      "maxMs": 31.633
+    },
+    "unchangedCodeRepeat": {
+      "file": "benchmark-candidate-eligible.json",
+      "samples": 30,
+      "p95Ms": 8.126,
+      "maxMs": 8.214
+    },
+    "sameRecordedSourceClosure": true,
+    "interpretation": "Initial comparison failed and remains evidence. One repeat passes without source changes. Cause of variation is UNKNOWN; no speedup or universal stable-tail conclusion. P99 remains NOT PROVEN at30 samples."
+  },
+  "securityScope": [
+    {
+      "classification": "PROVEN SOURCE plus named local negative cases",
+      "claim": "Recovery binds accepted receipt to validated original Auth UUID while independently requiring current active identity/membership. Legacy/other-account/unbound/no receipt is UNKNOWN; recovery does not restore write authority.",
+      "tests": [
+        "P2C-A-ORIGIN",
+        "P2C-A-SPOOF",
+        "P2C-A-REASSIGNED",
+        "P2C-A-DELETED",
+        "P2C-A-ACL"
+      ],
+      "limit": "Provider identity is an explicit local boundary; trusted inherited service-role table SELECT is not newly revoked or claimed safe for participants. Hosted BYPASSRLS and exhaustive policy matrix remain unproven."
+    },
+    {
+      "classification": "PROVEN SOURCE and scoped runtime ACL cases",
+      "claim": "New private delivery ledger has RLS enabled and no API-role table/sequence grants; private helpers deny roles; only reviewed public entrypoints are service executable. Exact Director requeue retains authorization/source/cycle checks.",
+      "limit": "RLS flag plus role denials is not proof of every inherited RLS policy or hosted service configuration."
+    },
+    {
+      "classification": "PROVEN SOURCE with annual local execution",
+      "claim": "Migration123 removes only the hash-checked obsolete false-only writer CHECK while retaining the positive certified-writer shape, false default and NOT NULL; it does not remove the authorship trigger.",
+      "limit": "This admits legitimate certified rows; it does not authorize Google export/financial publication or prove safe in-place upgrade of an already-certified hosted runtime."
+    }
+  ],
+  "competitiveSemantics": {
+    "source": "Migration122 alters only two accepted-receipt INSERTs to capture origin. Migration123 function/lock repairs and124 delivery policy/indexes do not alter canonical formulas or add direct score-write admission. The reviewed17 source hashes match the import-order addendum.",
+    "runtime": "Existing canonical31, derived15, recovery50 and full-sequence evidence provide distinct local semantics/atomicity proofs; this review does not execute them again.",
+    "conclusion": "No unintended canonical golf-rule or authorization change found in reviewed source/proofs. This is not physical/native or Production certification."
+  },
+  "reportCorrection": {
+    "path": "docs/reliability/phase2c/QUERY-PLANS.md",
+    "priorSha256": "4298bdcf54cd4b62168812d53a3f4e5018647f66b8c5a4ae6e498fb9ff178ab1",
+    "proposedSha256": "7d2bcde25eba68ec91717578250325c54225f21c499feda75f89bd28daf5ca1d",
+    "scope": "Only annual source-freshness paragraph and three related repetitions; no raw evidence changed."
+  },
+  "limitations": [
+    "Only isolated PostgreSQL17 plan/path evidence, not Production capacity or long-term worst-case behavior.",
+    "Nested execution counts are not network round trips and node buffers overlap; do not sum them.",
+    "Plans at1/10 do not create plans for interior scales; one plan is not latency-percentile evidence.",
+    "Recovery plan proof excludes full hosted authentication; protected annual guard evidence is separate.",
+    "Retained Google/archive delivery obligations remain unproven and block overall P0-B/staging readiness.",
+    "No database, test suite, network, deployment or source mutation occurred during this review."
+  ],
+  "actions": {
+    "database": false,
+    "tests": false,
+    "network": false,
+    "shippingSourceEdits": false,
+    "evidenceAndOneReportCorrectionOnly": true
+  }
+}

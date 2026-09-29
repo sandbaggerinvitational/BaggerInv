@@ -1,0 +1,248 @@
+{
+  "recordKind": "READ_ONLY_REPORT_SCOPE_AND_FINAL_RESPONSE_REVIEW",
+  "reviewedAt": "2026-09-29T21:15:49.458260+00:00",
+  "reviewer": "Codex engineering review (score_proof_design)",
+  "ownerAcceptance": "NOT_PERFORMED",
+  "result": "PARTIAL_VERDICT_AND_NO_STAGING_ARE_SUPPORTED; NARROW_WORDING_CORRECTIONS_PROPOSED",
+  "runtimeStatus": "Parent is rerunning affected suites after two import-order corrections. This review does not run tests or validate completion of the current pipeline.",
+  "currentDocumentHashes": {
+    "docs/reliability/phase2c/DERIVED-DELIVERY.md": "bd2abc9c5fcaa14ba8d7fe80c4e67844ca989160f0ada6e42e5f9779f9eb8337",
+    "docs/reliability/phase2c/DERIVED-WORKER-CONTRACT.md": "268f03a79e3c030eeda79c1a7cb6a9def9abfc4c4aa0c8c26e4b6c43f21992f6",
+    "docs/reliability/phase2c/RETRY-DEAD-LETTER.md": "cfd776d6b88c13022d882de2a58702b078a6ae43c77adf3a6b6e5adb1324f573",
+    "docs/reliability/phase2c/OWNER-REVIEW.md": "9733642f76b78a11ed288b0d6411eebee29391cccd7f1e05ebade798cf1091b9",
+    "docs/reliability/phase2c/NEXT-PHASE.md": "6155699c86a9d42fedfc2d8911451faf3e020cbcfa872db23d092c12c9189f93",
+    "docs/reliability/phase2c/DEPLOYMENT-PLAN.md": "3d7a3b726a2bfdcc3ddf6a8b692a5acdbd36f6048e0236390c180ef5ebbc1a5a",
+    "docs/reliability/phase2c/CLIENT-COMPATIBILITY.md": "c6dbc87cd430c71307bcbcbad82ea72bf32e3d70b462b5f0f1237ba3412f3b9b",
+    "docs/reliability/phase2c/GOOGLE-OUTBOX-GAP.md": "ae4a8da156c004de658f6bbea310a524f70f1e333d8c08d787fd4ee4a5dba205",
+    "docs/reliability/phase2c/SCORE-PATH-SCOPE.md": "fa821a92d7e499262926faea455690ae857c270b1082424872e37db24c6d0c61",
+    "docs/reliability/phase2c/DISCOVERED-ISSUES.md": "11bd31146c765ec5bcfe274356038af1e2aa1f334dbfd9ca2848676a58119d5d"
+  },
+  "sourceRequests": [
+    {
+      "path": "/Users/claybeltran/.codex/attachments/61670086-a005-4d9d-96cb-8b77587c94b8/Pasted text.txt",
+      "sha256": "63aff1bd07359c98cf9d72ed93d30f41a4239cf43358bcd7d3ddab824df15f46",
+      "scope": "\u00a7\u00a7125\u2013127 exact client compatibility classifications"
+    },
+    {
+      "path": "/Users/claybeltran/.codex/attachments/39379b30-81cb-4bf3-accd-08ca616db689/Pasted text.txt",
+      "sha256": "ca31d582c4e1539260165932a558e91f8b2bc6d23c117f3d43a9e56b1700bc81",
+      "scope": "\u00a7240 structured final response"
+    },
+    {
+      "path": "/Users/claybeltran/.codex/attachments/4fe351ba-e64d-4055-96ac-f143a2c072e2/Pasted text.txt",
+      "sha256": "93442f55407626131bc5030cb7347297bb4180dc3551993a14eecaca30551398",
+      "scope": "Required \u00a7240 response plus final decision/configuration lines and permitted exact outcome strings"
+    }
+  ],
+  "corrections": [
+    {
+      "id": "P2C-DOC-SCOPE-01",
+      "severity": "DOC_SCOPE_CLARIFICATION",
+      "path": "docs/reliability/phase2c/DERIVED-DELIVERY.md",
+      "line": 3,
+      "observed": "Those are not owner-approval waits; see [Google/outbox inventory and unresolved semantics](GOOGLE-OUTBOX-GAP.md).",
+      "proposed": "The missing reporting/export proof cannot be dismissed as a financial owner-approval wait. External-write admission and the legacy writer\u2019s financial side effects require explicit review; see [Google/outbox inventory and unresolved semantics](GOOGLE-OUTBOX-GAP.md).",
+      "rationale": "External admission applicability is unresolved; missing reporting proof cannot simply be treated as financial owner wait.",
+      "status": "PROPOSED_NOT_APPLIED"
+    },
+    {
+      "id": "P2C-DOC-SCOPE-02",
+      "severity": "DOC_SCOPE_CLARIFICATION",
+      "path": "docs/reliability/phase2c/DERIVED-DELIVERY.md",
+      "line": 20,
+      "observed": "Tick status is bounded and explicit: current pending automatic work, current active leases, owner-held Net Skins work, terminal work and blocked obsolete-authority work.",
+      "proposed": "For the candidate-managed intent and calculation queues, tick status is bounded and explicit: current pending automatic work, current active leases, owner-held Net Skins work, terminal work and blocked obsolete-authority work. The tick does not inspect Google outbox or external archive delivery.",
+      "rationale": "Prevent managed-queue counters from being read as all durable work status.",
+      "status": "PROPOSED_NOT_APPLIED"
+    },
+    {
+      "id": "P2C-DOC-SCOPE-03",
+      "severity": "DOC_SCOPE_CLARIFICATION",
+      "path": "docs/reliability/phase2c/DERIVED-DELIVERY.md",
+      "line": 22,
+      "observed": "Final child-process quiescence must use a tick started after the final score/finalize commit,",
+      "proposed": "Final child-process quiescence for Calcutta, Competition and Intelligence must use a tick started after the final score/finalize commit,",
+      "rationale": "The final idle observation does not prove Google/archive delivery.",
+      "status": "PROPOSED_NOT_APPLIED"
+    },
+    {
+      "id": "P2C-DOC-SCOPE-04",
+      "severity": "DOC_SCOPE_CLARIFICATION",
+      "path": "docs/reliability/phase2c/DERIVED-DELIVERY.md",
+      "line": 56,
+      "observed": "Each automatic family has actual child-process death after claim, during calculation, before completion and after a committed result write.",
+      "proposed": "Each of the three automatic families in this runner has actual child-process death after claim, during calculation, before completion and after a committed result write.",
+      "rationale": "Keep process-death claim tied to three executed families.",
+      "status": "PROPOSED_NOT_APPLIED"
+    },
+    {
+      "id": "P2C-DOC-SCOPE-01",
+      "severity": "DOC_SCOPE_CLARIFICATION",
+      "path": "docs/reliability/phase2c/DERIVED-WORKER-CONTRACT.md",
+      "line": 3,
+      "observed": "Those are not owner-approval waits; see [Google/outbox inventory and unresolved semantics](GOOGLE-OUTBOX-GAP.md).",
+      "proposed": "The missing reporting/export proof cannot be dismissed as a financial owner-approval wait. External-write admission and the legacy writer\u2019s financial side effects require explicit review; see [Google/outbox inventory and unresolved semantics](GOOGLE-OUTBOX-GAP.md).",
+      "rationale": "Same external admission applicability correction.",
+      "status": "PROPOSED_NOT_APPLIED"
+    },
+    {
+      "id": "P2C-DOC-SCOPE-05",
+      "severity": "DOC_SCOPE_CLARIFICATION",
+      "path": "docs/reliability/phase2c/DERIVED-WORKER-CONTRACT.md",
+      "line": 33,
+      "observed": "Retry policy: at most five attempts per logical current-source work cycle;",
+      "proposed": "For the candidate-managed intent and calculation queues, retry policy permits at most five attempts per logical current-source work cycle;",
+      "rationale": "The legacy Google outbox has no corresponding certified finite-attempt/exact-requeue contract.",
+      "status": "PROPOSED_NOT_APPLIED"
+    },
+    {
+      "id": "P2C-DOC-SCOPE-01",
+      "severity": "DOC_SCOPE_CLARIFICATION",
+      "path": "docs/reliability/phase2c/RETRY-DEAD-LETTER.md",
+      "line": 3,
+      "observed": "Those are not owner-approval waits; see [Google/outbox inventory and unresolved semantics](GOOGLE-OUTBOX-GAP.md).",
+      "proposed": "The missing reporting/export proof cannot be dismissed as a financial owner-approval wait. External-write admission and the legacy writer\u2019s financial side effects require explicit review; see [Google/outbox inventory and unresolved semantics](GOOGLE-OUTBOX-GAP.md).",
+      "rationale": "Same external admission applicability correction.",
+      "status": "PROPOSED_NOT_APPLIED"
+    },
+    {
+      "id": "P2C-DOC-SCOPE-06",
+      "severity": "DOC_SCOPE_CLARIFICATION",
+      "path": "docs/reliability/phase2c/RETRY-DEAD-LETTER.md",
+      "line": 4,
+      "observed": "Existing job rows hold delivery cycle, attempt count, available time, terminal time and error classification.",
+      "proposed": "Candidate-managed calculation job rows hold delivery cycle, attempt count, available time, terminal time and error classification.",
+      "rationale": "Do not imply migration124 policy applies to Google/archive tables.",
+      "status": "PROPOSED_NOT_APPLIED"
+    },
+    {
+      "id": "P2C-DOC-SCOPE-07",
+      "severity": "DOC_SCOPE_CLARIFICATION",
+      "path": "docs/reliability/phase2c/RETRY-DEAD-LETTER.md",
+      "line": 6,
+      "observed": "At most five attempts are allowed per source cycle.",
+      "proposed": "For the candidate-managed intent and calculation queues, at most five attempts are allowed per source cycle. This is not a finite-attempt or exact-requeue proof for the legacy Google outbox/archive classes.",
+      "rationale": "Make bounded-retry scope visible at policy statement.",
+      "status": "PROPOSED_NOT_APPLIED"
+    },
+    {
+      "id": "P2C-DOC-SCOPE-08",
+      "severity": "DOC_SCOPE_CLARIFICATION",
+      "path": "docs/reliability/phase2c/OWNER-REVIEW.md",
+      "line": 26,
+      "observed": "This is not a financial operation that legitimately waits for owner calculation approval.",
+      "proposed": "The reporting obligation cannot be dismissed as waiting for financial calculation approval. Its current export admission and bundled legacy financial side effects require the separate review described below.",
+      "rationale": "Avoid describing the legacy Finalize writer as financial-side-effect-free.",
+      "status": "PROPOSED_NOT_APPLIED"
+    },
+    {
+      "id": "P2C-DOC-SCOPE-09",
+      "severity": "DOC_SCOPE_CLARIFICATION",
+      "path": "docs/reliability/phase2c/DEPLOYMENT-PLAN.md",
+      "line": 12,
+      "observed": "No automatic financial publication is introduced.",
+      "proposed": "The new three-family runner grants no new financial publication authority. This does not certify the existing Google Finalize writer\u2019s financial side effects; its mirror-only boundary remains an unresolved prerequisite before staging review.",
+      "rationale": "Keep candidate-scope statement distinct from legacy export safety.",
+      "status": "PROPOSED_NOT_APPLIED"
+    }
+  ],
+  "rootOwnedReportCorrection": {
+    "path": "docs/reliability/phase2c/CLIENT-COMPATIBILITY.md",
+    "line": 40,
+    "issue": "The narrative explains unchanged old client contracts and no adoption of status, but does not state the exact requested \u00a7125/126 classification labels.",
+    "proposed": "For the exercised contracts: PWA \u2014 BACKWARD COMPATIBLE BUT DOES NOT USE NEW RECOVERY. Build10 retained model \u2014 BACKWARD COMPATIBLE BUT DOES NOT USE NEW RECOVERY, conditional on the explicit UTC profile; shipping native transport/queue/UI and physical behavior remain NOT PROVEN. Director \u2014 supported tested SQL controls remain compatible; UI/HTTP lifecycle and automatic use of recovery are not inferred.",
+    "scope": "Reporting requirement; not an instruction to alter current clients or claim full application runtime compatibility."
+  },
+  "finalResponseReview": {
+    "requiredSectionOrder": [
+      "PHASE 2C STATUS",
+      "P0 CLOSURE",
+      "POST-REVOCATION RECOVERY",
+      "DERIVED DELIVERY",
+      "ANNUAL WORKERS",
+      "NET SKINS DEADLOCK",
+      "FINITE TIMEOUT",
+      "CLIENT COMPATIBILITY",
+      "SCORE-PATH REGRESSION",
+      "FULL SEQUENCE",
+      "PERFORMANCE",
+      "BROAD TESTS",
+      "SOURCE",
+      "PRODUCTION",
+      "BUILD 11",
+      "PHASE 2 SCORE-PATH CANDIDATE",
+      "UNRESOLVED P0",
+      "NEW ISSUES",
+      "NEXT PHASE",
+      "NEXT CODEX CONFIGURATION",
+      "KEY WARNING"
+    ],
+    "additionalFinalLines": [
+      "OWNER STAGING-REVIEW DECISION: NO",
+      "PRODUCTION AUTHORIZED: NO",
+      "BUILD 11 AUTHORIZED: NO",
+      "NEXT TASK: Continue Phase 2C Google reporting/export contract and isolated SQL/fake-sink delivery proof",
+      "RECOMMENDED MODEL: GPT-6 Astra",
+      "REASONING: highest available",
+      "SPEED: Standard"
+    ],
+    "requiredOverallOutcome": "PHASE 2C: PARTIAL \u2014 SCORE-PATH CANDIDATE NOT READY FOR STAGING; REMAINING GATES LISTED ABOVE",
+    "criticalFieldScopes": [
+      {
+        "field": "P0-B AUTONOMOUS DERIVED DELIVERY",
+        "value": "PARTIAL \u2014 executed three-family protections retained; Google/reporting/archive applicability, mirror-only semantics and autonomous delivery proof remain open."
+      },
+      {
+        "field": "STRANDED REQUIRED INTENTS",
+        "value": "Report the actual zero/nonzero candidate-managed counters only, then explicitly state Google/export/archive required delivery is NOT PROVEN. Do not emit a universal zero."
+      },
+      {
+        "field": "UNRECOVERED DEAD LETTERS",
+        "value": "Scope measured count to tested managed queues. No exact Google BLOCKED requeue/exhaustion proof was established."
+      },
+      {
+        "field": "MANUAL INTERVENTIONS",
+        "value": "Distinguish zero manual worker wake-up in automatic cases from deliberate fixture fault injection, restart, authorized recovery and financial owner waits. Do not claim the entire test had zero interventions."
+      },
+      {
+        "field": "READY FOR OWNER REVIEW BEFORE STAGING",
+        "value": "NO; the package may be reviewed now, but its candidate is not recommended to advance to staging."
+      },
+      {
+        "field": "CONTRACT BREAK",
+        "value": "No score request/response break introduced in executed local contract layers. Do not infer full Build10 physical/client proof; UTC caveat remains."
+      },
+      {
+        "field": "PERFORMANCE / P95 / P99 / LOCK / RECOVERY LOOKUP",
+        "value": "Use only fresh parent-validated candidate artifacts with environment and sample limits. Two import swaps cannot retroactively refresh captured runtime provenance."
+      },
+      {
+        "field": "COMMITS / FINAL SHA / REMOTE / WORKTREE",
+        "value": "Populate from actual completed Git actions; pending actions are not complete."
+      }
+    ]
+  },
+  "assessment": {
+    "googleBlockerRetained": true,
+    "stagingReadinessNotClaimed": true,
+    "threeFamilyProofNotDismissed": true,
+    "newProductionAuthorization": false,
+    "newBuild11Authorization": false,
+    "noAdditionalShippingDefectConcludedFromThisDocumentReview": true,
+    "nextSinglePhase": "Continue Phase 2C Google reporting/export contract and offline actual-SQL/fake-sink proof; include Finalize archive obligations."
+  },
+  "proposal": {
+    "directory": "/private/tmp/phase2c-overclaim-reviewed-docs",
+    "patch": "/private/tmp/phase2c-overclaim-doc-corrections.patch",
+    "patchSha256": "a868ce75c338027440ca92ae7dfc940c5b140aca1bea9a5f21891b31a0093ab2",
+    "repositoryApplied": false
+  },
+  "actions": {
+    "testsRun": false,
+    "databaseAccess": false,
+    "networkAccess": false,
+    "repositorySourceEdits": false,
+    "repositoryDocEdits": false,
+    "temporaryReviewFilesOnly": true
+  }
+}

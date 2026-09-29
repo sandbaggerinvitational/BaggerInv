@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "retainedNonuniqueIndexes": [
+    "scoring_authority.calcutta_v1_recalculation_jobs_delivery_terminal",
+    "scoring_authority.net_skins_v1_recalculation_jobs_delivery_terminal",
+    "scoring_authority.competition_recalculation_jobs_delivery_due",
+    "scoring_authority.score_derived_intents_terminal_v1",
+    "production_control.score_derived_delivery_attempts_work_v1"
+  ],
+  "removedOptionalIndexes": [
+    "scoring_authority.calcutta_v1_recalculation_jobs_delivery_due",
+    "scoring_authority.net_skins_v1_recalculation_jobs_delivery_due",
+    "scoring_authority.competition_recalculation_jobs_delivery_terminal"
+  ],
+  "historicalReferenceDefinitions": {
+    "scoring_authority.calcutta_v1_recalculation_jobs_delivery_due": "CREATE INDEX calcutta_v1_recalculation_jobs_delivery_due ON scoring_authority.calcutta_v1_recalculation_jobs USING btree (tournament_id, delivery_available_at) WHERE ((status = ANY (ARRAY['PENDING'::text, 'FAILED'::text])) AND (delivery_dead_letter_at IS NULL))",
+    "scoring_authority.net_skins_v1_recalculation_jobs_delivery_due": "CREATE INDEX net_skins_v1_recalculation_jobs_delivery_due ON scoring_authority.net_skins_v1_recalculation_jobs USING btree (tournament_id, delivery_available_at) WHERE ((status = ANY (ARRAY['PENDING'::text, 'FAILED'::text])) AND (delivery_dead_letter_at IS NULL))",
+    "scoring_authority.competition_recalculation_jobs_delivery_terminal": "CREATE INDEX competition_recalculation_jobs_delivery_terminal ON scoring_authority.competition_recalculation_jobs USING btree (tournament_id, delivery_dead_letter_at) WHERE (delivery_dead_letter_at IS NOT NULL)"
+  },
+  "evidencePurpose": "Exact candidate set plus transaction-local historical counterfactuals. Do not install removed optional indexes outside isolated rollback tests.",
+  "historicalDefinitionSource": "docs/reliability/phase2c/evidence/index-review-before-removal-85f91fa8/202609280124_score_derived_delivery_v1.sql",
+  "historicalMigrationSHA256": "85f91fa8f13206669e4e622bf7f227f1531577acd7e1790a88fb1e12a5a4c930"
+}

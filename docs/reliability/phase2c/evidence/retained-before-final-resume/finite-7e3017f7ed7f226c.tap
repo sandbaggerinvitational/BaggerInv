@@ -1,0 +1,53 @@
+TAP version 13
+# Subtest: Phase2C finite timeout and bounded outcome recovery
+    # Subtest: P2C-TIME-001: normal finite database default applies to every new score connection
+    ok 1 - P2C-TIME-001: normal finite database default applies to every new score connection
+      ---
+      duration_ms: 370.919084
+      type: 'test'
+      ...
+    # Subtest: P2C-TIME-hole_scores: 25ms timeout rolls back canonical and durable work at hole_scores
+    ok 2 - P2C-TIME-hole_scores: 25ms timeout rolls back canonical and durable work at hole_scores
+      ---
+      duration_ms: 631.551792
+      type: 'test'
+      ...
+    # Subtest: P2C-TIME-score_mutations: 25ms timeout rolls back canonical and durable work at score_mutations
+    ok 3 - P2C-TIME-score_mutations: 25ms timeout rolls back canonical and durable work at score_mutations
+      ---
+      duration_ms: 471.873542
+      type: 'test'
+      ...
+    # Subtest: P2C-TIME-score_derived_intents_v1: 25ms timeout rolls back canonical and durable work at score_derived_intents_v1
+    ok 4 - P2C-TIME-score_derived_intents_v1: 25ms timeout rolls back canonical and durable work at score_derived_intents_v1
+      ---
+      duration_ms: 470.636625
+      type: 'test'
+      ...
+    # Subtest: P2C-TIME-LOCK: score lock timeout cannot fabricate a committed outcome
+    ok 5 - P2C-TIME-LOCK: score lock timeout cannot fabricate a committed outcome
+      ---
+      duration_ms: 416.454292
+      type: 'test'
+      ...
+    # Subtest: P2C-TIME-RECOVERY: finite recovery timeout never erases the committed receipt
+    ok 6 - P2C-TIME-RECOVERY: finite recovery timeout never erases the committed receipt
+      ---
+      duration_ms: 391.295708
+      type: 'test'
+      ...
+    1..6
+ok 1 - Phase2C finite timeout and bounded outcome recovery
+  ---
+  duration_ms: 5568.602125
+  type: 'test'
+  ...
+1..1
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5620.674208

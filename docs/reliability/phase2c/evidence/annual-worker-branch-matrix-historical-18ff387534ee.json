@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "scope": "Phase2C sections35/294: runtime coverage of all14 corrected functions",
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "annualReceipt": "annual.json",
+  "deliveryReceipt": "delivery.json",
+  "migrationHashes": {
+    "202609280121_score_derived_intents_v1.sql": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+    "202609280122_score_mutation_recovery_v1.sql": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce",
+    "202609280123_annual_worker_sql_and_net_skins_locks_v1.sql": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0",
+    "202609280124_score_derived_delivery_v1.sql": "295f3657c710b0b1e7937d603ac8db9c5439afe20734d41dc0e61a2f8e320221"
+  },
+  "commonEvidence": {
+    "historical42883": "P2C-C-BEFORE: all14 actual installed functions fail before correction",
+    "cleanInstall": "P2C-C-CLEAN",
+    "upgradeInstallAndAttributes": "P2C-C-INSTALL",
+    "initializerBoundaryValues": "P2C-C-AFTER (13 initializer functions); P2C-C-ODDS executes the14th UPDATE expression",
+    "finiteBudgetMs": 5000
+  },
+  "functions": [
+    {
+      "function": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-GOOGLE-COMPATIBILITY",
+        "P2C-C-COMPATIBILITY-MATRIX"
+      ],
+      "coveredBranches": "Empty; one and two prepared jobs; stale structural revision and writer generation; active lease exclusion; expired lease attempt2; bounded lease values.",
+      "notApplicableOrLimit": "No SUPERSEDED enum: stale structural authority and terminal BLOCKED are the applicable alternatives."
+    },
+    {
+      "function": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-CALCUTTA",
+        "P2C-C-CALCUTTA-MATRIX"
+      ],
+      "coveredBranches": "Empty; one current plus three terminal jobs; stale source supersession/replacement; receipt replay; active lease exclusion; actual expiry/backoff/reclaim and exhaustion.",
+      "notApplicableOrLimit": "Multiple active jobs are forbidden by the partial unique index. Multiple terminal historical jobs are executed instead."
+    },
+    {
+      "function": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-COMPETITION",
+        "P2C-C-ANNUAL-COMPLETION-MATRIX",
+        "P2C-C-COMPETITION-RETRY"
+      ],
+      "coveredBranches": "Empty; one and two engines; lease clamps; expired lease retirement/backoff/reclaim; old claim rejection and fresh completion.",
+      "notApplicableOrLimit": "Mutable per-engine current rows have no SUPERSEDED enum. Claim replacement and changed source demand are applicable."
+    },
+    {
+      "function": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-COMPETITION",
+        "P2C-C-ANNUAL-COMPLETION-MATRIX",
+        "P2C-C-COMPETITION-RETRY"
+      ],
+      "coveredBranches": "Actual completion; nonnegative duration; missing job/wrong token/expired lease/superseded claim rejected; replay cannot add a snapshot.",
+      "notApplicableOrLimit": "Exact engine completion has no queue selector. Its missing and sibling-row behavior is tested separately from multi-engine claims."
+    },
+    {
+      "function": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-INTELLIGENCE",
+        "P2C-C-ANNUAL-COMPLETION-MATRIX",
+        "P2C-C-ANNUAL-MIXED-BUNDLE"
+      ],
+      "coveredBranches": "Empty; single and multiple engines; active lease; bounded lease values; real tick/backoff/reclaim; mixed terminal/delayed/running siblings remain unchanged.",
+      "notApplicableOrLimit": "No SUPERSEDED job enum; current mutable engine rows use source/claim replacement."
+    },
+    {
+      "function": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-INTELLIGENCE",
+        "P2C-C-ANNUAL-COMPLETION-MATRIX"
+      ],
+      "coveredBranches": "Single and multiple engine success; positive/negative duration; missing job/wrong token/expired lease/superseded claim rejected; replay stale with no extra snapshot.",
+      "notApplicableOrLimit": "Completion handles the supplied exact engine bundle, not queue traversal. Full annual financial lifecycle is outside this SQL proof."
+    },
+    {
+      "function": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-GOOGLE",
+        "P2C-C-GOOGLE-MATRIX"
+      ],
+      "coveredBranches": "Empty; one and multiple ordered events; checkpoint sequencing; lease bounds; active lease exclusion; retry path and terminal exclusion.",
+      "notApplicableOrLimit": "No SUPERSEDED enum; checkpoint ordering, DELIVERED and BLOCKED are the actual terminal/stale states."
+    },
+    {
+      "function": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-GOOGLE",
+        "P2C-C-GOOGLE-MATRIX"
+      ],
+      "coveredBranches": "Missing exact ID; one event among multiple; checkpoint conflict; active lease; expired lease reclamation; RETRYABLE, BLOCKED and DELIVERED replay.",
+      "notApplicableOrLimit": "Exact-ID operation does not traverse a queue. Other retained events demonstrate selection isolation."
+    },
+    {
+      "function": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-GOOGLE",
+        "P2C-C-GOOGLE-MATRIX"
+      ],
+      "coveredBranches": "Real claim failure; bounded retry delay; repeated failure/wrong owner/expired lease rejected; retry reclaimed; permanent BLOCKED outcome.",
+      "notApplicableOrLimit": "Exact leased event mutation has no queue selector or SUPERSEDED enum. Claim tests establish empty and multiple-event behavior."
+    },
+    {
+      "function": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-ARCHIVE",
+        "P2C-C-ARCHIVE-MATRIX"
+      ],
+      "coveredBranches": "Empty; single and multiple revisions; older revision SUPERSEDED; lease clamps; active exclusion; expired lease reclaim; delayed retry; BLOCKED exclusion.",
+      "notApplicableOrLimit": "This proves metadata claims only, not archive rendering/storage/transport."
+    },
+    {
+      "function": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-ARCHIVE",
+        "P2C-C-ARCHIVE-MATRIX"
+      ],
+      "coveredBranches": "Real claimed job; bounded delay; stale/repeated/wrong-token/expired lease denied; retry then permanent BLOCKED; older superseded revision retained.",
+      "notApplicableOrLimit": "Exact claimed-job mutation does not select multiple jobs. The corresponding actual claim test proves that selector."
+    },
+    {
+      "function": "public.future_production_dispatch_odds_pre_withdrawal_v1(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-ODDS",
+        "P2C-C-ODDS-MATRIX"
+      ],
+      "coveredBranches": "Corrected completion UPDATE executes with null/negative/normal/intmax bytes; one and multiple jobs; missing/stale-token/expired/SUPERSEDED denied; replay; no publication.",
+      "notApplicableOrLimit": "The corrected expression is in completion. Its other unchanged request/checkpoint/publish branches are not silently certified by this test."
+    },
+    {
+      "function": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-FROZEN-COMPLETION",
+        "B competition-claim-crash-restart",
+        "B competition-completion-ack-loss",
+        "B competition-late-writer-current-pointer"
+      ],
+      "coveredBranches": "Supported public wrapper reaches corrected private core (alias absence asserted); null/negative/positive duration persists; missing/wrong started_at/replay denied; sibling unchanged; real B reclaim and late-writer proof.",
+      "notApplicableOrLimit": "Frozen authority is RUNNING plus exact started_at. Immediate lease-clock expiry is not an independent core rejection; tick retirement/reclaim invalidates the old claim."
+    },
+    {
+      "function": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+      "proofLayer": "POSTGRESQL",
+      "status": "PASS_FOR_STATED_RUNTIME_BRANCHES",
+      "evidence": [
+        "P2C-C-FROZEN-COMPLETION",
+        "B intelligence-claim-crash-restart",
+        "B intelligence-completion-ack-loss",
+        "B intelligence-late-writer-current-pointer"
+      ],
+      "coveredBranches": "Supported wrapper/core lineage; one and multiple engine success; null/negative/positive duration; missing/wrong started_at/replay denied; sibling unchanged; real B reclaim and late-writer proof.",
+      "notApplicableOrLimit": "Frozen and annual completion authority differ. Annual token/expiry proof is not substituted for the frozen timestamp contract."
+    }
+  ],
+  "limitations": [
+    "Focused annual worker fixtures declare synthetic runtime boundary substitutions; protected annual admission is independently executed in annual-admission-run.json",
+    "Queue-selection states do not apply to exact completion functions; their missing/exact/sibling behavior and the relevant claim tests are recorded separately",
+    "No hosted or physical proof, no provider delivery, no full annual financial lifecycle certification"
+  ]
+}

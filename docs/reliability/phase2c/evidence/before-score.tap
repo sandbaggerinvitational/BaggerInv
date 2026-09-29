@@ -1,0 +1,40 @@
+▶ Phase2 actual canonical score proof matrix
+  ✔ P2-FIXTURE-IDS: full input seed and hole key produce 432 distinct mutation identities (0.932792ms)
+  ✔ P2-IDEM-001: sequential identical mutation and changed payload (272.192584ms)
+  ✔ P2-IDEM-002: new mutation same Official score vs intentional revision-aware correction (408.839041ms)
+  ✔ P2-CONC-001: 20 concurrent identical requests resolve one canonical outcome (412.024625ms)
+  ✔ P2-CONC-002: concurrent new mutation IDs / same gross cannot overwrite stale authority (335.304833ms)
+  ✔ P2-CONC-003: concurrent new mutation IDs / different gross cannot overwrite stale authority (344.806542ms)
+  ✔ P2-CONC-004: adjacent holes serialize with revision conflict then same-mutation retry (357.374792ms)
+  ✔ P2-CONC-005: independent match score completes while another match transaction remains open (369.561625ms)
+  ✔ P2-CONC-LOCK-SCORE: SCORE wins Lock/score race safely (385.930958ms)
+  ✔ P2-CONC-LOCK-LOCK: LOCK wins Lock/score race safely (368.102166ms)
+  ✔ P2-ATOMIC-BEFORE_HOLE: failure at BEFORE_HOLE rolls back hole, match, receipt and audit (367.81025ms)
+  ✔ P2-ATOMIC-AFTER_HOLE: failure at AFTER_HOLE rolls back hole, match, receipt and audit (397.499666ms)
+  ✔ P2-ATOMIC-AFTER_MATCH: failure at AFTER_MATCH rolls back hole, match, receipt and audit (401.735959ms)
+  ✔ P2-ATOMIC-BEFORE_RECEIPT: failure at BEFORE_RECEIPT rolls back hole, match, receipt and audit (383.765333ms)
+  ✔ P2-ATOMIC-AFTER_RECEIPT: failure at AFTER_RECEIPT rolls back hole, match, receipt and audit (375.108666ms)
+  ✔ P2-ATOMIC-AFTER_HISTORY: failure at AFTER_HISTORY rolls back hole, match, receipt and audit (382.528542ms)
+  ✔ P2-ATOMIC-AFTER_AUDIT: failure at AFTER_AUDIT rolls back hole, match, receipt and audit (408.421459ms)
+  ✔ P2-ATOMIC-AFTER_OUTBOX: failure at AFTER_OUTBOX rolls back hole, match, receipt and audit (383.144041ms)
+  ✔ P2-FAIL-57014: statement timeout after hole work rolls back and preserves SQLSTATE57014 (473.055ms)
+  ✔ P2-FAIL-BEFORE-COMMIT: backend connection termination before COMMIT is exactly recoverable (360.741ms)
+  ✔ P2-FAIL-AFTER-COMMIT: backend connection termination after COMMIT is exactly recoverable (419.829833ms)
+  ✔ P2-UNKNOWN-INFLIGHT: absent receipt while transaction still active must remain UNKNOWN (342.781375ms)
+  ✔ P2-AUTH-001: real actor, match permission and private RPC privileges deny unauthorized identities (377.844625ms)
+  ✔ P2-IDEM-LOCKED-READBACK: committed receipt survives Lock even when participant replay loses permission (374.915958ms)
+  ✔ P2-GOLF-432: all R1/R2/R3 holes and Finalize retain canonical golf and receipts (1938.907583ms)
+  ✔ P2-GOLF-HALVES: all three formats preserve an 18-hole halved result and 1.5/1.5 points (478.456959ms)
+  ✔ P2-GOLF-EARLY: Singles clinch at10 preserves remaining18-hole gross and final three points (338.901084ms)
+  ✔ P2-CONC-FINALIZE: final-hole vs Finalize race is never Final with missing hole (736.040833ms)
+  ✔ P2-RESTART-IN-TRANSACTION: owned disposable PostgreSQL crash restart during open score transaction (5401.62325ms)
+  ✔ P2-RESTART-AFTER-COMMIT: owned disposable PostgreSQL crash restart after commit (694.795667ms)
+✔ Phase2 actual canonical score proof matrix (21696.324792ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21779.963834

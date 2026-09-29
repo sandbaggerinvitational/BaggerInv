@@ -1,0 +1,327 @@
+{
+  "schemaVersion": 1,
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "timestamp": "2026-09-28T14:35:00.361Z",
+  "migration": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+  "migrationSha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8",
+  "production": false,
+  "tests": [
+    {
+      "id": "P2-MIG-CLEAN",
+      "title": "effective clean schema installs and executes implementation manifest",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "installed": true,
+        "manifestExecuted": true,
+        "helpers": 4,
+        "indexes": 4,
+        "admissionGuardIndex": {
+          "ready": true,
+          "table": "production_control.google_writer_fence_rehearsals",
+          "valid": true,
+          "definition": "CREATE INDEX google_writer_fence_rehearsals_unrestored_idx ON production_control.google_writer_fence_rehearsals USING btree (run_id) WHERE ((status = 'RUNNING'::text) OR ((status = 'FAILED'::text) AND (NOT restoration_confirmed)))"
+        },
+        "schema": "Release139 migrations + shipped incremental repairs + explicit Resume candidate"
+      }
+    },
+    {
+      "id": "P2-MIG-UPGRADE",
+      "title": "synthetic history upgrade preserves canonical data and security attributes",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "canonicalHashUnchanged": true,
+        "replacedFunctions": 16,
+        "existingSecurityAttributesUnchanged": true,
+        "emergencyAdmissionFunctionUnchanged": true
+      }
+    },
+    {
+      "id": "P2-MIG-REAPPLY",
+      "title": "non-idempotent reapplication rejects atomically",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "reapply": "REJECTED_ATOMICALLY",
+        "catalogUnchanged": true,
+        "deploymentRequirement": "migration runner records apply-once identity"
+      }
+    },
+    {
+      "id": "P2-MIG-CERTIFICATION",
+      "title": "existing annual certification blocks install without changing it",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "install": "REJECTED",
+        "certificationPreserved": true,
+        "catalogUnchanged": true
+      }
+    },
+    {
+      "id": "P2-MIG-SOURCE-HASH",
+      "title": "unexpected installed trigger body rejects all migration changes",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "sourceGuard": "REJECTED",
+        "partialTableLeft": false,
+        "catalogUnchanged": true
+      }
+    },
+    {
+      "id": "P2-MIG-MANIFEST",
+      "title": "manifest rejects private helper or table privilege drift",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "helperPrivilegeDrift": "REJECTED",
+        "tablePrivilegeDrift": "REJECTED"
+      }
+    },
+    {
+      "id": "P2-MIG-CLOSE",
+      "title": "pending score demand blocks final handoff without changing emergency stop",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "finalHandoff": "DENIED_PENDING_INTENTS",
+        "emergencyStopBody": "UNCHANGED",
+        "emergencyStopRuntime": "NOT_TESTED",
+        "canonicalScore": "COMMITTED"
+      }
+    },
+    {
+      "id": "P2-MIG-GENERATION",
+      "title": "obsolete intent generation fails closed without rebinding or score loss",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "staleGeneration": "RETRYABLE_55000",
+        "silentlyRebound": false,
+        "receiptPreserved": true
+      }
+    },
+    {
+      "id": "P2-MIG-LIFECYCLE-SCOPE",
+      "title": "only score transactions defer; actual Lock/Finalize and round triggers retain synchronous work",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "score": {
+          "synchronousDerivedCalls": {},
+          "intents": 2
+        },
+        "lock": {
+          "code": "SCORING_LOCK",
+          "originalEnqueueCalls": {
+            "CALCUTTA": 1,
+            "NET_SKINS": 1,
+            "COMPETITION": 5
+          },
+          "intents": 0
+        },
+        "finalize": {
+          "code": "FINALIZED",
+          "originalEnqueueCalls": {
+            "CALCUTTA": 1,
+            "COMPETITION": 5
+          },
+          "intents": 0
+        },
+        "round": {
+          "originalEnqueueCalls": {
+            "CALCUTTA": 1
+          },
+          "intents": 0,
+          "proof": "ACTUAL_ROUND_TRIGGER_ONLY"
+        },
+        "fullRoundControlLifecycle": "NOT_PROVEN"
+      }
+    },
+    {
+      "id": "P2-MIG-ANNUAL-EXPECTED-RED",
+      "title": "actual future worker initializers reproduce pre-existing 42883 before and after",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "reproduced": [
+          {
+            "version": "PHASE1_BASELINE",
+            "function": "future_production_claim_calcutta_recalculation_v1",
+            "sqlstate": "42883",
+            "capabilityStatus": "EXPECTED_RED_PRE_EXISTING"
+          },
+          {
+            "version": "PHASE1_BASELINE",
+            "function": "future_production_claim_competition_derived_jobs_v1",
+            "sqlstate": "42883",
+            "capabilityStatus": "EXPECTED_RED_PRE_EXISTING"
+          },
+          {
+            "version": "PHASE1_BASELINE",
+            "function": "future_production_claim_intelligence_derived_bundle_v1",
+            "sqlstate": "42883",
+            "capabilityStatus": "EXPECTED_RED_PRE_EXISTING"
+          },
+          {
+            "version": "PHASE2_CANDIDATE",
+            "function": "future_production_claim_calcutta_recalculation_v1",
+            "sqlstate": "42883",
+            "capabilityStatus": "EXPECTED_RED_PRE_EXISTING"
+          },
+          {
+            "version": "PHASE2_CANDIDATE",
+            "function": "future_production_claim_competition_derived_jobs_v1",
+            "sqlstate": "42883",
+            "capabilityStatus": "EXPECTED_RED_PRE_EXISTING"
+          },
+          {
+            "version": "PHASE2_CANDIDATE",
+            "function": "future_production_claim_intelligence_derived_bundle_v1",
+            "sqlstate": "42883",
+            "capabilityStatus": "EXPECTED_RED_PRE_EXISTING"
+          }
+        ],
+        "annualWorkerCertification": "NOT_PROVEN",
+        "shippingFix": false
+      }
+    },
+    {
+      "id": "P2-MIG-SKINS-DEADLOCK",
+      "title": "mixed-round worker lock inversion is understood and durably retryable",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "classification": "KNOWN_WORKER_DEADLOCK_RETRYABLE_NOT_ELIMINATED",
+        "scope": "TWO_MATERIALIZATION_CALLS_PER_WORKER_TRANSACTION",
+        "lockGraph": [
+          {
+            "pid": 15305,
+            "blockedBy": [
+              15306
+            ],
+            "waitEvent": "advisory"
+          },
+          {
+            "pid": 15306,
+            "blockedBy": [
+              15305
+            ],
+            "waitEvent": "advisory"
+          }
+        ],
+        "locks": [
+          {
+            "pid": 15305,
+            "mode": "ExclusiveLock",
+            "objid": "2082806337",
+            "classid": "1549167931",
+            "granted": false,
+            "objsubid": 1
+          },
+          {
+            "pid": 15305,
+            "mode": "ExclusiveLock",
+            "objid": "2723577776",
+            "classid": "1616170987",
+            "granted": true,
+            "objsubid": 1
+          },
+          {
+            "pid": 15305,
+            "mode": "ShareLock",
+            "objid": "957585712",
+            "classid": "170",
+            "granted": true,
+            "objsubid": 1
+          },
+          {
+            "pid": 15306,
+            "mode": "ExclusiveLock",
+            "objid": "2723577776",
+            "classid": "1616170987",
+            "granted": false,
+            "objsubid": 1
+          },
+          {
+            "pid": 15306,
+            "mode": "ExclusiveLock",
+            "objid": "2082806337",
+            "classid": "1549167931",
+            "granted": true,
+            "objsubid": 1
+          },
+          {
+            "pid": 15306,
+            "mode": "ShareLock",
+            "objid": "957585712",
+            "classid": "170",
+            "granted": true,
+            "objsubid": 1
+          }
+        ],
+        "responses": [
+          {
+            "failed": 1,
+            "family": "NET_SKINS",
+            "maximum": 1,
+            "processed": 0
+          },
+          {
+            "failed": 0,
+            "family": "NET_SKINS",
+            "maximum": 1,
+            "processed": 1
+          }
+        ],
+        "afterDeadlock": [
+          {
+            "match": "2026-R1-1",
+            "status": "SUCCEEDED",
+            "attempts": 1,
+            "sqlstate": null
+          },
+          {
+            "match": "2026-R2-1",
+            "status": "SUCCEEDED",
+            "attempts": 1,
+            "sqlstate": null
+          },
+          {
+            "match": "2026-R2-2",
+            "status": "RETRYABLE",
+            "attempts": 1,
+            "sqlstate": "40P01"
+          },
+          {
+            "match": "2026-R1-2",
+            "status": "SUCCEEDED",
+            "attempts": 1,
+            "sqlstate": null
+          }
+        ],
+        "retry": {
+          "failed": 0,
+          "family": "NET_SKINS",
+          "maximum": 8,
+          "processed": 1
+        },
+        "canonicalDataUnchanged": true,
+        "automaticSchedulerProven": false,
+        "limitation": "Production claim batches also retain per-round locks; this reproduces lock-order mechanism, not hosted frequency"
+      }
+    }
+  ],
+  "limitations": [
+    "Effective clean install includes explicit historical Release139 SQL repairs and synthetic platform prerequisite rows",
+    "Expected annual worker SQL failures are reproduced defects, not successful annual worker certification",
+    "No hosted admission/release identity, Production migration or rollback deployment is certified"
+  ],
+  "completedAt": "2026-09-28T14:35:16.721Z",
+  "counts": {
+    "pass": 11,
+    "fail": 0
+  }
+}

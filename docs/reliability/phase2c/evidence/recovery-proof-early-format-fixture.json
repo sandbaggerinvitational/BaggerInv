@@ -1,0 +1,952 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-09-28T16:38:23.487Z",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+  "migrations": [
+    {
+      "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+      "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+    },
+    {
+      "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+      "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+    },
+    {
+      "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+      "sha256": "295f3657c710b0b1e7937d603ac8db9c5439afe20734d41dc0e61a2f8e320221"
+    }
+  ],
+  "statementTimeoutMs": 1000,
+  "timeZone": "UTC",
+  "production": false,
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES",
+  "childProofSource": {
+    "path": "test/support/reliability/phase2c-recovery-child.mjs",
+    "sha256": "d9aa96e7b926c7d2881aa58dba65cfc25a0f4c1ecb1391c90b7ef7b8a68414c2"
+  },
+  "tests": [
+    {
+      "id": "P2C-A-ORIGIN",
+      "name": "new receipts retain exact authenticated origin without changing response",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "receiptBound": true,
+        "responseChanged": false,
+        "receiptCount": 1
+      },
+      "elapsedMs": 286.20212500000025
+    },
+    {
+      "id": "P2C-A-LOCK-BB",
+      "name": "committed BB score survives lost acknowledgement and Lock;100reads do not write",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "format": "BB",
+        "replayDenied": "UNAUTHORIZED",
+        "newScoreDenied": true,
+        "recoveryChecks": 100,
+        "apiStatus": "COMMITTED",
+        "noWrites": true
+      },
+      "elapsedMs": 1629.2495829999998
+    },
+    {
+      "id": "P2C-A-FINAL-BB",
+      "name": "full BB lost final-hole acknowledgement remains recoverable after Finalize",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "format": "BB",
+        "holes": 18,
+        "final": true,
+        "lostFinalHoleAcknowledgement": true,
+        "finalHoleRecovery": "COMMITTED",
+        "newScoreDenied": true
+      },
+      "elapsedMs": 818.5732919999991
+    },
+    {
+      "id": "P2C-A-LOCK-SC",
+      "name": "committed SC score survives lost acknowledgement and Lock;100reads do not write",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "format": "SC",
+        "replayDenied": "UNAUTHORIZED",
+        "newScoreDenied": true,
+        "recoveryChecks": 100,
+        "apiStatus": "COMMITTED",
+        "noWrites": true
+      },
+      "elapsedMs": 1348.88875
+    },
+    {
+      "id": "P2C-A-FINAL-SC",
+      "name": "full SC lost final-hole acknowledgement remains recoverable after Finalize",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "format": "SC",
+        "holes": 18,
+        "final": true,
+        "lostFinalHoleAcknowledgement": true,
+        "finalHoleRecovery": "COMMITTED",
+        "newScoreDenied": true
+      },
+      "elapsedMs": 866.291459
+    },
+    {
+      "id": "P2C-A-LOCK-SI",
+      "name": "committed SI score survives lost acknowledgement and Lock;100reads do not write",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "format": "SI",
+        "replayDenied": "UNAUTHORIZED",
+        "newScoreDenied": true,
+        "recoveryChecks": 100,
+        "apiStatus": "COMMITTED",
+        "noWrites": true
+      },
+      "elapsedMs": 1558.115667
+    },
+    {
+      "id": "P2C-A-FINAL-SI",
+      "name": "full SI lost final-hole acknowledgement remains recoverable after Finalize",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "format": "SI",
+        "holes": 18,
+        "final": true,
+        "lostFinalHoleAcknowledgement": true,
+        "finalHoleRecovery": "COMMITTED",
+        "newScoreDenied": true
+      },
+      "elapsedMs": 801.3192080000008
+    },
+    {
+      "id": "P2C-A-ROUND-LOCK",
+      "name": "supported whole-round Lock revokes all12 matches while original owned receipt stays recoverable",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "round": 3,
+        "actualRoundRpc": true,
+        "affectedMatches": 12,
+        "activePermissions": 0,
+        "status": "COMMITTED",
+        "newScoreDenied": "UNAUTHORIZED",
+        "noRecoveryWrites": true,
+        "additionalGuardSubstitutions": false,
+        "limitation": "Existing Phase1 synthetic runtime boundary remains; actual round operation/readiness/actor functions execute. Not hosted round control."
+      },
+      "elapsedMs": 494.2201669999995
+    },
+    {
+      "id": "P2C-A-NO-WRITE-LOCK",
+      "name": "receipt recovery completes while another transaction holds the same match write lock",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "status": "COMMITTED",
+        "independentWriterSqlstate": "55P03",
+        "writerLockStillHeldAtReadCompletion": true,
+        "normalStatementTimeoutMs": 1000,
+        "recoveryMs": 3.1651660000006814,
+        "readOnlyTransaction": true,
+        "noRecoveryWrites": true,
+        "limitation": "Single isolated lock-behavior observation, not a latency distribution or provider contention benchmark."
+      },
+      "elapsedMs": 382.0699590000004
+    },
+    {
+      "id": "P2C-A-CORRECTION",
+      "name": "lost correction acknowledgement resolves distinctly from the original receipt",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "originalRevision": 1,
+        "correctionRevision": 2,
+        "currentReceiptNotConfused": true,
+        "lostCorrectionAcknowledgement": true,
+        "noRecoveryWrites": true
+      },
+      "elapsedMs": 452.0878750000011
+    },
+    {
+      "id": "P2C-A-EARLY",
+      "name": "all formats recover the lost decisive-hole acknowledgement before Hole18",
+      "result": "FAIL",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "error": "Expected values to be strictly equal:\n\nfalse !== true\n",
+      "elapsedMs": 503.2909579999996
+    },
+    {
+      "id": "P2C-A-HALVED",
+      "name": "all formats recover a lost final-hole acknowledgement after a halved Finalize",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "formats": [
+          {
+            "format": "BB",
+            "holes": 18,
+            "result": "Halved",
+            "points": [
+              1.5,
+              1.5
+            ],
+            "recovery": "COMMITTED"
+          },
+          {
+            "format": "SC",
+            "holes": 18,
+            "result": "Halved",
+            "points": [
+              1.5,
+              1.5
+            ],
+            "recovery": "COMMITTED"
+          },
+          {
+            "format": "SI",
+            "holes": 18,
+            "result": "Halved",
+            "points": [
+              1.5,
+              1.5
+            ],
+            "recovery": "COMMITTED"
+          }
+        ],
+        "lostFinalHoleAcknowledgement": true,
+        "noRecoveryWrites": true
+      },
+      "elapsedMs": 2800.1893340000006
+    },
+    {
+      "id": "P2C-A-PROCESS-RESTART",
+      "name": "fresh API process resolves durable receipt after the submitting process exits and Lock",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "submitExit": 77,
+        "submissionAcknowledgementDelivered": false,
+        "submitPid": 49450,
+        "recoveryPid": 49477,
+        "newProcess": true,
+        "status": "COMMITTED",
+        "actualPwaAdapter": true,
+        "actualStatusHandler": true,
+        "actualPostgresql": true,
+        "noRecoveryWrites": true,
+        "identity": "INJECTED_SYNTHETIC_CURRENT_IDENTITY",
+        "provider": "LOCAL_UNIX_SOCKET_SQL",
+        "hostedHttp": "NOT PROVEN"
+      },
+      "elapsedMs": 685.9736250000005
+    },
+    {
+      "id": "P2C-A-NO-CHANGE",
+      "name": "NO_CHANGE under a new ID cannot be falsely attributed as COMMITTED",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "newId": "UNKNOWN",
+        "existingId": "COMMITTED"
+      },
+      "elapsedMs": 373.94225000000006
+    },
+    {
+      "id": "P2C-A-LEGACY",
+      "name": "legacy receipt without immutable Auth association is UNKNOWN",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "legacyUnbound": "UNKNOWN",
+        "backfilled": false
+      },
+      "elapsedMs": 370.1282089999986
+    },
+    {
+      "id": "P2C-A-ENUMERATION",
+      "name": "other owner, other match, missing and random IDs do not disclose receipts",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "sameMatchOtherParticipant": "UNKNOWN",
+        "otherMatchParticipant": "UNKNOWN",
+        "random": "UNKNOWN",
+        "noExistenceDisclosure": true
+      },
+      "elapsedMs": 402.88824999999997
+    },
+    {
+      "id": "P2C-A-DENY-UNLINK",
+      "name": "UNLINK denies both receipt and write authority",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "sqlstate": "42501",
+        "privacyPreserved": true,
+        "scoreWriteDenied": true
+      },
+      "elapsedMs": 324.19654199999786
+    },
+    {
+      "id": "P2C-A-DENY-UNVERIFY",
+      "name": "UNVERIFY denies both receipt and write authority",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "sqlstate": "42501",
+        "privacyPreserved": true,
+        "scoreWriteDenied": true
+      },
+      "elapsedMs": 798.7907919999998
+    },
+    {
+      "id": "P2C-A-DENY-ROLE_REVOKE",
+      "name": "ROLE_REVOKE denies both receipt and write authority",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "sqlstate": "42501",
+        "privacyPreserved": true,
+        "scoreWriteDenied": true
+      },
+      "elapsedMs": 461.0929999999971
+    },
+    {
+      "id": "P2C-A-SPOOF",
+      "name": "mismatched Auth/player and tournament bindings fail closed",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "bindingDenials": 4,
+        "noCanonicalChanges": true
+      },
+      "elapsedMs": 493.55362500000047
+    },
+    {
+      "id": "P2C-A-REASSIGNED",
+      "name": "a newly valid account linked to the same golfer cannot claim the original account receipt",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "samePlayerNewAuth": "UNKNOWN_FOR_OLD_RECEIPT",
+        "newAccountOwnReceipt": "COMMITTED",
+        "currentIdentityNotHistoricalOwnership": true
+      },
+      "elapsedMs": 431.6858749999992
+    },
+    {
+      "id": "P2C-A-DELETED",
+      "name": "supported local account deletion preserves receipt but revokes recovery",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "syntheticAuthDeleted": true,
+        "canonicalReceiptRetained": true,
+        "recoveryDenied": "42501",
+        "providerDeletionTested": false
+      },
+      "elapsedMs": 409.22995900000024
+    },
+    {
+      "id": "P2C-A-RUNTIME",
+      "name": "recovery still calls current read-admission guard",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "guardExecuted": true,
+        "wrongResourceDenied": true,
+        "realHostedAdmission": "NOT PROVEN"
+      },
+      "elapsedMs": 334.5759169999983
+    },
+    {
+      "id": "P2C-A-TIMEOUT",
+      "name": "real database timeout during recovery leaves score intact and retry resolves",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "sqlstate": "57014",
+        "canonicalIntact": true,
+        "retryResult": "COMMITTED",
+        "faultPoint": "synthetic read-admission boundary"
+      },
+      "elapsedMs": 461.12604199999987
+    },
+    {
+      "id": "P2C-A-ACL",
+      "name": "real end-user roles cannot read receipts; private helper denies all API roles",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "actualRoleDenials": 7,
+        "servicePublicRpc": "COMMITTED",
+        "trustedServiceTableSelect": "PREEXISTING GRANT",
+        "serviceVisibleRows": 0,
+        "hostedServiceBypassRls": "NOT PROVEN",
+        "rlsFlagOnlyNotFullPolicyMatrix": true
+      },
+      "elapsedMs": 398.3023749999993
+    },
+    {
+      "id": "P2C-A-INFLIGHT",
+      "name": "invisible inflight receipt is UNKNOWN; commit resolves and rollback stays unknown",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "inflight": "UNKNOWN",
+        "committed": "COMMITTED",
+        "knownTestRollbackEndpoint": "UNKNOWN",
+        "noFalseNegative": true
+      },
+      "elapsedMs": 356.1194170000017
+    },
+    {
+      "id": "P2C-A-READONLY",
+      "name": "status executes inside READ ONLY transaction and creates no audit or derived demand",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "readOnlyTransaction": true,
+        "noCanonicalAuditWrites": true
+      },
+      "elapsedMs": 381.5355419999978
+    },
+    {
+      "id": "P2C-F-PWA",
+      "name": "shipping PWA persistence adapter survives lost ack and new status resolves after Lock",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "adapter": "persistParticipantScore",
+        "lostAckAfterSqlCommit": true,
+        "recovery": "COMMITTED",
+        "newScoreDenied": true,
+        "providerBoundary": "INJECTED_LOCAL_SQL",
+        "pwaUiCallsRecovery": false
+      },
+      "elapsedMs": 433.5628749999996
+    },
+    {
+      "id": "P2C-F-PWA-REPLAY",
+      "name": "shipping adapter same-ID replay, conflict and next-hole retain response shape",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "replay": true,
+        "conflict": "IDEMPOTENCY_CONFLICT",
+        "nextHole": 2
+      },
+      "elapsedMs": 378.82416699999885
+    },
+    {
+      "id": "P2C-F-MOBILE-BB",
+      "name": "unchanged mobile backend BB DTO from candidate SQL",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "mobileBackendDto": "PASS",
+        "shippingNativeSourceChanged": false,
+        "decoder": "SEPARATE_REQUIRED_PROOF"
+      },
+      "elapsedMs": 378.72429099999863
+    },
+    {
+      "id": "P2C-F-MOBILE-SC",
+      "name": "unchanged mobile backend SC DTO from candidate SQL",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "mobileBackendDto": "PASS",
+        "shippingNativeSourceChanged": false,
+        "decoder": "SEPARATE_REQUIRED_PROOF"
+      },
+      "elapsedMs": 367.9830000000002
+    },
+    {
+      "id": "P2C-F-MOBILE-SI",
+      "name": "unchanged mobile backend SI DTO from candidate SQL",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "details": {
+        "mobileBackendDto": "PASS",
+        "shippingNativeSourceChanged": false,
+        "decoder": "SEPARATE_REQUIRED_PROOF"
+      },
+      "elapsedMs": 387.3557499999988
+    }
+  ],
+  "nativeResponses": [
+    {
+      "format": "BB",
+      "request": {
+        "matchId": "2026-R1-1",
+        "holeNumber": 1,
+        "teamOneGrossScores": [
+          4,
+          5
+        ],
+        "teamTwoGrossScores": [
+          5,
+          6
+        ],
+        "mutationId": "6e0895fe-b5fc-48fc-8e80-7929ed52eac7",
+        "expectedMatchRevision": 0,
+        "expectedHoleRevision": 0
+      },
+      "accepted": {
+        "ok": true,
+        "apiVersion": "v1",
+        "data": {
+          "mutationId": "6e0895fe-b5fc-48fc-8e80-7929ed52eac7",
+          "accepted": true,
+          "idempotent": false,
+          "semanticNoop": false,
+          "matchId": "2026-R1-1",
+          "hole": {
+            "holeNumber": 1,
+            "revision": 1,
+            "gross": {
+              "teamOne": [
+                4,
+                5
+              ],
+              "teamTwo": [
+                5,
+                6
+              ]
+            },
+            "strokes": {
+              "teamOne": [
+                0,
+                2
+              ],
+              "teamTwo": [
+                1,
+                1
+              ]
+            },
+            "net": {
+              "teamOne": 3,
+              "teamTwo": 4
+            },
+            "winner": "teamOne",
+            "updatedAt": "2026-09-28T16:38:43.264056+00:00"
+          },
+          "match": {
+            "revision": 1,
+            "status": "inProgress",
+            "currentHole": 1,
+            "holesRemaining": 17,
+            "scorecardComplete": false,
+            "statusText": "Team 1 1 UP through 1"
+          },
+          "refreshRequired": false
+        },
+        "meta": {
+          "generatedAt": "2026-09-28T16:38:43.278Z"
+        }
+      },
+      "replay": {
+        "ok": true,
+        "apiVersion": "v1",
+        "data": {
+          "mutationId": "6e0895fe-b5fc-48fc-8e80-7929ed52eac7",
+          "accepted": true,
+          "idempotent": true,
+          "semanticNoop": false,
+          "matchId": "2026-R1-1",
+          "hole": {
+            "holeNumber": 1,
+            "revision": 1,
+            "gross": {
+              "teamOne": [
+                4,
+                5
+              ],
+              "teamTwo": [
+                5,
+                6
+              ]
+            },
+            "strokes": {
+              "teamOne": [
+                0,
+                2
+              ],
+              "teamTwo": [
+                1,
+                1
+              ]
+            },
+            "net": {
+              "teamOne": 3,
+              "teamTwo": 4
+            },
+            "winner": "teamOne",
+            "updatedAt": "2026-09-28T16:38:43.264056+00:00"
+          },
+          "match": {
+            "revision": 1,
+            "status": "inProgress",
+            "currentHole": 1,
+            "holesRemaining": 17,
+            "scorecardComplete": false,
+            "statusText": "Team 1 1 UP through 1"
+          },
+          "refreshRequired": false
+        },
+        "meta": {
+          "generatedAt": "2026-09-28T16:38:43.287Z"
+        }
+      }
+    },
+    {
+      "format": "SC",
+      "request": {
+        "matchId": "2026-R2-1",
+        "holeNumber": 1,
+        "teamOneGrossScores": [
+          4
+        ],
+        "teamTwoGrossScores": [
+          5
+        ],
+        "mutationId": "b5b6543d-a763-4d73-8e2e-1ce4a0294bb1",
+        "expectedMatchRevision": 0,
+        "expectedHoleRevision": 0
+      },
+      "accepted": {
+        "ok": true,
+        "apiVersion": "v1",
+        "data": {
+          "mutationId": "b5b6543d-a763-4d73-8e2e-1ce4a0294bb1",
+          "accepted": true,
+          "idempotent": false,
+          "semanticNoop": false,
+          "matchId": "2026-R2-1",
+          "hole": {
+            "holeNumber": 1,
+            "revision": 1,
+            "gross": {
+              "teamOne": [
+                4
+              ],
+              "teamTwo": [
+                5
+              ]
+            },
+            "strokes": {
+              "teamOne": [
+                1
+              ],
+              "teamTwo": [
+                0
+              ]
+            },
+            "net": {
+              "teamOne": 3,
+              "teamTwo": 5
+            },
+            "winner": "teamOne",
+            "updatedAt": "2026-09-28T16:38:43.628124+00:00"
+          },
+          "match": {
+            "revision": 1,
+            "status": "inProgress",
+            "currentHole": 1,
+            "holesRemaining": 17,
+            "scorecardComplete": false,
+            "statusText": "Team 1 1 UP through 1"
+          },
+          "refreshRequired": false
+        },
+        "meta": {
+          "generatedAt": "2026-09-28T16:38:43.644Z"
+        }
+      },
+      "replay": {
+        "ok": true,
+        "apiVersion": "v1",
+        "data": {
+          "mutationId": "b5b6543d-a763-4d73-8e2e-1ce4a0294bb1",
+          "accepted": true,
+          "idempotent": true,
+          "semanticNoop": false,
+          "matchId": "2026-R2-1",
+          "hole": {
+            "holeNumber": 1,
+            "revision": 1,
+            "gross": {
+              "teamOne": [
+                4
+              ],
+              "teamTwo": [
+                5
+              ]
+            },
+            "strokes": {
+              "teamOne": [
+                1
+              ],
+              "teamTwo": [
+                0
+              ]
+            },
+            "net": {
+              "teamOne": 3,
+              "teamTwo": 5
+            },
+            "winner": "teamOne",
+            "updatedAt": "2026-09-28T16:38:43.628124+00:00"
+          },
+          "match": {
+            "revision": 1,
+            "status": "inProgress",
+            "currentHole": 1,
+            "holesRemaining": 17,
+            "scorecardComplete": false,
+            "statusText": "Team 1 1 UP through 1"
+          },
+          "refreshRequired": false
+        },
+        "meta": {
+          "generatedAt": "2026-09-28T16:38:43.654Z"
+        }
+      }
+    },
+    {
+      "format": "SI",
+      "request": {
+        "matchId": "2026-R3-12",
+        "holeNumber": 1,
+        "teamOneGrossScores": [
+          4
+        ],
+        "teamTwoGrossScores": [
+          5
+        ],
+        "mutationId": "45d87e57-f1f7-4813-8010-58a4c77dcb95",
+        "expectedMatchRevision": 0,
+        "expectedHoleRevision": 0
+      },
+      "accepted": {
+        "ok": true,
+        "apiVersion": "v1",
+        "data": {
+          "mutationId": "45d87e57-f1f7-4813-8010-58a4c77dcb95",
+          "accepted": true,
+          "idempotent": false,
+          "semanticNoop": false,
+          "matchId": "2026-R3-12",
+          "hole": {
+            "holeNumber": 1,
+            "revision": 1,
+            "gross": {
+              "teamOne": [
+                4
+              ],
+              "teamTwo": [
+                5
+              ]
+            },
+            "strokes": {
+              "teamOne": [
+                0
+              ],
+              "teamTwo": [
+                3
+              ]
+            },
+            "net": {
+              "teamOne": 4,
+              "teamTwo": 2
+            },
+            "winner": "teamTwo",
+            "updatedAt": "2026-09-28T16:38:44.013317+00:00"
+          },
+          "match": {
+            "revision": 1,
+            "status": "inProgress",
+            "currentHole": 1,
+            "holesRemaining": 17,
+            "scorecardComplete": false,
+            "statusText": "Team 2 1 UP through 1"
+          },
+          "refreshRequired": false
+        },
+        "meta": {
+          "generatedAt": "2026-09-28T16:38:44.030Z"
+        }
+      },
+      "replay": {
+        "ok": true,
+        "apiVersion": "v1",
+        "data": {
+          "mutationId": "45d87e57-f1f7-4813-8010-58a4c77dcb95",
+          "accepted": true,
+          "idempotent": true,
+          "semanticNoop": false,
+          "matchId": "2026-R3-12",
+          "hole": {
+            "holeNumber": 1,
+            "revision": 1,
+            "gross": {
+              "teamOne": [
+                4
+              ],
+              "teamTwo": [
+                5
+              ]
+            },
+            "strokes": {
+              "teamOne": [
+                0
+              ],
+              "teamTwo": [
+                3
+              ]
+            },
+            "net": {
+              "teamOne": 4,
+              "teamTwo": 2
+            },
+            "winner": "teamTwo",
+            "updatedAt": "2026-09-28T16:38:44.013317+00:00"
+          },
+          "match": {
+            "revision": 1,
+            "status": "inProgress",
+            "currentHole": 1,
+            "holesRemaining": 17,
+            "scorecardComplete": false,
+            "statusText": "Team 2 1 UP through 1"
+          },
+          "refreshRequired": false
+        },
+        "meta": {
+          "generatedAt": "2026-09-28T16:38:44.041Z"
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Provider identity/admission boundaries are explicit synthetic substitutions; no hosted Auth or release proof",
+    "Shipping PWA adapter and mobile backend DTO execute; shipping clients do not call the new recovery API automatically",
+    "Legacy unbound and absent receipts remain UNKNOWN; no NOT_COMMITTED terminal-attempt protocol exists",
+    "No physical device; Build10 decoder must be verified separately against these retained JSON responses"
+  ],
+  "completedAt": "2026-09-28T16:38:44.064Z",
+  "summary": {
+    "total": 32,
+    "passed": 31,
+    "failed": 1
+  },
+  "clusterDestroyed": true
+}
