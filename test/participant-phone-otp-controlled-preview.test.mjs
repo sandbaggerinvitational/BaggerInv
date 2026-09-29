@@ -729,8 +729,8 @@ test("unlinked Auth UUID B receives no participant or scoring identity", async (
   const env = {
     VERCEL_ENV: "preview", GOOGLE_SHEETS_ID: "preview-workbook", PREVIEW_SCORING_SHEET_ID: "preview-workbook",
     PARTICIPANT_IDENTITY_AUTHORITY: "supabase", SCORING_AUTHORITY: "supabase",
-    SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "sb_secret_preview",
-    NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://preview.supabase.co", NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "sb_publishable_preview",
+    SUPABASE_SCORING_MIRROR_URL: "https://idgigvjjqkfbqjeredpb.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "sb_secret_preview",
+    NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://idgigvjjqkfbqjeredpb.supabase.co", NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "sb_publishable_preview",
   };
   await assert.rejects(() => resolveSupabaseParticipantIdentity({
     cookieStore: { getAll: () => [], get: () => undefined, set: () => {} },

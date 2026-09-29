@@ -1,17 +1,14 @@
 export const dynamic = "force-dynamic";
-import { refreshHistoricalData } from "../../lib/stats";
 import Link from "next/link";
 import { Header, Footer } from "../components";
 import {
   formatPercentage,
   formatRecord,
   getFormatName,
-  getRecords,
 } from "../../lib/stats";
 import styles from "../historical.module.css";
 import { addTournamentRanks } from "../../lib/rankings";
 import { pageMetadata } from "../../lib/seo";
-import { loadScorecardAnalytics } from "../../lib/scorecard-data";
 import ScoringStatGrid from "../ScoringStatGrid";
 import {
   formatRecordValue,
@@ -69,15 +66,9 @@ export const metadata = pageMetadata({
 export default async function RecordsPage() {
   const env = await applicationPageEnvironment();
   const useSupabase = isSupabaseSecondaryHistory(env);
-  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel({ env }) : null;
-  const scorecardAnalyticsPromise = useSupabase
-    ? Promise.resolve(secondaryHistory.scorecardAnalytics)
-    : loadScorecardAnalytics();
-  if (!useSupabase) await refreshHistoricalData();
-  const records = useSupabase
-    ? secondaryHistory.calculations.getRecords()
-    : getRecords();
-  const scorecardAnalytics = await scorecardAnalyticsPromise;
+  const secondaryHistory = await loadSecondaryHistoryModel({ env });
+  const records = secondaryHistory.calculations.getRecords();
+  const scorecardAnalytics = secondaryHistory.scorecardAnalytics;
   const playerNames = Object.fromEntries(
     records.points.map(({ player }) => [player["Player ID"], player["Display Name"]])
   );

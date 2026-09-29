@@ -4,5 +4,10 @@
       "path": "/api/cron/account-deletion",
       "schedule": "*/5 * * * *"
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "codex/reliability-phase2c1-google-retirement": false
+    }
+  }
 }

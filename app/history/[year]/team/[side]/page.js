@@ -48,6 +48,7 @@ function roundStatusLabel(value) {
 export async function generateMetadata({ params }) {
   const env = await applicationPageEnvironment();
   const { year, side } = await params;
+  if (!/^\d{4}$/.test(String(year)) || Number(year) < 2017 || Number(year) > 2026) notFound();
   const decodedSide = decodeURIComponent(side);
   let team;
 
@@ -105,6 +106,7 @@ const historyPresentationHref = (href, participantPresentation) => {
 export default async function TeamSeasonPage({ params, searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const { year, side } = await params;
+  if (!/^\d{4}$/.test(String(year)) || Number(year) < 2017 || Number(year) > 2026) notFound();
   const query = await searchParams;
   const decodedSide = decodeURIComponent(side);
   const useSupabase2026 = isSupabaseHistory2026(year, env);

@@ -2,7 +2,7 @@
 
 ## Odds Center publishing
 
-The protected `/odds-center/admin` page publishes official 10,000-run tournament snapshots to Google Sheets. Configure `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`, `GOOGLE_SHEETS_ID`, and `ODDS_ADMIN_SECRET` in Vercel. Share the spreadsheet with the service-account email as an editor. The application creates and maintains `Odds Control`, `Odds Snapshots`, `Odds Team Results`, and `Odds Player Results` automatically. Pre-Tournament may be overwritten until any later official phase is published, after which it is locked.
+The Google-retirement candidate publishes owner-reviewed Odds through canonical PostgreSQL authority. Google Sheets, service accounts and archive delivery are not runtime authorities. See [Phase 2C.1](docs/reliability/phase2c1/README.md) for candidate proof, limitations and the later cleanup plan. Do not revoke credentials or delete historical Google artifacts before separately authorized hosted certification, deployment, observation and preservation.
 
 War Room Evolution turns the matchup builder into a complete captain's decision desk.
 
@@ -39,4 +39,4 @@ npm run dev
 
 Run `npm run build` before deploying. The Captain's Briefing requires `OPENAI_API_KEY`; `OPENAI_MODEL` is optional. The API applies a small per-instance request limit, but a shared rate-limit store is recommended if the site runs across multiple serverless instances.
 
-Upload every file and folder in this package into the root of your GitHub `BaggerInv` repository and replace duplicate files. Commit to `main`; Vercel will deploy automatically.
+Reliability work stays on isolated branches. Do not merge, deploy, or change live configuration from a local certification task. Production deployment requires separate owner authorization and the reviewed deployment plan. Historical v10/v11 notes above describe prior releases, not current runtime dependencies.

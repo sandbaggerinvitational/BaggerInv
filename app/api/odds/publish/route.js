@@ -16,7 +16,6 @@ import { oddsPersistenceDiagnostics } from "../../../../lib/odds-workbook-persis
 import { buildPublishedOddsImport, PUBLISHED_ODDS_WORKBOOK_TABS, publishedOddsSnapshotsFromView, readPublishedOddsView, replacePublishedOddsSnapshots } from "../../../../lib/published-odds-supabase.js";
 import { buildSupabaseOddsPublication, loadSupabaseOddsInputs, publishSupabaseOddsSnapshot } from "../../../../lib/championship-odds-supabase.js";
 import { markOddsCalculationPublished, readPublishableOddsCalculation } from "../../../../lib/championship-odds-resilience.js";
-import { deliverSupabaseOddsGoogleMirror } from "../../../../lib/championship-odds-google-mirror.js";
 import { requireOddsCalculationInputSource, requireOddsPublicationAuthority } from "../../../../lib/odds-calculation-source.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
 import { withProductionGoogleAuthoringWrite } from "../../../../lib/production-google-authoring.js";
@@ -269,22 +268,8 @@ async function publishProjection(request) {
       nativePublication = await publishSupabaseOddsSnapshot(publication);
       if (!nativePublication.payload?.ok) throw Object.assign(new Error("Supabase Odds publication failed."), { code: nativePublication.payload?.code });
       pass("Supabase publication", { function: "publishSupabaseOddsSnapshot", publication: nativePublication.payload });
-      try {
-        start("Google reporting mirror", { workbookOperation: "Atomic reporting mirror", worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "publishOddsSnapshot" });
-        const mirror = await deliverSupabaseOddsGoogleMirror({ snapshotId: nativePublication.payload?.snapshot_id,
-          actorId: director?.identity?.player?.id || "Director publication" });
-        if (!mirror.ok) throw Object.assign(new Error("Google reporting mirror is delayed."), { code: mirror.code || "ODDS_GOOGLE_MIRROR_FAILED" });
-        if (mirror.delivered) {
-          snapshot = mirror.snapshot;
-          verification = mirror.verification;
-          pass("Google reporting mirror", { function: "verifyPublishedOddsSnapshot", verification, attemptCount: mirror.completion?.attempt_count });
-        } else {
-          pass("Google reporting mirror already verified", { function: "deliverSupabaseOddsGoogleMirror", duplicate: mirror.duplicate === true });
-        }
-      } catch (mirrorError) {
-        console.error("Championship Odds Google reporting mirror delayed", { code: mirrorError?.code || "ODDS_GOOGLE_MIRROR_FAILED", message: mirrorError?.message || String(mirrorError), snapshotId: nativePublication.payload?.snapshot_id });
-        pass("Google reporting mirror delayed", { function: "publishOddsSnapshot", snapshotId: nativePublication.payload?.snapshot_id, participantPublicationRetained: true });
-      }
+      // Reporting delivery retired; canonical publication is the complete owner-approved outcome.
+
     } else {
       start("Batch workbook write", { workbookOperation: "Atomic field-scoped replacement of projection runtime records", worksheet: "Odds Snapshots, Odds Control, Odds Team Results, Odds Player Results", function: "publishOddsSnapshot" });
       snapshot = await withProductionGoogleAuthoringWrite({

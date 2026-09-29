@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Historical code retained in Git, not copied into executable maintenance tools. External data untouched.",
+  "routes": [
+    {
+      "file": "app/api/admin/step11-6-production-google-writer-fence/route.js",
+      "historicalBase": "ab909d4519ea1331e27b0924de1572ebaf690777",
+      "sha256": "e48d5dccad8b918060fd4fdda0f404990601dedd02f29cd258b5e714f51a8733",
+      "status": "RETIRED_HTTP_ROUTE",
+      "restoration": "Review historical Git source; never enable as tournament runtime without architecture approval."
+    },
+    {
+      "file": "app/api/admin/step11-production-google-certificate/route.js",
+      "historicalBase": "ab909d4519ea1331e27b0924de1572ebaf690777",
+      "sha256": "ee2ee4ba2944316a36bb27dd976b87328ac5208e5ec148c812dd6e6b04feba63",
+      "status": "RETIRED_HTTP_ROUTE",
+      "restoration": "Review historical Git source; never enable as tournament runtime without architecture approval."
+    },
+    {
+      "file": "app/api/admin/step11-production-google-metadata/route.js",
+      "historicalBase": "ab909d4519ea1331e27b0924de1572ebaf690777",
+      "sha256": "227778423014ad2476330ca04ff1508c1f4a3ff4ac24fc33c490abbe87e6941f",
+      "status": "RETIRED_HTTP_ROUTE",
+      "restoration": "Review historical Git source; never enable as tournament runtime without architecture approval."
+    },
+    {
+      "file": "app/api/cron/guide-sync/diagnostics/route.js",
+      "historicalBase": "ab909d4519ea1331e27b0924de1572ebaf690777",
+      "sha256": "5dc52892749c4e19010642f5727eb45bd21caf59160deb160b872cf8274bb03f",
+      "status": "RETIRED_HTTP_ROUTE",
+      "restoration": "Review historical Git source; never enable as tournament runtime without architecture approval."
+    },
+    {
+      "file": "app/api/cron/guide-sync/route.js",
+      "historicalBase": "ab909d4519ea1331e27b0924de1572ebaf690777",
+      "sha256": "9d5353f083cdc524750e8c8fef1bada0d8475a7a4ae0ede39d446078a78f2abc",
+      "status": "RETIRED_HTTP_ROUTE",
+      "restoration": "Review historical Git source; never enable as tournament runtime without architecture approval."
+    },
+    {
+      "file": "app/api/director/future-tournaments/google-writer/route.js",
+      "historicalBase": "ab909d4519ea1331e27b0924de1572ebaf690777",
+      "sha256": "98d4e88247b1a7ad9b153a9e332b7583a0f08d196519b7bd879e130fcf3ff852",
+      "status": "RETIRED_HTTP_ROUTE",
+      "restoration": "Review historical Git source; never enable as tournament runtime without architecture approval."
+    },
+    {
+      "file": "app/api/director/scoring-authority/route.js",
+      "historicalBase": "ab909d4519ea1331e27b0924de1572ebaf690777",
+      "sha256": "22f21dc9eef9a71918c010562247a0ae73eb5b255901246a98be4efa74ca4b2e",
+      "status": "RETIRED_HTTP_ROUTE",
+      "restoration": "Review historical Git source; never enable as tournament runtime without architecture approval."
+    },
+    {
+      "file": "app/api/director/scoring-shadow/benchmark/route.js",
+      "historicalBase": "ab909d4519ea1331e27b0924de1572ebaf690777",
+      "sha256": "43859d63ed25d355b3037b646b736934a53fee96e071c6207f0118d03dfd0390",
+      "status": "RETIRED_HTTP_ROUTE",
+      "restoration": "Review historical Git source; never enable as tournament runtime without architecture approval."
+    },
+    {
+      "file": "app/api/director/scoring-shadow/phase2-dry-run/route.js",
+      "historicalBase": "ab909d4519ea1331e27b0924de1572ebaf690777",
+      "sha256": "a16d34a12136573545ab11ebf868392ebc838ba2617d69493f14bdb136fd95d4",
+      "status": "RETIRED_HTTP_ROUTE",
+      "restoration": "Review historical Git source; never enable as tournament runtime without architecture approval."
+    },
+    {
+      "file": "app/api/director/scoring-shadow/route.js",
+      "historicalBase": "ab909d4519ea1331e27b0924de1572ebaf690777",
+      "sha256": "2e115682763665368591c5859b2b0f695c26505bfc39cb378b6078eede773640",
+      "status": "RETIRED_HTTP_ROUTE",
+      "restoration": "Review historical Git source; never enable as tournament runtime without architecture approval."
+    },
+    {
+      "file": "app/api/odds/publication-operations/route.js",
+      "historicalBase": "ab909d4519ea1331e27b0924de1572ebaf690777",
+      "sha256": "806aa167b3d6c4d95f528729534459704132aedb564372b8d13f6148b58df6f4",
+      "status": "RETIRED_HTTP_ROUTE",
+      "restoration": "Review historical Git source; never enable as tournament runtime without architecture approval."
+    }
+  ]
+}

@@ -5,10 +5,7 @@ import { scoringTokenFromRequest, verifyScoringSession } from "../../../../lib/s
 import { clientAddress, consumeRateLimit } from "../../../../lib/rate-limit.js";
 import { normalizeLiveScoringRequest } from "../../../../lib/live-score-values.js";
 import { logScoringFailure, participantScoringError, participantScoringHttpStatus, participantScoringPauseHeaders } from "../../../../lib/scoring-api-errors.js";
-import { buildScoringShadowObservation, deliverScoringShadowObservation, shouldScheduleScoringShadowObservation } from "../../../../lib/scoring-shadow.js";
-import { scoringShadowEnvironment } from "../../../../lib/scoring-shadow-gate.js";
 import { persistParticipantScore } from "../../../../lib/scoring-persistence-adapter.js";
-import { drainGoogleOutbox } from "../../../../lib/scoring-google-outbox.js";
 import { validateAuthoritativeParticipantSession } from "../../../../lib/scoring-participant-authorization.js";
 import { readParticipantScoringMatch, scoringReadResponseHeaders } from "../../../../lib/scoring-read-service.js";
 import { readScoringMatchView } from "../../../../lib/scoring-read-supabase.js";
@@ -16,7 +13,6 @@ import { recalculateCompetitionDerivedTournament } from "../../../../lib/competi
 import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
 import { recalculateCalcuttaAfterCanonicalMutation } from "../../../../lib/calcutta-post-commit.js";
 import { productionShadowScoringMutationResponse } from "../../../../lib/production-shadow-scoring-safety.js";
-import { productionCutoverPhaseAtLeast } from "../../../../lib/production-cutover-activation-contract.js";
 import { attachScoringMutationAuthorityContract, currentScoringMutationAuthorityContract } from "../../../../lib/scoring-mutation-authority-server.js";
 
 export const dynamic = "force-dynamic";
@@ -72,14 +68,11 @@ async function telemetryPOST(request) {
     if (!rate.allowed) return NextResponse.json({ error: "Too many score updates. Wait a moment and try again." }, { status: 429 });
     const submitted = await request.json();
     const input = submitted.action === "confirm" ? submitted : normalizeLiveScoringRequest(submitted);
-    const persistenceStartedAt = Date.now();
     const measured = await persistParticipantScore({ matchId: current.matchId, input, current,
       updatedBy: current.scorerName || "Authorized participant",
       authorizationContext: verifiedAuthorization,
       request });
     const result = measured.result;
-    const googleDiagnostics = measured.diagnostics;
-    const googleAuthoritativeMs = measured.authority === "google" ? Date.now() - persistenceStartedAt : 0;
     const { _shadow, ...participantResult } = result;
     let authoritativeFinal = null;
     if (measured.authority === "supabase" && input.action === "confirm") {
@@ -99,53 +92,9 @@ async function telemetryPOST(request) {
         });
       }
     }
-    const gate = scoringShadowEnvironment();
-    if (measured.authority === "google" && shouldScheduleScoringShadowObservation({ gate, participantResult, shadow: _shadow })) {
-        const observation = buildScoringShadowObservation({
-          sourceWorkbookId: gate.sourceWorkbookId,
-          tournamentId: _shadow.match?.["Tournament ID"] || _shadow.match?.Year,
-          tournamentYear: _shadow.match?.Year,
-          match: _shadow.match,
-          hole: participantResult.hole,
-          calculated: _shadow.calculated,
-          allHoleResults: _shadow.allHoleResults,
-          mutationKey: input.clientMutationId || `finalize:${current.matchId}:${participantResult["Finalized At"] || participantResult["Updated At"]}`,
-          actorId: current.playerId,
-          actorName: current.scorerName,
-        });
-        after(async () => {
-          try {
-            const mirror = await deliverScoringShadowObservation(observation);
-            console.info("Scoring shadow delivery", {
-              matchId: observation.match_id,
-              holeNumber: observation.hole_number,
-              googleRevision: observation.google_revision,
-              comparisonStatus: observation.comparison_status,
-              authorizationMs,
-              googleAuthoritativeMs,
-              googleDiagnostics,
-              mirrorDurationMs: mirror.totalDurationMs,
-            });
-          } catch (error) {
-    recordOperationalError(error);
-            console.error("Scoring shadow delivery failed", {
-              matchId: observation.match_id,
-              holeNumber: observation.hole_number,
-              googleRevision: observation.google_revision,
-              status: error?.status || 0,
-              diagnostics: error?.shadowDiagnostics || {},
-            });
-          }
-        });
-    }
     if (measured.authority === "supabase") {
       after(async () => {
-        const productionWorkersAvailable = process.env.VERCEL_ENV !== "production" ||
-          productionCutoverPhaseAtLeast(process.env, "WORKERS");
-        const [drained, derived, intelligence, calcutta] = await Promise.allSettled([
-          productionWorkersAvailable
-            ? drainGoogleOutbox({ maximum: 8, actor: "Supabase scoring mirror" })
-            : Promise.resolve({ ok: true, delivered: 0, failed: 0, pending: true }),
+        const [derived, intelligence, calcutta] = await Promise.allSettled([
           recalculateCompetitionDerivedTournament(String(current.tournamentId || current.year || ""), {
             calculatedBy: `Scoring derived-state worker · ${current.playerId || "participant"}`,
           }),
@@ -158,8 +107,6 @@ async function telemetryPOST(request) {
             matchId: current.matchId,
           }),
         ]);
-        const mirror = drained.status === "fulfilled" ? drained.value : { ok: false, failed: 1 };
-        if (!mirror.ok) console.error("Supabase Google outbox remains pending", { matchId: current.matchId, failed: mirror.failed });
         if (derived.status === "rejected") console.error("Competition derived-state recalculation remains pending", {
           matchId: current.matchId, code: derived.reason?.code || "DERIVED_STATE_RECALCULATION_FAILED",
         });

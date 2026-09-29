@@ -116,7 +116,8 @@ test("Production overview reads Supabase contracts without touching Preview, Pas
     inspectReadState: async () => readState,
     inspectWorkers: async () => ({ payload: { ok: true, ingress: { state: "OPEN" }, worker_controls: {
       SCORING_GOOGLE_OUTBOX: { enabled: true }, ROUND_SCORECARDS_ARCHIVE: { enabled: true },
-    }, outbox_counts: { DELIVERED: 12 }, archive_counts: { COMPLETE: 3 } } }),
+      COMPETITION_DERIVED: { enabled: true }, INTELLIGENCE_DERIVED: { enabled: true }, CALCUTTA_V1_CALCULATION: { enabled: true },
+    }, required_pending_count: 0, outbox_counts: { DELIVERED: 12 }, archive_counts: { COMPLETE: 3 } } }),
     readOdds: async () => ({ payload: { ok: true, data: { snapshots: [{ is_current_official: true, milestone: "OPENING", published_at: "2026-09-23T10:00:00Z" }] } } }),
     readNetSkins: async () => ({ netSkinsState: { state: "CONFIGURED", available: true } }),
     readCalcutta: async () => ({ calcuttaState: { state: "OPEN", available: true } }),

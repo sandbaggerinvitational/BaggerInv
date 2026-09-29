@@ -32,6 +32,16 @@ export async function installPhase2C(cluster,database,{through=124,timeoutMs=nor
   assert.equal(sql(cluster,database,"select to_regclass('scoring_authority.score_derived_intents_v1') is not null"),'t','Phase2 migration121 required');
   const migrations=await phase2cMigrations({through});
   for(const migration of migrations)sqlFile(cluster,database,path.join(repositoryRoot,migration.path),{role:''});
+  if(process.env.BAGGER_PHASE2C1_CANDIDATE==='1'&&through===124){
+    for(const number of [125,126]){
+      const names=(await readdir(path.join(repositoryRoot,'supabase/production_migrations')))
+        .filter(name=>new RegExp(`^20260929${String(number).padStart(4,'0')}_.*\\.sql$`).test(name));
+      assert.equal(names.length,1,`exactly one Phase2C.1 migration ${number} required; never silently certify124`);
+      const file=path.join('supabase/production_migrations',names[0]);
+      sqlFile(cluster,database,path.join(repositoryRoot,file),{role:''});
+      migrations.push({path:file,sha256:createHash('sha256').update(await readFile(path.join(repositoryRoot,file))).digest('hex')});
+    }
+  }
   configureFiniteTimeout(cluster,database,timeoutMs);
   return {baseSha:phase2cBaseSha,fixtureVersion:phase2cFixtureVersion,migrations,statementTimeoutMs:timeoutMs,timeZone:'UTC',
     production:false,environment:'OWNED_SOCKET_ONLY_POSTGRESQL17',runtimeAuthority:'EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES'};

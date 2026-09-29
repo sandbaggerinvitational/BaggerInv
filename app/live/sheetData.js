@@ -1,3 +1,4 @@
+import { assertGoogleRuntimeRetired } from "../../lib/google-runtime-retirement.js";
 import {
   getRoundProgress,
   getEffectiveTournamentState,
@@ -575,6 +576,7 @@ const loaderDiagnostics = {
 };
 
 export async function getTournamentData() {
+  assertGoogleRuntimeRetired(); // Public CSV is also a retired transport, even without credentials.
   if (lastGoodTournamentData && Date.now() - lastGoodAt < TOURNAMENT_MODEL_TTL_MS) {
     loaderDiagnostics.cacheBehavior = "model-cache-hit";
     loaderDiagnostics.modelCacheHits += 1;

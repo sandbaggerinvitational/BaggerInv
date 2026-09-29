@@ -14,7 +14,7 @@ const previewEnv = {
   SCORING_READ_SOURCE: "supabase",
   GOOGLE_SHEETS_ID: "preview-workbook",
   PREVIEW_SCORING_SHEET_ID: "preview-workbook",
-  SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co",
+  SUPABASE_SCORING_MIRROR_URL: "https://idgigvjjqkfbqjeredpb.supabase.co",
   SUPABASE_SCORING_MIRROR_SECRET_KEY: "server-only-secret",
 };
 

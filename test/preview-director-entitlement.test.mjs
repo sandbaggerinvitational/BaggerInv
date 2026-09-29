@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+// Proof layer: UNIT with injected Auth/RPC dependencies; no hosted authorization claim.
+import { CANONICAL_PREVIEW_PROJECT_REF } from "../lib/canonical-runtime-source.js";
 import { createPlayerPassportSession } from "../lib/player-passport.js";
 import { authorizePreviewDirector, revokeCurrentPreviewDirector } from "../lib/preview-director-authorization.js";
 
@@ -12,11 +14,9 @@ const leaseId = "33333333-3333-4333-8333-333333333333";
 const env = {
   VERCEL_ENV: "preview",
   PARTICIPANT_IDENTITY_AUTHORITY: "supabase",
-  GOOGLE_SHEETS_ID: "preview-workbook",
-  PREVIEW_SCORING_SHEET_ID: "preview-workbook",
-  NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://preview.supabase.co",
+  NEXT_PUBLIC_SUPABASE_AUTH_URL: `https://${CANONICAL_PREVIEW_PROJECT_REF}.supabase.co`,
   NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "sb_publishable_preview",
-  SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co",
+  SUPABASE_SCORING_MIRROR_URL: `https://${CANONICAL_PREVIEW_PROJECT_REF}.supabase.co`,
   SUPABASE_SCORING_MIRROR_SECRET_KEY: "sb_secret_preview",
 };
 
@@ -71,35 +71,24 @@ test("capability follows account changes and a different participant account is 
   assert.equal(result.code, "DIRECTOR_ENTITLEMENT_REQUIRED");
 });
 
-test("a valid canonical Passport bootstraps only a verified Supabase account", async () => {
+test("retired Passport bootstrap cannot create a canonical Director entitlement", async () => {
   const token = createPlayerPassportSession({
     playerId: "DIR01", tournamentId: "2026", deviceId: "bootstrap-device", sessionVersion: 2,
   }, secret);
-  let linkedInput;
+  let passportInspections = 0, entitlementLinks = 0;
   const result = await authorizePreviewDirector({
-    request: request({ "sbi-preview-director-passport": token }), env,
+    request: request({ "sbi-preview-director-passport": token }), env, allowBootstrap: true,
     dependencies: deps({
       passportSecret: secret,
       readEntitlement: async () => ({ payload: { ok: true, found: false, active: false } }),
-      inspectPassport: async () => ({ status: "active", identity: {
-        actor: { id: "DIR01", name: "Canonical Director", role: "DIRECTOR" },
-        player: { id: "DIR01", name: "Canonical Director", role: "DIRECTOR" },
-      } }),
-      linkEntitlement: async (input) => {
-        linkedInput = input;
-        return { payload: { ok: true, active: true, changed: true, tournamentId: "2026", directorPlayerId: "DIR01", revision: 1 } };
-      },
+      inspectPassport: async () => { passportInspections += 1; return { status: "active" }; },
+      linkEntitlement: async () => { entitlementLinks += 1; return activeEntitlement(); },
     }),
   });
-  assert.equal(result.status, "active");
-  assert.equal(result.source, "passport-bootstrap");
-  assert.equal(result.linked, true);
-  assert.deepEqual(linkedInput, {
-    auth_user_id: authUserId,
-    tournament_id: "2026",
-    director_player_id: "DIR01",
-    bootstrap_source: "DIRECTOR_PASSPORT",
-  });
+  assert.equal(result.status, "inactive");
+  assert.equal(result.code, "DIRECTOR_ENTITLEMENT_REQUIRED");
+  assert.equal(result.identity, null);
+  assert.deepEqual([passportInspections, entitlementLinks], [0, 0]);
 });
 
 test("revocation is central, fail-closed, and a stale Passport cannot reactivate it", async () => {
@@ -161,16 +150,17 @@ test("active entitlement plus an account-bound current lease preserves Preview i
   assert.equal(result.identity.impersonation.targetPlayerId, "HM01");
 });
 
-test("Production uses the unchanged legacy authorization path and never reads entitlements", async () => {
+test("Production without canonical admission denies before account or retired Passport transport", async () => {
   let entitlementReads = 0;
   let legacyInspections = 0;
   const result = await authorizePreviewDirector({ request: request(), env: { ...env, VERCEL_ENV: "production" }, dependencies: {
     readEntitlement: async () => { entitlementReads += 1; return activeEntitlement(); },
     inspectPassport: async () => { legacyInspections += 1; return { status: "inactive", identity: null }; },
   } });
-  assert.equal(result.status, "inactive");
+  assert.equal(result.status, "forbidden");
+  assert.equal(result.code, "DIRECTOR_CANONICAL_AUTHORITY_REQUIRED");
   assert.equal(entitlementReads, 0);
-  assert.equal(legacyInspections, 1);
+  assert.equal(legacyInspections, 0);
 });
 
 test("schema is narrow, RLS-closed, account-bound, audited, and 2026-only", async () => {
@@ -200,12 +190,44 @@ test("menu warms account capability and every Director surface uses canonical ac
     "app/api/director/impersonation/route.js",
     "app/api/director/guide-content/route.js",
     "app/api/director/participant-identity/route.js",
-    "app/api/director/scoring-authority/route.js",
-    "app/api/director/scoring-shadow/route.js",
     "app/api/director/reset-preview/route.js",
   ];
   for (const route of routes) {
     const source = await readFile(new URL(`../${route}`, import.meta.url), "utf8");
     assert.match(source, /authorizePreviewDirector/, route);
+  }
+});
+
+for (const [label, invalid] of [
+  ["missing database", { ...env, SUPABASE_SCORING_MIRROR_URL: "" }],
+  ["unapproved project", { ...env, SUPABASE_SCORING_MIRROR_URL: "https://unapproved.supabase.co", NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://unapproved.supabase.co" }],
+  ["Auth/database origin mismatch", { ...env, NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://unapproved.supabase.co" }],
+  ["credential missing", { ...env, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" }],
+  ["retired Passport configured", { ...env, PARTICIPANT_IDENTITY_AUTHORITY: "passport" }],
+]) {
+  test(`canonical Director ${label} fails closed even with an active legacy Passport`, async () => {
+    const calls = [];
+    const result = await authorizePreviewDirector({ request: request(), env: invalid, allowBootstrap: true,
+      dependencies: {
+        verifyClaims: async () => { calls.push("auth"); return { status: "active", claims: { sub: authUserId } }; },
+        readEntitlement: async () => { calls.push("entitlement"); return activeEntitlement(); },
+        inspectPassport: async () => { calls.push("passport"); return { status: "active", identity: { actor: { id: "DIR01" } } }; },
+      },
+    });
+    assert.equal(result.status, "forbidden");
+    assert.equal(result.identity, null);
+    assert.equal(result.code, "DIRECTOR_CANONICAL_AUTHORITY_REQUIRED");
+    assert.deepEqual(calls, []);
+  });
+}
+
+test("retired Director migration endpoints reject without identity/provider transport", async () => {
+  for (const path of ["scoring-authority", "scoring-shadow"]) {
+    const route = await import(new URL(`../app/api/director/${path}/route.js`, import.meta.url));
+    for (const method of ["GET", "POST"]) {
+      const result = await route[method]({ get cookies() { throw new Error("retired route must not inspect credentials"); } });
+      assert.equal(result.status, 410);
+      assert.equal((await result.json()).code, "GOOGLE_RUNTIME_RETIRED");
+    }
   }
 });

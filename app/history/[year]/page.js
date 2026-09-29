@@ -99,6 +99,7 @@ import { mergeCanonicalLeaderboardPresentation } from "../../../lib/player-prese
 export async function generateMetadata({ params }) {
   const env = await applicationPageEnvironment();
   const { year } = await params;
+  if (!/^\d{4}$/.test(String(year)) || Number(year) < 2017 || Number(year) > 2026) notFound();
   let tournament;
 
   if (isSupabaseHistory2026(year, env)) {
@@ -662,6 +663,7 @@ function CurrentHistoryOverview({ tournament, roundPoints, leaderboard, pointsTr
 export default async function TournamentYearPage({ params, searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const { year } = await params;
+  if (!/^\d{4}$/.test(String(year)) || Number(year) < 2017 || Number(year) > 2026) notFound();
   const query = await searchParams;
   const useSupabase2026 = isSupabaseHistory2026(year, env);
   const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year, env);

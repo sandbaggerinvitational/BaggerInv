@@ -262,7 +262,7 @@ test("Phase 1 telemetry preserves scoring dispatch order, bounded request body, 
   assert.deepEqual(await exercise(candidate), await exercise(baseline));
 });
 
-test("Phase 1 telemetry preserves post-commit fan-out order, arguments, and settled results from Release 139", async () => {
+test("Phase 2C.1 retains Release 139 internal fan-out behavior and explicitly retires Google delivery", async () => {
   const [baseline, candidate] = await Promise.all([
     postCommitModule(baseSource("lib/mobile-v1-scoring-post-commit.js"), "release139-post-commit"),
     postCommitModule(await currentSource("lib/mobile-v1-scoring-post-commit.js"), "phase1-post-commit"),
@@ -293,7 +293,13 @@ test("Phase 1 telemetry preserves post-commit fan-out order, arguments, and sett
     };
   }
 
-  assert.deepEqual(await exercise(candidate), await exercise(baseline));
+  const prior = await exercise(baseline);
+  const current = await exercise(candidate);
+  // Preserve the historical observation; retirement intentionally removes only
+  // the first two external consumers, never disguising them as passing delivery.
+  assert.deepEqual(prior.calls.map(({ name }) => name), ["outbox", "archive", "competition", "intelligence", "calcutta"]);
+  assert.deepEqual(current.calls, prior.calls.slice(2));
+  assert.deepEqual(current.settled, prior.settled.slice(2));
 });
 
 for (const route of ["hole", "finalize"]) {

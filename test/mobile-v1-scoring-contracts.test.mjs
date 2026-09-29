@@ -97,11 +97,11 @@ test("mobile routes stay thin, Bearer-only, no-store adapters over shared author
   assert.match(scoring, /persistParticipantScore/);
   assert.match(scoring, /MATCH_ACCESS_ACTIONS\.START_SCORING/);
   assert.doesNotMatch(scoring, /submitCanonicalHoleScore|finalizeCanonicalMatch|calculateLiveHole|calculateMatchPoints|console\.|cookie/i);
-  for (const worker of ["drainGoogleOutbox", "drainScorecardArchiveJobs", "recalculateCompetitionDerivedTournament",
+  for (const worker of ["recalculateCompetitionDerivedTournament",
     "recalculateIntelligenceDerivedTournament", "recalculateCalcuttaTournament"]) assert.match(postCommit, new RegExp(worker));
 });
 
-test("successful mobile mutations reuse every existing post-commit publication worker without changing acknowledgement", async () => {
+test("successful mobile mutations retain internal post-commit work with retired Google unavailable", async () => {
   const calls = [];
   const worker = (name, reject = false) => async (...args) => {
     calls.push({ name, args });
@@ -109,18 +109,19 @@ test("successful mobile mutations reuse every existing post-commit publication w
     return { ok: true };
   };
   const settled = await runMobileScoringPostCommit({ tournamentId: "FIXTURE-2026" }, {
-    drainGoogleOutbox: worker("outbox"),
+    drainGoogleOutbox: worker("outbox", true),
     drainScorecardArchiveJobs: worker("archive", true),
-    recalculateCompetitionDerivedTournament: worker("competition"),
+    recalculateCompetitionDerivedTournament: worker("competition", true),
     recalculateIntelligenceDerivedTournament: worker("intelligence"),
     recalculateCalcuttaTournament: worker("calcutta"),
   });
-  assert.deepEqual(calls.map((call) => call.name), ["outbox", "archive", "competition", "intelligence", "calcutta"]);
-  assert.equal(settled.length, 5);
-  assert.equal(settled[1].status, "rejected");
-  assert.equal(calls[0].args[0].actor, "Mobile v1 scoring worker");
-  assert.equal(calls[2].args[0], "FIXTURE-2026");
-  assert.equal(calls[2].args[1].calculatedBy, "Mobile v1 scoring worker");
+  assert.deepEqual(calls.map((call) => call.name), ["competition", "intelligence", "calcutta"]);
+  assert.equal(settled.length, 3);
+  assert.equal(settled[0].status, "rejected");
+  for (const call of calls) {
+    assert.equal(call.args[0], "FIXTURE-2026");
+    assert.equal(call.args[1].calculatedBy, "Mobile v1 scoring worker");
+  }
 });
 
 test("canonical acknowledgement enrichment is mobile-only and preserves browser scoring response shape", async () => {

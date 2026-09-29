@@ -156,7 +156,7 @@ test("every mobile read and scoring selector must explicitly select isolated Sup
     assert.equal(result.status, 503, `${name} must not fall back to Google`);
   }
   assert.equal(mobileHealthResult({ ...previewEnv, SUPABASE_SCORING_MIRROR_ENABLED: "false" }).status, 503);
-  assert.equal(mobileHealthResult({ ...previewEnv, PREVIEW_SCORING_SHEET_ID: "other" }).status, 503);
+  assert.equal(mobileHealthResult({ ...previewEnv, GOOGLE_SHEETS_ID: undefined, PREVIEW_SCORING_SHEET_ID: undefined }).status, 200, "Google configuration is retired; canonical DB and anti-abuse gates remain required");
   assert.equal(mobileHealthResult({ ...previewEnv, MOBILE_NATIVE_AUTH_ANTI_ABUSE_MODE: "" }).status, 503);
   assert.equal(mobileHealthResult({ ...previewEnv, PARTICIPANT_AUTH_CAPTCHA_REQUIRED: "false" }).status, 503);
   assert.equal(mobileHealthResult({ ...previewEnv, PARTICIPANT_AUTH_CAPTCHA_CONFIGURED: "false" }).status, 503);

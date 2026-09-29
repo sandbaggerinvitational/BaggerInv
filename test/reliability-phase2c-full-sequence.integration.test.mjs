@@ -4,6 +4,7 @@ import test from 'node:test';
 import {writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {performance} from 'node:perf_hooks';
+import {withDataAuthorityRequestScope} from '../lib/data-authority-request.js';
 import {persistParticipantScore} from '../lib/scoring-persistence-adapter.js';
 import {withOperationalRoute} from '../lib/operational-telemetry.js';
 import {runtimeScope} from './support/reliability/synthetic-tournament.mjs';
@@ -27,7 +28,9 @@ async function observedScore(session,i,events,{loseAcknowledgement=false}={}){
     submitCanonicalHoleScore:async input=>{const begin=performance.now();canonical=JSON.parse(await session.query(rpcSql('submit_production_hole_score',runtimeScope(input))));return{payload:canonical,durationMs:performance.now()-begin};}}});
   assert.equal(result.authority,'supabase');return Response.json({ok:true});
  },{env:{},enabled:true,sink:event=>events.push(event)});
- const response=await handler(new Request('https://isolated.invalid/api/scoring/phase2c-isolated',{method:'POST'}));
+ const attempt=await withDataAuthorityRequestScope({env:{VERCEL_ENV:'preview'},injectGoogleOutage:true},()=>handler(new Request('https://isolated.invalid/api/scoring/phase2c-isolated',{method:'POST'})));
+ assert.equal(attempt.diagnostics.googleAttempts,0,'score must not even attempt retired Google transport');
+ const response=attempt.result;
  assert.equal(response.status,200);assert.ok(response.headers.get('x-request-id'));
  // Drop the completed transport acknowledgement before returning it to the
  // simulated caller. Recovery must read the durable receipt, not this value.
@@ -160,6 +163,17 @@ test('Phase2C full432hole chronological score sequence with autonomous derived d
   evidence.workerEventsAfterRestart=worker.events;evidence.final=current(c,d);assert.equal(evidence.final.holes,432);assert.equal(evidence.final.final,24);assert.equal(evidence.final.activeAccess,0);assert.equal(evidence.final.canonicalResults,24);assert.equal(evidence.final.scoreReceipts,432);assert.equal(evidence.final.unresolvedMutations,0);
   assert.equal(telemetry.filter(e=>e.event==='OUTCOME'&&e.phase==='score_acknowledgement'&&e.outcome==='COMMITTED').length,432);
   evidence.telemetry={enabled:true,adapter:'SHIPPING_PWA_PERSISTENCE',transport:'INJECTED_LOCAL_SQL',requestEvents:telemetry.filter(e=>e.event==='REQUEST').length,committedScoreOutcomes:432,sample:telemetry.slice(0,6)};
+  if(process.env.BAGGER_PHASE2C1_CANDIDATE==='1'){
+    const retired=JSON.parse(sql(c,d,`select jsonb_build_object(
+      'scoreMirrorJobs',(select count(*)from scoring_authority.google_outbox_events),
+      'archiveJobs',(select count(*)from scoring_authority.scorecard_archive_jobs),
+      'finalizedSnapshots',(select count(*)from scoring_authority.finalized_scorecard_snapshots),
+      'auditReceipts',(select count(*)from scoring_authority.audit_events),
+      'retiredWorkerAllowlist',(select count(*)from production_control.annual_scoring_rpc_allowlist_v1 where enabled and required_worker in('SCORING_GOOGLE_OUTBOX','ROUND_SCORECARDS_ARCHIVE')))`));
+    assert.equal(retired.scoreMirrorJobs,0);assert.equal(retired.archiveJobs,0);assert.equal(retired.finalizedSnapshots,24);assert.equal(retired.retiredWorkerAllowlist,0);assert.ok(retired.auditReceipts>=432);
+    evidence.googleRetirement={...retired,googleCalls:0,requiredGoogleIntents:0,credentialVariables:Object.keys(process.env).filter(k=>/GOOGLE|SHEET_ID|DRIVE_ID/.test(k)),networkGuard:'ALL_REMOTE_SOCKETS_DENIED',scoreTransportAttempts:0,requiredIntentsRemaining:pending(c,d)};
+    assert.deepEqual(evidence.googleRetirement.credentialVariables,[]);
+  }
   evidence.totalCanonicalHoles=total;evidence.totalLatency=stats(allTimes);evidence.historyResetBetweenRounds=false;evidence.result='PASS';
  }catch(error){evidence.failures.push(error.message);evidence.workerEventsAtFailure=worker?.events||[];throw error;}finally{
   if(worker)await worker.stop();await writeFile(path.join(repositoryRoot,'docs/reliability/phase2c/full-sequence-results.json'),JSON.stringify(evidence,null,2)+'\n');await destroyIsolatedCluster(c);

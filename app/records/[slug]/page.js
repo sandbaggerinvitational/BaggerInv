@@ -1,4 +1,3 @@
-import { refreshHistoricalData } from "../../../lib/stats";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "../../components";
@@ -6,12 +5,10 @@ import {
   getLeaderboardDefinition,
   getLeaderboardFromRecords,
 } from "../../../lib/leaderboards";
-import { getRecords } from "../../../lib/stats";
 import { cache } from "react";
 import SortableLeaderboard from "../SortableLeaderboard";
 import styles from "../../historical.module.css";
 import { pageMetadata } from "../../../lib/seo";
-import { loadScorecardAnalytics } from "../../../lib/scorecard-data";
 import {
   buildScorecardRecordLeaderboard,
   isScorecardRecordSlug,
@@ -35,20 +32,15 @@ const resolveLeaderboard = cache(async (slug) => {
 
   const env = await applicationPageEnvironment();
   const useSupabase = isSupabaseSecondaryHistory(env);
-  const secondaryHistory = useSupabase ? await loadSecondaryHistoryModel({ env }) : null;
-  if (!useSupabase) await refreshHistoricalData();
+  const secondaryHistory = await loadSecondaryHistoryModel({ env });
   if (officialDefinition) {
-    const records = useSupabase
-      ? secondaryHistory.calculations.getRecords()
-      : getRecords();
+    const records = secondaryHistory.calculations.getRecords();
     return {
       ...getLeaderboardFromRecords(slug, records),
       scorecard: false,
     };
   }
-  const analytics = useSupabase
-    ? secondaryHistory.scorecardAnalytics
-    : await loadScorecardAnalytics();
+  const analytics = secondaryHistory.scorecardAnalytics;
   const playerNames = Object.fromEntries(analytics.scorecards
     .filter((card) => card.playerId)
     .map((card) => [card.playerId, card.playerName || card.playerId]));

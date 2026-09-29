@@ -96,6 +96,7 @@ function displayPoints(value) {
 export async function generateMetadata({ params }) {
   const env = await applicationPageEnvironment();
   const { year, round } = await params;
+  if (!/^\d{4}$/.test(String(year)) || Number(year) < 2017 || Number(year) > 2026) notFound();
   let archive;
 
   if (isSupabaseHistory2026(year, env)) {
@@ -157,6 +158,7 @@ const historyPresentationHref = (href, participantPresentation) => {
 export default async function HistoricalRoundPage({ params, searchParams, participantPresentation = false }) {
   const env = await applicationPageEnvironment();
   const { year, round } = await params;
+  if (!/^\d{4}$/.test(String(year)) || Number(year) < 2017 || Number(year) > 2026) notFound();
   const query = await searchParams;
   const useSupabase2026 = isSupabaseHistory2026(year, env);
   const useSupabaseCompleted = isSupabaseCompletedHistoryYear(year, env);
