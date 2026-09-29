@@ -86,3 +86,7 @@ Three unapplied candidate migrations122–124. Migration121 and earlier historic
 |`tools/reliability/run-score-derived-worker.mjs`|P2C-B/F|Use supported autonomous worker and propagate safe identities/errors|Bounded worker calls; unchanged calculators and owner publication|delivery/full-sequence/foundation|Separate hosted process/configuration not installed|
 
 PHASE 2C: PARTIAL — SCORE-PATH CANDIDATE NOT READY FOR STAGING; REMAINING GATES LISTED ABOVE
+
+## Committed source checkpoint
+
+Source and its retained proof inputs: `aa9122daf847a7e18717cf24c8241950a398d988`. At that checkpoint: 662 files added, 14 modified, including78 source/test/tool files; three candidate migrations. The subsequent documentation commit binds metadata and reports without changing tested source. [Git receipt](git-final-state.json). Raw evidence whitespace is intentionally retained; [hygiene adjudication](evidence/whitespace-adjudication.json).

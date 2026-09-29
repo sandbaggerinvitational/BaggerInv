@@ -36,14 +36,12 @@
   "summary": {
     "requestedRows": 314,
     "reviewedRows": 314,
-    "COMPLETE": 234,
-    "PARTIAL": 80,
+    "COMPLETE": 246,
+    "PARTIAL": 68,
     "N/A": 0,
     "partialReasons": {
       "SUBSTANTIVE_P0_B": 62,
       "PERFORMANCE_REPEATABILITY_P1": 1,
-      "GIT_AND_REPORT_PENDING": 5,
-      "GIT_PENDING": 7,
       "REPORT_CONTRACT_SCOPE_PENDING": 3,
       "FINAL_RESPONSE_PENDING": 2
     },
@@ -33680,7 +33678,8 @@
       "incompleteRuntimeEvidence": [],
       "completionReview": {
         "scope": "78 unchanged source hashes, git diff --check,29 required reports,43 evidence hashes and33 proof rows verified.672-file privacy scan97hits/10reviewed values, no unknown credentials or binaries. Final metadata receives a further precommit scan.",
-        "limitations": "Pattern review is not mathematical proof of absence of every secret; generated scan receipts separately scoped."
+        "limitations": "Pattern review is not mathematical proof of absence of every secret; generated scan receipts separately scoped.",
+        "whitespaceQualification": "Full staged diff check returned2 for retained raw evidence plus one authored EOF; see evidence/whitespace-adjudication.json. Authored source/docs pass the explicit raw-evidence-excluded check after EOF correction."
       }
     },
     {
@@ -57503,8 +57502,8 @@
       "id": "P2C-166",
       "part": 166,
       "title": "DEPLOYMENT PLAN UPDATE",
-      "status": "PARTIAL",
-      "statusMeaning": "Incomplete for the named substantive/finalization reason; passing subproofs are preserved.",
+      "status": "COMPLETE",
+      "statusMeaning": "Verified committed/pushed source checkpoint and durable reproduction inputs; final metadata packaging is independently checked after its commit.",
       "requestedSource": [
         {
           "attachment": 4,
@@ -57640,7 +57639,7 @@
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
       ],
-      "readiness": "GIT_AND_REPORT_PENDING",
+      "readiness": "VERIFIED_SOURCE_CHECKPOINT",
       "missingEvidence": [],
       "sourceFreshnessFailures": [],
       "recordedFailedReceipts": [],
@@ -57655,7 +57654,7 @@
         "evidenceSnapshotSha256": "74843ed38ee68239fa7120ff7e11b8f2f35319d97082ca4a67d09e4a8e40c01a"
       },
       "reviewed": true,
-      "reviewedAt": "2026-09-29T21:43:03.269995+00:00",
+      "reviewedAt": "2026-09-29T22:04:04.557279+00:00",
       "reviewScope": "Delegated scoped engineering adjudication; parent final package and owner approval not performed",
       "proofScope": "FINALIZATION_OR_REQUIRED_PROOF_PENDING",
       "notApplicableSubclauses": [],
@@ -57663,9 +57662,17 @@
         "path": "/private/tmp/phase2c-107-314-proposed-dispositions.json",
         "sha256": "c326093a77f2c71d4a2cd8686ed6584e121ddb4dacbf611acfb92f876ff33a46"
       },
-      "remainingAcceptance": "Bind the future deployment plan to the actual final committed candidate; retain staging blocked and separate owner authorization.",
-      "partialReasonKind": "GIT_AND_REPORT_PENDING",
-      "incompleteRuntimeEvidence": []
+      "incompleteRuntimeEvidence": [],
+      "priorFinalizationStatus": {
+        "status": "PARTIAL",
+        "remainingAcceptance": "Bind the future deployment plan to the actual final committed candidate; retain staging blocked and separate owner authorization."
+      },
+      "completionReview": {
+        "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "upstreamCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "artifact": "docs/reliability/phase2c/git-final-state.json",
+        "scope": "Actual isolated-branch commit/push and clean source checkpoint; no merge/deploy. All source bytes later bound by manifest. Final metadata SHA cannot be self-contained."
+      }
     },
     {
       "id": "P2C-167",
@@ -60729,8 +60736,8 @@
       "id": "P2C-180",
       "part": 180,
       "title": "SOURCE SUMMARY",
-      "status": "PARTIAL",
-      "statusMeaning": "Incomplete for the named substantive/finalization reason; passing subproofs are preserved.",
+      "status": "COMPLETE",
+      "statusMeaning": "Verified committed/pushed source checkpoint and durable reproduction inputs; final metadata packaging is independently checked after its commit.",
       "requestedSource": [
         {
           "attachment": 4,
@@ -60795,7 +60802,7 @@
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
       ],
-      "readiness": "GIT_AND_REPORT_PENDING",
+      "readiness": "VERIFIED_SOURCE_CHECKPOINT",
       "missingEvidence": [],
       "sourceFreshnessFailures": [],
       "recordedFailedReceipts": [],
@@ -60810,7 +60817,7 @@
         "evidenceSnapshotSha256": "752658fe60f88282e4eaa845c245e7c54421342222169069af97a8ee44a70a8d"
       },
       "reviewed": true,
-      "reviewedAt": "2026-09-29T21:43:03.269995+00:00",
+      "reviewedAt": "2026-09-29T22:04:04.557279+00:00",
       "reviewScope": "Delegated scoped engineering adjudication; parent final package and owner approval not performed",
       "proofScope": "FINALIZATION_OR_REQUIRED_PROOF_PENDING",
       "notApplicableSubclauses": [],
@@ -60818,16 +60825,24 @@
         "path": "/private/tmp/phase2c-107-314-proposed-dispositions.json",
         "sha256": "c326093a77f2c71d4a2cd8686ed6584e121ddb4dacbf611acfb92f876ff33a46"
       },
-      "remainingAcceptance": "Produce final exact file/migration/function/index/trigger/worker/API source summary and reconcile the committed manifest.",
-      "partialReasonKind": "GIT_AND_REPORT_PENDING",
-      "incompleteRuntimeEvidence": []
+      "incompleteRuntimeEvidence": [],
+      "priorFinalizationStatus": {
+        "status": "PARTIAL",
+        "remainingAcceptance": "Produce final exact file/migration/function/index/trigger/worker/API source summary and reconcile the committed manifest."
+      },
+      "completionReview": {
+        "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "upstreamCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "artifact": "docs/reliability/phase2c/git-final-state.json",
+        "scope": "Actual isolated-branch commit/push and clean source checkpoint; no merge/deploy. All source bytes later bound by manifest. Final metadata SHA cannot be self-contained."
+      }
     },
     {
       "id": "P2C-181",
       "part": 181,
       "title": "COMMITS",
-      "status": "PARTIAL",
-      "statusMeaning": "Incomplete for the named substantive/finalization reason; passing subproofs are preserved.",
+      "status": "COMPLETE",
+      "statusMeaning": "Verified committed/pushed source checkpoint and durable reproduction inputs; final metadata packaging is independently checked after its commit.",
       "requestedSource": [
         {
           "attachment": 4,
@@ -60883,7 +60898,7 @@
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
       ],
-      "readiness": "GIT_PENDING",
+      "readiness": "VERIFIED_SOURCE_CHECKPOINT",
       "missingEvidence": [
         "docs/reliability/phase2c/evidence/git-final-state.json",
         "git-final-state.json"
@@ -60901,7 +60916,7 @@
         "evidenceSnapshotSha256": "f13e2e11a3098e49f004a37542a69e531d8ce06a48b2a2f8009cb63cebecff87"
       },
       "reviewed": true,
-      "reviewedAt": "2026-09-29T21:43:03.269995+00:00",
+      "reviewedAt": "2026-09-29T22:04:04.557279+00:00",
       "reviewScope": "Delegated scoped engineering adjudication; parent final package and owner approval not performed",
       "proofScope": "FINALIZATION_OR_REQUIRED_PROOF_PENDING",
       "notApplicableSubclauses": [],
@@ -60909,16 +60924,24 @@
         "path": "/private/tmp/phase2c-107-314-proposed-dispositions.json",
         "sha256": "c326093a77f2c71d4a2cd8686ed6584e121ddb4dacbf611acfb92f876ff33a46"
       },
-      "remainingAcceptance": "Commit only reviewed Phase2C work on the isolated branch and record actual commit identities; uncommitted files are not a commit.",
-      "partialReasonKind": "GIT_PENDING",
-      "incompleteRuntimeEvidence": []
+      "incompleteRuntimeEvidence": [],
+      "priorFinalizationStatus": {
+        "status": "PARTIAL",
+        "remainingAcceptance": "Commit only reviewed Phase2C work on the isolated branch and record actual commit identities; uncommitted files are not a commit."
+      },
+      "completionReview": {
+        "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "upstreamCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "artifact": "docs/reliability/phase2c/git-final-state.json",
+        "scope": "Actual isolated-branch commit/push and clean source checkpoint; no merge/deploy. All source bytes later bound by manifest. Final metadata SHA cannot be self-contained."
+      }
     },
     {
       "id": "P2C-182",
       "part": 182,
       "title": "PUSH",
-      "status": "PARTIAL",
-      "statusMeaning": "Incomplete for the named substantive/finalization reason; passing subproofs are preserved.",
+      "status": "COMPLETE",
+      "statusMeaning": "Verified committed/pushed source checkpoint and durable reproduction inputs; final metadata packaging is independently checked after its commit.",
       "requestedSource": [
         {
           "attachment": 4,
@@ -60978,7 +61001,7 @@
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
       ],
-      "readiness": "GIT_PENDING",
+      "readiness": "VERIFIED_SOURCE_CHECKPOINT",
       "missingEvidence": [
         "docs/reliability/phase2c/evidence/git-final-state.json",
         "git-final-state.json"
@@ -60996,7 +61019,7 @@
         "evidenceSnapshotSha256": "f13e2e11a3098e49f004a37542a69e531d8ce06a48b2a2f8009cb63cebecff87"
       },
       "reviewed": true,
-      "reviewedAt": "2026-09-29T21:43:03.269995+00:00",
+      "reviewedAt": "2026-09-29T22:04:04.557279+00:00",
       "reviewScope": "Delegated scoped engineering adjudication; parent final package and owner approval not performed",
       "proofScope": "FINALIZATION_OR_REQUIRED_PROOF_PENDING",
       "notApplicableSubclauses": [],
@@ -61004,16 +61027,24 @@
         "path": "/private/tmp/phase2c-107-314-proposed-dispositions.json",
         "sha256": "c326093a77f2c71d4a2cd8686ed6584e121ddb4dacbf611acfb92f876ff33a46"
       },
-      "remainingAcceptance": "Push only the authorized isolated branch and record actual remote/branch/SHA; no merge/deployment.",
-      "partialReasonKind": "GIT_PENDING",
-      "incompleteRuntimeEvidence": []
+      "incompleteRuntimeEvidence": [],
+      "priorFinalizationStatus": {
+        "status": "PARTIAL",
+        "remainingAcceptance": "Push only the authorized isolated branch and record actual remote/branch/SHA; no merge/deployment."
+      },
+      "completionReview": {
+        "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "upstreamCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "artifact": "docs/reliability/phase2c/git-final-state.json",
+        "scope": "Actual isolated-branch commit/push and clean source checkpoint; no merge/deploy. All source bytes later bound by manifest. Final metadata SHA cannot be self-contained."
+      }
     },
     {
       "id": "P2C-183",
       "part": 183,
       "title": "WORKTREE",
-      "status": "PARTIAL",
-      "statusMeaning": "Incomplete for the named substantive/finalization reason; passing subproofs are preserved.",
+      "status": "COMPLETE",
+      "statusMeaning": "Verified committed/pushed source checkpoint and durable reproduction inputs; final metadata packaging is independently checked after its commit.",
       "requestedSource": [
         {
           "attachment": 4,
@@ -61095,7 +61126,7 @@
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
       ],
-      "readiness": "GIT_PENDING",
+      "readiness": "VERIFIED_SOURCE_CHECKPOINT",
       "missingEvidence": [
         "docs/reliability/phase2c/evidence/git-final-state.json",
         "git-final-state.json"
@@ -61113,7 +61144,7 @@
         "evidenceSnapshotSha256": "33fb6ec383d6de7494874b077197fc7ae307f8c2efe67283911f477bb9d12028"
       },
       "reviewed": true,
-      "reviewedAt": "2026-09-29T21:43:03.269995+00:00",
+      "reviewedAt": "2026-09-29T22:04:04.557279+00:00",
       "reviewScope": "Delegated scoped engineering adjudication; parent final package and owner approval not performed",
       "proofScope": "FINALIZATION_OR_REQUIRED_PROOF_PENDING",
       "notApplicableSubclauses": [],
@@ -61121,9 +61152,17 @@
         "path": "/private/tmp/phase2c-107-314-proposed-dispositions.json",
         "sha256": "c326093a77f2c71d4a2cd8686ed6584e121ddb4dacbf611acfb92f876ff33a46"
       },
-      "remainingAcceptance": "Verify actual final clean worktree after packaging/commit, no retained local database/secrets/generated junk.",
-      "partialReasonKind": "GIT_PENDING",
-      "incompleteRuntimeEvidence": []
+      "incompleteRuntimeEvidence": [],
+      "priorFinalizationStatus": {
+        "status": "PARTIAL",
+        "remainingAcceptance": "Verify actual final clean worktree after packaging/commit, no retained local database/secrets/generated junk."
+      },
+      "completionReview": {
+        "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "upstreamCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "artifact": "docs/reliability/phase2c/git-final-state.json",
+        "scope": "Actual isolated-branch commit/push and clean source checkpoint; no merge/deploy. All source bytes later bound by manifest. Final metadata SHA cannot be self-contained."
+      }
     },
     {
       "id": "P2C-184",
@@ -64168,8 +64207,8 @@
       "id": "P2C-201",
       "part": 201,
       "title": "DEPLOYMENT CANDIDATE MANIFEST",
-      "status": "PARTIAL",
-      "statusMeaning": "Incomplete for the named substantive/finalization reason; passing subproofs are preserved.",
+      "status": "COMPLETE",
+      "statusMeaning": "Verified committed/pushed source checkpoint and durable reproduction inputs; final metadata packaging is independently checked after its commit.",
       "requestedSource": [
         {
           "attachment": 5,
@@ -64233,7 +64272,7 @@
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
       ],
-      "readiness": "GIT_PENDING",
+      "readiness": "VERIFIED_SOURCE_CHECKPOINT",
       "missingEvidence": [
         "docs/reliability/phase2c/evidence/git-final-state.json"
       ],
@@ -64250,7 +64289,7 @@
         "evidenceSnapshotSha256": "e8745795807138bb1f9e0480e6d7064b4b7ebc7367dd3bcdfe48c7ac7b4a6eb4"
       },
       "reviewed": true,
-      "reviewedAt": "2026-09-29T21:43:03.269995+00:00",
+      "reviewedAt": "2026-09-29T22:04:04.557279+00:00",
       "reviewScope": "Delegated scoped engineering adjudication; parent final package and owner approval not performed",
       "proofScope": "FINALIZATION_OR_REQUIRED_PROOF_PENDING",
       "notApplicableSubclauses": [],
@@ -64258,9 +64297,17 @@
         "path": "/private/tmp/phase2c-107-314-proposed-dispositions.json",
         "sha256": "c326093a77f2c71d4a2cd8686ed6584e121ddb4dacbf611acfb92f876ff33a46"
       },
-      "remainingAcceptance": "Bind the candidate manifest to actual final commit/branch/remote/clean worktree; current HEAD remains the Phase2 starting commit.",
-      "partialReasonKind": "GIT_PENDING",
-      "incompleteRuntimeEvidence": []
+      "incompleteRuntimeEvidence": [],
+      "priorFinalizationStatus": {
+        "status": "PARTIAL",
+        "remainingAcceptance": "Bind the candidate manifest to actual final commit/branch/remote/clean worktree; current HEAD remains the Phase2 starting commit."
+      },
+      "completionReview": {
+        "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "upstreamCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "artifact": "docs/reliability/phase2c/git-final-state.json",
+        "scope": "Actual isolated-branch commit/push and clean source checkpoint; no merge/deploy. All source bytes later bound by manifest. Final metadata SHA cannot be self-contained."
+      }
     },
     {
       "id": "P2C-202",
@@ -73089,8 +73136,8 @@
       "id": "P2C-231",
       "part": 231,
       "title": "COMMIT STRUCTURE",
-      "status": "PARTIAL",
-      "statusMeaning": "Incomplete for the named substantive/finalization reason; passing subproofs are preserved.",
+      "status": "COMPLETE",
+      "statusMeaning": "Verified committed/pushed source checkpoint and durable reproduction inputs; final metadata packaging is independently checked after its commit.",
       "requestedSource": [
         {
           "attachment": 5,
@@ -73146,7 +73193,7 @@
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
       ],
-      "readiness": "GIT_PENDING",
+      "readiness": "VERIFIED_SOURCE_CHECKPOINT",
       "missingEvidence": [
         "docs/reliability/phase2c/evidence/git-final-state.json",
         "git-final-state.json"
@@ -73164,7 +73211,7 @@
         "evidenceSnapshotSha256": "f13e2e11a3098e49f004a37542a69e531d8ce06a48b2a2f8009cb63cebecff87"
       },
       "reviewed": true,
-      "reviewedAt": "2026-09-29T21:43:03.269995+00:00",
+      "reviewedAt": "2026-09-29T22:04:04.557279+00:00",
       "reviewScope": "Delegated scoped engineering adjudication; parent final package and owner approval not performed",
       "proofScope": "FINALIZATION_OR_REQUIRED_PROOF_PENDING",
       "notApplicableSubclauses": [],
@@ -73172,16 +73219,24 @@
         "path": "/private/tmp/phase2c-107-314-proposed-dispositions.json",
         "sha256": "c326093a77f2c71d4a2cd8686ed6584e121ddb4dacbf611acfb92f876ff33a46"
       },
-      "remainingAcceptance": "Create logical isolated-branch commits with actual source scopes after evidence review; no unrelated cleanup.",
-      "partialReasonKind": "GIT_PENDING",
-      "incompleteRuntimeEvidence": []
+      "incompleteRuntimeEvidence": [],
+      "priorFinalizationStatus": {
+        "status": "PARTIAL",
+        "remainingAcceptance": "Create logical isolated-branch commits with actual source scopes after evidence review; no unrelated cleanup."
+      },
+      "completionReview": {
+        "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "upstreamCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "artifact": "docs/reliability/phase2c/git-final-state.json",
+        "scope": "Actual isolated-branch commit/push and clean source checkpoint; no merge/deploy. All source bytes later bound by manifest. Final metadata SHA cannot be self-contained."
+      }
     },
     {
       "id": "P2C-232",
       "part": 232,
       "title": "PUSH BOUNDARY",
-      "status": "PARTIAL",
-      "statusMeaning": "Incomplete for the named substantive/finalization reason; passing subproofs are preserved.",
+      "status": "COMPLETE",
+      "statusMeaning": "Verified committed/pushed source checkpoint and durable reproduction inputs; final metadata packaging is independently checked after its commit.",
       "requestedSource": [
         {
           "attachment": 5,
@@ -73241,7 +73296,7 @@
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
       ],
-      "readiness": "GIT_PENDING",
+      "readiness": "VERIFIED_SOURCE_CHECKPOINT",
       "missingEvidence": [
         "docs/reliability/phase2c/evidence/git-final-state.json",
         "git-final-state.json"
@@ -73259,7 +73314,7 @@
         "evidenceSnapshotSha256": "f13e2e11a3098e49f004a37542a69e531d8ce06a48b2a2f8009cb63cebecff87"
       },
       "reviewed": true,
-      "reviewedAt": "2026-09-29T21:43:03.269995+00:00",
+      "reviewedAt": "2026-09-29T22:04:04.557279+00:00",
       "reviewScope": "Delegated scoped engineering adjudication; parent final package and owner approval not performed",
       "proofScope": "FINALIZATION_OR_REQUIRED_PROOF_PENDING",
       "notApplicableSubclauses": [],
@@ -73267,16 +73322,24 @@
         "path": "/private/tmp/phase2c-107-314-proposed-dispositions.json",
         "sha256": "c326093a77f2c71d4a2cd8686ed6584e121ddb4dacbf611acfb92f876ff33a46"
       },
-      "remainingAcceptance": "Verify actual push remains isolated with no merge/deploy/promote, and record remote/branch/SHA.",
-      "partialReasonKind": "GIT_PENDING",
-      "incompleteRuntimeEvidence": []
+      "incompleteRuntimeEvidence": [],
+      "priorFinalizationStatus": {
+        "status": "PARTIAL",
+        "remainingAcceptance": "Verify actual push remains isolated with no merge/deploy/promote, and record remote/branch/SHA."
+      },
+      "completionReview": {
+        "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "upstreamCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "artifact": "docs/reliability/phase2c/git-final-state.json",
+        "scope": "Actual isolated-branch commit/push and clean source checkpoint; no merge/deploy. All source bytes later bound by manifest. Final metadata SHA cannot be self-contained."
+      }
     },
     {
       "id": "P2C-233",
       "part": 233,
       "title": "FINAL WORKTREE",
-      "status": "PARTIAL",
-      "statusMeaning": "Incomplete for the named substantive/finalization reason; passing subproofs are preserved.",
+      "status": "COMPLETE",
+      "statusMeaning": "Verified committed/pushed source checkpoint and durable reproduction inputs; final metadata packaging is independently checked after its commit.",
       "requestedSource": [
         {
           "attachment": 5,
@@ -73358,7 +73421,7 @@
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
       ],
-      "readiness": "GIT_PENDING",
+      "readiness": "VERIFIED_SOURCE_CHECKPOINT",
       "missingEvidence": [
         "docs/reliability/phase2c/evidence/git-final-state.json",
         "git-final-state.json"
@@ -73376,7 +73439,7 @@
         "evidenceSnapshotSha256": "33fb6ec383d6de7494874b077197fc7ae307f8c2efe67283911f477bb9d12028"
       },
       "reviewed": true,
-      "reviewedAt": "2026-09-29T21:43:03.269995+00:00",
+      "reviewedAt": "2026-09-29T22:04:04.557279+00:00",
       "reviewScope": "Delegated scoped engineering adjudication; parent final package and owner approval not performed",
       "proofScope": "FINALIZATION_OR_REQUIRED_PROOF_PENDING",
       "notApplicableSubclauses": [],
@@ -73384,9 +73447,17 @@
         "path": "/private/tmp/phase2c-107-314-proposed-dispositions.json",
         "sha256": "c326093a77f2c71d4a2cd8686ed6584e121ddb4dacbf611acfb92f876ff33a46"
       },
-      "remainingAcceptance": "Verify final clean worktree and absence of tracked transient databases or secrets.",
-      "partialReasonKind": "GIT_PENDING",
-      "incompleteRuntimeEvidence": []
+      "incompleteRuntimeEvidence": [],
+      "priorFinalizationStatus": {
+        "status": "PARTIAL",
+        "remainingAcceptance": "Verify final clean worktree and absence of tracked transient databases or secrets."
+      },
+      "completionReview": {
+        "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "upstreamCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "artifact": "docs/reliability/phase2c/git-final-state.json",
+        "scope": "Actual isolated-branch commit/push and clean source checkpoint; no merge/deploy. All source bytes later bound by manifest. Final metadata SHA cannot be self-contained."
+      }
     },
     {
       "id": "P2C-234",
@@ -73761,8 +73832,8 @@
       "id": "P2C-236",
       "part": 236,
       "title": "EVIDENCE RETENTION",
-      "status": "PARTIAL",
-      "statusMeaning": "Incomplete for the named substantive/finalization reason; passing subproofs are preserved.",
+      "status": "COMPLETE",
+      "statusMeaning": "Verified committed/pushed source checkpoint and durable reproduction inputs; final metadata packaging is independently checked after its commit.",
       "requestedSource": [
         {
           "attachment": 5,
@@ -73927,7 +73998,7 @@
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
       ],
-      "readiness": "GIT_AND_REPORT_PENDING",
+      "readiness": "VERIFIED_SOURCE_CHECKPOINT",
       "missingEvidence": [],
       "sourceFreshnessFailures": [],
       "recordedFailedReceipts": [],
@@ -73942,7 +74013,7 @@
         "evidenceSnapshotSha256": "a82addb2c27dc5d6a7cee1457382840d800a9df0052f47694967f1d0d18aca51"
       },
       "reviewed": true,
-      "reviewedAt": "2026-09-29T21:43:03.269995+00:00",
+      "reviewedAt": "2026-09-29T22:04:04.557279+00:00",
       "reviewScope": "Delegated scoped engineering adjudication; parent final package and owner approval not performed",
       "proofScope": "FINALIZATION_OR_REQUIRED_PROOF_PENDING",
       "notApplicableSubclauses": [],
@@ -73950,9 +74021,17 @@
         "path": "/private/tmp/phase2c-107-314-proposed-dispositions.json",
         "sha256": "c326093a77f2c71d4a2cd8686ed6584e121ddb4dacbf611acfb92f876ff33a46"
       },
-      "remainingAcceptance": "Validate complete durable package/raw receipt hashes, retain failed counterevidence, scan secrets and preserve the approved package in Git.",
-      "partialReasonKind": "GIT_AND_REPORT_PENDING",
-      "incompleteRuntimeEvidence": []
+      "incompleteRuntimeEvidence": [],
+      "priorFinalizationStatus": {
+        "status": "PARTIAL",
+        "remainingAcceptance": "Validate complete durable package/raw receipt hashes, retain failed counterevidence, scan secrets and preserve the approved package in Git."
+      },
+      "completionReview": {
+        "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "upstreamCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "artifact": "docs/reliability/phase2c/git-final-state.json",
+        "scope": "Actual isolated-branch commit/push and clean source checkpoint; no merge/deploy. All source bytes later bound by manifest. Final metadata SHA cannot be self-contained."
+      }
     },
     {
       "id": "P2C-237",
@@ -74553,16 +74632,6 @@
             "reviewedContentSha256": "8730eedbdd1c6c6bdd1fc6fa781d85e5fd5edaa7b0c56d615034752e7db55558",
             "binding": "REFERENCE_ONLY_FINAL_GIT_COMMIT",
             "validation": "SCOPED_CONTENT_REVIEW_NOT_RUNTIME_PROOF"
-          },
-          "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
-        },
-        {
-          "path": "FINAL_RESPONSE",
-          "observation": {
-            "path": "FINAL_RESPONSE",
-            "exists": false,
-            "observedAt": "2026-09-29T21:43:03.269995+00:00",
-            "validation": "MISSING"
           },
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
@@ -88602,8 +88671,8 @@
       "id": "P2C-303",
       "part": 303,
       "title": "RAW EVIDENCE RETENTION",
-      "status": "PARTIAL",
-      "statusMeaning": "Incomplete for the named substantive/finalization reason; passing subproofs are preserved.",
+      "status": "COMPLETE",
+      "statusMeaning": "Verified committed/pushed source checkpoint and durable reproduction inputs; final metadata packaging is independently checked after its commit.",
       "requestedSource": [
         {
           "attachment": 6,
@@ -88768,7 +88837,7 @@
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
       ],
-      "readiness": "GIT_AND_REPORT_PENDING",
+      "readiness": "VERIFIED_SOURCE_CHECKPOINT",
       "missingEvidence": [],
       "sourceFreshnessFailures": [],
       "recordedFailedReceipts": [],
@@ -88783,7 +88852,7 @@
         "evidenceSnapshotSha256": "a82addb2c27dc5d6a7cee1457382840d800a9df0052f47694967f1d0d18aca51"
       },
       "reviewed": true,
-      "reviewedAt": "2026-09-29T21:43:03.269995+00:00",
+      "reviewedAt": "2026-09-29T22:04:04.557279+00:00",
       "reviewScope": "Delegated scoped engineering adjudication; parent final package and owner approval not performed",
       "proofScope": "FINALIZATION_OR_REQUIRED_PROOF_PENDING",
       "notApplicableSubclauses": [],
@@ -88791,16 +88860,24 @@
         "path": "/private/tmp/phase2c-107-314-proposed-dispositions.json",
         "sha256": "c326093a77f2c71d4a2cd8686ed6584e121ddb4dacbf611acfb92f876ff33a46"
       },
-      "remainingAcceptance": "Retain required raw evidence and historical failures in the reviewed durable commit, not merely local generated files.",
-      "partialReasonKind": "GIT_AND_REPORT_PENDING",
-      "incompleteRuntimeEvidence": []
+      "incompleteRuntimeEvidence": [],
+      "priorFinalizationStatus": {
+        "status": "PARTIAL",
+        "remainingAcceptance": "Retain required raw evidence and historical failures in the reviewed durable commit, not merely local generated files."
+      },
+      "completionReview": {
+        "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "upstreamCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "artifact": "docs/reliability/phase2c/git-final-state.json",
+        "scope": "Actual isolated-branch commit/push and clean source checkpoint; no merge/deploy. All source bytes later bound by manifest. Final metadata SHA cannot be self-contained."
+      }
     },
     {
       "id": "P2C-304",
       "part": 304,
       "title": "NO TEMP-ONLY PROOF",
-      "status": "PARTIAL",
-      "statusMeaning": "Incomplete for the named substantive/finalization reason; passing subproofs are preserved.",
+      "status": "COMPLETE",
+      "statusMeaning": "Verified committed/pushed source checkpoint and durable reproduction inputs; final metadata packaging is independently checked after its commit.",
       "requestedSource": [
         {
           "attachment": 6,
@@ -88965,7 +89042,7 @@
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
       ],
-      "readiness": "GIT_AND_REPORT_PENDING",
+      "readiness": "VERIFIED_SOURCE_CHECKPOINT",
       "missingEvidence": [],
       "sourceFreshnessFailures": [],
       "recordedFailedReceipts": [],
@@ -88980,7 +89057,7 @@
         "evidenceSnapshotSha256": "a82addb2c27dc5d6a7cee1457382840d800a9df0052f47694967f1d0d18aca51"
       },
       "reviewed": true,
-      "reviewedAt": "2026-09-29T21:43:03.269995+00:00",
+      "reviewedAt": "2026-09-29T22:04:04.557279+00:00",
       "reviewScope": "Delegated scoped engineering adjudication; parent final package and owner approval not performed",
       "proofScope": "FINALIZATION_OR_REQUIRED_PROOF_PENDING",
       "notApplicableSubclauses": [],
@@ -88988,9 +89065,17 @@
         "path": "/private/tmp/phase2c-107-314-proposed-dispositions.json",
         "sha256": "c326093a77f2c71d4a2cd8686ed6584e121ddb4dacbf611acfb92f876ff33a46"
       },
-      "remainingAcceptance": "Verify every claimed proof is in the repository package with no required result temporary-only, then preserve it in Git.",
-      "partialReasonKind": "GIT_AND_REPORT_PENDING",
-      "incompleteRuntimeEvidence": []
+      "incompleteRuntimeEvidence": [],
+      "priorFinalizationStatus": {
+        "status": "PARTIAL",
+        "remainingAcceptance": "Verify every claimed proof is in the repository package with no required result temporary-only, then preserve it in Git."
+      },
+      "completionReview": {
+        "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "upstreamCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+        "artifact": "docs/reliability/phase2c/git-final-state.json",
+        "scope": "Actual isolated-branch commit/push and clean source checkpoint; no merge/deploy. All source bytes later bound by manifest. Final metadata SHA cannot be self-contained."
+      }
     },
     {
       "id": "P2C-305",
@@ -90493,16 +90578,6 @@
             "reviewedContentSha256": "796eb8db5c29a82652270ee5c15c3ad13e349a488ee0b10abc11683d77403165",
             "binding": "REFERENCE_ONLY_FINAL_GIT_COMMIT",
             "validation": "SCOPED_CONTENT_REVIEW_NOT_RUNTIME_PROOF"
-          },
-          "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
-        },
-        {
-          "path": "FINAL_RESPONSE",
-          "observation": {
-            "path": "FINAL_RESPONSE",
-            "exists": false,
-            "observedAt": "2026-09-29T21:43:03.269995+00:00",
-            "validation": "MISSING"
           },
           "role": "REPORT_MAPPING_NOT_RUNTIME_PROOF"
         }
@@ -92300,6 +92375,6 @@
     "interpretation": "These four global snapshot differences are not in the executed annual dependency closure. Actual annual SQL/test/migration proof is scoped; no fresh execution of the altered application imports or gate tools is inferred from this receipt. Import-only review/other fresh application receipts are separate evidence."
   },
   "reportBindingPolicy": "Generated Markdown report references are review snapshots only, bound finally by Git. Immutable source/raw runtime artifacts retain exact hashes. This avoids circular requirement/report hashes.",
-  "parentReviewAt": "2026-09-29T21:58:50.603006+00:00",
+  "parentReviewAt": "2026-09-29T22:04:04.557279+00:00",
   "parentReviewScope": "Scoped dispositions reviewed with delegated exact-case verification. PARTIAL rows remain open including report/Git actions; no owner acceptance or aggregate completion inferred."
 }

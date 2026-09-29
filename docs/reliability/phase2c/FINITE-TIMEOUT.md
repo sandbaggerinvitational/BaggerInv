@@ -25,4 +25,3 @@ Failure before commit leaves no partial hole, score receipt or derived intent. T
 Worker cancellation is tested separately in delivery evidence: explicit PL/pgSQL query_canceled handling rolls back partial materialization, records the retry state and returns statusIncomplete; the runner cannot interpret that response as idle success. Database clocks govern due/lease time. Timing acceleration in designated lease tests is fixture-only and is labeled; actual backoff cases wait until the recorded due time.
 
 Production timeout settings, I/O headroom, service pool behavior and provider restart timing are UNKNOWN. Finite local query correctness is not Production capacity certification.
-

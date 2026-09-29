@@ -1,0 +1,19 @@
+{
+  "recordKind": "VERIFIED_SOURCE_CHECKPOINT",
+  "verifiedAt": "2026-09-29T22:04:04.557279+00:00",
+  "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+  "branch": "codex/reliability-phase2c-recovery-delivery",
+  "remote": "origin",
+  "remoteUrl": "git@github.com:sandbaggerinvitational/BaggerInv.git",
+  "upstreamCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+  "upstreamMatch": true,
+  "worktreeAtCheckpoint": "CLEAN",
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "filesAddedAtSourceCheckpoint": 662,
+  "filesModifiedAtSourceCheckpoint": 14,
+  "mergePerformed": false,
+  "agentDeploymentPerformed": false,
+  "productionActions": false,
+  "externalProviderPreviewAutomation": "NOT_INSPECTED",
+  "finalPackagingCommit": "Subsequent documentation-only commit is returned with actual final HEAD/upstream/clean verification in the final response; this file cannot contain its own commit hash."
+}

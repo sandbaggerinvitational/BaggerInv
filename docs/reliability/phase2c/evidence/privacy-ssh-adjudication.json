@@ -1,0 +1,16 @@
+{
+  "reviewedAt": "2026-09-29T22:06:14.189485+00:00",
+  "review": "ONE_NEW_EXACT_FALSE_POSITIVE",
+  "previousBlockedResult": "UNKNOWN_VALUES_REQUIRE_REVIEW",
+  "valueSha256": "3de132cd98be7bf26b6f08e81c31c799a891bc32046b61f0b6fe3671ca2e44b5",
+  "classification": "NONSECRET_GIT_SSH_TRANSPORT_PRINCIPAL",
+  "rationale": "Email-pattern false positive on the standard GitHub SSH transport principal in the verified origin URL; not a mailbox, token, password or private credential. Exact value independently matched to local git remote metadata.",
+  "sourceFile": "docs/reliability/phase2c/git-final-state.json",
+  "sourceSha256": "84ec44b7915d9ee015fcce1ff7142f05c2204b98381c0f8d0b5f9714f04a6606",
+  "oldRegistrySha256": "d148378d607b243e6855007d92c50269705a41440c263cad6f1b64ff018aa4ef",
+  "newRegistrySha256": "f7549539071ab4a931392f82c63578fbce7b71f6788d431d236bff3076e62382",
+  "scannerPatternsChanged": false,
+  "otherExceptionsChanged": false,
+  "actualValueRetained": false,
+  "productionOrProviderCall": false
+}

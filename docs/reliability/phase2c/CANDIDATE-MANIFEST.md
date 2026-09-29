@@ -4,7 +4,7 @@
 
 - Base / recorded execution HEAD: `b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18`.
 - Isolated branch: `codex/reliability-phase2c-recovery-delivery`.
-- Candidate source commit: `PENDING LOCAL COMMIT`.
+- Candidate source commit: `aa9122daf847a7e18717cf24c8241950a398d988`.
 - Source paths: 78; exact byte hashes and migration122–124 fingerprints are retained.
 - Toolchain: Node26.7/npm11.19/PostgreSQL17.11, isolated synthetic Unix-socket clusters. Swift model decoding is macOS/UTC, not physical.
 

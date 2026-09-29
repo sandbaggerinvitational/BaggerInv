@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-29T21:05:44.520900+00:00",
+  "generatedAt": "2026-09-29T22:04:05.302021+00:00",
   "status": "PARTIAL_NOT_READY_FOR_STAGING",
   "branch": "codex/reliability-phase2c-recovery-delivery",
   "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
   "executionHead": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
-  "sourceCommit": null,
+  "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
   "sourceCommitMeaning": "All listed candidate source bytes match this commit; executions earlier recorded base HEAD plus exact dependency hashes. Later documentation-only commit is packaging, not a different tested implementation.",
   "sourceManifest": [
     {

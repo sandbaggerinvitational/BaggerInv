@@ -38,6 +38,6 @@ Overall PARTIAL. The current local gate validates named retained runtime evidenc
 | Google reporting outbox automatic delivery | NOT PROVEN: lifecycle; SOURCE review only | `docs/reliability/phase2c/evidence/google-outbox-scope-review.json` (`874cc5228610157cd138bed16b4634e2d508ed8716d86bc8594d270fa4ec2a44`); `docs/reliability/phase2c/GOOGLE-OUTBOX-GAP.md` (`ae4a8da156c004de658f6bbea310a524f70f1e333d8c08d787fd4ee4a5dba205`) |
 | Finalize scorecard archive automatic delivery | NOT PROVEN: lifecycle; SOURCE review only | `docs/reliability/phase2c/evidence/google-outbox-scope-review.json` (`874cc5228610157cd138bed16b4634e2d508ed8716d86bc8594d270fa4ec2a44`); `docs/reliability/phase2c/GOOGLE-OUTBOX-GAP.md` (`ae4a8da156c004de658f6bbea310a524f70f1e333d8c08d787fd4ee4a5dba205`) |
 
-The314 numbered decisions remain individually reviewed in [audit completeness](AUDIT-COMPLETENESS.md) and [structured dispositions](requirement-dispositions.json). Counts: {"COMPLETE": 234, "N/A": 0, "PARTIAL": 80}. No owner acceptance was performed.
+The314 numbered decisions remain individually reviewed in [audit completeness](AUDIT-COMPLETENESS.md) and [structured dispositions](requirement-dispositions.json). Counts: {"COMPLETE": 246, "N/A": 0, "PARTIAL": 68}. No owner acceptance was performed.
 
 PHASE 2C: PARTIAL — SCORE-PATH CANDIDATE NOT READY FOR STAGING; REMAINING GATES LISTED ABOVE

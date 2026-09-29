@@ -1,0 +1,39 @@
+{
+  "reviewedAt": "2026-09-29T22:07:28.421689+00:00",
+  "result": "FINAL_DOCUMENTATION_REVIEWED",
+  "overallStatus": "PARTIAL",
+  "sourceCommit": "aa9122daf847a7e18717cf24c8241950a398d988",
+  "sourceFilesUnchanged": 78,
+  "privacyScannedFiles": 679,
+  "privacyReviewedHits": 98,
+  "privacyReviewedValues": 11,
+  "privacyUnresolvedFindings": 0,
+  "snapshotReceipts": [
+    {
+      "path": "docs/reliability/phase2c/evidence/privacy-snapshots/0d356a550fd29933-phase2c-scope-privacy-scan.json",
+      "sha256": "0d356a550fd29933701ef32ffe525ffed0ac78d9e088abf8a903499315d8177f"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/privacy-snapshots/efd59a11dd8dbe3c-phase2c-privacy-adjudication-updated.json",
+      "sha256": "efd59a11dd8dbe3c8ac6bbffea3874b38f5842ed8b9f864adf957606deecfac1"
+    },
+    {
+      "path": "docs/reliability/phase2c/evidence/privacy-snapshots/991db4df4e1a600c-phase2c-final-package-check.json",
+      "sha256": "991db4df4e1a600c168e5063cf8e41e0e743cea7dee5f085add37b7c2e191758"
+    }
+  ],
+  "generatedReportExclusions": [
+    "docs/reliability/phase2c/evidence/privacy-snapshots/0d356a550fd29933-phase2c-scope-privacy-scan.json",
+    "docs/reliability/phase2c/evidence/privacy-snapshots/efd59a11dd8dbe3c-phase2c-privacy-adjudication-updated.json",
+    "docs/reliability/phase2c/evidence/privacy-snapshots/991db4df4e1a600c-phase2c-final-package-check.json",
+    "docs/reliability/phase2c/evidence/final-packaging-review.json"
+  ],
+  "exclusionReason": "Newly retained hash/path/count-only receipts and this declaration are reviewed generated metadata, outside their own input snapshots. No raw credential values added.",
+  "rawEvidenceWhitespace": "Retained intentionally; authored source/docs check passes after correcting one EOF. See whitespace-adjudication.json.",
+  "runtimeRerunRequired": false,
+  "reason": "Documentation identity/dispositions only; tested78source hashes unchanged.",
+  "finalGitAction": "Commit this documentation then push isolated branch and verify HEAD/upstream/CLEAN; actual final SHA returned to owner.",
+  "productionOrStagingAction": false,
+  "build11Implemented": false,
+  "proofBoundaries": "Google/archive P0 and performance repeatability P1 remain open; hosted/physical/capacity/restore/tournament readiness NOT PROVEN."
+}
