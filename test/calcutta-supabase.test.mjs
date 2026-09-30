@@ -236,12 +236,10 @@ test("stored financial result exposes explicit provisional/stale state", () => {
   assert.equal(result.stale, true);
 });
 
-test("Preview flag is server-only and Production fails closed to Google", () => {
-  const env = { CALCUTTA_READ_SOURCE: "supabase", GOOGLE_SHEETS_ID: "preview", PREVIEW_SCORING_SHEET_ID: "preview",
-    SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "server" };
-  assert.equal(calcuttaReadEnvironment({ ...env, VERCEL_ENV: "preview" }).resolved, "supabase");
-  assert.equal(calcuttaReadEnvironment({ ...env, VERCEL_ENV: "production" }).resolved, "google");
-  assert.equal(calcuttaReadEnvironment({ ...env, VERCEL_ENV: "production" }).reason, "production-hard-block");
+test("CALCUTTA_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {calcuttaReadEnvironment}=await import('../lib/calcutta-read-source.js');
+  assertCanonicalReadRetirementContract(calcuttaReadEnvironment,"CALCUTTA_READ_SOURCE");
 });
 
 test("migration is versioned, service-only, immutable, and asynchronous from scoring", async () => {

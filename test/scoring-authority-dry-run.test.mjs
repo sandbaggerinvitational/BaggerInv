@@ -37,7 +37,7 @@ function match(format = "SI") {
 
 test("authority flag fails closed unless the environment-specific isolation and activation gates are complete", () => {
   const safe = { VERCEL_ENV: "preview", SCORING_AUTHORITY: "supabase", PREVIEW_SCORING_SHEET_ID: "preview", GOOGLE_SHEETS_SPREADSHEET_ID: "preview",
-    SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "secret" };
+    SUPABASE_SCORING_MIRROR_URL: "https://idgigvjjqkfbqjeredpb.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "secret" };
   assert.equal(scoringAuthority(safe), "supabase");
   assert.throws(
     () => scoringAuthority({ ...safe, VERCEL_ENV: "production" }),
@@ -48,8 +48,8 @@ test("authority flag fails closed unless the environment-specific isolation and 
       return true;
     },
   );
-  assert.throws(() => scoringAuthority({ ...safe, GOOGLE_SHEETS_SPREADSHEET_ID: "production" }), /unavailable/i);
-  assert.equal(scoringAuthority({ ...safe, SCORING_AUTHORITY: "google" }), "google");
+  assert.equal(scoringAuthority({ ...safe, GOOGLE_SHEETS_SPREADSHEET_ID: "production" }), "supabase", "retired provider metadata has no authority");
+  assert.throws(() => scoringAuthority({ ...safe, SCORING_AUTHORITY: "google" }), {code:"SCORING_AUTHORITY_UNAVAILABLE"});
 });
 
 test("dry-run fixture captures immutable scoring configuration for all formats", () => {
@@ -172,20 +172,8 @@ test("dry-run RPC preserves post-clinch scoring and prevents a non-contiguous fa
   assert.doesNotMatch(sql, /clinched_value[^;]+MATCH_FINAL/is, "clinch state is not a write-blocking lifecycle guard");
 });
 
-test("Preview administrative route is Director-gated and leaves participant scoring authority untouched", async () => {
-  const route = await readFile(new URL("../app/api/director/scoring-shadow/phase2-dry-run/route.js", import.meta.url), "utf8");
-  assert.match(route, /VERCEL_ENV !== "preview"/);
-  assert.match(route, /assertScoringShadowAdministrativeEnvironment/);
-  assert.match(route, /authorizePreviewDirector/);
-  assert.match(route, /Tournament Director access is required/);
-  assert.doesNotMatch(route, /SCORING_AUTHORITY\s*=\s*["']supabase/i);
-  assert.match(route, /saveLiveHoleScore/, "Google timing samples retain the existing authoritative pipeline");
-  assert.match(route, /restorePreviewScoringBenchmarkRows/, "Google timing samples retain a Preview-only recovery fallback");
-  assert.match(route, /GOOGLE_AUTHORITY_TIMING/, "separated Google timings are persisted for percentile reporting");
-  assert.match(route, /READ_\$\{mode\}/, "read benchmark sample arrays are persisted");
-  assert.match(route, /verifiedBaseFixtures[\s\S]+TOURNAMENT_SUMMARY/);
-  assert.match(route, /fixtureSet === MAIN_SET[\s\S]+authoritativeFixtures/);
-});
+// Retired behavior: Administrative Google scoring dry-run endpoint is retired; supported canonical dry-run/score behavior needs distinct bounded fixtures. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
 
 test("Google scoring diagnostics separate pre-read, write, invalidation, verification, and audit timing", async () => {
   const source = await readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8");

@@ -68,11 +68,12 @@ test("native publication carries the prospective ranking contract while retainin
   assert.deepEqual(publication.published_payload, snapshot);
 });
 
-test("Preview flags fail closed in Production", () => {
-  const env = { ODDS_CALCULATION_INPUT_SOURCE: "supabase", ODDS_PUBLICATION_AUTHORITY: "supabase", GOOGLE_SHEETS_ID: "preview", PREVIEW_SCORING_SHEET_ID: "preview",
-    SUPABASE_SCORING_MIRROR_URL: "https://example.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "secret" };
-  assert.deepEqual([oddsCalculationEnvironment({ ...env, VERCEL_ENV: "preview" }).inputSource, oddsCalculationEnvironment({ ...env, VERCEL_ENV: "preview" }).publicationAuthority], ["supabase", "supabase"]);
-  assert.deepEqual([oddsCalculationEnvironment({ ...env, VERCEL_ENV: "production" }).inputSource, oddsCalculationEnvironment({ ...env, VERCEL_ENV: "production" }).publicationAuthority], ["google", "google"]);
+test("Preview flags fail closed in Production", async () => {
+const {canonicalReadFixture}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+const env={...canonicalReadFixture,ODDS_CALCULATION_INPUT_SOURCE:'supabase',ODDS_PUBLICATION_AUTHORITY:'supabase'};
+assert.deepEqual([oddsCalculationEnvironment(env).inputSource,oddsCalculationEnvironment(env).publicationAuthority],['supabase','supabase']);
+const closed=oddsCalculationEnvironment({...env,VERCEL_ENV:'production'});assert.deepEqual([closed.inputSource,closed.publicationAuthority],['unavailable','unavailable']);
+for(const variable of ['ODDS_CALCULATION_INPUT_SOURCE','ODDS_PUBLICATION_AUTHORITY']){const retired=oddsCalculationEnvironment({...env,[variable]:'google'});assert.equal(retired.publicationBlocked,true);}
 });
 
 test("migration and route are service/Director-only, idempotent, isolated, and retain v2 simulation seeds", async () => {
@@ -90,9 +91,9 @@ test("migration and route are service/Director-only, idempotent, isolated, and r
   assert.match(migration, /STALE_ODDS_INPUT_CONFIGURATION/);
   assert.match(guards, /STALE_ODDS_SOURCE_STATE/);
   assert.match(guards, /input->'historical_ratings' = '\{\}'::jsonb/);
-  assert.match(route, /inspectTournamentDirectorToken/);
-  assert.match(route, /Google reporting mirror delayed/);
-  assert.match(inputRoute, /readWorkbookSheetsByName\(\["Prediction Settings"\]\)/);
+  assert.match(route, /inspectTournamentDirectorToken|authorizePreviewDirector/);
+  assert.doesNotMatch(route, /enqueuePreviewOddsMirror|Google reporting mirror delayed/);
+  assert.match(inputRoute, /loadSupabaseOddsInputs/); // Retained refresh is maintenance-only and its transport refuses runtime Google.
   assert.match(inputRoute, /Number\(retained\.iterations\)/);
   assert.match(inputRoute, /Tournament Director access is required/);
   assert.match(engine, /ODDS_SIMULATION_SEED_VERSION = "odds-v2-nassau"/);

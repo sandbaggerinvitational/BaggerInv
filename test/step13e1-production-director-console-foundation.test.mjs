@@ -153,7 +153,8 @@ test("Production console foundation exposes the bounded navigation and hides leg
   ]) assert.doesNotMatch(consoleSource, new RegExp(hidden), hidden);
   assert.match(consoleSource, /data-production-console-slot="handicaps"[\s\S]*WeeklyHandicapPanel/);
   assert.match(consoleSource, /section === "players-access"[\s\S]*ProductionPlayersAccessPanel/);
-  assert.match(page, /production\.production && !production\.enabled[\s\S]*allowBootstrap: !production\.production[\s\S]*ProductionDirectorConsole[\s\S]*DirectorDashboard/);
+  assert.match(page, /production\.production && !production\.enabled[\s\S]*allowBootstrap: !production\.production[\s\S]*ProductionDirectorConsole[\s\S]*CanonicalDirectorConsole/);
+  assert.doesNotMatch(page, /DirectorDashboard/);
   assert.match(productionRoute, /authorization\.source !== "production-director-entitlement"/);
   assert.match(productionRoute, /DIRECTOR_DATA_UNAVAILABLE/);
   assert.match(legacyDashboard, /DirectorOperationsHub/);

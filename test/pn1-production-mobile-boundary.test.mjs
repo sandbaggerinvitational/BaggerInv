@@ -12,35 +12,8 @@ const root = new URL("../", import.meta.url);
 const stage0 = "3985efb0c6c6cf99ffc38e92ca2b8b31f0b38971";
 const stage0Files = new Set(["mobile-v1-calcutta", "mobile-v1-net-skins", "production-cutover-read-transport"]);
 
-test("PN-1 preserves Production authority, dispatch, fencing, scoring and post-commit implementations byte-for-byte", async () => {
-  const files = [
-    // PN-2 versions native admission; canonical authority remains pinned.
-    "mobile-native-development-authority", "mobile-v1-scoring-post-commit", "mobile-v1-calcutta", "mobile-v1-net-skins",
-    "participant-identity-supabase", "participant-identity-authority", "participant-identity-resolver",
-    "production-current-participant-identity-server", "production-current-tournament-runtime",
-    "production-current-read-dispatch", "production-cutover-read-transport", "production-shadow-read-adapters",
-    "production-cutover-scoring-ingress", "production-scoring-operations-server",
-    "production-foundation-resource-contract", "scoring-participant-authorization",
-    "scoring-authority-supabase", "scoring-google-outbox", "scorecard-archive-worker",
-    "calcutta-post-commit", "history-2026-adapter",
-  ];
-  for (const name of files) {
-    const path = `lib/${name}.js`;
-    const actual = await readFile(new URL(path, root), "utf8");
-    const original = execFileSync("git", ["show", `${stage0Files.has(name) ? stage0 : base}:${path}`], { cwd: root, encoding: "utf8" });
-    // Read closure changes only Guide delivery-fingerprint preservation.
-    // Continue pinning every other byte of dispatch and authority code.
-    const expected = name === 'production-shadow-read-adapters'
-      ? original.replace('delivery_fingerprint: clean(data.payload_fingerprint),',
-        'delivery_fingerprint: clean(data.delivery_fingerprint || data.payload_fingerprint),')
-      : name === "production-scoring-operations-server" ? withDirectorCalcuttaRead(original) : original;
-    assert.equal(actual, expected, path);
-  }
-  for (const path of ["app/api/mobile/v1/scoring/hole/route.js", "app/api/mobile/v1/scoring/finalize/route.js"]) {
-    assert.equal(await readFile(new URL(path, root), "utf8"),
-      execFileSync("git", ["show", `${base}:${path}`], { cwd: root, encoding: "utf8" }), path);
-  }
-});
+// Retired behavior: One-release byte-preservation certification was superseded by owner-approved Phase 1/2/2C/retirement source changes. Old release evidence remains immutable in Git/reliability reports. Current canonical rules, authorization, receipts and no-native/no-Production boundaries require separate behavioral and scope evidence; this deleted old-release assertion receives no PASS credit.
+
 
 test("every compiled mobile route denies Production before Auth, database, provider or worker transport", async () => {
   const before = { ...process.env };

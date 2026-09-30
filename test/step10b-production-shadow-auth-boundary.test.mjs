@@ -276,8 +276,8 @@ test("Production-shadow candidate blocks explicit Production archive reads befor
   });
   assert.equal(child.status, 0, child.stderr);
   const result = JSON.parse(child.stdout);
-  assert.equal(result.code, "PRODUCTION_SHADOW_CANDIDATE_GOOGLE_READ_FORBIDDEN");
-  assert.equal(result.error, "Google data access is unavailable on the Production-shadow candidate.");
+  assert.equal(result.code, "GOOGLE_RUNTIME_RETIRED");
+  assert.equal(result.error, "Google runtime delivery and live imports are retired. Use canonical tournament authority.");
   assert.equal(result.fetchCalls, 0);
 });
 
@@ -303,7 +303,7 @@ test("malformed requested Production-shadow candidate also blocks explicit Googl
   });
   assert.equal(child.status, 0, child.stderr);
   const result = JSON.parse(child.stdout);
-  assert.equal(result.code, "PRODUCTION_SHADOW_CANDIDATE_GOOGLE_READ_FORBIDDEN");
+  assert.equal(result.code, "GOOGLE_RUNTIME_RETIRED");
   assert.equal(result.fetchCalls, 0);
 });
 
@@ -320,7 +320,7 @@ test("live Production fails closed when candidate variables explicitly request S
   assert.equal(live.productionShadowCandidate, false);
   assert.equal(live.productionBlocked, true);
   assert.equal(live.reason, "activation-disabled");
-  assert.equal(participantIdentityAuthorityEnvironment({ VERCEL_ENV: "production" }).resolved, "passport");
+  assert.equal(participantIdentityAuthorityEnvironment({ VERCEL_ENV: "production" }).resolved, "unavailable");
 });
 
 test("Production-shadow identity RPCs are allowlisted and Preview administration remains separate", () => {

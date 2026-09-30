@@ -21,25 +21,16 @@ test("signed Passport sessions retain the Director actor while selecting a Previ
   assert.equal(isTournamentDirectorActor({ actor: { role: "DIRECTOR" }, player: { role: "PLAYER" } }), true);
 });
 
-test("impersonation API and QA Tools are strictly Preview gated", async () => {
-  const [route, dashboard, directorRoute] = await Promise.all([
-    source("app/api/director/impersonation/route.js"),
-    source("app/admin/director/DirectorDashboard.js"),
-    source("app/api/director/route.js"),
-  ]);
-  assert.match(route, /process\.env\.VERCEL_ENV !== "preview"/);
-  assert.match(route, /authorizePreviewDirector/);
-  assert.match(route, /playerPassportCookie\([\s\S]*sessionToken/);
-  assert.match(route, /export async function DELETE/);
-  assert.match(directorRoute, /qaTools: preview\.preview/);
-  assert.match(dashboard, /QA Tools/);
-  assert.match(dashboard, /Preview As/);
-  assert.match(dashboard, /Preview the app as the selected golfer\./);
-  assert.match(dashboard, /onChange=\{\(event\) => \{ const playerId = event\.target\.value; setTestPlayerId\(playerId\); previewAsPlayer\(playerId\); \}\}/);
-  assert.match(dashboard, /window\.dispatchEvent\(new Event\("player-passport-changed"\)\)[\s\S]*router\.push\("\/home"\)/);
-  assert.doesNotMatch(dashboard, /Change Player/);
-  assert.match(dashboard, /DirectorOperationsHub/);
-  assert.match(dashboard, /title="Preview Tools"/);
+// Proof layer: UNIT/SOURCE. Actual PostgreSQL capability proof is indexed in CAPABILITY-GAPS.md.
+test("SOURCE maintenance impersonation remains Preview-only and is not a required Director capability", async () => {
+  const route=await source("app/api/director/impersonation/route.js");
+  assert.match(route,/process\.env\.VERCEL_ENV !== "preview"/);assert.match(route,/authorizePreviewDirector/);
+  assert.match(route,/beginPreviewIdentityImpersonation/);assert.match(route,/endPreviewIdentityImpersonation/);
+  assert.match(route,/playerPassportCookie\([\s\S]*sessionToken/);
+  const page=await source("app/admin/director/page.js");const current=await source("app/admin/director/CanonicalDirectorConsole.js");
+  assert.doesNotMatch(page,/DirectorDashboard/);assert.doesNotMatch(current,/impersonation|Preview As|QA Tools/);
+  // The old embedded QA selector is intentionally not recreated. Lease security
+  // is still tested by preview-director-entitlement and identity suites.
 });
 
 test("participant shell exposes one persistent Preview identity with explicit controls", async () => {

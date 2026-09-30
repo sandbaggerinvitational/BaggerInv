@@ -57,12 +57,7 @@ test("Production Admin CMS schedule authority is retired without changing isolat
   assert.equal(diagnosis.productionGoogleAuthoringRetired, true);
   assert.equal(diagnosis.execution, "GOOGLE_DIRECTOR_AUTHORING");
 
-  const preview = assertDirectorMutationAuthority({
-    surface: "admin-cms",
-    action: "schedule",
-    env: { VERCEL_ENV: "preview", SCORING_MUTATION_SOURCE: "GOOGLE" },
-  });
-  assert.equal(preview.execution, "GOOGLE_DIRECTOR_AUTHORING");
+  assert.throws(()=>assertDirectorMutationAuthority({surface:"admin-cms",action:"schedule",env:{VERCEL_ENV:"preview",SCORING_MUTATION_SOURCE:"GOOGLE"}}),{code:"SCORING_AUTHORITY_UNAVAILABLE"});
 });
 
 test("the privileged Production Google authoring boundary rejects every retired Guide operation before callback dispatch", () => {

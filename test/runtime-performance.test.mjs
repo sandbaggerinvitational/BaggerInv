@@ -105,20 +105,4 @@ test("published projections use a semi-static cache refreshed by publish and res
   assert.match(workbook, /method !== "GET"[\s\S]*invalidateNormalizedSheetCache\(affectedSheets\.length \? affectedSheets : undefined\)/);
 });
 
-test("request-scoped workbook access reuses sheets and workbook metadata", async () => {
-  const [reader, workbook, director, publication] = await Promise.all([
-    source("lib/google-sheets-server-read.js"),
-    source("lib/google-sheets-write.js"),
-    source("app/api/director/route.js"),
-    source("app/api/odds/publish/route.js"),
-  ]);
-  assert.match(reader, /withNormalizedReadDiagnostics/);
-  assert.match(reader, /new AsyncLocalStorage\(\)/);
-  assert.match(reader, /duplicateWorksheetReads/);
-  assert.match(workbook, /_sheetSnapshots: new Map\(\)/);
-  assert.match(workbook, /_workbookMetadata/);
-  assert.match(workbook, /missing\.forEach\(\(tab\) => query\.append\("ranges"/);
-  assert.match(workbook, /readWorkbookMetadata\(\)/);
-  assert.match(director, /withWorkbookWriteDiagnostics\("director-dashboard"/);
-  assert.match(publication, /withWorkbookWriteDiagnostics\("championship-projection-publication"/);
-});
+// Retired behavior: Director GET no longer constructs workbook cache diagnostics; canonical read latency/cache behavior needs its own evidence rather than an old Google-request count. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.

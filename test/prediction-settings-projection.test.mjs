@@ -26,7 +26,7 @@ const previewEnv = {
   VERCEL_ENV: "preview",
   GOOGLE_SHEETS_ID: "preview-workbook",
   PREVIEW_SCORING_SHEET_ID: "preview-workbook",
-  SUPABASE_SCORING_MIRROR_URL: "https://example.supabase.co",
+  SUPABASE_SCORING_MIRROR_URL: "https://idgigvjjqkfbqjeredpb.supabase.co",
   SUPABASE_SCORING_MIRROR_SECRET_KEY: "secret",
 };
 
@@ -200,9 +200,9 @@ test("Preview source boundary is reversible, Production-hard-blocked, and never 
   const googleGate = predictionSettingsEnvironment({ ...previewEnv, PREDICTION_SETTINGS_READ_SOURCE: "google" });
   const productionGate = predictionSettingsEnvironment({ ...previewEnv, VERCEL_ENV: "production", PREDICTION_SETTINGS_READ_SOURCE: "supabase" });
   assert.equal(supabaseGate.source, "supabase");
-  assert.equal(googleGate.source, "google");
-  assert.equal(productionGate.source, "google");
-  assert.equal(productionGate.productionHardBlock, true);
+  assert.equal(googleGate.source, "unavailable");
+  assert.equal(productionGate.source, "unavailable");
+  assert.equal(productionGate.blocked, true);
 
   let googleCalls = 0;
   let supabaseCalls = 0;
@@ -221,7 +221,7 @@ test("Preview source boundary is reversible, Production-hard-blocked, and never 
   assert.equal(googleCalls, 0);
 });
 
-test("projection migration reuses Odds configuration revisions and the route reads one Google tab", async () => {
+test("projection migration reuses canonical Odds revisions; historical import remains maintenance-only", async () => {
   const [migration, sharedRpcMigration, route, projectionService, sourceGate, warRoom, optimizer, intelligence, oddsEngine] = await Promise.all([
     readFile(new URL("../supabase/migrations/202608210011_preview_prediction_settings_projection.sql", import.meta.url), "utf8"),
     readFile(new URL("../supabase/migrations/202608210012_preview_prediction_settings_shared_odds_rpc.sql", import.meta.url), "utf8"),
@@ -259,6 +259,6 @@ test("projection migration reuses Odds configuration revisions and the route rea
   assert.doesNotMatch(route, /simulateTournamentOdds/);
   assert.match(route, /Tournament Director access is required/);
   assert.match(sourceGate, /PREDICTION_SETTINGS_READ_SOURCE/);
-  assert.match(sourceGate, /productionHardBlock/);
+  assert.match(sourceGate, /canonicalReadEnvironment/);
   for (const consumer of [warRoom, optimizer, intelligence, oddsEngine]) assert.doesNotMatch(consumer, /prediction-settings-source|loadPredictionSettingsFromSelectedSource/);
 });

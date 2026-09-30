@@ -199,16 +199,10 @@ test("snapshot parity ignores mutable Live Matches Updated At but detects scorin
   assert.deepEqual(reconcileCanonicalScoringAuthority(imported, changed).snapshotDivergence, ["M1"]);
 });
 
-test("authority defaults Production to Google but explicit ineligible Supabase fails closed", () => {
-  assert.equal(scoringAuthority({}), "google");
-  const preview = { VERCEL_ENV: "preview", SCORING_AUTHORITY: "supabase", PREVIEW_SCORING_SHEET_ID: "preview", GOOGLE_SHEETS_SPREADSHEET_ID: "preview",
-    GOOGLE_SHEETS_ID: "preview", SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "secret" };
-  assert.equal(scoringAuthority(preview), "supabase");
-  assert.equal(scoringAuthorityEnvironment(preview).resolved, "supabase");
-  assert.equal(scoringAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "unavailable");
-  assert.equal(scoringAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).blocked, true);
-  assert.equal(scoringAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).productionBlocked, true);
-  assert.equal(scoringAuthorityEnvironment({ VERCEL_ENV: "production" }).resolved, "google");
+test("Canonical scoring requires exact authority and never defaults to Google", async () => {
+const {canonicalReadFixture:preview}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+assert.throws(()=>scoringAuthority({}),{code:'SCORING_AUTHORITY_UNAVAILABLE'});assert.equal(scoringAuthority(preview),'supabase');
+for(const env of [{...preview,VERCEL_ENV:'production'},{...preview,SCORING_AUTHORITY:'google'},{...preview,SUPABASE_SCORING_MIRROR_SECRET_KEY:''}])assert.throws(()=>scoringAuthority(env),{code:'SCORING_AUTHORITY_UNAVAILABLE'});
 });
 
 test("signed scoring session carries Player Passport identity and tournament scope without exposing it client-side", () => {
@@ -468,60 +462,14 @@ test("canonical migrations enforce RLS, locking, revisions, outbox ordering, cut
   assert.match(mirrorOperations, /revoke all on function %s from public, anon, authenticated/i);
 });
 
-test("Director mirror reconciliation inspects and delivers exactly one confirmed reopen event", async () => {
-  const route = await readFile(new URL("../app/api/director/scoring-authority/route.js", import.meta.url), "utf8");
-  const dashboard = await readFile(new URL("../app/admin/director/DirectorDashboard.js", import.meta.url), "utf8");
-  const worker = await readFile(new URL("../lib/scoring-google-outbox.js", import.meta.url), "utf8");
-  assert.match(route, /action === "mirror-diagnostics"/);
-  assert.match(route, /action === "deliver-mirror-event"/);
-  assert.match(route, /confirmDelivery !== true/);
-  assert.match(route, /healthyCommittedSupabaseEpoch/);
-  assert.match(route, /expectedEventId: eventId/);
-  assert.match(route, /includeMatchIds: \[expectedMatchId\]/);
-  assert.match(route, /canonicalAfter: canonicalAfter\.payload\.data/);
-  assert.match(route, /tournamentLiveViewAfter: liveViewAfter\.payload/);
-  assert.match(dashboard, /Inspect Mirror Outbox/);
-  assert.match(dashboard, /Deliver Selected Mirror Event/);
-  assert.match(worker, /LEGACY_REOPEN_CONFLICT/);
-  assert.match(worker, /ALREADY_DELIVERED/);
-  assert.match(worker, /normalizeLegacyReopenedMatch/);
-});
+// Retired behavior: Director's one-event Google mirror reconciliation is retired; canonical score/reopen receipts and internal derived delivery remain required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-test("Preview Live Matches migration inserts exactly one canonical column and verifies preservation", async () => {
-  const writer = await readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8");
-  const route = await readFile(new URL("../app/api/director/scoring-authority/route.js", import.meta.url), "utf8");
-  const dashboard = await readFile(new URL("../app/admin/director/DirectorDashboard.js", import.meta.url), "utf8");
-  const migration = writer.match(/export async function migratePreviewLiveMatchScoringLock[\s\S]+?\n}\n/)?.[0] || "";
-  assert.equal((migration.match(/insertDimension/g) || []).length, 1);
-  assert.match(migration, /endIndex: targetIndex \+ 1/);
-  assert.match(migration, /boolValue: \/\^final\$\/i/);
-  assert.match(migration, /Live Matches schema migration is Preview-only/);
-  for (const field of ["headers", "rowCount", "matchIds", "existingValues", "formulaTopology", "holeScores", "archivedMatches"]) {
-    assert.match(migration, new RegExp(`${field}:`));
-  }
-  assert.match(route, /action === "migrate-preview-scoring-lock-schema"/);
-  assert.match(route, /pending_outbox/);
-  assert.match(route, /matchRevision\) !== 20|match_revision\) !== 20/);
-  assert.match(route, /backfillCanonicalFinalMatchLocks/);
-  assert.match(route, /repairFinalizationParity\(actorId, "2026-R3-4"\)/);
-  assert.match(dashboard, /Migrate Preview Scoring Lock/);
-});
 
-test("Preview Director repair is gated, audited, and never re-finalizes or changes holes", async () => {
-  const route = await readFile(new URL("../app/api/director/scoring-authority/route.js", import.meta.url), "utf8");
-  const writer = await readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8");
-  const dashboard = await readFile(new URL("../app/admin/director/DirectorDashboard.js", import.meta.url), "utf8");
-  assert.match(route, /action === "repair-finalization-parity"/);
-  assert.match(route, /expected_match_revision: number\(match\.match_revision\)/);
-  assert.match(route, /repairFinalizedLiveMatchParity/);
-  assert.match(route, /completeCanonicalFinalizationParityRepair/);
-  assert.match(writer, /Only a finalized Preview match can be parity-repaired/);
-  assert.match(writer, /"Scoring Locked": "TRUE"/);
-  assert.match(writer, /"Access Active": "FALSE"/);
-  assert.match(writer, /Finalized Preview lifecycle parity did not verify from Google/);
-  assert.doesNotMatch(writer.match(/export async function repairFinalizedLiveMatchParity[\s\S]+?\n}\n/)?.[0] || "", /Live Hole Scores/);
-  assert.match(dashboard, /Repair Selected Final Parity/);
-});
+// Retired behavior: Live Matches Sheet column migration is historical maintenance, no longer a Director runtime action; preserve historical import source separately. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
+
+// Retired behavior: Google finalization parity repair path is retired; canonical Finalization and bounded recovery cannot be waived. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
 
 test("participant scoring routes preserve the API and delegate persistence server-side", async () => {
   const current = await readFile(new URL("../app/api/scoring/current/route.js", import.meta.url), "utf8");
@@ -529,33 +477,12 @@ test("participant scoring routes preserve the API and delegate persistence serve
   for (const source of [current, match]) {
     assert.match(source, /persistParticipantScore/);
     assert.match(source, /measured\.authority === "supabase"/);
-    assert.match(source, /drainGoogleOutbox/);
+    assert.doesNotMatch(source, /drainGoogleOutbox/);
     assert.match(source, /NextResponse\.json\(\{\s*result: participantResult/);
   }
 });
 
-test("Preview Director exposes only the explicit prepared cutover and rollback controls", async () => {
-  const dashboard = await readFile(new URL("../app/admin/director/DirectorDashboard.js", import.meta.url), "utf8");
-  const route = await readFile(new URL("../app/api/director/scoring-authority/route.js", import.meta.url), "utf8");
-  const adapter = await readFile(new URL("../lib/scoring-persistence-adapter.js", import.meta.url), "utf8");
-  assert.match(dashboard, /Pause \+ Prepare Cutover/);
-  assert.match(dashboard, /Commit Cutover Epoch/);
-  assert.match(dashboard, /Pause \+ Prepare Rollback/);
-  assert.match(dashboard, /Drain \+ Commit Rollback/);
-  assert.match(route, /requireCutoverSnapshot/);
-  assert.match(route, /action === "prepare-cutover"/);
-  assert.match(route, /action === "commit-cutover"/);
-  assert.match(adapter, /beginScoringIngress/);
-  assert.match(adapter, /completeScoringIngress/);
-});
+// Retired behavior: Prepared Google cutover/rollback Director controls are retired; supported canonical configuration and frozen authority remain required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-test("Phase 2 Director diagnostics retain safe PostgREST errors without exposing credentials", async () => {
-  const shadow = await readFile(new URL("../lib/scoring-shadow.js", import.meta.url), "utf8");
-  const route = await readFile(new URL("../app/api/director/scoring-authority/route.js", import.meta.url), "utf8");
-  assert.match(shadow, /message: payload\?\.message/);
-  assert.match(route, /diagnostics\.message \|\| error\?\.message/);
-  assert.doesNotMatch(route, /SUPABASE_SCORING_MIRROR_SECRET_KEY/);
-  assert.match(route, /tournament_year: number\(base\.tournament\.tournament_year\) \+ 1000/);
-  assert.match(route, /phase2-rehearsal-cleanup/);
-  assert.match(route, /const cleanup = await cleanupRehearsal\(setup, actorId\)/);
-});
+
+// Retired behavior: The removed Google diagnostic endpoint no longer forwards PostgREST diagnostics; keep secret-safe typed errors on current canonical routes as independent security coverage. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.

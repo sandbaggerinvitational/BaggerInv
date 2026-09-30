@@ -172,12 +172,10 @@ function preTournamentFixture() {
   return view;
 }
 
-test("Leaderboards core source is Preview-only and Production fails closed", () => {
-  assert.equal(leaderboardsCoreReadEnvironment(preview).resolved, "supabase");
-  assert.equal(leaderboardsCoreReadEnvironment({ ...preview, VERCEL_ENV: "production",
-    GOOGLE_SHEETS_ID: PRODUCTION_SPREADSHEET_ID }).resolved, "google");
-  assert.equal(leaderboardsCoreReadEnvironment({ ...preview, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" }).blocked, true);
-  assert.throws(() => requireLeaderboardsCoreReadSource({ ...preview, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" }), /unavailable/);
+test("LEADERBOARDS_CORE_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {leaderboardsCoreReadEnvironment}=await import('../lib/leaderboards-core-read-source.js');
+  assertCanonicalReadRetirementContract(leaderboardsCoreReadEnvironment,"LEADERBOARDS_CORE_READ_SOURCE");
 });
 
 test("service-only RPC returns canonical inputs without recreating standings in SQL", async () => {
@@ -438,7 +436,7 @@ test("Preview page and API use Supabase core with no Google fallback or Passport
   assert.match(dashboard, /secondaryReadUrl/);
   assert.match(dashboard, /tab === "skins"/);
   assert.match(dashboard, /if \(!supabaseCore\) \{\s*fetch\("\/api\/player-passport\/session"/);
-  assert.match(director, /leaderboards-core-parity/);
+  // Retired Google parity endpoint is not a participant-read requirement; canonical API/privacy assertions remain.
 });
 
 test("revisioned display cache is participant-scoped and cannot authorize scoring", () => {

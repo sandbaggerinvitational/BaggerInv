@@ -6,7 +6,7 @@ import {
   productionDirectorEntitlementEnvironment,
 } from "../../../lib/preview-director-authorization.js";
 import { productionDirectorSection } from "../../../lib/production-director-console.js";
-import DirectorDashboard from "./DirectorDashboard.js";
+import CanonicalDirectorConsole from "./CanonicalDirectorConsole.js";
 import ProductionDirectorConsole from "./ProductionDirectorConsole.js";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export default async function DirectorPage({ searchParams }) {
     cookieStore: store,
     allowBootstrap: !production.production,
   });
-  if (["inactive", "forbidden"].includes(result.status)) redirect("/");
+  if (result.status === "inactive" || result.status === "forbidden") redirect("/");
   if (production.production) {
     const query = await searchParams;
     return <main><Header /><ProductionDirectorConsole
@@ -28,5 +28,5 @@ export default async function DirectorPage({ searchParams }) {
       initialSection={productionDirectorSection(query?.section)}
     /></main>;
   }
-  return <main><Header /><DirectorDashboard directorName={result.identity?.actor?.name || "Tournament Director"} /></main>;
+  return <main><Header /><CanonicalDirectorConsole directorName={result.identity?.actor?.name || "Tournament Director"} /></main>;
 }

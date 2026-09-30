@@ -141,13 +141,13 @@ test("Step 5 Google to Supabase rollback is explicit, Preview-only, and year-iso
   const sequence = ["google", "supabase", "google", "supabase"].map((source) =>
     history2026ReadEnvironment({ ...previewEnv, HISTORY_2026_READ_SOURCE: source }).resolved
   );
-  assert.deepEqual(sequence, ["google", "supabase", "google", "supabase"]);
+  assert.deepEqual(sequence, ["unavailable", "supabase", "unavailable", "supabase"]);
 
   const production = history2026ReadEnvironment({
     ...previewEnv,
     VERCEL_ENV: "production",
     HISTORY_2026_READ_SOURCE: "supabase",
   });
-  assert.equal(production.resolved, "google");
+  assert.equal(production.resolved, "unavailable");
   assert.equal(production.productionBlocked, true);
 });

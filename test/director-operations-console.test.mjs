@@ -17,18 +17,17 @@ test("Mission Control exposes one searchable collapsible operations console", ()
   assert.match(consoleSource, /dynamic\(\(\) => import\("\.\/DirectorOperationEditors\.js"\)/);
 });
 
-test("new operations reuse the verified Director transaction and read-back pipeline", () => {
-  const route = source("app/api/director/route.js");
-  const dashboard = source("app/admin/director/DirectorDashboard.js");
-  const editors = source("app/admin/director/DirectorOperationEditors.js");
-  for (const action of ["match-management", "round-pairings", "calcutta-management", "net-skins-eligibility"]) {
-    assert.match(route, new RegExp(action));
-    assert.match(editors, new RegExp(action));
-  }
-  assert.match(route, /const authorization = await authorize\(request\)/);
-  assert.match(route, /verifyDirectorReadBack/);
-  assert.match(route, /invalidateTournamentDataCache/);
-  assert.match(dashboard, /const response = await directorFetch\("\/api\/director"/);
+// Proof layer: UNIT/SOURCE. Actual PostgreSQL capability proof is indexed in CAPABILITY-GAPS.md.
+test("UNIT canonical Director operations preserve revision and operation identity", async () => {
+  const {buildTournamentSetupMutation}=await import("../lib/production-tournament-setup-contract.js");
+  const request={expectedRevision:4,operationRequestId:"11111111-1111-4111-8111-111111111111",matchId:"M1"};
+  const first=buildTournamentSetupMutation("prepare-scoring-context",request);
+  assert.deepEqual(buildTournamentSetupMutation("prepare-scoring-context",request),first);
+  assert.equal(first.operation_request_id,request.operationRequestId);assert.equal(first.expected_revision,4);
+  assert.throws(()=>buildTournamentSetupMutation("prepare-scoring-context",{...request,operationRequestId:""}),{code:"TOURNAMENT_SETUP_OPERATION_REQUEST_ID_REQUIRED"});
+  const server=source("lib/production-tournament-setup-server.js");
+  assert.match(server,/read_production_tournament_setup_v1/);assert.match(server,/operation_request_id/);
+  assert.doesNotMatch(server,/google-sheets-write|readWorkbook/);
 });
 
 test("operational editors mount on demand and close only after verified success", () => {
@@ -43,25 +42,18 @@ test("operational editors mount on demand and close only after verified success"
   assert.match(css, /min-height:44px/);
 });
 
-test("Round Pairings uses the active-year team roster and one verified batch mutation", () => {
-  const consoleSource = source("app/admin/director/DirectorOperationsConsole.js");
-  const editors = source("app/admin/director/DirectorOperationEditors.js");
-  const writes = source("lib/google-sheets-write.js");
-  const route = source("app/api/director/route.js");
-  assert.match(consoleSource, /Round Pairings/);
-  assert.match(consoleSource, /Unsaved Pairing Changes/);
-  assert.match(editors, /pairingSlotsForFormat/);
-  assert.match(editors, /player\.side\) === side/);
-  assert.match(editors, /Save Round Pairings/);
-  assert.match(editors, /const updates = changedMatches\.map[\s\S]*roundPairingDraft/);
-  assert.match(writes, /const rosterRows = records\("Handicaps"\)/);
-  assert.match(writes, /allPlayers\.filter\(\(player\) => rosterById\.has\(player\.id\)\)/);
-  assert.match(writes, /record\["Team Names"\]/);
-  assert.match(writes, /updateDirectorRoundPairings/);
-  assert.match(writes, /writeSheetFieldBatch\("Live Matches"/);
-  assert.match(writes, /action: "Round Pairings Updated"/);
-  assert.match(route, /action === "round-pairings"/);
-  assert.match(route, /verifyActionReadBack/);
+// Proof layer: UNIT/SOURCE. Actual PostgreSQL capability proof is indexed in CAPABILITY-GAPS.md.
+test("UNIT canonical round pairings preserve format slots and one revision-bound batch", async () => {
+  const {buildTournamentSetupMutation}=await import("../lib/production-tournament-setup-contract.js");
+  const participants=[{playerId:"P1",teamSide:1,playerSlot:1},{playerId:"P2",teamSide:2,playerSlot:1}];
+  const request={expectedRevision:8,operationRequestId:"11111111-1111-4111-8111-111111111111",
+    expectedHandicapRevisionId:"22222222-2222-4222-8222-222222222222",roundNumber:3,matches:[{matchId:"M1",format:"SI",participants}]};
+  const result=buildTournamentSetupMutation("replace-round-pairings",request);
+  assert.equal(result.operation,"REPLACE_ROUND_PAIRINGS");assert.equal(result.round_number,3);
+  assert.equal(result.expected_handicap_revision_id,request.expectedHandicapRevisionId);
+  assert.deepEqual(result.matches[0].participants,[{player_id:"P1",team_side:1,player_slot:1},{player_id:"P2",team_side:2,player_slot:1}]);
+  assert.throws(()=>buildTournamentSetupMutation("replace-round-pairings",{...request,matches:[...request.matches,...request.matches]}),{code:"TOURNAMENT_SETUP_ROUND_MATCH_SET_INVALID"});
+  assert.throws(()=>buildTournamentSetupMutation("replace-round-pairings",{...request,matches:[{...request.matches[0],participants:[participants[0]]}]}),{code:"TOURNAMENT_SETUP_PAIRING_COUNT_INVALID"});
 });
 
 test("Round Pairings renders every format as an always-editable lineup sheet", () => {
@@ -102,84 +94,42 @@ test("Starting Hole is capability-gated by both the protected map and active she
   assert.doesNotMatch(editors, /Starting Hole is not writable|capabilityNote/);
 });
 
-test("Net Skins eligibility is edited, batch-written, and verified across configured rounds", () => {
-  const editors = source("app/admin/director/DirectorOperationEditors.js");
-  const writes = source("lib/google-sheets-write.js");
-  const route = source("app/api/director/route.js");
-  assert.match(editors, /skinsBulkEditor/);
-  assert.match(editors, /Round \{item\.round\} • \{item\.format\}/);
-  assert.match(editors, /role="switch"/);
-  assert.match(editors, /Unsaved Changes/);
-  assert.match(editors, /data-highlighted=\{highlightedRound === item\.round/);
-  assert.match(editors, /aria-label=\{`Unsaved Changes\. \$\{pending\.length\} update/);
-  assert.doesNotMatch(editors, /<span>\{eligible \? "Eligible" : "Ineligible"\}<\/span>/);
-  assert.match(editors, /Save Changes/);
-  assert.match(editors, /updates: pending\.map/);
-  assert.match(writes, /fields: \["Eligible"\]/);
-  assert.match(writes, /replaceScopedRuntimeRecordSets/);
-  assert.match(writes, /action: "Bulk Eligibility Updated"/);
-  assert.match(route, /Array\.isArray\(input\.updates\)/);
-  assert.match(route, /updates\.every/);
+// Proof layer: UNIT/SOURCE. Actual PostgreSQL capability proof is indexed in CAPABILITY-GAPS.md.
+test("UNIT canonical Net Skins entries remain round-scoped and binding-aware", async () => {
+  const {entryDraft,entrySaveRequest}=await import("../lib/net-skins-entry-workspace.js");
+  const round={roundNumber:2,revision:5,fieldFingerprint:"a".repeat(64),configured:true,
+    entrants:[{key:"PAIR1",bindingFingerprint:"b".repeat(64),entered:true},{key:"PAIR2",bindingFingerprint:"c".repeat(64),entered:false}]};
+  const draft=entryDraft(round);draft.entries[1].entered=true;
+  const request=entrySaveRequest(round,draft,"same-operation");
+  assert.equal(request.roundNumber,2);assert.equal(request.expectedRevision,5);assert.equal(request.fieldFingerprint,round.fieldFingerprint);
+  assert.equal(request.operationRequestId,"same-operation");assert.equal(request.entries[1].bindingFingerprint,"c".repeat(64));
+  assert.equal(round.entrants[1].entered,false,"request assembly must not mutate authority");
+  assert.deepEqual(entrySaveRequest(round,{...draft,configured:false},"other-operation").entries.map(e=>e.entered),[false,false]);
+  const route=source("app/api/director/net-skins-entries/route.js");assert.match(route,/productionNetSkinsEntries/);assert.doesNotMatch(route,/google-sheets-write/);
 });
 
-test("Calcutta purchase and ownership are edited and verified as one transaction", () => {
-  const editors = source("app/admin/director/DirectorOperationEditors.js");
-  const writes = source("lib/google-sheets-write.js");
-  const route = source("app/api/director/route.js");
-  assert.match(editors, /\+ Add Another Owner/);
-  assert.match(editors, /Ownership Total/);
-  assert.match(editors, /Ready to Save/);
-  assert.match(editors, /Need \$\{100 - total\}% more/);
-  assert.match(editors, /Reduce ownership by \$\{total - 100\}%/);
-  assert.match(editors, /ownerSelectRefs\.current\[pendingOwnerFocus\.current\]\?\.focus/);
-  assert.match(editors, /ownershipPercentInput/);
-  assert.match(editors, /aria-label=\{`Remove owner \$\{index \+ 1\}`\}/);
-  assert.match(editors, /Ownership percentages must total exactly 100%/);
-  assert.match(editors, /Each owner may only appear once/);
-  assert.match(editors, /operation: "calcutta-session"/);
-  assert.match(editors, /purchasePrice: Number\(price\), owners:/);
-  assert.doesNotMatch(editors, /operation: "purchase"/);
-  assert.match(editors, /Purchase Price modified/);
-  assert.match(editors, /Ownership updated/);
-  assert.match(editors, /owner change/);
-  assert.match(editors, /Save Changes/);
-  assert.match(writes, /input\.operation === "calcutta-session"/);
-  assert.match(writes, /replaceScopedRuntimeRecordSets/);
-  assert.match(writes, /tab: "Calcutta Purchases", sheet: purchaseSheet, fields: \["Purchase Price"\]/);
-  assert.match(writes, /tab: "Calcutta Ownership", sheet: ownershipSheet/);
-  assert.match(writes, /belongsToScope: \(record\) => String\(record\.Year\) === year && String\(record\["Golfer Player ID"\]\) === golferPlayerId/);
-  assert.match(route, /input\.operation === "calcutta-session"/);
-  assert.match(route, /purchaseVerified/);
-  assert.match(route, /actual\.length === expected\.length/);
+// Proof layer: UNIT/SOURCE. Actual PostgreSQL capability proof is indexed in CAPABILITY-GAPS.md.
+test("UNIT canonical Calcutta entry preserves exact price and complete ownership together", async () => {
+  const {entryPayload,mergeEntry}=await import("../lib/calcutta-management-model.js");
+  const players=["P1","P2","P3","P4"].map(player_id=>({player_id}));
+  const entry={playerId:"P1",purchasePrice:"125.25",owners:[{buyerId:"P2",percentage:"60"},{buyerId:"P3",percentage:"40"}]};
+  const payload=entryPayload(entry,players);
+  assert.equal(payload.purchasePrice,"125.25");assert.deepEqual(payload.owners,[{buyerId:"P2",ownershipFraction:"0.6"},{buyerId:"P3",ownershipFraction:"0.4"}]);
+  assert.throws(()=>entryPayload({...entry,owners:[entry.owners[0]]},players),/exactly 100%/);
+  assert.throws(()=>entryPayload({...entry,owners:[entry.owners[0],entry.owners[0]]},players),/only once/);
+  const merged=mergeEntry({purchases:[{player_id:"P4",purchase_price:"50"}],ownership:[{player_id:"P4",owner_player_id:"P2",ownership_fraction:"1"}]},payload);
+  assert.equal(merged.purchases.length,2);assert.equal(merged.ownership.length,3);assert.equal(merged.purchases.find(p=>p.player_id==="P4").purchase_price,"50");
+  const server=source("lib/calcutta-management-server.js");assert.match(server,/replaceProductionCalcuttaV1AuctionFacts/);assert.match(server,/canonicalEqual/);assert.doesNotMatch(server,/google-sheets-write/);
 });
 
-test("Match Management exposes contextual lifecycle controls through the verified Director pipeline", () => {
-  const editors = source("app/admin/director/DirectorOperationEditors.js");
-  const consoleSource = source("app/admin/director/DirectorOperationsConsole.js");
-  const dashboard = source("app/admin/director/DirectorDashboard.js");
-  const route = source("app/api/director/route.js");
-  const writes = source("lib/google-sheets-write.js");
-
-  assert.match(editors, /Match Controls/);
-  assert.match(editors, /Scoring Access/);
-  for (const label of ["Unlock Scoring", "Lock Scoring", "Mark Live", "Mark Final", "Reopen Match"]) assert.match(editors, new RegExp(label));
-  assert.match(editors, /Finalize Match\?/);
-  assert.match(editors, /Reopen Match\?/);
-  assert.match(editors, /final && operations\.capabilities\.matchStatus/);
-  assert.match(editors, /!final && operations\.capabilities\.scoringAccess && !unlocked/);
-  assert.match(editors, /!final && operations\.capabilities\.scoringAccess && unlocked/);
-  assert.match(consoleSource, /operate=\{operateMatch\}/);
-  assert.match(dashboard, /operateMatch=\{async/);
-
-  assert.match(route, /match-unlock-scoring[\s\S]*enableLiveMatchAccess/);
-  assert.match(route, /match-lock-scoring[\s\S]*disableLiveMatchAccess/);
-  assert.match(route, /match-mark-live[\s\S]*markLiveMatch\(input\.matchId, updatedBy\)/);
-  assert.match(route, /match-finalize[\s\S]*finalizeLiveMatch\(input\.matchId, \{\}, updatedBy\)/);
-  assert.match(route, /match-reopen[\s\S]*reopenLiveMatch\(input\.matchId, updatedBy\)/);
-  assert.match(route, /verifyDirectorReadBack/);
-  assert.match(route, /operationsAction = \[[^\]]*"match-finalize"[^\]]*"match-reopen"/);
-  assert.match(writes, /scoringUnlocked: truthy\(record\["Access Active"\]\) && !accessExpired\(record\) && !\/\^Final\$\/i\.test/);
-  assert.match(writes, /Only a Scheduled match can be marked Live\. Use Reopen Match for a Final result\./);
+// Proof layer: UNIT/SOURCE. Actual PostgreSQL capability proof is indexed in CAPABILITY-GAPS.md.
+test("UNIT canonical match controls honor complete scorecard, permissions, lock and Final state", async () => {
+  const {productionMatchControlActions:actions}=await import("../lib/production-director-console.js");
+  const complete={status:"LIVE",scoringLocked:false,permissionComplete:true,accessState:"ACTIVE",scorecardComplete:true,scoredHoles:18,unresolvedMutations:0,resultWinner:"Team 1"};
+  assert.ok(actions(complete).includes("finalize"));
+  for(const change of [{scoredHoles:17},{scorecardComplete:false},{unresolvedMutations:1},{scoringLocked:true},{resultWinner:""}])assert.equal(actions({...complete,...change}).includes("finalize"),false);
+  assert.deepEqual(actions({...complete,status:"FINAL",scoringLocked:true}),["reopen"]);
+  const route=source("app/api/director/route.js");assert.match(route,/persistDirectorMatchLifecycle/);assert.match(route,/receipt: lifecycle.result/);assert.doesNotMatch(route,/from .*google-sheets-write/);
 });
 
 test("match status and scoring access remain separate authoritative capabilities", () => {

@@ -19,12 +19,10 @@ const preview = {
   HOME_READ_SOURCE: "supabase",
 };
 
-test("Home Supabase source is Preview-only and Production fails closed to Google", () => {
-  assert.equal(homeReadEnvironment(preview).resolved, "supabase");
-  assert.equal(homeReadEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "google");
-  assert.equal(homeReadEnvironment({ ...preview, GOOGLE_SHEETS_ID: "production-workbook",
-    PREVIEW_SCORING_SHEET_ID: "preview-workbook" }).blocked, true);
-  assert.equal(homeReadEnvironment({ VERCEL_ENV: "preview" }).resolved, "google");
+test("HOME_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {homeReadEnvironment}=await import('../lib/home-read-source.js');
+  assertCanonicalReadRetirementContract(homeReadEnvironment,"HOME_READ_SOURCE");
 });
 
 test("Home presentation imports schedule and participant-only Net Skins display summaries", () => {

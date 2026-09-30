@@ -136,16 +136,10 @@ const projection = (read) => ({
   schedule: (read.liveData?.schedule || []).map((row) => row.title),
 });
 
-test("Homepage current source inherits the certified Tournament flag, supports an isolated override, and protects Production", () => {
-  assert.deepEqual(
-    { resolved: homepageCurrentReadEnvironment(preview).resolved, configuredBy: homepageCurrentReadEnvironment(preview).configuredBy },
-    { resolved: "supabase", configuredBy: "tournament-read-source" },
-  );
-  assert.equal(homepageCurrentReadEnvironment({ ...preview, HOMEPAGE_CURRENT_READ_SOURCE: "google" }).resolved, "google");
-  assert.equal(homepageCurrentReadEnvironment({ ...preview, HOMEPAGE_CURRENT_READ_SOURCE: "supabase" }).configuredBy, "homepage-override");
-  assert.equal(homepageCurrentReadEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "google");
-  assert.equal(homepageCurrentReadEnvironment({ ...preview, GOOGLE_SHEETS_ID: "production-workbook" }).blocked, true);
-  assert.equal(homepageCurrentReadEnvironment({ ...preview, HOMEPAGE_CURRENT_READ_SOURCE: "automatic" }).blocked, true);
+test("HOMEPAGE_CURRENT_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {homepageCurrentReadEnvironment}=await import('../lib/tournament-read-source.js');
+  assertCanonicalReadRetirementContract(homepageCurrentReadEnvironment,"HOMEPAGE_CURRENT_READ_SOURCE");
 });
 
 test("Homepage composes canonical live, current Guide content, the published Preview clock, storylines, Net Skins, and foundation contracts with zero Google live reads", async () => {
@@ -192,22 +186,13 @@ test("Selected Supabase Homepage source fails closed without a hidden Google fal
   assert.equal(counters.google || 0, 0);
 });
 
-test("Google to Supabase to Google to Supabase rollback preserves the consumer presentation contract", async () => {
-  const supabaseRead = await readHomepageCurrentTournament({ env: preview, dependencies: dependencies({}) });
-  const googleData = structuredClone(supabaseRead.liveData);
-  googleData.players = supabaseRead.foundation.roster.map((player) => ({ id: player.id, name: player.name,
-    slug: player.slug, photo: player.photo }));
-  const sequence = ["google", "supabase", "google", "supabase"];
-  const reads = [];
-  for (const selected of sequence) {
-    reads.push(await readHomepageCurrentTournament({
-      env: { ...preview, HOMEPAGE_CURRENT_READ_SOURCE: selected },
-      dependencies: { ...dependencies({}), readGoogleTournamentData: async () => structuredClone(googleData) },
-    }));
-  }
-  assert.deepEqual(reads.map((read) => read.diagnostics.source), sequence);
-  const normalized = reads.map((read) => ({ ...projection(read), source: undefined }));
-  for (const value of normalized.slice(1)) assert.deepEqual(value, normalized[0]);
+test("Canonical Homepage presentation is stable and rejects retired fallback before transport", async () => {
+const first=await readHomepageCurrentTournament({env:preview,dependencies:dependencies({})});
+const second=await readHomepageCurrentTournament({env:preview,dependencies:dependencies({})});
+assert.deepEqual(projection(first),projection(second));
+let googleCalls=0;
+for(const selected of ['google','typo'])await assert.rejects(()=>readHomepageCurrentTournament({env:{...preview,HOMEPAGE_CURRENT_READ_SOURCE:selected},dependencies:{...dependencies({}),readGoogleTournamentData:async()=>{googleCalls++;throw Error('retired fallback');}}}),{code:'HOMEPAGE_CURRENT_SUPABASE_CONFIGURATION_REQUIRED'});
+assert.equal(googleCalls,0);
 });
 
 test("Public Homepage keeps Google history isolated while its Supabase branch contains no live loader", async () => {

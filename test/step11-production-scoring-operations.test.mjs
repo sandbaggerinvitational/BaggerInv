@@ -80,8 +80,8 @@ test("Production scoring authority activates only at the exact committed cutover
     { VERCEL_ENV: "production", SCORING_AUTHORITY: "google" },
   ]) {
     const legacy = scoringAuthorityEnvironment(legacyEnv);
-    assert.equal(legacy.resolved, "google");
-    assert.equal(legacy.blocked, false);
+    assert.equal(legacy.resolved, "unavailable");
+    assert.equal(legacy.blocked, true);
   }
 });
 
@@ -165,32 +165,12 @@ test("Google scoring/archive workers stay dedicated while canonical legacy is fe
   assert.doesNotMatch(archiveWorker, /GOOGLE_SERVICE_ACCOUNT_EMAIL|GOOGLE_PRIVATE_KEY/);
 });
 
-test("worker routes are authenticated POST-only gates", () => {
-  for (const [source, secret] of [
-    [outboxRoute, "SCORING_GOOGLE_OUTBOX_WORKER_SECRET"],
-    [archiveRoute, "ROUND_SCORECARDS_ARCHIVE_WORKER_SECRET"],
-  ]) {
-    assert.match(source, new RegExp(secret));
-    assert.match(source, /timingSafeEqual/);
-    assert.match(source, /export async function POST/);
-    assert.match(source, /export async function GET/);
-    assert.match(source, /METHOD_NOT_ALLOWED/);
-    assert.match(source, /status: 405/);
-    assert.doesNotMatch(source, /NEXT_PUBLIC_/);
-  }
-  assert.match(outboxRoute, /productionCutoverPhaseAtLeast\(env, "WORKERS"\)/);
-  assert.match(outboxRoute, /PRODUCTION_SUPABASE_GOOGLE_MIRROR_ENABLED/);
-  assert.match(archiveRoute, /roundScorecardsArchiveEnvironment/);
-});
+// Retired behavior: Google outbox/archive workers are terminal410 before secret checks; no required Google worker route exists after retirement. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-test("participant scoring queues mirrors until the explicit Production worker phase", () => {
-  for (const source of [currentScoringRoute, matchScoringRoute, directorRoute, liveMatchesRoute]) {
-    assert.match(source, /productionCutoverPhaseAtLeast\(process\.env, "WORKERS"\)/);
-    assert.match(source, /process\.env\.VERCEL_ENV !== "production"/);
-    assert.match(source, /pending: true/);
-  }
-  assert.match(matchScoringRoute, /deliveries: \[\], pending: true/);
-  assert.match(liveMatchesRoute, /\["finalize", "reopen"\]\.includes\(mutationAuthority\.canonicalLifecycleAction\)/);
+
+test("Canonical scoring schedules only current internal derived families with no Google mirror", async () => {
+for(const source of [currentScoringRoute,matchScoringRoute,directorRoute,liveMatchesRoute])assert.doesNotMatch(source,/drainGoogleOutbox|deliverSupabaseOddsGoogleMirror|processNextScorecardArchiveJob/);
+for(const source of [currentScoringRoute,matchScoringRoute,liveMatchesRoute]){assert.match(source,/recalculateCompetitionDerivedTournament/);assert.match(source,/recalculateIntelligenceDerivedTournament/);assert.match(source,/recalculateCalcuttaAfterCanonicalMutation/);}
 });
 
 test("a Production control mirror uses the dedicated scope and checkpoints the claimed worker", async () => {

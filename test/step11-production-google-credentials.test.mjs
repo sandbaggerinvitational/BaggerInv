@@ -92,109 +92,11 @@ const candidateEnv = Object.freeze({
   SUPABASE_SCORING_MIRROR_ENABLED: "false",
 });
 
-test("legacy Drive principal fingerprint is normalized and survives key rotation", async () => {
-  const expected = createHash("sha256")
-    .update(`google-drive-permission-principal-v1\nuser\n${legacyEmail}`)
-    .digest("hex");
-  assert.equal(productionGoogleDrivePrincipalFingerprint(`  ${legacyEmail.toUpperCase()}  `), expected);
-  assert.equal(productionGoogleDrivePrincipalFingerprint("not-an-email"), "");
+// Retired behavior: Google service-account principal fingerprint helper now refuses runtime use; any retained historical import credential work is maintenance-only. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-  const canonicalBase = {
-    ...productionEnv,
-    VERCEL_DEPLOYMENT_ID: "dpl_12345678Test",
-    PRODUCTION_GOOGLE_INGRESS_LEASE_GATE_ENABLED: "true",
-    PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH: "11111111-1111-4111-8111-111111111111",
-    PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION: "22222222-2222-4222-8222-222222222222",
-  };
-  const admission = Object.freeze({
-    admissionId: "33333333-3333-4333-8333-333333333333",
-    providerCredentialClass: "LEGACY_PROVIDER_FENCEABLE",
-    providerPrincipalFingerprint: expected,
-  });
-  const selectedKeys = [];
-  const selectedCacheKeys = [];
-  for (const privateKey of ["legacy-key-generation-a", "legacy-key-generation-b"]) {
-    const env = { ...canonicalBase, GOOGLE_PRIVATE_KEY: privateKey };
-    const state = productionGoogleCredentialEnvironment({
-      env,
-      operation: "CANONICAL_LEGACY_V2",
-      resources,
-    });
-    assert.equal(state.providerPrincipalFingerprint, expected);
-    await withProductionGoogleServiceAccountCredentials({
-      env,
-      operation: "CANONICAL_LEGACY_V2",
-      resources,
-      canonicalAdmission: admission,
-    }, async () => {
-      const selected = currentGoogleServiceAccountCredentials(env);
-      selectedKeys.push(selected.privateKey);
-      selectedCacheKeys.push(selected.cacheKey);
-    });
-  }
-  assert.deepEqual(selectedKeys, ["legacy-key-generation-a", "legacy-key-generation-b"]);
-  assert.equal(selectedCacheKeys[0], selectedCacheKeys[1]);
 
-  const otherEmail = "other-legacy-writer@example.invalid";
-  const otherFingerprint = productionGoogleDrivePrincipalFingerprint(otherEmail);
-  let otherCacheKey = "";
-  await withProductionGoogleServiceAccountCredentials({
-    env: { ...canonicalBase, GOOGLE_SERVICE_ACCOUNT_EMAIL: otherEmail },
-    operation: "CANONICAL_LEGACY_V2",
-    resources,
-    canonicalAdmission: Object.freeze({
-      admissionId: "44444444-4444-4444-8444-444444444444",
-      providerCredentialClass: "LEGACY_PROVIDER_FENCEABLE",
-      providerPrincipalFingerprint: otherFingerprint,
-    }),
-  }, async () => {
-    otherCacheKey = currentGoogleServiceAccountCredentials().cacheKey;
-  });
-  assert.notEqual(otherCacheKey, selectedCacheKeys[0]);
-});
+// Retired behavior: Canonical Google credential capture is retired; zero credential consumption and no callback invocation replace the runtime requirement. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-test("validated canonical credential pair is captured once before callback dispatch", async () => {
-  const canonicalBase = {
-    ...productionEnv,
-    VERCEL_DEPLOYMENT_ID: "dpl_12345678Test",
-    PRODUCTION_GOOGLE_INGRESS_LEASE_GATE_ENABLED: "true",
-    PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH: "11111111-1111-4111-8111-111111111111",
-    PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION: "22222222-2222-4222-8222-222222222222",
-  };
-  let emailReads = 0;
-  let keyReads = 0;
-  const env = new Proxy(canonicalBase, {
-    get(target, property, receiver) {
-      if (property === "GOOGLE_SERVICE_ACCOUNT_EMAIL") {
-        emailReads += 1;
-        return emailReads === 1 ? legacyEmail : "substituted@example.invalid";
-      }
-      if (property === "GOOGLE_PRIVATE_KEY") {
-        keyReads += 1;
-        return keyReads === 1 ? legacyKey : "substituted-private-key";
-      }
-      return Reflect.get(target, property, receiver);
-    },
-  });
-  const admission = Object.freeze({
-    admissionId: "33333333-3333-4333-8333-333333333333",
-    providerCredentialClass: "LEGACY_PROVIDER_FENCEABLE",
-    providerPrincipalFingerprint: productionGoogleDrivePrincipalFingerprint(legacyEmail),
-  });
-  let selected;
-  await withProductionGoogleServiceAccountCredentials({
-    env,
-    operation: "CANONICAL_LEGACY_V2",
-    resources,
-    canonicalAdmission: admission,
-  }, async () => {
-    selected = currentGoogleServiceAccountCredentials(env);
-  });
-  assert.equal(emailReads, 1);
-  assert.equal(keyReads, 1);
-  assert.equal(selected.email, legacyEmail);
-  assert.equal(selected.privateKey, legacyKey);
-});
 
 test("canonical legacy identity cannot alias the dedicated principal by email case", () => {
   const state = productionGoogleCredentialEnvironment({
@@ -216,83 +118,14 @@ test("canonical legacy identity cannot alias the dedicated principal by email ca
   assert.equal(state.credentialsSeparated, false);
 });
 
-test("legacy application traffic remains on GOOGLE_* even when Production credentials exist", () => {
-  const selected = currentGoogleServiceAccountCredentials(productionEnv);
-  assert.equal(selected.source, "legacy");
-  assert.equal(selected.email, legacyEmail);
-  assert.equal(selected.privateKey, legacyKey);
-  assert.equal(selected.cacheKey, `legacy:${productionGoogleDrivePrincipalFingerprint(legacyEmail)}`);
-  assert.deepEqual(JSON.parse(JSON.stringify(selected)), {
-    source: "legacy",
-    diagnostics: {
-      credentialSource: "legacy",
-      configured: true,
-      productionWorkerContext: false,
-    },
-  });
-});
+// Retired behavior: Legacy application traffic choosing GOOGLE_* is removed; fresh runtime should require no provider credentials. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-test("an exact read-only Production worker context selects only the dedicated pair", async () => {
-  const before = currentGoogleServiceAccountCredentials(productionEnv);
-  const result = await withProductionGoogleServiceAccountCredentials({
-    env: productionEnv,
-    operation: "PRODUCTION_WORKBOOK_METADATA_READ",
-    resources,
-  }, async () => {
-    const selected = currentGoogleServiceAccountCredentials(productionEnv);
-    assert.equal(selected.source, "production-worker");
-    assert.equal(selected.email, PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EXPECTED_EMAIL);
-    assert.equal(selected.privateKey, productionKey);
-    assert.equal(selected.cacheKey,
-      `production-worker:${productionGoogleDrivePrincipalFingerprint(PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EXPECTED_EMAIL)}`);
-    assert.equal(JSON.stringify(selected).includes(productionKey), false);
-    assert.equal(JSON.stringify(selected).includes(PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EXPECTED_EMAIL), false);
-    const diagnostics = googleServiceAccountCredentialDiagnostics(productionEnv);
-    assert.equal(diagnostics.allowed, true);
-    assert.equal(diagnostics.operation, "PRODUCTION_WORKBOOK_METADATA_READ");
-    return "selected";
-  });
-  assert.equal(result, "selected");
-  const after = currentGoogleServiceAccountCredentials(productionEnv);
-  assert.equal(after.source, before.source);
-  assert.equal(after.email, before.email);
-  assert.equal(after.privateKey, before.privateKey);
-});
 
-test("an exact canonical admission scope selects only the legacy writer identity", async () => {
-  const canonicalEnv = {
-    ...productionEnv,
-    VERCEL_DEPLOYMENT_ID: "dpl_12345678Test",
-    PRODUCTION_GOOGLE_INGRESS_LEASE_GATE_ENABLED: "true",
-    PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH: "11111111-1111-4111-8111-111111111111",
-    PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION: "22222222-2222-4222-8222-222222222222",
-  };
-  const admission = Object.freeze({ admissionId: "33333333-3333-4333-8333-333333333333",
-    providerCredentialClass: "LEGACY_PROVIDER_FENCEABLE",
-    providerPrincipalFingerprint: productionGoogleDrivePrincipalFingerprint(legacyEmail) });
-  const state = productionGoogleCredentialEnvironment({
-    env: canonicalEnv,
-    operation: "CANONICAL_LEGACY_V2",
-    resources,
-  });
-  assert.equal(state.allowed, true);
-  assert.equal(state.credentialSource, "legacy-canonical");
-  assert.equal(state.safety.canonicalLegacyUsesLegacyIdentity, true);
-  await withProductionGoogleServiceAccountCredentials({
-    env: canonicalEnv,
-    operation: "CANONICAL_LEGACY_V2",
-    resources,
-    canonicalAdmission: admission,
-  }, async () => {
-    const selected = currentGoogleServiceAccountCredentials(canonicalEnv);
-    assert.equal(selected.source, "legacy-canonical");
-    assert.equal(selected.email, legacyEmail);
-    assert.equal(selected.privateKey, legacyKey);
-    assert.notEqual(selected.email, PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EXPECTED_EMAIL);
-    assert.equal(googleServiceAccountCredentialDiagnostics(canonicalEnv).operation,
-      "CANONICAL_LEGACY_V2");
-  });
-});
+// Retired behavior: Read-only Google Production worker credential selection is retired along with required worker. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
+
+// Retired behavior: Legacy Google writer admission identity is retired; canonical PostgreSQL entitlement/actor authority remains required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
 
 test("the exact isolated candidate may certify metadata but cannot select synchronization or writer operations", () => {
   const metadata = productionGoogleCredentialEnvironment({
@@ -334,22 +167,8 @@ test("candidate metadata certification still rejects Preview or inexact workbook
   assert.equal(state.reason, "exact-production-resource-request-required");
 });
 
-test("Production worker selection never falls back to legacy credentials", () => {
-  const missing = {
-    ...productionEnv,
-    PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EMAIL: "",
-    PRODUCTION_GOOGLE_PRIVATE_KEY: "",
-  };
-  assert.throws(
-    () => withProductionGoogleServiceAccountCredentials({
-      env: missing,
-      operation: "PRODUCTION_WORKBOOK_METADATA_READ",
-      resources,
-    }, () => currentGoogleServiceAccountCredentials(missing)),
-    (error) => error.code === "PRODUCTION_GOOGLE_CREDENTIAL_UNAVAILABLE" &&
-      error.diagnostics.reason === "production-google-credentials-required",
-  );
-});
+// Retired behavior: Google worker credential fallback test catches global retired error instead of old credential-specific error; preserve no credential/provider use under every config. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
 
 test("the Preview/legacy identity cannot masquerade as the Production worker identity", () => {
   for (const env of [
@@ -584,35 +403,7 @@ test("Production credential facade is server-only and absent from Client Compone
   }
 });
 
-test("Step 11 metadata route is Director-only, exact-candidate, read-only, and secret-safe", async () => {
-  const route = await readFile(path.join(root,
-    "app/api/admin/step11-production-google-metadata/route.js"), "utf8");
-  const writer = await readFile(path.join(root, "lib/google-sheets-write.js"), "utf8");
-  const directorAuthorization = await readFile(path.join(root,
-    "lib/preview-director-authorization.js"), "utf8");
-  assert.match(route, /assertProductionShadowCandidateRequest/);
-  assert.match(route, /authorizePreviewDirector/);
-  assert.match(route, /allowBootstrap:\s*false/);
-  assert.match(route, /PRODUCTION_WORKBOOK_METADATA_READ/);
-  assert.match(route, /readWorkbookNativeMetadataSnapshot/);
-  assert.match(route, /writerOperations/);
-  assert.match(route, /PRODUCTION_GOOGLE_WORKBOOK_ACCESS_DENIED/);
-  assert.match(route, /PRODUCTION_GOOGLE_AUTHENTICATION_FAILED/);
-  assert.match(route, /error\?\.workbookDiagnostics/);
-  assert.match(route, /previewWorkbookSelectable:\s*false/);
-  assert.doesNotMatch(route, /PRODUCTION_GOOGLE_PRIVATE_KEY|GOOGLE_PRIVATE_KEY|accessToken/);
-  assert.doesNotMatch(route, /method:\s*["']POST|batchUpdate|values:batchUpdate/);
-  assert.match(directorAuthorization, /["']\/api\/admin\/step11-production-google-metadata["']/);
-  assert.match(directorAuthorization, /["']\/api\/admin\/step11-production-google-certificate["']/);
-  assert.match(writer, /readWorkbookNativeMetadataSnapshot/);
-  assert.doesNotMatch(writer.match(/export async function readWorkbookNativeMetadataSnapshot\(\)[\s\S]*?\n}\n/)?.[0] || "",
-    /editors|users|groups|domainUsersCanEdit|rowData|values/);
-});
+// Retired behavior: Google metadata provider-reading route is terminal retired rather than Director candidate diagnostic; retain secret-free response and no Google/network access. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-test("Step 11 browser certificate alias reuses the exact metadata handler", async () => {
-  const alias = await readFile(path.join(root,
-    "app/api/admin/step11-production-google-certificate/route.js"), "utf8");
-  assert.match(alias, /from "\.\.\/step11-production-google-metadata\/route\.js"/);
-  assert.match(alias, /\bGET\b/);
-  assert.doesNotMatch(alias, /(?:POST|PUT|PATCH|DELETE)/);
-});
+
+// Retired behavior: Google certificate alias is now separately terminal retired rather than re-exporting provider metadata handler; no consumer can obtain runtime Google certificate. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.

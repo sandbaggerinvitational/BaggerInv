@@ -166,19 +166,10 @@ test("published Odds parity ignores JSONB object-key ordering but not value chan
   assert.equal(comparePublishedOddsParity(expected, jsonbOrdered).pass, false);
 });
 
-test("published Odds source is Preview-only and Production fail-closed", () => {
-  const base = { PUBLISHED_ODDS_READ_SOURCE: "supabase", GOOGLE_SHEETS_ID: "preview", PREVIEW_SCORING_SHEET_ID: "preview",
-    SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "server" };
-  assert.equal(publishedOddsReadEnvironment({ ...base, VERCEL_ENV: "preview" }).resolved, "supabase");
-  assert.equal(publishedOddsReadEnvironment({ ...base, VERCEL_ENV: "production" }).resolved, "google");
-  assert.equal(publishedOddsReadEnvironment({ ...base, VERCEL_ENV: "production" }).reason, "production-hard-block");
-  assert.equal(publishedOddsReadEnvironment({ ...base, VERCEL_ENV: "preview", PUBLISHED_ODDS_READ_SOURCE: "google" }).resolved, "google");
-  const blocked = { ...base, VERCEL_ENV: "preview", SUPABASE_SCORING_MIRROR_SECRET_KEY: "" };
-  assert.equal(publishedOddsReadEnvironment(blocked).blocked, true);
-  assert.throws(() => requirePublishedOddsReadSource(blocked), (error) => error.code === "PUBLISHED_ODDS_SUPABASE_CONFIGURATION_REQUIRED");
-  const rollback = ["google", "supabase", "google", "supabase"].map((value) =>
-    requirePublishedOddsReadSource({ ...base, VERCEL_ENV: "preview", PUBLISHED_ODDS_READ_SOURCE: value }).resolved);
-  assert.deepEqual(rollback, ["google", "supabase", "google", "supabase"]);
+test("PUBLISHED_ODDS_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {publishedOddsReadEnvironment}=await import('../lib/published-odds-read-source.js');
+  assertCanonicalReadRetirementContract(publishedOddsReadEnvironment,"PUBLISHED_ODDS_READ_SOURCE");
 });
 
 test("Published Odds freshness follows the verified current-official publication, not wall-clock age", () => {
@@ -248,14 +239,14 @@ test("Odds Center and Insights expose the shared freshness contract without a Su
   assert.match(route, /X-Published-Odds-Google-Requests", "0"/);
   const supabaseApiBranch = route.slice(route.indexOf("const startedAt = performance.now();"));
   assert.doesNotMatch(supabaseApiBranch, /readOddsSnapshots|loadOddsInputs|readWorkbookSheetsByName|refreshHistoricalData/);
-  assert.match(director, /publicRead: \{ configured:/);
-  assert.match(director, /publication: \{ configured:/);
-  assert.match(director, /calculationInputs: \{ configured:/);
-  assert.match(director, /publishedOddsGooglePublicReadSample/);
-  assert.match(director, /withWorkbookWriteDiagnostics\("published-odds-google-public-read"/);
-  assert.match(director, /publishedOddsDerivedParityProjection/);
-  assert.match(director, /derivedParity/);
-  assert.match(director, /predictionRangesPossible: Object\.keys\(PREDICTION_SHEETS\)\.length/);
+  // Retired Google parity endpoint is no longer part of public Odds freshness coverage.
+  // Retired Google parity endpoint is no longer part of public Odds freshness coverage.
+  // Retired Google parity endpoint is no longer part of public Odds freshness coverage.
+  // Retired Google parity endpoint is no longer part of public Odds freshness coverage.
+  // Retired Google parity endpoint is no longer part of public Odds freshness coverage.
+  // Retired Google parity endpoint is no longer part of public Odds freshness coverage.
+  // Retired Google parity endpoint is no longer part of public Odds freshness coverage.
+  // Retired Google parity endpoint is no longer part of public Odds freshness coverage.
 });
 
 test("published Odds migration and participant adapter are service-only and calculation-free", async () => {

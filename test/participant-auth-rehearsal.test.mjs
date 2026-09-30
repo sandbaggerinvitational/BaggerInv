@@ -127,12 +127,8 @@ test("email OTP request outcomes are enumeration-safe after identifier evaluatio
   assert.match(route, /catch \(error\) \{[\s\S]*pipelineError = error;[\s\S]*return enumerationSafeRequestResponse/);
 });
 
-test("Auth rehearsal requires Preview, isolated workbook, Passport authority, and complete config", () => {
-  assert.equal(participantIdentityAuthorityEnvironment(previewEnv).authRehearsalEnabled, true);
-  assert.equal(participantIdentityAuthorityEnvironment({ ...previewEnv, PARTICIPANT_IDENTITY_AUTHORITY: "supabase" }).authRehearsalEnabled, false);
-  assert.equal(participantIdentityAuthorityEnvironment({ ...previewEnv, VERCEL_ENV: "production" }).authRehearsalEnabled, false);
-  assert.equal(participantIdentityAuthorityEnvironment({ ...previewEnv, GOOGLE_SHEETS_ID: PRODUCTION_SPREADSHEET_ID }).authRehearsalEnabled, false);
-  assert.equal(participantIdentityAuthorityEnvironment({ ...previewEnv, NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "" }).authRehearsalEnabled, false);
+test("Retired Passport bootstrap cannot enable canonical participant authentication rehearsal", async () => {
+for(const env of [previewEnv,{...previewEnv,PARTICIPANT_IDENTITY_AUTHORITY:'supabase'},{...previewEnv,VERCEL_ENV:'production'},{...previewEnv,GOOGLE_SHEETS_ID:PRODUCTION_SPREADSHEET_ID},{...previewEnv,NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY:''}])assert.equal(participantIdentityAuthorityEnvironment(env).authRehearsalEnabled,false);
 });
 
 test("migration enforces one rehearsal identity, durable OTP limits, RLS, and service-only RPCs", async () => {

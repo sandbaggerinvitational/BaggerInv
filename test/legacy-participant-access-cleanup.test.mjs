@@ -11,9 +11,9 @@ const previewSupabaseEnv = {
   PREVIEW_SCORING_SHEET_ID: "preview-workbook",
   PARTICIPANT_IDENTITY_AUTHORITY: "supabase",
   SCORING_AUTHORITY: "supabase",
-  SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co",
+  SUPABASE_SCORING_MIRROR_URL: "https://idgigvjjqkfbqjeredpb.supabase.co",
   SUPABASE_SCORING_MIRROR_SECRET_KEY: "sb_secret_preview",
-  NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://preview.supabase.co",
+  NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://idgigvjjqkfbqjeredpb.supabase.co",
   NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "sb_publishable_preview",
 };
 
@@ -141,6 +141,7 @@ test("Director and rollback legacy routes remain present after participant calle
   ]);
   assert.match(activation, /PlayerPassportActivation/);
   assert.match(qr, /authenticateParticipantMatch/);
-  assert.match(liveMatches, /action === "access-generate"/);
+  assert.doesNotMatch(liveMatches, /action === "access-generate"/);
+  assert.match(liveMatches,/persistDirectorMatchLifecycle/);
   assert.match(impersonation, /beginPreviewIdentityImpersonation/);
 });

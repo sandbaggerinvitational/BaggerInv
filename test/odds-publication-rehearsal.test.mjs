@@ -54,51 +54,11 @@ test("Preview publication rehearsal executes real lifecycle operations and rolls
   assert.match(migration, /duplicate_claim:=public\.claim_preview_championship_odds_google_mirror/);
 });
 
-test("mirror delivery is claimed, retryable, checkpointed, and idempotent", async () => {
-  const [migration, supersession, baseMigration, mirror, publisher] = await Promise.all([
-    readFile(new URL("../supabase/migrations/202608210001_preview_championship_odds_publication_rehearsal.sql", import.meta.url), "utf8"),
-    readFile(new URL("../supabase/migrations/202608210002_preview_championship_odds_mirror_supersession.sql", import.meta.url), "utf8"),
-    readFile(new URL("../supabase/migrations/202608120038_preview_championship_odds_inputs_publication.sql", import.meta.url), "utf8"),
-    readFile(new URL("../lib/championship-odds-google-mirror.js", import.meta.url), "utf8"),
-    readFile(new URL("../app/api/odds/publish/route.js", import.meta.url), "utf8"),
-  ]);
-  assert.match(migration, /status='RUNNING',attempt_count=attempt_count\+1/);
-  assert.match(migration, /ODDS_GOOGLE_MIRROR_IN_PROGRESS/);
-  assert.match(migration, /ODDS_GOOGLE_MIRROR_ALREADY_VERIFIED/);
-  assert.match(migration, /'changed',false,'duplicate',true/);
-  assert.match(baseMigration, /unique \(snapshot_id\)/);
-  assert.match(supersession, /status in \('PENDING','RUNNING','SUCCEEDED','FAILED','SUPERSEDED'\)/);
-  assert.match(supersession, /snapshot_row\.is_current_official is not true/);
-  assert.match(supersession, /odds_google_mirror_supersession/);
-  assert.match(mirror, /claimSupabaseOddsGoogleMirror/);
-  assert.match(mirror, /publishOddsSnapshot\(snapshot\)/);
-  assert.match(mirror, /verifyPublishedOddsSnapshot\(snapshot\)/);
-  assert.match(mirror, /status: "FAILED"/);
-  assert.match(mirror, /retryable: true/);
-  assert.match(publisher, /deliverSupabaseOddsGoogleMirror/);
-  assert.match(publisher, /source\.publicationAuthority === "google"/);
-});
+// Retired behavior: Google Odds mirror claim/delivery/checkpoint behavior is retired; canonical calculation/publication and owner approval remain required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-test("Director rehearsal route is Preview-only, read-only for Google, and protects real retry behind Supabase authority", async () => {
-  const [route, readiness] = await Promise.all([
-    readFile(new URL("../app/api/odds/publication-operations/route.js", import.meta.url), "utf8"),
-    readFile(new URL("../app/admin/director/game-center-readiness/GameCenterReadinessClient.js", import.meta.url), "utf8"),
-  ]);
-  assert.match(route, /process\.env\.VERCEL_ENV !== "preview"/);
-  assert.match(route, /authorizePreviewDirector/);
-  assert.match(route, /Run non-destructive rehearsal/);
-  assert.match(route, /searchParams\.get\("ui"\) === "1"/);
-  assert.match(route, /request\.formData\(\)/);
-  assert.match(route, /rehearseSupabaseOddsSnapshot/);
-  assert.match(route, /buildOddsWorkbookPublicationRecords/);
-  assert.match(route, /googleWrites: 0/);
-  assert.doesNotMatch(route, /publishOddsSnapshot/);
-  assert.match(route, /sources\.publicationAuthority !== "supabase"/);
-  assert.match(route, /retry-google-mirror/);
-  assert.match(readiness, /Certify Odds Publication Lifecycle/);
-  assert.match(readiness, /\/api\/odds\/publication-operations/);
-  assert.match(readiness, /action: "rehearse"/);
-});
+
+// Retired behavior: Google Odds rehearsal route and mirror retry have been disconnected; preserve canonical owner publication/retry permissions rather than old Google diagnostics. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
 
 test("migration keeps all Odds publication operations service-only", async () => {
   const migration = await readFile(new URL("../supabase/migrations/202608210001_preview_championship_odds_publication_rehearsal.sql", import.meta.url), "utf8");

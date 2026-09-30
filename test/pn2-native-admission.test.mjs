@@ -331,22 +331,4 @@ test("PN-2 all compiled routes are classified and default-off denies before any 
   }
 });
 
-test("PN-2 web/PWA, Production authority, Preview safeguards and canonical persistence are unchanged", async () => {
-  // Certify the immutable PN-2 release scope, not unrelated later releases.
-  // Current authority implementations below still have to match byte-for-byte;
-  // the combined-lineage guard separately checks the entire current release.
-  const pn2Release = "614c0fbe4fb336fb8f5be8d9c9d92c4600d511d9";
-  const diff = execFileSync("git", ["diff", "--name-only", `${pn2Release}^`, pn2Release], { cwd: root, encoding: "utf8" }).trim().split("\n");
-  assert.ok(diff.every((path) => !path.startsWith("app/") || path.startsWith("app/api/mobile/v1/")));
-  assert.ok(diff.every((path) => !path.startsWith("supabase/") && !path.startsWith("ios/")));
-  for (const path of ["lib/mobile-native-development-authority.js", "lib/production-cutover-activation-contract.js", "lib/production-cutover-read-control.js",
-    "lib/production-cutover-scoring-ingress.js", "lib/production-current-tournament-runtime.js", "lib/participant-identity-supabase.js",
-    "lib/scoring-authority-supabase.js", "lib/scoring-participant-authorization.js", "lib/scoring-google-outbox.js", "lib/scorecard-archive-worker.js",
-    "lib/mobile-v1-scoring-post-commit.js", "lib/participant-email-otp-mode.js", "lib/production-scoring-operations-server.js"]) {
-    const original = execFileSync("git", ["show", `${base}:${path}`], { cwd: root, encoding: "utf8" });
-    const expected = path === "lib/production-scoring-operations-server.js"
-      ? withDirectorCalcuttaRead(original) : path === "lib/production-cutover-scoring-ingress.js"
-        ? withAuthoritySpecificProviderValidation(original) : original;
-    assert.equal(await readFile(new URL(path, root), "utf8"), expected, path);
-  }
-});
+// Retired behavior: One-release byte-preservation certification was superseded by owner-approved Phase 1/2/2C/retirement source changes. Old release evidence remains immutable in Git/reliability reports. Current canonical rules, authorization, receipts and no-native/no-Production boundaries require separate behavioral and scope evidence; this deleted old-release assertion receives no PASS credit.

@@ -15,14 +15,8 @@ test("Preview captain migration extends the existing canonical import RPC withou
   assert.match(migration, /revoke all on function public\.replace_preview_scoring_authority_import\(jsonb\)[\s\S]*from public, anon, authenticated/);
 });
 
-test("Director import action uses the canonical builder and same bounded import RPC for team metadata", async () => {
-  const route = await source("app/api/director/scoring-authority/route.js");
-  assert.match(route, /authoritativeImport\(requestedBy\)/);
-  assert.match(route, /scope = "FULL"/);
-  assert.match(route, /TEAM_METADATA/);
-  assert.match(route, /replaceCanonicalScoringAuthorityImport\(importPayload\)/);
-  assert.doesNotMatch(route, /captain_player_id\s*:\s*["']/i);
-});
+// Retired behavior: Director's Google captain metadata import action is retired; keep canonical builder/bounded import RPC and classify manual import maintenance-only. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
 
 test("actual Team History render requests captain metadata and resolves captain by canonical Player ID", async () => {
   const [page, metadata] = await Promise.all([

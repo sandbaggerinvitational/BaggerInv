@@ -151,21 +151,10 @@ test("an in-progress Draft remains versionable with explicit pending selections"
   assert.deepEqual(hydrated.picks.filter((pick) => pick.status === "PENDING").map((pick) => pick.pickNumber), [3, 4]);
 });
 
-test("Draft source selection is reversible, Preview-only, isolated, and fail-closed", () => {
-  const sequence = ["google", "supabase", "google", "supabase"].map((source) =>
-    draftReadEnvironment({ ...previewEnv, DRAFT_READ_SOURCE: source }).resolved
-  );
-  assert.deepEqual(sequence, ["google", "supabase", "google", "supabase"]);
-  const production = draftReadEnvironment({ ...previewEnv, VERCEL_ENV: "production" });
-  assert.equal(production.productionBlocked, true);
-  assert.equal(production.resolved, "google");
-  const missing = { ...previewEnv, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" };
-  assert.equal(draftReadEnvironment(missing).blocked, true);
-  assert.throws(() => requireDraftReadSource(missing), /supabase-credentials-required/);
-  const wrongProject = { ...previewEnv, SUPABASE_SCORING_MIRROR_URL: "https://idgigvjjqkfbqjeredpb.supabase.co.evil.example" };
-  assert.equal(draftReadEnvironment(wrongProject).blocked, true);
-  const productionWorkbook = { ...previewEnv, GOOGLE_SHEETS_ID: "1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4", PREVIEW_SCORING_SHEET_ID: "" };
-  assert.equal(draftReadEnvironment(productionWorkbook).blocked, true);
+test("DRAFT_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {draftReadEnvironment}=await import('../lib/draft-read-source.js');
+  assertCanonicalReadRetirementContract(draftReadEnvironment,"DRAFT_READ_SOURCE");
 });
 
 test("freshness distinguishes current, stale, unknown, and unavailable projections", () => {
@@ -215,7 +204,7 @@ test("schema, synchronization, services, routes, analytics, and profiles share o
   assert.match(route, /authorizePreviewDirector/);
   assert.match(service, /fallbackUsed: false/);
   assert.match(service, /googleDraftRequests: 0/);
-  assert.match(source, /production-hard-block/);
+  assert.match(source, /canonicalReadEnvironment/);
   assert.match(draft, /scope: "YEARS"/);
   assert.match(draft, /scope: "YEAR"/);
   assert.match(draft, /scope: "CURRENT"/);

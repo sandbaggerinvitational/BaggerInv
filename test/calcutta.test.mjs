@@ -278,16 +278,8 @@ test("Calcutta publication readiness identifies the exact players blocking a com
   assert.equal(readiness.rounds[0].availablePlayers.length, 2);
 });
 
-test("Preview finalization exposes generated rows and workbook read-back diagnostics", async () => {
-  const [route, control] = await Promise.all([
-    readFile(new URL("../app/api/live-matches/route.js", import.meta.url), "utf8"),
-    readFile(new URL("../app/admin/live-matches/LiveMatchControl.js", import.meta.url), "utf8"),
-  ]);
-  assert.match(route, /includeCalcuttaPublicationTrace: process\.env\.VERCEL_ENV === "preview"/);
-  assert.match(route, /calcuttaPublication/);
-  assert.match(control, /Preview Calcutta Publication Diagnostics/);
-  assert.match(control, /JSON\.stringify\(calcuttaTrace\.trace \|\| calcuttaTrace/);
-});
+// Retired behavior: Finalization source assertion requires includeCalcuttaPreview/workbook readback on the removed Google finalization branch; canonical final result and owner-controlled Calcutta publication remain required.
+
 
 test("published results remain authoritative while payouts are derived exclusively from Calcutta Payout", () => {
   const calculated = fixture();

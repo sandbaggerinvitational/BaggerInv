@@ -262,8 +262,8 @@ function validEnvironment() {
     ODDS_CALCULATION_INPUT_SOURCE: "supabase",
     WAR_ROOM_PREDICTION_SETTINGS_SOURCE_FINGERPRINT: "8".repeat(64),
     WAR_ROOM_PREDICTION_SETTINGS_EFFECTIVE_FINGERPRINT: "9".repeat(64),
-    ODDS_PUBLICATION_AUTHORITY: "google",
-    PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED: "false",
+    ODDS_PUBLICATION_AUTHORITY: "supabase",
+    PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED: "true",
     PRODUCTION_SUPABASE_ODDS_GOOGLE_MIRROR_ENABLED: "false",
     SCORING_AUTHORITY: "supabase",
     PARTICIPANT_IDENTITY_AUTHORITY: "supabase",
@@ -287,11 +287,9 @@ test("runtime eligibility attests the exact dormant single-deployment capability
     ["PRODUCTION_SUPABASE_SCORING_INGRESS_ENABLED", "false", "exact-paused-runtime-configuration-required"],
     ["PRODUCTION_MAINTENANCE_DEPLOYMENT_CAPABILITY_CEILING", "ODDS_WAR_ROOM", "exact-paused-runtime-configuration-required"],
     ["PRODUCTION_SUPABASE_WORKERS_ENABLED", "false", "exact-paused-runtime-configuration-required"],
-    ["SCORING_GOOGLE_OUTBOX_WORKER_SECRET", "short", "exact-paused-runtime-configuration-required"],
-    ["ROUND_SCORECARDS_ARCHIVE_WORKER_SECRET", "short", "exact-paused-runtime-configuration-required"],
     ["WAR_ROOM_INPUT_SOURCE", "google", "exact-paused-runtime-configuration-required"],
     ["WAR_ROOM_PREDICTION_SETTINGS_SOURCE_FINGERPRINT", "bad", "exact-paused-runtime-configuration-required"],
-    ["ODDS_PUBLICATION_AUTHORITY", "supabase", "exact-paused-runtime-configuration-required"],
+    ["ODDS_PUBLICATION_AUTHORITY", "google", "exact-paused-runtime-configuration-required"],
   ]) {
     const result = module.productionMaintenancePrecommitDeploymentEnvironment({
       ...env,
@@ -393,13 +391,13 @@ test("the live route derives replacement deployment and epoch claims from server
   assert.equal(observedRequest.runtime_scoring_authority, "SUPABASE");
   assert.equal(observedRequest.runtime_supabase_scoring_ingress_enabled, true);
   assert.equal(observedRequest.runtime_workers_enabled, true);
-  assert.equal(observedRequest.runtime_google_mirror_enabled, true);
-  assert.equal(observedRequest.runtime_scorecard_archive_enabled, true);
-  assert.equal(observedRequest.runtime_outbox_worker_secret_configured, true);
-  assert.equal(observedRequest.runtime_archive_worker_secret_configured, true);
+  assert.equal(observedRequest.runtime_google_mirror_enabled, false);
+  assert.equal(observedRequest.runtime_scorecard_archive_enabled, false);
+  assert.equal(observedRequest.runtime_outbox_worker_secret_configured, false);
+  assert.equal(observedRequest.runtime_archive_worker_secret_configured, false);
   assert.equal(observedRequest.runtime_odds_calculation_enabled, true);
   assert.equal(observedRequest.runtime_war_room_input_source, "SUPABASE");
-  assert.equal(observedRequest.runtime_odds_publication_authority, "GOOGLE");
+  assert.equal(observedRequest.runtime_odds_publication_authority, "SUPABASE");
   assert.equal(
     JSON.stringify(observedRequest).includes(
       env.SCORING_GOOGLE_OUTBOX_WORKER_SECRET,

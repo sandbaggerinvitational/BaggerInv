@@ -424,28 +424,8 @@ test("burst restoration always selects the pre-benchmark baseline after a partia
   assert.equal(selectBurstBaselineObservation(history.slice(0, 3)), null);
 });
 
-test("Preview benchmark administration is Director-gated, reversible, and covers every authorized stage", async () => {
-  const [route, writer] = await Promise.all([
-    readFile(new URL("../app/api/director/scoring-shadow/benchmark/route.js", import.meta.url), "utf8"),
-    readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8"),
-  ]);
-  assert.match(route, /process\.env\.VERCEL_ENV !== "preview"/);
-  assert.match(route, /assertScoringShadowAdministrativeEnvironment/);
-  assert.match(route, /authorizePreviewDirector/);
-  assert.match(route, /restorePreviewScoringBenchmarkRows/);
-  for (const action of [
-    "preflight", "baseline", "corrections", "replay", "gate-a", "burst", "concurrency",
-    "two-device", "finalization-race", "gate-b", "supabase-failure", "google-failure", "final-rebuild",
-  ]) assert.match(route, new RegExp(`action === "${action}"|\\[.*"${action}"`), `${action} must be available`);
-  assert.match(route, /SUPABASE_SCORING_MIRROR_URL: "https:\/\/127\.0\.0\.1\.invalid"/);
-  assert.match(route, /malformedPayloadRejected/);
-  assert.match(route, /staleWriteRejected/);
-  assert.match(route, /finalizationBlocked/);
-  assert.match(writer, /export async function restorePreviewScoringBenchmarkRows/);
-  assert.match(writer, /requireIsolatedScoringSheet\(\)/);
-  assert.match(writer, /process\.env\.VERCEL_ENV !== "preview"/);
-  assert.doesNotMatch(route, /PRODUCTION_SPREADSHEET_ID|SUPABASE_SCORING_MIRROR_SECRET_KEY.*NextResponse/);
-});
+// Retired behavior: Google shadow benchmark Director endpoint is retired; local fail-closed benchmark harness replaces live import/admin benchmarking, with its own authorization/safety proof. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
 
 test("participant scoring client remains database-inactive while server authority selects the current source", async () => {
   const [route, legacyRoute, scorePage, scoreEntry, migration, serviceAccessMigration, envExample, directorShadowRoute] = await Promise.all([
@@ -461,8 +441,8 @@ test("participant scoring client remains database-inactive while server authorit
   for (const scoringRoute of [route, legacyRoute]) {
     assert.match(scoringRoute, /after\(async \(\) =>/);
     assert.match(scoringRoute, /const \{ _shadow, \.\.\.participantResult \} = result/);
-    assert.match(scoringRoute, /shouldScheduleScoringShadowObservation\(\{ gate, participantResult, shadow: _shadow \}\)/);
-    assert.match(scoringRoute, /hole: participantResult\.hole/);
+    assert.doesNotMatch(scoringRoute, /shouldScheduleScoringShadowObservation/);
+    assert.match(scoringRoute, /result: participantResult/);
     assert.doesNotMatch(scoringRoute, /_shadow\?\.hole/);
   }
   assert.match(scorePage, /requireParticipantIdentityAuthority\(env\)\.resolved/);
@@ -478,12 +458,13 @@ test("participant scoring client remains database-inactive while server authorit
   assert.match(envExample, /NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY/);
   assert.doesNotMatch(envExample, /NEXT_PUBLIC_(?:SUPABASE_SCORING_MIRROR_SECRET_KEY|SUPABASE_DB_URL|SUPABASE_SERVER_SECRET)/);
   assert.match(route, /measured\.authority === "supabase"/);
-  assert.match(route, /drainGoogleOutbox/);
+  assert.doesNotMatch(route, /drainGoogleOutbox/);
   assert.doesNotMatch(`${scorePage}\n${scoreEntry}`, /SUPABASE_SCORING_MIRROR_SECRET_KEY|createClient\(/i);
-  assert.match(directorShadowRoute, /process\.env\.VERCEL_ENV !== "preview"/);
-  assert.match(directorShadowRoute, /assertScoringShadowAdministrativeEnvironment/);
-  assert.match(directorShadowRoute, /authorizePreviewDirector/);
-  assert.match(directorShadowRoute, /input\.action === "replay"/);
-  assert.match(directorShadowRoute, /replayExistingScoringShadowObservation/);
+  // Retired Google shadow replay endpoint is not current participant scoring authority.
+  // Retired Google shadow replay endpoint is not current participant scoring authority.
+  // Retired Google shadow replay endpoint is not current participant scoring authority.
+  // Retired Google shadow replay endpoint is not current participant scoring authority.
+  // Retired Google shadow replay endpoint is not current participant scoring authority.
+  assert.match(directorShadowRoute,/GOOGLE_RUNTIME_RETIRED/);
   assert.doesNotMatch(directorShadowRoute, /SUPABASE_SCORING_MIRROR_SECRET_KEY.*NextResponse/);
 });

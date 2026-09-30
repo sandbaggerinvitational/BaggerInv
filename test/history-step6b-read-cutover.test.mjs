@@ -166,23 +166,10 @@ const previewEnv = {
   SUPABASE_SCORING_MIRROR_SECRET_KEY: "test-secret",
 };
 
-test("completed History source gate is reversible, Preview-only, and fails closed", () => {
-  const sequence = ["google", "supabase", "google", "supabase"].map((source) =>
-    completedHistoryReadEnvironment({ ...previewEnv, COMPLETED_HISTORY_READ_SOURCE: source }).resolved
-  );
-  assert.deepEqual(sequence, ["google", "supabase", "google", "supabase"]);
-  assert.equal(isSupabaseCompletedHistoryYear(2017, previewEnv), true);
-  assert.equal(isSupabaseCompletedHistoryYear(2026, previewEnv), false);
-
-  const production = completedHistoryReadEnvironment({ ...previewEnv, VERCEL_ENV: "production" });
-  assert.equal(production.productionBlocked, true);
-  assert.equal(production.resolved, "google");
-  assert.equal(isSupabaseCompletedHistoryYear(2017, { ...previewEnv, VERCEL_ENV: "production" }), false);
-
-  const incomplete = { ...previewEnv, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" };
-  assert.equal(completedHistoryReadEnvironment(incomplete).blocked, true);
-  assert.equal(isSupabaseCompletedHistoryYear(2017, incomplete), true);
-  assert.throws(() => requireCompletedHistoryReadSource(incomplete), /credentials-missing/);
+test("COMPLETED_HISTORY_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {completedHistoryReadEnvironment}=await import('../lib/completed-history-read-source.js');
+  assertCanonicalReadRetirementContract(completedHistoryReadEnvironment,"COMPLETED_HISTORY_READ_SOURCE");
 });
 
 test("2017/2018 preserve official champion identity without fabricating a final score", () => {
@@ -289,7 +276,7 @@ test("migrated routes use the shared service and contain no direct Supabase or h
   assert.match(historyIndex, /loadCompletedHistoryYears/);
 });
 
-test("environment documentation defaults completed History reads to Google", async () => {
+test("environment documentation defaults completed History reads to canonical Supabase", async () => {
   const envExample = await readFile(new URL("../.env.example", import.meta.url), "utf8");
-  assert.match(envExample, /^COMPLETED_HISTORY_READ_SOURCE=google$/m);
+  assert.match(envExample, /^COMPLETED_HISTORY_READ_SOURCE=supabase$/m);
 });

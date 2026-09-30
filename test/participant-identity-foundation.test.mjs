@@ -88,23 +88,11 @@ test("missing, duplicate, malformed, shared, inactive, unknown, and duplicate-pl
   assert.equal(playerConflict.quality.mappingConflicts, 1);
 });
 
-test("identity authority defaults to Passport, shadow defaults off, and Production hard-blocks Supabase", () => {
-  assert.deepEqual(participantIdentityAuthorityEnvironment({}).resolved, "passport");
-  assert.equal(participantIdentityAuthorityEnvironment({}).shadowEnabled, false);
-  const preview = {
-    VERCEL_ENV: "preview", PARTICIPANT_IDENTITY_AUTHORITY: "supabase", SUPABASE_PARTICIPANT_IDENTITY_SHADOW_ENABLED: "true",
-    GOOGLE_SHEETS_ID: "preview", PREVIEW_SCORING_SHEET_ID: "preview",
-    NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://preview.supabase.co", NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "publishable",
-    SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "server-secret",
-  };
-  assert.equal(participantIdentityAuthorityEnvironment(preview).resolved, "supabase");
-  assert.equal(participantIdentityAuthorityEnvironment(preview).shadowEnabled, true);
-  assert.equal(participantIdentityAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "unavailable");
-  assert.equal(participantIdentityAuthorityEnvironment({ ...preview, VERCEL_ENV: "production" }).blocked, true);
-  assert.equal(participantIdentityAuthorityEnvironment({ VERCEL_ENV: "production" }).resolved, "passport");
-  const ineligiblePreview = participantIdentityAuthorityEnvironment({ ...preview, GOOGLE_SHEETS_ID: PRODUCTION_SPREADSHEET_ID });
-  assert.equal(ineligiblePreview.resolved, "unavailable");
-  assert.equal(ineligiblePreview.blocked, true);
+test("Identity uses canonical database authority and cannot fall back to Passport", async () => {
+const {canonicalReadFixture:preview}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+assert.equal(participantIdentityAuthorityEnvironment({}).resolved,'unavailable');assert.equal(participantIdentityAuthorityEnvironment({}).shadowEnabled,false);
+assert.equal(participantIdentityAuthorityEnvironment(preview).resolved,'supabase');
+for(const env of [{...preview,VERCEL_ENV:'production'},{...preview,PARTICIPANT_IDENTITY_AUTHORITY:'passport'},{...preview,SUPABASE_SCORING_MIRROR_URL:'https://wrong.supabase.co'}]){const state=participantIdentityAuthorityEnvironment(env);assert.equal(state.resolved,'unavailable');assert.equal(state.blocked,true);assert.equal(state.participantAuthEnabled,false);}
 });
 
 test("shadow comparison covers stable player, tournament, team, membership, matches, and permissions", () => {

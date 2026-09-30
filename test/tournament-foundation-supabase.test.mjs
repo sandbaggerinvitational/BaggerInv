@@ -116,13 +116,10 @@ const guideProjection = { payload: { ok: true, data: { content: { content: { cou
   "Course ID": course.id, Round: index + 1, Course: course.name, "Course Logo": course.logo,
 })) } }, course_context: [] } } };
 
-test("Tournament foundation source is independently Preview-gated and cannot move live scoring", () => {
-  assert.equal(tournamentFoundationReadEnvironment(preview).resolved, "supabase");
-  assert.equal(tournamentFoundationReadEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "google");
-  assert.equal(tournamentFoundationReadEnvironment({ ...preview, GOOGLE_SHEETS_ID: "production-workbook" }).blocked, true);
-  assert.equal(tournamentFoundationReadEnvironment({ ...preview, TOURNAMENT_FOUNDATION_READ_SOURCE: "automatic" }).blocked, true);
-  assert.equal(tournamentFoundationReadEnvironment({ VERCEL_ENV: "preview" }).resolved, "google");
-  assert.equal(tournamentReadEnvironment(preview).resolved, "google");
+test("TOURNAMENT_FOUNDATION_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {tournamentFoundationReadEnvironment}=await import('../lib/tournament-read-source.js');
+  assertCanonicalReadRetirementContract(tournamentFoundationReadEnvironment,"TOURNAMENT_FOUNDATION_READ_SOURCE");
 });
 
 test("Google and Supabase foundation adapters preserve tournament, team, roster, round, and course parity", () => {

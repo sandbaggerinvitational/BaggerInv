@@ -153,11 +153,10 @@ test("parity comparison ignores internal entry identity but not payouts", () => 
   assert.equal(compareNetSkinsParity(calculated, equivalent).pass, false);
 });
 
-test("source flag is Preview-only, server-controlled, and Production fail-closed", () => {
-  const common = { NET_SKINS_READ_SOURCE: "supabase", GOOGLE_SHEETS_ID: "preview-sheet", PREVIEW_SCORING_SHEET_ID: "preview-sheet", SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "server-only" };
-  assert.equal(netSkinsReadEnvironment({ ...common, VERCEL_ENV: "preview" }).resolved, "supabase");
-  assert.equal(netSkinsReadEnvironment({ ...common, VERCEL_ENV: "production" }).resolved, "google");
-  assert.equal(netSkinsReadEnvironment({ ...common, VERCEL_ENV: "production" }).reason, "production-hard-block");
+test("NET_SKINS_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {netSkinsReadEnvironment}=await import('../lib/net-skins-read-source.js');
+  assertCanonicalReadRetirementContract(netSkinsReadEnvironment,"NET_SKINS_READ_SOURCE");
 });
 
 test("migrations are service-only, versioned, event-invalidated, and never calculate inside scoring", async () => {

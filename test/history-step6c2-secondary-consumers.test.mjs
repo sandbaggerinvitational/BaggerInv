@@ -35,7 +35,7 @@ test("Supabase branches reuse canonical calculations and scorecards without a hi
     source("lib/secondary-history-service.js"),
   ]);
   assert.match(records, /secondaryHistory\.calculations\.getRecords\(\)/);
-  assert.match(records, /Promise\.resolve\(secondaryHistory\.scorecardAnalytics\)/);
+  assert.match(records, /secondaryHistory\.scorecardAnalytics/);
   assert.match(detail, /getLeaderboardFromRecords\(slug, records\)/);
   assert.match(detail, /secondaryHistory\.scorecardAnalytics/);
   assert.match(statistics, /getLeaderboardFromRecords\(item\.slug, records\)/);

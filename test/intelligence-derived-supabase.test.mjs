@@ -51,14 +51,12 @@ test("final recap fails closed until 24 matches, complete cards, official result
   assert.equal(calculated.recap.payloadHash, calculateIntelligenceDerivedFromData({ core: core({ final: true, complete: true }), snapshots: [snapshot("Pre-Tournament", 0), finalSnapshot], oddsMetadata: {} }).recap.payloadHash);
 });
 
-test("source flags are Preview-only and fail closed outside isolated Preview", () => {
-  const preview = { VERCEL_ENV: "preview", GOOGLE_SHEETS_ID: "preview", PREVIEW_SCORING_SHEET_ID: "preview",
-    SUPABASE_SCORING_MIRROR_URL: "https://example.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "secret",
-    TOURNAMENT_INTELLIGENCE_READ_SOURCE: "supabase", PROJECTION_EDITORIAL_READ_SOURCE: "supabase", FINAL_RECAP_READ_SOURCE: "supabase" };
-  assert.equal(tournamentIntelligenceReadEnvironment(preview).resolved, "supabase");
-  assert.equal(projectionEditorialReadEnvironment(preview).resolved, "supabase");
-  assert.equal(finalRecapReadEnvironment(preview).resolved, "supabase");
-  assert.equal(tournamentIntelligenceReadEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "application");
+test("source flags are Preview-only and fail closed outside isolated Preview", async () => {
+const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+const module=await import('../lib/intelligence-derived-read-source.js');
+assertCanonicalReadRetirementContract(module.tournamentIntelligenceReadEnvironment,'TOURNAMENT_INTELLIGENCE_READ_SOURCE');
+assertCanonicalReadRetirementContract(module.projectionEditorialReadEnvironment,'PROJECTION_EDITORIAL_READ_SOURCE');
+assertCanonicalReadRetirementContract(module.finalRecapReadEnvironment,'FINAL_RECAP_READ_SOURCE');
 });
 
 test("migration is service-only and Final Recap is gated", async () => {

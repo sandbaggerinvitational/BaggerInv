@@ -115,7 +115,7 @@ test("Rules parity detects current format drift without pretending points or han
   assert.match(conflict.issues.join(" "), /missing from the Rounds catalog/);
 });
 
-test("Guide maintenance labels distinguish Google authoring from participant projection refresh", async () => {
+test("SOURCE historical Guide maintenance labels stay isolated from canonical runtime readiness", async () => {
   const [editor, readiness] = await Promise.all([
     source("app/admin/tournament-guide/GuideEditor.js"),
     source("app/admin/director/game-center-readiness/GameCenterReadinessClient.js"),
@@ -127,6 +127,7 @@ test("Guide maintenance labels distinguish Google authoring from participant pro
   assert.match(editor, /Recommended primary Schedule editor: Admin Center → Schedule/);
   assert.match(editor, /Information \(Legacy\)/);
   assert.match(editor, /not used by the current participant Tournament Guide/);
-  assert.match(readiness, />Refresh Participant Guide</);
-  assert.match(readiness, /guideOperation\("refresh-guide-content"\)/);
+  assert.match(readiness, /import CanonicalDirectorConsole/);
+  assert.match(readiness, /return <CanonicalDirectorConsole/);
+  assert.doesNotMatch(readiness, /Refresh Participant Guide|refresh-guide-content|guideOperation/);
 });

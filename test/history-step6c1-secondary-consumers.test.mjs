@@ -68,16 +68,10 @@ function completedView(year, playerId = "P1") {
   };
 }
 
-test("secondary History gate is explicit, reversible, Preview-only, and fails closed", () => {
-  assert.equal(secondaryHistoryReadEnvironment({ ...preview, SECONDARY_HISTORY_READ_SOURCE: "google" }).resolved, "google");
-  assert.equal(secondaryHistoryReadEnvironment(preview).resolved, "supabase");
-  assert.equal(isSupabaseSecondaryHistory(preview), true);
-  const production = secondaryHistoryReadEnvironment({ ...preview, VERCEL_ENV: "production" });
-  assert.equal(production.resolved, "google");
-  assert.equal(production.productionBlocked, true);
-  const wrongProject = secondaryHistoryReadEnvironment({ ...preview, SUPABASE_SCORING_MIRROR_URL: "https://wrong.supabase.co" });
-  assert.equal(wrongProject.resolved, "supabase");
-  assert.equal(wrongProject.blocked, true);
+test("SECONDARY_HISTORY_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {secondaryHistoryReadEnvironment}=await import('../lib/secondary-history-read-source.js');
+  assertCanonicalReadRetirementContract(secondaryHistoryReadEnvironment,"SECONDARY_HISTORY_READ_SOURCE");
 });
 
 test("Sheet-authored public profiles project deterministically without becoming identity authority", () => {
@@ -144,5 +138,5 @@ test("Players and Profiles use the shared service branch without page-level Supa
   assert.match(migration, /update scoring_authority\.players/);
   assert.doesNotMatch(migration, /update scoring_authority\.(matches|hole_scores|tournament_players|scoring_permissions|scoring_authority_epochs)/i);
   assert.match(migration, /revoke all on function public\.read_preview_secondary_history_players\(jsonb\)[\s\S]*to service_role/);
-  assert.match(envExample, /^SECONDARY_HISTORY_READ_SOURCE=google$/m);
+  assert.match(envExample, /^SECONDARY_HISTORY_READ_SOURCE=supabase$/m);
 });

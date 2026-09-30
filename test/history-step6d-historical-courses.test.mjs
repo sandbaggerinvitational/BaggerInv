@@ -150,17 +150,10 @@ function model() {
   });
 }
 
-test("historical-course source is reversible, Preview-only, and fails closed", () => {
-  assert.deepEqual(["google", "supabase", "google", "supabase"].map((value) =>
-    historicalCourseReadEnvironment({ ...preview, HISTORICAL_COURSE_READ_SOURCE: value }).resolved
-  ), ["google", "supabase", "google", "supabase"]);
-  const production = historicalCourseReadEnvironment({ ...preview, VERCEL_ENV: "production" });
-  assert.equal(production.resolved, "google");
-  assert.equal(production.productionBlocked, true);
-  const incomplete = { ...preview, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" };
-  assert.equal(historicalCourseReadEnvironment(incomplete).blocked, true);
-  assert.throws(() => requireHistoricalCourseReadSource(incomplete), /credentials-missing/);
-  assert.throws(() => requireHistoricalCourseReadSource({ ...preview, HISTORICAL_COURSE_READ_SOURCE: "mystery" }), /invalid-source/);
+test("HISTORICAL_COURSE_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {historicalCourseReadEnvironment}=await import('../lib/historical-course-read-source.js');
+  assertCanonicalReadRetirementContract(historicalCourseReadEnvironment,"HISTORICAL_COURSE_READ_SOURCE");
 });
 
 test("canonical course identity, temporal appearances, and known aliases remain certified", () => {
@@ -249,7 +242,7 @@ test("course routes use the shared service with an isolated current Guide path a
   assert.doesNotMatch(service, /\.from\(|createClient\(|scoringShadowRpc/);
   assert.match(service, /googleForegroundRequests:\s*0/);
   assert.match(service, /noFallback:\s*true/);
-  assert.match(envExample, /^HISTORICAL_COURSE_READ_SOURCE=google$/m);
+  assert.match(envExample, /^HISTORICAL_COURSE_READ_SOURCE=supabase$/m);
   for (const protectedRoute of [players, records, compare]) assert.match(protectedRoute, /loadSecondaryHistoryModel/);
 });
 

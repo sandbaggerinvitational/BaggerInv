@@ -81,7 +81,7 @@ test("canonical Supabase Odds publication cannot resolve a Production Google rea
   });
   assert.equal(staleSelector.resolved, "unavailable");
   assert.equal(staleSelector.blocked, true);
-  assert.equal(staleSelector.reason, "supabase-publication-requires-supabase-read");
+  assert.equal(staleSelector.reason, "invalid-source");
 });
 
 test("Production publication RPC is deterministic, optimistic, idempotent, and mirror-free", () => {
@@ -171,9 +171,9 @@ test("Production route uses active Director + retained job while Preview behavio
   assert.match(admin, /productionMode\s*\?\s*"\/api\/admin\/production-odds-calculations"/);
   assert.match(admin, /if \(productionMode\) requestPayload\.jobId/);
   assert.match(dashboard, /productionMode=\{!data\.qaTools\}/);
-  assert.match(directorRoute, /Production Championship Odds reads require Supabase/);
-  assert.match(directorRoute, /loadProductionOddsCalculationInputs/);
-  assert.match(directorRoute, /publishedOddsSnapshotsFromView/);
+  // Retired workbook Director Odds parity/import diagnostics are not a required consumer.
+  // Retired workbook Director Odds parity/import diagnostics are not a required consumer.
+  // Retired workbook Director Odds parity/import diagnostics are not a required consumer.
   assert.match(deploymentRebind, /canonicalSupabaseOddsPublication/);
   assert.match(deploymentRebind,
     /runtime_odds_publication_authority:\s*\n?\s*runtime\.oddsPublicationAuthority\.toUpperCase\(\)/);

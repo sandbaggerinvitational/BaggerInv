@@ -58,9 +58,9 @@ test("2026 History source is explicitly Preview-only, year-bound, and Production
   assert.equal(isSupabaseHistory2026(2025, previewEnv), false);
 
   const production = history2026ReadEnvironment({ ...previewEnv, VERCEL_ENV: "production" });
-  assert.equal(production.resolved, "google");
+  assert.equal(production.resolved, "unavailable");
   assert.equal(production.productionBlocked, true);
-  assert.equal(isSupabaseHistory2026(2026, { ...previewEnv, VERCEL_ENV: "production" }), false);
+  assert.equal(isSupabaseHistory2026(2026, { ...previewEnv, VERCEL_ENV: "production" }), true, "year dispatch must not silently select retired fallback on bad authority");
 
   const fixtureYear = history2026ReadEnvironment({ ...previewEnv, HISTORY_2026_TOURNAMENT_ID: "3026" });
   assert.notEqual(fixtureYear.resolved, "supabase");

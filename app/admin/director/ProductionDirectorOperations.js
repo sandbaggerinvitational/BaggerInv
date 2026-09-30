@@ -61,7 +61,7 @@ const ACTIONS = Object.freeze({
   "scoring-unlock": { label: "Unlock Scoring", endpoint: "/api/director", action: "match-unlock-scoring", result: "Scoring unlocked", consequence: "Scoring is unlocked and participant scoring access is activated." },
   "access-activate": { label: "Activate Access", endpoint: "/api/live-matches", action: "access-generate", result: "Access active", consequence: "Existing participant scoring permissions become active. The scoring lock does not change." },
   "access-revoke": { label: "Revoke Access", endpoint: "/api/live-matches", action: "access-disable", result: "Access revoked", consequence: "Participant scoring access is revoked. The scoring lock does not change." },
-  finalize: { label: "Finalize", endpoint: "/api/director", action: "match-finalize", result: "Final", consequence: "The official result is committed, scoring is locked, participant access is revoked, and the archive workflow is queued." },
+  finalize: { label: "Finalize", endpoint: "/api/director", action: "match-finalize", result: "Final", consequence: "The official result is committed, scoring is locked, participant access is revoked, and the official scorecard is retained." },
   reopen: { label: "Reopen", endpoint: "/api/director", action: "match-reopen", result: "Live and reopened", consequence: "The official result is invalidated, the match returns to Live, scoring unlocks, and participant access is activated." },
 });
 

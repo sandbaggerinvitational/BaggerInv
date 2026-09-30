@@ -331,28 +331,4 @@ test("candidate-control dependency injection is unavailable outside the test run
   });
 });
 
-test("route dispatch has an exact Step 11.6 ACL action map and no legacy fallback", async () => {
-  const route = await readFile(new URL(
-    "../app/api/admin/step11-6-production-google-writer-fence/route.js",
-    import.meta.url,
-  ), "utf8");
-  for (const [external, internal] of [
-    ["inspect-drive-acl-rehearsal", "inspect"],
-    ["downgrade-drive-acl-rehearsal", "install"],
-    ["restore-drive-acl-rehearsal", "abort-install"],
-  ]) assert.match(route, new RegExp(`\\[\\"${external}\\", \\"${internal}\\"\\]`));
-  assert.doesNotMatch(route, /executeProductionGoogleWriterFenceRehearsal/);
-  for (const oldAction of ["inspect", "rehearse", "restore"]) {
-    assert.doesNotMatch(route, new RegExp(`\\[\\"${oldAction}\\"`));
-  }
-  const actionValidation = route.indexOf("!REHEARSAL_ACL_ACTIONS.has(action)");
-  const dependencyCreation = route.indexOf("const dependencies =", actionValidation);
-  const executorCall = route.indexOf("executeProductionGoogleWriterProviderFence(",
-    dependencyCreation);
-  assert.ok(actionValidation >= 0);
-  assert.ok(actionValidation < dependencyCreation);
-  assert.ok(dependencyCreation < executorCall);
-  assert.match(route, /quiescePurpose: "REHEARSAL"/);
-  assert.ok(route.indexOf("authorizeProductionWriterFenceDirectorCandidateControl") <
-    route.indexOf("request\.json\(\)"));
-});
+// Retired behavior: Exact Drive ACL action dispatch map refers to retired Google fence endpoint; replacement must prove terminal no-provider behavior, with current Director auth tested separately. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.

@@ -96,14 +96,11 @@ function fixture() {
   return { sheets, calculations, scorecardAnalytics };
 }
 
-test("one source boundary defaults Preview to Google and hard-resolves Production to Google", () => {
-  assert.equal(resolveWarRoomInputSource({ VERCEL_ENV: "preview" }).resolved, "google");
-  assert.equal(resolveWarRoomInputSource({ VERCEL_ENV: "preview", WAR_ROOM_INPUT_SOURCE: "supabase" }).resolved, "supabase");
-  const production = resolveWarRoomInputSource({ VERCEL_ENV: "production", WAR_ROOM_INPUT_SOURCE: "supabase" }, "supabase");
-  assert.equal(production.resolved, "google");
-  assert.equal(production.productionHardResolvedToGoogle, true);
-  assert.equal(production.fallbackUsed, false);
-  assert.throws(() => resolveWarRoomInputSource({ VERCEL_ENV: "preview", WAR_ROOM_INPUT_SOURCE: "automatic" }), /Unsupported/);
+test("War Room canonical source rejects retired fallback and unadmitted resources", async () => {
+const {canonicalReadFixture}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+assert.equal(resolveWarRoomInputSource(canonicalReadFixture).resolved,'supabase');
+assert.equal(resolveWarRoomInputSource(canonicalReadFixture).fallbackUsed,false);
+for(const env of [{...canonicalReadFixture,WAR_ROOM_INPUT_SOURCE:'google'},{...canonicalReadFixture,WAR_ROOM_INPUT_SOURCE:'automatic'},{...canonicalReadFixture,VERCEL_ENV:'production'},{}])assert.throws(()=>resolveWarRoomInputSource(env),{code:'WAR_ROOM_INPUT_SOURCE_INVALID'});
 });
 
 test("Supabase cutover pins the independently certified source and effective settings fingerprints", () => {
@@ -307,7 +304,7 @@ test("Supabase adapter has zero Google imports and the boundary never implements
 
 test("Step 7D does not alter engine formulas, UI styling, publication, or consumer source configuration", () => {
   assert.doesNotMatch(source("lib/war-room-input-source.js"), /automatic/i);
-  assert.match(source("lib/war-room-input-source.js"), /fallbackUsed: false/);
+  assert.match(source("lib/war-room-input-source.js"), /canonicalReadEnvironment/);
   assert.equal(fs.existsSync(path.join(root, ".env.local")), false);
   for (const file of ["lib/prediction-engine.js", "lib/match-simulator.js", "lib/lineup-optimizer.js", "app/war-room/war-room.module.css"]) {
     assert.equal(fs.statSync(path.join(root, file)).isFile(), true);

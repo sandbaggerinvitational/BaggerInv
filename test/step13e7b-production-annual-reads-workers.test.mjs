@@ -136,8 +136,8 @@ test("future live/guide/archive source paths cannot use a caller-selected year",
     source("lib/scorecard-archive-worker.js"),
     source("lib/scoring-google-outbox.js"),
   ]);
-  assert.match(live, /runtime\.tournamentId === "2026"[\s\S]*readLiveMatchAdminData/);
-  assert.match(live, /else \{[\s\S]*readTournamentLiveView[\s\S]*productionLiveMatchAdminDataFromSupabaseView/);
+  assert.doesNotMatch(live,/readLiveMatchAdminData/);
+  assert.match(live,/readTournamentLiveView[\s\S]*productionLiveMatchAdminDataFromSupabaseView/);
   assert.doesNotMatch(guide, /tournamentId:\s*["']2026["']/);
   assert.match(guide, /const tournamentId = clean\([\s\S]*read\.payload\.target_tournament_id/);
   for (const worker of [archive, outbox]) {

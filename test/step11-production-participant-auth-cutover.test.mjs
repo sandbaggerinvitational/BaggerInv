@@ -69,8 +69,8 @@ test("dormant live Production fails closed when Supabase identity was explicitly
     { VERCEL_ENV: "production", PARTICIPANT_IDENTITY_AUTHORITY: "passport" },
   ]) {
     const legacy = participantIdentityAuthorityEnvironment(legacyEnv);
-    assert.equal(legacy.resolved, "passport");
-    assert.equal(legacy.blocked, false);
+    assert.equal(legacy.resolved, "unavailable");
+    assert.equal(legacy.blocked, true);
   }
 });
 
@@ -117,9 +117,9 @@ test("Preview identity behavior remains separate from Production activation", ()
     GOOGLE_SHEETS_ID: "preview-workbook",
     PREVIEW_SCORING_SHEET_ID: "preview-workbook",
     PARTICIPANT_IDENTITY_AUTHORITY: "supabase",
-    NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://preview.example.supabase.co",
+    NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://idgigvjjqkfbqjeredpb.supabase.co",
     NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY: "preview-publishable",
-    SUPABASE_SCORING_MIRROR_URL: "https://preview.example.supabase.co",
+    SUPABASE_SCORING_MIRROR_URL: "https://idgigvjjqkfbqjeredpb.supabase.co",
     SUPABASE_SCORING_MIRROR_SECRET_KEY: "preview-server-secret",
     PARTICIPANT_SMS_CAPTCHA_REQUIRED: "true",
     PARTICIPANT_SMS_CAPTCHA_CONFIGURED: "true",
@@ -128,7 +128,7 @@ test("Preview identity behavior remains separate from Production activation", ()
   const authority = participantIdentityAuthorityEnvironment(preview);
   assert.equal(authority.resolved, "supabase");
   assert.equal(authority.productionCutoverIdentity, false);
-  assert.equal(authority.previewWorkbook, true);
+  assert.equal(authority.productionIsolated, true);
   assert.equal(participantAuthCaptchaConfigured(preview), true);
 });
 

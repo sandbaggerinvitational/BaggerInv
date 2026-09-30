@@ -340,18 +340,20 @@ test("writer copies protected formulas and worker transport stays exact-scoped a
   const futureServer = await readFile(new URL(
     "../lib/production-future-google-writer-server.js", import.meta.url,
   ), "utf8");
+  assert.match(route,/FUTURE_MATCH_GOOGLE_COMPATIBILITY_RETIRED/);
+  assert.doesNotMatch(route,/SCORING_GOOGLE_OUTBOX_WORKER_SECRET/);
   assert.match(writer, /pasteType:\s*"PASTE_FORMULA"/);
   assert.match(writer, /target\.rawValues\?\.\["Match ID"\]/);
   assert.match(writer, /valueInputOption:\s*"RAW"/);
   assert.match(writer, /FUTURE_MATCH_RESULT_FIELDS/);
   assert.match(writer, /FUTURE_MATCH_ACCESS_SECRET_FIELDS/);
   assert.match(writer, /FUTURE_MATCH_GOOGLE_COMPATIBILITY_EXISTING_ROW_CONFLICT/);
-  assert.match(route, /SCORING_GOOGLE_OUTBOX_WORKER_SECRET/);
-  assert.match(route, /targetTournamentId/);
-  assert.match(route, /FUTURE_MATCH_GOOGLE_COMPATIBILITY_TARGET_REQUIRED/);
-  assert.match(route, /export async function GET\(\)[\s\S]*METHOD_NOT_ALLOWED/);
-  assert.match(route, /VERCEL_ENV[\s\S]*production/);
-  assert.doesNotMatch(route, /export async function (?:PUT|PATCH|DELETE)/);
+  // Google compatibility cron is terminal retired; historical formula/scoping utilities remain tested.
+  // Google compatibility cron is terminal retired; historical formula/scoping utilities remain tested.
+  // Google compatibility cron is terminal retired; historical formula/scoping utilities remain tested.
+  // Google compatibility cron is terminal retired; historical formula/scoping utilities remain tested.
+  // Google compatibility cron is terminal retired; historical formula/scoping utilities remain tested.
+  // Google compatibility cron is terminal retired; historical formula/scoping utilities remain tested.
   assert.match(runtime, /resolve_production_future_match_google_compatibility_v2:\s*"WORKERS"/);
   assert.match(futureServer, /"resolve_production_future_match_google_compatibility_v2"/);
   for (const rpc of ["claim", "complete", "fail"]) {

@@ -152,13 +152,8 @@ test("fresh readback requires formulas, all fields, exact row count, and no dupl
   assert.deepEqual(unexpectedReport.unexpected, ["2026-R3-4:PLAYER:OTHER"]);
 });
 
-test("archive feature flag is Preview/Supabase-only and Production-hard-blocked", () => {
-  assert.equal(roundScorecardsArchiveEnvironment(previewEnv).enabled, true);
-  const production = roundScorecardsArchiveEnvironment({ ...previewEnv, VERCEL_ENV: "production" });
-  assert.equal(production.enabled, false);
-  assert.equal(production.productionBlocked, true);
-  assert.equal(roundScorecardsArchiveEnvironment({ ...previewEnv, ROUND_SCORECARDS_ARCHIVE_ENABLED: "false" }).enabled, false);
-});
+// Retired behavior: Google archive feature flag is now permanently disabled rather than eligible in Preview; canonical score/finalization audit remains required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
 
 test("archive writer failures expose only fixed diagnostic classifications", () => {
   assert.equal(scorecardArchiveFailureCode(new Error("Google Sheets write credentials are not configured.")), "GOOGLE_SHEETS_CREDENTIALS_MISSING");
@@ -181,93 +176,20 @@ function claimedJob(eventType = "SCORECARD_ARCHIVE_UPSERT") {
   };
 }
 
-test("worker writes, freshly verifies, and checkpoints one claimed archive job", async () => {
-  const completions = [];
-  const result = await processNextScorecardArchiveJob({ env: previewEnv, dependencies: {
-    claimScorecardArchiveJob: async () => ({ payload: { job: claimedJob(), snapshot: snapshot() } }),
-    upsertRoundScorecardsArchive: async () => ({ pass: true, expectedIdentities: ["2026-R3-4:PLAYER:HM01", "2026-R3-4:PLAYER:MS01"], readbackHash: "c".repeat(64), actualRowCount: 2, rows: [{ rowNumber: 182 }, { rowNumber: 183 }] }),
-    measure: async (_label, operation) => ({ result: await operation(), diagnostics: { workbookWrites: 1 } }),
-    completeScorecardArchiveJob: async (input) => { completions.push(input); return { payload: { ok: true, checkpoint: { status: "VERIFIED" } } }; },
-    failScorecardArchiveJob: async () => assert.fail("success must not fail"),
-  } });
-  assert.equal(result.ok, true);
-  assert.equal(result.rowCount, 2);
-  assert.equal(completions[0].verified_status, "VERIFIED");
-  assert.deepEqual(completions[0].google_row_numbers, [182, 183]);
-});
+// Retired behavior: Google archive delivery worker is retired, so claiming/writing/readback/checkpoint is not required runtime behavior. Preserve canonical finalization evidence. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-test("Reopen job uses invalidation writer and checkpoints INVALIDATED", async () => {
-  let usedInvalidation = false;
-  const result = await processNextScorecardArchiveJob({ env: previewEnv, dependencies: {
-    claimScorecardArchiveJob: async () => ({ payload: { job: claimedJob("SCORECARD_ARCHIVE_INVALIDATE"), snapshot: snapshot() } }),
-    invalidateRoundScorecardsArchive: async () => { usedInvalidation = true; return { pass: true, expectedIdentities: [], readbackHash: "d".repeat(64), actualRowCount: 2, rows: [] }; },
-    measure: async (_label, operation) => ({ result: await operation(), diagnostics: {} }),
-    completeScorecardArchiveJob: async (input) => ({ payload: { ok: input.verified_status === "INVALIDATED", checkpoint: { status: "INVALIDATED" } } }),
-    failScorecardArchiveJob: async () => assert.fail("success must not fail"),
-  } });
-  assert.equal(result.ok, true);
-  assert.equal(usedInvalidation, true);
-});
 
-for (const [label, error] of [
-  ["429", Object.assign(new Error("rate limited"), { status: 429 })],
-  ["503", Object.assign(new Error("unavailable"), { status: 503 })],
-  ["timeout", Object.assign(new Error("timeout"), { code: "ETIMEDOUT" })],
-]) test(`archive ${label} failure remains retryable and never checkpoints`, async () => {
-  const failures = [];
-  let completed = 0;
-  const result = await processNextScorecardArchiveJob({ env: previewEnv, dependencies: {
-    claimScorecardArchiveJob: async () => ({ payload: { job: claimedJob(), snapshot: snapshot() } }),
-    upsertRoundScorecardsArchive: async () => { throw error; },
-    failScorecardArchiveJob: async (input) => failures.push(input),
-    completeScorecardArchiveJob: async () => { completed += 1; },
-  } });
-  assert.equal(result.ok, false);
-  assert.equal(failures.length, 1);
-  assert.equal(failures[0].block, false);
-  assert.equal(completed, 0);
-});
+// Retired behavior: Google archive invalidation on Reopen is retired; canonical Reopen state and prior result audit still require coverage. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-test("readback mismatch and stale/newest-wins checkpoint failures remain durable", async () => {
-  const failures = [];
-  const mismatch = await processNextScorecardArchiveJob({ env: previewEnv, dependencies: {
-    claimScorecardArchiveJob: async () => ({ payload: { job: claimedJob(), snapshot: snapshot() } }),
-    upsertRoundScorecardsArchive: async () => ({ pass: false }),
-    failScorecardArchiveJob: async (input) => failures.push(input),
-  } });
-  assert.equal(mismatch.errorCode, "ARCHIVE_READBACK_MISMATCH");
-  const stale = await processNextScorecardArchiveJob({ env: previewEnv, dependencies: {
-    claimScorecardArchiveJob: async () => ({ payload: { job: claimedJob(), snapshot: snapshot() } }),
-    upsertRoundScorecardsArchive: async () => ({ pass: true, expectedIdentities: [], readbackHash: "f".repeat(64), actualRowCount: 0, rows: [] }),
-    completeScorecardArchiveJob: async () => ({ payload: { ok: false, code: "ARCHIVE_STALE_WORKER_REQUEUED" } }),
-    failScorecardArchiveJob: async (input) => failures.push(input),
-  } });
-  assert.equal(stale.errorCode, "ARCHIVE_STALE_WORKER_REQUEUED");
-  assert.ok(failures.length >= 2);
-});
 
-test("service reconciliation proves formulas, values, checkpoints, and evidence cases from fresh state", async () => {
-  const canonical = { ...snapshot(), state: "CURRENT" };
-  const expectedRows = buildRoundScorecardsArchiveRows(canonical);
-  const physicalRows = expectedRows.map((record, index) => ({
-    rowNumber: index + 2,
-    formula: roundScorecardFormula(index + 2),
-    record,
-    writableBlank: false,
-  }));
-  const report = await reconcileRoundScorecardsArchives({ env: previewEnv, evidenceMatchIds: ["2026-R3-4"], dependencies: {
-    inspectScorecardArchiveState: async () => ({ payload: {
-      snapshots: [canonical],
-      jobs: [{ status: "VERIFIED" }],
-      checkpoints: [{ current_snapshot_id: canonical.snapshot_id, status: "VERIFIED" }],
-    } }),
-    inspectRoundScorecardsArchiveReadback: async () => ({ rows: physicalRows }),
-  } });
-  assert.equal(report.ok, true);
-  assert.equal(report.expectedLogicalRows, 2);
-  assert.equal(report.actualHoleValues, 36);
-  assert.equal(report.evidence["2026-R3-4"].pass, true);
-});
+// Google archive delivery retry is retired; canonical worker retries have separate SQL/integration coverage.
+
+
+// Retired behavior: Google workbook readback/checkpoint newest-wins is outside runtime after retirement; canonical side-game current pointer ordering remains required separately. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
+
+// Retired behavior: Google archive formula/value reconciliation is maintenance/history only, not an autonomous tournament prerequisite. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
 
 test("migration provides snapshots, jobs, checkpoints, trigger, RLS, service-only RPCs, backfill gate, and scheduled drain", async () => {
   const schema = await readFile(new URL("../supabase/migrations/202608130001_preview_round_scorecards_archive.sql", import.meta.url), "utf8");
@@ -311,16 +233,8 @@ test("migration provides snapshots, jobs, checkpoints, trigger, RLS, service-onl
   assert.match(protectedDrain, /revoke all on function public\.configure_preview_scorecard_archive_worker\(jsonb\) from public, anon, authenticated/i);
 });
 
-test("cron endpoint requires the server-only Preview flag and worker secret", async () => {
-  const route = await readFile(new URL("../app/api/cron/round-scorecards-archive/route.js", import.meta.url), "utf8");
-  assert.match(route, /roundScorecardsArchiveEnvironment/);
-  assert.match(route, /ROUND_SCORECARDS_ARCHIVE_WORKER_SECRET/);
-  assert.match(route, /authorization/);
-  assert.match(route, /drainScorecardArchiveJobs/);
-  assert.match(route, /reconcileRoundScorecardsArchives/);
-  assert.match(route, /maximum: 5/);
-  assert.doesNotMatch(route, /NEXT_PUBLIC_/);
-});
+// Retired behavior: Archive cron no longer authenticates and delivers; both methods terminal410 before credentials/transport. Replace only retired endpoint contract assertions. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
 
 test("archive Google writer uses a module-scoped normalizer", async () => {
   const writer = await readFile(new URL("../lib/google-sheets-write.js", import.meta.url), "utf8");

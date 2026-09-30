@@ -22,11 +22,10 @@ const preview = {
   TOURNAMENT_READ_SOURCE: "supabase",
 };
 
-test("Tournament Supabase source is Preview-only and Production fails closed", () => {
-  assert.equal(tournamentReadEnvironment(preview).resolved, "supabase");
-  assert.equal(tournamentReadEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "google");
-  assert.equal(tournamentReadEnvironment({ ...preview, GOOGLE_SHEETS_ID: "production-workbook" }).blocked, true);
-  assert.equal(tournamentReadEnvironment({ VERCEL_ENV: "preview" }).resolved, "google");
+test("TOURNAMENT_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {tournamentReadEnvironment}=await import('../lib/tournament-read-source.js');
+  assertCanonicalReadRetirementContract(tournamentReadEnvironment,"TOURNAMENT_READ_SOURCE");
 });
 
 test("Tournament RPC is compact, service-only, and uses canonical score authority", async () => {

@@ -106,9 +106,8 @@ test("annual Odds scope is server-selected and cannot be replaced by caller inpu
     authorityGenerationId);
   assert.equal(scope.expected_annual_admission_generation_id,
     admissionGenerationId);
-  assert.equal(scope.expected_google_writer_generation_id,
-    writerGenerationId);
-  assert.equal(scope.annual_destination_workbook_id, annualWorkbook);
+  assert.equal("expected_google_writer_generation_id" in scope, false);
+  assert.equal("annual_destination_workbook_id" in scope, false);
   assert.equal(scope.authorization.tournament_id, "2027");
   assert.equal(scope.source_workbook_id, PRODUCTION_GOOGLE_WORKBOOK_ID,
     "the frozen platform workbook remains attestation evidence only");
@@ -222,8 +221,7 @@ test("application dispatcher preserves the frozen 2026 RPC and binds future call
   assert.equal(calls[1].body.input.target_tournament_year, 2027);
   assert.equal(calls[1].body.input.expected_runtime_generation_id,
     runtimeGenerationId);
-  assert.equal(calls[1].body.input.annual_destination_workbook_id,
-    annualWorkbook);
+  assert.equal("annual_destination_workbook_id" in calls[1].body.input, false);
 });
 
 test("2026 publication request identity remains byte-compatible while future identity is target-bound", () => {

@@ -218,11 +218,11 @@ test("missing candidate transport fails closed without a Google fallback", () =>
   assert.equal(predictionInputBundleEnvironment(incomplete).available, false);
   assert.throws(
     () => resolveWarRoomInputSource(incomplete),
-    (error) => error.code === "PRODUCTION_SHADOW_WAR_ROOM_CONFIGURATION_REQUIRED",
+    (error) => error.code === "WAR_ROOM_INPUT_SOURCE_INVALID",
   );
 });
 
-test("live Production remains Google/Passport and rejects injected candidate read selection", () => {
+test("unadmitted Production fails closed and rejects injected candidate read selection", () => {
   const live = {
     ...candidateReadEnv,
     VERCEL_ENV: "production",
@@ -250,13 +250,13 @@ test("live Production remains Google/Passport and rejects injected candidate rea
   ];
   for (const selector of googleSelectors) {
     const state = selector(live);
-    assert.equal(state.resolved || state.source, "google", selector.name);
+    assert.equal(state.resolved || state.source, "unavailable", selector.name);
     assert.equal(state.productionShadowCandidate || false, false, selector.name);
   }
-  assert.equal(resolveWarRoomInputSource(live).resolved, "google");
+  assert.throws(() => resolveWarRoomInputSource(live), error => error.code === "WAR_ROOM_INPUT_SOURCE_INVALID");
   const odds = oddsCalculationEnvironment(live);
-  assert.equal(odds.inputSource, "google");
-  assert.equal(odds.publicationAuthority, "google");
+  assert.equal(odds.inputSource, "unavailable");
+  assert.equal(odds.publicationAuthority, "unavailable");
   assert.equal(predictionInputBundleEnvironment(live).available, false);
 });
 
@@ -274,11 +274,11 @@ test("candidate can never acquire Odds publication authority", () => {
 test("candidate War Room cannot select the Google rollback adapter", () => {
   assert.throws(
     () => resolveWarRoomInputSource({ ...candidateReadEnv, WAR_ROOM_INPUT_SOURCE: "google" }),
-    (error) => error.code === "PRODUCTION_SHADOW_WAR_ROOM_SUPABASE_REQUIRED",
+    (error) => error.code === "WAR_ROOM_INPUT_SOURCE_INVALID",
   );
   assert.throws(
     () => resolveWarRoomInputSource(candidateReadEnv, "google"),
-    (error) => error.code === "PRODUCTION_SHADOW_WAR_ROOM_SUPABASE_REQUIRED",
+    (error) => error.code === "WAR_ROOM_INPUT_SOURCE_INVALID",
   );
 });
 

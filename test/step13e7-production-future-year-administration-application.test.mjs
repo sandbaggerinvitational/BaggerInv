@@ -116,16 +116,18 @@ const PRODUCTION_TOURNAMENT_YEAR = 2026;`,
       /import \{ recordDataAuthorityTransport \} from "\.\/data-authority-request\.js";/,
       "function recordDataAuthorityTransport() {}",
     )
+    .replace('from "./annual-runtime-request-hash.js";', `from "${new URL("../lib/annual-runtime-request-hash.js", import.meta.url).href}";`)
     .replace('from "./production-future-year-administration-contract.js";', `from "${contractUrl}";`);
   return import(`data:text/javascript;base64,${Buffer.from(transformed).toString("base64")}`);
 }
 
-test("future target scope is separate from and cannot alias the certified 2026 provenance", () => {
+test("annual year representation is explicit; installed current-authority admission decides future eligibility", () => {
   assert.deepEqual(canonicalFutureTournamentScope("2027", 2027), {
     tournamentId: "2027",
     tournamentYear: 2027,
   });
-  assert.throws(() => canonicalFutureTournamentScope("2026", 2026),
+  assert.deepEqual(canonicalFutureTournamentScope("2026", 2026), {tournamentId: "2026", tournamentYear: 2026});
+  assert.throws(() => canonicalFutureTournamentScope("2098", "2098"),
     (error) => error.code === "FUTURE_YEAR_TARGET_TOURNAMENT_INVALID");
   assert.throws(() => canonicalFutureTournamentScope("TOUR-2027", 2027),
     (error) => error.code === "FUTURE_YEAR_TARGET_TOURNAMENT_INVALID");
@@ -183,6 +185,8 @@ test("all eight actions emit bounded snake_case annual-administration payloads",
   assert.equal(operations[0].creation_mode, "CLONE_STRUCTURE");
   assert.equal(operations[0].clone_source_tournament_id, "2026");
   assert.equal(operations[0].target_tournament_id, "2027");
+  assert.equal(operations[0].target_tournament_year, 2027);
+  assert.equal(Object.hasOwn(operations[0], "tournament_year"), false);
   assert.equal(operations[1].target_tournament_id, "2027");
   assert.equal(operations[3].roster[0].player_id, "CB01");
   assert.deepEqual(operations[4], {

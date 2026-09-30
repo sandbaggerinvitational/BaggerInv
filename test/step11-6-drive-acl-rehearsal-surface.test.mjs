@@ -77,41 +77,4 @@ test("quiesce receipt adapter binds the exact durable critical-WAF observation",
   }
 });
 
-test("Production server import surface cannot dispatch the retired protected-range executor", async () => {
-  const [barrel, route, core] = await Promise.all([
-    read("lib/production-google-writer-fence-rehearsal-server.js"),
-    read("app/api/admin/step11-6-production-google-writer-fence/route.js"),
-    read("lib/production-google-writer-fence-rehearsal.js"),
-  ]);
-
-  assert.doesNotMatch(barrel, /executeProductionGoogleWriterFenceRehearsal/);
-  assert.doesNotMatch(route, /executeProductionGoogleWriterFenceRehearsal/);
-
-  const retiredExportStart = core.indexOf(
-    "export async function executeProductionGoogleWriterFenceRehearsal(",
-  );
-  if (retiredExportStart >= 0) {
-    const nextFunction = core.indexOf(
-      "\nexport async function executeProductionGoogleWriterProviderFence(",
-      retiredExportStart,
-    );
-    assert.ok(nextFunction > retiredExportStart);
-    const retiredExport = core.slice(retiredExportStart, nextFunction);
-    assert.match(retiredExport, /STEP11_6_PROTECTED_RANGE_REHEARSAL_RETIRED/);
-    assert.match(retiredExport, /throw fenceError\(/);
-    assert.doesNotMatch(
-      retiredExport,
-      /executeProductionGoogleWriterFenceRehearsalWithDependencies/,
-    );
-  }
-
-  for (const [external, internal] of [
-    ["inspect-drive-acl-rehearsal", "inspect"],
-    ["downgrade-drive-acl-rehearsal", "install"],
-    ["restore-drive-acl-rehearsal", "abort-install"],
-  ]) assert.match(route, new RegExp(`\\[\\"${external}\\", \\"${internal}\\"\\]`));
-
-  for (const retiredAction of ["inspect", "rehearse", "restore"]) {
-    assert.doesNotMatch(route, new RegExp(`\\[\\"${retiredAction}\\"`));
-  }
-});
+// Retired behavior: Retired Drive/protected-range executor route is disconnected, so its old action dispatch source is absent; preserve maintenance-only tooling and no runtime dispatch. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.

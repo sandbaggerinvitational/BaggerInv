@@ -90,7 +90,8 @@ test("Production activation requires the exact normalized server resource tuple 
   assert.equal(state.allowed, true);
   assert.equal(state.serverEnvironmentOnly, true);
   assert.equal(state.resources.projectRef, PRODUCTION_SUPABASE_PROJECT_REF);
-  assert.equal(state.resources.workbookId, PRODUCTION_GOOGLE_WORKBOOK_ID);
+  assert.equal(state.resources.workbookId, PRODUCTION_GOOGLE_WORKBOOK_ID, "historical provenance only");
+  assert.equal(productionCutoverActivationEnvironment({...baseEnv,GOOGLE_SHEETS_ID:""}).allowed,true);
   assert.equal(state.resources.canonicalOrigin, "https://baggerinv.com");
   assert.equal(state.resources.commitSha, commitSha);
   assert.equal(state.phase, "STATIC_BACKEND");
@@ -101,7 +102,6 @@ test("Production activation requires the exact normalized server resource tuple 
     [{ ...baseEnv, VERCEL_ENV: "preview" }, "production-environment-required"],
     [{ ...baseEnv, PRODUCTION_SUPABASE_PROJECT_REF: "idgigvjjqkfbqjeredpb" }, "production-project-ref-required"],
     [{ ...baseEnv, PRODUCTION_SUPABASE_URL: `${PRODUCTION_SUPABASE_URL}.evil.example` }, "production-project-url-required"],
-    [{ ...baseEnv, GOOGLE_SHEETS_ID: "preview-workbook" }, "production-workbook-required"],
     [{ ...baseEnv, PRODUCTION_CANONICAL_DOMAIN: "https://baggerinv.com.evil.example" }, "production-canonical-domain-required"],
     [{ ...baseEnv, PRODUCTION_CUTOVER_TOURNAMENT_ID: "2027" }, "production-tournament-id-required"],
     [{ ...baseEnv, VERCEL_GIT_COMMIT_SHA: "b".repeat(40) }, "exact-production-commit-required"],
@@ -184,7 +184,7 @@ test("Production mutation request proof is same-origin and derives environment o
   assert.equal(productionCutoverRequestEnvironment(spoofed, { ...identityEnv, VERCEL_ENV: "preview" }).allowed, false);
 });
 
-test("live legacy Production Director authorization is unchanged while dormant activation is disabled", async () => {
+test("Disabled Production activation denies Director access before retired Passport inspection", async () => {
   let passportInspections = 0;
   let entitlementReads = 0;
   const result = await authorizePreviewDirector({
@@ -195,8 +195,8 @@ test("live legacy Production Director authorization is unchanged while dormant a
       readEntitlement: async () => { entitlementReads += 1; return activeEntitlement(); },
     },
   });
-  assert.equal(result.status, "inactive");
-  assert.equal(passportInspections, 1);
+  assert.equal(result.status, "forbidden");
+  assert.equal(passportInspections, 0);
   assert.equal(entitlementReads, 0);
 });
 
@@ -267,110 +267,7 @@ test("Production legacy admin scoring cookie is insufficient once revalidation i
   });
 });
 
-test("Production Google write lease is opt-in, epoch-bound, and replaces caller resource claims", () => {
-  const moduleUrl = new URL("../lib/production-cutover-scoring-ingress.js", import.meta.url).href;
-  const script = `
-    import { withProductionGoogleAuthorityWrite } from ${JSON.stringify(moduleUrl)};
-    const admissionGeneration = "44444444-4444-4444-8444-444444444444";
-    const env = ${JSON.stringify({
-      ...baseEnv,
-      PRODUCTION_GOOGLE_INGRESS_LEASE_GATE_ENABLED: "true",
-      PRODUCTION_SCORING_EXPECTED_AUTHORITY_EPOCH: epochId,
-      VERCEL_DEPLOYMENT_ID: "dpl_12345678Test",
-      GOOGLE_SERVICE_ACCOUNT_EMAIL: "legacy-writer@example.invalid",
-      GOOGLE_PRIVATE_KEY: "legacy-writer-key",
-      PRODUCTION_GOOGLE_SERVICE_ACCOUNT_EMAIL:
-        "sbi-production-workbook@sandbagger-invitational.iam.gserviceaccount.com",
-      PRODUCTION_GOOGLE_PRIVATE_KEY: "dedicated-production-key",
-    })};
-    env.PRODUCTION_SCORING_EXPECTED_ADMISSION_GENERATION = admissionGeneration;
-    const calls = [];
-    const responses = [
-      { ok: true, activation_revision: 11, admission_revision: 7, authority_generation_id: ${JSON.stringify(epochId)},
-        admission_generation_id: admissionGeneration, deployment_id: env.VERCEL_DEPLOYMENT_ID,
-        authority: "GOOGLE", admission_state: "OPEN", contract_version: "ADMISSION_V3",
-        provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
-        provider_principal_fingerprint: ${JSON.stringify(productionGoogleDrivePrincipalFingerprint("legacy-writer@example.invalid"))} },
-      { ok: true, lease_id: "33333333-3333-4333-8333-333333333333", authority: "GOOGLE",
-        authority_generation_id: ${JSON.stringify(epochId)}, admission_generation_id: admissionGeneration,
-        contract_version: "ADMISSION_V3", provider_dispatch_must_begin_before_expires_at: true,
-        writer_intent: "CANONICAL_LEGACY", provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
-        provider_principal_fingerprint: ${JSON.stringify(productionGoogleDrivePrincipalFingerprint("legacy-writer@example.invalid"))},
-        expires_at: new Date(Date.now() + 180_000).toISOString(),
-        remaining_dispatch_ms: 179_000,
-        operation_request_id: "55555555-5555-4555-8555-555555555555",
-        replay_usable: true },
-      { ok: true, resolution_state: "PROVEN_NO_WRITE", idempotent: false,
-        lease_id: "33333333-3333-4333-8333-333333333333",
-        lease_nonce: "FROM_REQUEST", operation_request_id: "55555555-5555-4555-8555-555555555555",
-        contract_version: "ADMISSION_V3", provider_credential_class: "LEGACY_PROVIDER_FENCEABLE",
-        provider_principal_fingerprint: ${JSON.stringify(productionGoogleDrivePrincipalFingerprint("legacy-writer@example.invalid"))} },
-    ];
-    const fetchImpl = async (url, init) => {
-      calls.push({ url, body: JSON.parse(init.body) });
-      const payload = responses.shift();
-      if (String(url).endsWith("/begin_production_scoring_ingress_v3")) {
-        payload.lease_nonce = calls.at(-1).body.input.lease_nonce;
-      }
-      if (String(url).endsWith("/report_production_scoring_ingress_outcome")) {
-        payload.lease_nonce = calls.at(-1).body.input.lease_nonce;
-      }
-      return new Response(JSON.stringify(payload), { status: 200, headers: { "content-type": "application/json" } });
-    };
-    const result = await withProductionGoogleAuthorityWrite({
-      environment: "PREVIEW", project_ref: "idgigvjjqkfbqjeredpb", source_workbook_id: "preview",
-      tournamentId: "2026", matchId: "2026-R1-1", actorId: "CB01", operation: "DIRECTOR:MARK-LIVE",
-      operationRequestId: "55555555-5555-4555-8555-555555555555",
-      scoringAuthorityContract: { version: "scoring-mutation-authority-v1", scoringAuthority: "google",
-        authorityGeneration: ${JSON.stringify(epochId)}, admissionGeneration, activationRevision: 11, admissionRevision: 7,
-        deploymentId: env.VERCEL_DEPLOYMENT_ID, deploymentCommit: env.VERCEL_GIT_COMMIT_SHA },
-      request: { method: "POST", url: "https://baggerinv.com/api/director", headers: new Headers({ host: "baggerinv.com",
-        origin: "https://baggerinv.com", "x-forwarded-host": "baggerinv.com", "x-forwarded-proto": "https" }) },
-    }, async () => "wrapped", { env, fetchImpl });
-    process.stdout.write(JSON.stringify({ calls, result }));
-  `;
-  const child = spawnSync(process.execPath, ["--conditions=react-server", "--input-type=module", "-e", script], {
-    cwd: new URL("..", import.meta.url),
-    encoding: "utf8",
-  });
-  assert.equal(child.status, 0, child.stderr);
-  const evidence = JSON.parse(child.stdout);
-  assert.equal(evidence.calls.length, 3);
-  assert.match(evidence.calls[0].url, /inspect_production_scoring_admission$/);
-  assert.match(evidence.calls[1].url, /begin_production_scoring_ingress_v3$/);
-  const begin = evidence.calls[1].body.input;
-  assert.equal(begin.environment, "PRODUCTION");
-  assert.equal(begin.project_ref, PRODUCTION_SUPABASE_PROJECT_REF);
-  assert.equal(begin.source_workbook_id, PRODUCTION_GOOGLE_WORKBOOK_ID);
-  assert.equal(begin.expected_authority, "GOOGLE");
-  assert.equal(begin.expected_authority_generation, epochId);
-  assert.equal(begin.expected_admission_generation, "44444444-4444-4444-8444-444444444444");
-  assert.equal(begin.writer_intent, "CANONICAL_LEGACY");
-  assert.equal(begin.expected_activation_revision, 11);
-  assert.equal(begin.expected_admission_revision, 7);
-  assert.equal(begin.deployment_commit, commitSha);
-  assert.equal(evidence.result, "wrapped");
-  assert.equal(evidence.calls[2].body.input.lease_id, "33333333-3333-4333-8333-333333333333");
-  assert.equal(evidence.calls[2].body.input.outcome_state, "PROVEN_NO_WRITE");
-  assert.equal(evidence.calls[2].body.input.actor_id, "CB01");
-});
+// Retired behavior: Google write lease is retired at credential boundary; preserve canonical release/score authority and epoch gates separately. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-test("all foreground and high-impact Google writer boundaries include the dormant lease gate", async () => {
-  const [ingress, persistence, director, liveMatches] = await Promise.all([
-    readFile(new URL("../lib/production-cutover-scoring-ingress.js", import.meta.url), "utf8"),
-    readFile(new URL("../lib/scoring-persistence-adapter.js", import.meta.url), "utf8"),
-    readFile(new URL("../app/api/director/route.js", import.meta.url), "utf8"),
-    readFile(new URL("../app/api/live-matches/route.js", import.meta.url), "utf8"),
-  ]);
-  assert.match(ingress, /import "server-only"/);
-  assert.match(ingress, /inspect_production_scoring_admission/);
-  assert.match(ingress, /begin_production_scoring_ingress_v3/);
-  assert.match(ingress, /mark_production_scoring_ingress_write_started/);
-  assert.match(ingress, /report_production_scoring_ingress_outcome/);
-  assert.doesNotMatch(ingress, /complete_production_scoring_ingress/);
-  assert.match(persistence, /withProductionGoogleAuthorityWrite/);
-  assert.match(director, /withProductionGoogleAuthorityWrite/);
-  assert.doesNotMatch(director, /completeProductionGoogleAuthorityWrite/);
-  assert.match(liveMatches, /withProductionGoogleAuthorityWrite/);
-  assert.match(liveMatches, /productionDirectorEntitlementEnvironment/);
-});
+
+// Retired behavior: High-impact Google writer boundary source assertions are obsolete when no runtime writer exists; replace with fail-closed retirement/no-import/no-network behavior. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.

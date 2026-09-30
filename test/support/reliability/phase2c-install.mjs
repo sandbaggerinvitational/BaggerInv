@@ -42,6 +42,15 @@ export async function installPhase2C(cluster,database,{through=124,timeoutMs=nor
       migrations.push({path:file,sha256:createHash('sha256').update(await readFile(path.join(repositoryRoot,file))).digest('hex')});
     }
   }
+  if(process.env.BAGGER_PHASE2C1_CLOSURE==='1'&&through===124){
+    assert.equal(process.env.BAGGER_PHASE2C1_CANDIDATE,'1','Closure requires the verified retirement base');
+    const names=(await readdir(path.join(repositoryRoot,'supabase/production_migrations')))
+      .filter(name=>/^\d{8}0127_.*\.sql$/.test(name));
+    assert.equal(names.length,1,'Exactly one closure migration127 required');
+    const file=path.join('supabase/production_migrations',names[0]);
+    sqlFile(cluster,database,path.join(repositoryRoot,file),{role:''});
+    migrations.push({path:file,sha256:createHash('sha256').update(await readFile(path.join(repositoryRoot,file))).digest('hex')});
+  }
   configureFiniteTimeout(cluster,database,timeoutMs);
   return {baseSha:phase2cBaseSha,fixtureVersion:phase2cFixtureVersion,migrations,statementTimeoutMs:timeoutMs,timeZone:'UTC',
     production:false,environment:'OWNED_SOCKET_ONLY_POSTGRESQL17',runtimeAuthority:'EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES'};

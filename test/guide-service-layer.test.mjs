@@ -40,45 +40,16 @@ const canonicalContext = rpc({
   },
 });
 
-test("Guide and course reads are Preview-only, workbook-isolated, and project-scoped", () => {
-  const state = guideReadEnvironment(previewEnv);
-  assert.equal(state.guide.resolved, "supabase");
-  assert.equal(state.course.resolved, "supabase");
-  assert.equal(state.supabaseEligible, true);
-
-  const existingPreviewWithoutRedundantWorkbookVariable = guideReadEnvironment({
-    ...previewEnv,
-    PREVIEW_SCORING_SHEET_ID: "",
-  });
-  assert.equal(existingPreviewWithoutRedundantWorkbookVariable.guide.resolved, "supabase");
-  assert.equal(existingPreviewWithoutRedundantWorkbookVariable.previewWorkbook, true);
-
-  const wrongProject = guideReadEnvironment({ ...previewEnv, SUPABASE_SCORING_MIRROR_URL: "https://other.supabase.co" });
-  assert.equal(wrongProject.guide.blocked, true);
-  assert.equal(wrongProject.guide.reason, "preview-project-required");
-
-  const production = guideReadEnvironment({ ...previewEnv, VERCEL_ENV: "production" });
-  assert.equal(production.guide.resolved, "google");
-  assert.equal(production.guide.productionBlocked, true);
-
-  const missingCredentials = guideReadEnvironment({ ...previewEnv, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" });
-  assert.equal(missingCredentials.guide.blocked, true);
-  assert.equal(missingCredentials.guide.resolved, "unavailable");
-  assert.equal(missingCredentials.guide.reason, "credentials-missing");
-
-  const independentlyBlockedCourse = guideReadEnvironment({ ...previewEnv, COURSE_PRESENTATION_READ_SOURCE: "invalid" });
-  assert.equal(independentlyBlockedCourse.guide.resolved, "supabase");
-  assert.equal(independentlyBlockedCourse.course.blocked, true);
-  assert.equal(independentlyBlockedCourse.course.resolved, "unavailable");
+test("Guide and course read admission is canonical, independent, and Google-free", async () => {
+const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+assertCanonicalReadRetirementContract(env=>guideReadEnvironment(env).guide,'GUIDE_READ_SOURCE');
+assertCanonicalReadRetirementContract(env=>guideReadEnvironment(env).course,'COURSE_PRESENTATION_READ_SOURCE');
+const {canonicalReadFixture}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+const separate=guideReadEnvironment({...canonicalReadFixture,COURSE_PRESENTATION_READ_SOURCE:'typo'});assert.equal(separate.guide.resolved,'supabase');assert.equal(separate.course.blocked,true);
 });
 
-test("automatic sync is separately gated while manual sync remains eligible in isolated Preview", () => {
-  assert.equal(guideSyncEnvironment(previewEnv).autoSyncEnabled, true);
-  const manualOnly = guideSyncEnvironment({ ...previewEnv, GUIDE_AUTO_SYNC_ENABLED: "false" });
-  assert.equal(manualOnly.administrativeEligible, true);
-  assert.equal(manualOnly.autoSyncEnabled, false);
-  assert.equal(guideSyncEnvironment({ ...previewEnv, GUIDE_SYNC_TOURNAMENT_ID: "3026" }).administrativeEligible, false);
-});
+// Retired behavior: Automatic/manual Google Guide synchronization eligibility is retired; canonical Guide presentation is not delivery proof and needs its own tests. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
 
 test("Guide worker requires the separate application bearer secret", () => {
   assert.equal(guideWorkerAuthorized({ headers: new Headers() }, previewEnv), false);
@@ -86,87 +57,14 @@ test("Guide worker requires the separate application bearer secret", () => {
   assert.equal(guideWorkerAuthorized({ headers: new Headers({ authorization: `Bearer ${workerSecret}` }) }, previewEnv), true);
 });
 
-test("Guide worker bootstrap takes its fixed endpoint and bearer only from server deployment configuration", () => {
-  const configuration = guideWorkerServerConfiguration(previewEnv);
-  assert.equal(configuration.ready, true);
-  assert.equal(configuration.workerSecret, workerSecret);
-  assert.equal(configuration.endpointUrl,
-    "https://bagger-inv-git-feature-mock-tour-b4f752-sandbagger-invitational.vercel.app/api/cron/guide-sync");
-  assert.equal(guideWorkerServerConfiguration({ ...previewEnv, GUIDE_SYNC_WORKER_SECRET: "short" }).ready, false);
-  assert.equal(guideWorkerServerConfiguration({ ...previewEnv, GUIDE_AUTO_SYNC_ENABLED: "false" }).ready, false);
-});
+// Retired behavior: There is no automatic Google Guide worker bootstrap after retirement; terminal endpoint must not consume URL/token or initiate transport. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-test("canonical sync claims before Google, publishes one validated projection, and reports a no-op safely", async () => {
-  const calls = [];
-  let publishedInput;
-  const result = await synchronizeGuideContent({
-    triggerType: "SCHEDULED",
-    requestedBy: "scheduler",
-    env: previewEnv,
-    dependencies: {
-      claimGuideSync: async () => { calls.push("claim"); return rpc({ ok: true, claim_token: "claim", current_content_fingerprint: "f".repeat(64) }); },
-      readGuideSourceContext: async () => { calls.push("context"); return canonicalContext; },
-      readGoogleSheets: async () => { calls.push("google"); return { result: {}, diagnostics: { sheetsApiCalls: 1 } }; },
-      buildGuideProjection: () => { calls.push("validate"); return {
-        schemaVersion: "guide-projection-v1", sourceCounts: { schedule: 4 },
-        sourceFingerprint: "a".repeat(64), contentFingerprint: "f".repeat(64),
-        payloadHash: "b".repeat(64), content: { schedule: [] },
-        sourceCanonicalJson: '{"source":"fixture"}',
-        contentCanonicalJson: '{"schedule":[]}',
-        payloadCanonicalJson: '{"schemaVersion":"guide-projection-v1","content":{"schedule":[]}}',
-      }; },
-      publishGuideProjection: async (input) => { calls.push("publish"); publishedInput = input; return rpc({ ok: true, changed: false, no_op: true, projection_revision: 3, content_fingerprint: "f".repeat(64) }); },
-      failGuideSync: async () => { throw new Error("not expected"); },
-    },
-  });
-  assert.deepEqual(calls, ["claim", "context", "google", "validate", "publish"]);
-  assert.equal(result.ok, true);
-  assert.equal(result.noOp, true);
-  assert.equal(publishedInput.contentPayload.schemaVersion, "guide-projection-v1");
-  assert.deepEqual(publishedInput.contentPayload.content, { schedule: [] });
-  assert.equal(result.diagnostics.googleRequests, 1);
-});
 
-test("invalid Google content records a fixed safe failure and preserves last-known-good", async () => {
-  let failure;
-  const message = "Courses TPGC01:1 tee does not match canonical scoring configuration";
-  const result = await synchronizeGuideContent({
-    triggerType: "MANUAL",
-    requestedBy: "director",
-    env: { ...previewEnv, GUIDE_AUTO_SYNC_ENABLED: "false" },
-    dependencies: {
-      claimGuideSync: async () => rpc({ ok: true, claim_token: "claim" }),
-      readGuideSourceContext: async () => canonicalContext,
-      readGoogleSheets: async () => ({ result: {} }),
-      buildGuideProjection: () => { throw new GuideProjectionValidationError([message], [{
-        message,
-        source: "Courses",
-        entity: "TPGC01 · Round 1",
-        field: "Tee Played",
-        currentValue: "Blue",
-        expectedValue: "Gold",
-        valueSafe: true,
-      }]); },
-      publishGuideProjection: async () => { throw new Error("not expected"); },
-      failGuideSync: async (input) => { failure = input; return rpc({ ok: true }); },
-    },
-  });
-  assert.equal(result.ok, false);
-  assert.equal(result.failureCategory, "VALIDATION");
-  assert.equal(result.lastKnownGoodPreserved, true);
-  assert.deepEqual(result.validationIssues, [{
-    source: "Courses",
-    entity: "TPGC01 · Round 1",
-    field: "Tee Played",
-    reason: message,
-    currentValue: "Blue",
-    expectedValue: "Gold",
-  }]);
-  assert.equal(failure.validationStatus, "INVALID");
-  assert.equal(failure.failureSafe, "Google Guide content did not pass publication validation.");
-  assert.equal(failure.auditMetadata.validationIssueCount, 1);
-  assert.doesNotMatch(JSON.stringify(failure.auditMetadata), /Blue|Gold|TPGC01/);
-});
+// Retired behavior: Claim/import/publish of Google Guide content is retired runtime behavior; preserve canonical Guide projection use and manual historical import provenance. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
+
+// Retired behavior: Invalid Google-content delivery failure handling is outside required runtime; test instead that current canonical Guide is independent of unavailable Google. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
 
 test("Director validation diagnostics allowlist safe Guide values and never expose contact data or internal errors", () => {
   const contactMessage = "Important Contacts row 1 is missing Email";
@@ -188,71 +86,11 @@ test("Director validation diagnostics allowlist safe Guide values and never expo
   }]);
 });
 
-test("transient Google failures are classified safely and preserve last-known-good", async () => {
-  const failures = [
-    { error: Object.assign(new Error("rate limited"), { status: 429 }), category: "GOOGLE_429" },
-    { error: Object.assign(new Error("temporarily unavailable"), { status: 503 }), category: "GOOGLE_5XX" },
-    { error: Object.assign(new Error("timed out"), { code: "ETIMEDOUT" }), category: "GOOGLE_TIMEOUT" },
-  ];
+// Retired behavior: Google transient retry classifier was part of retired Guide synchronization; it is not a reason to keep that worker required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-  for (const fixture of failures) {
-    let recordedFailure;
-    let publishCalled = false;
-    const result = await synchronizeGuideContent({
-      triggerType: "SCHEDULED",
-      requestedBy: "scheduler",
-      env: previewEnv,
-      dependencies: {
-        claimGuideSync: async () => rpc({ ok: true, claim_token: "claim" }),
-        readGuideSourceContext: async () => canonicalContext,
-        readGoogleSheets: async () => { throw fixture.error; },
-        publishGuideProjection: async () => { publishCalled = true; return rpc({ ok: true }); },
-        failGuideSync: async (input) => { recordedFailure = input; return rpc({ ok: true }); },
-      },
-    });
 
-    assert.equal(result.ok, false);
-    assert.equal(result.failureCategory, fixture.category);
-    assert.equal(result.lastKnownGoodPreserved, true);
-    assert.equal(recordedFailure.failureCategory, fixture.category);
-    assert.equal(recordedFailure.validationStatus, "NOT_RUN");
-    assert.equal(publishCalled, false);
-  }
-});
+// Retired behavior: This failure belongs to the retired Google-to-Guide publication pipeline; current canonical Guide writes and transactional failure semantics remain separate required tests. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
 
-test("Supabase publication failure is isolated and leaves the verified projection current", async () => {
-  let recordedFailure;
-  const result = await synchronizeGuideContent({
-    triggerType: "MANUAL",
-    requestedBy: "director",
-    env: previewEnv,
-    dependencies: {
-      claimGuideSync: async () => rpc({ ok: true, claim_token: "claim", current_content_fingerprint: "e".repeat(64) }),
-      readGuideSourceContext: async () => canonicalContext,
-      readGoogleSheets: async () => ({ result: {}, diagnostics: { sheetsApiCalls: 1 } }),
-      buildGuideProjection: () => ({
-        schemaVersion: "guide-projection-v1",
-        sourceCounts: { schedule: 4 },
-        sourceFingerprint: "a".repeat(64),
-        contentFingerprint: "f".repeat(64),
-        payloadHash: "b".repeat(64),
-        content: { schedule: [] },
-        sourceCanonicalJson: '{"source":"fixture"}',
-        contentCanonicalJson: '{"schedule":[]}',
-        payloadCanonicalJson: '{"schemaVersion":"guide-projection-v1","content":{"schedule":[]}}',
-      }),
-      publishGuideProjection: async () => rpc({ ok: false, code: "GUIDE_PROJECTION_PUBLICATION_FAILED" }),
-      failGuideSync: async (input) => { recordedFailure = input; return rpc({ ok: true }); },
-    },
-  });
-
-  assert.equal(result.ok, false);
-  assert.equal(result.failureCategory, "SUPABASE_SERVICE");
-  assert.equal(result.lastKnownGoodPreserved, true);
-  assert.equal(recordedFailure.failureCategory, "SUPABASE_SERVICE");
-  assert.equal(recordedFailure.validationStatus, "NOT_RUN");
-  assert.equal(recordedFailure.changed, true);
-});
 
 test("invalid Guide synchronization triggers and actors fail before any claim or Google read", async () => {
   let dependencyCalled = false;
@@ -276,13 +114,29 @@ test("invalid Guide synchronization triggers and actors fail before any claim or
   assert.equal(dependencyCalled, false);
 });
 
-test("Production blocks synchronization before a claim or Google import", async () => {
-  let called = false;
-  await assert.rejects(() => synchronizeGuideContent({
-    triggerType: "MANUAL",
-    requestedBy: "director",
-    env: { ...previewEnv, VERCEL_ENV: "production" },
-    dependencies: { claimGuideSync: async () => { called = true; return rpc({ ok: true }); } },
-  }), /production-hard-block/);
-  assert.equal(called, false);
+// Retired behavior: Google Guide synchronization is denied in all runtimes, with retired reason instead of Production-only reason; maintain zero claim/Google-call assertions. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
+
+test("UNIT retired Guide delivery never claims or reads even when legacy flags are enabled", async () => {
+  const calls=[]; const deny=name=>async()=>{calls.push(name);throw Error('Unexpected '+name)};
+  const dependencies={claimGuideSync:deny('claim'),readGuideSourceContext:deny('context'),
+    publishGuideProjection:deny('publish'),failGuideSync:deny('failure receipt'),readGoogleSheets:deny('Google')};
+  const {canonicalReadFixture}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  for(const env of [{...canonicalReadFixture},{...previewEnv},{...previewEnv,VERCEL_ENV:'production'}]) {
+    assert.equal(guideSyncEnvironment(env).reason,'google-runtime-retired');
+    assert.equal(guideWorkerServerConfiguration(env).ready,false);
+    for(const triggerType of ['MANUAL','SCHEDULED']) await assert.rejects(
+      ()=>synchronizeGuideContent({triggerType,requestedBy:'synthetic-director',env,dependencies}),
+      error=>error.status===503 && /google-runtime-retired/.test(error.message));
+  }
+  assert.deepEqual(calls,[]);
+});
+
+test("API retired Guide cron and diagnostics reject before credentials or provider access", async () => {
+  for(const module of [await import('../app/api/cron/guide-sync/route.js'),await import('../app/api/cron/guide-sync/diagnostics/route.js')]) {
+    for(const method of ['GET','POST','PATCH','DELETE']) {
+      const response=await module[method]({get headers(){assert.fail('must not read credentials')},json(){assert.fail('must not read body')}});
+      assert.equal(response.status,410); assert.equal((await response.json()).code,'GOOGLE_RUNTIME_RETIRED');
+    }
+  }
 });

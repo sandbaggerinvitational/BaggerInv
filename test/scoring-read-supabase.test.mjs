@@ -127,13 +127,10 @@ function view(format = "BB", status = "LIVE", scoreCount = 2) {
   };
 }
 
-test("scoring read source is Preview-only, server-controlled, and has no browser override", () => {
-  assert.equal(scoringReadEnvironment(previewEnv).resolved, "supabase");
-  const production = scoringReadEnvironment({ ...previewEnv, VERCEL_ENV: "production", GOOGLE_SHEETS_ID: PRODUCTION_SPREADSHEET_ID });
-  assert.equal(production.resolved, "google");
-  assert.equal(production.productionBlocked, true);
-  assert.equal(scoringReadEnvironment({ ...previewEnv, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" }).blocked, true);
-  assert.throws(() => requireScoringReadSource({ ...previewEnv, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" }), /unavailable/);
+test("SCORING_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {scoringReadEnvironment}=await import('../lib/scoring-read-source.js');
+  assertCanonicalReadRetirementContract(scoringReadEnvironment,"SCORING_READ_SOURCE");
 });
 
 for (const [format, expectedPlayers, expectedGross] of [["BB", 4, "4/4"], ["SC", 4, "4"], ["SI", 2, "4"]]) {
@@ -237,22 +234,8 @@ test("participant scoring routes use the Supabase adapter without a direct Googl
   assert.doesNotMatch(service, /catch[\s\S]{0,300}readGoogle/);
 });
 
-test("Director diagnostics expose a read-only 24-match scoring contract parity action", async () => {
-  const [route, client] = await Promise.all([
-    source("app/api/director/scoring-authority/route.js"),
-    source("app/admin/director/game-center-readiness/GameCenterReadinessClient.js"),
-  ]);
-  assert.match(route, /action === "scoring-read-parity"/);
-  assert.match(route, /matchesCompared:\s*matchIds\.length/);
-  assert.match(route, /matchIds\.length === 24/);
-  assert.match(route, /correctedBestBall2026R16/);
-  assert.match(route, /finalizedSingles2026R34/);
-  assert.match(route, /canonicalView\.match\.match_revision/);
-  assert.match(route, /scores:\s*canonicalView\.scores/);
-  const branch = route.split('action === "scoring-read-parity"')[1].split('action === "my-match-parity"')[0];
-  assert.doesNotMatch(branch, /replace|submit|persist|finalize|reopen/i);
-  assert.match(client, /run\("scoring-read-parity", \{ samples: 3 \}\)/);
-});
+// Retired behavior: Google scoring parity administrative action is retired; current match/hole readback and 24-match canonical authority remain required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.
+
 
 test("installed PWA and Tournament Hub avoid the public root and legacy /api/live", async () => {
   const [menu, home, session, participantAuth] = await Promise.all([

@@ -16,7 +16,7 @@ const previewEnv = {
   GAME_CENTER_READ_SOURCE: "supabase",
   GOOGLE_SHEETS_ID: "preview-workbook",
   PREVIEW_SCORING_SHEET_ID: "preview-workbook",
-  SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co",
+  SUPABASE_SCORING_MIRROR_URL: "https://idgigvjjqkfbqjeredpb.supabase.co",
   SUPABASE_SCORING_MIRROR_SECRET_KEY: "server-secret",
 };
 
@@ -68,11 +68,10 @@ function fixture(status = "LIVE", scoreCount = 1) {
   return { payload, presentation, matchId };
 }
 
-test("Game Center read source is Preview-only, server-controlled, and fails closed when Preview Supabase config is incomplete", () => {
-  assert.equal(gameCenterReadEnvironment(previewEnv).resolved, "supabase");
-  assert.equal(gameCenterReadEnvironment({ ...previewEnv, VERCEL_ENV: "production", GOOGLE_SHEETS_ID: PRODUCTION_SPREADSHEET_ID }).resolved, "google");
-  assert.equal(gameCenterReadEnvironment({ ...previewEnv, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" }).blocked, true);
-  assert.throws(() => requireGameCenterReadSource({ ...previewEnv, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" }), /unavailable/);
+test("GAME_CENTER_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {gameCenterReadEnvironment}=await import('../lib/game-center-read-source.js');
+  assertCanonicalReadRetirementContract(gameCenterReadEnvironment,"GAME_CENTER_READ_SOURCE");
 });
 
 test("presentation import is explicit, complete, and limited to the approved Game Center projection", () => {
@@ -135,11 +134,4 @@ test("active Supabase Game Center branch has no Google or tournament-model read 
   assert.doesNotMatch(`${page}\n${route}`, /resolvePlayerPassportToken|inspectPlayerPassportToken/);
 });
 
-test("Director exposes explicit Preview presentation refresh and parity operations", async () => {
-  const dashboard = await source("app/admin/director/DirectorDashboard.js");
-  const route = await source("app/api/director/scoring-authority/route.js");
-  assert.match(dashboard, /runPhase2Authority\("refresh-game-center-presentations"\)/);
-  assert.match(dashboard, /runPhase2Authority\("game-center-parity"\)/);
-  assert.match(route, /action === "refresh-game-center-presentations"/);
-  assert.match(route, /action === "game-center-parity"/);
-});
+// Retired behavior: Legacy Director Google projection refresh/parity actions were retired; canonical participant read service remains, and maintenance-only import is not an automatic runtime requirement. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.

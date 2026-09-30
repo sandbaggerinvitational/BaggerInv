@@ -57,26 +57,4 @@ test("generic lifecycle mutation fails with the dedicated-action contract", () =
   assert.doesNotThrow(() => assertGenericMatchUpdateHasNoLifecycle({ Notes: "Director note" }));
 });
 
-test("legacy normalization is Preview-only, audited, versioned, and leaves scoring authority unchanged", async () => {
-  const migration = await source("supabase/migrations/202608200001_preview_legacy_reopen_normalization.sql");
-  const route = await source("app/api/director/scoring-authority/route.js");
-  const writer = await source("lib/google-sheets-write.js");
-  assert.match(migration, /upper\(coalesce\(input->>'environment', ''\)\) <> 'PREVIEW'/i);
-  assert.match(migration, /director_authorized/i);
-  assert.match(migration, /operator_intent_confirmed/i);
-  assert.match(migration, /score_revision_history/i);
-  assert.match(migration, /audit_events/i);
-  assert.match(migration, /google_match_checkpoints/i);
-  assert.match(migration, /SCORING_PERMISSIONS_NOT_IMPORTED/i);
-  assert.doesNotMatch(migration, /update scoring_authority\.ingress_gates set[\s\S]{0,100}authority/i);
-  assert.match(route, /normalize-legacy-reopen/);
-  assert.match(route, /beginScoringIngress/);
-  assert.match(route, /completeScoringIngress/);
-  assert.match(route, /normalizeLegacyReopenedMatch/);
-  assert.match(route, /normalizeCanonicalLegacyReopen/);
-  assert.doesNotMatch(route, /normalize-legacy-reopen[\s\S]{0,500}replaceCanonicalScoringAuthorityImport/);
-  assert.match(writer, /holeScoresPreserved: true/);
-  assert.match(writer, /Legacy Reopen Normalized/);
-  assert.match(writer, /OFFICIAL_ARCHIVE_RESULT_FIELDS\.some/);
-  assert.match(route, /ARCHIVE_INVALIDATION_FAILED/);
-});
+// Retired behavior: Google sheet lifecycle normalization is historical migration tooling, not current runtime; keep canonical Reopen audit/version/score preservation tests. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.

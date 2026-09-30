@@ -131,14 +131,4 @@ test("migration is inert, owner/service scoped, deterministic, and never claims 
     /grant execute on function[\s\S]*adopt_production_future_google_destination_v1\(jsonb\)[\s\S]*to authenticated/i);
 });
 
-test("nested Director API is same-origin guarded and does not forward destination input", async () => {
-  const route = await readFile(routeUrl, "utf8");
-  assert.match(route,
-    /assertProductionCutoverRequest\(request, process\.env, \{ requireOrigin: true \}\)/);
-  assert.match(route, /allowBootstrap: false/);
-  assert.match(route, /production-director-entitlement/);
-  assert.match(route, /targetTournamentId: input\.targetTournamentId/);
-  assert.doesNotMatch(route,
-    /destinationWorkbookId:\s*input\.|sourceWorkbookId:\s*input\./);
-  assert.match(route, /googleRequests: 0/);
-});
+// Retired behavior: Nested annual Google writer certification route is retired. Future canonical year setup/authority must be tested through annual canonical contracts, not provider certification. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.

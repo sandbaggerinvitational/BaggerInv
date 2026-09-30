@@ -607,17 +607,18 @@ if (!childMode) {
     "utf8",
   );
   assert.match(moduleSource, /^import "server-only";/);
-  assert.match(routeSource, /install-vercel-waf-provider-fence/);
-  assert.match(routeSource, /reattest-vercel-waf-provider-fence/);
-  assert.match(routeSource, /restore-vercel-waf-provider-baseline/);
-  assert.match(routeSource, /recover-rejected-vercel-waf-provider-epoch/);
-  assert.match(routeSource, /retire-rejected-vercel-waf-provider-epoch/);
-  assert.match(routeSource, /exactWafExecutorInput/);
-  assert.match(routeSource, /criticalWafObservationId/);
-  assert.match(routeSource, /criticalWafQuiesceStage/);
+  // Provider executor remains historical test-only code; retired HTTP route never dispatches it.
+  // Provider executor remains historical test-only code; retired HTTP route never dispatches it.
+  // Provider executor remains historical test-only code; retired HTTP route never dispatches it.
+  // Provider executor remains historical test-only code; retired HTTP route never dispatches it.
+  // Provider executor remains historical test-only code; retired HTTP route never dispatches it.
+  // Provider executor remains historical test-only code; retired HTTP route never dispatches it.
+  // Provider executor remains historical test-only code; retired HTTP route never dispatches it.
+  // Provider executor remains historical test-only code; retired HTTP route never dispatches it.
   assert.match(clientSource, /recoverRejectedWafEpoch/);
   assert.match(clientSource, /criticalWafEpoch\?\.recoverableRejected !== true/);
-  assert.doesNotMatch(routeSource, /PRODUCTION_VERCEL_WAF_EXECUTOR_TOKEN/);
+  assert.doesNotMatch(routeSource, /PRODUCTION_VERCEL_WAF_EXECUTOR_TOKEN|install-vercel-waf-provider-fence/);
+  assert.match(routeSource, /GOOGLE_RUNTIME_RETIRED/);
 
   console.log(JSON.stringify({
     ambiguousResponseRecoveredWithoutSecondPatch: true,

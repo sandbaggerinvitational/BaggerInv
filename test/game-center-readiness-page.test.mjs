@@ -2,14 +2,14 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 
-test("isolated Director Game Center readiness page exposes only explicit refresh and parity actions", () => {
+test("SOURCE isolated Director readiness selects canonical current authority without provider refresh", () => {
   const page = fs.readFileSync(new URL("../app/admin/director/game-center-readiness/page.js", import.meta.url), "utf8");
   const client = fs.readFileSync(new URL("../app/admin/director/game-center-readiness/GameCenterReadinessClient.js", import.meta.url), "utf8");
   assert.match(page, /authorizePreviewDirector/);
   assert.match(page, /result\.status !== "active"/);
-  assert.match(client, /refresh-game-center-presentations/);
-  assert.match(client, /game-center-parity/);
-  assert.match(client, /identity-shadow-diagnostics/);
+  assert.match(client, /import CanonicalDirectorConsole/);
+  assert.match(client, /return <CanonicalDirectorConsole/);
+  assert.doesNotMatch(client, /refresh-game-center-presentations|game-center-parity|identity-shadow-diagnostics|\/api\/director["']/);
   assert.doesNotMatch(client, /getTournamentData|readWorkbookSheetsByName/);
 });
 

@@ -181,54 +181,10 @@ test("invalid mutation authority fails closed", () => {
   );
 });
 
-test("Director mutation guards execute before legacy Google reads and writes", async () => {
-  const director = postBody(await source("app/api/director/route.js"));
-  const directorGuard = 'assertDirectorMutationAuthority({ surface: "director", action: input.action })';
-  for (const operation of [
-    "getTournamentData(",
-    "updateTournamentAdminData(",
-    "setMatchesLiveAndOpenScoring(",
-    "enableLiveMatchAccess(",
-    "disableLiveMatchAccess(",
-    "persistDirectorMatchLifecycle(",
-    "reopenLiveMatch(",
-    "markLiveMatch(",
-    "finalizeLiveMatch(",
-    "updateDirectorMatchManagement(",
-    "updateDirectorRoundPairings(",
-    "updateDirectorCalcutta(",
-    "updateDirectorNetSkins(",
-    "updateDirectorCourseTees(",
-    "readDirectorOperationsData(",
-  ]) assertBefore(director, directorGuard, operation, "director POST");
-
-  const liveMatches = postBody(await source("app/api/live-matches/route.js"));
-  const liveGuard = 'assertDirectorMutationAuthority({ surface: "live-matches", action, authority: authority.resolved })';
-  for (const operation of [
-    "withWorkbookWriteDiagnostics(",
-    "updateLiveMatch(",
-    "markLiveMatch(",
-    "updateLiveMatchPairing(",
-    "persistDirectorMatchLifecycle(",
-    "finalizeLiveMatch(",
-    "reopenLiveMatch(",
-    "generateLiveMatchAccess(",
-    "disableLiveMatchAccess(",
-  ]) assertBefore(liveMatches, liveGuard, operation, "live-matches POST");
-
-  const resetPreview = postBody(await source("app/api/director/reset-preview/route.js"));
-  const resetGuard = 'assertDirectorMutationAuthority({ surface: "director", action: "reset-preview" })';
-  assertBefore(resetPreview, resetGuard, "getTournamentData(", "reset-preview POST");
-  assertBefore(resetPreview, resetGuard, "resetPreviewTournament(", "reset-preview POST");
-
-  const tournamentAdmin = postBody(await source("app/api/admin/tournament/route.js"));
-  const tournamentAdminGuard = 'assertDirectorMutationAuthority({ surface: "director", action: "tournament-admin-update" })';
-  assertBefore(tournamentAdmin, tournamentAdminGuard, "updateTournamentAdminData(", "tournament admin POST");
-
-  const adminCms = postBody(await source("app/api/admin/cms/route.js"));
-  const adminCmsGuard = 'assertDirectorMutationAuthority({ surface: "admin-cms", action: resource })';
-  for (const operation of ["withWorkbookWriteDiagnostics(", "saveCmsRecord(", "archiveCmsRecord(", "deleteCmsRecord(", "reorderCmsRecord("])
-    assertBefore(adminCms, adminCmsGuard, operation, "admin CMS POST");
+test("Canonical Director lifecycle validates account-authorized mutation and client authority before persistence", async () => {
+for(const file of ['app/api/director/route.js','app/api/live-matches/route.js']){const handler=postBody(await source(file));const guard=handler.indexOf('assertDirectorMutationAuthority('),contract=handler.indexOf('assertScoringMutationAuthorityContractBeforeDispatch('),write=handler.indexOf('persistDirectorMatchLifecycle(');assert.ok(guard>=0&&contract>guard&&write>contract,file);assert.doesNotMatch(handler,/getTournamentData\(|updateDirectorRoundPairings\(|withProductionGoogleAuthorityWrite\(/);}
+const resetPreview=postBody(await source('app/api/director/reset-preview/route.js'));assertBefore(resetPreview,'assertDirectorMutationAuthority(','resetPreviewTournament(','maintenance reset');
+const cms=postBody(await source('app/api/admin/cms/route.js'));for(const op of ['saveCmsRecord(','archiveCmsRecord(','deleteCmsRecord(','reorderCmsRecord('])assertBefore(cms,'assertDirectorMutationAuthority(',op,'historical CMS guard');
 });
 
 test("Supabase Director lifecycle operations use canonical state before any legacy workbook read", async () => {
@@ -238,7 +194,7 @@ test("Supabase Director lifecycle operations use canonical state before any lega
     director.indexOf("const data = await getTournamentData()"),
   );
   assert.match(supabaseBranch, /persistDirectorMatchLifecycle/);
-  assert.match(supabaseBranch, /drainGoogleOutbox/);
+  assert.doesNotMatch(supabaseBranch, /drainGoogleOutbox/);
   assert.doesNotMatch(supabaseBranch, /getTournamentData|readDirectorOperationsData|finalizeLiveMatch|reopenLiveMatch/);
 });
 
@@ -246,8 +202,8 @@ test("live-match authorization does not accept Guide or Odds secrets", async () 
   const liveMatches = await source("app/api/live-matches/route.js");
   assert.doesNotMatch(liveMatches, /GUIDE_ADMIN_SECRET/);
   assert.doesNotMatch(liveMatches, /ODDS_ADMIN_SECRET/);
-  assert.match(liveMatches, /process\.env\.ADMIN_SECRET/);
-  assert.match(liveMatches, /process\.env\.LIVE_ADMIN_SECRET/);
+  assert.doesNotMatch(liveMatches, /process\.env\.(?:ADMIN_SECRET|LIVE_ADMIN_SECRET)/);
+  assert.match(liveMatches,/authorizePreviewDirector/);
 });
 
 test("Supabase scoring authority blocks legacy secret and match-code sessions before credential handling", async () => {

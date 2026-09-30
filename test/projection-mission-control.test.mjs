@@ -54,20 +54,14 @@ test("next projection remains locked until its operational prerequisite is compl
   assert.match(status.reason, /Close Round 2/);
 });
 
-test("Mission Control embeds the existing publisher and uses Director authorization", async () => {
-  const [dashboard, directorRoute, publisher, publishRoute] = await Promise.all([
-    source("app/admin/director/DirectorDashboard.js"),
-    source("app/api/director/route.js"),
-    source("app/odds-center/admin/OddsAdmin.js"),
-    source("app/api/odds/publish/route.js"),
-  ]);
-
-  assert.match(dashboard, /Current Publication/);
-  assert.match(dashboard, /Next Milestone/);
-  assert.match(dashboard, /Ready to publish/);
-  assert.match(dashboard, /<OddsAdmin embedded directorAuthorized/);
-  assert.match(directorRoute, /championshipProjectionMissionStatus/);
-  assert.match(publisher, /publicationReady/);
-  assert.match(publishRoute, /authorizePreviewDirector/);
-  assert.match(publishRoute, /Tournament Director access is required/);
+// Proof layer: UNIT/SOURCE. Actual PostgreSQL capability proof is indexed in CAPABILITY-GAPS.md.
+test("UNIT canonical Odds publication remains an explicit Director-reviewed capability", async () => {
+  const status=championshipProjectionMissionStatus({snapshots:[],rounds:[round(1,"UPCOMING")],openingStatus:{ready:true},roundThreeStatus:{ready:false}});
+  assert.equal(status.nextPhase,"Pre-Tournament");assert.equal(status.ready,true);
+  const ui=await source("app/admin/director/ProductionDirectorOperations.js");const route=await source("app/api/odds/publish/route.js");
+  assert.match(ui,/ProductionOddsSnapshotReview/);assert.match(ui,/odds\/publish/);
+  const canonical=route.slice(route.indexOf("async function publishProductionProjection"),route.indexOf("async function publishProjection"));
+  assert.match(canonical,/authorizePreviewDirector/);assert.match(canonical,/publishProductionOddsCalculation/);
+  assert.doesNotMatch(canonical,/publishOddsSnapshot\(|readWorkbookSheetsByName\(|withProductionGoogleAuthoringWrite\(/);
+  const inputs=await source("app/api/odds/inputs/route.js");assert.match(inputs,/ODDS_LEGACY_IMPORT_RETIRED/);assert.doesNotMatch(inputs,/readGooglePredictionSettingsSheets/);
 });

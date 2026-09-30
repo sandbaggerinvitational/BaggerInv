@@ -431,9 +431,8 @@ test("source and route expose only Drive ACL capability orchestration", async ()
   assert.match(core, /STEP11_6_PROTECTED_RANGE_REHEARSAL_RETIRED/);
   assert.doesNotMatch(barrel, /executeProductionGoogleWriterFenceRehearsal/);
   assert.doesNotMatch(route, /executeProductionGoogleWriterFenceRehearsal/);
-  assert.match(route, /"criticalWafEpochId"/);
-  assert.match(route,
-    /receipt\.criticalWafEpochId \|\| receipt\.critical_waf_epoch_id/);
+  assert.match(route, /GOOGLE_RUNTIME_RETIRED/);
+  assert.doesNotMatch(route, /executeProductionGoogleWriterProviderFence|install-vercel-waf-provider-fence/);
   for (const client of [rehearsalClient, persistentClient]) {
     assert.match(client, /criticalWafEpochId/);
     assert.match(client, /noSheetsTransportSentinelFingerprint/);

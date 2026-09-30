@@ -246,12 +246,9 @@ test("future scoring strips caller annual authority and uses one certified dispa
   assert.equal(body.expected_runtime_generation_id, runtimeGenerationId);
   assert.equal(body.expected_annual_authority_generation_id, authorityGenerationId);
   assert.equal(body.expected_annual_admission_generation_id, admissionGenerationId);
-  assert.equal(body.expected_google_writer_generation_id, writerGenerationId);
-  assert.equal(body.annual_destination_workbook_id, "annual-workbook-2027");
-  assert.equal(
-    body.expected_google_target_contract_fingerprint,
-    targetContractFingerprint,
-  );
+  assert.equal("expected_google_writer_generation_id" in body, false);
+  assert.equal("annual_destination_workbook_id" in body, false);
+  assert.equal("expected_google_target_contract_fingerprint" in body, false);
   assert.equal("target_tournament_id" in body, false);
   assert.doesNotMatch(request.options.body, /2099|caller-workbook|dddddddd/);
 });
@@ -279,42 +276,4 @@ test("preactivation compatibility remains a direct certified server RPC", async 
   assert.equal(body.annual_scoring_dispatch_contract, undefined);
 });
 
-test("Google worker resources require the branded exact annual context", async () => {
-  const env = { ...baseEnv, PRODUCTION_CUTOVER_PHASE: "WORKERS" };
-  const context = await resolveProductionScoringDispatchContext({
-    requiredPhase: "WORKERS",
-    env,
-    readCurrentTournamentRuntime: async () => futureRuntime,
-    readScoringPlatformCertification: async () => certification,
-    readAnnualScoringGoogleDestination: async () => destination,
-  });
-  const resources = productionScoringDispatchGoogleResources(context, {
-    requiredPhase: "WORKERS",
-    env,
-  });
-  assert.equal(resources.tournamentId, "2027");
-  assert.equal(resources.tournamentYear, 2027);
-  assert.equal(resources.googleWorkbookId, "annual-workbook-2027");
-  assert.equal(resources.platformGoogleWorkbookId, PRODUCTION_GOOGLE_WORKBOOK_ID);
-  assert.equal(resources.writerGenerationId, writerGenerationId);
-  assert.equal(resources.googleTargetContractFingerprint, targetContractFingerprint);
-  assert.throws(
-    () => productionScoringDispatchGoogleResources(
-      JSON.parse(JSON.stringify(context)), { requiredPhase: "WORKERS", env },
-    ),
-    (error) => error.code === "PRODUCTION_SCORING_DISPATCH_CONTEXT_INVALID",
-  );
-  assert.throws(
-    () => productionScoringDispatchGoogleResources(context, {
-      requiredPhase: "SCORING_COMMIT", env,
-    }),
-    (error) => error.code === "PRODUCTION_SCORING_DISPATCH_CONTEXT_INVALID",
-  );
-  assert.throws(
-    () => productionScoringDispatchGoogleResources(context, {
-      requiredPhase: "WORKERS",
-      env: { ...env, VERCEL_DEPLOYMENT_ID: "dpl_moved" },
-    }),
-    (error) => error.code === "PRODUCTION_SCORING_DISPATCH_CONTEXT_INVALID",
-  );
-});
+// Retired behavior: Google worker resource resolver is not a required consumer. Retain provenance/historical context as maintenance data; do not infer current canonical annual authority from retired writer fields. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.

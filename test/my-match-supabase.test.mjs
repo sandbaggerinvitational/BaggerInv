@@ -15,7 +15,7 @@ const previewEnv = {
   MY_MATCH_READ_SOURCE: "supabase",
   GOOGLE_SHEETS_ID: "preview-workbook",
   PREVIEW_SCORING_SHEET_ID: "preview-workbook",
-  SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co",
+  SUPABASE_SCORING_MIRROR_URL: "https://idgigvjjqkfbqjeredpb.supabase.co",
   SUPABASE_SCORING_MIRROR_SECRET_KEY: "server-secret",
 };
 
@@ -57,11 +57,10 @@ function fixture({ status = "LIVE", scoreCount = 3, matchId = "2026-R3-4" } = {}
   return { payload, presentation };
 }
 
-test("My Match read source is Preview-only, server-controlled, and fail-closed", () => {
-  assert.equal(myMatchReadEnvironment(previewEnv).resolved, "supabase");
-  assert.equal(myMatchReadEnvironment({ ...previewEnv, VERCEL_ENV: "production", GOOGLE_SHEETS_ID: PRODUCTION_SPREADSHEET_ID }).resolved, "google");
-  assert.equal(myMatchReadEnvironment({ ...previewEnv, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" }).blocked, true);
-  assert.throws(() => requireMyMatchReadSource({ ...previewEnv, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" }), /unavailable/);
+test("MY_MATCH_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {myMatchReadEnvironment}=await import('../lib/my-match-read-source.js');
+  assertCanonicalReadRetirementContract(myMatchReadEnvironment,"MY_MATCH_READ_SOURCE");
 });
 
 for (const [label, status, holes] of [["LIVE", "LIVE", 3], ["FINAL", "FINAL", 18], ["zero-hole", "UPCOMING", 0]]) {
@@ -145,12 +144,4 @@ test("normal My Match handling records non-blocking scoped Auth shadow observati
   assert.match(route, /My Match participant identity shadow unavailable/);
 });
 
-test("Director parity compares all 24 active participants and reports independent query/service timings", async () => {
-  const route = await source("app/api/director/scoring-authority/route.js");
-  const readiness = await source("app/admin/director/game-center-readiness/GameCenterReadinessClient.js");
-  assert.match(route, /players\.length === 24/);
-  assert.match(route, /action === "my-match-parity"/);
-  assert.match(route, /postgresQuery: benchmarkSummary/);
-  assert.match(route, /supabaseService: benchmarkSummary/);
-  assert.match(readiness, /Verify My Match Parity/);
-});
+// Retired behavior: Old Director My Match Google parity action is retired; retain canonical participant read model and independent request/database timing coverage. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.

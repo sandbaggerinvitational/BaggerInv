@@ -153,14 +153,16 @@ test("LIVE matches with disabled participant scoring require Director action", (
   assert.match(model.issues.find((item) => item.id === "scoring:M1").message, /LIVE but participant scoring is locked/);
 });
 
-test("Director LIVE transitions also open scoring and explicit lock controls remain available", () => {
-  const route = source("app/api/director/route.js");
-  assert.match(route, /setMatchesLiveAndOpenScoring/);
-  assert.match(route, /enableLiveMatchAccess\(match\.id, updatedBy\)/);
-  assert.match(route, /input\.action === "unlock-scoring"/);
-  assert.match(route, /input\.action === "lock-scoring"/);
-  const dashboard = source("app/admin/director/DirectorDashboard.js");
-  assert.match(dashboard, /data\.operatingRound\.scoringLocked \? "unlock-scoring" : "lock-scoring"/);
+// Proof layer: UNIT/SOURCE. Actual PostgreSQL capability proof is indexed in CAPABILITY-GAPS.md.
+test("UNIT canonical Mark Live preserves separate scoring-lock and participant-access authority", async () => {
+  const {productionMatchControlActions:actions}=await import("../lib/production-director-console.js");
+  assert.ok(actions({status:"UPCOMING",scoringReady:true}).includes("mark-live"));
+  assert.equal(actions({status:"UPCOMING",scoringReady:false}).includes("mark-live"),false);
+  assert.deepEqual(actions({status:"LIVE",scoringLocked:true,permissionComplete:true,accessState:"REVOKED"}),["scoring-unlock"]);
+  assert.ok(actions({status:"LIVE",scoringLocked:false,permissionComplete:true,accessState:"ACTIVE"}).includes("scoring-lock"));
+  const controls=source("app/admin/director/ProductionDirectorOperations.js");
+  assert.match(controls,/The match becomes Live\. Scoring lock and participant access do not change/);
+  assert.match(controls,/"match-lock-scoring"/);assert.match(controls,/"match-unlock-scoring"/);
 });
 
 test("natural next-event wording includes the event name and action", () => {
@@ -186,17 +188,15 @@ test("automation becomes due only within the configured 30-minute opening window
   assert.equal(directorAutomationDue({ ...model, automation: { ...model.automation, enabled: false } }, new Date("2026-07-01T07:35:00")), null);
 });
 
-test("Director API requires canonical account Director authorization and uses audited writers", () => {
-  const route = source("app/api/director/route.js");
-  assert.match(route, /authorizePreviewDirector/);
-  assert.match(route, /authorization\.status !== "active"/);
-  assert.match(route, /status: 403/);
-  assert.match(route, /status: 503/);
-  assert.match(route, /markLiveMatch/);
-  assert.match(route, /reopenLiveMatch/);
-  assert.match(route, /updateTournamentAdminData/);
-  assert.match(route, /directorAutomationDue/);
-  assert.doesNotMatch(route, /x-live-admin-secret|ADMIN_SECRET/);
+// Proof layer: UNIT/SOURCE. Actual PostgreSQL capability proof is indexed in CAPABILITY-GAPS.md.
+test("SOURCE canonical Director APIs require active account authority and canonical receipts", async () => {
+  const route=source("app/api/director/canonical-overview/route.js");const operation=source("lib/canonical-director-overview.js");
+  assert.match(route,/authorizePreviewDirector/);assert.match(route,/allowBootstrap: false/);assert.match(route,/authorization.status !== "active"/);
+  assert.match(operation,/authorization\?\.source !== "entitlement"/);assert.match(operation,/identity\?\.actor\?\.role !== "DIRECTOR"/);
+  assert.match(operation,/read_preview_director_operation_v1/);assert.match(operation,/finalizeCanonicalMatch/);assert.match(operation,/reopenCanonicalMatch/);
+  assert.doesNotMatch(route+operation,/x-live-admin-secret|ADMIN_SECRET|google-sheets-write/);
+  // API/SECURITY execution is in reliability-phase2c1-closure-director.test.mjs;
+  // receipt, audit, permission revocation and rollback execute in Preview PostgreSQL.
 });
 
 test("Director dashboard contains operations, health, attention, automation, and Full Admin access", () => {
@@ -227,7 +227,7 @@ test("PLAYER accounts are redirected away from the Director page", async () => {
       "../../../lib/preview-director-authorization.js": { productionDirectorEntitlementEnvironment: () => ({ production: true, enabled: true }),
         authorizePreviewDirector: async input => { assert.equal(input.allowBootstrap, false); return { status }; } },
       "../../../lib/production-director-console.js": { productionDirectorSection: value => value },
-      "./DirectorDashboard.js": () => null, "./ProductionDirectorConsole.js": () => null,
+      "./CanonicalDirectorConsole.js": () => null, "./ProductionDirectorConsole.js": () => null,
     });
     if (["inactive", "forbidden"].includes(status)) {
       await assert.rejects(() => module.default({ searchParams: Promise.resolve({}) }), /REDIRECT/);
@@ -282,15 +282,13 @@ test("Director identity is reused safely within a signed session", () => {
   assert.match(resolver, /tournamentDirectorIdentityDiagnostics/);
 });
 
-test("Director actions log every transaction boundary and verify workbook read-back", () => {
-  const route = source("app/api/director/route.js");
-  for (const stage of ["Identity verification", "Action authorization", "Workbook verification", "Action execution", "Workbook write", "Read-back verification", "Success", "Failure"]) assert.match(route, new RegExp(stage));
-  assert.match(route, /verifyActionReadBack/);
-  assert.match(route, /verifyDirectorReadBack/);
-  assert.match(route, /invalidateTournamentDataCache/);
-  assert.match(route, /Cache invalidation attempt/);
-  assert.match(route, /Verification read attempt/);
-  assert.match(route, /googleWriteCompletedAt/);
-  assert.match(route, /Director action transaction/);
-  assert.match(route, /X-Director-Retryable/);
+// Proof layer: UNIT/SOURCE. Actual PostgreSQL capability proof is indexed in CAPABILITY-GAPS.md.
+test("SOURCE canonical Director confirms receipt and canonical readback without workbook acknowledgement", async () => {
+  const operation=source("lib/canonical-director-overview.js");const route=source("app/api/director/canonical-overview/route.js");
+  assert.match(operation,/read_preview_director_operation_v1/);assert.match(operation,/DIRECTOR_CANONICAL_READBACK_UNCONFIRMED/);
+  assert.match(operation,/committed: true, operationRequestId: key/);assert.match(route,/CHECK_STATUS_RETRY_SAME_OPERATION/);
+  assert.match(route,/withOperationalRoute/);assert.match(route,/recordOperationalError/);
+  assert.doesNotMatch(operation,/googleWriteCompletedAt|verifyDirectorReadBack|readWorkbook/);
+  // Behavioral loss-after-commit recovery is covered by the named Director
+  // failure-injection regression; real SQL receipt recovery runs after Final revocation.
 });

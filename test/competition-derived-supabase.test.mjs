@@ -129,14 +129,11 @@ test("derived read marks an engine stale from its coalesced dependency job", () 
   assert.deepEqual(result.momentum, { teamOne: "A", teamTwo: "B" });
 });
 
-test("Preview flags fail closed to application outside an isolated Preview deployment", () => {
-  const preview = { VERCEL_ENV: "preview", GOOGLE_SHEETS_ID: "preview", PREVIEW_SCORING_SHEET_ID: "preview",
-    SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co", SUPABASE_SCORING_MIRROR_SECRET_KEY: "server",
-    MOMENTUM_READ_SOURCE: "supabase", STORYLINES_READ_SOURCE: "supabase" };
-  assert.equal(momentumReadEnvironment(preview).resolved, "supabase");
-  assert.equal(storylinesReadEnvironment(preview).resolved, "supabase");
-  assert.equal(momentumReadEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "application");
-  assert.equal(storylinesReadEnvironment({ ...preview, VERCEL_ENV: "production" }).resolved, "application");
+test("Preview flags fail closed to application outside an isolated Preview deployment", async () => {
+const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+const module=await import('../lib/competition-derived-read-source.js');
+assertCanonicalReadRetirementContract(module.momentumReadEnvironment,'MOMENTUM_READ_SOURCE');
+assertCanonicalReadRetirementContract(module.storylinesReadEnvironment,'STORYLINES_READ_SOURCE');
 });
 
 test("migration preserves restrictive RLS and event-driven coalesced jobs", async () => {
@@ -172,7 +169,7 @@ test("participant reads consume prepared state and never calculate Storylines on
   assert.doesNotMatch(home, /tournamentStorylines\(/);
   assert.match(scoring, /after\(async \(\) =>/);
   assert.match(scoring, /recalculateCompetitionDerivedTournament/);
-  assert.match(readiness, /canonicalJson\(prepared\.storylines\) === canonicalJson\(calculated\.storylines\.stories\)/);
+  // Google parity import is retired; the canonical prepared-state and no participant calculation assertions above remain.
 });
 
 test("secondary failures retain the core Home and Tournament payload with explicit unavailable state", async () => {

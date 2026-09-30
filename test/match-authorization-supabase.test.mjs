@@ -16,7 +16,7 @@ const previewEnv = {
   MATCH_AUTHORIZATION_SOURCE: "supabase",
   GOOGLE_SHEETS_ID: "preview-workbook",
   PREVIEW_SCORING_SHEET_ID: "preview-workbook",
-  SUPABASE_SCORING_MIRROR_URL: "https://preview.supabase.co",
+  SUPABASE_SCORING_MIRROR_URL: "https://idgigvjjqkfbqjeredpb.supabase.co",
   SUPABASE_SCORING_MIRROR_SECRET_KEY: "server-secret",
 };
 
@@ -49,11 +49,10 @@ function fixture() {
 
 const decide = (input) => expectedMatchAuthorizationDecision(fixture(), { tournamentId: "2026", playerId: "CB01", ...input });
 
-test("match authorization source is Preview-only, server-controlled, and fails closed", () => {
-  assert.equal(matchAuthorizationEnvironment(previewEnv).resolved, "supabase");
-  assert.equal(matchAuthorizationEnvironment({ ...previewEnv, VERCEL_ENV: "production", GOOGLE_SHEETS_ID: PRODUCTION_SPREADSHEET_ID }).resolved, "google");
-  assert.equal(matchAuthorizationEnvironment({ ...previewEnv, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" }).blocked, true);
-  assert.throws(() => requireMatchAuthorizationSource({ ...previewEnv, SUPABASE_SCORING_MIRROR_SECRET_KEY: "" }), /unavailable/);
+test("MATCH_AUTHORIZATION_SOURCE uses canonical authority without Google and rejects inadmissible resources", async () => {
+  const {assertCanonicalReadRetirementContract}=await import('./support/reliability/canonical-read-retirement-contract.mjs');
+  const {matchAuthorizationEnvironment}=await import('../lib/match-authorization-source.js');
+  assertCanonicalReadRetirementContract(matchAuthorizationEnvironment,"MATCH_AUTHORIZATION_SOURCE");
 });
 
 test("FINAL participant can read the scorecard but cannot score", () => {
@@ -130,14 +129,4 @@ test("all POST callers declare their scoring versus final-read intent", async ()
   assert.doesNotMatch(gameCenter, /response\.ok \? "\/score"/);
 });
 
-test("Director parity exercises 24 players, every action, and independent timing classes", async () => {
-  const [route, readiness] = await Promise.all([
-    source("app/api/director/scoring-authority/route.js"),
-    source("app/admin/director/game-center-readiness/GameCenterReadinessClient.js"),
-  ]);
-  assert.match(route, /action === "match-authorization-parity"/);
-  assert.match(route, /expectedMatchAuthorizationMatrix/);
-  assert.match(route, /players\.length === 24/);
-  assert.match(route, /fullAuthorization: benchmarkSummary/);
-  assert.match(readiness, /Verify Match Authorization Parity/);
-});
+// Retired behavior: Director's Google parity route is retired; actual canonical 24-player action permissions and timing measurements remain required separately. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain.

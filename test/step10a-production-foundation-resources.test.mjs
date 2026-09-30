@@ -130,13 +130,8 @@ test("Production foundation blocks non-legacy authority and authoritative featur
   }
 });
 
-test("live Production source selectors remain Google and Passport", () => {
-  const odds = oddsCalculationEnvironment(productionFoundation);
-  assert.equal(odds.inputSource, "google");
-  assert.equal(odds.publicationAuthority, "google");
-  assert.equal(scoringAuthorityEnvironment(productionFoundation).resolved, "google");
-  assert.equal(participantIdentityAuthorityEnvironment(productionFoundation).resolved, "passport");
-  assert.equal(resolveWarRoomInputSource(productionFoundation).resolved, "google");
+test("Dormant Production foundation cannot select Google or Passport runtime authority", async () => {
+const odds=oddsCalculationEnvironment(productionFoundation);assert.equal(odds.inputSource,'unavailable');assert.equal(odds.publicationAuthority,'unavailable');assert.equal(scoringAuthorityEnvironment(productionFoundation).resolved,'unavailable');assert.equal(participantIdentityAuthorityEnvironment(productionFoundation).resolved,'unavailable');assert.throws(()=>resolveWarRoomInputSource(productionFoundation),{code:'WAR_ROOM_INPUT_SOURCE_INVALID'});
 });
 
 test("Production foundation transport is server-only and never selected by a route", async () => {

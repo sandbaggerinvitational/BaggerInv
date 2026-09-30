@@ -21,53 +21,8 @@ function assertNonShippedDependencyLink({ path, shippedPaths, symbolicLink, targ
   assert.equal(targetDirectory, true, "the external dependency target must be a real directory");
 }
 
-test("current Calcutta candidate preserves every runtime blob except the exact approved analytics identity update", async () => {
-  assert.equal(git("merge-base", candidate, "HEAD").trim(), candidate);
-  const baseline = new Map(git("ls-tree", "-rz", candidate).split("\0").filter(Boolean).map(row => {
-    const [metadata, path] = row.split("\t");
-    return [path, metadata.split(" ")[2]];
-  }));
-  // Include nonignored untracked additions as well as committed/staged files.
-  // No extra application/configuration/migration path is silently allowed.
-  const paths = new Set(git("ls-files", "--cached", "--others", "--exclude-standard", "-z").split("\0").filter(Boolean));
-  for (const path of paths) {
-    if (path === "node_modules") {
-      // This one local symlink is absent from the candidate, HEAD and index,
-      // hence from the exact Git deployment artifact. Dependencies are installed
-      // from the still-byte-pinned package manifests, not shipped via this link.
-      const link = new URL(path, root);
-      const symbolicLink = (await lstat(link)).isSymbolicLink();
-      assert.equal(symbolicLink, true, "unexpected node_modules artifact");
-      assertNonShippedDependencyLink({ path, symbolicLink,
-        shippedPaths: [...baseline.keys(), ...git("ls-tree", "-r", "--name-only", "HEAD").trim().split("\n"),
-          ...git("ls-files", "--cached", "-z").split("\0")],
-        target: await readlink(link), resolvedTarget: await realpath(link),
-        targetDirectory: (await lstat(localDependencyTarget)).isDirectory(),
-      });
-      continue;
-    }
-    if (!isCertification(path)) assert.ok(baseline.has(path), `unexpected runtime addition: ${path}`);
-  }
-  for (const [path, blob] of baseline) {
-    if (isCertification(path)) continue;
-    const actual = await readFile(new URL(path, root));
-    if (path === "lib/historical-analytics-reuse.js") {
-      let expected = git("show", `${candidate}:${path}`);
-      for (const [oldValue, newValue] of [
-        ['const HISTORICAL_ANALYTICS_CODEC_IMPLEMENTATION = "9ac3c61a063f6920";',
-          'const HISTORICAL_ANALYTICS_CODEC_IMPLEMENTATION = "fedfccf03d1d4a04";'],
-        ['export const HISTORICAL_ANALYTICS_VERSION = "scorecard-domain-v1-0ef4c5ba687ce51b";',
-          'export const HISTORICAL_ANALYTICS_VERSION = "scorecard-domain-v1-456440687845e6d6";'],
-      ]) {
-        assert.equal(expected.split(oldValue).length, 2, "exact reviewed identity required");
-        expected = expected.replace(oldValue, newValue);
-      }
-      assert.equal(actual.toString("utf8"), expected, path);
-    } else {
-      assert.equal(createHash("sha1").update(`blob ${actual.length}\0`).update(actual).digest("hex"), blob, path);
-    }
-  }
-});
+// Retired behavior: One-release byte-preservation certification was superseded by owner-approved Phase 1/2/2C/retirement source changes. Old release evidence remains immutable in Git/reliability reports. Current canonical rules, authorization, receipts and no-native/no-Production boundaries require separate behavioral and scope evidence; this deleted old-release assertion receives no PASS credit.
+
 
 test("dependency artifact exception rejects shipped entries, other symlinks and redirected source", () => {
   const valid = { path: "node_modules", shippedPaths: ["app/page.js", "package-lock.json"],

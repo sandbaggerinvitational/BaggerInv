@@ -29,5 +29,6 @@ test("generic updates cannot bypass dedicated lifecycle transactions", async () 
   assert.match(writes, /Official match archives cannot be deleted from generic content management/);
   assert.match(writes, /Official match archives are created only by Finalize Match/);
   assert.match(cms, /field\("Match Status", "Status", "readonly"\)/);
-  assert.match(route, /action === "mark-live"[\s\S]*markLiveMatch/);
+  assert.match(route, /persistDirectorMatchLifecycle/);
+  assert.doesNotMatch(route, /markLiveMatch\(/);
 });

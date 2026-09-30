@@ -45,21 +45,21 @@ test("migrated Preview source boundaries reject unknown tokens instead of reachi
   for (const [requireSource, variable] of checks) {
     assert.throws(
       () => requireSource({ ...preview, [variable]: "typo" }),
-      /invalid-source/,
+      /legacy-runtime-source-retired/,
       variable,
     );
   }
   assert.throws(
     () => requireMomentumReadSource({ ...preview, MOMENTUM_READ_SOURCE: "typo" }),
-    /invalid-source/,
+    /legacy-runtime-source-retired/,
   );
   assert.throws(
     () => requireIntelligenceDerivedReadSources({ ...preview, FINAL_RECAP_READ_SOURCE: "typo" }),
-    /invalid-source/,
+    /legacy-runtime-source-retired/,
   );
 });
 
-test("Production retains its approved legacy resolution when Supabase is requested", () => {
+test("Unadmitted Production has no legacy fallback when Supabase is requested", () => {
   const production = { ...preview, VERCEL_ENV: "production" };
   for (const [requireSource, variable] of [
     [requireTournamentReadSource, "TOURNAMENT_READ_SOURCE"],
@@ -69,9 +69,7 @@ test("Production retains its approved legacy resolution when Supabase is request
     [requireScoringReadSource, "SCORING_READ_SOURCE"],
     [requireDraftReadSource, "DRAFT_READ_SOURCE"],
   ]) {
-    const state = requireSource({ ...production, [variable]: "supabase" });
-    assert.equal(state.resolved, "google", variable);
-    assert.equal(state.blocked, false, variable);
+    assert.throws(() => requireSource({ ...production, [variable]: "supabase" }), /unavailable/i, variable);
   }
 });
 
@@ -100,7 +98,7 @@ test("secondary-history route selection cannot turn an invalid token into a Goog
   const { isSupabaseSecondaryHistory } = await import("../lib/secondary-history-read-source.js");
   assert.throws(
     () => isSupabaseSecondaryHistory({ ...preview, SECONDARY_HISTORY_READ_SOURCE: "typo" }),
-    /invalid-source/,
+    /legacy-runtime-source-retired/,
   );
 });
 

@@ -133,11 +133,11 @@ test("ODDS_WAR_ROOM inputs require their later phase and publication uses one ex
     ODDS_PUBLICATION_AUTHORITY: "google",
   };
   assert.throws(() => resolveWarRoomInputSource(earlyEnv), {
-    code: "PRODUCTION_CUTOVER_READ_SOURCE_UNAVAILABLE",
+    code: "WAR_ROOM_INPUT_SOURCE_INVALID",
   });
   assert.equal(predictionSettingsEnvironment(earlyEnv).blocked, true);
   assert.equal(oddsCalculationEnvironment(earlyEnv).inputBlocked, true);
-  assert.equal(oddsCalculationEnvironment(earlyEnv).publicationAuthority, "google");
+  assert.equal(oddsCalculationEnvironment(earlyEnv).publicationAuthority, "unavailable");
 
   const activeEnv = { ...earlyEnv, PRODUCTION_CUTOVER_PHASE: "ODDS_WAR_ROOM" };
   assert.equal(resolveWarRoomInputSource(activeEnv).resolved, "supabase");
@@ -145,7 +145,7 @@ test("ODDS_WAR_ROOM inputs require their later phase and publication uses one ex
   assert.equal(predictionInputBundleEnvironment(activeEnv).available, true);
   const odds = oddsCalculationEnvironment(activeEnv);
   assert.equal(odds.inputSource, "supabase");
-  assert.equal(odds.publicationAuthority, "google");
+  assert.equal(odds.publicationAuthority, "unavailable");
   assert.equal(odds.fallbackUsed, false);
 
   const migrated = oddsCalculationEnvironment({
@@ -182,7 +182,7 @@ test("invalid, incomplete, and malformed active Production requests never resolv
   }
 });
 
-test("activation disabled preserves certified live Production legacy resolution", () => {
+test("Activation disabled fails closed without retired Production resolution", () => {
   const legacy = {
     ...activeBase,
     PRODUCTION_CUTOVER_ACTIVATION_ENABLED: "false",
@@ -192,11 +192,11 @@ test("activation disabled preserves certified live Production legacy resolution"
     WAR_ROOM_INPUT_SOURCE: "supabase",
     ODDS_CALCULATION_INPUT_SOURCE: "supabase",
   };
-  assert.equal(completedHistoryReadEnvironment(legacy).resolved, "google");
-  assert.equal(tournamentReadEnvironment(legacy).resolved, "google");
-  assert.equal(resolveWarRoomInputSource(legacy).resolved, "google");
-  assert.equal(oddsCalculationEnvironment(legacy).inputSource, "google");
-  assert.equal(oddsCalculationEnvironment(legacy).publicationAuthority, "google");
+  assert.equal(completedHistoryReadEnvironment(legacy).resolved, "unavailable");
+  assert.equal(tournamentReadEnvironment(legacy).resolved, "unavailable");
+  assert.throws(()=>resolveWarRoomInputSource(legacy),{code:"WAR_ROOM_INPUT_SOURCE_INVALID"});
+  assert.equal(oddsCalculationEnvironment(legacy).inputSource, "unavailable");
+  assert.equal(oddsCalculationEnvironment(legacy).publicationAuthority, "unavailable");
 });
 
 test("optional side-game reads preserve canonical empty states without an obsolete deployment-configuration gate", () => {
@@ -215,8 +215,8 @@ test("optional side-game reads preserve canonical empty states without an obsole
     PRODUCTION_CUTOVER_PHASE: "CURRENT_READS",
     CALCUTTA_READ_SOURCE: "google",
   });
-  assert.equal(missingCalcutta.resolved, "google", "explicit retained rollback selection, never implicit fallback");
-  assert.equal(missingCalcutta.blocked, false);
+  assert.equal(missingCalcutta.resolved, "unavailable", "retired Google rollback selection is denied");
+  assert.equal(missingCalcutta.blocked, true);
   assert.equal(missingCalcutta.fallbackUsed, false);
   for (const flag of [undefined, "false", "true"]) {
     const state = calcuttaReadEnvironment({ ...activeBase, PRODUCTION_CUTOVER_PHASE: "OBSERVATION", CALCUTTA_READ_SOURCE: "supabase", PRODUCTION_CALCUTTA_CONFIGURED: flag });
