@@ -1,0 +1,550 @@
+{
+  "schemaVersion": 1,
+  "result": "NO_SYSTEMATIC_REGRESSION_DETECTED",
+  "proofLayer": "PERFORMANCE",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "fixtureVersion": "bagger-r139-synthetic-history-v1+phase2-eligible-history-v2",
+  "seed": "2026-never-again-139",
+  "sourceArtifact": "benchmark-results.json",
+  "samples": 12000,
+  "failures": 0,
+  "scales": [
+    {
+      "scale": 1,
+      "samples": 3000,
+      "failures": 0,
+      "p50ByBatch": [
+        0.544,
+        0.546,
+        0.597
+      ],
+      "p95ByBatch": [
+        0.628,
+        0.711,
+        0.725
+      ],
+      "p99ByBatch": [
+        1.328,
+        1.292,
+        1.341
+      ],
+      "maxByBatch": [
+        8.024,
+        8.297,
+        8.332
+      ],
+      "medianOfBatchMedians": 0.546,
+      "medianSpreadPercent": 9.74,
+      "outlierDefinition": "Greater than5ms is descriptive analysis only, not an approved failure threshold",
+      "outliers": [
+        {
+          "batch": 1,
+          "connectionBatch": 1,
+          "sampleIndex": 0,
+          "milliseconds": 7.887
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 2,
+          "sampleIndex": 0,
+          "milliseconds": 8.017
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 3,
+          "sampleIndex": 0,
+          "milliseconds": 7.934
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 4,
+          "sampleIndex": 0,
+          "milliseconds": 8.024
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 5,
+          "sampleIndex": 0,
+          "milliseconds": 7.986
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 1,
+          "sampleIndex": 0,
+          "milliseconds": 7.829
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 2,
+          "sampleIndex": 0,
+          "milliseconds": 8.072
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 3,
+          "sampleIndex": 0,
+          "milliseconds": 7.794
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 4,
+          "sampleIndex": 0,
+          "milliseconds": 7.856
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 5,
+          "sampleIndex": 0,
+          "milliseconds": 8.297
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 1,
+          "sampleIndex": 0,
+          "milliseconds": 8.282
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 2,
+          "sampleIndex": 0,
+          "milliseconds": 8.241
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 3,
+          "sampleIndex": 0,
+          "milliseconds": 8.073
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 4,
+          "sampleIndex": 0,
+          "milliseconds": 8.047
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 5,
+          "sampleIndex": 0,
+          "milliseconds": 8.332
+        }
+      ],
+      "nestedSqlExecutions": [
+        85,
+        85,
+        85
+      ]
+    },
+    {
+      "scale": 2,
+      "samples": 3000,
+      "failures": 0,
+      "p50ByBatch": [
+        0.599,
+        0.549,
+        0.6
+      ],
+      "p95ByBatch": [
+        0.708,
+        0.689,
+        0.714
+      ],
+      "p99ByBatch": [
+        1.346,
+        1.373,
+        1.35
+      ],
+      "maxByBatch": [
+        8.433,
+        10.652,
+        8.853
+      ],
+      "medianOfBatchMedians": 0.599,
+      "medianSpreadPercent": 9.29,
+      "outlierDefinition": "Greater than5ms is descriptive analysis only, not an approved failure threshold",
+      "outliers": [
+        {
+          "batch": 1,
+          "connectionBatch": 1,
+          "sampleIndex": 0,
+          "milliseconds": 8.309
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 2,
+          "sampleIndex": 0,
+          "milliseconds": 8.433
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 3,
+          "sampleIndex": 0,
+          "milliseconds": 8.066
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 4,
+          "sampleIndex": 0,
+          "milliseconds": 8.023
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 5,
+          "sampleIndex": 0,
+          "milliseconds": 8.213
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 1,
+          "sampleIndex": 0,
+          "milliseconds": 8.091
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 2,
+          "sampleIndex": 0,
+          "milliseconds": 8.507
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 3,
+          "sampleIndex": 0,
+          "milliseconds": 8.766
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 3,
+          "sampleIndex": 42,
+          "milliseconds": 9.169
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 3,
+          "sampleIndex": 159,
+          "milliseconds": 10.652
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 3,
+          "sampleIndex": 166,
+          "milliseconds": 6.776
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 4,
+          "sampleIndex": 0,
+          "milliseconds": 8.382
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 5,
+          "sampleIndex": 0,
+          "milliseconds": 7.969
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 1,
+          "sampleIndex": 0,
+          "milliseconds": 8.144
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 2,
+          "sampleIndex": 0,
+          "milliseconds": 8.853
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 3,
+          "sampleIndex": 0,
+          "milliseconds": 8.308
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 4,
+          "sampleIndex": 0,
+          "milliseconds": 8.086
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 5,
+          "sampleIndex": 0,
+          "milliseconds": 7.966
+        }
+      ],
+      "nestedSqlExecutions": [
+        85,
+        85,
+        85
+      ]
+    },
+    {
+      "scale": 5,
+      "samples": 3000,
+      "failures": 0,
+      "p50ByBatch": [
+        0.545,
+        0.566,
+        0.551
+      ],
+      "p95ByBatch": [
+        0.63,
+        0.773,
+        0.716
+      ],
+      "p99ByBatch": [
+        1.321,
+        1.624,
+        1.357
+      ],
+      "maxByBatch": [
+        8.337,
+        8.714,
+        10.109
+      ],
+      "medianOfBatchMedians": 0.551,
+      "medianSpreadPercent": 3.85,
+      "outlierDefinition": "Greater than5ms is descriptive analysis only, not an approved failure threshold",
+      "outliers": [
+        {
+          "batch": 1,
+          "connectionBatch": 1,
+          "sampleIndex": 0,
+          "milliseconds": 8.171
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 2,
+          "sampleIndex": 0,
+          "milliseconds": 8.202
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 3,
+          "sampleIndex": 0,
+          "milliseconds": 7.956
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 4,
+          "sampleIndex": 0,
+          "milliseconds": 8.109
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 5,
+          "sampleIndex": 0,
+          "milliseconds": 8.337
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 1,
+          "sampleIndex": 0,
+          "milliseconds": 8.239
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 2,
+          "sampleIndex": 0,
+          "milliseconds": 8.253
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 3,
+          "sampleIndex": 0,
+          "milliseconds": 8.622
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 4,
+          "sampleIndex": 0,
+          "milliseconds": 8.443
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 5,
+          "sampleIndex": 0,
+          "milliseconds": 8.714
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 1,
+          "sampleIndex": 0,
+          "milliseconds": 7.97
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 2,
+          "sampleIndex": 0,
+          "milliseconds": 8.198
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 3,
+          "sampleIndex": 0,
+          "milliseconds": 10.109
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 4,
+          "sampleIndex": 0,
+          "milliseconds": 8.614
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 5,
+          "sampleIndex": 0,
+          "milliseconds": 8.097
+        }
+      ],
+      "nestedSqlExecutions": [
+        85,
+        85,
+        85
+      ]
+    },
+    {
+      "scale": 10,
+      "samples": 3000,
+      "failures": 0,
+      "p50ByBatch": [
+        0.551,
+        0.565,
+        0.552
+      ],
+      "p95ByBatch": [
+        0.789,
+        0.907,
+        0.724
+      ],
+      "p99ByBatch": [
+        1.611,
+        1.526,
+        1.353
+      ],
+      "maxByBatch": [
+        8.896,
+        9.388,
+        8.412
+      ],
+      "medianOfBatchMedians": 0.552,
+      "medianSpreadPercent": 2.54,
+      "outlierDefinition": "Greater than5ms is descriptive analysis only, not an approved failure threshold",
+      "outliers": [
+        {
+          "batch": 1,
+          "connectionBatch": 1,
+          "sampleIndex": 0,
+          "milliseconds": 8.446
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 2,
+          "sampleIndex": 0,
+          "milliseconds": 8.6
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 3,
+          "sampleIndex": 0,
+          "milliseconds": 8.169
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 3,
+          "sampleIndex": 179,
+          "milliseconds": 6.824
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 4,
+          "sampleIndex": 0,
+          "milliseconds": 8.229
+        },
+        {
+          "batch": 1,
+          "connectionBatch": 5,
+          "sampleIndex": 0,
+          "milliseconds": 8.896
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 1,
+          "sampleIndex": 0,
+          "milliseconds": 8.434
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 2,
+          "sampleIndex": 0,
+          "milliseconds": 8.086
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 3,
+          "sampleIndex": 0,
+          "milliseconds": 9.388
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 4,
+          "sampleIndex": 0,
+          "milliseconds": 8.451
+        },
+        {
+          "batch": 2,
+          "connectionBatch": 5,
+          "sampleIndex": 0,
+          "milliseconds": 8.76
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 1,
+          "sampleIndex": 0,
+          "milliseconds": 8.083
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 2,
+          "sampleIndex": 0,
+          "milliseconds": 8.162
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 2,
+          "sampleIndex": 83,
+          "milliseconds": 6.941
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 3,
+          "sampleIndex": 0,
+          "milliseconds": 8.187
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 4,
+          "sampleIndex": 0,
+          "milliseconds": 8.184
+        },
+        {
+          "batch": 3,
+          "connectionBatch": 5,
+          "sampleIndex": 0,
+          "milliseconds": 8.412
+        }
+      ],
+      "nestedSqlExecutions": [
+        85,
+        85,
+        85
+      ]
+    }
+  ],
+  "workerActivity": "No task-owned derived workers ran concurrently; unrelated host processes not controlled",
+  "historyConclusion": "No monotonic growth in median or max across1x/2x/5x/10x. This measures the common no-compatible-receipt branch; other eligible branches retain Phase2C evidence, not remeasured here.",
+  "limitations": [
+    "Local cache and operating-system scheduling are not controlled. No Production capacity claim.",
+    "Durable COMMIT and HTTP latency not measured by this benchmark.",
+    "Lock duration is not separately measured; no fabricated lock percentile."
+  ]
+}

@@ -1,0 +1,1009 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-30T01:38:23.391755+00:00",
+  "phase": "2C.1-CANONICAL-CAPABILITY-CLOSURE",
+  "status": "PARTIAL",
+  "baseSha": "4f5be5928a362f77edca375919df55be23695177",
+  "sourceBinding": "Exact before/after file hashes in each run receipt; executionHEAD plus candidate working bytes, not an invented future commit. See CANDIDATE-MANIFEST.md for source/evidence commits.",
+  "productionInteraction": false,
+  "googleAccountAccess": false,
+  "stagingDeployment": false,
+  "nativeShippingChanged": false,
+  "runs": [
+    {
+      "id": "RUN-ANNUAL-CLIENT",
+      "suite": "annual-client",
+      "artifact": "evidence/annual-client.json",
+      "artifactSha256": "41580da9dde65e4576be9c2e0c19344a80f7362c80a912f8851f99ed682fa33c",
+      "result": "PASS",
+      "counts": {
+        "tests": 31,
+        "pass": 31,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T00:56:13.014Z",
+      "completedAt": "2026-09-30T00:56:13.513Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-ANNUAL-CREATE",
+      "suite": "annual-create",
+      "artifact": "evidence/annual-create.json",
+      "artifactSha256": "beea7af3d9ac33eca5522f7fb61affb14c8e4767c69ca631dbea7e4f8df0cbb8",
+      "result": "PASS",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T00:56:13.661Z",
+      "completedAt": "2026-09-30T00:56:20.683Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-ANNUAL-ODDS-CONTRACT",
+      "suite": "annual-odds-contract",
+      "artifact": "evidence/annual-odds-contract.json",
+      "artifactSha256": "541dd6185c2d1bbab703bb7ac4e0624ab1564d89e0f908125619bb16b602e75a",
+      "result": "PASS",
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T00:56:20.875Z",
+      "completedAt": "2026-09-30T00:56:21.104Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-ANNUAL",
+      "suite": "annual",
+      "artifact": "evidence/annual.json",
+      "artifactSha256": "2a139eb382f70376f1ea704899c2d307043cfc95d86b1b19f7874fc08be024ff",
+      "result": "PASS",
+      "counts": {
+        "tests": 26,
+        "pass": 26,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T00:59:01.387Z",
+      "completedAt": "2026-09-30T00:59:52.773Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-APPLICATION",
+      "suite": "application",
+      "artifact": "evidence/application.json",
+      "artifactSha256": "550a0016136fbf5b0bf6ef6e0f8a840d705084e4f21562cf73b1693a1024aea5",
+      "result": "FAIL",
+      "counts": {
+        "tests": 4095,
+        "pass": 4072,
+        "fail": 23,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:23:59.088Z",
+      "completedAt": "2026-09-30T01:26:44.148Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Identical493-file selection; compare known failure identities before adjudication"
+      ]
+    },
+    {
+      "id": "RUN-BOOT",
+      "suite": "boot",
+      "artifact": "evidence/boot.json",
+      "artifactSha256": "97e35c59d7569907e5692f12ccc3226cf51f12fa57e37875f403d4a74e69093f",
+      "result": "PASS",
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:26:57.296Z",
+      "completedAt": "2026-09-30T01:26:58.278Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-BOUNDARIES",
+      "suite": "boundaries",
+      "artifact": "evidence/boundaries.json",
+      "artifactSha256": "d8e8294180fd1747692849ffc6a730ec006b708f5866b3d538e796e35cd34836",
+      "result": "PASS",
+      "counts": {
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:23:56.550Z",
+      "completedAt": "2026-09-30T01:23:56.682Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-BUILD",
+      "suite": "build",
+      "artifact": "evidence/build.json",
+      "artifactSha256": "6209371b4b1160af543a3113f1678bb6792b2dcf15f0c969405ab88e56397975",
+      "result": "PASS",
+      "counts": null,
+      "startedAt": "2026-09-30T01:26:44.975Z",
+      "completedAt": "2026-09-30T01:26:57.148Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Compilation only"
+      ]
+    },
+    {
+      "id": "RUN-DEADLOCK",
+      "suite": "deadlock",
+      "artifact": "evidence/deadlock.json",
+      "artifactSha256": "225971a1728c3946c0c759023b97217a81947435ebb46aa2ce7ec8f604d399e6",
+      "result": "PASS",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:02:28.141Z",
+      "completedAt": "2026-09-30T01:03:31.528Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-DELIVERY",
+      "suite": "delivery",
+      "artifact": "evidence/delivery.json",
+      "artifactSha256": "430ab86a5b5a5ee024a3c9ab178f869252514f54e173c0e4d66b28db722094f6",
+      "result": "PASS",
+      "counts": {
+        "tests": 54,
+        "pass": 54,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:00:20.868Z",
+      "completedAt": "2026-09-30T01:02:27.929Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-DIRECTOR-CAPABILITIES",
+      "suite": "director-capabilities",
+      "artifact": "evidence/director-capabilities.json",
+      "artifactSha256": "b04b726e792c7bdd796b84351ee950edd0689a4d11a246307c7da16aae7b5024",
+      "result": "PASS",
+      "counts": {
+        "tests": 21,
+        "pass": 21,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T00:56:24.036Z",
+      "completedAt": "2026-09-30T00:56:52.456Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-DIRECTOR-ODDS-PUBLICATION",
+      "suite": "director-odds-publication",
+      "artifact": "evidence/director-odds-publication.json",
+      "artifactSha256": "4e6b81b2ca741c875c4e1971e3318595f8417edfb4e49472385cbfb103dbd202",
+      "result": "PASS",
+      "counts": {
+        "tests": 13,
+        "pass": 13,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:36:36.808Z",
+      "completedAt": "2026-09-30T01:36:51.770Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-DIRECTOR-ODDS",
+      "suite": "director-odds",
+      "artifact": "evidence/director-odds.json",
+      "artifactSha256": "505d86dcbe5ca408201a0c4c738b953d9a17824f1a85ce2136b498cac02de95b",
+      "result": "PASS",
+      "counts": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:23:56.210Z",
+      "completedAt": "2026-09-30T01:23:56.414Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-DIRECTOR-PREVIEW",
+      "suite": "director-preview",
+      "artifact": "evidence/director-preview.json",
+      "artifactSha256": "56d78d60f7443623d27e4b782a65d93571f227cfed094ecf85d96917a02a07b2",
+      "result": "PASS",
+      "counts": {
+        "tests": 9,
+        "pass": 9,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:36:35.091Z",
+      "completedAt": "2026-09-30T01:36:36.545Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-DIRECTOR",
+      "suite": "director",
+      "artifact": "evidence/director.json",
+      "artifactSha256": "eeae22d59bde938a25f7a726994d5156a240ca87b099dcb48f63abee84888a91",
+      "result": "PASS",
+      "counts": {
+        "tests": 21,
+        "pass": 21,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:23:53.878Z",
+      "completedAt": "2026-09-30T01:23:54.385Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-FINITE",
+      "suite": "finite",
+      "artifact": "evidence/finite.json",
+      "artifactSha256": "b7829407225082d92376289cc1e12056436179dc5a5ed2b2097c36a79a49c325",
+      "result": "PASS",
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:03:31.736Z",
+      "completedAt": "2026-09-30T01:03:38.115Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-FULL-SEQUENCE",
+      "suite": "full-sequence",
+      "artifact": "evidence/full-sequence.json",
+      "artifactSha256": "cc50a06245011e724753d2ff8f43e3dca2279f5e85cc9dc3861af9f89baac99c",
+      "result": "PASS",
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:03:56.198Z",
+      "completedAt": "2026-09-30T01:04:26.476Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-HARNESS",
+      "suite": "harness",
+      "artifact": "evidence/harness.json",
+      "artifactSha256": "ea01ed6ae1d8a1f3170c117ec3bf7089ccf8ac6953824cb6c8a5413d921030a8",
+      "result": "PASS",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:23:56.815Z",
+      "completedAt": "2026-09-30T01:23:56.983Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-RECOVERY",
+      "suite": "recovery",
+      "artifact": "evidence/recovery.json",
+      "artifactSha256": "42df25bc730b3bf424e9450b9898305f3eb6720e2b42f46e900c4d68146c1d34",
+      "result": "PASS",
+      "counts": {
+        "tests": 50,
+        "pass": 50,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T00:59:53.061Z",
+      "completedAt": "2026-09-30T01:00:20.631Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-RETIREMENT-RELEASE",
+      "suite": "retirement-release",
+      "artifact": "evidence/retirement-release.json",
+      "artifactSha256": "d7eb4d40b28d5c24f8c41ebc4a3d1fa4d2bd99c5fdaec0bafd3abf6761143753",
+      "result": "PASS",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:03:50.820Z",
+      "completedAt": "2026-09-30T01:03:55.942Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-RETIREMENT-SECURITY",
+      "suite": "retirement-security",
+      "artifact": "evidence/retirement-security.json",
+      "artifactSha256": "7d0fc49a2dd36041f6bcf5ea043bb2d0c57dfaa8564e81a8f9265e96abd80397",
+      "result": "PASS",
+      "counts": {
+        "tests": 84,
+        "pass": 84,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T00:58:59.581Z",
+      "completedAt": "2026-09-30T00:59:00.185Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-RETIREMENT-SQL",
+      "suite": "retirement-sql",
+      "artifact": "evidence/retirement-sql.json",
+      "artifactSha256": "643acde0def3105a467095988310612ceca4e471ddfac7960eb3147b919a741a",
+      "result": "PASS",
+      "counts": {
+        "tests": 8,
+        "pass": 8,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T00:58:48.844Z",
+      "completedAt": "2026-09-30T00:58:59.307Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-RETIREMENT",
+      "suite": "retirement",
+      "artifact": "evidence/retirement.json",
+      "artifactSha256": "8e615acbe8b7b24849525d97e91c5a567c812cf14b35adf313aff511f4776dde",
+      "result": "PASS",
+      "counts": {
+        "tests": 47,
+        "pass": 47,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T00:59:00.460Z",
+      "completedAt": "2026-09-30T00:59:01.233Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-ROUTING-SAFETY",
+      "suite": "routing-safety",
+      "artifact": "evidence/routing-safety.json",
+      "artifactSha256": "e57105d16737f981736fc913f7a299d0d6bfd5dac85d4e28506ca0a679bbcd3a",
+      "result": "FAIL",
+      "counts": {
+        "tests": 3,
+        "pass": 0,
+        "fail": 3,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:23:57.586Z",
+      "completedAt": "2026-09-30T01:23:57.720Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-ROUTING",
+      "suite": "routing",
+      "artifact": "evidence/routing.json",
+      "artifactSha256": "8251cf0305e88de8d285e363b919d8cbaab66768da21c583484ed12a432f4758",
+      "result": "FAIL",
+      "counts": {
+        "tests": 14,
+        "pass": 11,
+        "fail": 3,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:23:57.170Z",
+      "completedAt": "2026-09-30T01:23:57.430Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    },
+    {
+      "id": "RUN-WORKER-LOCK-ORDER",
+      "suite": "worker-lock-order",
+      "artifact": "evidence/worker-lock-order.json",
+      "artifactSha256": "99c18349ac0b22258bf11691aef4f80c352b27ce311ecb7eb33d4614d638bf77",
+      "result": "PASS",
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "startedAt": "2026-09-30T01:03:38.360Z",
+      "completedAt": "2026-09-30T01:03:50.654Z",
+      "executionHead": "4f5be5928a362f77edca375919df55be23695177",
+      "sourceStableDuringRun": true,
+      "environment": "LOCAL_NON_PRODUCTION",
+      "limitations": [
+        "Explicit runtime substitutions remain labelled by individual test; no hosted/physical proof"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "CL-ODDS-OWNER-PUBLICATION",
+      "result": "PASS_SCOPED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "API",
+        "POSTGRESQL",
+        "INTEGRATION",
+        "SECURITY",
+        "FAILURE_INJECTION"
+      ],
+      "runs": [
+        "RUN-DIRECTOR-ODDS-PUBLICATION"
+      ],
+      "artifacts": [],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Actual After Round1 publication and real calculator; synthetic identity/Next after callback, manually driven processor. Owner confirmation, stale-input checks, audit rollback, same-job readback/replay,0newGooglejobs. No hosted Auth/automatic scheduling proof."
+    },
+    {
+      "id": "CL-ANNUAL",
+      "result": "PASS_SCOPED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "UNIT",
+        "POSTGRESQL",
+        "API",
+        "INTEGRATION",
+        "SECURITY",
+        "FAILURE_INJECTION"
+      ],
+      "runs": [
+        "RUN-ANNUAL-CLIENT",
+        "RUN-ANNUAL-CREATE"
+      ],
+      "artifacts": [
+        {
+          "path": "evidence/annual-create-results.json",
+          "sha256": "9c509175b531639bd676e9e98169be0e81687511d9c19c1fd807c41ebeff78f6"
+        }
+      ],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "One current-authority scope plus explicit future target year; draft receipt/readback/retry/rollback. Synthetic auth/activation and socket transport, no hosted proof."
+    },
+    {
+      "id": "CL-ANNUAL-WIRE-HASH",
+      "result": "PASS_SCOPED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "UNIT",
+        "POSTGRESQL",
+        "API",
+        "INTEGRATION"
+      ],
+      "runs": [
+        "RUN-ANNUAL-CLIENT",
+        "RUN-ANNUAL-CREATE"
+      ],
+      "artifacts": [
+        {
+          "path": "evidence/annual-create-results.json",
+          "sha256": "9c509175b531639bd676e9e98169be0e81687511d9c19c1fd807c41ebeff78f6"
+        }
+      ],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Actual PostgreSQL JSONB wire hash parity; legacyv1CREATE digest unchanged. Full annual activation chronology unproved."
+    },
+    {
+      "id": "CL-DIRECTOR-SCOPED",
+      "result": "PASS_SCOPED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "SOURCE",
+        "UNIT",
+        "POSTGRESQL",
+        "API",
+        "INTEGRATION",
+        "SECURITY",
+        "FAILURE_INJECTION"
+      ],
+      "runs": [
+        "RUN-DIRECTOR",
+        "RUN-DIRECTOR-PREVIEW"
+      ],
+      "artifacts": [],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Overview, Finalize and Reopen only. Other required capabilities remain individually classified."
+    },
+    {
+      "id": "CL-CAPABILITY-PARITY",
+      "result": "PARTIAL",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "SOURCE"
+      ],
+      "runs": [],
+      "artifacts": [
+        {
+          "path": "CAPABILITY-GAPS.md",
+          "sha256": "b9f4e8c8ad870ca9ed32e7b4b6eb01b42aa6df3f770f866135124dff5a7c4dba"
+        },
+        {
+          "path": "CANONICAL-ADAPTER-DESIGN-REVIEW.md",
+          "sha256": "3a11aed65904a6e577fd1113d206edbef68ed66ef40e71572e4ad78960bb6d8a"
+        }
+      ],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Preview bulk imports would not preserve canonical setup, immutable entry/auction and readiness semantics; safe isolated command context missing."
+    },
+    {
+      "id": "CL-ROUTING",
+      "result": "FAIL_REQUIRED_RED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "UNIT",
+        "API",
+        "INTEGRATION"
+      ],
+      "runs": [
+        "RUN-ROUTING",
+        "RUN-ROUTING-SAFETY"
+      ],
+      "artifacts": [
+        {
+          "path": "ROUTING-ADMISSION-REVIEW.md",
+          "sha256": "26cb7b09f30e8cba69c22876640db0540c01df455d12e6e82052a3eb78ed95db"
+        }
+      ],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Three original gaps plus no-fallback guard remain RED; automatic approval review rejected source edit and explicit owner confirmation is pending."
+    },
+    {
+      "id": "P0-A",
+      "result": "PASS_SCOPED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "POSTGRESQL",
+        "API",
+        "INTEGRATION",
+        "FAILURE_INJECTION"
+      ],
+      "runs": [
+        "RUN-RECOVERY",
+        "RUN-FULL-SEQUENCE"
+      ],
+      "artifacts": [],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Recovery after authority revocation; synthetic local fixture, no physical client or hosted admission."
+    },
+    {
+      "id": "P0-B",
+      "result": "PASS_SCOPED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION",
+        "FAILURE_INJECTION"
+      ],
+      "runs": [
+        "RUN-DELIVERY",
+        "RUN-FULL-SEQUENCE"
+      ],
+      "artifacts": [],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Required automatic Calcutta/Competition/Intelligence families; owner-controlled publication not automated; Google retired, not delivery-certified."
+    },
+    {
+      "id": "P0-C",
+      "result": "PASS_SCOPED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "runs": [
+        "RUN-ANNUAL"
+      ],
+      "artifacts": [],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Known14-function worker inventory. AnnualCREATE is a separate claim."
+    },
+    {
+      "id": "P0-D",
+      "result": "PASS_SCOPED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION",
+        "CONCURRENCY",
+        "FAILURE_INJECTION"
+      ],
+      "runs": [
+        "RUN-DEADLOCK",
+        "RUN-WORKER-LOCK-ORDER"
+      ],
+      "artifacts": [],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Known mixed-round Net Skins lock case only, no Production contention capacity."
+    },
+    {
+      "id": "P0-E",
+      "result": "PASS_SCOPED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "POSTGRESQL",
+        "INTEGRATION",
+        "FAILURE_INJECTION"
+      ],
+      "runs": [
+        "RUN-FINITE",
+        "RUN-FULL-SEQUENCE"
+      ],
+      "artifacts": [],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Finite local statement timeout and57014rollback/recovery; no timeout increase."
+    },
+    {
+      "id": "P0-F",
+      "result": "PARTIAL",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "SOURCE",
+        "UNIT",
+        "POSTGRESQL",
+        "API",
+        "INTEGRATION"
+      ],
+      "runs": [
+        "RUN-DIRECTOR",
+        "RUN-ANNUAL-CREATE",
+        "RUN-ROUTING",
+        "RUN-ROUTING-SAFETY",
+        "RUN-RETIREMENT-RELEASE"
+      ],
+      "artifacts": [
+        {
+          "path": "CLIENT-COMPATIBILITY.md",
+          "sha256": "b4fb56f6a980eded0fcdd2d31b2b1a8d4aab53b3e4cdbaaea44ef84193717f2f"
+        }
+      ],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Required isolated Director contexts and routing proofs missing. Existing scoped client/control/release passes do not close parity."
+    },
+    {
+      "id": "CL-FULL-SEQUENCE",
+      "result": "PASS_SCOPED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "POSTGRESQL",
+        "API",
+        "INTEGRATION",
+        "FAILURE_INJECTION"
+      ],
+      "runs": [
+        "RUN-FULL-SEQUENCE"
+      ],
+      "artifacts": [
+        {
+          "path": "evidence/revalidation/phase2c/full-sequence-results.json",
+          "sha256": "b5c58ca0186cf728ef86860319544d13f7a4e328239dd070d01d774a39f77ae2"
+        }
+      ],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "432holes/24Final/432receipts/0Google/0required automatic backlog. Synthetic preparedLive starting state; fsyncOFF; no Prepare/Open rehearsal."
+    },
+    {
+      "id": "CL-HISTORY-RECORDS",
+      "result": "PASS_SCOPED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "UNIT",
+        "API",
+        "INTEGRATION"
+      ],
+      "runs": [
+        "RUN-RETIREMENT"
+      ],
+      "artifacts": [],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Synthetic2017\u20132026canonical fixtures/8checks; no real archive completeness or Google artifact preservation access."
+    },
+    {
+      "id": "CL-PERFORMANCE",
+      "result": "NO_SYSTEMATIC_REGRESSION_DETECTED",
+      "confidence": "STRONGLY_SUPPORTED",
+      "proofLayers": [
+        "POSTGRESQL",
+        "PERFORMANCE"
+      ],
+      "runs": [],
+      "artifacts": [
+        {
+          "path": "evidence/benchmark-results.json",
+          "sha256": "dc07e710b0d94a9bc2a5fdc9002edd4055829c0168f0972669878f376a771be5"
+        },
+        {
+          "path": "PERFORMANCE.md",
+          "sha256": "8ab14d48463b482abf623fffe44caf6e2374904fbd53884fe66f134f32b3c408"
+        }
+      ],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "12000rollbackRPCsamples,3batches/fourscales; empiricaltails, external scheduling uncontrolled; noProductioncapacityclaim."
+    },
+    {
+      "id": "CL-NATIVE-DTO",
+      "result": "PASS_SCOPED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "INTEGRATION"
+      ],
+      "runs": [],
+      "artifacts": [
+        {
+          "path": "evidence/native-decoder-proof.json",
+          "sha256": "99fb1521cdba44a4dc71021837540f53f2d92d8ade2a86a53a32d826cea7a89c"
+        }
+      ],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "24checks actual retainedSwiftdecoder/newsyntheticDTO; UTC only. Build10lineage stronglysupported; no physical/appqueue/UIproof."
+    },
+    {
+      "id": "CL-BROAD-ACCOUNTING",
+      "result": "ACCOUNTED_KNOWN_FAILURES",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "UNIT"
+      ],
+      "runs": [
+        "RUN-APPLICATION"
+      ],
+      "artifacts": [
+        {
+          "path": "test-accounting.json",
+          "sha256": "069cd81d30f1df7214e4b203bedb39885c380db8b321e2d7ba764ddd612c10d6"
+        },
+        {
+          "path": "failure-manifest.json",
+          "sha256": "9bec35d873b76a3c3e0fd9b7919d037590f82e88f513b6961275c7f328f22d56"
+        }
+      ],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Exactidentity accounting; original493-file selection. KnownrequiredRED remainsfailure, obsolete deletions notpasses."
+    },
+    {
+      "id": "CL-BUILD-BOOT",
+      "result": "PASS_SCOPED",
+      "confidence": "PROVEN",
+      "proofLayers": [
+        "INTEGRATION"
+      ],
+      "runs": [
+        "RUN-BUILD",
+        "RUN-BOOT"
+      ],
+      "artifacts": [],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "Local compilation and loopbackboot with scrubbedcredentials/remotesocketsdenied; no deployment."
+    },
+    {
+      "id": "CL-SECURITY",
+      "result": "PASS_SCOPED",
+      "confidence": "STRONGLY_SUPPORTED",
+      "proofLayers": [
+        "SOURCE",
+        "UNIT",
+        "POSTGRESQL",
+        "API",
+        "SECURITY"
+      ],
+      "runs": [
+        "RUN-RETIREMENT-SECURITY",
+        "RUN-DIRECTOR",
+        "RUN-DIRECTOR-PREVIEW",
+        "RUN-ANNUAL-CREATE"
+      ],
+      "artifacts": [
+        {
+          "path": "SECURITY-REVIEW.md",
+          "sha256": "4e0ac6bf4217b856cbfa2012a27e7b536adfe97fb5c7ec4d5a0f79a4a6d6d358"
+        },
+        {
+          "path": "evidence/annual-final-review.json",
+          "sha256": "45d8594893767dcead8923caa152f67b686c9ef6d672a06f9d5a4bc36b034255"
+        }
+      ],
+      "environment": "LOCAL_NON_PRODUCTION",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "limitation": "No observednewregression in exercisedchangedpaths. KnownroutingadmissionRED remainsseparate; no global/hostedsecurityclaim."
+    }
+  ],
+  "sourceCandidateSha": "63fd9f0e47993eb48e89ae268d03b939b0a5c10c",
+  "executionAttribution": "Execution HEAD remains the recorded base plus hashed working bytes; source candidate commit binds final files. No tests claimed executed after source commit."
+}

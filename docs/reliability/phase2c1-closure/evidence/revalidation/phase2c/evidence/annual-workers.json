@@ -1,0 +1,1514 @@
+{
+  "schemaVersion": 1,
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "fixture": "phase2c-annual-workers-v1",
+  "seed": "2099-worker-contracts-v1",
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "timestamp": "2026-09-29T20:16:17.068Z",
+  "migration": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+  "migrationSha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0",
+  "statementTimeoutMs": 5000,
+  "composition": "121+122+123+124",
+  "tests": [
+    {
+      "id": "P2C-C-BEFORE",
+      "title": "all14 installed defects reproduce SQLSTATE42883 before correction",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "failures": [
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "sqlstate": "42883"
+          },
+          {
+            "signature": "public.future_production_dispatch_odds_pre_withdrawal_v1(jsonb)",
+            "sqlstate": "42883",
+            "partialWrite": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-C-BEFORE-WRITER-CHECK",
+      "title": "actual eligible writer sync reproduces obsolete false-only CHECK23514",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "issue": "P2C-NEW-GOOGLE-WRITER-23514",
+        "sqlstate": "23514",
+        "error": "ERROR:  23514: new row for relation \"future_match_google_compatibility_jobs_v1\" violates check constraint \"future_match_google_compatibility_jobs_v_writer_installed_check\"\nDETAIL:  Failing row contains (5eff7c3e-5f09-40fd-8893-cd9b6c0b9df1, 2100, 2100-R1-1, REQUIRED_FOR_ROLLBACK_EVIDENCE, PROVISIONING_REQUIRED, t, null, null, 2026-09-29 20:16:17.820394+00, 2026-09-29 20:16:17.832071+00, 0, 2026-09-29 20:16:17.832071+00, null, null, null, null, null, null, null, a2600000-0000-4000-8000-000000000001, synthetic-local-2100, bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb, 05ca948a41277bedbb870e81d9f9159ebf942a3cab69c6d6f5a11b813eb0d01d, 1).\nCONTEXT:  SQL statement \"update production_control.future_match_google_compatibility_jobs_v1 value set\n    writer_installed = eligible,\n    writer_generation_id = case when eligible\n      then target.writer_generation_id else value.writer_generation_id end,\n    destination_workbook_id = case when eligible\n      then target.destination_workbook_id else value.destination_workbook_id end,\n    target_contract_fingerprint = case when eligible\n      then target.target_contract_fingerprint\n      else value.target_contract_fingerprint end,\n    structural_fingerprint = case when eligible\n      then fingerprint_value else null end,\n    structural_runtime_revision = case when eligible\n      then binding.runtime_revision else null end,\n    status = case\n      when value.status = 'NOT_REQUIRED' then 'NOT_REQUIRED'\n      when not eligible then 'PROVISIONING_REQUIRED'\n      when value.structural_fingerprint is distinct from fingerprint_value\n        or value.writer_generation_id is distinct from target.writer_generation_id\n        or value.destination_workbook_id\n          is distinct from target.destination_workbook_id\n        or value.target_contract_fingerprint\n          is distinct from target.target_contract_fingerprint\n        then 'PROVISIONING_REQUIRED'\n      else value.status end,\n    expected_manifest_fingerprint = case\n      when eligible and value.structural_fingerprint = fingerprint_value\n        and value.writer_generation_id = target.writer_generation_id\n        and value.destination_workbook_id = target.destination_workbook_id\n        and value.target_contract_fingerprint = target.target_contract_fingerprint\n      then value.expected_manifest_fingerprint else null end,\n    readback_fingerprint = case\n      when eligible and value.structural_fingerprint = fingerprint_value\n        and value.writer_generation_id = target.writer_generation_id\n        and value.destination_workbook_id = target.destination_workbook_id\n        and value.target_contract_fingerprint = target.target_contract_fingerprint\n      then value.readback_fingerprint else null end,\n    readback_checkpoint = case\n      when eligible and value.structural_fingerprint = fingerprint_value\n        and value.writer_generation_id = target.writer_generation_id\n        and value.destination_workbook_id = target.destination_workbook_id\n        and value.target_contract_fingerprint = target.target_contract_fingerprint\n      then value.readback_checkpoint else null end,\n    certified_at = case\n      when eligible and value.structural_fingerprint = fingerprint_value\n        and value.writer_generation_id = target.writer_generation_id\n        and value.destination_workbook_id = target.destination_workbook_id\n        and value.target_contract_fingerprint = target.target_contract_fingerprint\n      then value.certified_at else null end,\n    claim_token = null, claimed_by = null, lease_expires_at = null,\n    available_at = pg_catalog.clock_timestamp(),\n    safe_error_code = case when eligible then null\n      else 'FUTURE_GOOGLE_WRITER_CONTRACT_NOT_READY' end,\n    updated_at = pg_catalog.clock_timestamp()\n  where value.tournament_id = target_tournament\n    and value.match_id = target_match\"\nPL/pgSQL function production_control.sync_future_google_writer_job_v2(text,text) line 33 at SQL statement\nSCHEMA NAME:  production_control\nTABLE NAME:  future_match_google_compatibility_jobs_v1\nCONSTRAINT NAME:  future_match_google_compatibility_jobs_v_writer_installed_check\nLOCATION:  ExecConstraints, execMain.c:2079\n",
+        "partialInstallation": false
+      }
+    },
+    {
+      "id": "P2C-C-INSTALL",
+      "title": "upgrade preserves attributes and removes only proven special-expression misuse",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "functions": 14,
+        "attributesPreserved": true,
+        "invalidInstalledExpressions": 0,
+        "expressionInventory": {
+          "candidateNames": [
+            "least",
+            "greatest",
+            "coalesce",
+            "nullif",
+            "extract",
+            "trim",
+            "position",
+            "substring",
+            "overlay",
+            "current_date",
+            "current_time",
+            "current_timestamp",
+            "localtime",
+            "localtimestamp"
+          ],
+          "installedCandidates": [
+            {
+              "name": "substring",
+              "signature": "production_control.guide_authoring_with_item_ids_v1(jsonb)",
+              "catalogFunctionExists": true
+            }
+          ],
+          "historicalFiles": [
+            {
+              "file": "202608290055_production_net_skins_v1.sql",
+              "names": [
+                "least",
+                "greatest"
+              ],
+              "sourceOccurrences": 7
+            },
+            {
+              "file": "202608290056_production_calcutta_v1.sql",
+              "names": [
+                "least",
+                "greatest"
+              ],
+              "sourceOccurrences": 2
+            },
+            {
+              "file": "202608300067_production_current_scoring_runtime_v1.sql",
+              "names": [
+                "greatest",
+                "least"
+              ],
+              "sourceOccurrences": 10
+            },
+            {
+              "file": "202608300068_production_future_participant_identity_runtime_v1.sql",
+              "names": [
+                "least",
+                "greatest"
+              ],
+              "sourceOccurrences": 6
+            },
+            {
+              "file": "202608300071_production_annual_reads_workers_v1.sql",
+              "names": [
+                "greatest",
+                "least"
+              ],
+              "sourceOccurrences": 9
+            },
+            {
+              "file": "202608300073_production_annual_odds_v1.sql",
+              "names": [
+                "greatest"
+              ],
+              "sourceOccurrences": 1
+            },
+            {
+              "file": "202608300075_production_annual_calcutta_v1.sql",
+              "names": [
+                "least",
+                "greatest"
+              ],
+              "sourceOccurrences": 2
+            },
+            {
+              "file": "202608300077_production_annual_derived_worker_close_fence_v1.sql",
+              "names": [
+                "greatest"
+              ],
+              "sourceOccurrences": 2
+            },
+            {
+              "file": "202608310082_production_guide_authoring_v1.sql",
+              "names": [
+                "substring"
+              ],
+              "sourceOccurrences": 1
+            },
+            {
+              "file": "202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+              "names": [
+                "least",
+                "greatest"
+              ],
+              "sourceOccurrences": 2
+            }
+          ],
+          "limitation": "Text candidates are distinguished from executable SQL. Existing ordinary catalog functions are not classified as defects merely by spelling; historical migration text remains preserved."
+        }
+      }
+    },
+    {
+      "id": "P2C-C-AFTER",
+      "title": "every corrected initializer executes through its original guard rather than42883",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "calls": [
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.claim_production_future_match_google_compatibility_v2(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_calcutta_recalculation_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_competition_derived_jobs_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_event_pre_generation_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_google_outbox_pre_generation_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_intelligence_derived_bundle_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_claim_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_google_outbox_pre_generation_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_fail_scorecard_archive_job_pre_generation_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": null,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": -1,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 0,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 60,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 301,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "public.future_production_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": "42501",
+            "result": "ORIGINAL_AUTHORITY_GUARD"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": null,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": -1,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 0,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 60,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 301,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_competition_derived_snapshot_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": "ABSENT",
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": null,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": -1,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 0,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 60,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 301,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          },
+          {
+            "signature": "production_control.frozen_2026_write_intelligence_derived_bundle_v1(jsonb)",
+            "input": 2147483647,
+            "sqlstate": null,
+            "result": "VALIDATION_RESPONSE"
+          }
+        ],
+        "scope": "Initializer runtime and original guard only; successful claims/completions below"
+      }
+    },
+    {
+      "id": "P2C-C-COMPETITION",
+      "title": "2099 claim/complete/replay/stale and lease clamp use actual worker SQL",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "results": [
+          {
+            "lease": null,
+            "actualLeaseSeconds": 90,
+            "completed": true,
+            "replay": "STALE_DERIVED_JOB",
+            "snapshots": 1
+          },
+          {
+            "lease": -1,
+            "actualLeaseSeconds": 15,
+            "completed": true,
+            "replay": "STALE_DERIVED_JOB",
+            "snapshots": 1
+          },
+          {
+            "lease": 60,
+            "actualLeaseSeconds": 60,
+            "completed": true,
+            "replay": "STALE_DERIVED_JOB",
+            "snapshots": 1
+          },
+          {
+            "lease": 999,
+            "actualLeaseSeconds": 300,
+            "completed": true,
+            "replay": "STALE_DERIVED_JOB",
+            "snapshots": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-C-BEFORE-42702",
+      "title": "corrected initializer exposes historical annual intelligence variable collision",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "issue": "P2C-NEW-ANNUAL-42702",
+        "sqlstate": "42702",
+        "partialSnapshot": false,
+        "error": "ERROR:  42702: column reference \"configuration_fingerprint\" is ambiguous\nLINE 10:     ) on conflict (\n                           ^\nDETAIL:  It could refer to either a PL/pgSQL variable or a table column.\nQUERY:  insert into scoring_authority.competition_derived_runs (\n      tournament_id, round_number, engine_key, engine_version,\n      configuration_fingerprint, source_fingerprint, payload_hash, status,\n      calculated_by, started_at, completed_at, duration_ms\n    ) values (\n      target, 0, key_value, target_engine_version,\n      configuration_fingerprint, target_source, target_payload_hash,\n      'SUCCEEDED', target_actor, target_claim,\n      pg_catalog.clock_timestamp(), target_duration\n    ) on conflict (\n      tournament_id, round_number, engine_key, engine_version,\n      configuration_fingerprint, source_fingerprint, payload_hash, status\n    ) do update set\n      completed_at = pg_catalog.clock_timestamp(),\n      duration_ms = excluded.duration_ms,\n      calculated_by = excluded.calculated_by\nCONTEXT:  PL/pgSQL function public.future_production_write_intelligence_derived_bundle_v1(jsonb) line 122 at SQL statement\nLOCATION:  plpgsql_post_column_ref, pl_comp.c:1138\n"
+      }
+    },
+    {
+      "id": "P2C-C-INTELLIGENCE",
+      "title": "2099 bundle claim/complete preserves active lease and expired-lease retry",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "results": [
+          {
+            "lease": null,
+            "actualLeaseSeconds": 90,
+            "completed": 2,
+            "replay": "STALE_INTELLIGENCE_WORKER",
+            "expiredLeaseReclaimed": "SEPARATE_LEASE_60_CASE",
+            "demandModel": "NEW_SOURCE_THEN_DELIVERY_TICK_BACKOFF"
+          },
+          {
+            "lease": -1,
+            "actualLeaseSeconds": 15,
+            "completed": 2,
+            "replay": "STALE_INTELLIGENCE_WORKER",
+            "expiredLeaseReclaimed": "SEPARATE_LEASE_60_CASE",
+            "demandModel": "NEW_SOURCE_THEN_DELIVERY_TICK_BACKOFF"
+          },
+          {
+            "lease": 60,
+            "actualLeaseSeconds": 60,
+            "completed": 2,
+            "replay": "STALE_INTELLIGENCE_WORKER",
+            "expiredLeaseReclaimed": true,
+            "demandModel": "NEW_SOURCE_THEN_DELIVERY_TICK_BACKOFF"
+          },
+          {
+            "lease": 999,
+            "actualLeaseSeconds": 300,
+            "completed": 2,
+            "replay": "STALE_INTELLIGENCE_WORKER",
+            "expiredLeaseReclaimed": "SEPARATE_LEASE_60_CASE",
+            "demandModel": "NEW_SOURCE_THEN_DELIVERY_TICK_BACKOFF"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-C-CALCUTTA",
+      "title": "2099 nonempty Calcutta claim executes lease bounds and same-request replay",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "rows": [
+          {
+            "lease": null,
+            "actualLeaseSeconds": 60,
+            "jobClaimed": true,
+            "sameRequestReplay": true,
+            "activeLeaseSkipped": true
+          },
+          {
+            "lease": -1,
+            "actualLeaseSeconds": 15,
+            "jobClaimed": true,
+            "sameRequestReplay": true,
+            "activeLeaseSkipped": true
+          },
+          {
+            "lease": 60,
+            "actualLeaseSeconds": 60,
+            "jobClaimed": true,
+            "sameRequestReplay": true,
+            "activeLeaseSkipped": true
+          },
+          {
+            "lease": 999,
+            "actualLeaseSeconds": 300,
+            "jobClaimed": true,
+            "sameRequestReplay": true,
+            "activeLeaseSkipped": true
+          }
+        ],
+        "boundarySubstitutions": [
+          "assert_future_production_scoring_runtime_v1",
+          "assert_annual_calcutta_runtime_v1"
+        ],
+        "scope": "Actual nonempty annual claim/lease/current-source/receipt SQL; empty synthetic annual golf/auction facts are not financial-calculator certification"
+      }
+    },
+    {
+      "id": "P2C-C-GOOGLE-COMPATIBILITY",
+      "title": "2100 pre-activation job claims clamp leases and reclaim an expired lease",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "rows": [
+          {
+            "lease": null,
+            "actualLeaseSeconds": 120,
+            "firstAttempt": 1,
+            "reclaimedAttempt": 2,
+            "activeLeaseSkipped": true
+          },
+          {
+            "lease": -1,
+            "actualLeaseSeconds": 30,
+            "firstAttempt": 1,
+            "reclaimedAttempt": 2,
+            "activeLeaseSkipped": true
+          },
+          {
+            "lease": 60,
+            "actualLeaseSeconds": 60,
+            "firstAttempt": 1,
+            "reclaimedAttempt": 2,
+            "activeLeaseSkipped": true
+          },
+          {
+            "lease": 999,
+            "actualLeaseSeconds": 300,
+            "firstAttempt": 1,
+            "reclaimedAttempt": 2,
+            "activeLeaseSkipped": true
+          }
+        ],
+        "boundarySubstitutions": [
+          "assert_future_google_writer_v2",
+          "future_google_match_manifest_v2"
+        ],
+        "scope": "Actual nonempty pre-activation claim/lease SQL; not future writer certification or external Google provisioning"
+      }
+    },
+    {
+      "id": "P2C-C-WRITER-CHECK",
+      "title": "writer sync retains certification and prepared-state requirements",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "eligibleInstalled": true,
+        "invalidatedTargetInstalled": false,
+        "unpreparedBindingInstalled": false,
+        "missingCertificationMetadata": "23514",
+        "remainingConstraints": [
+          "future_match_google_compatibility_j_tournament_id_match_id_fkey",
+          "future_match_google_compatibility_job_writer_generation_id_fkey",
+          "future_match_google_compatibility_jobs__requirement_class_check",
+          "future_match_google_compatibility_jobs_v1_match_id_key",
+          "future_match_google_compatibility_jobs_v1_pkey",
+          "production_future_google_certified_writer_shape_v2",
+          "production_future_google_job_attempts_v2",
+          "production_future_google_job_certified_v2",
+          "production_future_google_job_manifest_v2",
+          "production_future_google_job_readback_v2",
+          "production_future_google_job_shape_v2",
+          "production_future_google_job_status_v2",
+          "production_future_google_structural_fingerprint_v2",
+          "production_future_google_target_fingerprint_v2"
+        ]
+      }
+    },
+    {
+      "id": "P2C-C-GOOGLE",
+      "title": "2099 outbox claims and retry delay retain finite bounds and stale-lease rejection",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "rows": [
+          {
+            "lease": null,
+            "leaseSeconds": 30,
+            "retryAfter": null,
+            "retryDelaySeconds": 1,
+            "exactIdClaim": true,
+            "staleFailDenied": true
+          },
+          {
+            "lease": -1,
+            "leaseSeconds": 5,
+            "retryAfter": -1,
+            "retryDelaySeconds": 1,
+            "exactIdClaim": true,
+            "staleFailDenied": true
+          },
+          {
+            "lease": 60,
+            "leaseSeconds": 60,
+            "retryAfter": 20,
+            "retryDelaySeconds": 20,
+            "exactIdClaim": true,
+            "staleFailDenied": true
+          },
+          {
+            "lease": 999,
+            "leaseSeconds": 300,
+            "retryAfter": 999,
+            "retryDelaySeconds": 300,
+            "exactIdClaim": true,
+            "staleFailDenied": true
+          }
+        ],
+        "scope": "Outbox metadata claim/lease/failure; no Google transport or verified mirror"
+      }
+    },
+    {
+      "id": "P2C-C-ARCHIVE",
+      "title": "2099 archive claims and retry delay preserve supersession and finite bounds",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "rows": [
+          {
+            "lease": null,
+            "leaseSeconds": 60,
+            "retryAfter": null,
+            "retryDelaySeconds": 30,
+            "supersededRevision": 1,
+            "currentRevision": 2,
+            "staleFailDenied": true
+          },
+          {
+            "lease": -1,
+            "leaseSeconds": 15,
+            "retryAfter": -1,
+            "retryDelaySeconds": 2,
+            "supersededRevision": 1,
+            "currentRevision": 2,
+            "staleFailDenied": true
+          },
+          {
+            "lease": 60,
+            "leaseSeconds": 60,
+            "retryAfter": 20,
+            "retryDelaySeconds": 20,
+            "supersededRevision": 1,
+            "currentRevision": 2,
+            "staleFailDenied": true
+          },
+          {
+            "lease": 999,
+            "leaseSeconds": 300,
+            "retryAfter": 9999,
+            "retryDelaySeconds": 3600,
+            "supersededRevision": 1,
+            "currentRevision": 2,
+            "staleFailDenied": true
+          }
+        ],
+        "scope": "Archive queue metadata and lease/failure only; not scorecard rendering/storage/Google delivery"
+      }
+    },
+    {
+      "id": "P2C-C-ODDS",
+      "title": "2099 actual completion clamps output bytes without publishing or duplicating results",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "rows": [
+          {
+            "bytes": null,
+            "state": {
+              "bytes": 0,
+              "status": "SUCCEEDED",
+              "payload": {
+                "year": 2099,
+                "phase": "Pre-Tournament"
+              },
+              "publication": "READY"
+            }
+          },
+          {
+            "bytes": -1,
+            "state": {
+              "bytes": 0,
+              "status": "SUCCEEDED",
+              "payload": {
+                "year": 2099,
+                "phase": "Pre-Tournament"
+              },
+              "publication": "READY"
+            }
+          },
+          {
+            "bytes": 123,
+            "state": {
+              "bytes": 123,
+              "status": "SUCCEEDED",
+              "payload": {
+                "year": 2099,
+                "phase": "Pre-Tournament"
+              },
+              "publication": "READY"
+            }
+          },
+          {
+            "bytes": 2147483647,
+            "state": {
+              "bytes": 2147483647,
+              "status": "SUCCEEDED",
+              "payload": {
+                "year": 2099,
+                "phase": "Pre-Tournament"
+              },
+              "publication": "READY"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-C-CALCUTTA-MATRIX",
+      "title": "annual Calcutta empty, historical, stale-source and expired-lease branches",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "results": [
+          {
+            "scenario": "EMPTY",
+            "result": "PRODUCTION_CALCUTTA_V1_RECALCULATION_EMPTY"
+          },
+          {
+            "scenario": "TERMINAL_HISTORY",
+            "result": "PASS"
+          },
+          {
+            "scenario": "STALE_SOURCE",
+            "result": "PASS"
+          },
+          {
+            "scenario": "EXPIRED_LEASE",
+            "result": "PASS"
+          },
+          {
+            "scenario": "EXHAUSTED_LEASE",
+            "result": "PASS"
+          }
+        ],
+        "multipleActiveJobs": "NOT_APPLICABLE: unique partial index permits one active Calcutta job per tournament; multiple terminal history rows exercised"
+      }
+    },
+    {
+      "id": "P2C-C-COMPATIBILITY-MATRIX",
+      "title": "Google compatibility rejects stale structure and bounds multiple-job selection",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "results": [
+          {
+            "scenario": "EMPTY",
+            "result": "PASS"
+          },
+          {
+            "scenario": "MULTIPLE",
+            "result": "PASS"
+          },
+          {
+            "scenario": "STALE_STRUCTURE",
+            "result": "PASS"
+          },
+          {
+            "scenario": "STALE_GENERATION",
+            "result": "PASS"
+          },
+          {
+            "scenario": "TERMINAL",
+            "result": "PASS"
+          }
+        ],
+        "boundarySubstitutions": [
+          "writer admission",
+          "manifest input"
+        ],
+        "superseded": "No SUPERSEDED enum; stale structural authority and terminal BLOCKED explicitly covered"
+      }
+    },
+    {
+      "id": "P2C-C-GOOGLE-MATRIX",
+      "title": "annual Google exact and queue claims enforce empty, order, lease and terminal states",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "empty": true,
+        "singleAndMultiple": true,
+        "checkpointOrdering": true,
+        "activeLease": true,
+        "expiredLeaseRetry": true,
+        "wrongOwnerDenied": true,
+        "permanentFailure": true,
+        "deliveredReplay": true,
+        "scope": "Queue metadata only; no external delivery. DELIVERED is fixture construction, not asserted transport proof."
+      }
+    },
+    {
+      "id": "P2C-C-ARCHIVE-MATRIX",
+      "title": "annual archive empty, active, expired, retry and blocked branches retain one job authority",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "empty": true,
+        "single": true,
+        "activeLeaseSkipped": true,
+        "wrongTokenRejected": true,
+        "expiredLeaseReclaimed": true,
+        "retryDelayRespected": true,
+        "retryClaimed": true,
+        "terminalExcluded": true,
+        "multipleAndSupersession": "P2C-C-ARCHIVE"
+      }
+    },
+    {
+      "id": "P2C-C-ANNUAL-COMPLETION-MATRIX",
+      "title": "annual current jobs require exact active claims before completion",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "results": [
+          {
+            "family": "COMPETITION",
+            "variant": "SINGLE",
+            "result": "COMPLETED"
+          },
+          {
+            "family": "COMPETITION",
+            "variant": "MISSING",
+            "result": "STALE_DERIVED_JOB"
+          },
+          {
+            "family": "COMPETITION",
+            "variant": "WRONG_TOKEN",
+            "result": "STALE_DERIVED_JOB"
+          },
+          {
+            "family": "COMPETITION",
+            "variant": "EXPIRED",
+            "result": "STALE_DERIVED_JOB"
+          },
+          {
+            "family": "COMPETITION",
+            "variant": "SUPERSEDED_CLAIM",
+            "result": "STALE_DERIVED_JOB"
+          },
+          {
+            "family": "INTELLIGENCE",
+            "variant": "SINGLE",
+            "result": "COMPLETED"
+          },
+          {
+            "family": "INTELLIGENCE",
+            "variant": "MISSING",
+            "result": "STALE_INTELLIGENCE_WORKER"
+          },
+          {
+            "family": "INTELLIGENCE",
+            "variant": "WRONG_TOKEN",
+            "result": "STALE_INTELLIGENCE_WORKER"
+          },
+          {
+            "family": "INTELLIGENCE",
+            "variant": "EXPIRED",
+            "result": "STALE_INTELLIGENCE_WORKER"
+          },
+          {
+            "family": "INTELLIGENCE",
+            "variant": "SUPERSEDED_CLAIM",
+            "result": "STALE_INTELLIGENCE_WORKER"
+          }
+        ],
+        "emptyQueues": true,
+        "multipleJobs": "P2C-C-COMPETITION and P2C-C-INTELLIGENCE",
+        "scope": "No new scoring or financial payload semantics; exact current derived job authorization only"
+      }
+    },
+    {
+      "id": "P2C-C-ODDS-MATRIX",
+      "title": "annual Odds completion rejects absent, stale and superseded exact jobs",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "results": [
+          {
+            "variant": "MISSING",
+            "result": "ODDS_CALCULATION_JOB_NOT_FOUND"
+          },
+          {
+            "variant": "WRONG_TOKEN",
+            "result": "ODDS_CALCULATION_CLAIM_STALE"
+          },
+          {
+            "variant": "EXPIRED",
+            "result": "ODDS_CALCULATION_CLAIM_STALE"
+          },
+          {
+            "variant": "SUPERSEDED",
+            "result": "ODDS_CALCULATION_CLAIM_STALE"
+          },
+          {
+            "variant": "MULTIPLE",
+            "result": "COMPLETED"
+          }
+        ],
+        "scope": "Corrected completion branch. No automatic Odds publication or full Odds lifecycle claim."
+      }
+    },
+    {
+      "id": "P2C-C-COMPETITION-RETRY",
+      "title": "annual Competition expiration preserves bounded retry and rejects the retired claim",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "actualAnnualClaim": true,
+        "backoffMs": 2092,
+        "retiredClaimRejected": true,
+        "retriedClaimCompleted": true,
+        "attempts": 2
+      }
+    },
+    {
+      "id": "P2C-C-FROZEN-COMPLETION",
+      "title": "supported frozen completion wrappers preserve exact claims and duration bounds",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "rows": [
+          {
+            "family": "COMPETITION",
+            "scenario": "NULL",
+            "result": "COMPLETED",
+            "correctedPrivateCoreReached": true
+          },
+          {
+            "family": "COMPETITION",
+            "scenario": "NEGATIVE",
+            "result": "COMPLETED",
+            "correctedPrivateCoreReached": true
+          },
+          {
+            "family": "COMPETITION",
+            "scenario": "POSITIVE",
+            "result": "COMPLETED",
+            "correctedPrivateCoreReached": true
+          },
+          {
+            "family": "COMPETITION",
+            "scenario": "MISSING",
+            "result": "STALE_DERIVED_JOB",
+            "correctedPrivateCoreReached": true
+          },
+          {
+            "family": "COMPETITION",
+            "scenario": "WRONG_STARTED",
+            "result": "STALE_DERIVED_JOB",
+            "correctedPrivateCoreReached": true
+          },
+          {
+            "family": "COMPETITION",
+            "scenario": "MULTIPLE",
+            "result": "COMPLETED",
+            "correctedPrivateCoreReached": true
+          },
+          {
+            "family": "INTELLIGENCE",
+            "scenario": "NULL",
+            "result": "COMPLETED",
+            "correctedPrivateCoreReached": true
+          },
+          {
+            "family": "INTELLIGENCE",
+            "scenario": "NEGATIVE",
+            "result": "COMPLETED",
+            "correctedPrivateCoreReached": true
+          },
+          {
+            "family": "INTELLIGENCE",
+            "scenario": "POSITIVE",
+            "result": "COMPLETED",
+            "correctedPrivateCoreReached": true
+          },
+          {
+            "family": "INTELLIGENCE",
+            "scenario": "MISSING",
+            "result": "STALE_INTELLIGENCE_WORKER",
+            "correctedPrivateCoreReached": true
+          },
+          {
+            "family": "INTELLIGENCE",
+            "scenario": "WRONG_STARTED",
+            "result": "STALE_INTELLIGENCE_WORKER",
+            "correctedPrivateCoreReached": true
+          },
+          {
+            "family": "INTELLIGENCE",
+            "scenario": "MULTIPLE",
+            "result": "COMPLETED",
+            "correctedPrivateCoreReached": true
+          }
+        ],
+        "leaseSemantics": "Frozen cores authorize RUNNING plus exact started_at; expiry retirement/reclaim belongs to delivery tick. No independent lease-token or immediate expiry denial is claimed.",
+        "queueSelection": "Not applicable to exact completion; claim matrix and delivery lease tests cover selection and retry."
+      }
+    },
+    {
+      "id": "P2C-C-ANNUAL-MIXED-BUNDLE",
+      "title": "annual Intelligence leaves mixed terminal and delayed siblings unchanged",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "rows": [
+          {
+            "scenario": "TERMINAL",
+            "result": "NO_PENDING_INTELLIGENCE",
+            "rowsUnchanged": true
+          },
+          {
+            "scenario": "DELAYED",
+            "result": "NO_PENDING_INTELLIGENCE",
+            "rowsUnchanged": true
+          },
+          {
+            "scenario": "RUNNING",
+            "result": "INTELLIGENCE_LEASE_ACTIVE",
+            "rowsUnchanged": true
+          }
+        ],
+        "actualAnnualFunction": true,
+        "terminalState": "FAILED plus delivery_dead_letter_at; no SUPERSEDED enum exists for per-engine current jobs"
+      }
+    },
+    {
+      "id": "P2C-C-MANIFEST",
+      "title": "annual writer manifest retains strict authorship and rejects topology/security drift",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "issue": "P2C-NEW-ANNUAL-MANIFEST-102",
+        "expectedOriginalTriggers": 5,
+        "strictAuthorshipTrigger": 1,
+        "rows": [
+          {
+            "scenario": "DISABLED",
+            "result": "REJECTED_AND_ROLLED_BACK"
+          },
+          {
+            "scenario": "MISSING",
+            "result": "REJECTED_AND_ROLLED_BACK"
+          },
+          {
+            "scenario": "CHANGED_ARGUMENT",
+            "result": "REJECTED_AND_ROLLED_BACK"
+          },
+          {
+            "scenario": "UNEXPECTED_EXTRA",
+            "result": "REJECTED_AND_ROLLED_BACK"
+          },
+          {
+            "scenario": "PUBLIC_EXECUTE",
+            "result": "REJECTED_AND_ROLLED_BACK"
+          },
+          {
+            "scenario": "CHANGED_FUNCTION",
+            "result": "REJECTED_AND_ROLLED_BACK"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-C-REAPPLY",
+      "title": "reapplication fails atomically instead of silently accepting unknown source",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "reapplication": "REJECTED_ATOMICALLY"
+      }
+    },
+    {
+      "id": "P2C-C-CLEAN",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "effectiveCleanInstall": true,
+        "manifestExecuted": true,
+        "fullCandidate122And124": "INSTALLED"
+      }
+    },
+    {
+      "id": "P2C-C-CLEAN",
+      "proofLayer": "POSTGRESQL",
+      "result": "PASS",
+      "details": {
+        "effectiveCleanInstall": true,
+        "manifestExecuted": true,
+        "fullCandidate122And124": "INSTALLED"
+      }
+    }
+  ],
+  "limitations": [
+    "Synthetic 2099 authority/current-pointer rows and explicit assert_future runtime substitution; not protected annual admission proof",
+    "Odds completion additionally substitutes annual runtime, exact job scope, and current-input boundary; actual completion SQL/constraints execute",
+    "No Google/Archive network delivery, Production, financial publication, or real participant identity"
+  ],
+  "completedAt": "2026-09-30T00:59:52.661Z",
+  "counts": {
+    "pass": 26,
+    "fail": 0
+  }
+}

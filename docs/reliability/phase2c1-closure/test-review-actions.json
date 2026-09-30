@@ -1,0 +1,906 @@
+[
+  {
+    "file": "test/calcutta-supabase.test.mjs",
+    "test": "Preview flag is server-only and Production fails closed to Google",
+    "action": "REWRITE",
+    "replacement": "CALCUTTA_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "c388dca41a3c03a81e3e1fe27f30dadbd37b7b4003332767bc24632c5daa4a4e"
+  },
+  {
+    "file": "test/draft-supabase-projection.test.mjs",
+    "test": "Draft source selection is reversible, Preview-only, isolated, and fail-closed",
+    "action": "REWRITE",
+    "replacement": "DRAFT_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "9482532d325c49a85f2f7e55e650d1855e19df4b34bbd55514d7e88aa4f56233"
+  },
+  {
+    "file": "test/game-center-supabase.test.mjs",
+    "test": "Game Center read source is Preview-only, server-controlled, and fails closed when Preview Supabase config is incomplete",
+    "action": "REWRITE",
+    "replacement": "GAME_CENTER_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "38ef34981e1e88cb318f2344255b1423e58611a677683b222f56f5ef3743e585"
+  },
+  {
+    "file": "test/home-supabase-read.test.mjs",
+    "test": "Home Supabase source is Preview-only and Production fails closed to Google",
+    "action": "REWRITE",
+    "replacement": "HOME_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "ac184472fd29e74c2ef366f3c81a873fa38edbe01716d61ece32e0ac460d2b73"
+  },
+  {
+    "file": "test/homepage-current-supabase.test.mjs",
+    "test": "Homepage current source inherits the certified Tournament flag, supports an isolated override, and protects Production",
+    "action": "REWRITE",
+    "replacement": "HOMEPAGE_CURRENT_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "caafeb511b5d1b55e447184f128158b3504dc67e0502d9fc9fcebd83a6e7e05f"
+  },
+  {
+    "file": "test/leaderboards-core-supabase.test.mjs",
+    "test": "Leaderboards core source is Preview-only and Production fails closed",
+    "action": "REWRITE",
+    "replacement": "LEADERBOARDS_CORE_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "1dd8c0ea70c4e59e9d417c7c1c9a52d6ec8cf3009fd1f9348a1081e2d586249a"
+  },
+  {
+    "file": "test/match-authorization-supabase.test.mjs",
+    "test": "match authorization source is Preview-only, server-controlled, and fails closed",
+    "action": "REWRITE",
+    "replacement": "MATCH_AUTHORIZATION_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "162aae5a20dabf6cccede3e732d24701d0a8995761ceab5c06cdb69ec0f3f371"
+  },
+  {
+    "file": "test/my-match-supabase.test.mjs",
+    "test": "My Match read source is Preview-only, server-controlled, and fail-closed",
+    "action": "REWRITE",
+    "replacement": "MY_MATCH_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "3fba65ab1a936a11b2201b469ca2a57a7477d4c42070e3aabb001095cf26e357"
+  },
+  {
+    "file": "test/net-skins-supabase.test.mjs",
+    "test": "source flag is Preview-only, server-controlled, and Production fail-closed",
+    "action": "REWRITE",
+    "replacement": "NET_SKINS_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "8d744d7773f71a2959e693c0daac314bef953090f01f21d53642dbfcea2e9a67"
+  },
+  {
+    "file": "test/published-odds-supabase.test.mjs",
+    "test": "published Odds source is Preview-only and Production fail-closed",
+    "action": "REWRITE",
+    "replacement": "PUBLISHED_ODDS_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "5c9aeba954f8f4bfeef1e2a98730f3010f8a50d4f00d6b2a8bfbc11e37337e43"
+  },
+  {
+    "file": "test/scoring-read-supabase.test.mjs",
+    "test": "scoring read source is Preview-only, server-controlled, and has no browser override",
+    "action": "REWRITE",
+    "replacement": "SCORING_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "cdfb45d911376a52363e6c291fb4487a5da34ba2408f687f805d5b3ed46641bb"
+  },
+  {
+    "file": "test/tournament-foundation-supabase.test.mjs",
+    "test": "Tournament foundation source is independently Preview-gated and cannot move live scoring",
+    "action": "REWRITE",
+    "replacement": "TOURNAMENT_FOUNDATION_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "f7612349b2ed510542b0803c76b19b197d84d0107cb747a26c47dbe3e7a0a6d8"
+  },
+  {
+    "file": "test/tournament-supabase-read.test.mjs",
+    "test": "Tournament Supabase source is Preview-only and Production fails closed",
+    "action": "REWRITE",
+    "replacement": "TOURNAMENT_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "74d584219b46b41b2bf2b6afbd447108e49b7293aa13d152df3040bd42f66ce8"
+  },
+  {
+    "file": "test/history-step6b-read-cutover.test.mjs",
+    "test": "completed History source gate is reversible, Preview-only, and fails closed",
+    "action": "REWRITE",
+    "replacement": "COMPLETED_HISTORY_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "d8292c8f5f08935d8f9fca3163d97240f25a11481793b4ea9c6a73215326b60b"
+  },
+  {
+    "file": "test/history-step6c1-secondary-consumers.test.mjs",
+    "test": "secondary History gate is explicit, reversible, Preview-only, and fails closed",
+    "action": "REWRITE",
+    "replacement": "SECONDARY_HISTORY_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "5f11927e53b0b59e401c618686083909a6b33b9874f869ef8fbeeeb7582cdbc8"
+  },
+  {
+    "file": "test/history-step6d-historical-courses.test.mjs",
+    "test": "historical-course source is reversible, Preview-only, and fails closed",
+    "action": "REWRITE",
+    "replacement": "HISTORICAL_COURSE_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources",
+    "oldTestSha256": "124e3ba60fe3a65b07665f08479e58a2e4b832bc1006e7085e486064b7b62848"
+  },
+  {
+    "file": "test/game-center-supabase.test.mjs",
+    "test": "Director exposes explicit Preview presentation refresh and parity operations",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "91df027c904efc6e9e4f066358860e649ef9d2f6bcaccd3d7d56a13ac53eca94",
+    "why": "Legacy Director Google projection refresh/parity actions were retired; canonical participant read service remains, and maintenance-only import is not an automatic runtime requirement. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/guide-api-security.test.mjs",
+    "test": "protected Guide worker endpoint is POST-only, Preview-gated, and requires application authorization before every action",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "d808074c5e8244bcc3201d42419d6012fedac000bbd8cde75cb5dd3ebc4d6ebf",
+    "why": "The retired Guide Google cron now returns terminal410 before any provider or identity action; replace credential-gated delivery assertions with no-transport retirement tests. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/guide-api-security.test.mjs",
+    "test": "protected worker configure/status actions use deployment configuration and return only allowlisted safe status",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "315267a4345e024b80f2e3f943ad69cdcd7792a10cb43c879dfc017d9c8c29b6",
+    "why": "Guide Google worker configure/status actions are no longer runtime operations. Safe canonical Guide configuration remains separate; never treat a retired410 as successful configuration. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/guide-service-layer.test.mjs",
+    "test": "automatic sync is separately gated while manual sync remains eligible in isolated Preview",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "fa68a89213da6181d677ae5f700bf2ab82236f69c06ef5aa04309e3ec837bca2",
+    "why": "Automatic/manual Google Guide synchronization eligibility is retired; canonical Guide presentation is not delivery proof and needs its own tests. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/guide-service-layer.test.mjs",
+    "test": "Guide worker bootstrap takes its fixed endpoint and bearer only from server deployment configuration",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "044a12675898210ada522856e5d8e48158685bb999aba3477b0b2c861c9eb43c",
+    "why": "There is no automatic Google Guide worker bootstrap after retirement; terminal endpoint must not consume URL/token or initiate transport. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/guide-service-layer.test.mjs",
+    "test": "canonical sync claims before Google, publishes one validated projection, and reports a no-op safely",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "5f077ee944bdb793aa7ac02177e068a52def8e4638ec3f763e77d8f3791ca369",
+    "why": "Claim/import/publish of Google Guide content is retired runtime behavior; preserve canonical Guide projection use and manual historical import provenance. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/guide-service-layer.test.mjs",
+    "test": "invalid Google content records a fixed safe failure and preserves last-known-good",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "0d5eeaf547691dfa5046d7e8e9f4a108aab85296e6e28fad28c461ac616f64d4",
+    "why": "Invalid Google-content delivery failure handling is outside required runtime; test instead that current canonical Guide is independent of unavailable Google. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/guide-service-layer.test.mjs",
+    "test": "transient Google failures are classified safely and preserve last-known-good",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "95b7424f4f99bccedc50dd9463a822109b1f54f4ed4a5867b9bdd5312ac733b7",
+    "why": "Google transient retry classifier was part of retired Guide synchronization; it is not a reason to keep that worker required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/guide-service-layer.test.mjs",
+    "test": "Supabase publication failure is isolated and leaves the verified projection current",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "4dc52bd95b3bde4ddb4bc3d6f4a4931506ce36fdbb2f825351e099c45e61d623",
+    "why": "This failure belongs to the retired Google-to-Guide publication pipeline; current canonical Guide writes and transactional failure semantics remain separate required tests. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/guide-service-layer.test.mjs",
+    "test": "Production blocks synchronization before a claim or Google import",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "a09629e80eb695bad7fabf15c7ddfe14b70a7746530b4e0595d638f907484f34",
+    "why": "Google Guide synchronization is denied in all runtimes, with retired reason instead of Production-only reason; maintain zero claim/Google-call assertions. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/history-step1c-captain-import.test.mjs",
+    "test": "Director import action uses the canonical builder and same bounded import RPC for team metadata",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "16a1d5827c683dff75daba76fc4b78f70d1d23bf031af6e54414e7ab18d99999",
+    "why": "Director's Google captain metadata import action is retired; keep canonical builder/bounded import RPC and classify manual import maintenance-only. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/match-authorization-supabase.test.mjs",
+    "test": "Director parity exercises 24 players, every action, and independent timing classes",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "1504001ed26d5e5fba3d48094276f13feb166a00e66884f8e03bad5fca2d3d84",
+    "why": "Director's Google parity route is retired; actual canonical 24-player action permissions and timing measurements remain required separately. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/my-match-supabase.test.mjs",
+    "test": "Director parity compares all 24 active participants and reports independent query/service timings",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "a90c0caa996499d2b96fd9a951055ef50a5a8b1a300e24c459264eda3f6ba295",
+    "why": "Old Director My Match Google parity action is retired; retain canonical participant read model and independent request/database timing coverage. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/odds-publication-rehearsal.test.mjs",
+    "test": "mirror delivery is claimed, retryable, checkpointed, and idempotent",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "644d24c71e7de8921525886e089c97befd24ba7d9b75f349a402520fc3402f14",
+    "why": "Google Odds mirror claim/delivery/checkpoint behavior is retired; canonical calculation/publication and owner approval remain required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/odds-publication-rehearsal.test.mjs",
+    "test": "Director rehearsal route is Preview-only, read-only for Google, and protects real retry behind Supabase authority",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "13dc10f05586b434dba3ffa64a25f7ea02996dfae3ffd0c30293f64de5a6dd0b",
+    "why": "Google Odds rehearsal route and mirror retry have been disconnected; preserve canonical owner publication/retry permissions rather than old Google diagnostics. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/round-scorecards-archive.test.mjs",
+    "test": "archive feature flag is Preview/Supabase-only and Production-hard-blocked",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "df6b7d17f483e1389aad183c9e7ad8e00090a13f4cd6737eb78872ab40d94afe",
+    "why": "Google archive feature flag is now permanently disabled rather than eligible in Preview; canonical score/finalization audit remains required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/round-scorecards-archive.test.mjs",
+    "test": "worker writes, freshly verifies, and checkpoints one claimed archive job",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "930c3e54e44833c9bf0fb983116df193b3603b890e60da167fbfa6ad14c77992",
+    "why": "Google archive delivery worker is retired, so claiming/writing/readback/checkpoint is not required runtime behavior. Preserve canonical finalization evidence. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/round-scorecards-archive.test.mjs",
+    "test": "Reopen job uses invalidation writer and checkpoints INVALIDATED",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "246e7924fd6abf241879f6a3a8b4c955510d0e8e035988f1e5b9acdc95acfb02",
+    "why": "Google archive invalidation on Reopen is retired; canonical Reopen state and prior result audit still require coverage. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/round-scorecards-archive.test.mjs",
+    "test": "readback mismatch and stale/newest-wins checkpoint failures remain durable",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "2a66c6f3a304d21ccd2a21eb2d24bb87650c78eee9db0d28d25b55e5a82dd431",
+    "why": "Google workbook readback/checkpoint newest-wins is outside runtime after retirement; canonical side-game current pointer ordering remains required separately. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/round-scorecards-archive.test.mjs",
+    "test": "service reconciliation proves formulas, values, checkpoints, and evidence cases from fresh state",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "901d511b45281e3908e699d2134c9047c94b13e94a4c73e706c524c7db5b679b",
+    "why": "Google archive formula/value reconciliation is maintenance/history only, not an autonomous tournament prerequisite. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/round-scorecards-archive.test.mjs",
+    "test": "cron endpoint requires the server-only Preview flag and worker secret",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "354a85916f504cb34636e20cd34f63da24c95dbe0ffc1e0bffc7389fd021ed5f",
+    "why": "Archive cron no longer authenticates and delivers; both methods terminal410 before credentials/transport. Replace only retired endpoint contract assertions. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/runtime-performance.test.mjs",
+    "test": "request-scoped workbook access reuses sheets and workbook metadata",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "b7b9b732280b8906e184339e107ab1c164b9478598772adddd3dac8510fcbd88",
+    "why": "Director GET no longer constructs workbook cache diagnostics; canonical read latency/cache behavior needs its own evidence rather than an old Google-request count. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/scoring-authority-dry-run.test.mjs",
+    "test": "Preview administrative route is Director-gated and leaves participant scoring authority untouched",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "2bb59de7347c182ed873378739c52ef3934b3cccb0d419e9649479ef4b374d3b",
+    "why": "Administrative Google scoring dry-run endpoint is retired; supported canonical dry-run/score behavior needs distinct bounded fixtures. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/scoring-authority-phase2.test.mjs",
+    "test": "Director mirror reconciliation inspects and delivers exactly one confirmed reopen event",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "2bb778f3fd016fb42140e8463931e1803b7d52eeb08c7671a431b7fbb0d8c4c7",
+    "why": "Director's one-event Google mirror reconciliation is retired; canonical score/reopen receipts and internal derived delivery remain required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/scoring-authority-phase2.test.mjs",
+    "test": "Preview Live Matches migration inserts exactly one canonical column and verifies preservation",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "e7836c07d0ed7cfa57ca847a1fdc6a071796eb7430f6ec335fba7566a15659f2",
+    "why": "Live Matches Sheet column migration is historical maintenance, no longer a Director runtime action; preserve historical import source separately. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/scoring-authority-phase2.test.mjs",
+    "test": "Preview Director repair is gated, audited, and never re-finalizes or changes holes",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "b8e40997e787fa6ff44a78deddd14632b96a301ce30e9777f522a4ba444ef261",
+    "why": "Google finalization parity repair path is retired; canonical Finalization and bounded recovery cannot be waived. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/scoring-authority-phase2.test.mjs",
+    "test": "Preview Director exposes only the explicit prepared cutover and rollback controls",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "52618edc8828647fd73e292348ebea289031b9238f83d16c927a18f0ab457119",
+    "why": "Prepared Google cutover/rollback Director controls are retired; supported canonical configuration and frozen authority remain required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/scoring-authority-phase2.test.mjs",
+    "test": "Phase 2 Director diagnostics retain safe PostgREST errors without exposing credentials",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "ab851061691e32a8a7286bac4afde57318d3a05ba518fc04db933745ee54a3dd",
+    "why": "The removed Google diagnostic endpoint no longer forwards PostgREST diagnostics; keep secret-safe typed errors on current canonical routes as independent security coverage. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/scoring-read-supabase.test.mjs",
+    "test": "Director diagnostics expose a read-only 24-match scoring contract parity action",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "71cce6c42c0d033208cfd0bb98e26ba9b3a3fb7e1b3efc01ba1f80ba3ecb4c99",
+    "why": "Google scoring parity administrative action is retired; current match/hole readback and 24-match canonical authority remain required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/scoring-reopen-lifecycle-hardening.test.mjs",
+    "test": "legacy normalization is Preview-only, audited, versioned, and leaves scoring authority unchanged",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "6e59868cb57bff3de251266b6a6cecf7e8dc284d43c0f23b29c663ad39464065",
+    "why": "Google sheet lifecycle normalization is historical migration tooling, not current runtime; keep canonical Reopen audit/version/score preservation tests. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/scoring-shadow-phase-1.test.mjs",
+    "test": "Preview benchmark administration is Director-gated, reversible, and covers every authorized stage",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "ffb0900f89a3202f5382da23ea7d54a777aac5363e7d19ef622bdc66774cd5b5",
+    "why": "Google shadow benchmark Director endpoint is retired; local fail-closed benchmark harness replaces live import/admin benchmarking, with its own authorization/safety proof. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-6-candidate-control-authorization.test.mjs",
+    "test": "route dispatch has an exact Step 11.6 ACL action map and no legacy fallback",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "caa10e287629eb91aa551c6e286a681574ddb06c7df4fe9374d9539537571b78",
+    "why": "Exact Drive ACL action dispatch map refers to retired Google fence endpoint; replacement must prove terminal no-provider behavior, with current Director auth tested separately. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-6-drive-acl-rehearsal-surface.test.mjs",
+    "test": "Production server import surface cannot dispatch the retired protected-range executor",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "05330531009d37d39955cc288f49502b6ad93ee84c6d03c74430fa475c87c433",
+    "why": "Retired Drive/protected-range executor route is disconnected, so its old action dispatch source is absent; preserve maintenance-only tooling and no runtime dispatch. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-6-legacy-google-mutation-inventory.test.mjs",
+    "test": "canonical route matrix is exact, POST-only, lease-bound, and fail-closed when admission is CLOSED",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "df5ad09a517f5c573a374a5fd6e4b7dce6f38abc9ad2063a020e52f193667794",
+    "why": "Exact former Google-writer route matrix is obsolete after disconnection. New invariant is zero runtime writers and denied low-level provider transport, not preservation of all previous wrappers. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-6-legacy-google-mutation-inventory.test.mjs",
+    "test": "canonical wrapper and participant adapter import surfaces are closed to the matrix",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "d8c808f48c3d7ca7d0397676e84cb4bcb637bbbb4f55fe20815eda8cd58a7a8c",
+    "why": "Closed Google import-surface matrix changes intentionally because participant/Director adapters no longer import the writer; preserve zero-runtime-write path/security tests. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-6-production-google-writer-boundary.test.mjs",
+    "test": "the private Sheets transport dynamically marks WRITE_STARTED after OAuth and before every canonical provider write",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "381f878716c9b7a016a10612fa7309c7b154bd93a95af8a1ab7ae2f306f51931",
+    "why": "Google private Sheets WRITE_STARTED/OAuth sequence is no longer callable in runtime; canonical audit/receipt correctness must stay separate. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-6-production-google-writer-boundary.test.mjs",
+    "test": "v3 canonical boundary has no v1 completion-success escape",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "240f375374d6264d763f3ba4d6a58c9d006c602809cdca463a42a5fdec8c2ffc",
+    "why": "Google v3 completion fence source assertion is obsolete in terminal retired route; no provider dispatch must remain behaviorally covered. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-6-production-google-writer-boundary.test.mjs",
+    "test": "v3 admission fails closed and uses the fenceable legacy credential identity",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "b5ea0e413a96b35d1016042e50dfd297b6c18cdb5d310bab95cde5c266a7326a",
+    "why": "Google writer credential admission intentionally fails with runtime-retired error before callback; canonical application admission remains required separately. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-6-production-google-writer-boundary.test.mjs",
+    "test": "lost BEGIN response replays the exact OPEN payload during CLOSING without a second lease",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "df43757e073ff12e717ed98b76bdad6347fb0f87325d546bb31da0fcbc930103",
+    "why": "Google lease BEGIN/CLOSING replay is retired writer behavior. Canonical score mutation replay/lost-response proof remains required, and must not be inferred from this classification. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-6-production-google-writer-boundary.test.mjs",
+    "test": "settled callback revokes detached dispatch before outcome reporting can pause",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "4316069bcb789bf5aaf7596a14218b6b7bc1a4185bbd64f7d6c503f37cfa8616",
+    "why": "Google callback dispatch revocation is retired transport behavior; no-runtime-provider-call negative test replaces it for runtime certification. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-6-production-google-writer-boundary.test.mjs",
+    "test": "credential operations are identity-bound to canonical, authoring, and mirror mutation intents",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "5b11ede8ee57b8d228268324b28200dfd4ccaad94a4e683851e2c5e903f62dbd",
+    "why": "Google credential intents are retired before private key/callback handling; canonical mutation IDs/authority must remain unchanged. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-6-production-google-writer-boundary.test.mjs",
+    "test": "v3 reports no-write, ambiguous, and partial outcomes without a finally-success path",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "a35b226fb11fa1304a6cc537a31a65f02152ed06a8ac44ac44e7766ffb009675",
+    "why": "Google no-write/ambiguous/partial outcome reporting is retired delivery behavior; canonical score ambiguity recovery still needs its own evidence. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-6-provider-attestation-client.test.mjs",
+    "test": "both browser clients gate quiesce execution on the attestation workflow",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "3aaf9fc2b8da0041847c938a080bf958a33838aaefdda3eee656c39046e956c2",
+    "why": "Browser Google provider-fence attestation actions no longer have a callable runtime endpoint; historical provider cleanup remains later owner-authorized work. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-production-activation-safety.test.mjs",
+    "test": "Production Google write lease is opt-in, epoch-bound, and replaces caller resource claims",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "b4bb5b50d8cb9c2901e8cb44ca4de15211fa3db9469ab9597e61f47c596eb038",
+    "why": "Google write lease is retired at credential boundary; preserve canonical release/score authority and epoch gates separately. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-production-activation-safety.test.mjs",
+    "test": "all foreground and high-impact Google writer boundaries include the dormant lease gate",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "bf3dab7e2e17f12d3521e605ba939579e087ddd05f716810b039a2b3ba11c9cb",
+    "why": "High-impact Google writer boundary source assertions are obsolete when no runtime writer exists; replace with fail-closed retirement/no-import/no-network behavior. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-production-google-credentials.test.mjs",
+    "test": "legacy Drive principal fingerprint is normalized and survives key rotation",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "fa55470309bed577d4422138d37ae9767b1edf0c0abc2332a0719b3b9e984c0f",
+    "why": "Google service-account principal fingerprint helper now refuses runtime use; any retained historical import credential work is maintenance-only. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-production-google-credentials.test.mjs",
+    "test": "validated canonical credential pair is captured once before callback dispatch",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "f71f012c47f0b56ee086deb9afb98d8a1b2a873bd15e76bd6ca303d02cfcf183",
+    "why": "Canonical Google credential capture is retired; zero credential consumption and no callback invocation replace the runtime requirement. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-production-google-credentials.test.mjs",
+    "test": "legacy application traffic remains on GOOGLE_* even when Production credentials exist",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "4e06fd29b61513776e64bc4a5cee56aa8c4fd5ae6d91b5f2ec764a973fbf8d5b",
+    "why": "Legacy application traffic choosing GOOGLE_* is removed; fresh runtime should require no provider credentials. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-production-google-credentials.test.mjs",
+    "test": "an exact read-only Production worker context selects only the dedicated pair",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "79682bc0249d750a900100e7cb61c48d1b4e7186f823aead1cbbd268940ab818",
+    "why": "Read-only Google Production worker credential selection is retired along with required worker. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-production-google-credentials.test.mjs",
+    "test": "an exact canonical admission scope selects only the legacy writer identity",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "d018c2363b89e41a8959c04ebae707af6d5cd33bde933e59d49ce2302e53e808",
+    "why": "Legacy Google writer admission identity is retired; canonical PostgreSQL entitlement/actor authority remains required. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-production-google-credentials.test.mjs",
+    "test": "Production worker selection never falls back to legacy credentials",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "e2890edcffc454c98f0bdc0a51cc9785afaee2302376f881559f8e946c98d55b",
+    "why": "Google worker credential fallback test catches global retired error instead of old credential-specific error; preserve no credential/provider use under every config. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-production-google-credentials.test.mjs",
+    "test": "Step 11 metadata route is Director-only, exact-candidate, read-only, and secret-safe",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "a632d7c311dd9cbca2e63da765b62d7c4725352a6939b82599151dc3181357e3",
+    "why": "Google metadata provider-reading route is terminal retired rather than Director candidate diagnostic; retain secret-free response and no Google/network access. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-production-google-credentials.test.mjs",
+    "test": "Step 11 browser certificate alias reuses the exact metadata handler",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "f10345756ad9d3b1d7115dd15d3b3b79f8301fa39c47721bdf1afe7d33e0e171",
+    "why": "Google certificate alias is now separately terminal retired rather than re-exporting provider metadata handler; no consumer can obtain runtime Google certificate. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step11-production-scoring-operations.test.mjs",
+    "test": "worker routes are authenticated POST-only gates",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "336d4557ff689619d62a8abf400fab34e74422447a87f461b249bced41d28125",
+    "why": "Google outbox/archive workers are terminal410 before secret checks; no required Google worker route exists after retirement. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step13e7b-production-annual-google-writer-certification.test.mjs",
+    "test": "nested Director API is same-origin guarded and does not forward destination input",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "13c96e861f1a57ec4f55c80884565bb87bacd16bada6b3d912a82c38920c9254",
+    "why": "Nested annual Google writer certification route is retired. Future canonical year setup/authority must be tested through annual canonical contracts, not provider certification. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/step13e7b-production-annual-scoring-dispatch.test.mjs",
+    "test": "Google worker resources require the branded exact annual context",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "ff30786339807c863fd64ac23e5fdcba56e0f4104eca64e1a61e8f0a81b3d6e4",
+    "why": "Google worker resource resolver is not a required consumer. Retain provenance/historical context as maintenance data; do not infer current canonical annual authority from retired writer fields. Replacement: canonical/zero-Google retirement suite; historical utility tests in this file remain."
+  },
+  {
+    "file": "test/published-odds-supabase.test.mjs",
+    "test": "Retired Google parity endpoint is no longer part of public Odds freshness coverage.",
+    "action": "RETIRED_BEHAVIOR_ASSERTIONS_REMOVED",
+    "replacement": null,
+    "oldTestSha256": "ed184bfcf24e14a04cd29f68c6a415d37a517dab6b90d1497fa10c76152b38e6",
+    "why": "Retired Google parity endpoint is no longer part of public Odds freshness coverage."
+  },
+  {
+    "file": "test/competition-derived-supabase.test.mjs",
+    "test": "Google parity import is retired; the canonical prepared-state and no participant calculation assertions above remain.",
+    "action": "RETIRED_BEHAVIOR_ASSERTIONS_REMOVED",
+    "replacement": null,
+    "oldTestSha256": "c17a47255a5aef6dd957de98c8a3d886633d624aff08fb3a892c9be4999bd748",
+    "why": "Google parity import is retired; the canonical prepared-state and no participant calculation assertions above remain."
+  },
+  {
+    "file": "test/step11-6-vercel-waf-provider-executor.test.mjs",
+    "test": "Provider executor remains historical test-only code; retired HTTP route never dispatches it.",
+    "action": "RETIRED_BEHAVIOR_ASSERTIONS_REMOVED",
+    "replacement": null,
+    "oldTestSha256": "80f6f13d9345ccec7f08ea49611517460041f6236b5555489b74a93f77d2a237",
+    "why": "Provider executor remains historical test-only code; retired HTTP route never dispatches it."
+  },
+  {
+    "file": "test/round-scorecards-archive.test.mjs",
+    "test": "archive 429 failure remains retryable and never checkpoints",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "66d6f3e27d4b31f524b8b095ed8df576bc4b5feb5894378b8218e599272f4abe",
+    "why": "Retired Google-only archive retry delivery; canonical audit retention and derived-worker recovery are independently tested."
+  },
+  {
+    "file": "test/round-scorecards-archive.test.mjs",
+    "test": "archive 503 failure remains retryable and never checkpoints",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "66d6f3e27d4b31f524b8b095ed8df576bc4b5feb5894378b8218e599272f4abe",
+    "why": "Retired Google-only archive retry delivery; canonical audit retention and derived-worker recovery are independently tested."
+  },
+  {
+    "file": "test/round-scorecards-archive.test.mjs",
+    "test": "archive timeout failure remains retryable and never checkpoints",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "66d6f3e27d4b31f524b8b095ed8df576bc4b5feb5894378b8218e599272f4abe",
+    "why": "Retired Google-only archive retry delivery; canonical audit retention and derived-worker recovery are independently tested."
+  },
+  {
+    "file": "test/competition-derived-supabase.test.mjs",
+    "test": "Preview flags fail closed to application outside an isolated Preview deployment",
+    "action": "REWRITE",
+    "replacement": "Preview flags fail closed to application outside an isolated Preview deployment",
+    "oldTestSha256": "d2d0d60d55bcecefabefb6ee954b90415b09b685482cb91539eeec9d85783c78"
+  },
+  {
+    "file": "test/intelligence-derived-supabase.test.mjs",
+    "test": "source flags are Preview-only and fail closed outside isolated Preview",
+    "action": "REWRITE",
+    "replacement": "source flags are Preview-only and fail closed outside isolated Preview",
+    "oldTestSha256": "b2664b14cc33fde4eb98cdf55d1daf82a4cbe07cc13afabcff501960b3682a80"
+  },
+  {
+    "file": "test/championship-odds-supabase-inputs.test.mjs",
+    "test": "Preview flags fail closed in Production",
+    "action": "REWRITE",
+    "replacement": "Preview flags fail closed in Production",
+    "oldTestSha256": "8b3fd4817e4b6505a28582bf21794364c5ab812652e9d897dabfe0df0a6c333e"
+  },
+  {
+    "file": "test/guide-service-layer.test.mjs",
+    "test": "Guide and course reads are Preview-only, workbook-isolated, and project-scoped",
+    "action": "REWRITE",
+    "replacement": "Guide and course read admission is canonical, independent, and Google-free",
+    "oldTestSha256": "048fc842f7ecf7a9285d6eb0edd0ba2d3624463ebe2704f07b212702e17a1e3a"
+  },
+  {
+    "file": "test/homepage-current-supabase.test.mjs",
+    "test": "Google to Supabase to Google to Supabase rollback preserves the consumer presentation contract",
+    "action": "REWRITE",
+    "replacement": "Canonical Homepage presentation is stable and rejects retired fallback before transport",
+    "oldTestSha256": "61196bd228e40c3c97496009b5ecdde8a544b99f83360bd6c2f7e20ac4d75e0f"
+  },
+  {
+    "file": "test/war-room-input-dual-path.test.mjs",
+    "test": "one source boundary defaults Preview to Google and hard-resolves Production to Google",
+    "action": "REWRITE",
+    "replacement": "War Room canonical source rejects retired fallback and unadmitted resources",
+    "oldTestSha256": "00be9080f57d1dcfeb917e4e47a44a41031000f8ab30c891d7a906a9b68ce212"
+  },
+  {
+    "file": "test/calcutta.test.mjs",
+    "test": "Preview finalization exposes generated rows and workbook read-back diagnostics",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "d3beba0a9ffc0ba0dc6158c49c9e497b628e294ff8c48bd38245d0972b4dfe90",
+    "why": "Finalization source assertion requires includeCalcuttaPreview/workbook readback on the removed Google finalization branch; canonical final result and owner-controlled Calcutta publication remain required."
+  },
+  {
+    "file": "test/step9-1-authority-selectors.test.mjs",
+    "test": "missing and explicit legacy Preview selectors preserve their approved authorities",
+    "action": "REWRITE",
+    "replacement": "Canonical Preview defaults require no Google and reject legacy authority",
+    "oldTestSha256": "51278675f68cfd7ecde1c39f9a4126e7188cdea189e04e119c7a065bbe4f5376"
+  },
+  {
+    "file": "test/step9-1-authority-selectors.test.mjs",
+    "test": "Scoring accepts an isolated Preview workbook when the optional exact workbook selector is absent",
+    "action": "REWRITE",
+    "replacement": "Scoring isolation uses canonical database identity and ignores retired workbook metadata",
+    "oldTestSha256": "5e0447fc4fd7286469c6a89a7e0b62443feb7e6074f8a98c278b9ee33d598428"
+  },
+  {
+    "file": "test/step9-1-authority-selectors.test.mjs",
+    "test": "invalid Preview authority tokens fail closed instead of selecting a legacy authority",
+    "action": "REWRITE",
+    "replacement": "invalid Preview authority tokens fail closed instead of selecting a legacy authority",
+    "oldTestSha256": "d45db9e6f90b2f7c2c2281f4c7a9c6f222a06fade2cdf7e4548bae7a0fabe67e"
+  },
+  {
+    "file": "test/step9-1-authority-selectors.test.mjs",
+    "test": "ineligible Preview Supabase requests fail closed with prerequisite diagnostics",
+    "action": "REWRITE",
+    "replacement": "ineligible Preview Supabase requests fail closed with prerequisite diagnostics",
+    "oldTestSha256": "5818097ff6663728cb819bcbbf17e2761e64100ff858baa8238171fd0de8d04c"
+  },
+  {
+    "file": "test/step9-1-authority-selectors.test.mjs",
+    "test": "Production preserves legacy defaults but explicit Supabase authority fails closed until cutover is eligible",
+    "action": "REWRITE",
+    "replacement": "Unadmitted Production cannot select canonical or retired authority",
+    "oldTestSha256": "2e2176814ced22a9c88cb7490e54dcb883585da0542ce7ec387618f75a1122bb"
+  },
+  {
+    "file": "test/step9-1-authority-selectors.test.mjs",
+    "test": "Odds calculation and publication selectors remain independently enforceable",
+    "action": "REWRITE",
+    "replacement": "Odds calculation and publication selectors remain independently enforceable",
+    "oldTestSha256": "121dfc7df5eb9f144b7733f1e926feffdfe7f36d715843a68dc4d1a44e8efa07"
+  },
+  {
+    "file": "test/scoring-authority-phase2.test.mjs",
+    "test": "authority defaults Production to Google but explicit ineligible Supabase fails closed",
+    "action": "REWRITE",
+    "replacement": "Canonical scoring requires exact authority and never defaults to Google",
+    "oldTestSha256": "9bedbd6f082f4e23059f48355a84c6e36556ee5e5bfd05687d844709ba589744"
+  },
+  {
+    "file": "test/participant-auth-rehearsal.test.mjs",
+    "test": "Auth rehearsal requires Preview, isolated workbook, Passport authority, and complete config",
+    "action": "REWRITE",
+    "replacement": "Retired Passport bootstrap cannot enable canonical participant authentication rehearsal",
+    "oldTestSha256": "c0bb18a1fe04d99eec892b7fd99767ff769e30f3becdc2c5ef3bf516ead8bff3"
+  },
+  {
+    "file": "test/participant-identity-foundation.test.mjs",
+    "test": "identity authority defaults to Passport, shadow defaults off, and Production hard-blocks Supabase",
+    "action": "REWRITE",
+    "replacement": "Identity uses canonical database authority and cannot fall back to Passport",
+    "oldTestSha256": "ab74d6b1e8b4db4fea7b41ca55da3802c150f83b0fa4380c19995f1d2a7c8cbe"
+  },
+  {
+    "file": "test/step10a-production-foundation-resources.test.mjs",
+    "test": "live Production source selectors remain Google and Passport",
+    "action": "REWRITE",
+    "replacement": "Dormant Production foundation cannot select Google or Passport runtime authority",
+    "oldTestSha256": "3ba4d30d9c5c968bec02622e4ecbacf6fc367970625bf9b59c52b72ca4211d8f"
+  },
+  {
+    "file": "test/step11-production-scoring-operations.test.mjs",
+    "test": "participant scoring queues mirrors until the explicit Production worker phase",
+    "action": "REWRITE",
+    "replacement": "Canonical scoring schedules only current internal derived families with no Google mirror",
+    "oldTestSha256": "7ea0c2636170d0b34a1aeb679a28218527d08912ab17635e5c4ce27dc53d0a65"
+  },
+  {
+    "file": "test/scoring-shadow-phase-1.test.mjs",
+    "test": "Retired Google shadow replay endpoint is not current participant scoring authority.",
+    "action": "RETIRED_BEHAVIOR_ASSERTIONS_REMOVED",
+    "replacement": null,
+    "oldTestSha256": "5bbbc78642a834ec18348fe3c2870c4576d83d5e28e93f783d769e0e2e6f9ca6",
+    "why": "Retired Google shadow replay endpoint is not current participant scoring authority."
+  },
+  {
+    "file": "test/leaderboards-core-supabase.test.mjs",
+    "test": "Retired Google parity endpoint is not a participant-read requirement; canonical API/privacy assertions remain.",
+    "action": "RETIRED_BEHAVIOR_ASSERTIONS_REMOVED",
+    "replacement": null,
+    "oldTestSha256": "53cdfa898d0398968ea34222f10fd9f01b47244aa76b912240e1221699112bd6",
+    "why": "Retired Google parity endpoint is not a participant-read requirement; canonical API/privacy assertions remain."
+  },
+  {
+    "file": "test/step11-6-production-google-writer-boundary.test.mjs",
+    "test": "environment example keeps rehearsal and persistent-fence gates explicit and disabled",
+    "action": "REWRITE",
+    "replacement": "Runtime template has no Google writer admission and keeps canonical rehearsal disabled",
+    "oldTestSha256": "77c32c4ca4f1a219cab1b6bf635badbce425f5752a64de30da7b07a38f1b87ec"
+  },
+  {
+    "file": "test/step13e7a-future-match-google-compatibility-worker.test.mjs",
+    "test": "Google compatibility cron is terminal retired; historical formula/scoping utilities remain tested.",
+    "action": "RETIRED_BEHAVIOR_ASSERTIONS_REMOVED",
+    "replacement": null,
+    "oldTestSha256": "808516fd3515a2f8f6c98c2e6ed4db32ab7c59a70bae19fb086b35b28e0646df",
+    "why": "Google compatibility cron is terminal retired; historical formula/scoping utilities remain tested."
+  },
+  {
+    "file": "test/step9-1-director-mutation-authority.test.mjs",
+    "test": "Director mutation guards execute before legacy Google reads and writes",
+    "action": "REWRITE",
+    "replacement": "Canonical Director lifecycle validates account-authorized mutation and client authority before persistence",
+    "oldTestSha256": "b57fe86667cd2a12249971e68d523feb603145e0c83a5445d402933c6b27f743"
+  },
+  {
+    "file": "test/step13c-odds-publication-runtime.test.mjs",
+    "test": "retired Director Odds import diagnostics",
+    "action": "RETIRED_BEHAVIOR_ASSERTIONS_REMOVED",
+    "replacement": null,
+    "oldTestSha256": "b617b7c0eb9b643a7cfb4c122680366542f0c640254161a3a4bb30f48ed7e6b2",
+    "why": "Canonical publication and retained job authority remain asserted above. New isolated Director capability tested separately."
+  },
+  {
+    "file": "test/calcutta-candidate-integrity.test.mjs",
+    "test": "current Calcutta candidate preserves every runtime blob except the exact approved analytics identity update",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "5fae5b936634b6ddbf142f1aa7e9a228ab3d4aabfec35a69898ed86929dc35a1",
+    "why": "One-release byte-preservation certification was superseded by owner-approved Phase 1/2/2C/retirement source changes. Old release evidence remains immutable in Git/reliability reports. Current canonical rules, authorization, receipts and no-native/no-Production boundaries require separate behavioral and scope evidence; this deleted old-release assertion receives no PASS credit."
+  },
+  {
+    "file": "test/calcutta-recovery-source-boundary.test.mjs",
+    "test": "Release 133 runtime is byte-preserved except the authorized additive recovery SQL",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "2c3890e85653ad66a391e5ba0e48c144ffa55ccf2455b9295e223600b0b21c6f",
+    "why": "One-release byte-preservation certification was superseded by owner-approved Phase 1/2/2C/retirement source changes. Old release evidence remains immutable in Git/reliability reports. Current canonical rules, authorization, receipts and no-native/no-Production boundaries require separate behavioral and scope evidence; this deleted old-release assertion receives no PASS credit."
+  },
+  {
+    "file": "test/calcutta-ux-clarity.test.mjs",
+    "test": "Clear scope remains limited to Calcutta; other Director and participant files unchanged from Release 132",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "fc9a79c7c6a6735138c1a3b0747c244f49a966dac11a796cc488622e59f76c40",
+    "why": "One-release byte-preservation certification was superseded by owner-approved Phase 1/2/2C/retirement source changes. Old release evidence remains immutable in Git/reliability reports. Current canonical rules, authorization, receipts and no-native/no-Production boundaries require separate behavioral and scope evidence; this deleted old-release assertion receives no PASS credit."
+  },
+  {
+    "file": "test/net-skins-sql-source-boundary.test.mjs",
+    "test": "Release 134 application, guards, Calcutta, Odds and participant runtime remain byte-identical",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "4093852f8ebc69bce2cf9aab9941443c080335b367500984394246d08a98bea4",
+    "why": "One-release byte-preservation certification was superseded by owner-approved Phase 1/2/2C/retirement source changes. Old release evidence remains immutable in Git/reliability reports. Current canonical rules, authorization, receipts and no-native/no-Production boundaries require separate behavioral and scope evidence; this deleted old-release assertion receives no PASS credit."
+  },
+  {
+    "file": "test/pn1-production-mobile-boundary.test.mjs",
+    "test": "PN-1 preserves Production authority, dispatch, fencing, scoring and post-commit implementations byte-for-byte",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "9352d0a351a848b3148f033f0416589e63d0c1087a08d798a1be93afb37c1acb",
+    "why": "One-release byte-preservation certification was superseded by owner-approved Phase 1/2/2C/retirement source changes. Old release evidence remains immutable in Git/reliability reports. Current canonical rules, authorization, receipts and no-native/no-Production boundaries require separate behavioral and scope evidence; this deleted old-release assertion receives no PASS credit."
+  },
+  {
+    "file": "test/pn2-native-admission.test.mjs",
+    "test": "PN-2 web/PWA, Production authority, Preview safeguards and canonical persistence are unchanged",
+    "action": "DELETE_OBSOLETE",
+    "replacement": null,
+    "oldTestSha256": "c303703a3731dbe4d88e9a563ad94733bd21e14c894d15191edc9f1cebd2f9e5",
+    "why": "One-release byte-preservation certification was superseded by owner-approved Phase 1/2/2C/retirement source changes. Old release evidence remains immutable in Git/reliability reports. Current canonical rules, authorization, receipts and no-native/no-Production boundaries require separate behavioral and scope evidence; this deleted old-release assertion receives no PASS credit."
+  },
+  {
+    "file": "test/history-step6b-read-cutover.test.mjs",
+    "test": "environment documentation defaults completed History reads to Google",
+    "action": "REWRITE",
+    "replacement": "environment documentation defaults completed History reads to canonical Supabase",
+    "oldTestSha256": "5b38ba158e34d1d822b2933a86cb046b923ee82809079e6f7ab6878b19d79710",
+    "why": "Provider-neutral canonical contract replaces legacy provider or dual-year representation; required negative cases retained."
+  },
+  {
+    "file": "test/prediction-settings-projection.test.mjs",
+    "test": "projection migration reuses Odds configuration revisions and the route reads one Google tab",
+    "action": "REWRITE",
+    "replacement": "projection migration reuses canonical Odds revisions; historical import remains maintenance-only",
+    "oldTestSha256": "5b38ba158e34d1d822b2933a86cb046b923ee82809079e6f7ab6878b19d79710",
+    "why": "Provider-neutral canonical contract replaces legacy provider or dual-year representation; required negative cases retained."
+  },
+  {
+    "file": "test/step11-production-activation-safety.test.mjs",
+    "test": "live legacy Production Director authorization is unchanged while dormant activation is disabled",
+    "action": "REWRITE",
+    "replacement": "Disabled Production activation denies Director access before retired Passport inspection",
+    "oldTestSha256": "5b38ba158e34d1d822b2933a86cb046b923ee82809079e6f7ab6878b19d79710",
+    "why": "Provider-neutral canonical contract replaces legacy provider or dual-year representation; required negative cases retained."
+  },
+  {
+    "file": "test/step11-production-cutover-read-sources.test.mjs",
+    "test": "activation disabled preserves certified live Production legacy resolution",
+    "action": "REWRITE",
+    "replacement": "Activation disabled fails closed without retired Production resolution",
+    "oldTestSha256": "5b38ba158e34d1d822b2933a86cb046b923ee82809079e6f7ab6878b19d79710",
+    "why": "Provider-neutral canonical contract replaces legacy provider or dual-year representation; required negative cases retained."
+  },
+  {
+    "file": "test/step9-data-authority-cleanup.test.mjs",
+    "test": "Production retains its approved legacy resolution when Supabase is requested",
+    "action": "REWRITE",
+    "replacement": "Unadmitted Production has no legacy fallback when Supabase is requested",
+    "oldTestSha256": "5b38ba158e34d1d822b2933a86cb046b923ee82809079e6f7ab6878b19d79710",
+    "why": "Provider-neutral canonical contract replaces legacy provider or dual-year representation; required negative cases retained."
+  },
+  {
+    "file": "test/step13e7-production-future-year-administration-application.test.mjs",
+    "test": "future target scope is separate from and cannot alias the certified 2026 provenance",
+    "action": "REWRITE",
+    "replacement": "annual year representation is explicit; installed current-authority admission decides future eligibility",
+    "oldTestSha256": "c884758cdd1b5dd8ecf19cf0b95658e062d3eaf0bc5a44b7aefcc1b74699b86f",
+    "why": "Provider-neutral canonical contract replaces legacy provider or dual-year representation; required negative cases retained."
+  },
+  {
+    "file": "test/game-center-readiness-page.test.mjs",
+    "test": "isolated Director Game Center readiness page exposes only explicit refresh and parity actions",
+    "action": "REWRITE",
+    "replacement": "SOURCE isolated Director readiness selects canonical current authority without provider refresh",
+    "oldTestSha256": "a9a8d16ada873cb20eb698c13f87debde88752ec40147d453df1d7a55638ac60",
+    "why": "Old buttons invoked retired Google import/parity diagnostics. Auth and active Director denial assertions are unchanged; canonical client/API/SQL read proof lives in reliability-phase2c1-closure-director.test.mjs and Preview integration. This source guard does not close missing authoring capabilities.",
+    "closureOnlyFailure": true
+  },
+  {
+    "file": "test/step13e1-production-director-console-foundation.test.mjs",
+    "test": "Production console foundation exposes the bounded navigation and hides legacy editors",
+    "action": "REWRITE",
+    "replacement": "Production console foundation exposes the bounded navigation and hides legacy editors",
+    "oldTestSha256": "873bdc05df3f6f4256188c3d38784420c75c9ee29c7e7edbeba536cd4149e2aa",
+    "why": "Old shell regex required the retired non-Production DirectorDashboard. CanonicalDirectorConsole is the replacement. All Production admission, bounded navigation, hidden editors, route entitlement and preserved historical dashboard assertions remain unchanged.",
+    "closureOnlyFailure": true
+  },
+  {
+    "file": "test/tournament-guide-annual-template.test.mjs",
+    "test": "Guide maintenance labels distinguish Google authoring from participant projection refresh",
+    "action": "REWRITE",
+    "replacement": "SOURCE historical Guide maintenance labels stay isolated from canonical runtime readiness",
+    "oldTestSha256": "f02dfe7c154fc0e3e61979bb7f72a5e19150658d86a23eeb6d77fc526b84c9c6",
+    "why": "Historical Guide editor labels remain maintenance evidence. The active readiness surface must no longer select a retired Google refresh action; it delegates canonical current reads. No claim that optional legacy editor can execute Google.",
+    "closureOnlyFailure": true
+  }
+]

@@ -1,0 +1,857 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-30T01:43:29.120500+00:00",
+  "proofLayer": "SOURCE",
+  "result": "PASS_SCOPED_FRESHNESS_REVIEW",
+  "equivalenceEvidence": "unaffected-operation-equivalence.json",
+  "topLevelSqlComment": {
+    "file": "supabase/migrations/202609290003_preview_odds_runtime_retirement_v1.sql",
+    "beforeSha256": "c39309aa619c51790a4f0418a2a6d63f99cbfcacc842ba576b6497e37c4e1746",
+    "afterSha256": "430dd6f941791fc132a15cb7cfdf376229566b95d06d2dc6afaad3382fe8cbd0",
+    "adjudication": "ONLY_TOP_LEVEL_SQL_COMMENT_CHANGED; executableSQL/prosrc unchanged; affected13caseOdds suite rerun after correction"
+  },
+  "runs": [
+    {
+      "suite": "annual-client",
+      "receipt": "annual-client.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "lib/operational-rpc-contract.js",
+          "testedSha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+          "currentSha256": "ad32efdf6e0ee2b0c9af0d851c9fe9c66bf22b5971d477f5341ebaa335c93140",
+          "adjudication": "EXACT_EXISTING_OPERATION_BYTES_EQUIVALENT"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/reliability-phase2c1-closure-retirement-postgres.integration.test.mjs",
+          "testedSha256": "7b7afe8b4f2079bf382dbb7365eb4544a7c1335523ac5a1d5d582a76c9d00161",
+          "currentSha256": "e6bd7d56fd3902fa86e71b24052f1e76cf1e3e698b154bc8d8df8975c5fb3d04"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "annual-create",
+      "receipt": "annual-create.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/reliability-phase2c1-closure-retirement-postgres.integration.test.mjs",
+          "testedSha256": "7b7afe8b4f2079bf382dbb7365eb4544a7c1335523ac5a1d5d582a76c9d00161",
+          "currentSha256": "e6bd7d56fd3902fa86e71b24052f1e76cf1e3e698b154bc8d8df8975c5fb3d04"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "annual-odds-contract",
+      "receipt": "annual-odds-contract.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "lib/operational-rpc-contract.js",
+          "testedSha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+          "currentSha256": "ad32efdf6e0ee2b0c9af0d851c9fe9c66bf22b5971d477f5341ebaa335c93140",
+          "adjudication": "EXACT_EXISTING_OPERATION_BYTES_EQUIVALENT"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/reliability-phase2c1-closure-retirement-postgres.integration.test.mjs",
+          "testedSha256": "7b7afe8b4f2079bf382dbb7365eb4544a7c1335523ac5a1d5d582a76c9d00161",
+          "currentSha256": "e6bd7d56fd3902fa86e71b24052f1e76cf1e3e698b154bc8d8df8975c5fb3d04"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "annual",
+      "receipt": "annual.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "application",
+      "receipt": "application.json",
+      "result": "FAIL",
+      "stableDuringRun": true,
+      "dependencyChanges": [],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "supabase/migrations/202609290003_preview_odds_runtime_retirement_v1.sql",
+          "testedSha256": "c39309aa619c51790a4f0418a2a6d63f99cbfcacc842ba576b6497e37c4e1746",
+          "currentSha256": "430dd6f941791fc132a15cb7cfdf376229566b95d06d2dc6afaad3382fe8cbd0"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        }
+      ],
+      "freshness": "CURRENT_DEPENDENCY_BYTES"
+    },
+    {
+      "suite": "boot",
+      "receipt": "boot.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "supabase/migrations/202609290003_preview_odds_runtime_retirement_v1.sql",
+          "testedSha256": "c39309aa619c51790a4f0418a2a6d63f99cbfcacc842ba576b6497e37c4e1746",
+          "currentSha256": "430dd6f941791fc132a15cb7cfdf376229566b95d06d2dc6afaad3382fe8cbd0"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        }
+      ],
+      "freshness": "CURRENT_DEPENDENCY_BYTES"
+    },
+    {
+      "suite": "boundaries",
+      "receipt": "boundaries.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "supabase/migrations/202609290003_preview_odds_runtime_retirement_v1.sql",
+          "testedSha256": "c39309aa619c51790a4f0418a2a6d63f99cbfcacc842ba576b6497e37c4e1746",
+          "currentSha256": "430dd6f941791fc132a15cb7cfdf376229566b95d06d2dc6afaad3382fe8cbd0"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        }
+      ],
+      "freshness": "CURRENT_DEPENDENCY_BYTES"
+    },
+    {
+      "suite": "build",
+      "receipt": "build.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "supabase/migrations/202609290003_preview_odds_runtime_retirement_v1.sql",
+          "testedSha256": "c39309aa619c51790a4f0418a2a6d63f99cbfcacc842ba576b6497e37c4e1746",
+          "currentSha256": "430dd6f941791fc132a15cb7cfdf376229566b95d06d2dc6afaad3382fe8cbd0"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        }
+      ],
+      "freshness": "CURRENT_DEPENDENCY_BYTES"
+    },
+    {
+      "suite": "deadlock",
+      "receipt": "deadlock.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "lib/operational-rpc-contract.js",
+          "testedSha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+          "currentSha256": "ad32efdf6e0ee2b0c9af0d851c9fe9c66bf22b5971d477f5341ebaa335c93140",
+          "adjudication": "EXACT_EXISTING_OPERATION_BYTES_EQUIVALENT"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "delivery",
+      "receipt": "delivery.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "lib/operational-rpc-contract.js",
+          "testedSha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+          "currentSha256": "ad32efdf6e0ee2b0c9af0d851c9fe9c66bf22b5971d477f5341ebaa335c93140",
+          "adjudication": "EXACT_EXISTING_OPERATION_BYTES_EQUIVALENT"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "director-capabilities",
+      "receipt": "director-capabilities.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/reliability-phase2c1-closure-retirement-postgres.integration.test.mjs",
+          "testedSha256": "7b7afe8b4f2079bf382dbb7365eb4544a7c1335523ac5a1d5d582a76c9d00161",
+          "currentSha256": "e6bd7d56fd3902fa86e71b24052f1e76cf1e3e698b154bc8d8df8975c5fb3d04"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "director-odds-publication",
+      "receipt": "director-odds-publication.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [],
+      "broaderImplementationManifestChanges": [],
+      "freshness": "CURRENT_DEPENDENCY_BYTES"
+    },
+    {
+      "suite": "director-odds",
+      "receipt": "director-odds.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "supabase/migrations/202609290003_preview_odds_runtime_retirement_v1.sql",
+          "testedSha256": "c39309aa619c51790a4f0418a2a6d63f99cbfcacc842ba576b6497e37c4e1746",
+          "currentSha256": "430dd6f941791fc132a15cb7cfdf376229566b95d06d2dc6afaad3382fe8cbd0"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        }
+      ],
+      "freshness": "CURRENT_DEPENDENCY_BYTES"
+    },
+    {
+      "suite": "director-preview",
+      "receipt": "director-preview.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [],
+      "broaderImplementationManifestChanges": [],
+      "freshness": "CURRENT_DEPENDENCY_BYTES"
+    },
+    {
+      "suite": "director",
+      "receipt": "director.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "supabase/migrations/202609290003_preview_odds_runtime_retirement_v1.sql",
+          "testedSha256": "c39309aa619c51790a4f0418a2a6d63f99cbfcacc842ba576b6497e37c4e1746",
+          "currentSha256": "430dd6f941791fc132a15cb7cfdf376229566b95d06d2dc6afaad3382fe8cbd0"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        }
+      ],
+      "freshness": "CURRENT_DEPENDENCY_BYTES"
+    },
+    {
+      "suite": "finite",
+      "receipt": "finite.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "full-sequence",
+      "receipt": "full-sequence.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "lib/operational-rpc-contract.js",
+          "testedSha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+          "currentSha256": "ad32efdf6e0ee2b0c9af0d851c9fe9c66bf22b5971d477f5341ebaa335c93140",
+          "adjudication": "EXACT_EXISTING_OPERATION_BYTES_EQUIVALENT"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "harness",
+      "receipt": "harness.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "supabase/migrations/202609290003_preview_odds_runtime_retirement_v1.sql",
+          "testedSha256": "c39309aa619c51790a4f0418a2a6d63f99cbfcacc842ba576b6497e37c4e1746",
+          "currentSha256": "430dd6f941791fc132a15cb7cfdf376229566b95d06d2dc6afaad3382fe8cbd0"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        }
+      ],
+      "freshness": "CURRENT_DEPENDENCY_BYTES"
+    },
+    {
+      "suite": "recovery",
+      "receipt": "recovery.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "lib/operational-rpc-contract.js",
+          "testedSha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+          "currentSha256": "ad32efdf6e0ee2b0c9af0d851c9fe9c66bf22b5971d477f5341ebaa335c93140",
+          "adjudication": "EXACT_EXISTING_OPERATION_BYTES_EQUIVALENT"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "retirement-release",
+      "receipt": "retirement-release.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "retirement-security",
+      "receipt": "retirement-security.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "lib/operational-rpc-contract.js",
+          "testedSha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+          "currentSha256": "ad32efdf6e0ee2b0c9af0d851c9fe9c66bf22b5971d477f5341ebaa335c93140",
+          "adjudication": "EXACT_EXISTING_OPERATION_BYTES_EQUIVALENT"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "retirement-sql",
+      "receipt": "retirement-sql.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "retirement",
+      "receipt": "retirement.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "lib/operational-rpc-contract.js",
+          "testedSha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+          "currentSha256": "ad32efdf6e0ee2b0c9af0d851c9fe9c66bf22b5971d477f5341ebaa335c93140",
+          "adjudication": "EXACT_EXISTING_OPERATION_BYTES_EQUIVALENT"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    },
+    {
+      "suite": "routing-safety",
+      "receipt": "routing-safety.json",
+      "result": "FAIL",
+      "stableDuringRun": true,
+      "dependencyChanges": [],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "supabase/migrations/202609290003_preview_odds_runtime_retirement_v1.sql",
+          "testedSha256": "c39309aa619c51790a4f0418a2a6d63f99cbfcacc842ba576b6497e37c4e1746",
+          "currentSha256": "430dd6f941791fc132a15cb7cfdf376229566b95d06d2dc6afaad3382fe8cbd0"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        }
+      ],
+      "freshness": "CURRENT_DEPENDENCY_BYTES"
+    },
+    {
+      "suite": "routing",
+      "receipt": "routing.json",
+      "result": "FAIL",
+      "stableDuringRun": true,
+      "dependencyChanges": [],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "supabase/migrations/202609290003_preview_odds_runtime_retirement_v1.sql",
+          "testedSha256": "c39309aa619c51790a4f0418a2a6d63f99cbfcacc842ba576b6497e37c4e1746",
+          "currentSha256": "430dd6f941791fc132a15cb7cfdf376229566b95d06d2dc6afaad3382fe8cbd0"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        }
+      ],
+      "freshness": "CURRENT_DEPENDENCY_BYTES"
+    },
+    {
+      "suite": "worker-lock-order",
+      "receipt": "worker-lock-order.json",
+      "result": "PASS",
+      "stableDuringRun": true,
+      "dependencyChanges": [
+        {
+          "file": "lib/operational-rpc-contract.js",
+          "testedSha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+          "currentSha256": "ad32efdf6e0ee2b0c9af0d851c9fe9c66bf22b5971d477f5341ebaa335c93140",
+          "adjudication": "EXACT_EXISTING_OPERATION_BYTES_EQUIVALENT"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+          "adjudication": "EXACT_EXISTING_SUITE_BYTES_EQUIVALENT"
+        }
+      ],
+      "broaderImplementationManifestChanges": [
+        {
+          "file": "app/admin/director/CanonicalDirectorConsole.js",
+          "testedSha256": "95c18ffeca29356b55c4cfba74f1742f1c8b181601f9d9df1f3f7f73cfbe5968",
+          "currentSha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+        },
+        {
+          "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+          "testedSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+          "currentSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1"
+        },
+        {
+          "file": "tools/reliability/account-phase2c1-closure-tests.mjs",
+          "testedSha256": "819afa04f88784e99567c134baab57204cd859e4c5a6d1692d4af6d9cf215dd7",
+          "currentSha256": "b01c1d24a9661547f371145a37788cffda1a85b3dbbcc59b578d4b630a78b0d1"
+        },
+        {
+          "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+          "testedSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+          "currentSha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b"
+        }
+      ],
+      "freshness": "RETAINED_WITH_EXACT_UNAFFECTED_OPERATION_EQUIVALENCE"
+    }
+  ],
+  "limits": [
+    "Global candidate manifests include unrelated tests/tools and newly added capabilities; these are not all claimed as executed by each retained test.",
+    "Retained run exact dependency changes are limited to one new read-only RPC classification and one added scoped suite mapping; all existing operation and suite bytes proved identical.",
+    "New Odds functionality has its own fresh13testAPI/PostgreSQL proof; prior full-sequenceProduction-shaped fixture does not include it.",
+    "No observed pass is retroactively attributed to futureGitcommit; commits bind the tested source bytes."
+  ],
+  "fixtureEofFormatting": [
+    {
+      "file": "test/support/reliability/phase2c1-closure-preview-fixture.mjs",
+      "beforeSha256": "cc76327e1d80ec5e642411ddb036e14be6cb9b2b7ef1e3a323f3ea1140139e87",
+      "afterSha256": "e78a9259fe06a7971caa7cc3e6c47e417da0698729be1f6b822da12d62b628d1",
+      "adjudication": "ONE_EXTRA_EOF_BLANK_LINE_REMOVED; no executable content changed; both dependent Preview/Odds suites rerun"
+    }
+  ],
+  "finalSourceCommit": "63fd9f0e47993eb48e89ae268d03b939b0a5c10c"
+}

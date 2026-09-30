@@ -1,0 +1,33 @@
+{
+  "fixture": "phase2c1-annual-initialization-v1",
+  "targetYear": 2098,
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "runtimeGuardsSubstituted": false,
+  "operations": [],
+  "status": "EXPECTED_RED",
+  "gate": "ANNUAL_INITIALIZATION_NOT_PROVEN",
+  "issue": "P2C1-ANNUAL-001",
+  "cases": [
+    {
+      "year": 2098,
+      "error": "ERROR:  PRODUCTION_FUTURE_RUNTIME_EXACT_RESOURCE_REQUIRED\nCONTEXT:  PL/pgSQL function production_control.assert_annual_future_admin_scope_v1(jsonb,text,boolean,boolean) line 47 at RAISE\nPL/pgSQL function production_control.assert_future_year_runtime_v1(jsonb,boolean) line 3 at PERFORM\nPL/pgSQL function public.mutate_production_future_year_administration_v1(jsonb) line 56 at PERFORM"
+    },
+    {
+      "year": 2026,
+      "response": {
+        "ok": false,
+        "code": "FUTURE_TOURNAMENT_METADATA_INVALID"
+      }
+    }
+  ],
+  "GoogleCalls": 0,
+  "GoogleCredentialsPresent": false,
+  "futureTournamentCreated": false,
+  "limitations": [
+    "Existing installed annual CREATE protocol is contradictory: current authorization scope and target metadata share tournament_year",
+    "No future tournament or readiness/generation certificate was inserted to evade the failing operation",
+    "Downstream setup, authoring, annual PREPARE/CLOSE/ACTIVATE remain NOT PROVEN by this fixture",
+    "Historical platform bootstrap and pre-existing owner identity are synthetic fixture preconditions",
+    "No hosted, Production, Google or physical proof"
+  ]
+}

@@ -1,0 +1,214 @@
+{
+  "schema": "phase2c1-closure-source-review-v1",
+  "timestamp": "2026-09-30T01:15:39.768599+00:00",
+  "reviewer": "annual_closure",
+  "reviewType": "READ_ONLY_SOURCE_SECURITY_SCOPE",
+  "baseSha": "4f5be5928a362f77edca375919df55be23695177",
+  "independence": "Independent review of Director/Odds changes; annual implementation self-review (not independent authorship).",
+  "result": "NO_NEW_SECURITY_OR_ANNUAL_INTEGRITY_REGRESSION_IDENTIFIED_IN_REVIEWED_SCOPE",
+  "sourceFiles": [
+    {
+      "path": "app/admin/director/CanonicalDirectorConsole.js",
+      "sha256": "1f086de85d0d89d1606403a016f49a64d4e773f443e368706e4744372895e4a3"
+    },
+    {
+      "path": "app/admin/director/CanonicalDirectorOdds.js",
+      "sha256": "fa2da3496dd97c3ab485c28ae6ca0a31635578d603f6b5c07c16e47b17c2c0f0"
+    },
+    {
+      "path": "app/admin/director/ProductionDirectorOperations.js",
+      "sha256": "e1275974ece272a3d21d8388322ce4dc2384bbbddee9cae48e5d41513d012635"
+    },
+    {
+      "path": "app/admin/director/ProductionFutureYearAdministrationPanel.js",
+      "sha256": "c477c055f470025ffe5599d40863f8d791d9c54cae6f437fb3df516d803d3017"
+    },
+    {
+      "path": "app/admin/director/game-center-readiness/GameCenterReadinessClient.js",
+      "sha256": "36cdf791369e189da282b2c75c65788a1acdf99c9fc1baf09022c830fd17169b"
+    },
+    {
+      "path": "app/admin/director/page.js",
+      "sha256": "e77826508856cac9ecec28f855b60d514c220cf777ca1e11f434ef36691ad981"
+    },
+    {
+      "path": "app/api/director/canonical-odds/route.js",
+      "sha256": "5d2063fa161f028faa9235e1806e4dcc253ab22f26c7e8dffbb08f6afc407715"
+    },
+    {
+      "path": "app/api/director/canonical-overview/route.js",
+      "sha256": "e667bf29f98f04b4641a71fc96a6c34a3d52260d7cbd63720fe8d14690d83e36"
+    },
+    {
+      "path": "app/api/odds/inputs/route.js",
+      "sha256": "8d2523571aa9a7d6360180b0f080d9e0e498455e4c57b704f85e8732d23c09dd"
+    },
+    {
+      "path": "app/odds-center/admin/OddsAdmin.js",
+      "sha256": "b1ea3e3eaa1fc8994a013cea6b4627cb0c607ce565873e2eddc0f2214bb3e85c"
+    },
+    {
+      "path": "lib/annual-runtime-request-hash.js",
+      "sha256": "da6a2faa6800136a99e26b69c6cd2cf4277f9b9b4cac48cf649fcab07160132e"
+    },
+    {
+      "path": "lib/canonical-director-client.js",
+      "sha256": "ad0e4aba8e5fccd46b0af605ee0ace7682a2e05fc8413b95a60cc6ba5f4dcea3"
+    },
+    {
+      "path": "lib/canonical-director-odds-client.js",
+      "sha256": "d5b4284fb439657726531d704170382e8251440a3648a9634dcb8f73efedc20b"
+    },
+    {
+      "path": "lib/canonical-director-odds.js",
+      "sha256": "68480feab268a0743e562b2f4eed702695e3e173079aca2769c3258c3de2d2c8"
+    },
+    {
+      "path": "lib/canonical-director-overview.js",
+      "sha256": "2d893243410144767d6655c68007d4014fceb33423df9226571e2fce1df3039d"
+    },
+    {
+      "path": "lib/future-year-administration-client.js",
+      "sha256": "fbed6c828e34eacd3c1ceda20f75e5dae26c69ec12bd84fb5fcbd8e471dbf6fd"
+    },
+    {
+      "path": "lib/production-future-year-administration-contract.js",
+      "sha256": "627eb61eb98933c88c69955bd9d5538ce6a5488151aa28fe77c8cdff177bdc96"
+    },
+    {
+      "path": "lib/production-future-year-administration-server.js",
+      "sha256": "2487524e49fb51f473273235fa5bc4fdc81941baf101f4db1a6851fc379fda47"
+    },
+    {
+      "path": "lib/production-odds-calculation-contract.js",
+      "sha256": "0b34ede4980698e7e4349142987c50dfc2eb32f75c9b562e7e8826cb32a82739"
+    },
+    {
+      "path": "supabase/migrations/202609290002_preview_google_runtime_retirement_v1.sql",
+      "sha256": "83132af15f70bb86f88c4568fa4ba0d34b4826b6270314c97ac27aba5c326bbc"
+    },
+    {
+      "path": "supabase/migrations/202609290003_preview_odds_runtime_retirement_v1.sql",
+      "sha256": "acba400a3b7ebf61fd94c27c61881798517dcc4fa6565aeea900c6799415a2e0"
+    },
+    {
+      "path": "supabase/production_migrations/202609300127_canonical_annual_create_contract_v1.sql",
+      "sha256": "f1d6a293eaeb56a899d897ed3f182549529f3af4efe2da1dfbfe004f6017ec57"
+    }
+  ],
+  "checks": [
+    {
+      "id": "ANNUAL-CURRENT-TARGET-SEPARATION",
+      "proofLayer": [
+        "SOURCE",
+        "API",
+        "POSTGRESQL"
+      ],
+      "result": "PASS_SCOPED",
+      "evidence": "Server owns current actor tournament; integer target year is separate and SQL checks target > locked current year. Browser cannot choose actor/resource authorization."
+    },
+    {
+      "id": "ANNUAL-RECEIPT-HASH",
+      "proofLayer": [
+        "SOURCE",
+        "POSTGRESQL"
+      ],
+      "result": "PASS_SCOPED",
+      "evidence": "V1 administration hash unchanged; V2 runtime/annual-transition encoder matches PostgreSQL JSON wire digest. Five actual nested/Unicode/decimal/exponent vectors; old digest rejected; real promotion replay and changed-payload conflict."
+    },
+    {
+      "id": "ANNUAL-CANONICAL-READBACK",
+      "proofLayer": [
+        "SOURCE",
+        "UNIT",
+        "API",
+        "POSTGRESQL"
+      ],
+      "result": "PASS_SCOPED",
+      "evidence": "Exact target/year and administration revision required. Global course actions use additive exact course/context receipt/readback. Same operation identity retained on response/readback loss; panel clears review only after confirmation."
+    },
+    {
+      "id": "DIRECTOR-HTTP-AUTHORITY",
+      "proofLayer": [
+        "SOURCE"
+      ],
+      "result": "PASS_SCOPED",
+      "evidence": "New overview and Odds mutation routes enforce same origin, active entitlement, no bootstrap, no impersonation, and server-selected canonical authority. Domain helpers reject non-isolated environments. Browser has no privileged RPC credential."
+    },
+    {
+      "id": "DIRECTOR-CANONICAL-RECEIPT",
+      "proofLayer": [
+        "SOURCE"
+      ],
+      "result": "PASS_SCOPED",
+      "evidence": "Match controls whitelist Finalize/Reopen, exact tournament/match, explicit revisions, bounded receipt lookup and canonical readback. Ambiguous failures retain the same operation identity."
+    },
+    {
+      "id": "ODDS-OWNER-PUBLICATION",
+      "proofLayer": [
+        "SOURCE"
+      ],
+      "result": "PASS_SCOPED",
+      "evidence": "Calculation request is separate from explicit reviewed completed-job publication. Job/current snapshot tournament checked, canonical source fingerprints retained, no Google delivery or automatic publication added."
+    },
+    {
+      "id": "SQL-GRANTS-RLS",
+      "proofLayer": [
+        "SOURCE",
+        "POSTGRESQL"
+      ],
+      "result": "PASS_SCOPED",
+      "evidence": "Annual127 changes two exact-hash definitions with existing grants/RLS retained and actual role denials tested. Preview new capability/receipt functions revoke PUBLIC/anon/authenticated before granting service_role. Retired delivery claims/completions lose service_role EXECUTE. No public browser table-write grants added."
+    },
+    {
+      "id": "NO-NEW-GOOGLE-EDGE",
+      "proofLayer": [
+        "SOURCE"
+      ],
+      "result": "STRONGLY_SUPPORTED",
+      "evidence": "No new runtime Google provider import, fallback, credential, external destination or completion gate added in the reviewed files. Existing inert historical resource identifiers remain; tested zero-Google behavior is separately recorded."
+    },
+    {
+      "id": "SOURCE-SCOPE",
+      "proofLayer": [
+        "SOURCE"
+      ],
+      "result": "PASS_SCOPED",
+      "evidence": "Changed runtime files concern canonical Director/annual/Odds capability closure, Google retirement, and candidate migration. No native shipping source changed. Vercel change disables deployment on closure branch; no deployment command is part of this review."
+    }
+  ],
+  "secretScan": {
+    "scope": "22 changed/new runtime source and candidate SQL files; patterns checked without exposing values",
+    "patterns": [
+      "private_key",
+      "google_api_key",
+      "live_secret_key",
+      "connection_string_credentials",
+      "jwt"
+    ],
+    "findings": [],
+    "result": "NO_MATCHES"
+  },
+  "annualEvidence": {
+    "path": "docs/reliability/phase2c1-closure/evidence/annual-create-results.json",
+    "sha256": "9c509175b531639bd676e9e98169be0e81687511d9c19c1fd807c41ebeff78f6",
+    "status": "PASS",
+    "matrixCases": 21
+  },
+  "nativeShippingFilesChanged": [],
+  "knownOpenCapabilities": [
+    "isolated setup/course/handicap/pairing authority context",
+    "isolated immutable Net Skins entry authority",
+    "isolated independent Calcutta auction authority",
+    "isolated lifecycle parity beyond Finalize/Reopen"
+  ],
+  "limitations": [
+    "This is scoped source review, not exhaustive formal security verification. Annual author reviewed own code; Director changes independently reviewed.",
+    "Pattern secret scan cannot prove absence of every possible secret format. Historical immutable resource IDs are not credentials.",
+    "Local API proof uses synthetic HTTP identity/activation and owned socket RPC adapters; hosted auth/PostgREST and resource admission remain NOT PROVEN.",
+    "Annual-transition receipt hash boundary passes; complete annual transition lifecycle is a separate proof surface.",
+    "No source-only statement certifies Production state, real Google account state, hosted capacity, physical device behavior or overall P0-F closure.",
+    "Known protected current-read routing changes awaiting review were not made or assessed as implemented.",
+    "No new runtime/database action was performed by this review; exact source hashes determine evidence freshness."
+  ]
+}

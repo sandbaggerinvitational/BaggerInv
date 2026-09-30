@@ -1,0 +1,568 @@
+{
+  "fixture": "phase2c1-closure-annual-create-v1",
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "schema": 127,
+  "runtimeDatabaseGuardsSubstituted": false,
+  "GoogleCalls": 0,
+  "GoogleCredentialsPresent": false,
+  "network": "REMOTE_DENIED",
+  "cases": [
+    {
+      "id": "NA-2026-ANNUAL-CREATE-CONTRACT",
+      "result": "PASS",
+      "chain": "shipping client → shipping API POST/GET → shipping server → actual PostgreSQL → canonical readback",
+      "year": 2098,
+      "initialLifecycle": "DRAFT"
+    },
+    {
+      "id": "same-logical-create-retry",
+      "result": "PASS",
+      "duplicateAuthority": 0
+    },
+    {
+      "id": "same-id-different-payload-and-same-year-duplicate",
+      "result": "PASS",
+      "silentOverwrite": false
+    },
+    {
+      "id": "different-generic-future-year",
+      "result": "PASS",
+      "year": 2097
+    },
+    {
+      "id": "malformed-conflicting-and-unsupported-year",
+      "result": "PASS"
+    },
+    {
+      "id": "committed-create-readback-loss-safe-retry",
+      "result": "PASS",
+      "sameOperationId": true
+    },
+    {
+      "id": "atomicity-before-future_tournament_resources_v1",
+      "result": "PASS",
+      "rollback": "COMPLETE",
+      "sameRequestRetry": "PASS"
+    },
+    {
+      "id": "atomicity-before-future_year_audit_events_v1",
+      "result": "PASS",
+      "rollback": "COMPLETE",
+      "sameRequestRetry": "PASS"
+    },
+    {
+      "id": "atomicity-before-future_year_operation_receipts_v1",
+      "result": "PASS",
+      "rollback": "COMPLETE",
+      "sameRequestRetry": "PASS"
+    },
+    {
+      "id": "existing-incomplete-draft-not-falsely-ready",
+      "result": "PASS"
+    },
+    {
+      "id": "sql-strict-target-year-and-current-year-denial",
+      "result": "PASS"
+    },
+    {
+      "id": "post-commit-response-loss-same-id-recovery",
+      "result": "PASS",
+      "receiptResolved": true
+    },
+    {
+      "id": "annual-create-with-retired-pending-and-failed-history",
+      "result": "PASS",
+      "historicalJobsPreserved": 4,
+      "createdGoogleJobs": 0
+    },
+    {
+      "id": "P2C1CL-ANNUAL-READ-001",
+      "result": "PASS",
+      "teamSource": "exact match tournament + participant side",
+      "crossYearLeak": false,
+      "retiredHistoryBlocksReadiness": false
+    },
+    {
+      "id": "annual-current-read-old-function-reproduction",
+      "result": "PASS",
+      "historicalDefectReproduced": true,
+      "candidateRestored": true
+    },
+    {
+      "id": "annual-owner-security-and-rpc-rls-boundary",
+      "result": "PASS",
+      "privileges": {
+        "rls": true,
+        "anon": false,
+        "service": true,
+        "authenticated": false
+      },
+      "httpDenied": [
+        "PARTICIPANT",
+        "SPECTATOR",
+        "SIGNED_OUT"
+      ]
+    },
+    {
+      "id": "migration-repeat-fails-closed-atomically",
+      "result": "PASS"
+    }
+  ],
+  "status": "PARTIAL",
+  "runtimeCompatibilityCountercheck": {
+    "result": "FAIL",
+    "code": "PRODUCTION_FUTURE_RUNTIME_PAYLOAD_HASH_INVALID",
+    "caller": "mutateProductionFutureRuntime",
+    "rpc": "mutate_production_future_runtime_v2",
+    "issue": "P2C1CL-ANNUAL-HASH-001",
+    "effect": "A valid canonical future runtime request is rejected before setup processing; CREATEv1 remains independently proven"
+  },
+  "currentReadPlan": {
+    "family": "ANNUAL_MATCH_TEAM_BY_TOURNAMENT_SIDE",
+    "plan": [
+      {
+        "Plan": {
+          "Node Type": "Index Scan",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Scan Direction": "Forward",
+          "Index Name": "teams_tournament_id_team_side_key",
+          "Relation Name": "teams",
+          "Alias": "teams",
+          "Startup Cost": 0.15,
+          "Total Cost": 8.17,
+          "Plan Rows": 1,
+          "Plan Width": 32,
+          "Actual Startup Time": 0.005,
+          "Actual Total Time": 0.005,
+          "Actual Rows": 1,
+          "Actual Loops": 1,
+          "Index Cond": "((tournament_id = '2097'::text) AND (team_side = 1))",
+          "Rows Removed by Index Recheck": 0,
+          "Shared Hit Blocks": 2,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        },
+        "Planning": {
+          "Shared Hit Blocks": 107,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        },
+        "Planning Time": 0.121,
+        "Triggers": [],
+        "Execution Time": 0.014
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX teams_pkey ON scoring_authority.teams USING btree (tournament_id, team_id)",
+      "CREATE UNIQUE INDEX teams_tournament_id_team_side_key ON scoring_authority.teams USING btree (tournament_id, team_side)"
+    ],
+    "scope": "Exact match tournament + canonical participant side; one row maximum by existing unique key",
+    "before": "42703 nonexistent participant.team_id; no executable prior plan"
+  },
+  "readFailureReproduction": {
+    "result": "EXPECTED_HISTORICAL_FAILURE",
+    "SQLSTATE": "42703",
+    "message": "column participant.team_id does not exist",
+    "historicalFunctionSha256": "d944544d4d55b58817fd8f5147dd04a841ef51600a9a0d98993d9d65ab238712",
+    "candidateFunctionSha256": "e385ee9da41ee53f1d337bf6aa2cd29ecf4de8b6428f214295d2233eb4a0fa8d",
+    "transaction": "ROLLBACK_ONLY"
+  },
+  "migration": {
+    "cleanInstall": "PASS (empty owned cluster through historical schema + 125/126/127)",
+    "upgradeFrom126": "PASS",
+    "repeatedApplication": "REJECTED_BY_EXACT_SOURCE_GUARD_WITH_NO_CHANGE",
+    "functionSha256": "1814fb9ded9e13ea89351406a436db09453109354dc24e8b14cccfb12e9ba01c",
+    "grantsAndRlsPreserved": true,
+    "tableChanges": 0,
+    "indexChanges": 0
+  },
+  "canonicalContract": "CURRENT_SCOPE_AND_TARGET_YEAR_SEPARATE_V1",
+  "caseCount": 17,
+  "rpcCalls": [
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2098,
+      "target": "2098",
+      "operationId": "08e05110-c22b-4619-a721-790c497069dc"
+    },
+    {
+      "name": "read_production_future_year_administration_v1",
+      "operation": "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1",
+      "currentYear": 2026,
+      "target": "2098"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2098"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2098,
+      "target": "2098",
+      "operationId": "08e05110-c22b-4619-a721-790c497069dc"
+    },
+    {
+      "name": "read_production_future_year_administration_v1",
+      "operation": "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1",
+      "currentYear": 2026,
+      "target": "2098"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2098"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2098,
+      "target": "2098",
+      "operationId": "08e05110-c22b-4619-a721-790c497069dc"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2098,
+      "target": "2098",
+      "operationId": "e01dbccc-3d3e-4450-8e19-1f31078de0b5"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2097,
+      "target": "2097",
+      "operationId": "aa0549e5-a91f-4201-bfa2-ef505b1e4d2f"
+    },
+    {
+      "name": "read_production_future_year_administration_v1",
+      "operation": "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1",
+      "currentYear": 2026,
+      "target": "2097"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2097"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2096,
+      "target": "2096",
+      "operationId": "c74f27b0-5002-46ef-b0cb-dbfd49546df3"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2096,
+      "target": "2096",
+      "operationId": "c74f27b0-5002-46ef-b0cb-dbfd49546df3"
+    },
+    {
+      "name": "read_production_future_year_administration_v1",
+      "operation": "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1",
+      "currentYear": 2026,
+      "target": "2096"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2096"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2095,
+      "target": "2095",
+      "operationId": "3e3d4c5e-afa3-49e6-87f3-a14cde375160"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2095,
+      "target": "2095",
+      "operationId": "3e3d4c5e-afa3-49e6-87f3-a14cde375160"
+    },
+    {
+      "name": "read_production_future_year_administration_v1",
+      "operation": "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1",
+      "currentYear": 2026,
+      "target": "2095"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2095"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2094,
+      "target": "2094",
+      "operationId": "99097b32-3512-4db0-b603-b7f63888a13c"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2094,
+      "target": "2094",
+      "operationId": "99097b32-3512-4db0-b603-b7f63888a13c"
+    },
+    {
+      "name": "read_production_future_year_administration_v1",
+      "operation": "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1",
+      "currentYear": 2026,
+      "target": "2094"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2094"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2093,
+      "target": "2093",
+      "operationId": "c301edd3-cae1-4d4e-9c3b-b1eedabe43ae"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2093,
+      "target": "2093",
+      "operationId": "c301edd3-cae1-4d4e-9c3b-b1eedabe43ae"
+    },
+    {
+      "name": "read_production_future_year_administration_v1",
+      "operation": "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1",
+      "currentYear": 2026,
+      "target": "2093"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2093"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2092,
+      "target": "2092",
+      "operationId": "7989f5c6-7117-48bd-b6f1-0378b4b77f4e"
+    },
+    {
+      "name": "read_production_future_year_administration_v1",
+      "operation": "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1",
+      "currentYear": 2026,
+      "target": "2092"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2092"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2092,
+      "target": "2092",
+      "operationId": "90c7c705-78a9-471f-807c-09ce8e4f5ed4"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CONFIGURE_ROUND",
+      "currentYear": 2026,
+      "target": "2097",
+      "operationId": "5a56f3de-781b-4cdd-880d-a3b0885cabfe"
+    },
+    {
+      "name": "read_production_future_year_administration_v1",
+      "operation": "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1",
+      "currentYear": 2026,
+      "target": "2097"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2097"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "GENERATE_MATCH_STRUCTURE",
+      "currentYear": 2026,
+      "target": "2097",
+      "operationId": "a0432548-ee85-48b7-b2f2-dfb9e05f2f63"
+    },
+    {
+      "name": "read_production_future_year_administration_v1",
+      "operation": "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1",
+      "currentYear": 2026,
+      "target": "2097"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2097"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CONFIGURE_ROUND",
+      "currentYear": 2026,
+      "target": "2096",
+      "operationId": "67776d46-b7f6-48e5-bdb3-7bdc546f5654"
+    },
+    {
+      "name": "read_production_future_year_administration_v1",
+      "operation": "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1",
+      "currentYear": 2026,
+      "target": "2096"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2096"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "GENERATE_MATCH_STRUCTURE",
+      "currentYear": 2026,
+      "target": "2096",
+      "operationId": "0443d44f-42db-4fd1-9814-181003a50cfe"
+    },
+    {
+      "name": "read_production_future_year_administration_v1",
+      "operation": "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1",
+      "currentYear": 2026,
+      "target": "2096"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2096"
+    },
+    {
+      "name": "mutate_production_future_runtime_v2",
+      "currentYear": 2026,
+      "targetYear": 2098,
+      "target": "2098",
+      "operationId": "ab778eb4-ba91-4515-a1dd-7beecfb421b2"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2090,
+      "target": "2090",
+      "operationId": "6d3de375-366d-4a5e-b041-ea9e09c078d6"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2090,
+      "target": "2090",
+      "operationId": "6d3de375-366d-4a5e-b041-ea9e09c078d6"
+    },
+    {
+      "name": "read_production_future_year_administration_v1",
+      "operation": "READ_PRODUCTION_FUTURE_YEAR_ADMINISTRATION_V1",
+      "currentYear": 2026,
+      "target": "2090"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2090"
+    },
+    {
+      "name": "read_production_future_runtime_v2",
+      "operation": "READ_PRODUCTION_FUTURE_RUNTIME_V2",
+      "currentYear": 2026,
+      "target": "2097"
+    },
+    {
+      "name": "mutate_production_future_year_administration_v1",
+      "operation": "CREATE_TOURNAMENT",
+      "currentYear": 2026,
+      "targetYear": 2091,
+      "target": "2091",
+      "operationId": "2e4702de-f1f0-405a-ac5a-35832de8287a"
+    }
+  ],
+  "futureYearsCreated": [
+    2090,
+    2092,
+    2093,
+    2094,
+    2095,
+    2096,
+    2097,
+    2098
+  ],
+  "currentPointerUnchanged": true,
+  "GoogleJobsCreated": 0,
+  "initialState": {
+    "lifecycle": "DRAFT",
+    "setupRevision": 1,
+    "lifecycleRevision": 1,
+    "resourcePolicy": "RETIRED",
+    "ownerSpecificFactsCreated": false,
+    "ready": false,
+    "automaticActivation": false
+  },
+  "limitations": [
+    "API request identity/activation and socket RPC transport are test fixture adapters; no hosted auth or PostgREST deployment proof",
+    "Actual installed PostgreSQL owner/current-pointer checks, grants, RLS and transactions execute",
+    "CREATE creates the private draft/resources/audit/receipt only; owner setup, promotion, Prepare/Open and annual activation remain distinct operations",
+    "Known annual-worker PostgreSQL execution is separately recertified; an empty DRAFT must not enqueue operational workers",
+    "Historical Google provenance identifiers are inert fixture/schema values, not credentials or network authority",
+    "No hosted, Production, real Google or physical proof"
+  ]
+}

@@ -1,0 +1,364 @@
+{
+  "proof": "ACTUAL_SQL_LOCK_GRAPH",
+  "production": false,
+  "tests": [
+    {
+      "case": "match-control",
+      "pass": true,
+      "waiting": [
+        {
+          "pid": 51234,
+          "wait": "ClientRead",
+          "blockedBy": []
+        },
+        {
+          "pid": 51235,
+          "wait": "advisory",
+          "blockedBy": [
+            51234
+          ]
+        },
+        {
+          "pid": 51236,
+          "wait": "advisory",
+          "blockedBy": [
+            51235
+          ]
+        }
+      ],
+      "results": [
+        {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "work": [],
+            "ready": {
+              "CALCUTTA": false,
+              "COMPETITION": false,
+              "INTELLIGENCE": false
+            },
+            "scope": {
+              "tournamentId": "2026",
+              "runtimeGenerationId": null
+            },
+            "calcutta": {
+              "auctionRevision": 37,
+              "auctionFingerprint": "2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a",
+              "configurationRevision": 2,
+              "configurationFingerprint": "6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474"
+            },
+            "terminal": 0,
+            "cancelled": false,
+            "activeLeases": 0,
+            "materialized": 1,
+            "waitingOwner": {
+              "NET_SKINS": 1
+            },
+            "blockedAutomatic": 0,
+            "pendingAutomatic": 2,
+            "statusIncomplete": false,
+            "terminalTruncated": false,
+            "waitingPublication": {
+              "FINAL_RECAP": 0
+            },
+            "blockedAutomaticLimit": 101,
+            "pendingAutomaticLimit": 101
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "code": "SCORING_LOCK",
+            "status": "LIVE",
+            "match_id": "2026-R1-1",
+            "updated_at": "2026-09-30T01:03:47.521809+00:00",
+            "access_active": false,
+            "audit_created": true,
+            "match_revision": 2,
+            "scoring_locked": true,
+            "permission_revision": 2,
+            "scoring_context_hash": null,
+            "google_outbox_created": false,
+            "permission_transition": {
+              "after": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P01",
+                  "revoked_at": "2026-09-30T01:03:47.521809+00:00",
+                  "updated_at": "2026-09-30T01:03:47.521809+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P02",
+                  "revoked_at": "2026-09-30T01:03:47.521809+00:00",
+                  "updated_at": "2026-09-30T01:03:47.521809+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P13",
+                  "revoked_at": "2026-09-30T01:03:47.521809+00:00",
+                  "updated_at": "2026-09-30T01:03:47.521809+00:00",
+                  "permission_revision": 2
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": false,
+                  "player_id": "P14",
+                  "revoked_at": "2026-09-30T01:03:47.521809+00:00",
+                  "updated_at": "2026-09-30T01:03:47.521809+00:00",
+                  "permission_revision": 2
+                }
+              ],
+              "before": [
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P01",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-30T01:03:40.599595+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P02",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-30T01:03:40.599595+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P13",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-30T01:03:40.599595+00:00",
+                  "permission_revision": 1
+                },
+                {
+                  "match_id": "2026-R1-1",
+                  "can_score": true,
+                  "player_id": "P14",
+                  "revoked_at": null,
+                  "updated_at": "2026-09-30T01:03:40.599595+00:00",
+                  "permission_revision": 1
+                }
+              ]
+            },
+            "google_target_match_id": "2026-R1-1",
+            "previous_permission_revision": 1
+          }
+        }
+      ],
+      "controlTimeoutMs": 1000,
+      "workerTimeoutMs": 5000,
+      "barrier": "test-only after actual family flush; status uses no other-family write locks"
+    },
+    {
+      "case": "owner-net-completion",
+      "pass": true,
+      "waiting": [
+        {
+          "pid": 51274,
+          "wait": "ClientRead",
+          "blockedBy": []
+        },
+        {
+          "pid": 51275,
+          "wait": "advisory",
+          "blockedBy": [
+            51274
+          ]
+        },
+        {
+          "pid": 51276,
+          "wait": "transactionid",
+          "blockedBy": [
+            51275
+          ]
+        }
+      ],
+      "results": [
+        {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "work": [
+              {
+                "key": "TEAM_MOMENTUM",
+                "cycle": 1,
+                "family": "COMPETITION",
+                "attempt": 0
+              },
+              {
+                "key": "TOURNAMENT_STORYLINES",
+                "cycle": 1,
+                "family": "COMPETITION",
+                "attempt": 0
+              },
+              {
+                "key": "TOURNAMENT_INTELLIGENCE",
+                "cycle": 1,
+                "family": "INTELLIGENCE",
+                "attempt": 0
+              },
+              {
+                "key": "PROJECTION_EDITORIAL",
+                "cycle": 1,
+                "family": "INTELLIGENCE",
+                "attempt": 0
+              }
+            ],
+            "ready": {
+              "CALCUTTA": false,
+              "COMPETITION": true,
+              "INTELLIGENCE": true
+            },
+            "scope": {
+              "tournamentId": "2026",
+              "runtimeGenerationId": null
+            },
+            "calcutta": {
+              "auctionRevision": 37,
+              "auctionFingerprint": "2dcfcf50b2753b6b32f64df11e2494c290e7429f9f4f0b1af75a1e79837a401a",
+              "configurationRevision": 2,
+              "configurationFingerprint": "6ae596cadbcea27be218707a733253ea43a6bfbbaf552d4db459d171324eb474"
+            },
+            "terminal": 0,
+            "cancelled": false,
+            "activeLeases": 0,
+            "materialized": 1,
+            "waitingOwner": {
+              "NET_SKINS": 1
+            },
+            "blockedAutomatic": 0,
+            "pendingAutomatic": 5,
+            "statusIncomplete": false,
+            "terminalTruncated": false,
+            "waitingPublication": {
+              "FINAL_RECAP": 1
+            },
+            "blockedAutomaticLimit": 101,
+            "pendingAutomaticLimit": 101
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "ok": true,
+            "code": "PRODUCTION_NET_SKINS_V1_RECALCULATION_COMPLETED",
+            "job_id": "cfd6b7bb-20d3-4a1f-b006-ef6f34de36ef",
+            "published": false,
+            "idempotent": false,
+            "result_state": "PROVISIONAL",
+            "round_number": 1,
+            "result_revision": 2,
+            "configuration_revision": 3
+          }
+        }
+      ],
+      "controlTimeoutMs": 1000,
+      "workerTimeoutMs": 5000,
+      "barrier": "test-only after actual family flush; status uses no other-family write locks"
+    },
+    {
+      "case": "old-lexicographic",
+      "pass": true,
+      "expectedCounterexample": true,
+      "oneWay": [
+        {
+          "pid": 51301,
+          "wait": "ClientRead",
+          "blockedBy": []
+        },
+        {
+          "pid": 51302,
+          "wait": "transactionid",
+          "blockedBy": [
+            51301
+          ]
+        }
+      ],
+      "reciprocal": [
+        {
+          "pid": 51301,
+          "wait": "transactionid",
+          "blockedBy": [
+            51302
+          ]
+        },
+        {
+          "pid": 51302,
+          "wait": "transactionid",
+          "blockedBy": [
+            51301
+          ]
+        }
+      ],
+      "control": {
+        "ok": false,
+        "error": "Owned SQL session closed (3): ERROR:  canceling statement due to statement timeout\nCONTEXT:  while locking tuple (0,4) in relation \"competition_recalculation_jobs\"\nSQL statement \"insert into scoring_authority.competition_recalculation_jobs (\n      tournament_id, round_number, engine_key, status,\n      requested_source_revision, requested_at, started_at, completed_at,\n      last_error_code, last_error_safe, runtime_generation_id,\n      claim_token, claimed_by, lease_expires_at, updated_at\n    ) values (\n      target_tournament, 0, engine_value, 'PENDING',\n      pg_catalog.jsonb_build_object(\n        'reason', reason_value, 'revision', revision_value,\n        'transactional', true\n      ), pg_catalog.clock_timestamp(), null, null, null, null,\n      runtime_generation, null, null, null, pg_catalog.clock_timestamp()\n    ) on conflict (tournament_id, round_number, engine_key) do update set\n      status = 'PENDING',\n      requested_source_revision = excluded.requested_source_revision,\n      requested_at = excluded.requested_at,\n      started_at = null, completed_at = null,\n      last_error_code = null, last_error_safe = null,\n      runtime_generation_id = excluded.runtime_generation_id,\n      claim_token = null, claimed_by = null, lease_expires_at = null,\n      updated_at = excluded.updated_at\"\nPL/pgSQL function scoring_authority.enqueue_annual_derived_v1_change() line 132 at SQL statement\nSQL statement \"update scoring_authority.matches set\n    status = case when operation = 'MARK_LIVE' then 'LIVE' else status end,\n    scoring_locked = target_locked,\n    match_revision = next_match_revision,\n    permission_revision = next_permission_revision,\n    authority_updated_at = transition_at,\n    updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function public.mutate_production_match_control(jsonb) line 269 at SQL statement\n"
+      }
+    },
+    {
+      "case": "inherited-control",
+      "pass": true,
+      "oneWay": [
+        {
+          "pid": 51358,
+          "wait": "ClientRead",
+          "blockedBy": []
+        },
+        {
+          "pid": 51359,
+          "wait": "transactionid",
+          "blockedBy": [
+            51358
+          ]
+        }
+      ],
+      "claimed": true,
+      "controlCommitted": true
+    }
+  ],
+  "installed": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48"
+      },
+      {
+        "path": "supabase/production_migrations/202609290125_google_runtime_retirement_v1.sql",
+        "sha256": "355be26c45d1e52ad0fd8a8e1520b7b0ad06dedba6a48b4aa15c6e2d3ee6b7dc"
+      },
+      {
+        "path": "supabase/production_migrations/202609290126_google_retired_release_admission_v1.sql",
+        "sha256": "4e14777857cd69b893662761c621753bfb5f1d48ceaed49c8283968e58d8c5a3"
+      },
+      {
+        "path": "supabase/production_migrations/202609300127_canonical_annual_create_contract_v1.sql",
+        "sha256": "f1d6a293eaeb56a899d897ed3f182549529f3af4efe2da1dfbfe004f6017ec57"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  }
+}

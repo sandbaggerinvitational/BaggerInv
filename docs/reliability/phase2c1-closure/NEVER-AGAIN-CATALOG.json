@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "phase": "PHASE2C1_CANONICAL_CLOSURE",
+  "baseSha": "4f5be5928a362f77edca375919df55be23695177",
+  "historicalCatalog": "../testing/NEVER-AGAIN-CATALOG.json",
+  "policy": "Additive catalog; passing source or reproduction never replaces required runtime or fixed-behavior gates. Native expected-red gates remain unchanged.",
+  "tests": [
+    {
+      "id": "NA-2026-ANNUAL-CREATE-CONTRACT",
+      "incident": "P2C1-ANNUAL-001",
+      "test": "test/reliability-phase2c1-closure-annual-create.integration.test.mjs",
+      "suite": "annual-create",
+      "proof": [
+        "API",
+        "INTEGRATION",
+        "POSTGRESQL",
+        "SECURITY",
+        "FAILURE_INJECTION"
+      ],
+      "status": "PASS_SCOPED",
+      "requirement": "One explicit current authorization year and separate generic target year; atomic draft, receipt, exact readback and same-operation retry.",
+      "limits": "Synthetic identity/activation and Unix-socket transport; no hosted auth or full activation chronology.",
+      "futureTournamentReleaseBlocking": true,
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "NA-2026-ANNUAL-RUNTIME-WIRE-HASH",
+      "incident": "P2C1CL-ANNUAL-HASH-001",
+      "test": "test/reliability-phase2c1-closure-annual-create.integration.test.mjs",
+      "suite": "annual-create",
+      "proof": [
+        "API",
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "status": "PASS_SCOPED",
+      "requirement": "Shipping runtime/annual-transition digest agrees with installed PostgreSQL JSONB digest; v1 CREATE receipt hash unchanged.",
+      "limits": "Representative runtime promotion/course and transition receipt boundary, not every annual operation sequence.",
+      "futureTournamentReleaseBlocking": true,
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "NA-2026-DIRECTOR-CANONICAL-ROUTING",
+      "incident": "P2C1-DIRECTOR-001",
+      "test": "test/reliability-phase2c1-closure-preview.integration.test.mjs",
+      "suite": "director-preview",
+      "proof": [
+        "API",
+        "INTEGRATION",
+        "POSTGRESQL",
+        "SECURITY",
+        "FAILURE_INJECTION"
+      ],
+      "status": "PASS_SCOPED",
+      "requirement": "Isolated overview and Finalize/Reopen use canonical authority, receipt and readback with no retired route.",
+      "limits": "Seven other required capability identities remain PARTIAL; no broad Director parity claim.",
+      "futureTournamentReleaseBlocking": true,
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "NA-2026-GOOGLE-RUNTIME-DEPENDENCY-PREVIEW",
+      "incident": "P2C1CL-PREVIEW-GOOGLE-001",
+      "test": "test/reliability-phase2c1-closure-preview.integration.test.mjs",
+      "suite": "director-preview",
+      "proof": [
+        "POSTGRESQL",
+        "INTEGRATION"
+      ],
+      "status": "PASS_SCOPED",
+      "requirement": "Preview scoring/snapshot/control functions create no Google jobs and preserve existing job history, canonical audit and scores.",
+      "limits": "Separate Preview schema from Production-shaped432-hole fixture.",
+      "futureTournamentReleaseBlocking": true,
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "NA-2026-CANONICAL-READ-ADMISSION",
+      "incident": "P2C1-COMPAT-001/ROUTE-01",
+      "test": "test/step10b-production-shadow-read-routing.test.mjs",
+      "suite": "routing",
+      "proof": [
+        "UNIT",
+        "API_ADAPTER"
+      ],
+      "status": "EXPECTED_RED_BLOCKING",
+      "requirement": "Supported exact read-only candidate resolves canonical reads without Google config.",
+      "limits": "Source edit blocked by automatic approval review; explicit owner confirmation pending.",
+      "futureTournamentReleaseBlocking": true,
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "NA-2026-CANONICAL-READ-PUBLICATION-DENIAL",
+      "incident": "P2C1-COMPAT-001/ROUTE-02",
+      "test": "test/step10b-production-shadow-read-routing.test.mjs",
+      "suite": "routing",
+      "proof": [
+        "UNIT"
+      ],
+      "status": "EXPECTED_RED_BLOCKING",
+      "requirement": "Positive canonical input readability with no publication or scoring write authority.",
+      "limits": "Read admission fails before publication assertion; not evidence of an existing unauthorized publication.",
+      "futureTournamentReleaseBlocking": true,
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "NA-2026-CANONICAL-READ-OUTAGE",
+      "incident": "P2C1-COMPAT-001/ROUTE-03",
+      "test": "test/step11-pwa-network-boundaries.test.mjs",
+      "suite": "routing",
+      "proof": [
+        "API_ADAPTER",
+        "FAILURE_INJECTION"
+      ],
+      "status": "EXPECTED_RED_BLOCKING",
+      "requirement": "Actual canonical services reach typed local outage handling and never fall back to Google.",
+      "limits": "Current rejection occurs before the required canonical adapter path.",
+      "futureTournamentReleaseBlocking": true,
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "NA-2026-CANONICAL-READ-FAIL-CLOSED",
+      "incident": "P2C1CL-ROUTING-ADMISSION-001",
+      "test": "test/reliability-phase2c1-closure-routing.test.mjs",
+      "suite": "routing-safety",
+      "proof": [
+        "UNIT",
+        "API_ADAPTER",
+        "SECURITY"
+      ],
+      "status": "EXPECTED_RED_BLOCKING",
+      "requirement": "An invalid requested diagnostic lane cannot silently become ordinary Preview; mutations denied before transport.",
+      "limits": "Synthetic environment only; no observed Production privilege escalation.",
+      "futureTournamentReleaseBlocking": true,
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "NA-2026-DIRECTOR-ODDS-CANONICAL-PUBLICATION",
+      "incident": "P2C1CL-PREVIEW-ODDS-001/BROAD-NEW-073",
+      "test": "test/reliability-phase2c1-closure-odds.integration.test.mjs",
+      "suite": "director-odds-publication",
+      "proof": [
+        "API",
+        "INTEGRATION",
+        "POSTGRESQL",
+        "SECURITY",
+        "FAILURE_INJECTION"
+      ],
+      "status": "PASS_SCOPED",
+      "requirement": "Owner-reviewed canonical calculation/publication creates no Google job, preserves historical jobs and audit, rejects stale/cross-scope requests and confirms readback/replay.",
+      "limits": "After Round 1 actual publication; synthetic authenticated identity and Next after callback; real calculator invoked manually. No hosted identity, automatic after scheduling or all-milestone proof.",
+      "futureTournamentReleaseBlocking": true,
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    }
+  ]
+}

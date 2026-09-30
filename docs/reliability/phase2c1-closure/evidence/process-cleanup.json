@@ -1,0 +1,12 @@
+{
+  "observedAt": "2026-09-30T01:31:52.928319+00:00",
+  "method": "local process metadata; no database connections",
+  "clusters": [
+    {
+      "pid": 12023,
+      "directory": "/private/tmp/bagger-r3-dependency-recovery/pg",
+      "ownedClosureFixture": false
+    }
+  ],
+  "unrelatedClustersUntouched": true
+}

@@ -1,0 +1,412 @@
+{
+  "schemaVersion": 1,
+  "sourceProvenance": {
+    "contract": "phase2c-swift-decoder-inputs-v1",
+    "before": {
+      "capturedAt": "2026-09-30T01:11:37.602Z",
+      "files": [
+        {
+          "path": "docs/reliability/phase2c/evidence/native-timezone-counterexample.json",
+          "sha256": "b967d0d6d93426cca35f33dbdb986d53b4db38928fa98033093489cfbb6f49bb"
+        },
+        {
+          "path": "docs/reliability/phase2c1-closure/evidence/revalidation/phase2c/evidence/recovery-proof.json",
+          "sha256": "6faf0052a276036ed9020b75f5eca460429a4664cf929355fb4669c9af439301"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/fixture-manifest.json",
+          "sha256": "5c864a0b2aa3030af488a10c0b62fb7f90f6ab2f93a396d9fc1aaa0a92b433b7"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/main.swift",
+          "sha256": "00d0feb479c6b8483bf557ae8ff8769d84137e0c8403fcabbb405dea3d2521a8"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/run-closure.mjs",
+          "sha256": "73165ddac4c3fe13919ce1071c0940aed941924e4766e56455c00b318f070e57"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileMatchDetailModels.swift",
+          "sha256": "cbdaa786b1a30887f7ead127a984aa6db120799fc2f4d2993d25152fafa4cecb"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileModels.swift",
+          "sha256": "6d3cdb7836bf5a4b33b945e26e33450fe8be089d68e918cdb07fad97616764d9"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileParticipantContentValidation.swift",
+          "sha256": "1950693cb540a3900929a467e559cd1332a8d7c7eee10b03aacf86c56f9ce018"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobilePlayerRoundPerformance.swift",
+          "sha256": "b0119121fd1fa9741a479ae9dd2ab8b122f535c7cb12a1fa44c91329403166b5"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobilePlayersIntelligence.swift",
+          "sha256": "15a10cbbb234f68a0be9716d41b9895bf38b42d1ee9d51d19995c7e2952b2dad"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileR1RoundCompetition.swift",
+          "sha256": "5e77ec76a66ec611f3efcb68c4c3e8b2e04afc7346f0d8b114db8eeda8d2a5f6"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileR2PairCompetition.swift",
+          "sha256": "c035e856a9f894cf9179ddfacd5d4ab8f334e71f7764845aaca68a9575233ee5"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileR3RoundCompetition.swift",
+          "sha256": "42db679fbd020cc17dd99fff80fbc7e52fafc79c7b02c02b66ea0068011ead00"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileReadModels.swift",
+          "sha256": "738cb72710e17f963228f2000f6af38e6341d40d6a059c88d932bfa7cc6d855d"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileRoundScorecard.swift",
+          "sha256": "7d80c3e043c33573b8926fda2ca9674dd4a71dd014d4d705ea94ef4a251e8c45"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileScoringModels.swift",
+          "sha256": "f36c2a50bf74cc7d84ff6730818dfaa198c6f57bcc4d78a82f8dff4dcae3544c"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/NativeEnvironment.swift",
+          "sha256": "30cdd8d29ededb51dfdbe72d967e76541ff48c1c2829b0217e892c51281ebdfa"
+        }
+      ]
+    },
+    "after": {
+      "capturedAt": "2026-09-30T01:11:43.836Z",
+      "files": [
+        {
+          "path": "docs/reliability/phase2c/evidence/native-timezone-counterexample.json",
+          "sha256": "b967d0d6d93426cca35f33dbdb986d53b4db38928fa98033093489cfbb6f49bb"
+        },
+        {
+          "path": "docs/reliability/phase2c1-closure/evidence/revalidation/phase2c/evidence/recovery-proof.json",
+          "sha256": "6faf0052a276036ed9020b75f5eca460429a4664cf929355fb4669c9af439301"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/fixture-manifest.json",
+          "sha256": "5c864a0b2aa3030af488a10c0b62fb7f90f6ab2f93a396d9fc1aaa0a92b433b7"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/main.swift",
+          "sha256": "00d0feb479c6b8483bf557ae8ff8769d84137e0c8403fcabbb405dea3d2521a8"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/run-closure.mjs",
+          "sha256": "73165ddac4c3fe13919ce1071c0940aed941924e4766e56455c00b318f070e57"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileMatchDetailModels.swift",
+          "sha256": "cbdaa786b1a30887f7ead127a984aa6db120799fc2f4d2993d25152fafa4cecb"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileModels.swift",
+          "sha256": "6d3cdb7836bf5a4b33b945e26e33450fe8be089d68e918cdb07fad97616764d9"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileParticipantContentValidation.swift",
+          "sha256": "1950693cb540a3900929a467e559cd1332a8d7c7eee10b03aacf86c56f9ce018"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobilePlayerRoundPerformance.swift",
+          "sha256": "b0119121fd1fa9741a479ae9dd2ab8b122f535c7cb12a1fa44c91329403166b5"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobilePlayersIntelligence.swift",
+          "sha256": "15a10cbbb234f68a0be9716d41b9895bf38b42d1ee9d51d19995c7e2952b2dad"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileR1RoundCompetition.swift",
+          "sha256": "5e77ec76a66ec611f3efcb68c4c3e8b2e04afc7346f0d8b114db8eeda8d2a5f6"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileR2PairCompetition.swift",
+          "sha256": "c035e856a9f894cf9179ddfacd5d4ab8f334e71f7764845aaca68a9575233ee5"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileR3RoundCompetition.swift",
+          "sha256": "42db679fbd020cc17dd99fff80fbc7e52fafc79c7b02c02b66ea0068011ead00"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileReadModels.swift",
+          "sha256": "738cb72710e17f963228f2000f6af38e6341d40d6a059c88d932bfa7cc6d855d"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileRoundScorecard.swift",
+          "sha256": "7d80c3e043c33573b8926fda2ca9674dd4a71dd014d4d705ea94ef4a251e8c45"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/MobileScoringModels.swift",
+          "sha256": "f36c2a50bf74cc7d84ff6730818dfaa198c6f57bcc4d78a82f8dff4dcae3544c"
+        },
+        {
+          "path": "tools/reliability/native-never-again/decoder/Vendor/NativeEnvironment.swift",
+          "sha256": "30cdd8d29ededb51dfdbe72d967e76541ff48c1c2829b0217e892c51281ebdfa"
+        }
+      ]
+    },
+    "sourcesStable": true,
+    "result": "PASS"
+  },
+  "sourcesStable": true,
+  "generatedAt": "2026-09-30T01:11:43.836Z",
+  "proofLayer": "INTEGRATION",
+  "executionRuntime": "SWIFT_MACOS_MODEL",
+  "production": false,
+  "shippingNativeChanged": false,
+  "physical": false,
+  "simulator": false,
+  "toolchain": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+  "native": {
+    "version": "1.2",
+    "build": 10,
+    "gitSha": "e7652b9b65595861f4f7cdf0b8326491581a27b8"
+  },
+  "provenance": {
+    "source": "/private/tmp/bagger-build10-promo/PROJECT/capture-source",
+    "report": "/private/tmp/bagger-build10-promo/PROJECT/SOURCE-PROVENANCE.json",
+    "statement": "Preserved report records 495 tracked iOS files compared, only two DEBUG fixture differences; model/service files unchanged",
+    "limitation": "Pinned Git object unavailable for independent re-verification; current byte hashes and preserved independent snapshot matches retained",
+    "claim": "STRONGLY SUPPORTED Build10 attribution; PROVEN byte-exact retained source used"
+  },
+  "modelSources": [
+    {
+      "path": "Vendor/MobileMatchDetailModels.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileMatchDetailModels.swift",
+      "sha256": "cbdaa786b1a30887f7ead127a984aa6db120799fc2f4d2993d25152fafa4cecb"
+    },
+    {
+      "path": "Vendor/MobileModels.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileModels.swift",
+      "sha256": "6d3cdb7836bf5a4b33b945e26e33450fe8be089d68e918cdb07fad97616764d9"
+    },
+    {
+      "path": "Vendor/MobileParticipantContentValidation.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileParticipantContentValidation.swift",
+      "sha256": "1950693cb540a3900929a467e559cd1332a8d7c7eee10b03aacf86c56f9ce018"
+    },
+    {
+      "path": "Vendor/MobilePlayerRoundPerformance.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobilePlayerRoundPerformance.swift",
+      "sha256": "b0119121fd1fa9741a479ae9dd2ab8b122f535c7cb12a1fa44c91329403166b5"
+    },
+    {
+      "path": "Vendor/MobilePlayersIntelligence.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobilePlayersIntelligence.swift",
+      "sha256": "15a10cbbb234f68a0be9716d41b9895bf38b42d1ee9d51d19995c7e2952b2dad"
+    },
+    {
+      "path": "Vendor/MobileR1RoundCompetition.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileR1RoundCompetition.swift",
+      "sha256": "5e77ec76a66ec611f3efcb68c4c3e8b2e04afc7346f0d8b114db8eeda8d2a5f6"
+    },
+    {
+      "path": "Vendor/MobileR2PairCompetition.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileR2PairCompetition.swift",
+      "sha256": "c035e856a9f894cf9179ddfacd5d4ab8f334e71f7764845aaca68a9575233ee5"
+    },
+    {
+      "path": "Vendor/MobileR3RoundCompetition.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileR3RoundCompetition.swift",
+      "sha256": "42db679fbd020cc17dd99fff80fbc7e52fafc79c7b02c02b66ea0068011ead00"
+    },
+    {
+      "path": "Vendor/MobileReadModels.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileReadModels.swift",
+      "sha256": "738cb72710e17f963228f2000f6af38e6341d40d6a059c88d932bfa7cc6d855d"
+    },
+    {
+      "path": "Vendor/MobileRoundScorecard.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileRoundScorecard.swift",
+      "sha256": "7d80c3e043c33573b8926fda2ca9674dd4a71dd014d4d705ea94ef4a251e8c45"
+    },
+    {
+      "path": "Vendor/MobileScoringModels.swift",
+      "upstreamPath": "ios/BaggerInv/Models/MobileScoringModels.swift",
+      "sha256": "f36c2a50bf74cc7d84ff6730818dfaa198c6f57bcc4d78a82f8dff4dcae3544c"
+    },
+    {
+      "path": "Vendor/NativeEnvironment.swift",
+      "upstreamPath": "ios/BaggerInv/Configuration/NativeEnvironment.swift",
+      "sha256": "30cdd8d29ededb51dfdbe72d967e76541ff48c1c2829b0217e892c51281ebdfa"
+    }
+  ],
+  "fixture": {
+    "path": "docs/reliability/phase2c1-closure/evidence/revalidation/phase2c/evidence/recovery-proof.json",
+    "sha256": "6faf0052a276036ed9020b75f5eca460429a4664cf929355fb4669c9af439301",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48"
+      },
+      {
+        "path": "supabase/production_migrations/202609290125_google_runtime_retirement_v1.sql",
+        "sha256": "355be26c45d1e52ad0fd8a8e1520b7b0ad06dedba6a48b4aa15c6e2d3ee6b7dc"
+      },
+      {
+        "path": "supabase/production_migrations/202609290126_google_retired_release_admission_v1.sql",
+        "sha256": "4e14777857cd69b893662761c621753bfb5f1d48ceaed49c8283968e58d8c5a3"
+      },
+      {
+        "path": "supabase/production_migrations/202609300127_canonical_annual_create_contract_v1.sql",
+        "sha256": "f1d6a293eaeb56a899d897ed3f182549529f3af4efe2da1dfbfe004f6017ec57"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "format": "BB",
+      "id": "REQUEST",
+      "result": "PASS"
+    },
+    {
+      "format": "BB",
+      "id": "ACCEPTED",
+      "result": "PASS"
+    },
+    {
+      "format": "BB",
+      "id": "REPLAY",
+      "result": "PASS"
+    },
+    {
+      "format": "BB",
+      "id": "CONFLICT_ERROR",
+      "result": "PASS"
+    },
+    {
+      "format": "BB",
+      "id": "SQL_TIMEOUT_ERROR",
+      "result": "PASS"
+    },
+    {
+      "format": "BB",
+      "id": "WRONG_MUTATION_DENIED",
+      "result": "PASS"
+    },
+    {
+      "format": "BB",
+      "id": "WRONG_GROSS_DENIED",
+      "result": "PASS"
+    },
+    {
+      "format": "BB",
+      "id": "MISSING_REQUIRED_ACK_DENIED",
+      "result": "PASS"
+    },
+    {
+      "format": "SC",
+      "id": "REQUEST",
+      "result": "PASS"
+    },
+    {
+      "format": "SC",
+      "id": "ACCEPTED",
+      "result": "PASS"
+    },
+    {
+      "format": "SC",
+      "id": "REPLAY",
+      "result": "PASS"
+    },
+    {
+      "format": "SC",
+      "id": "CONFLICT_ERROR",
+      "result": "PASS"
+    },
+    {
+      "format": "SC",
+      "id": "SQL_TIMEOUT_ERROR",
+      "result": "PASS"
+    },
+    {
+      "format": "SC",
+      "id": "WRONG_MUTATION_DENIED",
+      "result": "PASS"
+    },
+    {
+      "format": "SC",
+      "id": "WRONG_GROSS_DENIED",
+      "result": "PASS"
+    },
+    {
+      "format": "SC",
+      "id": "MISSING_REQUIRED_ACK_DENIED",
+      "result": "PASS"
+    },
+    {
+      "format": "SI",
+      "id": "REQUEST",
+      "result": "PASS"
+    },
+    {
+      "format": "SI",
+      "id": "ACCEPTED",
+      "result": "PASS"
+    },
+    {
+      "format": "SI",
+      "id": "REPLAY",
+      "result": "PASS"
+    },
+    {
+      "format": "SI",
+      "id": "CONFLICT_ERROR",
+      "result": "PASS"
+    },
+    {
+      "format": "SI",
+      "id": "SQL_TIMEOUT_ERROR",
+      "result": "PASS"
+    },
+    {
+      "format": "SI",
+      "id": "WRONG_MUTATION_DENIED",
+      "result": "PASS"
+    },
+    {
+      "format": "SI",
+      "id": "WRONG_GROSS_DENIED",
+      "result": "PASS"
+    },
+    {
+      "format": "SI",
+      "id": "MISSING_REQUIRED_ACK_DENIED",
+      "result": "PASS"
+    }
+  ],
+  "knownLimitations": [
+    {
+      "id": "P2C-NEW-TIMESTAMP-TIMEZONE",
+      "result": "EXPECTED_REJECTION_CONFIRMED",
+      "artifact": "docs/reliability/phase2c/evidence/native-timezone-counterexample.json",
+      "sha256": "b967d0d6d93426cca35f33dbdb986d53b4db38928fa98033093489cfbb6f49bb",
+      "error": "invalidTimestamp",
+      "interpretation": "Non-UTC PostgreSQL timestamp offsets are unsupported by this unchanged native decoder; not a fixed defect"
+    }
+  ],
+  "compatibilityCondition": "SQL session TimeZone=UTC",
+  "summary": {
+    "passed": 24,
+    "failed": 0
+  },
+  "limitations": [
+    "Actual retained Swift JSONDecoder and request-compatibility guard, not MobileAPIClient HTTP/session/queue/UI execution",
+    "No physical iPhone, simulator, hosted Auth, Production or end-to-end new recovery UX proof",
+    "Compatibility proof is conditional on explicitly UTC database/session profile; nonUTC counterexample remains unresolved",
+    "Shipping Build10 does not consume the new mutation-status route",
+    "Build10 lineage is supported by retained contemporaneous provenance report; pinned native Git object unavailable"
+  ]
+}

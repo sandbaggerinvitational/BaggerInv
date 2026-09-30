@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-30T01:25:09.806786+00:00",
+  "proofLayer": "SOURCE",
+  "result": "PASS",
+  "checks": 2,
+  "production": false,
+  "files": [
+    {
+      "file": "lib/operational-rpc-contract.js",
+      "sha256": "ad32efdf6e0ee2b0c9af0d851c9fe9c66bf22b5971d477f5341ebaa335c93140",
+      "baseSha256": "23421d2d6de5f7784b06eebe70f18789f4e4fb868885979a42dca3db9dcf41d9",
+      "proof": "Removing exactly one new read-only Odds query-family classification yields byte-identical base file; no existing RPC classification or function changed."
+    },
+    {
+      "file": "tools/reliability/run-phase2c1-closure-tests.mjs",
+      "sha256": "0c795749745d8d3e09ed1733483c1e9b5dcca910b0c9b9ce37a3f42fc9833e3b",
+      "beforeSha256": "08c228bacf78dc022e8e9474fd153c6c49f1e2aefd3ba4b1b9f3174097091ca2",
+      "proof": "Removing exactly one additional scoped suite mapping yields byte-identical runner used by retained full-sequence proof; all existing suite selection/environment/commands unchanged."
+    }
+  ],
+  "limitation": "Source equivalence of unaffected existing operations, not runtime proof of the new Odds RPC; that RPC has its separate fresh API/PostgreSQL suite."
+}

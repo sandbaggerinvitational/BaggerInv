@@ -1,0 +1,23 @@
+# Client and control compatibility
+
+**PARTIAL.** Google is not restored. Annual CREATE and the implemented isolated Director capabilities have actual local client/API/PostgreSQL proof. Three read-only candidate routing cases and seven required isolated Director capability identities remain open; they prevent P0-F closure.
+
+| Surface | Request / response contract | Result and proof boundary |
+|---|---|---|
+| Annual Director CREATE | Existing action, targetTournamentId, numeric tournamentYear, expectedRevision and operationRequestId; response remains canonical receipt + read model | PASS scoped. Internal target_tournament_year is separate from current authority. UI confirms exact canonical target/year/revision after readback. Synthetic HTTP identity/activation and Unix-socket transport are explicit seams. |
+| Annual runtime / global course | Existing request shape; corrected JSONB wire digest for v2 and transition requests; additive course/tee/context receipt fields | PASS scoped representative promotion/course/context/assignment and retry/conflict proof. V1 receipt hash is unchanged. Full annual activation chronology is NOT PROVEN. |
+| Isolated Director current read, Finalize, Reopen | New explicit /api/director/canonical-overview contract; existing canonical RPC response and operation identity | PASS scoped client → handler → server → PostgreSQL → readback. Unknown/committed outcomes retain identity; known rejected predecessor refreshes authority. |
+| Other required isolated Director authoring | Existing canonical Production-bound setup, side-game and control contracts | PARTIAL. An isolated adapter/operation context is still missing; a passing model or database test is not client access proof. |
+| PWA score and recovery | Existing persistence adapter and score acknowledgement shape remain unchanged | Fresh recovery/full-sequence proofs execute the shipping adapter with local SQL transport. No new recovery UX is claimed. |
+| PWA current reads / read-only diagnostic candidate | Existing supported exact read-only context | FAIL in three retained routing cases. No fallback is restored; related source edit remains blocked by approval review. |
+| Build10 backend score/error DTO | Unchanged retained native models and unchanged backend score/recovery DTO modules | Local retained Swift decoder evidence is conditional on UTC. No physical device, queue, navigation or full MobileAPIClient proof. See final evidence ledger for fresh decoder result. |
+| Lock / Resume / Finalize / compatible release | Existing canonical functions and release admission | Scoped Phase2C regression only. Full Round Control/Prepare/Open and mixed-version hosted rollback are NOT PROVEN. |
+| Optional Odds input refresh | Retired Google-only refresh returns410; current Verify path remains canonical | Four actual-handler tests prove no provider call/fallback. No calculation, financial or publication rule changed. |
+
+The retired Google route is not a supported alternate authority. Its failure cannot trigger session reset, scoring suspension or another provider selection. New APIs never expose service credentials or allow browser-controlled tournament/actor authority. The new Director current read is bounded to the authenticated tournament and returns no private financial data; full authoring remains denied until its canonical context is implemented.
+
+The original eleven failure identities are adjudicated individually in[CAPABILITY-GAPS.md](CAPABILITY-GAPS.md). Build10 lineage remains STRONGLY SUPPORTED by retained source/provenance; no unavailable pinned Git object is invented. Non-UTC native timestamp rejection remains an unresolved limitation. Production and physical compatibility remain NOT PROVEN.
+
+Scoped Odds closure: the explicit isolated Director calculation/publication adapter now has13 actual client/API/PostgreSQL tests. It requires owner confirmation, preserves current-source/config/Final and pairings checks, uses the existing calculator, confirms canonical readback and supports same-calculation recovery. The old Preview publisher's Google mirror sink and replay grants are retired, with historical jobs preserved. This closes only BROAD-NEW-073; it does not resolve the separate diagnostic read-only routing gap or hosted publication admission.
+
+Odds proof boundary: the integration fixture supplies verified synthetic identity and a test replacement for Next `after()`, then invokes the actual existing calculator. It proves shipping client/API/server/SQL and the calculated result; it does not prove hosted Auth or automatic post-response scheduling. Actual publication exercises After Round1; other milestones retain source checks but are not all executed by this new fixture.

@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "method": "Exact TAP names plus occurrence counts; ambiguous changed failure identities require source-file attribution, never name-only resolution.",
+  "beforeTests": 4159,
+  "afterTests": 4095,
+  "rawHashesVerified": true,
+  "candidateRawSha256": "94d5459a71c1df5f0a33998da2c6cb2860294762a5e2eb85af821b1de71ecf19",
+  "duplicateNames": [
+    {
+      "name": "revision 2 exact points/payouts round-trip; 24th 5% is valid",
+      "before": 5,
+      "after": 5,
+      "delta": 0
+    },
+    {
+      "name": "configuration edits, exact total, missing/duplicate places, invalid points fail closed",
+      "before": 5,
+      "after": 5,
+      "delta": 0
+    },
+    {
+      "name": "future tournament sizes and exact decimal presentation",
+      "before": 5,
+      "after": 5,
+      "delta": 0
+    },
+    {
+      "name": "self/multiple ownership 100",
+      "before": 5,
+      "after": 5,
+      "delta": 0
+    },
+    {
+      "name": "self/multiple ownership 50/50",
+      "before": 5,
+      "after": 5,
+      "delta": 0
+    },
+    {
+      "name": "self/multiple ownership 75/25",
+      "before": 5,
+      "after": 5,
+      "delta": 0
+    },
+    {
+      "name": "self/multiple ownership 25/25/50",
+      "before": 5,
+      "after": 5,
+      "delta": 0
+    },
+    {
+      "name": "self/multiple ownership 33.33/33.33/33.34",
+      "before": 5,
+      "after": 5,
+      "delta": 0
+    },
+    {
+      "name": "incomplete/overallocated/duplicate/unknown buyer and price rejected without normalization",
+      "before": 5,
+      "after": 5,
+      "delta": 0
+    },
+    {
+      "name": "selected-entry merge preserves other golfers; buyers may own multiple golfers",
+      "before": 5,
+      "after": 5,
+      "delta": 0
+    },
+    {
+      "name": "Director-only read and editor remain separate from participant/publication paths",
+      "before": 5,
+      "after": 5,
+      "delta": 0
+    },
+    {
+      "name": "the presentation cleanup adds no request or dependency",
+      "before": 2,
+      "after": 2,
+      "delta": 0
+    },
+    {
+      "name": "unauthenticated/stale/altered/disabled hook never calls database or provider",
+      "before": 6,
+      "after": 6,
+      "delta": 0
+    },
+    {
+      "name": "malformed or conflicting signed provider payload denied before dispatch",
+      "before": 4,
+      "after": 4,
+      "delta": 0
+    },
+    {
+      "name": "invalid database evidence denied",
+      "before": 8,
+      "after": 8,
+      "delta": 0
+    },
+    {
+      "name": "reserved request cannot reach live sender after removal, SMS enablement or failed signature",
+      "before": 3,
+      "after": 3,
+      "delta": 0
+    },
+    {
+      "name": "migration is one balanced transaction",
+      "before": 2,
+      "after": 2,
+      "delta": 0
+    }
+  ],
+  "changedDuplicateMultiplicities": [],
+  "ambiguousFailureIdentities": [],
+  "fileLevelEntries": [
+    {
+      "name": "test/scoring-authority-specific-provider.test.mjs",
+      "result": "ok"
+    }
+  ],
+  "limitation": "Source-file identity is authoritative for named failures and AST declaration changes. Repeated imported utility tests count as repeated executions, not independent capability proof."
+}

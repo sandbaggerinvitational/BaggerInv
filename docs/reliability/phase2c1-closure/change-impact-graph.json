@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "phase": "PHASE2C1_CLOSURE",
+  "runner": "tools/reliability/run-phase2c1-closure-tests.mjs",
+  "edges": [
+    {
+      "sources": [
+        "lib/future-year-administration-client.js",
+        "lib/production-future-year-administration-contract.js",
+        "lib/production-future-year-administration-server.js",
+        "lib/annual-runtime-request-hash.js",
+        "app/admin/director/ProductionFutureYearAdministrationPanel.js",
+        "supabase/production_migrations/202609300127_canonical_annual_create_contract_v1.sql"
+      ],
+      "invalidate": [
+        "annual-client",
+        "annual-create",
+        "annual",
+        "retirement-release",
+        "application",
+        "build"
+      ],
+      "reason": "Year/scope/serialization/receipt/readback changes can invalidate CREATE and annual compatibility."
+    },
+    {
+      "sources": [
+        "lib/canonical-director-client.js",
+        "lib/canonical-director-overview.js",
+        "app/api/director/canonical-overview/route.js",
+        "app/admin/director/CanonicalDirectorConsole.js",
+        "app/admin/director/page.js",
+        "supabase/migrations/202609290002_preview_google_runtime_retirement_v1.sql"
+      ],
+      "invalidate": [
+        "director",
+        "director-preview",
+        "director-capabilities",
+        "retirement-security",
+        "application",
+        "build",
+        "boot"
+      ],
+      "reason": "Canonical routing, entitlement, origin, result scope, operation identity and Preview no-enqueue are jointly required."
+    },
+    {
+      "sources": [
+        "lib/canonical-runtime-source.js",
+        "lib/production-shadow-candidate.js",
+        "lib/production-shadow-candidate-server.js",
+        "lib/odds-calculation-source.js",
+        "lib/scoring-shadow.js"
+      ],
+      "invalidate": [
+        "routing",
+        "routing-safety",
+        "retirement-security",
+        "retirement",
+        "application",
+        "build"
+      ],
+      "reason": "Read-only resource admission cannot grant writes or fall back across authority contexts. These gates remain RED."
+    },
+    {
+      "sources": [
+        "app/api/odds/inputs/route.js",
+        "app/odds-center/admin/OddsAdmin.js",
+        "lib/production-odds-calculation-contract.js"
+      ],
+      "invalidate": [
+        "director-odds",
+        "annual-odds-contract",
+        "retirement",
+        "application",
+        "build"
+      ],
+      "reason": "Retired refresh must terminate locally and canonical Odds request must omit retired destination metadata."
+    },
+    {
+      "sources": [
+        "lib/score-derived-worker.js",
+        "supabase/production_migrations/",
+        "test/support/reliability/phase2c-install.mjs"
+      ],
+      "invalidate": [
+        "recovery",
+        "delivery",
+        "annual",
+        "deadlock",
+        "finite",
+        "worker-lock-order",
+        "full-sequence",
+        "retirement-sql"
+      ],
+      "reason": "Canonical score/worker compatibility requires actual SQL and failure/retry proof; changed function families need targeted performance remeasurement."
+    },
+    {
+      "sources": [
+        "lib/canonical-director-odds.js",
+        "lib/canonical-director-odds-client.js",
+        "app/admin/director/CanonicalDirectorOdds.js",
+        "app/api/director/canonical-odds/route.js",
+        "supabase/migrations/202609290003_preview_odds_runtime_retirement_v1.sql"
+      ],
+      "invalidate": [
+        "director-odds-publication",
+        "director",
+        "director-preview",
+        "application",
+        "build",
+        "boot"
+      ],
+      "reason": "Owner publication, current source validation, bounded read, historical mirror preservation and migration contract marker must remain jointly proven."
+    }
+  ],
+  "invariant": "No required tournament capability may import a retired Google adapter or depend on Google credentials, completion, or global health. Reintroduction requires architecture review.",
+  "deploymentAuthorization": false
+}

@@ -1,0 +1,108 @@
+[
+  {
+    "id": "BROAD-NEW-007",
+    "file": "test/director-course-tees.test.mjs",
+    "oldTest": "course tee read-back includes refreshed handicap lookup verification",
+    "newTest": "UNIT canonical course/tee mutation requires all holes and explicit prepared-context readback",
+    "action": "REWRITE_CANONICAL_CONTRACT",
+    "assertionStrength": "EQUIVALENT_OR_RETIRED_PROVIDER_BEHAVIOR"
+  },
+  {
+    "id": "BROAD-NEW-008",
+    "file": "test/director-operations-console.test.mjs",
+    "oldTest": "new operations reuse the verified Director transaction and read-back pipeline",
+    "newTest": "UNIT canonical Director operations preserve revision and operation identity",
+    "action": "REWRITE_CANONICAL_CONTRACT",
+    "assertionStrength": "EQUIVALENT_OR_RETIRED_PROVIDER_BEHAVIOR"
+  },
+  {
+    "id": "BROAD-NEW-009",
+    "file": "test/director-operations-console.test.mjs",
+    "oldTest": "Round Pairings uses the active-year team roster and one verified batch mutation",
+    "newTest": "UNIT canonical round pairings preserve format slots and one revision-bound batch",
+    "action": "REWRITE_CANONICAL_CONTRACT",
+    "assertionStrength": "EQUIVALENT_OR_RETIRED_PROVIDER_BEHAVIOR"
+  },
+  {
+    "id": "BROAD-NEW-010",
+    "file": "test/director-operations-console.test.mjs",
+    "oldTest": "Net Skins eligibility is edited, batch-written, and verified across configured rounds",
+    "newTest": "UNIT canonical Net Skins entries remain round-scoped and binding-aware",
+    "action": "REWRITE_CANONICAL_CONTRACT",
+    "assertionStrength": "EQUIVALENT_OR_RETIRED_PROVIDER_BEHAVIOR"
+  },
+  {
+    "id": "BROAD-NEW-011",
+    "file": "test/director-operations-console.test.mjs",
+    "oldTest": "Calcutta purchase and ownership are edited and verified as one transaction",
+    "newTest": "UNIT canonical Calcutta entry preserves exact price and complete ownership together",
+    "action": "REWRITE_CANONICAL_CONTRACT",
+    "assertionStrength": "EQUIVALENT_OR_RETIRED_PROVIDER_BEHAVIOR"
+  },
+  {
+    "id": "BROAD-NEW-012",
+    "file": "test/director-operations-console.test.mjs",
+    "oldTest": "Match Management exposes contextual lifecycle controls through the verified Director pipeline",
+    "newTest": "UNIT canonical match controls honor complete scorecard, permissions, lock and Final state",
+    "action": "REWRITE_CANONICAL_CONTRACT",
+    "assertionStrength": "EQUIVALENT_OR_RETIRED_PROVIDER_BEHAVIOR"
+  },
+  {
+    "id": "BROAD-NEW-072",
+    "file": "test/preview-player-impersonation.test.mjs",
+    "oldTest": "impersonation API and QA Tools are strictly Preview gated",
+    "newTest": "SOURCE maintenance impersonation remains Preview-only and is not a required Director capability",
+    "action": "REWRITE_CANONICAL_CONTRACT",
+    "assertionStrength": "EQUIVALENT_OR_RETIRED_PROVIDER_BEHAVIOR"
+  },
+  {
+    "id": "BROAD-NEW-073",
+    "file": "test/projection-mission-control.test.mjs",
+    "oldTest": "Mission Control embeds the existing publisher and uses Director authorization",
+    "newTest": "UNIT canonical Odds publication remains an explicit Director-reviewed capability",
+    "action": "REWRITE_CANONICAL_CONTRACT",
+    "assertionStrength": "EQUIVALENT_OR_RETIRED_PROVIDER_BEHAVIOR"
+  },
+  {
+    "id": "BROAD-NEW-174",
+    "file": "test/tournament-director.test.mjs",
+    "oldTest": "Director LIVE transitions also open scoring and explicit lock controls remain available",
+    "newTest": "UNIT canonical Mark Live preserves separate scoring-lock and participant-access authority",
+    "action": "REWRITE_CANONICAL_CONTRACT",
+    "assertionStrength": "EQUIVALENT_OR_RETIRED_PROVIDER_BEHAVIOR"
+  },
+  {
+    "id": "BROAD-NEW-175",
+    "file": "test/tournament-director.test.mjs",
+    "oldTest": "Director API requires canonical account Director authorization and uses audited writers",
+    "newTest": "SOURCE canonical Director APIs require active account authority and canonical receipts",
+    "action": "REWRITE_CANONICAL_CONTRACT",
+    "assertionStrength": "EQUIVALENT_OR_RETIRED_PROVIDER_BEHAVIOR"
+  },
+  {
+    "id": "BROAD-NEW-176",
+    "file": "test/tournament-director.test.mjs",
+    "oldTest": "Director actions log every transaction boundary and verify workbook read-back",
+    "newTest": "SOURCE canonical Director confirms receipt and canonical readback without workbook acknowledgement",
+    "action": "REWRITE_CANONICAL_CONTRACT",
+    "assertionStrength": "EQUIVALENT_OR_RETIRED_PROVIDER_BEHAVIOR"
+  },
+  {
+    "id": "CLOSURE-READINESS-001",
+    "file": "test/guide-api-security.test.mjs",
+    "oldTest": "existing Director readiness surface exposes immediate Guide refresh and safe status",
+    "newTest": "SOURCE Director readiness uses canonical current authority without retired provider refresh",
+    "action": "REWRITE_CANONICAL_CONTRACT",
+    "assertionStrength": "EQUIVALENT_OR_RETIRED_PROVIDER_BEHAVIOR"
+  },
+  {
+    "id": "CLOSURE-DIRECTOR-PAGE-FIXTURE-001",
+    "file": "test/tournament-director.test.mjs",
+    "oldTest": "PLAYER accounts are redirected away from the Director page",
+    "newTest": "PLAYER accounts are redirected away from the Director page",
+    "action": "FIXTURE_COMPONENT_IMPORT",
+    "assertionStrength": "EQUIVALENT",
+    "oldModel": "Retired DirectorDashboard component import",
+    "newModel": "CanonicalDirectorConsole component import; same role redirects and unavailable-auth recovery assertions"
+  }
+]
