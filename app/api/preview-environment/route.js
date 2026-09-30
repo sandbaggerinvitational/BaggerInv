@@ -28,6 +28,7 @@ export async function GET() {
       projectRefApproved: candidate.projectRefApproved,
       projectUrlApproved: candidate.projectUrlApproved,
       workbookApproved: candidate.workbookApproved,
+      googleConfigurationRequired: candidate.googleConfigurationRequired,
       serverCredentialsConfigured: candidate.serverCredentialsConfigured,
       publicAuthUrlApproved: candidate.publicAuthUrlApproved,
       publicAuthKeyConfigured: candidate.publicAuthKeyConfigured,

@@ -1,0 +1,71 @@
+{
+  "baseSha": "7b6ca99510dc2f44cc411bfe7769e7f0c05ed962",
+  "candidateRuntimeUnchanged": true,
+  "status": "PARTIAL_APPROVAL_PENDING",
+  "files": [
+    {
+      "file": "evidence/p0f-final-closure/READONLY-INVENTORY.md",
+      "sha256": "929c234f202d814fe989f49798393f0b68153acfff6707175e2e17b008a1e779"
+    },
+    {
+      "file": "evidence/p0f-final-closure/artifact-manifest.json",
+      "sha256": "a74aae24068ae214e6c22bac8031aa4b7bc98502c7abb18a8f61afc3c659fec8"
+    },
+    {
+      "file": "evidence/p0f-final-closure/capability-existing-coverage.json",
+      "sha256": "ff9d458cf52435ebc49762851680789e9a7a60a3937eedc44543b4ff205c57b6"
+    },
+    {
+      "file": "evidence/p0f-final-closure/capability-existing-coverage.tap",
+      "sha256": "7459e29d75ca1373b0e90a0fc37b83f73ab149a32895a43dca74da10fa1b55b7"
+    },
+    {
+      "file": "evidence/p0f-final-closure/capability-reproduction.json",
+      "sha256": "ef82b62c51270507f696e9040161cb7535194529b715436370a5b9d36ae37ba8"
+    },
+    {
+      "file": "evidence/p0f-final-closure/capability-reproduction.log",
+      "sha256": "5195dd6a31d5873c049d6fa36d1bddae603e2413f3264712173e86a2f58922a4"
+    },
+    {
+      "file": "evidence/p0f-final-closure/capability-reproduction.mjs",
+      "sha256": "e8ace8746c55aa36e99d0295a898ee7e5cb845e9bc1466d5220411e3a4f5b2a8"
+    },
+    {
+      "file": "evidence/p0f-final-closure/draft-preservation-manifest.json",
+      "sha256": "95b4453d2187e1089cc0c844108b2a52678e94f130616735a9044d7950743c03"
+    },
+    {
+      "file": "evidence/p0f-final-closure/p0f-director-api-approval-draft-review.md",
+      "sha256": "8132f93db882640a4f8526962cc4fb8d8e404f6fcfcf4946eb9f6c72a570e5fc"
+    },
+    {
+      "file": "evidence/p0f-final-closure/p0f-setup-control-review.md",
+      "sha256": "55d323e347dbe2bb3824ca48d2011de090d470b720e975b993fd272f5888f7cd"
+    },
+    {
+      "file": "evidence/p0f-final-closure/routing-independent-selector-script.mjs",
+      "sha256": "6df928451c2f4f0c1cd86b69acb552407e1b381271d0b5b1f368d37a6ac5b070"
+    },
+    {
+      "file": "evidence/p0f-final-closure/routing-independent-selector.json",
+      "sha256": "902bcaed770610b6adb17fec32af7f9f52f71849c4a208db76b0064d1df85516"
+    },
+    {
+      "file": "evidence/p0f-final-closure/routing-safety.json",
+      "sha256": "79e91423348561d105411f898fbb7b9150e30ca2722970e33ad452ca14499fd9"
+    },
+    {
+      "file": "evidence/p0f-final-closure/routing-safety.tap",
+      "sha256": "3ed0bfe59c67d80b67e5abeb8a3c5abceda562db1b456834f981abce44270e4f"
+    },
+    {
+      "file": "evidence/p0f-final-closure/routing.json",
+      "sha256": "6bc96c03755b173b5ec8df287f31c7ef32621e4e40939b025378be5eb8e887ff"
+    },
+    {
+      "file": "evidence/p0f-final-closure/routing.tap",
+      "sha256": "1abe5a57d817b67a1c8ef0ead882bc4727821a8fe27a20eea7982dadf8124973"
+    }
+  ]
+}

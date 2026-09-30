@@ -1,0 +1,1991 @@
+TAP version 13
+# Subtest: migration 078 rebinds future annual normal releases without mutating annual state
+    # Subtest: future annual authorization, replay, stale and invariance
+    not ok 1 - future annual authorization, replay, stale and invariance
+      ---
+      duration_ms: 2648.899083
+      type: 'test'
+      location: 'annual-normal-release-rebind-generated.mjs:25:13'
+      failureType: 'testCodeFailure'
+      error: |-
+        mutate_production_tournament_setup_v1 original and candidate canonical effects must agree
+        + actual - expected
+        ... Skipped lines
+        
+          {
+            current: {
+              data: {
+                actor: {
+                  owner: false,
+        ...
+                    actorPlayerId: 'PX01',
+        +           eventId: 'c7ec550d-5d9f-4f00-be63-5c3456afb874',
+        +           occurredAt: '2026-09-29T22:29:29.697628-05:00',
+        -           eventId: '4aa178ba-db9a-4705-b988-d7fdea75bfb3',
+        -           occurredAt: '2026-09-29T22:29:29.65201-05:00',
+                    result: 'CHANGED',
+                    revision: 1,
+                    targetId: '2026',
+                    targetKind: 'TOURNAMENT'
+                  }
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+        match: ~
+        replay:
+          ok: true
+          code: 'TOURNAMENT_SETUP_UPDATED'
+          action: 'UPDATE_TOURNAMENT'
+          target: '2026'
+          changed: true
+          revision: 1
+          targetId: '2026'
+          warnings:
+          readiness:
+            ready: false
+            state: 'NEEDS_ATTENTION'
+            summary:
+              teams: 2
+              rounds: 3
+              matches: 1
+              activeRoster: 24
+              pairedMatches: 1
+              startedMatches: 0
+              expectedMatches: 24
+              handicapCovered: 0
+              preparedScoringContexts: 0
+            blockers:
+              0:
+                code: 'TEAM_CAPTAIN_REQUIRED'
+                target: 'PXT1'
+                message: 'Synthetic One needs an active roster captain.'
+                section: 'teams'
+              1:
+                code: 'TEAM_CAPTAIN_REQUIRED'
+                target: 'PXT2'
+                message: 'Synthetic Two needs an active roster captain.'
+                section: 'teams'
+              2:
+                code: 'ROSTER_HANDICAPS_INCOMPLETE'
+                message: '24 roster Players are missing an approved tournament handicap.'
+                section: 'roster'
+                missingCount: 24
+              3:
+                code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                target: 'Round 1'
+                message: 'Round 1 needs 6 matches; 1 are configured.'
+                section: 'matches'
+                actualCount: 1
+                expectedCount: 6
+              4:
+                code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                target: 'Round 2'
+                message: 'Round 2 needs 6 matches; 0 are configured.'
+                section: 'matches'
+                actualCount: 0
+                expectedCount: 6
+              5:
+                code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                target: 'Round 3'
+                message: 'Round 3 needs 12 matches; 0 are configured.'
+                section: 'matches'
+                actualCount: 0
+                expectedCount: 12
+              6:
+                code: 'SCORING_CONTEXT_INCOMPLETE'
+                message: '1 matches need a complete scoring context.'
+                section: 'matches'
+                missingCount: 1
+            messages:
+              0: 'Synthetic One needs an active roster captain.'
+              1: 'Synthetic Two needs an active roster captain.'
+              2: '24 roster Players are missing an approved tournament handicap.'
+              3: 'Round 1 needs 6 matches; 1 are configured.'
+              4: 'Round 2 needs 6 matches; 0 are configured.'
+              5: 'Round 3 needs 12 matches; 0 are configured.'
+              6: '1 matches need a complete scoring context.'
+            sections:
+              teams: 'NEEDS_ATTENTION'
+              roster: 'NEEDS_ATTENTION'
+              rounds: 'COMPLETE'
+              courses: 'COMPLETE'
+              matches: 'NEEDS_ATTENTION'
+              tournament: 'COMPLETE'
+              scoringContext: 'NOT_STARTED'
+            sideGames:
+              calcutta:
+                state: 'NOT_CONFIGURED'
+                optional: true
+                blocksTournamentReadiness: false
+              netSkins:
+                ready: false
+                state: 'NOT_READY'
+                derivedFromCanonicalSetup: true
+          idempotent: true
+          snapshotPrepared: false
+          scoringMutationCreated: false
+          scoringPermissionGranted: false
+        current:
+          ok: true
+          data:
+            actor:
+              owner: false
+              playerId: 'PX01'
+            audit:
+              0:
+                action: 'UPDATE_TOURNAMENT'
+                result: 'CHANGED'
+                eventId: '4aa178ba-db9a-4705-b988-d7fdea75bfb3'
+                revision: 1
+                targetId: '2026'
+                occurredAt: '2026-09-29T22:29:29.65201-05:00'
+                targetKind: 'TOURNAMENT'
+                actorPlayerId: 'PX01'
+            teams:
+              0:
+                name: 'Synthetic One'
+                locked: false
+                teamId: 'PXT1'
+                teamSide: 1
+                captainName: ~
+                setupRevision: ~
+                captainPlayerId: ~
+                activeRosterCount: 12
+              1:
+                name: 'Synthetic Two'
+                locked: false
+                teamId: 'PXT2'
+                teamSide: 2
+                captainName: ~
+                setupRevision: ~
+                captainPlayerId: ~
+                activeRosterCount: 12
+            roster:
+              0:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX01'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 1'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 1
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              1:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX10'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 10'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              2:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX11'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 11'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              3:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX12'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 12'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              4:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX02'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 2'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 1
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              5:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX03'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 3'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              6:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX04'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 4'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              7:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX05'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 5'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              8:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX06'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 6'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              9:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX07'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 7'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              10:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX08'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 8'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              11:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX09'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 9'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              12:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX13'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 13'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 1
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              13:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX14'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 14'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 1
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              14:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX15'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 15'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              15:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX16'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 16'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              16:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX17'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 17'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              17:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX18'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 18'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              18:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX19'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 19'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              19:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX20'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 20'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              20:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX21'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 21'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              21:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX22'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 22'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              22:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX23'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 23'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              23:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX24'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 24'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+            rounds:
+              0:
+                tee: ~
+                name: 'Synthetic Best Ball'
+                format: 'BB'
+                locked: false
+                status: 'UPCOMING'
+                courseId: ~
+                teamSize: 2
+                matchCount: 1
+                roundNumber: 1
+                displayOrder: 1
+                setupRevision: ~
+                pointsAvailable: ~
+                handicapAllowance: 0.9
+              1:
+                tee: ~
+                name: 'Synthetic Scramble'
+                format: 'SC'
+                locked: false
+                status: 'UPCOMING'
+                courseId: ~
+                teamSize: 2
+                matchCount: 0
+                roundNumber: 2
+                displayOrder: 2
+                setupRevision: ~
+                pointsAvailable: ~
+                handicapAllowance: 1
+              2:
+                tee: ~
+                name: 'Synthetic Singles'
+                format: 'SI'
+                locked: false
+                status: 'UPCOMING'
+                courseId: ~
+                teamSize: 1
+                matchCount: 0
+                roundNumber: 3
+                displayOrder: 3
+                setupRevision: ~
+                pointsAvailable: ~
+                handicapAllowance: 1
+            courses:
+              0:
+                par: 72
+                tee: 'Synthetic'
+                city: ~
+                name: 'P0FC'
+                holes:
+                  0:
+                    par: 4
+                    yardage: 400
+                    hole_number: 1
+                    stroke_index: 1
+                  1:
+                    par: 4
+                    yardage: 400
+                    hole_number: 2
+                    stroke_index: 2
+                  2:
+                    par: 4
+                    yardage: 400
+                    hole_number: 3
+                    stroke_index: 3
+                  3:
+                    par: 4
+                    yardage: 400
+                    hole_number: 4
+                    stroke_index: 4
+                  4:
+                    par: 4
+                    yardage: 400
+                    hole_number: 5
+                    stroke_index: 5
+                  5:
+                    par: 4
+                    yardage: 400
+                    hole_number: 6
+                    stroke_index: 6
+                  6:
+                    par: 4
+                    yardage: 400
+                    hole_number: 7
+                    stroke_index: 7
+                  7:
+                    par: 4
+                    yardage: 400
+                    hole_number: 8
+                    stroke_index: 8
+                  8:
+                    par: 4
+                    yardage: 400
+                    hole_number: 9
+                    stroke_index: 9
+                  9:
+                    par: 4
+                    yardage: 400
+                    hole_number: 10
+                    stroke_index: 10
+                  10:
+                    par: 4
+                    yardage: 400
+                    hole_number: 11
+                    stroke_index: 11
+                  11:
+                    par: 4
+                    yardage: 400
+                    hole_number: 12
+                    stroke_index: 12
+                  12:
+                    par: 4
+                    yardage: 400
+                    hole_number: 13
+                    stroke_index: 13
+                  13:
+                    par: 4
+                    yardage: 400
+                    hole_number: 14
+                    stroke_index: 14
+                  14:
+                    par: 4
+                    yardage: 400
+                    hole_number: 15
+                    stroke_index: 15
+                  15:
+                    par: 4
+                    yardage: 400
+                    hole_number: 16
+                    stroke_index: 16
+                  16:
+                    par: 4
+                    yardage: 400
+                    hole_number: 17
+                    stroke_index: 17
+                  17:
+                    par: 4
+                    yardage: 400
+                    hole_number: 18
+                    stroke_index: 18
+                slope: 120
+                state: ~
+                locked: false
+                rating: 72
+                complete: true
+                courseId: 'P0FC'
+                location: ~
+                holeCount: 18
+                displayName: 'P0FC'
+                roundNumber: 1
+                roundNumbers:
+                  0: 1
+                setupManaged: false
+                setupRevision: ~
+            matches:
+              0:
+                tee: 'Synthetic'
+                format: 'BB'
+                locked: false
+                status: 'UPCOMING'
+                matchId: '2026-R1-1'
+                teeTime: ~
+                blockers:
+                courseId: 'P0FC'
+                prepared: true
+                snapshot:
+                  id: '2026-R1-1:S1'
+                  par: 72
+                  tee: 'Synthetic'
+                  slope: 120
+                  rating: 72
+                  current: true
+                  courseId: 'P0FC'
+                  prepared: true
+                  revision: 1
+                  holeCount: 18
+                  snapshotId: '2026-R1-1:S1'
+                  canonicalHash: 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+                  handicapRevisionId: ~
+                warnings:
+                  0: 'Prepare the scoring context with the current approved handicaps.'
+                courseName: 'P0FC'
+                matchNumber: 1
+                roundNumber: 1
+                scoredHoles: 0
+                accessActive: false
+                participants:
+                  0:
+                    playerId: 'PX01'
+                    teamSide: 1
+                    playerSlot: 1
+                    displayName: 'P0F synthetic golfer 1'
+                    finalStrokes: 0
+                    tournamentHandicap: 0
+                  1:
+                    playerId: 'PX02'
+                    teamSide: 1
+                    playerSlot: 2
+                    displayName: 'P0F synthetic golfer 2'
+                    finalStrokes: 0
+                    tournamentHandicap: 0
+                  2:
+                    playerId: 'PX13'
+                    teamSide: 2
+                    playerSlot: 1
+                    displayName: 'P0F synthetic golfer 13'
+                    finalStrokes: 0
+                    tournamentHandicap: 0
+                  3:
+                    playerId: 'PX14'
+                    teamSide: 2
+                    playerSlot: 2
+                    displayName: 'P0F synthetic golfer 14'
+                    finalStrokes: 0
+                    tournamentHandicap: 0
+                startingHole: 1
+                matchRevision: 0
+                scoringLocked: false
+                scoring_ready: false
+                detailsManaged: false
+                participantCount: 4
+                strictlyUnstarted: true
+                contextFingerprint: '63975d9509c60bd494d4946e3494bbe84e07475652149b6c1cfe92f81f86509a'
+                permissionRevision: 1
+                preparedSetupRevision: ~
+                scoring_readiness_code: 'PRODUCTION_MATCH_NOT_SCORING_READY'
+                scoring_readiness_reasons:
+                  0:
+                    code: 'HANDICAP_CONTEXT_NOT_CURRENT'
+                    message: 'Every paired Player needs the current approved handicap context.'
+                  1:
+                    code: 'SCORING_HOLES_NOT_CURRENT'
+                    message: 'The match hole scoring context is not current.'
+            deferred:
+              0: 'GLOBAL_COURSE_ID_ALLOCATION_POLICY_REQUIRED'
+              1: 'TOURNAMENT_OPERATIONAL_STATUS_SEMANTICS_REQUIRED'
+              2: 'POST_START_SETUP_CORRECTION_FLOW_REQUIRED'
+            revision: 1
+            readiness:
+              ready: false
+              state: 'NEEDS_ATTENTION'
+              summary:
+                teams: 2
+                rounds: 3
+                matches: 1
+                activeRoster: 24
+                pairedMatches: 1
+                startedMatches: 0
+                expectedMatches: 24
+                handicapCovered: 0
+                preparedScoringContexts: 0
+              blockers:
+                0:
+                  code: 'TEAM_CAPTAIN_REQUIRED'
+                  target: 'PXT1'
+                  message: 'Synthetic One needs an active roster captain.'
+                  section: 'teams'
+                1:
+                  code: 'TEAM_CAPTAIN_REQUIRED'
+                  target: 'PXT2'
+                  message: 'Synthetic Two needs an active roster captain.'
+                  section: 'teams'
+                2:
+                  code: 'ROSTER_HANDICAPS_INCOMPLETE'
+                  message: '24 roster Players are missing an approved tournament handicap.'
+                  section: 'roster'
+                  missingCount: 24
+                3:
+                  code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                  target: 'Round 1'
+                  message: 'Round 1 needs 6 matches; 1 are configured.'
+                  section: 'matches'
+                  actualCount: 1
+                  expectedCount: 6
+                4:
+                  code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                  target: 'Round 2'
+                  message: 'Round 2 needs 6 matches; 0 are configured.'
+                  section: 'matches'
+                  actualCount: 0
+                  expectedCount: 6
+                5:
+                  code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                  target: 'Round 3'
+                  message: 'Round 3 needs 12 matches; 0 are configured.'
+                  section: 'matches'
+                  actualCount: 0
+                  expectedCount: 12
+                6:
+                  code: 'SCORING_CONTEXT_INCOMPLETE'
+                  message: '1 matches need a complete scoring context.'
+                  section: 'matches'
+                  missingCount: 1
+              messages:
+                0: 'Synthetic One needs an active roster captain.'
+                1: 'Synthetic Two needs an active roster captain.'
+                2: '24 roster Players are missing an approved tournament handicap.'
+                3: 'Round 1 needs 6 matches; 1 are configured.'
+                4: 'Round 2 needs 6 matches; 0 are configured.'
+                5: 'Round 3 needs 12 matches; 0 are configured.'
+                6: '1 matches need a complete scoring context.'
+              sections:
+                teams: 'NEEDS_ATTENTION'
+                roster: 'NEEDS_ATTENTION'
+                rounds: 'COMPLETE'
+                courses: 'COMPLETE'
+                matches: 'NEEDS_ATTENTION'
+                tournament: 'COMPLETE'
+                scoringContext: 'NOT_STARTED'
+              sideGames:
+                calcutta:
+                  state: 'NOT_CONFIGURED'
+                  optional: true
+                  blocksTournamentReadiness: false
+                netSkins:
+                  ready: false
+                  state: 'NOT_READY'
+                  derivedFromCanonicalSetup: true
+            tournament:
+              id: '2026'
+              name: 'P0F Protected Canonical Tournament'
+              year: 2026
+              status: 'UPCOMING'
+              endDate: '2026-10-03'
+              timezone: 'America/Chicago'
+              startDate: '2026-10-01'
+              destination: 'Synthetic fixture'
+              setupRevision: 1
+              statusEditable: false
+              sourceWorkbookId: '1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4'
+            capabilities:
+              update-team: true
+              update-round: true
+              upsert-match: true
+              upsert-course: true
+              replace-pairings: true
+              update-tournament: true
+              assign-roster-team: true
+              create-global-course: false
+              activate-scoring-access: false
+              prepare-scoring-context: true
+              change-operational-status: false
+            dependencies:
+              oddsPublished: false
+              draftPickCount: 0
+              calcuttaConfigured: false
+              netSkinsConfigured: false
+            tournamentId: '2026'
+            contractVersion: 'production-tournament-setup-v1'
+            availablePlayers:
+            availableCourseIdentities:
+            approvedHandicapRevisionId: ~
+            approvedHandicapRevisionNumber: ~
+        receipt:
+          ok: true
+          code: 'TOURNAMENT_SETUP_UPDATED'
+          action: 'UPDATE_TOURNAMENT'
+          target: '2026'
+          changed: true
+          revision: 1
+          targetId: '2026'
+          warnings:
+          readiness:
+            ready: false
+            state: 'NEEDS_ATTENTION'
+            summary:
+              teams: 2
+              rounds: 3
+              matches: 1
+              activeRoster: 24
+              pairedMatches: 1
+              startedMatches: 0
+              expectedMatches: 24
+              handicapCovered: 0
+              preparedScoringContexts: 0
+            blockers:
+              0:
+                code: 'TEAM_CAPTAIN_REQUIRED'
+                target: 'PXT1'
+                message: 'Synthetic One needs an active roster captain.'
+                section: 'teams'
+              1:
+                code: 'TEAM_CAPTAIN_REQUIRED'
+                target: 'PXT2'
+                message: 'Synthetic Two needs an active roster captain.'
+                section: 'teams'
+              2:
+                code: 'ROSTER_HANDICAPS_INCOMPLETE'
+                message: '24 roster Players are missing an approved tournament handicap.'
+                section: 'roster'
+                missingCount: 24
+              3:
+                code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                target: 'Round 1'
+                message: 'Round 1 needs 6 matches; 1 are configured.'
+                section: 'matches'
+                actualCount: 1
+                expectedCount: 6
+              4:
+                code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                target: 'Round 2'
+                message: 'Round 2 needs 6 matches; 0 are configured.'
+                section: 'matches'
+                actualCount: 0
+                expectedCount: 6
+              5:
+                code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                target: 'Round 3'
+                message: 'Round 3 needs 12 matches; 0 are configured.'
+                section: 'matches'
+                actualCount: 0
+                expectedCount: 12
+              6:
+                code: 'SCORING_CONTEXT_INCOMPLETE'
+                message: '1 matches need a complete scoring context.'
+                section: 'matches'
+                missingCount: 1
+            messages:
+              0: 'Synthetic One needs an active roster captain.'
+              1: 'Synthetic Two needs an active roster captain.'
+              2: '24 roster Players are missing an approved tournament handicap.'
+              3: 'Round 1 needs 6 matches; 1 are configured.'
+              4: 'Round 2 needs 6 matches; 0 are configured.'
+              5: 'Round 3 needs 12 matches; 0 are configured.'
+              6: '1 matches need a complete scoring context.'
+            sections:
+              teams: 'NEEDS_ATTENTION'
+              roster: 'NEEDS_ATTENTION'
+              rounds: 'COMPLETE'
+              courses: 'COMPLETE'
+              matches: 'NEEDS_ATTENTION'
+              tournament: 'COMPLETE'
+              scoringContext: 'NOT_STARTED'
+            sideGames:
+              calcutta:
+                state: 'NOT_CONFIGURED'
+                optional: true
+                blocksTournamentReadiness: false
+              netSkins:
+                ready: false
+                state: 'NOT_READY'
+                derivedFromCanonicalSetup: true
+          idempotent: false
+          snapshotPrepared: false
+          scoringMutationCreated: false
+          scoringPermissionGranted: false
+        googleJobs: 0
+        permissions: ~
+      actual:
+        match: ~
+        replay:
+          ok: true
+          code: 'TOURNAMENT_SETUP_UPDATED'
+          action: 'UPDATE_TOURNAMENT'
+          target: '2026'
+          changed: true
+          revision: 1
+          targetId: '2026'
+          warnings:
+          readiness:
+            ready: false
+            state: 'NEEDS_ATTENTION'
+            summary:
+              teams: 2
+              rounds: 3
+              matches: 1
+              activeRoster: 24
+              pairedMatches: 1
+              startedMatches: 0
+              expectedMatches: 24
+              handicapCovered: 0
+              preparedScoringContexts: 0
+            blockers:
+              0:
+                code: 'TEAM_CAPTAIN_REQUIRED'
+                target: 'PXT1'
+                message: 'Synthetic One needs an active roster captain.'
+                section: 'teams'
+              1:
+                code: 'TEAM_CAPTAIN_REQUIRED'
+                target: 'PXT2'
+                message: 'Synthetic Two needs an active roster captain.'
+                section: 'teams'
+              2:
+                code: 'ROSTER_HANDICAPS_INCOMPLETE'
+                message: '24 roster Players are missing an approved tournament handicap.'
+                section: 'roster'
+                missingCount: 24
+              3:
+                code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                target: 'Round 1'
+                message: 'Round 1 needs 6 matches; 1 are configured.'
+                section: 'matches'
+                actualCount: 1
+                expectedCount: 6
+              4:
+                code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                target: 'Round 2'
+                message: 'Round 2 needs 6 matches; 0 are configured.'
+                section: 'matches'
+                actualCount: 0
+                expectedCount: 6
+              5:
+                code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                target: 'Round 3'
+                message: 'Round 3 needs 12 matches; 0 are configured.'
+                section: 'matches'
+                actualCount: 0
+                expectedCount: 12
+              6:
+                code: 'SCORING_CONTEXT_INCOMPLETE'
+                message: '1 matches need a complete scoring context.'
+                section: 'matches'
+                missingCount: 1
+            messages:
+              0: 'Synthetic One needs an active roster captain.'
+              1: 'Synthetic Two needs an active roster captain.'
+              2: '24 roster Players are missing an approved tournament handicap.'
+              3: 'Round 1 needs 6 matches; 1 are configured.'
+              4: 'Round 2 needs 6 matches; 0 are configured.'
+              5: 'Round 3 needs 12 matches; 0 are configured.'
+              6: '1 matches need a complete scoring context.'
+            sections:
+              teams: 'NEEDS_ATTENTION'
+              roster: 'NEEDS_ATTENTION'
+              rounds: 'COMPLETE'
+              courses: 'COMPLETE'
+              matches: 'NEEDS_ATTENTION'
+              tournament: 'COMPLETE'
+              scoringContext: 'NOT_STARTED'
+            sideGames:
+              calcutta:
+                state: 'NOT_CONFIGURED'
+                optional: true
+                blocksTournamentReadiness: false
+              netSkins:
+                ready: false
+                state: 'NOT_READY'
+                derivedFromCanonicalSetup: true
+          idempotent: true
+          snapshotPrepared: false
+          scoringMutationCreated: false
+          scoringPermissionGranted: false
+        current:
+          ok: true
+          data:
+            actor:
+              owner: false
+              playerId: 'PX01'
+            audit:
+              0:
+                action: 'UPDATE_TOURNAMENT'
+                result: 'CHANGED'
+                eventId: 'c7ec550d-5d9f-4f00-be63-5c3456afb874'
+                revision: 1
+                targetId: '2026'
+                occurredAt: '2026-09-29T22:29:29.697628-05:00'
+                targetKind: 'TOURNAMENT'
+                actorPlayerId: 'PX01'
+            teams:
+              0:
+                name: 'Synthetic One'
+                locked: false
+                teamId: 'PXT1'
+                teamSide: 1
+                captainName: ~
+                setupRevision: ~
+                captainPlayerId: ~
+                activeRosterCount: 12
+              1:
+                name: 'Synthetic Two'
+                locked: false
+                teamId: 'PXT2'
+                teamSide: 2
+                captainName: ~
+                setupRevision: ~
+                captainPlayerId: ~
+                activeRosterCount: 12
+            roster:
+              0:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX01'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 1'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 1
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              1:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX10'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 10'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              2:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX11'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 11'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              3:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX12'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 12'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              4:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX02'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 2'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 1
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              5:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX03'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 3'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              6:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX04'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 4'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              7:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX05'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 5'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              8:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX06'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 6'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              9:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX07'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 7'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              10:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX08'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 8'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              11:
+                teamId: 'PXT1'
+                blockers:
+                playerId: 'PX09'
+                teamName: 'Synthetic One'
+                teamSide: 1
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 9'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              12:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX13'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 13'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 1
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              13:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX14'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 14'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 1
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              14:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX15'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 15'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              15:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX16'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 16'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              16:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX17'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 17'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              17:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX18'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 18'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              18:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX19'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 19'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              19:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX20'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 20'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              20:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX21'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 21'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              21:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX22'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 22'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              22:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX23'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 23'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+              23:
+                teamId: 'PXT2'
+                blockers:
+                playerId: 'PX24'
+                teamName: 'Synthetic Two'
+                teamSide: 2
+                readiness:
+                  teamAssigned: true
+                  handicapApproved: false
+                displayName: 'P0F synthetic golfer 24'
+                canAssignTeam: true
+                frozenMatchCount: 0
+                membershipStatus: 'ACTIVE'
+                pairedMatchCount: 0
+                handicapRevisionId: ~
+                tournamentHandicap: ~
+            rounds:
+              0:
+                tee: ~
+                name: 'Synthetic Best Ball'
+                format: 'BB'
+                locked: false
+                status: 'UPCOMING'
+                courseId: ~
+                teamSize: 2
+                matchCount: 1
+                roundNumber: 1
+                displayOrder: 1
+                setupRevision: ~
+                pointsAvailable: ~
+                handicapAllowance: 0.9
+              1:
+                tee: ~
+                name: 'Synthetic Scramble'
+                format: 'SC'
+                locked: false
+                status: 'UPCOMING'
+                courseId: ~
+                teamSize: 2
+                matchCount: 0
+                roundNumber: 2
+                displayOrder: 2
+                setupRevision: ~
+                pointsAvailable: ~
+                handicapAllowance: 1
+              2:
+                tee: ~
+                name: 'Synthetic Singles'
+                format: 'SI'
+                locked: false
+                status: 'UPCOMING'
+                courseId: ~
+                teamSize: 1
+                matchCount: 0
+                roundNumber: 3
+                displayOrder: 3
+                setupRevision: ~
+                pointsAvailable: ~
+                handicapAllowance: 1
+            courses:
+              0:
+                par: 72
+                tee: 'Synthetic'
+                city: ~
+                name: 'P0FC'
+                holes:
+                  0:
+                    par: 4
+                    yardage: 400
+                    hole_number: 1
+                    stroke_index: 1
+                  1:
+                    par: 4
+                    yardage: 400
+                    hole_number: 2
+                    stroke_index: 2
+                  2:
+                    par: 4
+                    yardage: 400
+                    hole_number: 3
+                    stroke_index: 3
+                  3:
+                    par: 4
+                    yardage: 400
+                    hole_number: 4
+                    stroke_index: 4
+                  4:
+                    par: 4
+                    yardage: 400
+                    hole_number: 5
+                    stroke_index: 5
+                  5:
+                    par: 4
+                    yardage: 400
+                    hole_number: 6
+                    stroke_index: 6
+                  6:
+                    par: 4
+                    yardage: 400
+                    hole_number: 7
+                    stroke_index: 7
+                  7:
+                    par: 4
+                    yardage: 400
+                    hole_number: 8
+                    stroke_index: 8
+                  8:
+                    par: 4
+                    yardage: 400
+                    hole_number: 9
+                    stroke_index: 9
+                  9:
+                    par: 4
+                    yardage: 400
+                    hole_number: 10
+                    stroke_index: 10
+                  10:
+                    par: 4
+                    yardage: 400
+                    hole_number: 11
+                    stroke_index: 11
+                  11:
+                    par: 4
+                    yardage: 400
+                    hole_number: 12
+                    stroke_index: 12
+                  12:
+                    par: 4
+                    yardage: 400
+                    hole_number: 13
+                    stroke_index: 13
+                  13:
+                    par: 4
+                    yardage: 400
+                    hole_number: 14
+                    stroke_index: 14
+                  14:
+                    par: 4
+                    yardage: 400
+                    hole_number: 15
+                    stroke_index: 15
+                  15:
+                    par: 4
+                    yardage: 400
+                    hole_number: 16
+                    stroke_index: 16
+                  16:
+                    par: 4
+                    yardage: 400
+                    hole_number: 17
+                    stroke_index: 17
+                  17:
+                    par: 4
+                    yardage: 400
+                    hole_number: 18
+                    stroke_index: 18
+                slope: 120
+                state: ~
+                locked: false
+                rating: 72
+                complete: true
+                courseId: 'P0FC'
+                location: ~
+                holeCount: 18
+                displayName: 'P0FC'
+                roundNumber: 1
+                roundNumbers:
+                  0: 1
+                setupManaged: false
+                setupRevision: ~
+            matches:
+              0:
+                tee: 'Synthetic'
+                format: 'BB'
+                locked: false
+                status: 'UPCOMING'
+                matchId: '2026-R1-1'
+                teeTime: ~
+                blockers:
+                courseId: 'P0FC'
+                prepared: true
+                snapshot:
+                  id: '2026-R1-1:S1'
+                  par: 72
+                  tee: 'Synthetic'
+                  slope: 120
+                  rating: 72
+                  current: true
+                  courseId: 'P0FC'
+                  prepared: true
+                  revision: 1
+                  holeCount: 18
+                  snapshotId: '2026-R1-1:S1'
+                  canonicalHash: 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+                  handicapRevisionId: ~
+                warnings:
+                  0: 'Prepare the scoring context with the current approved handicaps.'
+                courseName: 'P0FC'
+                matchNumber: 1
+                roundNumber: 1
+                scoredHoles: 0
+                accessActive: false
+                participants:
+                  0:
+                    playerId: 'PX01'
+                    teamSide: 1
+                    playerSlot: 1
+                    displayName: 'P0F synthetic golfer 1'
+                    finalStrokes: 0
+                    tournamentHandicap: 0
+                  1:
+                    playerId: 'PX02'
+                    teamSide: 1
+                    playerSlot: 2
+                    displayName: 'P0F synthetic golfer 2'
+                    finalStrokes: 0
+                    tournamentHandicap: 0
+                  2:
+                    playerId: 'PX13'
+                    teamSide: 2
+                    playerSlot: 1
+                    displayName: 'P0F synthetic golfer 13'
+                    finalStrokes: 0
+                    tournamentHandicap: 0
+                  3:
+                    playerId: 'PX14'
+                    teamSide: 2
+                    playerSlot: 2
+                    displayName: 'P0F synthetic golfer 14'
+                    finalStrokes: 0
+                    tournamentHandicap: 0
+                startingHole: 1
+                matchRevision: 0
+                scoringLocked: false
+                scoring_ready: false
+                detailsManaged: false
+                participantCount: 4
+                strictlyUnstarted: true
+                contextFingerprint: '63975d9509c60bd494d4946e3494bbe84e07475652149b6c1cfe92f81f86509a'
+                permissionRevision: 1
+                preparedSetupRevision: ~
+                scoring_readiness_code: 'PRODUCTION_MATCH_NOT_SCORING_READY'
+                scoring_readiness_reasons:
+                  0:
+                    code: 'HANDICAP_CONTEXT_NOT_CURRENT'
+                    message: 'Every paired Player needs the current approved handicap context.'
+                  1:
+                    code: 'SCORING_HOLES_NOT_CURRENT'
+                    message: 'The match hole scoring context is not current.'
+            deferred:
+              0: 'GLOBAL_COURSE_ID_ALLOCATION_POLICY_REQUIRED'
+              1: 'TOURNAMENT_OPERATIONAL_STATUS_SEMANTICS_REQUIRED'
+              2: 'POST_START_SETUP_CORRECTION_FLOW_REQUIRED'
+            revision: 1
+            readiness:
+              ready: false
+              state: 'NEEDS_ATTENTION'
+              summary:
+                teams: 2
+                rounds: 3
+                matches: 1
+                activeRoster: 24
+                pairedMatches: 1
+                startedMatches: 0
+                expectedMatches: 24
+                handicapCovered: 0
+                preparedScoringContexts: 0
+              blockers:
+                0:
+                  code: 'TEAM_CAPTAIN_REQUIRED'
+                  target: 'PXT1'
+                  message: 'Synthetic One needs an active roster captain.'
+                  section: 'teams'
+                1:
+                  code: 'TEAM_CAPTAIN_REQUIRED'
+                  target: 'PXT2'
+                  message: 'Synthetic Two needs an active roster captain.'
+                  section: 'teams'
+                2:
+                  code: 'ROSTER_HANDICAPS_INCOMPLETE'
+                  message: '24 roster Players are missing an approved tournament handicap.'
+                  section: 'roster'
+                  missingCount: 24
+                3:
+                  code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                  target: 'Round 1'
+                  message: 'Round 1 needs 6 matches; 1 are configured.'
+                  section: 'matches'
+                  actualCount: 1
+                  expectedCount: 6
+                4:
+                  code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                  target: 'Round 2'
+                  message: 'Round 2 needs 6 matches; 0 are configured.'
+                  section: 'matches'
+                  actualCount: 0
+                  expectedCount: 6
+                5:
+                  code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                  target: 'Round 3'
+                  message: 'Round 3 needs 12 matches; 0 are configured.'
+                  section: 'matches'
+                  actualCount: 0
+                  expectedCount: 12
+                6:
+                  code: 'SCORING_CONTEXT_INCOMPLETE'
+                  message: '1 matches need a complete scoring context.'
+                  section: 'matches'
+                  missingCount: 1
+              messages:
+                0: 'Synthetic One needs an active roster captain.'
+                1: 'Synthetic Two needs an active roster captain.'
+                2: '24 roster Players are missing an approved tournament handicap.'
+                3: 'Round 1 needs 6 matches; 1 are configured.'
+                4: 'Round 2 needs 6 matches; 0 are configured.'
+                5: 'Round 3 needs 12 matches; 0 are configured.'
+                6: '1 matches need a complete scoring context.'
+              sections:
+                teams: 'NEEDS_ATTENTION'
+                roster: 'NEEDS_ATTENTION'
+                rounds: 'COMPLETE'
+                courses: 'COMPLETE'
+                matches: 'NEEDS_ATTENTION'
+                tournament: 'COMPLETE'
+                scoringContext: 'NOT_STARTED'
+              sideGames:
+                calcutta:
+                  state: 'NOT_CONFIGURED'
+                  optional: true
+                  blocksTournamentReadiness: false
+                netSkins:
+                  ready: false
+                  state: 'NOT_READY'
+                  derivedFromCanonicalSetup: true
+            tournament:
+              id: '2026'
+              name: 'P0F Protected Canonical Tournament'
+              year: 2026
+              status: 'UPCOMING'
+              endDate: '2026-10-03'
+              timezone: 'America/Chicago'
+              startDate: '2026-10-01'
+              destination: 'Synthetic fixture'
+              setupRevision: 1
+              statusEditable: false
+              sourceWorkbookId: '1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4'
+            capabilities:
+              update-team: true
+              update-round: true
+              upsert-match: true
+              upsert-course: true
+              replace-pairings: true
+              update-tournament: true
+              assign-roster-team: true
+              create-global-course: false
+              activate-scoring-access: false
+              prepare-scoring-context: true
+              change-operational-status: false
+            dependencies:
+              oddsPublished: false
+              draftPickCount: 0
+              calcuttaConfigured: false
+              netSkinsConfigured: false
+            tournamentId: '2026'
+            contractVersion: 'production-tournament-setup-v1'
+            availablePlayers:
+            availableCourseIdentities:
+            approvedHandicapRevisionId: ~
+            approvedHandicapRevisionNumber: ~
+        receipt:
+          ok: true
+          code: 'TOURNAMENT_SETUP_UPDATED'
+          action: 'UPDATE_TOURNAMENT'
+          target: '2026'
+          changed: true
+          revision: 1
+          targetId: '2026'
+          warnings:
+          readiness:
+            ready: false
+            state: 'NEEDS_ATTENTION'
+            summary:
+              teams: 2
+              rounds: 3
+              matches: 1
+              activeRoster: 24
+              pairedMatches: 1
+              startedMatches: 0
+              expectedMatches: 24
+              handicapCovered: 0
+              preparedScoringContexts: 0
+            blockers:
+              0:
+                code: 'TEAM_CAPTAIN_REQUIRED'
+                target: 'PXT1'
+                message: 'Synthetic One needs an active roster captain.'
+                section: 'teams'
+              1:
+                code: 'TEAM_CAPTAIN_REQUIRED'
+                target: 'PXT2'
+                message: 'Synthetic Two needs an active roster captain.'
+                section: 'teams'
+              2:
+                code: 'ROSTER_HANDICAPS_INCOMPLETE'
+                message: '24 roster Players are missing an approved tournament handicap.'
+                section: 'roster'
+                missingCount: 24
+              3:
+                code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                target: 'Round 1'
+                message: 'Round 1 needs 6 matches; 1 are configured.'
+                section: 'matches'
+                actualCount: 1
+                expectedCount: 6
+              4:
+                code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                target: 'Round 2'
+                message: 'Round 2 needs 6 matches; 0 are configured.'
+                section: 'matches'
+                actualCount: 0
+                expectedCount: 6
+              5:
+                code: 'ROUND_MATCH_COUNT_INCOMPLETE'
+                target: 'Round 3'
+                message: 'Round 3 needs 12 matches; 0 are configured.'
+                section: 'matches'
+                actualCount: 0
+                expectedCount: 12
+              6:
+                code: 'SCORING_CONTEXT_INCOMPLETE'
+                message: '1 matches need a complete scoring context.'
+                section: 'matches'
+                missingCount: 1
+            messages:
+              0: 'Synthetic One needs an active roster captain.'
+              1: 'Synthetic Two needs an active roster captain.'
+              2: '24 roster Players are missing an approved tournament handicap.'
+              3: 'Round 1 needs 6 matches; 1 are configured.'
+              4: 'Round 2 needs 6 matches; 0 are configured.'
+              5: 'Round 3 needs 12 matches; 0 are configured.'
+              6: '1 matches need a complete scoring context.'
+            sections:
+              teams: 'NEEDS_ATTENTION'
+              roster: 'NEEDS_ATTENTION'
+              rounds: 'COMPLETE'
+              courses: 'COMPLETE'
+              matches: 'NEEDS_ATTENTION'
+              tournament: 'COMPLETE'
+              scoringContext: 'NOT_STARTED'
+            sideGames:
+              calcutta:
+                state: 'NOT_CONFIGURED'
+                optional: true
+                blocksTournamentReadiness: false
+              netSkins:
+                ready: false
+                state: 'NOT_READY'
+                derivedFromCanonicalSetup: true
+          idempotent: false
+          snapshotPrepared: false
+          scoringMutationCreated: false
+          scoringPermissionGranted: false
+        googleJobs: 0
+        permissions: ~
+      operator: 'deepStrictEqual'
+      stack: |-
+        runP0FProductionEquivalence (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/p0f-production-equivalence.mjs:60:320)
+        TestContext.<anonymous> (annual-normal-release-rebind-generated.mjs:2176:32)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+        context.test (annual-normal-release-rebind-generated.mjs:25:13)
+        annual-normal-release-rebind-generated.mjs:1711:15
+        async Test.run (node:internal/test_runner/test:1404:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+      ...
+    1..1
+not ok 1 - migration 078 rebinds future annual normal releases without mutating annual state
+  ---
+  duration_ms: 4303.292375
+  type: 'test'
+  location: 'annual-normal-release-rebind-generated.mjs:18:10'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4361.17225

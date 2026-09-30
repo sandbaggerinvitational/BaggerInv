@@ -1,0 +1,35 @@
+{
+  "suite": "capability-existing-coverage",
+  "executionHead": "7b6ca99510dc2f44cc411bfe7769e7f0c05ed962",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "remoteNetwork": "DENIED_AT_NET_TLS_SOCKET",
+  "credentials": "SCRUBBED",
+  "args": [
+    "node",
+    "--conditions=react-server",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "test/director-course-tees.test.mjs",
+    "test/director-operations-console.test.mjs",
+    "test/tournament-director.test.mjs",
+    "test/reliability-phase2c1-closure-director.test.mjs"
+  ],
+  "counts": {
+    "tests": 57,
+    "pass": 57,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "exitCode": 0,
+  "failures": [],
+  "sourceHashes": {
+    "test/director-course-tees.test.mjs": "f79722b1cf592ed311ddf7df8aa77e35852b460ab01bb14578a3b9365722648e",
+    "test/director-operations-console.test.mjs": "56725710ad4ff1ff4f9e9a849f2cfd5134733174419fdbb92d15b6d9c60d59ad",
+    "test/tournament-director.test.mjs": "330b52f96cc85f5ee63234e24add5bf5dfcb014749bdf4217f22cb1e7d614891",
+    "test/reliability-phase2c1-closure-director.test.mjs": "d17e4b1bbf6fc6f2daf162d1ea3c5216c4b352010c617ac8e21a15df79d3dd8f"
+  },
+  "rawSha256": "7459e29d75ca1373b0e90a0fc37b83f73ab149a32895a43dca74da10fa1b55b7",
+  "limitation": "Existing model/source/DI handler tests only. Does not establish missing isolated setup/entries/auction/lifecycle client-API-SQL capability. No PostgreSQL test run."
+}

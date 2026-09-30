@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 2,
+  "auditedAt": "2026-09-30T05:03:20.674612+00:00",
+  "baseSha": "7b6ca99510dc2f44cc411bfe7769e7f0c05ed962",
+  "environment": "READ_ONLY_LOCAL_SOURCE_AND_PRESERVED_EVIDENCE",
+  "sourceSnapshotClaim": "Current source hashes audited after the owner-approved History RPC adapter correction. Receipts retain execution HEAD7b6ca995 and exact source manifests; no future commit SHA is attributed to earlier tests. Historical pre-history-rpc and pre-read-extension audits remain preserved.",
+  "suites": [
+    {
+      "suite": "annual-create",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/annual-create.json",
+      "receiptSha256": "8e77cb2608be2473e547a8430e29a1c829ff8c318911597ca70142bd1769e95d",
+      "completedAt": "2026-09-30T03:38:37.514Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 156,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/annual-create.tap",
+      "rawSha256": "919750d7c012bdbaad9c5f8403b3f9811a55c4a6189e0e1c75a4760bca8cacde",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "annual",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/annual.json",
+      "receiptSha256": "c0aa744a696735c95fc116c100cccb7fe820b7b137ba3358779490a23e7bdbad",
+      "completedAt": "2026-09-30T03:43:35.504Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 26,
+        "pass": 26,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 143,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/annual.tap",
+      "rawSha256": "5e29f11e1e5260f91f8cec14d7044c9e35fb9c0cca624a876db16f53742c342a",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "api",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/api.json",
+      "receiptSha256": "527662a1dccd584fe17959555bc6f84a6d7a9fa0efdd0f70bf2f25e5cf2b35a6",
+      "completedAt": "2026-09-30T03:44:01.497Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 38,
+        "pass": 38,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 210,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/api.tap",
+      "rawSha256": "a8bf7ed283797a27d3fc1d5eb52d03acb6e811a24068ba600b2cababc368c01c",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "application",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/application.json",
+      "receiptSha256": "49885dbf23ec5ac29f770c1608b9e361af70856e627b20b18bcff2da8220d2ae",
+      "completedAt": "2026-09-30T05:01:40.652Z",
+      "result": "FAIL",
+      "counts": {
+        "tests": 4097,
+        "pass": 4077,
+        "fail": 20,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 1618,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/application.tap",
+      "rawSha256": "eb0ae911bc7e260baae6c526bce2b876c009940560af5a389b9187ad135814b7",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "build",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/build.json",
+      "receiptSha256": "50abe74f4a08975c1380e6a05866a1fed2bb2ca5b47a1f7d42318963f27174f8",
+      "completedAt": "2026-09-30T04:57:04.209Z",
+      "result": "PASS",
+      "counts": null,
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 1085,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/build.tap",
+      "rawSha256": "24bfd20a402ba8dc29a319f83495fb0d4f8b725b7e88da807e3c1ad929878418",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "capabilities",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/capabilities.json",
+      "receiptSha256": "a7141e6805916964b9e42aa1b6ead443ae513b988645f5e74c45519ef4c43927",
+      "completedAt": "2026-09-30T03:38:24.530Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 220,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/capabilities.tap",
+      "rawSha256": "4e9714dcecfa9c6016d82b5bd4dc45c4a1ede9dd1217bbe8b115e1bbe186d140",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "context",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/context.json",
+      "receiptSha256": "fab28d6b9991f2e2bee5c144ca58263f650b6b2d775541b7a47ece3e676f8623",
+      "completedAt": "2026-09-30T03:38:03.642Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 141,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/context.tap",
+      "rawSha256": "26d68e34c4cc20073244efecaa51b74fae7ab5248eb8c4c3973113b5f5be144a",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "deadlock",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/deadlock.json",
+      "receiptSha256": "d8bcf3f4dc4c66a2eb104bbd49fbe8bdea4167c949b41a992503e5b98ae15748",
+      "completedAt": "2026-09-30T03:42:46.665Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 186,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/deadlock.tap",
+      "rawSha256": "464c0a5ca5911374cb7a102dec39ff51164a5856b2a22119b3c35902e1688aff",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "delivery",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/delivery.json",
+      "receiptSha256": "b890e56a08dc853e1d4189338624d5dba5b529e13cde251736b21aabc90440c4",
+      "completedAt": "2026-09-30T03:41:44.798Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 54,
+        "pass": 54,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 206,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/delivery.tap",
+      "rawSha256": "139fc566f4d1911dd67e5689561ace7c50bfb4657711539063eccf6db23469d0",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "financial",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/financial.json",
+      "receiptSha256": "c0d525f635d427a2d44d9ffab9895bd25f61a0218291bd89dda4095a9051c88d",
+      "completedAt": "2026-09-30T03:38:18.345Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 144,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/financial.tap",
+      "rawSha256": "bce6f440fcffb9e2a9e3523aedfb87c9a51312cacf905c9664a0a9f47ec76af6",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "finite",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/finite.json",
+      "receiptSha256": "11a57e29bfc0aa715d50d95a5a1e811978e13a73d18362d930ebf95c4094a5b1",
+      "completedAt": "2026-09-30T03:39:11.591Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 141,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/finite.tap",
+      "rawSha256": "066c3c8a0a1d1887a540dd17c8f93169746914d5dac337e72be5627383c22829",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "full-sequence",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/full-sequence.json",
+      "receiptSha256": "57a5ca6850139e0017ac18e62f72ac5d7418c362eb928b137ee5e8c3e6b77ab3",
+      "completedAt": "2026-09-30T03:39:06.087Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 218,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/full-sequence.tap",
+      "rawSha256": "17105276c9feb10fd31ca9836f01db0b617cabc88f1dd3e34524a8cbf8fd174e",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "harness",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/harness.json",
+      "receiptSha256": "653fcb9ba9ad708a031bfa10edb02686f28cdfd0b3183fd1b52c80a54572e7c7",
+      "completedAt": "2026-09-30T03:44:02.600Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 133,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/harness.tap",
+      "rawSha256": "6d7b72db0f55ce818c85c80fc015cfac577c4cb2cc08e33959fb70ad721df04a",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "read-adapters",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/read-adapters.json",
+      "receiptSha256": "e1c5ea6ea1cac5b3c487b0e953d4381d245a81bb22c0dbaca1a2e69b49911e65",
+      "completedAt": "2026-09-30T04:46:11.373Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 112,
+        "pass": 112,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 252,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": false,
+      "globalImplementationChangedFiles": [],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "app/admin/director/CalcuttaManagementEditor.js",
+        "app/admin/director/CanonicalDirectorConsole.js",
+        "app/admin/director/CanonicalDirectorMatchControls.js",
+        "app/admin/director/CanonicalDirectorOperations.js",
+        "app/admin/director/ProductionNetSkinsEntries.js",
+        "app/admin/director/ProductionTournamentSetupPanel.js",
+        "app/api/director/canonical-operations/route.js",
+        "app/api/preview-environment/route.js",
+        "lib/canonical-director-operations-client.js",
+        "lib/canonical-runtime-source.js",
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/isolated-director-operations.js",
+        "lib/match-control-actions.js",
+        "lib/odds-calculation-source.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "lib/production-shadow-candidate-server.js",
+        "lib/production-shadow-candidate.js",
+        "supabase/production_migrations/202609300128_isolated_director_context_v1.sql",
+        "supabase/production_migrations/202609300129_isolated_financial_cores_v1.sql",
+        "supabase/production_migrations/202609300130_isolated_setup_control_cores_v1.sql",
+        "test/reliability-p0f-director-workspace.test.mjs",
+        "test/reliability-p0f-financial.integration.test.mjs",
+        "test/reliability-p0f-isolated-context.integration.test.mjs",
+        "test/reliability-p0f-operations-api.test.mjs",
+        "test/reliability-p0f-operations.integration.test.mjs",
+        "test/reliability-p0f-proof-harness.test.mjs",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/reliability-p0f-setup-control.integration.test.mjs",
+        "test/reliability-phase2c1-closure-routing.test.mjs",
+        "test/reliability-phase2c1-release-admission.integration.test.mjs",
+        "test/step10b-production-shadow-auth-boundary.test.mjs",
+        "test/step10b-production-shadow-read-routing.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs",
+        "test/support/reliability/p0f-financial-fixture.mjs",
+        "test/support/reliability/p0f-production-equivalence.mjs",
+        "test/support/reliability/p0f-protected-financial.mjs",
+        "test/support/reliability/p0f-setup-fixture.mjs",
+        "test/support/reliability/phase2c-install.mjs",
+        "tools/reliability/p0f-proof-isolation.cjs",
+        "tools/reliability/run-p0f-tests.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/read-adapters.tap",
+      "rawSha256": "e6dd57deef0d8066bcbc7e5eaffcb2a79fcaf4a5bab3c2f88772eca3b6b92152",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "recovery",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/recovery.json",
+      "receiptSha256": "ea7a225dc067631f256c1d9c3a761ae32378be1d40b9e9f2dde2b7b0fad6cc37",
+      "completedAt": "2026-09-30T03:39:38.922Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 50,
+        "pass": 50,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 241,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/recovery.tap",
+      "rawSha256": "643b6b7ef7e1dea60eed7d82e24e0827e3aba09df2a27cb5ea0d82fcf3481012",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "release",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/release.json",
+      "receiptSha256": "bdf98c118840599514aaa0f2fef78ce27fc64c0b8c7adcd7d30cbc5d2058fdae",
+      "completedAt": "2026-09-30T03:38:30.326Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 155,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/release.tap",
+      "rawSha256": "e97af1795069ebc0f6c0db40d3319c75901fd905a4efdc5c358d73bcb384a12f",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "retirement",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/retirement.json",
+      "receiptSha256": "99414f39aa40f90bb2ff8390f79faddf7687154b5a7ec9839f97f4f68f21b6bb",
+      "completedAt": "2026-09-30T04:56:30.823Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 45,
+        "pass": 45,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 240,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/retirement.tap",
+      "rawSha256": "ae51c4310c7dec69a03f22190669d7ee2935cac6eb3eb51d8fd06f5cc4889a22",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "routing",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/routing.json",
+      "receiptSha256": "f0cb209694b9b8ef96799d1aa071c347673ea9b85162000fa3a47247ee92b0d3",
+      "completedAt": "2026-09-30T04:45:31.475Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 42,
+        "pass": 42,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 303,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "lib/match-control-actions.js",
+          "capturedSha256": "58a9f5bb442736b4955551f5f94e914c2b192076cb3edc7d61cc9e4a00c1fcd6",
+          "currentSha256": "e6df4c31b18192d9bb39c07a2dfcacdcabcb36d9855e3531b189a38d98b38983"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/routing.tap",
+      "rawSha256": "706065459de7ba5f1be851581f6d62daf3114b5b7d38292f240610a1bca28af7",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "security",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/security.json",
+      "receiptSha256": "68948d416155519784b7f27091a863e81c11b59778e9fd3ed366038a1d8cb332",
+      "completedAt": "2026-09-30T04:45:33.110Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 84,
+        "pass": 84,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 229,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "lib/match-control-actions.js",
+          "capturedSha256": "58a9f5bb442736b4955551f5f94e914c2b192076cb3edc7d61cc9e4a00c1fcd6",
+          "currentSha256": "e6df4c31b18192d9bb39c07a2dfcacdcabcb36d9855e3531b189a38d98b38983"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/security.tap",
+      "rawSha256": "c950c13c90bbd9e867818daad14975af99345008599b289a97b4261acc261652",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "setup",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/setup.json",
+      "receiptSha256": "6e05187d09eca76790769b046dc93786b3e753b47d0d19410d0f931b3c7f1dde",
+      "completedAt": "2026-09-30T03:38:13.011Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 143,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [
+        {
+          "file": "app/admin/director/CanonicalDirectorMatchControls.js",
+          "capturedSha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+          "currentSha256": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c"
+        },
+        {
+          "file": "app/admin/director/ProductionTournamentSetupPanel.js",
+          "capturedSha256": "96c0f98016bf6e5842929c88c33c2bf07d3fc37ce2b1eada23bf3024a29a67c9",
+          "currentSha256": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5"
+        },
+        {
+          "file": "test/reliability-p0f-director-workspace.test.mjs",
+          "capturedSha256": "59c112a1853e5b1eedbbd1b0fa5f2954aeec12bd10bb472f077a82ab2a649d09",
+          "currentSha256": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365"
+        }
+      ],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [
+        "lib/history-2026-read-source.js",
+        "lib/history-2026-supabase.js",
+        "lib/match-control-actions.js",
+        "lib/prediction-input-bundle-source.js",
+        "lib/production-director-console.js",
+        "test/reliability-p0f-read-adapter-extension.test.mjs",
+        "test/step11-6-candidate-control-authorization.test.mjs",
+        "test/step11-production-odds-calculation.test.mjs"
+      ],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/setup.tap",
+      "rawSha256": "1e8d65da6fe3684697430119aa693b3737c1e6cd9a9302fe4eeaf2e79a8a0172",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    },
+    {
+      "suite": "workspace",
+      "receipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/workspace.json",
+      "receiptSha256": "f1bab2efe26b72030c3e83fd7d716ac630fdf3c82393c710c81150bd1678fd0f",
+      "completedAt": "2026-09-30T04:56:28.779Z",
+      "result": "PASS",
+      "counts": {
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "sourceStableDuringRun": true,
+      "relevantDependencyCount": 239,
+      "relevantChangedFiles": [],
+      "relevantMissingFiles": [],
+      "dynamicRelevantFilesBoundByImplementationManifest": [
+        "app/admin/director/CanonicalDirectorOperations.js",
+        "app/admin/director/CanonicalDirectorConsole.js",
+        "app/admin/director/CalcuttaManagementEditor.js",
+        "app/admin/director/ProductionNetSkinsEntries.js"
+      ],
+      "dynamicUnboundFiles": [],
+      "globalImplementationManifestCaptured": true,
+      "globalImplementationChangedFiles": [],
+      "globalImplementationMissingFiles": [],
+      "currentChangedPathsAbsentFromHistoricalGlobalManifest": [],
+      "rawArtifact": "docs/reliability/phase2c1-closure/evidence/p0f-approved/workspace.tap",
+      "rawSha256": "97bea6947d07d1abf0e5d2334889c653396af42ad7f418e9de0fa663011bb3b4",
+      "rawHashMatchesReceipt": true,
+      "freshness": "CURRENT_AT_AUDIT"
+    }
+  ],
+  "requiredFreshnessReruns": [],
+  "failedSuitesDespiteCurrentDependencies": [
+    "application"
+  ],
+  "applicationComparison": {
+    "baselineReceipt": "docs/reliability/phase2c1-closure/evidence/application.json",
+    "baselineCompletedAt": "2026-09-30T01:26:44.148Z",
+    "baselineCounts": {
+      "tests": 4095,
+      "pass": 4072,
+      "fail": 23,
+      "skipped": 0,
+      "cancelled": 0
+    },
+    "candidateReceipt": "docs/reliability/phase2c1-closure/evidence/p0f-approved/application.json",
+    "candidateCompletedAt": "2026-09-30T05:01:40.652Z",
+    "candidateCounts": {
+      "tests": 4097,
+      "pass": 4077,
+      "fail": 20,
+      "skipped": 0,
+      "cancelled": 0
+    },
+    "baselineRawSha256": "94d5459a71c1df5f0a33998da2c6cb2860294762a5e2eb85af821b1de71ecf19",
+    "candidateRawSha256": "eb0ae911bc7e260baae6c526bce2b876c009940560af5a389b9187ad135814b7",
+    "rawHashesVerified": true,
+    "diagnosticNormalization": [
+      "checkout path",
+      "duration_ms"
+    ],
+    "diagnosticsTruncated": false,
+    "exactUnchangedDiagnosticCount": 20,
+    "exactUnchangedDiagnosticIdentities": [
+      "CLI writes one immutable local artifact and never calls a provider",
+      "Email provider flow remains byte-identical apart from optional enrollment proof issuance",
+      "Google-backed secondary failures are isolated from the core route",
+      "OTP route is no-signup, six-digit, scoped, durably audited, and returns generic unapproved behavior",
+      "Phase 2 public pages consume the shared scorecard analytics service",
+      "Players uses one compact accessible Round and Rank By control surface",
+      "SSR session, logout, shadow comparison, and participant context stay Passport-authoritative",
+      "Supabase verification distinguishes rejected tokens from provider outages",
+      "analytics implementation digest requires an explicit version update",
+      "every compiled mobile route denies Production before Auth, database, provider or worker transport",
+      "historical READY deployments with the safe-method Google writer are exact",
+      "historical writer-scope evidence is generated from exact retained inputs",
+      "native certification receives only a server-verified Auth UUID and confirmed email",
+      "participant navigation uses one fixed safe-area-aware native shell",
+      "phone candidate introduces no identity tables or Director mutation and keeps service-only grants",
+      "phone lifecycle dispatch is individually enumerated for frozen and future Production, with no Director namespace",
+      "polish is presentation-only and does not add a leaderboard request path",
+      "routes report feedback only after canonical completion; no client-selected receipt",
+      "the provider contract uses one exact all-method path OR group",
+      "v4 credential confinement classifies the complete provider and environment inventories"
+    ],
+    "resolvedFailureIdentities": [
+      "all migrated candidate selectors resolve only certified Production shadow reads",
+      "candidate can never acquire Odds publication authority",
+      "representative candidate Supabase services fail closed with zero Google fallback"
+    ],
+    "newFailureIdentities": [],
+    "changedDiagnosticIdentities": [],
+    "nodeInventoryDelta": 2,
+    "accountingNote": "The frozen493-file broad selection contains two added Google-absence tests; intentional retired-provider assertion changes are accounted separately. The55 focused read-adapter tests are outside that selection and run with57 existing compatibility tests in the112-case read-adapters suite. No failed test was skipped or relabeled expected-red."
+  },
+  "routingProofDistinction": {
+    "originalRoutingSuite": {
+      "counts": {
+        "tests": 42,
+        "pass": 42,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "status": "PASS",
+      "scope": "Original selector/request boundary cases"
+    },
+    "actualHistoryTransport": {
+      "test": "NA-P0F-HISTORY-TRANSPORT-02: actual canonical History reader reaches certified read-only transport",
+      "suiteCounts": {
+        "tests": 112,
+        "pass": 112,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "status": "PASS",
+      "scope": "Actual History reader, real translator and service/builder/sanitizer with synthetic fetch responses and denied external network. Exact RPC body, fixed2026 scope, private-field exclusion, failure locality, negative context and unchanged ordinary isolated/cutover routing are exercised.",
+      "requiredThirdFile": "lib/history-2026-supabase.js",
+      "thirdFileImplemented": true,
+      "thirdFileSha256": "0c119b587548cbf62b5411da4483fe8d4c0fdf45efc38cda7893647f8d7984c9",
+      "authority": "Exact additional adapter explicitly approved by owner and installed through normal runtime review",
+      "productionOrHostedProof": false
+    },
+    "certificationConsequence": "Previously required actual History transport RED is now PASS at the scoped local API-adapter proof layer. Broad suite retains only20 unchanged baseline failures. No hosted/Production/physical or broader tournament-ready certification is inferred."
+  },
+  "financialReportReview": {
+    "file": "docs/reliability/phase2c1-closure/P0F-FINANCIAL-CONTEXT-PROOF.md",
+    "sha256": "6217074f9073b7b637cc76587f24b8db941c1512a24850ed5505af5196dee0ae",
+    "supportedClaims": [
+      "financial17/17",
+      "context1/1 including final128 shared fence",
+      "release2/2",
+      "protected financial original/candidate comparisons3/3",
+      "original admission preserved and isolated provenance scoped to approved operations"
+    ],
+    "status": "SUPPORTED_AT_SCOPED_LOCAL_PROOF_LAYER",
+    "limitations": [
+      "No hosted or Production proof",
+      "The three approved History/Prediction adapter edits are absent from these PostgreSQL proof dependency graphs",
+      "Workspace dynamic component inputs are checked against its implementation manifest as well as its static graph"
+    ]
+  },
+  "productionQueried": false,
+  "databaseStarted": false,
+  "sourceChanged": false,
+  "retainedProofRationale": {
+    "unchangedRelevantDependencies": [
+      "api",
+      "context",
+      "financial",
+      "setup",
+      "capabilities",
+      "release",
+      "annual-create",
+      "full-sequence",
+      "finite",
+      "recovery",
+      "delivery",
+      "deadlock",
+      "annual"
+    ],
+    "claim": "Required SQL, grants/OIDs, financial provenance,432-hole sequence and Phase2 P0 A\u2013E proofs remain fresh because every captured relevant dependency and parser hash is unchanged. Global manifest differences outside those graphs are listed separately; source graph limitations remain those of the original receipts.",
+    "limitation": "Static/declared source dependency evidence is not hosted tracing or full npm dependency-content hashing."
+  },
+  "finalFormatCorrection": {
+    "file": "lib/match-control-actions.js",
+    "sha256": "e6df4c31b18192d9bb39c07a2dfcacdcabcb36d9855e3531b189a38d98b38983",
+    "change": "Removed only an extra blank line at EOF; shared function body unchanged.",
+    "affectedProofsRerun": [
+      "workspace",
+      "retirement",
+      "application",
+      "build"
+    ],
+    "rawEvidencePreservation": "Verbatim TAP and historical unified-diff bytes remain unchanged; whitespace exceptions are separately enumerated in source-hygiene.json."
+  }
+}

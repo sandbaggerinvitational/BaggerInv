@@ -1,0 +1,238 @@
+TAP version 13
+# Subtest: API server binds actor/resource/context and confirms receipt plus matching canonical readback
+ok 1 - API server binds actor/resource/context and confirms receipt plus matching canonical readback
+  ---
+  duration_ms: 1.943042
+  type: 'test'
+  ...
+# Subtest: SECURITY local API boundary denies unauthorized shape {"status":"inactive"}
+ok 2 - SECURITY local API boundary denies unauthorized shape {"status":"inactive"}
+  ---
+  duration_ms: 0.201625
+  type: 'test'
+  ...
+# Subtest: SECURITY local API boundary denies unauthorized shape {"status":"unavailable"}
+ok 3 - SECURITY local API boundary denies unauthorized shape {"status":"unavailable"}
+  ---
+  duration_ms: 0.050417
+  type: 'test'
+  ...
+# Subtest: SECURITY local API boundary denies unauthorized shape {"source":"bootstrap"}
+ok 4 - SECURITY local API boundary denies unauthorized shape {"source":"bootstrap"}
+  ---
+  duration_ms: 0.060209
+  type: 'test'
+  ...
+# Subtest: SECURITY local API boundary denies unauthorized shape {"source":"production-shadow-entitlement"}
+ok 5 - SECURITY local API boundary denies unauthorized shape {"source":"production-shadow-entitlement"}
+  ---
+  duration_ms: 0.045458
+  type: 'test'
+  ...
+# Subtest: SECURITY local API boundary denies unauthorized shape {"identity":{"authUserId":"33333333-3333-4333-8333-333333333333","actor":{"id":"P01","role":"DIRECTOR"},"tournamentId":"2026","impersonating":true}}
+ok 6 - SECURITY local API boundary denies unauthorized shape {"identity":{"authUserId":"33333333-3333-4333-8333-333333333333","actor":{"id":"P01","role":"DIRECTOR"},"tournamentId":"2026","impersonating":true}}
+  ---
+  duration_ms: 0.053958
+  type: 'test'
+  ...
+# Subtest: SECURITY local API boundary denies unauthorized shape {"identity":{"authUserId":"33333333-3333-4333-8333-333333333333","actor":{"id":"P01","role":"PLAYER"},"tournamentId":"2026"}}
+ok 7 - SECURITY local API boundary denies unauthorized shape {"identity":{"authUserId":"33333333-3333-4333-8333-333333333333","actor":{"id":"P01","role":"PLAYER"},"tournamentId":"2026"}}
+  ---
+  duration_ms: 0.052042
+  type: 'test'
+  ...
+# Subtest: SECURITY local API boundary denies unauthorized shape {"identity":{"authUserId":"33333333-3333-4333-8333-333333333333","actor":{"id":"P01","role":"SPECTATOR"},"tournamentId":"2026"}}
+ok 8 - SECURITY local API boundary denies unauthorized shape {"identity":{"authUserId":"33333333-3333-4333-8333-333333333333","actor":{"id":"P01","role":"SPECTATOR"},"tournamentId":"2026"}}
+  ---
+  duration_ms: 0.07025
+  type: 'test'
+  ...
+# Subtest: SECURITY isolated writer rejects resource/context shape {"VERCEL_ENV":"production"}
+ok 9 - SECURITY isolated writer rejects resource/context shape {"VERCEL_ENV":"production"}
+  ---
+  duration_ms: 0.064208
+  type: 'test'
+  ...
+# Subtest: SECURITY isolated writer rejects resource/context shape {"SUPABASE_SCORING_MIRROR_URL":"https://production.invalid"}
+ok 10 - SECURITY isolated writer rejects resource/context shape {"SUPABASE_SCORING_MIRROR_URL":"https://production.invalid"}
+  ---
+  duration_ms: 0.087416
+  type: 'test'
+  ...
+# Subtest: SECURITY isolated writer rejects resource/context shape {"BAGGER_ISOLATED_DIRECTOR_BINDING_ID":""}
+ok 11 - SECURITY isolated writer rejects resource/context shape {"BAGGER_ISOLATED_DIRECTOR_BINDING_ID":""}
+  ---
+  duration_ms: 0.053792
+  type: 'test'
+  ...
+# Subtest: SECURITY isolated writer rejects resource/context shape {"PRODUCTION_SHADOW_CANDIDATE_ENABLED":"true"}
+ok 12 - SECURITY isolated writer rejects resource/context shape {"PRODUCTION_SHADOW_CANDIDATE_ENABLED":"true"}
+  ---
+  duration_ms: 0.038209
+  type: 'test'
+  ...
+# Subtest: SECURITY caller authorization cannot be nested into a domain payload
+ok 13 - SECURITY caller authorization cannot be nested into a domain payload
+  ---
+  duration_ms: 0.056041
+  type: 'test'
+  ...
+# Subtest: SECURITY caller resource cannot be nested into a domain payload
+ok 14 - SECURITY caller resource cannot be nested into a domain payload
+  ---
+  duration_ms: 0.043375
+  type: 'test'
+  ...
+# Subtest: SECURITY caller actor_auth_user_id cannot be nested into a domain payload
+ok 15 - SECURITY caller actor_auth_user_id cannot be nested into a domain payload
+  ---
+  duration_ms: 0.084583
+  type: 'test'
+  ...
+# Subtest: SECURITY caller project_ref cannot be nested into a domain payload
+ok 16 - SECURITY caller project_ref cannot be nested into a domain payload
+  ---
+  duration_ms: 0.032875
+  type: 'test'
+  ...
+# Subtest: SECURITY caller tournament_id cannot be nested into a domain payload
+ok 17 - SECURITY caller tournament_id cannot be nested into a domain payload
+  ---
+  duration_ms: 0.04175
+  type: 'test'
+  ...
+# Subtest: SECURITY caller request_fingerprint cannot be nested into a domain payload
+ok 18 - SECURITY caller request_fingerprint cannot be nested into a domain payload
+  ---
+  duration_ms: 0.055459
+  type: 'test'
+  ...
+# Subtest: SECURITY caller cannot add privileged top-level metadata or select arbitrary RPC
+ok 19 - SECURITY caller cannot add privileged top-level metadata or select arbitrary RPC
+  ---
+  duration_ms: 0.424
+  type: 'test'
+  ...
+# Subtest: API financial configuration is outside approved minimum capability
+ok 20 - API financial configuration is outside approved minimum capability
+  ---
+  duration_ms: 0.063125
+  type: 'test'
+  ...
+# Subtest: API context scope mismatch or stale context fails before execute
+ok 21 - API context scope mismatch or stale context fails before execute
+  ---
+  duration_ms: 0.17725
+  type: 'test'
+  ...
+# Subtest: FAILURE_INJECTION timeout is typed while the operation outcome remains UNKNOWN
+ok 22 - FAILURE_INJECTION timeout is typed while the operation outcome remains UNKNOWN
+  ---
+  duration_ms: 0.164458
+  type: 'test'
+  ...
+# Subtest: FAILURE_INJECTION committed operation with lost readback is not reported as a successful capability
+ok 23 - FAILURE_INJECTION committed operation with lost readback is not reported as a successful capability
+  ---
+  duration_ms: 0.295916
+  type: 'test'
+  ...
+# Subtest: API actual handler and shipping client confirm the provider-neutral route using injected canonical RPC
+ok 24 - API actual handler and shipping client confirm the provider-neutral route using injected canonical RPC
+  ---
+  duration_ms: 21.600708
+  type: 'test'
+  ...
+# Subtest: SECURITY POST missing origin denied before auth/RPC
+ok 25 - SECURITY POST missing origin denied before auth/RPC
+  ---
+  duration_ms: 0.718291
+  type: 'test'
+  ...
+# Subtest: SECURITY POST https://untrusted.invalid origin denied before auth/RPC
+ok 26 - SECURITY POST https://untrusted.invalid origin denied before auth/RPC
+  ---
+  duration_ms: 0.589083
+  type: 'test'
+  ...
+# Subtest: API unavailable authorization stays feature-local and does not dispatch
+ok 27 - API unavailable authorization stays feature-local and does not dispatch
+  ---
+  duration_ms: 0.673
+  type: 'test'
+  ...
+# Subtest: API malformed body/query fails locally without a provider fallback
+ok 28 - API malformed body/query fails locally without a provider fallback
+  ---
+  duration_ms: 0.948416
+  type: 'test'
+  ...
+# Subtest: API telemetry sink failure cannot prevent a confirmed context read
+ok 29 - API telemetry sink failure cannot prevent a confirmed context read
+  ---
+  duration_ms: 0.454875
+  type: 'test'
+  ...
+# Subtest: CLIENT retry retains original context and operation ID after refreshed context changes
+ok 30 - CLIENT retry retains original context and operation ID after refreshed context changes
+  ---
+  duration_ms: 0.341834
+  type: 'test'
+  ...
+# Subtest: CLIENT malformed or provider-forged success remains UNKNOWN; no Google fallback
+ok 31 - CLIENT malformed or provider-forged success remains UNKNOWN; no Google fallback
+  ---
+  duration_ms: 0.180917
+  type: 'test'
+  ...
+# Subtest: RECOVERY current admission resolves original exact receipt after context changes without execute
+ok 32 - RECOVERY current admission resolves original exact receipt after context changes without execute
+  ---
+  duration_ms: 0.23525
+  type: 'test'
+  ...
+# Subtest: RECOVERY absent exact receipt remains UNKNOWN and cannot imply rollback
+ok 33 - RECOVERY absent exact receipt remains UNKNOWN and cannot imply rollback
+  ---
+  duration_ms: 0.095416
+  type: 'test'
+  ...
+# Subtest: RECOVERY shipping client retains original review when requesting read-only status
+ok 34 - RECOVERY shipping client retains original review when requesting read-only status
+  ---
+  duration_ms: 0.184958
+  type: 'test'
+  ...
+# Subtest: RECOVERY API status remains same-origin and authorized while a telemetry sink fails
+ok 35 - RECOVERY API status remains same-origin and authorized while a telemetry sink fails
+  ---
+  duration_ms: 1.209708
+  type: 'test'
+  ...
+# Subtest: API structured canonical control denial preserves feature-local domain error
+ok 36 - API structured canonical control denial preserves feature-local domain error
+  ---
+  duration_ms: 0.389833
+  type: 'test'
+  ...
+# Subtest: CLIENT status not found contains original operation and never silently resubmits
+ok 37 - CLIENT status not found contains original operation and never silently resubmits
+  ---
+  duration_ms: 0.1795
+  type: 'test'
+  ...
+# Subtest: CLIENT malformed or foreign-provider response cannot assert a canonical commit
+ok 38 - CLIENT malformed or foreign-provider response cannot assert a canonical commit
+  ---
+  duration_ms: 0.184833
+  type: 'test'
+  ...
+1..38
+# tests 38
+# suites 0
+# pass 38
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 73.8235

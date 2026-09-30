@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 1,
+  "status": "PARTIAL",
+  "baseSha": "7b6ca99510dc2f44cc411bfe7769e7f0c05ed962",
+  "executionHead": "7b6ca99510dc2f44cc411bfe7769e7f0c05ed962",
+  "newCommit": null,
+  "branch": "codex/reliability-phase2c1-capability-closure",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "directorCapabilities": {
+    "total": 7,
+    "pass": 7
+  },
+  "routing": {
+    "total": 3,
+    "pass": 2,
+    "fail": 1
+  },
+  "p0": {
+    "A": "PASS_SCOPED",
+    "B": "PASS_SCOPED",
+    "C": "PASS_SCOPED",
+    "D": "PASS_SCOPED",
+    "E": "PASS_SCOPED",
+    "F": "PARTIAL"
+  },
+  "pendingApproval": [
+    "lib/history-2026-read-source.js",
+    "lib/prediction-input-bundle-source.js"
+  ],
+  "application": {
+    "tests": 4097,
+    "pass": 4076,
+    "fail": 21,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "unchangedBaselineFailures": 20,
+  "routingFailures": 1,
+  "newFailureIdentities": 0,
+  "productionInteraction": false,
+  "stagingDeployment": false,
+  "realGoogleAccess": false,
+  "nativeChanges": false,
+  "commitPushGate": "NOT_MET",
+  "receipts": [
+    {
+      "suite": "context",
+      "path": "context.json",
+      "sha256": "fab28d6b9991f2e2bee5c144ca58263f650b6b2d775541b7a47ece3e676f8623",
+      "result": "PASS",
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "setup",
+      "path": "setup.json",
+      "sha256": "6e05187d09eca76790769b046dc93786b3e753b47d0d19410d0f931b3c7f1dde",
+      "result": "PASS",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "financial",
+      "path": "financial.json",
+      "sha256": "c0d525f635d427a2d44d9ffab9895bd25f61a0218291bd89dda4095a9051c88d",
+      "result": "PASS",
+      "counts": {
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "capabilities",
+      "path": "capabilities.json",
+      "sha256": "a7141e6805916964b9e42aa1b6ead443ae513b988645f5e74c45519ef4c43927",
+      "result": "PASS",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "api",
+      "path": "api.json",
+      "sha256": "527662a1dccd584fe17959555bc6f84a6d7a9fa0efdd0f70bf2f25e5cf2b35a6",
+      "result": "PASS",
+      "counts": {
+        "tests": 38,
+        "pass": 38,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "workspace",
+      "path": "workspace.json",
+      "sha256": "68856579426b0b9a8cff513aa5761bd896dce310724b239d591c2e124cca9ac2",
+      "result": "PASS",
+      "counts": {
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "routing",
+      "path": "routing.json",
+      "sha256": "b5f88d271e614079060a9ede989418a6ea8933ad771bbf416d851594b2e84f6c",
+      "result": "FAIL",
+      "counts": {
+        "tests": 42,
+        "pass": 41,
+        "fail": 1,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "retirement",
+      "path": "retirement.json",
+      "sha256": "efdda1e2b3b65957ca026ccd0b597ecf88e17bb73abfddf47a4ae64d570a71a3",
+      "result": "PASS",
+      "counts": {
+        "tests": 45,
+        "pass": 45,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "security",
+      "path": "security.json",
+      "sha256": "511b633afde4a7427fa71752de376560af632a3ec202916109e0f8f6f21c2e11",
+      "result": "PASS",
+      "counts": {
+        "tests": 84,
+        "pass": 84,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "release",
+      "path": "release.json",
+      "sha256": "bdf98c118840599514aaa0f2fef78ce27fc64c0b8c7adcd7d30cbc5d2058fdae",
+      "result": "PASS",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "annual-create",
+      "path": "annual-create.json",
+      "sha256": "8e77cb2608be2473e547a8430e29a1c829ff8c318911597ca70142bd1769e95d",
+      "result": "PASS",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "full-sequence",
+      "path": "full-sequence.json",
+      "sha256": "57a5ca6850139e0017ac18e62f72ac5d7418c362eb928b137ee5e8c3e6b77ab3",
+      "result": "PASS",
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "finite",
+      "path": "finite.json",
+      "sha256": "11a57e29bfc0aa715d50d95a5a1e811978e13a73d18362d930ebf95c4094a5b1",
+      "result": "PASS",
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "recovery",
+      "path": "recovery.json",
+      "sha256": "ea7a225dc067631f256c1d9c3a761ae32378be1d40b9e9f2dde2b7b0fad6cc37",
+      "result": "PASS",
+      "counts": {
+        "tests": 50,
+        "pass": 50,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "delivery",
+      "path": "delivery.json",
+      "sha256": "b890e56a08dc853e1d4189338624d5dba5b529e13cde251736b21aabc90440c4",
+      "result": "PASS",
+      "counts": {
+        "tests": 54,
+        "pass": 54,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "deadlock",
+      "path": "deadlock.json",
+      "sha256": "d8bcf3f4dc4c66a2eb104bbd49fbe8bdea4167c949b41a992503e5b98ae15748",
+      "result": "PASS",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "annual",
+      "path": "annual.json",
+      "sha256": "c0aa744a696735c95fc116c100cccb7fe820b7b137ba3358779490a23e7bdbad",
+      "result": "PASS",
+      "counts": {
+        "tests": 26,
+        "pass": 26,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "harness",
+      "path": "harness.json",
+      "sha256": "653fcb9ba9ad708a031bfa10edb02686f28cdfd0b3183fd1b52c80a54572e7c7",
+      "result": "PASS",
+      "counts": {
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "application",
+      "path": "application.json",
+      "sha256": "32cbad909a19b3baaebe1837ad6b446efc1e2eb7dbbd74a212dd828d53df1ea8",
+      "result": "FAIL",
+      "counts": {
+        "tests": 4097,
+        "pass": 4076,
+        "fail": 21,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "build",
+      "path": "build.json",
+      "sha256": "be135a6e819eff35ec12c23f03efe37034b5cadaf49d626e5f6852c28e863748",
+      "result": "PASS",
+      "counts": null
+    }
+  ],
+  "applicationTestsAdded": 2,
+  "applicationTestsDeleted": 0,
+  "testInventoryScope": "Fixed original493-file application selection only; focused P0F suites are separate and must not be summed as unique tests.",
+  "supportingAudits": [
+    {
+      "path": "evidence-freshness.json",
+      "sha256": "8df015faa4ff840e1e53b587414baeb74445ecc77693dd9e992c15c0198679a0"
+    },
+    {
+      "path": "source-hygiene.json",
+      "sha256": "a697a6e2fc53e92d877cb45450c3b9d1561715161b5fcdbb323e1c1f8d7976e0"
+    }
+  ]
+}

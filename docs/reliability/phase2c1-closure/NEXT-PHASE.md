@@ -1,17 +1,13 @@
 # Next single phase
 
-**Continue Phase2C.1 canonical capability closure — isolated Director operation context and remaining read-only routing.** Do not begin Phase2D.
+**PHASE 2D — ISOLATED HOSTED/STAGING SCORE-PATH CERTIFICATION.**
 
-Why: annual CREATE and representative runtime hashing/readback now work locally, while seven required Director capability identities and three routing cases still lack required proof. These are score-path P0-F prerequisites, not general Production-capacity gates. The existing canonical domain functions must be reused through a safe isolated operation context; no Google fallback or Production identity spoof is acceptable.
+All six score-path P0 gates are closed at their required non-Production layers. The architecture is ready for owner review before a separate hosted task. Do not begin Phase 2D under this task: staging requires a new explicit authorization and verified non-Production identity.
 
-Prerequisites: review the exact remaining rows in CAPABILITY-GAPS.md, preserve all required rejection tests, and obtain the pending explicit owner confirmation for the narrowly scoped routing-admission edit that automatic approval review rejected. That confirmation cannot be inferred from elapsed time. Existing Production resource/activation admission remains unchanged.
+The next phase must install the candidate on an independently isolated hosted target, without Google runtime credentials; verify migration prerequisites and inert context binding; exercise real Auth/client transport, the seven Director operations, History/adjacent readers, canonical scoring, recovery, finite timeout, current derived workers and client contracts; run performance smoke and rollback. Local RPC/service tests are not substitutes for that layer.
 
-Scope: the smallest canonical isolated adapters for setup/course/tee/handicaps, pairings, Net Skins entries, Calcutta ownership/purchase editing, Mark Live/Lock/Resume/access; complete the three read-only routing cases without giving the diagnostic lane write rights. Preserve exact actor/tournament scope, permissions, receipts, stale-authority checks, current-pointer reads, financial privacy and readback. Do not rebuild domain rules or a new Round Control engine.
+Use the canonical profile through migration 127, verify the existing `director-calcutta-management-read-v1.sql` and `director-calcutta-clear-entry-v1.sql` prerequisites before 129, then install 128/129/130 in dependency order. Verify exact private/public function definitions and grants. Review application rollback plus restoration of original public wrappers before removing new private dependencies; preserve all ledgers and audit history. The [closure report](P0F-FINAL-CLOSURE.md) records the boundaries.
 
-Acceptance: every required capability reaches real local PostgreSQL through its shipping client/API, rejects unauthorized/stale/conflicting requests, resolves lost responses by the same operation identity, and creates no Google work. Zero unexplained broad failures, P0A–E retained, P0-F fully proven, zero-Google432-hole sequence and build remain required. Only then may the owner consider a separate hosted/staging certification task.
+Recommended configuration: **GPT-5.6 Sol · Extra High reasoning · Standard speed.** This is a bounded hosted certification task with settled source architecture. Stop for a separate decision if hosted evidence exposes another authority or architecture change.
 
-Non-goals: hosted deployment, Production queries/configuration, real Google access/cleanup, native/Build11, infrastructure changes, scoring or side-game rule changes, full tournament-ready claims.
-
-Risks: duplicating domain authority, bypassing protected resource admission, losing readback/idempotency semantics, or treating model tests as client capability proof. Preserve PARTIAL if any required proof remains missing.
-
-Recommended configuration: GPT-6 Astra; highest available reasoning; Standard speed. The next work still has authority/adapter architecture questions. GPT-5.6 Sol with Extra High reasoning is appropriate later for bounded Phase2D verification once those contracts are settled.
+Production deployment requires separate owner authorization after hosted proof. Production capacity/restore, complete Round Control, diagnostic admission, native/physical scoring, full tournament chronology and owner rehearsal remain later gates. Build 11 and external Google cleanup do not begin automatically.

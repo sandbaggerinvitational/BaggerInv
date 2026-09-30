@@ -1,0 +1,95 @@
+{
+  "baseSha": "7b6ca99510dc2f44cc411bfe7769e7f0c05ed962",
+  "files": [
+    {
+      "source": "/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/admin/director/ProductionTournamentSetupPanel.js",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/accepted-but-unmounted/app/admin/director/ProductionTournamentSetupPanel.js",
+      "sha256": "c19efe07b3e4bdd2fcd2ddb39fc96bdbb9f6b562b7339d49ebf3187f7cf6e7f8",
+      "status": "ACCEPTED_DRAFT_TO_RESTORE_NOT_CERTIFIED"
+    },
+    {
+      "source": "/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/admin/director/CanonicalDirectorMatchControls.js",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/accepted-but-unmounted/app/admin/director/CanonicalDirectorMatchControls.js",
+      "sha256": "ebe67605b8291656de4c056aa76860573b7e0833c7c5dfce53c76677b7b1ba34",
+      "status": "ACCEPTED_DRAFT_TO_RESTORE_NOT_CERTIFIED"
+    },
+    {
+      "source": "/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/supabase/production_migrations/202609300128_isolated_director_context_v1.sql",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/accepted-but-unmounted/supabase/production_migrations/202609300128_isolated_director_context_v1.sql",
+      "sha256": "ecb9d40af8359f18c6044e49ae0b5799a341958d6b156a6692f27ff2fef7b8ef",
+      "status": "ACCEPTED_DRAFT_TO_RESTORE_NOT_CERTIFIED"
+    },
+    {
+      "source": "/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-p0f-isolated-context.integration.test.mjs",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/accepted-but-unmounted/test/reliability-p0f-isolated-context.integration.test.mjs",
+      "sha256": "4e00a241b959b816cc40679a2b5c9a1ef383ceb958fca4bb3b03e1dc7184b999",
+      "status": "ACCEPTED_DRAFT_TO_RESTORE_NOT_CERTIFIED"
+    },
+    {
+      "source": "/private/tmp/p0f-setup-control-cores-v1.sql",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/review-only/p0f-setup-control-cores-v1.sql",
+      "sha256": "499e192f8b85e473d614ec93b72cbbe1be6c2f6f8cb1514888f4d13f7cda4633",
+      "status": "REVIEW_ONLY_NOT_APPLIED"
+    },
+    {
+      "source": "/private/tmp/p0f-setup-control-review.md",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/review-only/p0f-setup-control-review.md",
+      "sha256": "55d323e347dbe2bb3824ca48d2011de090d470b720e975b993fd272f5888f7cd",
+      "status": "REVIEW_ONLY_NOT_APPLIED"
+    },
+    {
+      "source": "/private/tmp/p0f-director-source-definitions.json",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/review-only/p0f-director-source-definitions.json",
+      "sha256": "248cfa2fa8a9fe8ecd5763d39dba2a1130d8144bd4c01ec0158a06131823865a",
+      "status": "REVIEW_ONLY_NOT_APPLIED"
+    },
+    {
+      "source": "/private/tmp/bagger-p0f-financial-migration.py",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/review-only/bagger-p0f-financial-migration.py",
+      "sha256": "278deedbc519fa808ed8f23338dddd73e7bfcf228d91fae21c7969b975847248",
+      "status": "REVIEW_ONLY_NOT_APPLIED"
+    },
+    {
+      "source": "/private/tmp/p0f-director-api-approval-draft-review.md",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/review-only/p0f-director-api-approval-draft-review.md",
+      "sha256": "8132f93db882640a4f8526962cc4fb8d8e404f6fcfcf4946eb9f6c72a570e5fc",
+      "status": "REVIEW_ONLY_NOT_APPLIED"
+    },
+    {
+      "source": "/private/tmp/p0f-director-api-draft-manifest.json",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/review-only/p0f-director-api-draft-manifest.json",
+      "sha256": "9e4275ceeb68db46da2854df25523d2d4caf62c9dedf32296793739a4f33ea51",
+      "status": "REVIEW_ONLY_NOT_APPLIED"
+    },
+    {
+      "source": "/private/tmp/p0f-isolated-director-operations.js",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/review-only/p0f-isolated-director-operations.js",
+      "sha256": "7fc66ea47ccae4c2527fd751e015a71d7fa0ba65d68838f2f67e0cf42bc0cfdc",
+      "status": "REVIEW_ONLY_NOT_APPLIED"
+    },
+    {
+      "source": "/private/tmp/p0f-canonical-operations-route.js",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/review-only/p0f-canonical-operations-route.js",
+      "sha256": "62132837daf4ba9ee0e0d5afffecd6ce14a237186f91d87444e77ae5d753f8d5",
+      "status": "REVIEW_ONLY_NOT_APPLIED"
+    },
+    {
+      "source": "/private/tmp/p0f-canonical-director-operations-client.js",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/review-only/p0f-canonical-director-operations-client.js",
+      "sha256": "2302f44b1353938e4b3090adebcb1861c13a4aff20f27984b08507141f398060",
+      "status": "REVIEW_ONLY_NOT_APPLIED"
+    },
+    {
+      "source": "/private/tmp/p0f-isolated-director-operations-financial-review-draft.js",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/review-only/p0f-isolated-director-operations-financial-review-draft.js",
+      "sha256": "7539d9d8dba9323bdb48e59a128f221eaf68cd89cc42aa91f9b9c9616d282071",
+      "status": "REVIEW_ONLY_NOT_APPLIED"
+    },
+    {
+      "source": "/private/tmp/p0f-canonical-director-operations-client-financial-review-draft.js",
+      "copy": "/private/tmp/bagger-p0f-approval-checkpoint-20260930/review-only/p0f-canonical-director-operations-client-financial-review-draft.js",
+      "sha256": "efd0d86422dd414d5e02b3f96fc6a02c4e15a9ddd7ce503c5310131411325947",
+      "status": "REVIEW_ONLY_NOT_APPLIED"
+    }
+  ]
+}

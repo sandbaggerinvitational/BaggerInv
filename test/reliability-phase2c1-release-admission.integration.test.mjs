@@ -34,10 +34,23 @@ async function destroyCluster(cluster){await destroyOwnedCluster(cluster);}
 `+source.slice(end);
 const later=(await readdir(path.join(repositoryRoot,'supabase/production_migrations'))).filter(n=>/^\d{12}_.*\.sql$/.test(n)&&Number(n.slice(8,12))>=79&&Number(n.slice(8,12))<=126).sort();
 assert.equal(later.at(-1)?.slice(8,12),'0126');
+// Opt-in P0F proof installs the exact candidate, preserving historical default126.
+if(process.env.BAGGER_P0F_CANDIDATE==='1'){
+ const installed=Number(later.at(-1).slice(8,12));
+ const additions=(await readdir(path.join(repositoryRoot,'supabase/production_migrations')))
+  .filter(n=>/^\d{12}_.*\.sql$/.test(n)&&Number(n.slice(8,12))>installed&&Number(n.slice(8,12))<=130).sort();
+ assert.equal(additions.length,130-installed);
+ later.push(...additions);
+}
+const p0fDefinitionsSql="select jsonb_agg(jsonb_build_object('signature',v.signature,'definition',pg_get_functiondef(v.signature::regprocedure)) order by v.signature) from (values ('public.mutate_production_match_control(jsonb)'),('production_control.read_tournament_setup_before_round_workspace_v1(jsonb)'),('production_control.mutate_setup_before_late_r3_v1(jsonb)'),('production_control.mutate_round_pairings_before_late_r3_v1(jsonb)'),('public.read_production_tournament_setup_v1(jsonb)'),('production_control.mutate_late_r3_dispatch_v1(jsonb,boolean)'),('public.mutate_production_round_pairings_v1(jsonb)'),('public.mutate_production_tournament_setup_v1(jsonb)'),('public.save_production_net_skins_entries_v1(jsonb)'),('public.replace_production_calcutta_v1_auction_facts(jsonb)'),('public.clear_production_calcutta_v1_auction_entry(jsonb)')) v(signature)";
+const p0fPrerequisites=['supabase/production_incremental/director-calcutta-management-read-v1.sql','supabase/production_incremental/director-calcutta-clear-entry-v1.sql'];
 const extras=['supabase/production_incremental/net-skins-sql-expressions-v1.sql','supabase/production_incremental/calcutta-exact-job-activation-recovery-v1.sql','candidates/scored-match-resume.sql'];
 once('        const frozenDatabase = "annual_normal_release_frozen_2026";',`
+        let p0fBeforeDefinitions;
         for(const filename of ${JSON.stringify(later)}){
           if(filename.startsWith('202609280121'))for(const extra of ${JSON.stringify(extras)})psqlFile(cluster,database,path.join(repositoryRoot,extra));
+          if(filename.startsWith('202609300128'))for(const extra of ${JSON.stringify(p0fPrerequisites)})psqlFile(cluster,database,path.join(repositoryRoot,extra));
+          if(filename.startsWith('202609300128'))p0fBeforeDefinitions=JSON.parse(psql(cluster,database,${JSON.stringify(p0fDefinitionsSql)}));
           psqlFile(cluster,database,path.join(migrationsDirectory,filename));
         }
         // This is canonical synthetic fixture configuration, not Google data import.
@@ -54,10 +67,23 @@ once('function normalReleaseDirectInput(current, label, overrides = {}) {\n  ret
     runtime_archive_worker_secret_configured:false,
     runtime_odds_publication_authority:'SUPABASE',
     runtime_supabase_odds_publication_enabled:true,`);
+// P0F-only positive equivalence uses the already admitted synthetic frozen2026
+// database. No hosted identity is asserted by this harness.
+if(process.env.BAGGER_P0F_CANDIDATE==='1')source=`import {runP0FProductionEquivalence} from ${JSON.stringify(pathToFileURL(path.join(repositoryRoot,'test/support/reliability/p0f-production-equivalence.mjs')).href)};\n`+source;
 const annualInitMarker='        const annualBefore = psql(';
 once(annualInitMarker,`
+        if(process.env.BAGGER_P0F_CANDIDATE==='1'){
+          const protectedProof=runP0FProductionEquivalence({cluster,database:frozenDatabase,psql,jsonSql,scope:normalReleaseCapabilityScope(),beforeDefinitions:p0fBeforeDefinitions});
+          const protectedFile=path.join(repositoryRoot,'docs/reliability/phase2c1-closure/evidence/p0f-approved/protected-equivalence.json');
+          mkdirSync(path.dirname(protectedFile),{recursive:true});writeFileSync(protectedFile,JSON.stringify(protectedProof,null,2)+'\\n');
+        }
+        // The historical126 helper expects the CREATE contradiction. Candidate127+
+        // is certified by the separate corrected annual-create suite; do not run
+        // its obsolete expected-red assertion as release admission evidence.
+        if(process.env.BAGGER_P0F_CANDIDATE!=='1'||process.env.BAGGER_P0F_ANNUAL_CONTRACT==='1'){
         const annualProof=runZeroGoogleAnnualInitialization({cluster,database:frozenDatabase,psql,jsonSql});
         const annualEvidenceFile=path.join(repositoryRoot,'docs/reliability/phase2c1/evidence/annual-initialization.json');mkdirSync(path.dirname(annualEvidenceFile),{recursive:true});writeFileSync(annualEvidenceFile,JSON.stringify(annualProof.evidence,null,2)+'\\n');
+        }
 `+annualInitMarker);
 const annualMarker='        const annualBefore = psql(';
 once(annualMarker,`
@@ -81,6 +107,7 @@ once(finalMarker,`
           staleAuthorityDenied:true,conflictingReplayDenied:true,canonicalActiveWorkerDenied:true,orphanCanonicalLeaseDenied:true,activeAnnualTransitionDenied:true,
           GoogleFlagsRejected:5,retiredMirrorHistoryIgnored:true,annualRowsUnchanged:annualAfter===annualBefore,canonicalSideGameCertification:zeroGoogleContext.sideGameCertificationFingerprint,
           limitations:['Synthetic annual authority fixture; not a full CREATE/PREPARE/ACTIVATE annual initialization','Historical platform bootstrap models prior Google cutover locally; candidate normal release phase requires no Google','No hosted, Production, real Google or physical proof'],timestamp:new Date().toISOString()};
+        if(process.env.BAGGER_P0F_CANDIDATE==='1')evidence.schema=130;
         if(process.env.BAGGER_PHASE2C1_RELEASE_EVIDENCE){const file=path.resolve(process.env.BAGGER_PHASE2C1_RELEASE_EVIDENCE);assert.ok(file.startsWith(path.join(repositoryRoot,'docs/reliability/phase2c1/')));mkdirSync(path.dirname(file),{recursive:true});writeFileSync(file,JSON.stringify(evidence,null,2)+'\\n');}
         console.log(JSON.stringify(evidence));
 `+finalMarker);

@@ -1,0 +1,37 @@
+{
+  "suite": "routing-safety",
+  "executionHead": "7b6ca99510dc2f44cc411bfe7769e7f0c05ed962",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "remoteNetwork": "DENIED_AT_NET_TLS_SOCKET",
+  "providerCredentials": "SCRUBBED",
+  "fixtureSecrets": "SYNTHETIC_ONLY",
+  "args": [
+    "node",
+    "--conditions=react-server",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "test/reliability-phase2c1-closure-routing.test.mjs"
+  ],
+  "node": "v26.7.0",
+  "counts": {
+    "tests": 3,
+    "pass": 0,
+    "fail": 3,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "exitCode": 1,
+  "failures": [
+    "NA-CANONICAL-ROUTING-01: exact diagnostic read authority needs no Google configuration",
+    "NA-CANONICAL-ROUTING-02: readable candidate never acquires publication or scoring writes",
+    "canonical candidate retains exact security admission and cannot fallback to Preview"
+  ],
+  "entryPointHashes": {
+    "test/reliability-phase2c1-closure-routing.test.mjs": "2777dd61ce6757e72d031121848b1c279b892364e4730c358083c169c94e4e5d"
+  },
+  "sourcesUnchanged": true,
+  "rawSha256": "3ed0bfe59c67d80b67e5abeb8a3c5abceda562db1b456834f981abce44270e4f",
+  "rawArtifact": "/private/tmp/bagger-p0f-routing-7b6ca995-20260930T015537Z/routing-safety.tap",
+  "limitation": "Read-only test invocation; uses same network guard but omits old evidence-output redirection to avoid historical evidence mutation. Existing tests are UNIT/API adapter fakes, not hosted proof."
+}

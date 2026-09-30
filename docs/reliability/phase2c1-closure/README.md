@@ -1,3 +1,26 @@
+# Current P0-F closure result
+
+**PASS at the required local/non-Production proof layer.** All seven remaining Director identities, all three canonical routing cases and P0 A–F are closed at their stated scope. Google remains retired from the candidate runtime architecture. Ready for owner review before a separate hosted/staging certification task: **YES**. No staging or Production action is authorized by this result.
+
+The current authority is:
+
+- [Owner review](OWNER-REVIEW.md)
+- [Certification](CERTIFICATION.md)
+- [Final closure and migration/rollback requirements](P0F-FINAL-CLOSURE.md)
+- [P0-F proof matrix](P0F-PROOF-MATRIX.md)
+- [Evidence and exact test counts](EVIDENCE.md)
+- [Machine-readable final index](evidence/p0f-approved/final-index.json)
+- [Broad-test accounting addendum](P0F-TEST-ACCOUNTING-ADDENDUM.md)
+- [Next single phase: separately authorized Phase 2D](NEXT-PHASE.md)
+
+The exact candidate is the enclosing Git commit containing this report. Execution receipts identify base `7b6ca99510dc2f44cc411bfe7769e7f0c05ed962` plus source manifests. The local zero-Google sequence is 432 holes / 24 Finals; actual History service and adjacent readers pass in the 112-test adapter suite using mocked transport. Broad results are 4,077 pass / 20 unchanged baseline failures. These are not hosted, Production or physical-device certifications.
+
+## Historical closure checkpoint — superseded, preserved unchanged below
+
+The earlier PARTIAL narrative and its original reports below describe the pre-approval checkpoint. They are historical evidence, not current P0-F certification. The current links above supersede their status statements without rewriting them.
+
+---
+
 # Phase 2C.1 canonical capability and proof closure
 
 **PARTIAL — not ready for owner review before hosted/staging certification.** Google remains retired as the chosen architecture. The completed changes preserve that decision; remaining required Director capability and read-routing proofs are listed rather than waived.

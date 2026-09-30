@@ -1,0 +1,112 @@
+TAP version 13
+# Subtest: UI canonical workspace supplies every existing editor its canonical transport and excludes financial configure
+ok 1 - UI canonical workspace supplies every existing editor its canonical transport and excludes financial configure
+  ---
+  duration_ms: 19.423416
+  type: 'test'
+  ...
+# Subtest: UI missing current authority renders no mutation editor and a local retry
+ok 2 - UI missing current authority renders no mutation editor and a local retry
+  ---
+  duration_ms: 2.18025
+  type: 'test'
+  ...
+# Subtest: UI failed admission stays local and never invokes a different provider
+ok 3 - UI failed admission stays local and never invokes a different provider
+  ---
+  duration_ms: 2.433209
+  type: 'test'
+  ...
+# Subtest: UI auctionOnly=true preserves only the requested financial controls
+ok 4 - UI auctionOnly=true preserves only the requested financial controls
+  ---
+  duration_ms: 11.000667
+  type: 'test'
+  ...
+# Subtest: UI auctionOnly=false preserves only the requested financial controls
+ok 5 - UI auctionOnly=false preserves only the requested financial controls
+  ---
+  duration_ms: 9.071084
+  type: 'test'
+  ...
+# Subtest: SOURCE console mounts canonical workspace and no retired route; Production defaults remain explicit
+ok 6 - SOURCE console mounts canonical workspace and no retired route; Production defaults remain explicit
+  ---
+  duration_ms: 1.018542
+  type: 'test'
+  ...
+# Subtest: UI match review captures one UUID and exact current match revisions
+ok 7 - UI match review captures one UUID and exact current match revisions
+  ---
+  duration_ms: 3.494375
+  type: 'test'
+  ...
+# Subtest: UI unknown match outcome exposes same-review retry and retains UUID; verified recovery clears it
+ok 8 - UI unknown match outcome exposes same-review retry and retains UUID; verified recovery clears it
+  ---
+  duration_ms: 7.385541
+  type: 'test'
+  ...
+# Subtest: SOURCE isolated profile cannot mount the Production awards editor even with stale selected section
+ok 9 - SOURCE isolated profile cannot mount the Production awards editor even with stale selected section
+  ---
+  duration_ms: 0.4735
+  type: 'test'
+  ...
+# Subtest: UI isolated setup contains an unknown attempt and retries the same reviewed payload; confirmation releases containment
+ok 10 - UI isolated setup contains an unknown attempt and retries the same reviewed payload; confirmation releases containment
+  ---
+  duration_ms: 13.834958
+  type: 'test'
+  ...
+# Subtest: UI Production setup default keeps its existing post-error editing behavior
+ok 11 - UI Production setup default keeps its existing post-error editing behavior
+  ---
+  duration_ms: 10.876292
+  type: 'test'
+  ...
+# Subtest: UI isolated entry unknown outcome freezes selections and retains exact payload/UUID on retry
+ok 12 - UI isolated entry unknown outcome freezes selections and retains exact payload/UUID on retry
+  ---
+  duration_ms: 6.881708
+  type: 'test'
+  ...
+# Subtest: UI isolated entry workspace blocks reload and other round edits while a reviewed operation is unresolved
+ok 13 - UI isolated entry workspace blocks reload and other round edits while a reviewed operation is unresolved
+  ---
+  duration_ms: 5.313875
+  type: 'test'
+  ...
+# Subtest: UI Production entries default remains editable after a failed save
+ok 14 - UI Production entries default remains editable after a failed save
+  ---
+  duration_ms: 5.998625
+  type: 'test'
+  ...
+# Subtest: UI auction-only unknown outcome disables discard/read, retains exact request and releases only after verified recovery
+ok 15 - UI auction-only unknown outcome disables discard/read, retains exact request and releases only after verified recovery
+  ---
+  duration_ms: 11.629792
+  type: 'test'
+  ...
+# Subtest: UI Production Calcutta default preserves the existing explicit discard option
+ok 16 - UI Production Calcutta default preserves the existing explicit discard option
+  ---
+  duration_ms: 9.911375
+  type: 'test'
+  ...
+# Subtest: CLIENT BOUNDARY match controls import only the pure availability helper and preserve action semantics
+ok 17 - CLIENT BOUNDARY match controls import only the pure availability helper and preserve action semantics
+  ---
+  duration_ms: 0.668708
+  type: 'test'
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 322.33325

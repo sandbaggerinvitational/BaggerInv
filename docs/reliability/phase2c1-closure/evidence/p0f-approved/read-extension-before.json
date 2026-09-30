@@ -1,0 +1,15 @@
+{
+  "environment": "LOCAL_NO_NETWORK_SYNTHETIC_ENVIRONMENT",
+  "history": {
+    "resolved": "unavailable",
+    "reason": "supabase-service-disabled",
+    "productionShadowCandidate": true,
+    "serviceError": "HISTORY_2026_SUPABASE_CONFIGURATION_REQUIRED"
+  },
+  "predictionInvalidRequested": {
+    "available": true,
+    "reason": "preview-supabase-prediction-input-bundle",
+    "productionShadowCandidate": false
+  },
+  "fetchCalls": 0
+}

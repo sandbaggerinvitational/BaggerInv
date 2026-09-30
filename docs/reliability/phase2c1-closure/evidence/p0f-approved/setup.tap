@@ -1,0 +1,71 @@
+TAP version 13
+# Subtest: P0-F approved setup/control extraction preserves admission, domain rules, bounded recovery and canonical capabilities
+    # Subtest: installed catalog: OID/owner/domain identity, least privilege, exact direct-call denials
+    ok 1 - installed catalog: OID/owner/domain identity, least privilege, exact direct-call denials
+      ---
+      duration_ms: 202.8675
+      type: 'test'
+      ...
+    # Subtest: protected public and nested round entry points still deny isolated authority; new gateway denies stale/unprivileged scope
+    ok 2 - protected public and nested round entry points still deny isolated authority; new gateway denies stale/unprivileged scope
+      ---
+      duration_ms: 213.057041
+      type: 'test'
+      ...
+    # Subtest: canonical course/tee setup and same-request replay preserve frozen handicap authority
+    ok 3 - canonical course/tee setup and same-request replay preserve frozen handicap authority
+      ---
+      duration_ms: 1198.970875
+      type: 'test'
+      ...
+    # Subtest: atomic full-round participant exchange uses current approved handicap and preserves complete coverage
+    ok 4 - atomic full-round participant exchange uses current approved handicap and preserves complete coverage
+      ---
+      duration_ms: 465.648083
+      type: 'test'
+      ...
+    # Subtest: prepared context gates Mark Live; lock/unlock and access authority remain distinct and receipt-backed
+    ok 5 - prepared context gates Mark Live; lock/unlock and access authority remain distinct and receipt-backed
+      ---
+      duration_ms: 1113.192583
+      type: 'test'
+      ...
+    # Subtest: lost response resolves exact canonical receipt after context change without replay or new operation
+    ok 6 - lost response resolves exact canonical receipt after context change without replay or new operation
+      ---
+      duration_ms: 117.52575
+      type: 'test'
+      ...
+    # Subtest: injected required audit failure rolls back setup authority and receipt atomically
+    ok 7 - injected required audit failure rolls back setup authority and receipt atomically
+      ---
+      duration_ms: 405.191584
+      type: 'test'
+      ...
+    # Subtest: Google remains absent; financial facts and canonical scores remain unchanged
+    ok 8 - Google remains absent; financial facts and canonical scores remain unchanged
+      ---
+      duration_ms: 20.284333
+      type: 'test'
+      ...
+    1..8
+ok 1 - P0-F approved setup/control extraction preserves admission, domain rules, bounded recovery and canonical capabilities
+  ---
+  duration_ms: 6331.369625
+  type: 'test'
+  ...
+# Subtest: P0-F migration refuses an unreviewed OID-bound caller before moving any authority function
+ok 2 - P0-F migration refuses an unreviewed OID-bound caller before moving any authority function
+  ---
+  duration_ms: 2749.61675
+  type: 'test'
+  ...
+1..2
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9133.35525

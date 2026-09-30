@@ -1,0 +1,255 @@
+{
+  "schema": "p0f-readonly-capability-reproduction-v1",
+  "executionHead": "7b6ca99510dc2f44cc411bfe7769e7f0c05ed962",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "proofLayer": "API_HANDLER_AND_ACTUAL_SELECTOR_CHARACTERIZATION",
+  "result": "7_REQUIRED_GAPS_REPRODUCED",
+  "counts": {
+    "gapIdentities": 7,
+    "missingCapabilityResponses": 7,
+    "unsupportedControlOperations": 5,
+    "fetchCalls": 0,
+    "downstreamCalls": 0,
+    "authorizationStubCalls": 2
+  },
+  "rows": [
+    {
+      "id": "BROAD-NEW-007",
+      "file": "app/api/director/tournament-setup/route.js",
+      "route": "/api/director/tournament-setup",
+      "method": "POST",
+      "input": {
+        "action": "upsert-course"
+      },
+      "expectedStatus": 404,
+      "expectedCode": null,
+      "capability": "Course/tee + handicap readback",
+      "observed": {
+        "status": 404,
+        "body": {
+          "error": "Not found."
+        },
+        "authorizationStubCalls": 0,
+        "downstreamStubCalls": 0,
+        "fetchCalls": 0
+      },
+      "result": "MISSING_CAPABILITY_REPRODUCED",
+      "capabilityVerdict": "PARTIAL"
+    },
+    {
+      "id": "BROAD-NEW-008",
+      "file": "app/api/director/tournament-setup/route.js",
+      "route": "/api/director/tournament-setup",
+      "method": "GET",
+      "expectedStatus": 404,
+      "expectedCode": null,
+      "capability": "Verified full setup operation pipeline",
+      "observed": {
+        "status": 404,
+        "body": {
+          "error": "Not found."
+        },
+        "authorizationStubCalls": 0,
+        "downstreamStubCalls": 0,
+        "fetchCalls": 0
+      },
+      "result": "MISSING_CAPABILITY_REPRODUCED",
+      "capabilityVerdict": "PARTIAL"
+    },
+    {
+      "id": "BROAD-NEW-009",
+      "file": "app/api/director/tournament-setup/route.js",
+      "route": "/api/director/tournament-setup",
+      "method": "POST",
+      "input": {
+        "action": "replace-round-pairings"
+      },
+      "expectedStatus": 404,
+      "expectedCode": null,
+      "capability": "Atomic round pairings",
+      "observed": {
+        "status": 404,
+        "body": {
+          "error": "Not found."
+        },
+        "authorizationStubCalls": 0,
+        "downstreamStubCalls": 0,
+        "fetchCalls": 0
+      },
+      "result": "MISSING_CAPABILITY_REPRODUCED",
+      "capabilityVerdict": "PARTIAL"
+    },
+    {
+      "id": "BROAD-NEW-010",
+      "file": "app/api/director/net-skins-entries/route.js",
+      "route": "/api/director/net-skins-entries",
+      "method": "POST",
+      "input": {
+        "roundId": "R1",
+        "operationRequestId": "synthetic-entry"
+      },
+      "expectedStatus": 404,
+      "expectedCode": null,
+      "capability": "Net Skins entry authority",
+      "observed": {
+        "status": 404,
+        "body": {
+          "error": "Not found."
+        },
+        "authorizationStubCalls": 0,
+        "downstreamStubCalls": 0,
+        "fetchCalls": 0
+      },
+      "result": "MISSING_CAPABILITY_REPRODUCED",
+      "capabilityVerdict": "PARTIAL"
+    },
+    {
+      "id": "BROAD-NEW-011",
+      "file": "app/api/admin/production-calcutta-v1/route.js",
+      "route": "/api/admin/production-calcutta-v1",
+      "method": "POST",
+      "input": {
+        "action": "management-entry"
+      },
+      "expectedStatus": 404,
+      "expectedCode": null,
+      "capability": "Calcutta purchase/ownership",
+      "observed": {
+        "status": 404,
+        "body": {
+          "error": "Not found."
+        },
+        "authorizationStubCalls": 0,
+        "downstreamStubCalls": 0,
+        "fetchCalls": 0
+      },
+      "result": "MISSING_CAPABILITY_REPRODUCED",
+      "capabilityVerdict": "PARTIAL"
+    },
+    {
+      "id": "BROAD-NEW-012",
+      "file": "app/api/director/canonical-overview/route.js",
+      "route": "/api/director/canonical-overview",
+      "method": "POST",
+      "input": {
+        "action": "scoring-lock",
+        "matchId": "M1",
+        "operationRequestId": "synthetic-lock",
+        "expectedMatchRevision": 1,
+        "expectedPermissionRevision": 1
+      },
+      "expectedStatus": 400,
+      "expectedCode": "DIRECTOR_CANONICAL_INPUT_INVALID",
+      "capability": "Contextual Lock/Resume controls",
+      "observed": {
+        "status": 400,
+        "body": {
+          "code": "DIRECTOR_CANONICAL_INPUT_INVALID",
+          "error": "The canonical operation could not be confirmed. Refresh current authority before retrying the same operation."
+        },
+        "authorizationStubCalls": 1,
+        "downstreamStubCalls": 0,
+        "fetchCalls": 0
+      },
+      "result": "MISSING_CAPABILITY_REPRODUCED",
+      "capabilityVerdict": "PARTIAL"
+    },
+    {
+      "id": "BROAD-NEW-174",
+      "file": "app/api/director/canonical-overview/route.js",
+      "route": "/api/director/canonical-overview",
+      "method": "POST",
+      "input": {
+        "action": "mark-live",
+        "matchId": "M1",
+        "operationRequestId": "synthetic-open",
+        "expectedMatchRevision": 1,
+        "expectedPermissionRevision": 1
+      },
+      "expectedStatus": 400,
+      "expectedCode": "DIRECTOR_CANONICAL_INPUT_INVALID",
+      "capability": "Mark Live / scoring lock / access",
+      "observed": {
+        "status": 400,
+        "body": {
+          "code": "DIRECTOR_CANONICAL_INPUT_INVALID",
+          "error": "The canonical operation could not be confirmed. Refresh current authority before retrying the same operation."
+        },
+        "authorizationStubCalls": 1,
+        "downstreamStubCalls": 0,
+        "fetchCalls": 0
+      },
+      "result": "MISSING_CAPABILITY_REPRODUCED",
+      "capabilityVerdict": "PARTIAL"
+    }
+  ],
+  "controls": [
+    {
+      "operation": "MARK_LIVE",
+      "status": 409,
+      "code": "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY",
+      "result": "UNSUPPORTED_REPRODUCED"
+    },
+    {
+      "operation": "SCORING_LOCK",
+      "status": 409,
+      "code": "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY",
+      "result": "UNSUPPORTED_REPRODUCED"
+    },
+    {
+      "operation": "SCORING_UNLOCK",
+      "status": 409,
+      "code": "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY",
+      "result": "UNSUPPORTED_REPRODUCED"
+    },
+    {
+      "operation": "ACCESS_ACTIVATE",
+      "status": 409,
+      "code": "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY",
+      "result": "UNSUPPORTED_REPRODUCED"
+    },
+    {
+      "operation": "ACCESS_REVOKE",
+      "status": 409,
+      "code": "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY",
+      "result": "UNSUPPORTED_REPRODUCED"
+    }
+  ],
+  "sourceHashes": [
+    {
+      "file": "app/api/director/tournament-setup/route.js",
+      "sha256": "2b2e17a9d6c956ea8a5613f72cbe4b6403f460c311edc88705f9150912c4b813"
+    },
+    {
+      "file": "app/api/director/net-skins-entries/route.js",
+      "sha256": "e656ed40d0c5786a9512fa74b5f36b86cc07b3d74c9c3e047b4e6ec3a961bdf8"
+    },
+    {
+      "file": "app/api/admin/production-calcutta-v1/route.js",
+      "sha256": "18ebfe673a670ded1893b2e8f7b13fa2d32a05036ac94ef384b3d74284a22254"
+    },
+    {
+      "file": "app/api/director/canonical-overview/route.js",
+      "sha256": "e667bf29f98f04b4641a71fc96a6c34a3d52260d7cbd63720fe8d14690d83e36"
+    },
+    {
+      "file": "lib/canonical-director-overview.js",
+      "sha256": "2d893243410144767d6655c68007d4014fceb33423df9226571e2fce1df3039d"
+    },
+    {
+      "file": "lib/scoring-authority-supabase.js",
+      "sha256": "4dde49461f6805cccce8b5805a80ab4ba159627abc90e1b321d27d92df941196"
+    },
+    {
+      "file": "lib/production-tournament-setup-contract.js",
+      "sha256": "2a242a6bf200515eac2cc9c88f578cbaa446b588c5ec5f53c3ff8b85b81b95f7"
+    }
+  ],
+  "limitations": [
+    "Shipping route function bodies executed through the prior closure route-loader pattern; named imports are replaced with explicit stubs.",
+    "Production-only route guards execute before authorization and request validation; these five requests intentionally characterize admission, not full valid client payloads.",
+    "Canonical overview executes actual isolated mutation helper, with synthetic active entitlement; unsupported action returns before database I/O.",
+    "Authorization provider is stubbed: not a security PASS. No SQL, hosted environment, rendering, or successful capability chain is proven.",
+    "No requested or rejected source change was applied; no test expectations were changed."
+  ]
+}

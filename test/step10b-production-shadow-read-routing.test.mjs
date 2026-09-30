@@ -182,7 +182,8 @@ test("all migrated candidate selectors resolve only certified Production shadow 
 
   const odds = oddsCalculationEnvironment(candidateReadEnv);
   assert.equal(odds.inputSource, "supabase");
-  assert.equal(odds.publicationAuthority, "google");
+  assert.equal(odds.publicationAuthority, "unavailable");
+  assert.equal(odds.publicationBlocked, true);
   assert.equal(odds.productionShadowCandidate, true);
 
   const guideSync = guideSyncEnvironment({ ...candidateReadEnv, GUIDE_AUTO_SYNC_ENABLED: "true" });

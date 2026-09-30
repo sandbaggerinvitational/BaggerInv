@@ -1,0 +1,262 @@
+TAP version 13
+# Subtest: NA-CANONICAL-ROUTING-01: exact diagnostic read authority needs no Google configuration
+ok 1 - NA-CANONICAL-ROUTING-01: exact diagnostic read authority needs no Google configuration
+  ---
+  duration_ms: 1.188625
+  type: 'test'
+  ...
+# Subtest: NA-CANONICAL-ROUTING-02: readable candidate never acquires publication or scoring writes
+ok 2 - NA-CANONICAL-ROUTING-02: readable candidate never acquires publication or scoring writes
+  ---
+  duration_ms: 15.280042
+  type: 'test'
+  ...
+# Subtest: canonical candidate retains exact security admission and cannot fallback to Preview
+ok 3 - canonical candidate retains exact security admission and cannot fallback to Preview
+  ---
+  duration_ms: 1.170041
+  type: 'test'
+  ...
+# Subtest: diagnostic Google absence or stale configuration cannot select provider fallback
+ok 4 - diagnostic Google absence or stale configuration cannot select provider fallback
+  ---
+  duration_ms: 0.422583
+  type: 'test'
+  ...
+# Subtest: exact Production-shadow candidate tuple enables Supabase Auth without selecting live Production
+ok 5 - exact Production-shadow candidate tuple enables Supabase Auth without selecting live Production
+  ---
+  duration_ms: 2.342
+  type: 'test'
+  ...
+# Subtest: candidate fails closed on hostname, resource, CAPTCHA, or authority drift
+ok 6 - candidate fails closed on hostname, resource, CAPTCHA, or authority drift
+  ---
+  duration_ms: 1.49825
+  type: 'test'
+  ...
+# Subtest: candidate requests are bound to the stable alias and same origin
+ok 7 - candidate requests are bound to the stable alias and same origin
+  ---
+  duration_ms: 11.562833
+  type: 'test'
+  ...
+# Subtest: Production-shadow Auth page and optional diagnostics stay on the exact candidate boundary
+ok 8 - Production-shadow Auth page and optional diagnostics stay on the exact candidate boundary
+  ---
+  duration_ms: 4.272375
+  type: 'test'
+  ...
+# Subtest: Production-shadow candidate cannot initialize or call the legacy Google Admin CMS path
+ok 9 - Production-shadow candidate cannot initialize or call the legacy Google Admin CMS path
+  ---
+  duration_ms: 0.88775
+  type: 'test'
+  ...
+# Subtest: Google modules import without side effects but default operations retain the Preview workbook guard
+ok 10 - Google modules import without side effects but default operations retain the Preview workbook guard
+  ---
+  duration_ms: 90.556334
+  type: 'test'
+  ...
+# Subtest: Production-shadow candidate blocks explicit Production archive reads before transport or fallback
+ok 11 - Production-shadow candidate blocks explicit Production archive reads before transport or fallback
+  ---
+  duration_ms: 57.967458
+  type: 'test'
+  ...
+# Subtest: malformed requested Production-shadow candidate also blocks explicit Google reads
+ok 12 - malformed requested Production-shadow candidate also blocks explicit Google reads
+  ---
+  duration_ms: 56.666208
+  type: 'test'
+  ...
+# Subtest: live Production fails closed when candidate variables explicitly request Supabase identity
+ok 13 - live Production fails closed when candidate variables explicitly request Supabase identity
+  ---
+  duration_ms: 0.325
+  type: 'test'
+  ...
+# Subtest: Production-shadow identity RPCs are allowlisted and Preview administration remains separate
+ok 14 - Production-shadow identity RPCs are allowlisted and Preview administration remains separate
+  ---
+  duration_ms: 0.387125
+  type: 'test'
+  ...
+# Subtest: Production-shadow Director entitlement authorizes only the explicit read-only diagnostic
+ok 15 - Production-shadow Director entitlement authorizes only the explicit read-only diagnostic
+  ---
+  duration_ms: 1.291
+  type: 'test'
+  ...
+# Subtest: required CAPTCHA remains fail-closed when its key/configuration is unavailable
+ok 16 - required CAPTCHA remains fail-closed when its key/configuration is unavailable
+  ---
+  duration_ms: 0.421375
+  type: 'test'
+  ...
+# Subtest: candidate SMS stays disabled until the candidate-only certification flag is explicit
+ok 17 - candidate SMS stays disabled until the candidate-only certification flag is explicit
+  ---
+  duration_ms: 0.300541
+  type: 'test'
+  ...
+# Subtest: Auth request hashing uses an Auth-only HMAC and provider failures are classified distinctly
+ok 18 - Auth request hashing uses an Auth-only HMAC and provider failures are classified distinctly
+  ---
+  duration_ms: 3.07575
+  type: 'test'
+  ...
+# Subtest: Production Auth preprovision evidence is exact, deterministic, and does not retain raw email
+ok 19 - Production Auth preprovision evidence is exact, deterministic, and does not retain raw email
+  ---
+  duration_ms: 0.411167
+  type: 'test'
+  ...
+# Subtest: Production Auth recovery is bound to one exact OTP request and Auth user
+ok 20 - Production Auth recovery is bound to one exact OTP request and Auth user
+  ---
+  duration_ms: 0.212125
+  type: 'test'
+  ...
+# Subtest: Production-shadow central identity resolver rejects PREPARED candidates and accepts only exact VERIFIED identity
+ok 21 - Production-shadow central identity resolver rejects PREPARED candidates and accepts only exact VERIFIED identity
+  ---
+  duration_ms: 0.778
+  type: 'test'
+  ...
+# Subtest: post-Auth certification recording retries boundedly without requesting another OTP
+ok 22 - post-Auth certification recording retries boundedly without requesting another OTP
+  ---
+  duration_ms: 0.214792
+  type: 'test'
+  ...
+# Subtest: server credential transport and Production Auth migration are browser-inaccessible
+ok 23 - server credential transport and Production Auth migration are browser-inaccessible
+  ---
+  duration_ms: 6.615916
+  type: 'test'
+  ...
+# Subtest: Production-shadow reads require the asserted exact Production server transport
+ok 24 - Production-shadow reads require the asserted exact Production server transport
+  ---
+  duration_ms: 1.244459
+  type: 'test'
+  ...
+# Subtest: all migrated candidate selectors resolve only certified Production shadow reads
+ok 25 - all migrated candidate selectors resolve only certified Production shadow reads
+  ---
+  duration_ms: 1.724667
+  type: 'test'
+  ...
+# Subtest: missing candidate transport fails closed without a Google fallback
+ok 26 - missing candidate transport fails closed without a Google fallback
+  ---
+  duration_ms: 0.605959
+  type: 'test'
+  ...
+# Subtest: unadmitted Production fails closed and rejects injected candidate read selection
+ok 27 - unadmitted Production fails closed and rejects injected candidate read selection
+  ---
+  duration_ms: 0.415209
+  type: 'test'
+  ...
+# Subtest: candidate can never acquire Odds publication authority
+ok 28 - candidate can never acquire Odds publication authority
+  ---
+  duration_ms: 0.109209
+  type: 'test'
+  ...
+# Subtest: candidate War Room cannot select the Google rollback adapter
+ok 29 - candidate War Room cannot select the Google rollback adapter
+  ---
+  duration_ms: 0.135542
+  type: 'test'
+  ...
+# Subtest: candidate transport bypasses the legacy Preview gate for allowlisted reads only
+ok 30 - candidate transport bypasses the legacy Preview gate for allowlisted reads only
+  ---
+  duration_ms: 15.2295
+  type: 'test'
+  ...
+# Subtest: the exact Production-shadow candidate rejects scoring mutations as read-only
+ok 31 - the exact Production-shadow candidate rejects scoring mutations as read-only
+  ---
+  duration_ms: 14.145833
+  type: 'test'
+  ...
+# Subtest: a malformed requested candidate fails closed while ordinary Preview and live Production remain unchanged
+ok 32 - a malformed requested candidate fails closed while ordinary Preview and live Production remain unchanged
+  ---
+  duration_ms: 0.408292
+  type: 'test'
+  ...
+# Subtest: every web scoring mutation and scoring-session issuance fails before side effects
+ok 33 - every web scoring mutation and scoring-session issuance fails before side effects
+  ---
+  duration_ms: 7.216458
+  type: 'test'
+  ...
+# Subtest: mobile scoring mutations short-circuit before identity, persistence, and post-commit work
+ok 34 - mobile scoring mutations short-circuit before identity, persistence, and post-commit work
+  ---
+  duration_ms: 1.226042
+  type: 'test'
+  ...
+# Subtest: candidate score pages disable local-first persistence and render only read-only match actions
+ok 35 - candidate score pages disable local-first persistence and render only read-only match actions
+  ---
+  duration_ms: 1.179833
+  type: 'test'
+  ...
+# Subtest: Step 11 worker installs v6, activates immediately, and evicts only older SBI shells
+ok 36 - Step 11 worker installs v6, activates immediately, and evicts only older SBI shells
+  ---
+  duration_ms: 21.025667
+  type: 'test'
+  ...
+# Subtest: Step 11 worker never intercepts Auth, APIs, scoring, admin, Game Center, or Next assets
+ok 37 - Step 11 worker never intercepts Auth, APIs, scoring, admin, Game Center, or Next assets
+  ---
+  duration_ms: 2.680125
+  type: 'test'
+  ...
+# Subtest: Step 11 navigations are network-only with a static offline shell and never persist route data
+ok 38 - Step 11 navigations are network-only with a static offline shell and never persist route data
+  ---
+  duration_ms: 2.687667
+  type: 'test'
+  ...
+# Subtest: first worker install does not reload-loop and an existing controller reloads at most once
+ok 39 - first worker install does not reload-loop and an existing controller reloads at most once
+  ---
+  duration_ms: 0.674625
+  type: 'test'
+  ...
+# Subtest: SMS stays absent from the Production-shadow launch even when Preview phone variables leak in
+ok 40 - SMS stays absent from the Production-shadow launch even when Preview phone variables leak in
+  ---
+  duration_ms: 2.385208
+  type: 'test'
+  ...
+# Subtest: representative candidate Supabase services fail closed with zero Google fallback
+ok 41 - representative candidate Supabase services fail closed with zero Google fallback
+  ---
+  duration_ms: 79.450208
+  type: 'test'
+  ...
+# Subtest: the request-scoped route covers the Step 11 website/PWA matrix without write adapters
+ok 42 - the request-scoped route covers the Step 11 website/PWA matrix without write adapters
+  ---
+  duration_ms: 1.303959
+  type: 'test'
+  ...
+1..42
+# tests 42
+# suites 0
+# pass 42
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 828.279834

@@ -1,0 +1,793 @@
+{
+  "schemaVersion": 1,
+  "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+  "fixture": "phase2c-three-round-workers-v1",
+  "seed": "ordered-rounds-20260928",
+  "environment": "ISOLATED_LOCAL_POSTGRESQL17",
+  "statementTimeoutMs": 5000,
+  "composition": "121+122+123+124",
+  "migration": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+  "migrationSha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0",
+  "timestamp": "2026-09-30T03:41:47.365Z",
+  "tests": [
+    {
+      "id": "P2C-D-ORDER",
+      "title": "historical opposite-round transactions form one-way waiting, not a cycle",
+      "proofLayer": "CONCURRENCY",
+      "result": "PASS",
+      "details": {
+        "graph": [
+          {
+            "pid": 85115,
+            "wait": "advisory",
+            "blockedBy": [
+              85114
+            ]
+          }
+        ],
+        "deadlocks": 0,
+        "processed": 4,
+        "priorFailure": "before-migration.json P2-MIG-SKINS-DEADLOCK has reciprocal advisory waits and40P01"
+      }
+    },
+    {
+      "id": "P2C-D-STRESS-12",
+      "title": "repeated mixed-round 1/2 batches preserve current job parity",
+      "proofLayer": "CONCURRENCY",
+      "result": "PASS",
+      "details": {
+        "iterations": 8,
+        "rows": [
+          {
+            "iteration": 0,
+            "order": [
+              1,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 93.42041700000118,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 1,
+            "order": [
+              2,
+              1
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 129.6905000000006,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 2,
+            "order": [
+              1,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 97.61466599999949,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 3,
+            "order": [
+              2,
+              1
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 93.93133299999863,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 4,
+            "order": [
+              1,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 100.47450000000026,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 5,
+            "order": [
+              2,
+              1
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 99.3974159999998,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 6,
+            "order": [
+              1,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 110.04716700000063,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 7,
+            "order": [
+              2,
+              1
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 92.56541700000162,
+            "jobFingerprintParity": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-D-STRESS-23",
+      "title": "repeated mixed-round 2/3 batches preserve current job parity",
+      "proofLayer": "CONCURRENCY",
+      "result": "PASS",
+      "details": {
+        "iterations": 8,
+        "rows": [
+          {
+            "iteration": 0,
+            "order": [
+              2,
+              3
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 96.29179199999999,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 1,
+            "order": [
+              3,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 97.7320839999993,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 2,
+            "order": [
+              2,
+              3
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 96.09433300000092,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 3,
+            "order": [
+              3,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 116.64987499999916,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 4,
+            "order": [
+              2,
+              3
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 96.03191700000025,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 5,
+            "order": [
+              3,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 96.16849999999977,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 6,
+            "order": [
+              2,
+              3
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 99.1728750000002,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 7,
+            "order": [
+              3,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 94.88933299999917,
+            "jobFingerprintParity": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-D-STRESS-13",
+      "title": "repeated mixed-round 1/3 batches preserve current job parity",
+      "proofLayer": "CONCURRENCY",
+      "result": "PASS",
+      "details": {
+        "iterations": 8,
+        "rows": [
+          {
+            "iteration": 0,
+            "order": [
+              1,
+              3
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 103.2019169999985,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 1,
+            "order": [
+              3,
+              1
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 102.75145899999916,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 2,
+            "order": [
+              1,
+              3
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 106.12291600000026,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 3,
+            "order": [
+              3,
+              1
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 99.86841600000116,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 4,
+            "order": [
+              1,
+              3
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 114.66795799999818,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 5,
+            "order": [
+              3,
+              1
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 101.73091699999713,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 6,
+            "order": [
+              1,
+              3
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 100.02279099999942,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 7,
+            "order": [
+              3,
+              1
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 100.92470899999898,
+            "jobFingerprintParity": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-D-STRESS-123",
+      "title": "repeated mixed-round 1/2/3 batches preserve current job parity",
+      "proofLayer": "CONCURRENCY",
+      "result": "PASS",
+      "details": {
+        "iterations": 8,
+        "rows": [
+          {
+            "iteration": 0,
+            "order": [
+              1,
+              2,
+              3
+            ],
+            "workers": 3,
+            "processed": 9,
+            "deadlocks": 0,
+            "elapsedMs": 120.68574999999691,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 1,
+            "order": [
+              3,
+              2,
+              1
+            ],
+            "workers": 3,
+            "processed": 9,
+            "deadlocks": 0,
+            "elapsedMs": 117.21545800000604,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 2,
+            "order": [
+              1,
+              2,
+              3
+            ],
+            "workers": 3,
+            "processed": 9,
+            "deadlocks": 0,
+            "elapsedMs": 121.70441699999355,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 3,
+            "order": [
+              3,
+              2,
+              1
+            ],
+            "workers": 3,
+            "processed": 9,
+            "deadlocks": 0,
+            "elapsedMs": 119.11204100000032,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 4,
+            "order": [
+              1,
+              2,
+              3
+            ],
+            "workers": 3,
+            "processed": 9,
+            "deadlocks": 0,
+            "elapsedMs": 122.65662499999598,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 5,
+            "order": [
+              3,
+              2,
+              1
+            ],
+            "workers": 3,
+            "processed": 9,
+            "deadlocks": 0,
+            "elapsedMs": 125.25879200000054,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 6,
+            "order": [
+              1,
+              2,
+              3
+            ],
+            "workers": 3,
+            "processed": 9,
+            "deadlocks": 0,
+            "elapsedMs": 123.74366600000212,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 7,
+            "order": [
+              3,
+              2,
+              1
+            ],
+            "workers": 3,
+            "processed": 9,
+            "deadlocks": 0,
+            "elapsedMs": 119.19562500000029,
+            "jobFingerprintParity": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-D-STRESS-22",
+      "title": "repeated mixed-round 2/2 batches preserve current job parity",
+      "proofLayer": "CONCURRENCY",
+      "result": "PASS",
+      "details": {
+        "iterations": 8,
+        "rows": [
+          {
+            "iteration": 0,
+            "order": [
+              2,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 98.44779199999903,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 1,
+            "order": [
+              2,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 94.50545899999997,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 2,
+            "order": [
+              2,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 93.11587500000314,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 3,
+            "order": [
+              2,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 88.60991600000125,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 4,
+            "order": [
+              2,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 97.2566250000018,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 5,
+            "order": [
+              2,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 91.19841699999961,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 6,
+            "order": [
+              2,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 94.44154200000048,
+            "jobFingerprintParity": true
+          },
+          {
+            "iteration": 7,
+            "order": [
+              2,
+              2
+            ],
+            "workers": 3,
+            "processed": 6,
+            "deadlocks": 0,
+            "elapsedMs": 89.90437499999825,
+            "jobFingerprintParity": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-D-FINANCIAL",
+      "title": "serial and concurrent materialization preserve actual three-round Net Skins results",
+      "proofLayer": "CONCURRENCY",
+      "result": "PASS",
+      "details": {
+        "rounds": [
+          1,
+          2,
+          3
+        ],
+        "workers": 3,
+        "serialFlush": {
+          "failed": 0,
+          "family": "NET_SKINS",
+          "maximum": 8,
+          "cancelled": false,
+          "processed": 3
+        },
+        "parallelFlush": [
+          {
+            "failed": 0,
+            "family": "NET_SKINS",
+            "maximum": 1,
+            "cancelled": false,
+            "processed": 1
+          },
+          {
+            "failed": 0,
+            "family": "NET_SKINS",
+            "maximum": 1,
+            "cancelled": false,
+            "processed": 1
+          },
+          {
+            "failed": 0,
+            "family": "NET_SKINS",
+            "maximum": 1,
+            "cancelled": false,
+            "processed": 1
+          }
+        ],
+        "processorPath": "EXPLICIT_OWNER_REQUEST_PUBLIC_CLAIM_UNCHANGED_JS_PUBLIC_COMPLETE",
+        "engine": "net-skins-full-net-v2",
+        "resultState": "PROVISIONAL",
+        "roundEvidence": [
+          {
+            "round": 1,
+            "source": "b87cfbad4822ea82a3a529196c8cb7ce46ac8963024899b20d25a7fae3ef8d13",
+            "payloadSha256": "3ed55b1deefc92be50d57df86c9aff02b7382137ffd972c90f462e3729871331",
+            "fullNetEntrants": 24,
+            "claimReplay": true,
+            "completionReplay": true
+          },
+          {
+            "round": 2,
+            "source": "fa9f55e0c0a571a5a815f913acb7d93d34402cdd051ba382e60e1ec1d049ba27",
+            "payloadSha256": "fcb29d57d0f8850e5f3d36a8e536222e09787418a5c6ea57df0f8f0fff1ba637",
+            "fullNetEntrants": 12,
+            "claimReplay": true,
+            "completionReplay": true
+          },
+          {
+            "round": 3,
+            "source": "34bb4ae54eedf24820a2fc19807083d2cc20c318fd428e38a12230fa0dcf4b51",
+            "payloadSha256": "7a9353770b27ce498c1ac58971e8b7ac0375d8482dc26eab234b15fa5c10f89e",
+            "fullNetEntrants": 24,
+            "claimReplay": true,
+            "completionReplay": true
+          }
+        ],
+        "currentResultParity": true,
+        "historicalResultsPreserved": 2,
+        "additionalResultsPerFixture": 3,
+        "immutableMembership": true,
+        "duplicateResults": 0,
+        "publicationChanged": false,
+        "provisionalPublicPayloadWithheld": true,
+        "limitations": [
+          "Synthetic explicit opt-ins and Live matches; no final financial publication or full-round payout certification",
+          "SQL service-role worker path after explicit test owner request; Director HTTP authorization remains a separate proof layer"
+        ]
+      }
+    },
+    {
+      "id": "P2C-D-STALE-CURRENT",
+      "title": "stale and superseded financial workers cannot replace the current round result",
+      "proofLayer": "CONCURRENCY",
+      "result": "PASS",
+      "details": {
+        "rows": [
+          {
+            "scenario": "STALE_RUNNING",
+            "iteration": 0,
+            "startOrder": [
+              0,
+              1
+            ],
+            "denial": "PRODUCTION_NET_SKINS_SOURCE_REVISION_CONFLICT",
+            "currentSourcePreserved": true,
+            "deadlocks": 0,
+            "retries": 0
+          },
+          {
+            "scenario": "STALE_RUNNING",
+            "iteration": 1,
+            "startOrder": [
+              1,
+              0
+            ],
+            "denial": "PRODUCTION_NET_SKINS_SOURCE_REVISION_CONFLICT",
+            "currentSourcePreserved": true,
+            "deadlocks": 0,
+            "retries": 0
+          },
+          {
+            "scenario": "STALE_RUNNING",
+            "iteration": 2,
+            "startOrder": [
+              0,
+              1
+            ],
+            "denial": "PRODUCTION_NET_SKINS_SOURCE_REVISION_CONFLICT",
+            "currentSourcePreserved": true,
+            "deadlocks": 0,
+            "retries": 0
+          },
+          {
+            "scenario": "STALE_RUNNING",
+            "iteration": 3,
+            "startOrder": [
+              1,
+              0
+            ],
+            "denial": "PRODUCTION_NET_SKINS_SOURCE_REVISION_CONFLICT",
+            "currentSourcePreserved": true,
+            "deadlocks": 0,
+            "retries": 0
+          },
+          {
+            "scenario": "SUPERSEDED",
+            "iteration": 0,
+            "startOrder": [
+              0,
+              1
+            ],
+            "denial": "PRODUCTION_NET_SKINS_JOB_LEASE_REQUIRED",
+            "currentSourcePreserved": true,
+            "deadlocks": 0,
+            "retries": 0
+          },
+          {
+            "scenario": "SUPERSEDED",
+            "iteration": 1,
+            "startOrder": [
+              1,
+              0
+            ],
+            "denial": "PRODUCTION_NET_SKINS_JOB_LEASE_REQUIRED",
+            "currentSourcePreserved": true,
+            "deadlocks": 0,
+            "retries": 0
+          },
+          {
+            "scenario": "SUPERSEDED",
+            "iteration": 2,
+            "startOrder": [
+              0,
+              1
+            ],
+            "denial": "PRODUCTION_NET_SKINS_JOB_LEASE_REQUIRED",
+            "currentSourcePreserved": true,
+            "deadlocks": 0,
+            "retries": 0
+          },
+          {
+            "scenario": "SUPERSEDED",
+            "iteration": 3,
+            "startOrder": [
+              1,
+              0
+            ],
+            "denial": "PRODUCTION_NET_SKINS_JOB_LEASE_REQUIRED",
+            "currentSourcePreserved": true,
+            "deadlocks": 0,
+            "retries": 0
+          }
+        ],
+        "runs": 8,
+        "deadlocks": 0,
+        "oldResultsWritten": 0,
+        "scope": "Actual owner-requested stale completion races current intent materialization; current financial result parity is separately proven by P2C-D-FINANCIAL."
+      }
+    },
+    {
+      "id": "P2C-D-SCORING",
+      "title": "held Net Skins ordered lock set does not prevent canonical scoring",
+      "proofLayer": "CONCURRENCY",
+      "result": "PASS",
+      "details": {
+        "score": "ACCEPTED",
+        "scoreBudgetMs": 1000,
+        "elapsedMs": 38.76187500000378,
+        "workerLocksHeld": true
+      }
+    }
+  ],
+  "limitations": [
+    "Synthetic current authority boundary; no Production lock-frequency or capacity claim",
+    "Financial comparison executes an explicit owner-invoked SQL claim/calculator/completion sequence; it does not test Director HTTP authorization or authorize automated financial publication",
+    "Eliminated known advisory cycle is distinct from automatic retry for unrelated40P01, covered by delivery tests"
+  ],
+  "completedAt": "2026-09-30T03:42:42.524Z",
+  "counts": {
+    "pass": 9,
+    "fail": 0
+  }
+}

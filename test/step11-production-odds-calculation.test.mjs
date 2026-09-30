@@ -21,6 +21,7 @@ import {
   PRODUCTION_SUPABASE_PROJECT_REF,
   PRODUCTION_SUPABASE_URL,
 } from "../lib/production-foundation-resource-contract.js";
+import { oddsCalculationEnvironment } from "../lib/odds-calculation-source.js";
 import { scoringShadowPayloadHash } from "../lib/scoring-shadow.js";
 import { buildProductionOddsRehearsalInputs } from "../lib/production-odds-rehearsal-fixture.js";
 import {
@@ -134,7 +135,7 @@ function productionConfiguration() {
   };
 }
 
-test("Step 11 Production Odds gate requires the exact isolated candidate and keeps publication Google", () => {
+test("Step 11 Production Odds gate requires the exact isolated candidate and forbids candidate publication", () => {
   const ready = productionOddsCalculationEnvironment(candidateEnv);
   assert.equal(ready.allowed, true);
   assert.equal(ready.mode, PRODUCTION_ODDS_CALCULATION_MODES.REHEARSAL);
@@ -144,7 +145,6 @@ test("Step 11 Production Odds gate requires the exact isolated candidate and kee
   for (const invalid of [
     { VERCEL_PROJECT_ID: "prj_wrong" },
     { PRODUCTION_SUPABASE_PROJECT_REF: "idgigvjjqkfbqjeredpb" },
-    { GOOGLE_SHEETS_ID: "1hSn6uABZwYftU3DrtoOz08ygX4x-c1JAWzuohtQ31Ts" },
     { ODDS_PUBLICATION_AUTHORITY: "supabase" },
     { PRODUCTION_STEP11_EXTERNAL_GOOGLE_WRITES_ENABLED: "true" },
     { PRODUCTION_STEP11_ODDS_REHEARSAL_SECRET: "short" },
@@ -155,6 +155,22 @@ test("Step 11 Production Odds gate requires the exact isolated candidate and kee
       () => assertProductionOddsCalculationEnvironment({ ...candidateEnv, ...invalid }),
       (error) => error.code === "PRODUCTION_ODDS_CALCULATION_UNAVAILABLE",
     );
+  }
+});
+
+test("Step 11 diagnostic Odds admission ignores retired Google workbook config and never enables publication", () => {
+  const { GOOGLE_SHEETS_ID: _retiredWorkbook, ...withoutGoogle } = candidateEnv;
+  for (const env of [withoutGoogle, { ...withoutGoogle, GOOGLE_SHEETS_ID: "obsolete-unrelated-workbook" }]) {
+    const canonical = { ...env, SCORING_AUTHORITY: "supabase" };
+    const state = productionOddsCalculationEnvironment(canonical);
+    assert.equal(state.allowed, true);
+    assert.equal(state.mode, PRODUCTION_ODDS_CALCULATION_MODES.REHEARSAL);
+    assert.equal(state.candidate.googleConfigurationRequired, false);
+    assert.equal(state.candidate.resources.sourceWorkbookId, PRODUCTION_GOOGLE_WORKBOOK_ID);
+    assert.equal(state.candidate.safety.scoringIngressEnabled, false);
+    assert.equal(state.candidate.safety.googleMirrorDeliveryEnabled, false);
+    assert.equal(state.candidate.safety.oddsPublicationEnabled, false);
+    assert.equal(oddsCalculationEnvironment(canonical).publicationAuthority, "unavailable");
   }
 });
 

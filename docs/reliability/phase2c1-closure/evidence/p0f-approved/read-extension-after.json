@@ -1,0 +1,19 @@
+{
+  "environment": "LOCAL_NO_NETWORK_SYNTHETIC_ENVIRONMENT",
+  "history": {
+    "resolved": "supabase",
+    "reason": "production-shadow-candidate-read-ready",
+    "productionShadowCandidate": true,
+    "serviceError": {
+      "code": "PRODUCTION_SHADOW_CANDIDATE_RPC_FORBIDDEN",
+      "status": 403
+    }
+  },
+  "predictionInvalidRequested": {
+    "available": false,
+    "reason": "candidate-request-transport-required",
+    "productionShadowCandidate": false,
+    "fallbackUsed": false
+  },
+  "fetchCalls": 0
+}

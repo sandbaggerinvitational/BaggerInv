@@ -51,6 +51,25 @@ export async function installPhase2C(cluster,database,{through=124,timeoutMs=nor
     sqlFile(cluster,database,path.join(repositoryRoot,file),{role:''});
     migrations.push({path:file,sha256:createHash('sha256').update(await readFile(path.join(repositoryRoot,file))).digest('hex')});
   }
+  if(process.env.BAGGER_P0F_CANDIDATE==='1'&&through===124){
+    assert.equal(process.env.BAGGER_PHASE2C1_CANDIDATE,'1','P0F requires retirement');
+    assert.equal(process.env.BAGGER_PHASE2C1_CLOSURE,'1','P0F requires annual closure');
+    // Already existing optional installation artifacts are exact prerequisites
+    // of the reduced financial wrapper. No mock replacement or remote target.
+    for(const name of ['director-calcutta-management-read-v1.sql','director-calcutta-clear-entry-v1.sql']){
+      const file=path.join('supabase/production_incremental',name);
+      sqlFile(cluster,database,path.join(repositoryRoot,file),{role:''});
+      migrations.push({path:file,sha256:createHash('sha256').update(await readFile(path.join(repositoryRoot,file))).digest('hex')});
+    }
+    for(const number of [128,129,130]){
+      const names=(await readdir(path.join(repositoryRoot,'supabase/production_migrations')))
+        .filter(name=>new RegExp(`^20260930${String(number).padStart(4,'0')}_.*\\.sql$`).test(name));
+      assert.equal(names.length,1,`Exactly one approved P0F migration ${number} required`);
+      const file=path.join('supabase/production_migrations',names[0]);
+      sqlFile(cluster,database,path.join(repositoryRoot,file),{role:''});
+      migrations.push({path:file,sha256:createHash('sha256').update(await readFile(path.join(repositoryRoot,file))).digest('hex')});
+    }
+  }
   configureFiniteTimeout(cluster,database,timeoutMs);
   return {baseSha:phase2cBaseSha,fixtureVersion:phase2cFixtureVersion,migrations,statementTimeoutMs:timeoutMs,timeZone:'UTC',
     production:false,environment:'OWNED_SOCKET_ONLY_POSTGRESQL17',runtimeAuthority:'EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES'};

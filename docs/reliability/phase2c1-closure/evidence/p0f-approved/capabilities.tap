@@ -1,0 +1,74 @@
+TAP version 13
+# Subtest: P0F seven required capability identities use actual canonical PostgreSQL with Google unavailable
+    # Subtest: BROAD-NEW-007 course/tee and approved handicap authority through shipping adapter
+    ok 1 - BROAD-NEW-007 course/tee and approved handicap authority through shipping adapter
+      ---
+      duration_ms: 215.124083
+      type: 'test'
+      ...
+    # Subtest: BROAD-NEW-008 shared reviewed operation ID, receipt, readback and retry pipeline
+    ok 2 - BROAD-NEW-008 shared reviewed operation ID, receipt, readback and retry pipeline
+      ---
+      duration_ms: 374.852958
+      type: 'test'
+      ...
+# {"event":"isolated-api-denial","status":409,"code":"DIRECTOR_OPERATIONS_DOMAIN_REJECTED","domainCode":"PRODUCTION_MATCH_NOT_SCORING_READY"}
+# prepare-dependencies []
+# {"event":"isolated-api-denial","status":403,"code":"DIRECTOR_OPERATIONS_AUTHORIZATION_REQUIRED","domainCode":"PRODUCTION_DIRECTOR_AUTHORIZATION_REQUIRED"}
+    # Subtest: RECOVERY response loss then changed context finds exact prior receipt without replay
+    ok 3 - RECOVERY response loss then changed context finds exact prior receipt without replay
+      ---
+      duration_ms: 394.78625
+      type: 'test'
+      ...
+    # Subtest: BROAD-NEW-009 atomic full round pairing replacement with frozen handicap reference
+    ok 4 - BROAD-NEW-009 atomic full round pairing replacement with frozen handicap reference
+      ---
+      duration_ms: 204.889334
+      type: 'test'
+      ...
+    # Subtest: BROAD-NEW-010 Net Skins explicit entry ledger and server-owned field authority
+    ok 5 - BROAD-NEW-010 Net Skins explicit entry ledger and server-owned field authority
+      ---
+      duration_ms: 75.740875
+      type: 'test'
+      ...
+    # Subtest: BROAD-NEW-012 contextual lifecycle refuses Mark Live before current preparation
+    ok 6 - BROAD-NEW-012 contextual lifecycle refuses Mark Live before current preparation
+      ---
+      duration_ms: 194.553625
+      type: 'test'
+      ...
+    # Subtest: BROAD-NEW-174 Prepare then Mark Live, lock, unlock, revoke and activate preserve canonical receipts
+    ok 7 - BROAD-NEW-174 Prepare then Mark Live, lock, unlock, revoke and activate preserve canonical receipts
+      ---
+      duration_ms: 1210.235958
+      type: 'test'
+      ...
+    # Subtest: BROAD-NEW-011 Calcutta purchase/ownership and clear are canonical, unpublished, no configuration write
+    ok 8 - BROAD-NEW-011 Calcutta purchase/ownership and clear are canonical, unpublished, no configuration write
+      ---
+      duration_ms: 95.289334
+      type: 'test'
+      ...
+    # Subtest: SECURITY actual database revocation denies canonical API despite an active account-adapter stub
+    ok 9 - SECURITY actual database revocation denies canonical API despite an active account-adapter stub
+      ---
+      duration_ms: 21.67
+      type: 'test'
+      ...
+    1..9
+ok 1 - P0F seven required capability identities use actual canonical PostgreSQL with Google unavailable
+  ---
+  duration_ms: 5704.085708
+  type: 'test'
+  ...
+1..1
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5762.8295

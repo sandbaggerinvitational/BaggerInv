@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   buildTournamentSetupMutation,
@@ -223,12 +223,13 @@ function Readiness({ data }) {
   </section>;
 }
 
-export default function ProductionTournamentSetupPanel() {
+export default function ProductionTournamentSetupPanel({ request = fetch, isolated = false } = {}) {
   const [data, setData] = useState(null);
   const [phase, setPhase] = useState("loading");
   const [message, setMessage] = useState("");
   const [section, setSection] = useState("readiness");
   const [review, setReview] = useState(null);
+  const attemptedReview = useRef(false);
   useEffect(() => {
     if (!review) return;
     const heading = document.getElementById('tournament-setup-review-title');
@@ -247,11 +248,13 @@ export default function ProductionTournamentSetupPanel() {
   },[hasPendingPairings]);
   const [confirmed, setConfirmed] = useState(false);
   const [receipt, setReceipt] = useState(null);
+  const [unresolved, setUnresolved] = useState(false);
 
   const load = useCallback(async ({ quiet = false, ownDetailsId } = {}) => {
+    if (isolated && attemptedReview.current) return null;
     if (!quiet) setPhase("loading");
     try {
-      const response = await fetch(ENDPOINT, { cache: "no-store", credentials: "same-origin" });
+      const response = await request(ENDPOINT, { cache: "no-store", credentials: "same-origin" });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw Object.assign(new Error(payload.error || "Tournament Setup is temporarily unavailable."), { code: payload.code });
       setPairingDrafts(current=>mergePairingDrafts(current,payload.data.matches,{ownDetailsId}));
@@ -263,11 +266,11 @@ export default function ProductionTournamentSetupPanel() {
       setPhase("failure");
       return null;
     }
-  }, []);
+  }, [request, isolated]);
   useEffect(() => { load(); }, [load]);
 
   const stage = useCallback((action, values, description, summary) => {
-    if (!data) return;
+    if (!data || (isolated && attemptedReview.current)) return;
     try {
       const operationRequestId = uuid();
       buildTournamentSetupMutation(action, { ...values, expectedRevision: data.revision, operationRequestId });
@@ -279,14 +282,15 @@ export default function ProductionTournamentSetupPanel() {
       setMessage(error?.message || "Review the highlighted Tournament Setup fields.");
       setPhase("failure");
     }
-  }, [data]);
+  }, [data, isolated]);
 
   const commit = useCallback(async () => {
-    if (!review || !confirmed) return;
+    if (!review || !confirmed || (isolated && phase === "submitting")) return;
+    if (isolated) { attemptedReview.current = true; setUnresolved(true); }
     setPhase("submitting");
     setMessage("");
     try {
-      const response = await fetch(ENDPOINT, {
+      const response = await request(ENDPOINT, {
         method: "POST",
         credentials: "same-origin",
         headers: { "content-type": "application/json" },
@@ -300,26 +304,27 @@ export default function ProductionTournamentSetupPanel() {
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw Object.assign(new Error(payload.error || "Tournament Setup did not complete."), { code: payload.code });
       if(!payload.data?.ok || !Number.isSafeInteger(payload.data?.revision) || payload.data.action!==review.action.toUpperCase().replaceAll('-','_')) throw new Error('The response is uncertain. Your selections and operation identity are retained; retry this same review.');
+      if (isolated) { attemptedReview.current = false; setUnresolved(false); }
       setReceipt(payload.data);
       setReview(null);
       setConfirmed(false);
-      setMessage(payload.data?.idempotent ? "The safe retry returned the existing authoritative result." : "Production confirmed the Tournament Setup change.");
+      setMessage(payload.data?.idempotent ? "The safe retry returned the existing authoritative result." : "Canonical authority confirmed the Tournament Setup change.");
       await load({ quiet: true, ownDetailsId:review.action==='upsert-match'?review.values.matchId:undefined });
     } catch (error) {
       setMessage(error?.message || "Tournament Setup did not complete.");
       setPhase("failure");
     }
-  }, [confirmed, load, review]);
+  }, [confirmed, load, review, request, isolated, phase]);
 
   const current = useMemo(() => data?.readiness.sections.find((item) => item.id === section), [data, section]);
-  if (phase === "loading" && !data) return <section className={styles.loading} role="status"><strong>Opening Tournament Setup</strong><span>Reading authoritative Production tournament facts…</span></section>;
+  if (phase === "loading" && !data) return <section className={styles.loading} role="status"><strong>Opening Tournament Setup</strong><span>Reading authoritative tournament facts…</span></section>;
   if (!data) return <section className={styles.failure} role="alert"><h2>Tournament Setup is unavailable</h2><p>{message}</p><button type="button" onClick={() => load()}>Try Again</button></section>;
   const disabled = phase === "submitting" || Boolean(review);
   return <section className={styles.shell} aria-labelledby="tournament-setup-title">
-    <header className={styles.hero}><div><span>Supabase-native tournament operations</span><h2 id="tournament-setup-title">Tournament Setup</h2><p>Build and validate the competition without SQL or Google canonical edits.</p></div><div><StateBadge value={data.readiness.state} /><small>Setup revision {data.revision}</small></div></header>
-    <nav className={styles.sectionNav} aria-label="Tournament Setup sections">{SECTIONS.map(([id, label]) => {
+    <header className={styles.hero}><div><span>Supabase-native tournament operations</span><h2 id="tournament-setup-title">Tournament Setup</h2><p>Build and validate the competition from its canonical saved facts.</p></div><div><StateBadge value={data.readiness.state} /><small>Setup revision {data.revision}</small></div></header>
+    <nav className={styles.sectionNav} aria-label="Tournament Setup sections">{SECTIONS.filter(([id]) => !isolated || id !== "awards").map(([id, label]) => {
       const state = data.readiness.sections.find((item) => item.id === id)?.state;
-      return <button type="button" key={id} aria-current={section === id ? "page" : undefined} onClick={() => setSection(id)}><span>{label}</span>{state ? <StateBadge value={state} /> : null}</button>;
+      return <button type="button" key={id} disabled={isolated && unresolved} aria-current={section === id ? "page" : undefined} onClick={() => setSection(id)}><span>{label}</span>{state ? <StateBadge value={state} /> : null}</button>;
     })}</nav>
     {current ? <Blockers blockers={current.blockers} warnings={current.warnings} /> : null}
     {section === "tournament" ? <TournamentEditor data={data} disabled={disabled || !data.capabilities["update-tournament"].allowed} stage={stage} /> : null}
@@ -328,9 +333,9 @@ export default function ProductionTournamentSetupPanel() {
     {section === "rounds" ? <RoundsEditor data={data} disabled={disabled || !data.capabilities["update-round"].allowed} stage={stage} /> : null}
     {section === "courses" ? <CoursesEditor data={data} disabled={disabled || !data.capabilities["upsert-course"].allowed} stage={stage} /> : null}
     {section === "matches" ? <RoundPairingWorkspace data={data} drafts={pairingDrafts} setDrafts={setPairingDrafts} round={selectedRound} setRound={setSelectedRound} reload={()=>load({quiet:true})} disabled={disabled || (!data.capabilities["upsert-match"].allowed && !data.capabilities["replace-pairings"].allowed)} stage={stage} /> : null}
-    {section === "awards" ? <ProductionTournamentAwardsPanel disabled={disabled} /> : null}
+    {!isolated && section === "awards" ? <ProductionTournamentAwardsPanel disabled={disabled} /> : null}
     {section === "readiness" ? <Readiness data={data} /> : null}
-    {review ? <section className={styles.review} aria-labelledby="tournament-setup-review-title"><header><span>Review before commit</span><h3 id="tournament-setup-review-title" tabIndex={-1}>{pretty(review.action)}</h3><p>No Production change has been made.</p></header><dl><div><dt>Requested change</dt><dd>{review.description}</dd></div><div><dt>Expected setup revision</dt><dd>{review.expectedRevision}</dd></div><div><dt>Operation identity</dt><dd>Prepared for one safe, idempotent Production operation</dd></div></dl><PairingReview review={review} data={data} /><p>The server will revalidate exact resources, Director entitlement, revision, dependencies, and frozen competition facts atomically.</p><label className={styles.confirmation}><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>I reviewed the target, current state, downstream consequences, and immutable audit effect.</span></label><div className={styles.buttonRow}><button type="button" className={styles.secondaryButton} disabled={phase === "submitting"} onClick={() => { setReview(null); setConfirmed(false); setPhase("ready"); document.getElementById(`pairing-round-tab-${selectedRound}`)?.focus(); }}>Return to Editing</button><button type="button" disabled={!confirmed || phase === "submitting"} onClick={commit}>{phase === "submitting" ? "Confirming…" : (review.action==="replace-round-pairings" ? "Confirm Round Pairings" : review.action==="replace-pairings" ? "Save This Match’s Pairings" : "Confirm Production Change")}</button></div></section> : null}
+    {review ? <section className={styles.review} aria-labelledby="tournament-setup-review-title"><header><span>Review before commit</span><h3 id="tournament-setup-review-title" tabIndex={-1}>{pretty(review.action)}</h3><p>{isolated && unresolved ? "The outcome is not yet confirmed. Keep this review open and retry the same operation." : "No change has been made."}</p></header><dl><div><dt>Requested change</dt><dd>{review.description}</dd></div><div><dt>Expected setup revision</dt><dd>{review.expectedRevision}</dd></div><div><dt>Operation identity</dt><dd>Prepared for one safe, idempotent operation</dd></div></dl><PairingReview review={review} data={data} /><p>The server will revalidate exact resources, Director entitlement, revision, dependencies, and frozen competition facts atomically.</p><label className={styles.confirmation}><input type="checkbox" checked={confirmed} disabled={isolated && unresolved} onChange={(event) => setConfirmed(event.target.checked)} /><span>I reviewed the target, current state, downstream consequences, and immutable audit effect.</span></label><div className={styles.buttonRow}><button type="button" className={styles.secondaryButton} disabled={phase === "submitting" || (isolated && unresolved)} onClick={() => { if (isolated && attemptedReview.current) return; setReview(null); setConfirmed(false); setPhase("ready"); document.getElementById(`pairing-round-tab-${selectedRound}`)?.focus(); }}>Return to Editing</button><button type="button" disabled={!confirmed || phase === "submitting"} onClick={commit}>{phase === "submitting" ? "Confirming…" : isolated && unresolved ? "Retry Same Operation" : (review.action==="replace-round-pairings" ? "Confirm Round Pairings" : review.action==="replace-pairings" ? "Save This Match’s Pairings" : isolated ? "Confirm Change" : "Confirm Production Change")}</button></div></section> : null}
     {message ? <p className={styles.message} data-error={phase === "failure" ? "true" : undefined} role={phase === "failure" ? "alert" : "status"}>{message}</p> : null}
     {receipt ? <p className={styles.receipt}><strong>{pretty(receipt.action)} confirmed</strong><span>Setup revision {receipt.revision}{receipt.idempotent ? " · safe retry" : ""}</span></p> : null}
     {receipt ? <Blockers warnings={receipt.warnings} /> : null}

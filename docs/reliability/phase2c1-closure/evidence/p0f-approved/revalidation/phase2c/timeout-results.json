@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "environment": "LOCAL_NON_PRODUCTION",
+  "fixture": {
+    "baseSha": "b1ceaa89f2d7cd0cdf2835aba04a24aca442ca18",
+    "fixtureVersion": "bagger-phase2c-recovery-delivery-v1",
+    "migrations": [
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48"
+      },
+      {
+        "path": "supabase/production_migrations/202609290125_google_runtime_retirement_v1.sql",
+        "sha256": "355be26c45d1e52ad0fd8a8e1520b7b0ad06dedba6a48b4aa15c6e2d3ee6b7dc"
+      },
+      {
+        "path": "supabase/production_migrations/202609290126_google_retired_release_admission_v1.sql",
+        "sha256": "4e14777857cd69b893662761c621753bfb5f1d48ceaed49c8283968e58d8c5a3"
+      },
+      {
+        "path": "supabase/production_migrations/202609300127_canonical_annual_create_contract_v1.sql",
+        "sha256": "f1d6a293eaeb56a899d897ed3f182549529f3af4efe2da1dfbfe004f6017ec57"
+      },
+      {
+        "path": "supabase/production_incremental/director-calcutta-management-read-v1.sql",
+        "sha256": "5ef573739842968358490928ad219b78f79073f0af474d0938beb4041292ec00"
+      },
+      {
+        "path": "supabase/production_incremental/director-calcutta-clear-entry-v1.sql",
+        "sha256": "47a930c4f292d422a771d621d00da12f6afe5bbe7f7f59258ed8c3999fa56dc3"
+      },
+      {
+        "path": "supabase/production_migrations/202609300128_isolated_director_context_v1.sql",
+        "sha256": "63d9b83d5cf332f3a53876612ad8c866993588adef77977242a62b66fe204483"
+      },
+      {
+        "path": "supabase/production_migrations/202609300129_isolated_financial_cores_v1.sql",
+        "sha256": "05248182beb2dc123ecbbffc6c9bf712244e1375630f41cc723ad1a6b9a0b15a"
+      },
+      {
+        "path": "supabase/production_migrations/202609300130_isolated_setup_control_cores_v1.sql",
+        "sha256": "1dbccb261ba4c44d5dc338fae4293f6019d212a9ce436cabc79a11ef37cc38d9"
+      }
+    ],
+    "statementTimeoutMs": 1000,
+    "timeZone": "UTC",
+    "production": false,
+    "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+    "runtimeAuthority": "EXPLICIT_SYNTHETIC_BOUNDARIES_UNLESS_TEST_OVERRIDES"
+  },
+  "normalScoreTimeoutMs": 1000,
+  "normalWorkerTimeoutMs": 5000,
+  "tightTimeoutMs": 25,
+  "rows": [
+    {
+      "id": "P2C-TIME-001",
+      "name": "normal finite database default applies to every new score connection",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "timeoutMs": 1000,
+        "outcomes": [
+          {
+            "round": 1,
+            "code": "ACCEPTED"
+          },
+          {
+            "round": 2,
+            "code": "ACCEPTED"
+          },
+          {
+            "round": 3,
+            "code": "ACCEPTED"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2C-TIME-hole_scores",
+      "name": "25ms timeout rolls back canonical and durable work at hole_scores",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "timeoutMs": 25,
+        "injectedDelayMs": 100,
+        "sqlstate": "57014",
+        "partialState": false,
+        "readAfterRollback": "UNKNOWN",
+        "sameMutationRetry": "ACCEPTED"
+      }
+    },
+    {
+      "id": "P2C-TIME-score_mutations",
+      "name": "25ms timeout rolls back canonical and durable work at score_mutations",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "timeoutMs": 25,
+        "injectedDelayMs": 100,
+        "sqlstate": "57014",
+        "partialState": false,
+        "readAfterRollback": "UNKNOWN",
+        "sameMutationRetry": "ACCEPTED"
+      }
+    },
+    {
+      "id": "P2C-TIME-score_derived_intents_v1",
+      "name": "25ms timeout rolls back canonical and durable work at score_derived_intents_v1",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "timeoutMs": 25,
+        "injectedDelayMs": 100,
+        "sqlstate": "57014",
+        "partialState": false,
+        "readAfterRollback": "UNKNOWN",
+        "sameMutationRetry": "ACCEPTED"
+      }
+    },
+    {
+      "id": "P2C-TIME-LOCK",
+      "name": "score lock timeout cannot fabricate a committed outcome",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "lockTimeoutMs": 25,
+        "canonical": "UNCHANGED_UNTIL_SAFE_SAME_MUTATION_RETRY"
+      }
+    },
+    {
+      "id": "P2C-TIME-RECOVERY",
+      "name": "finite recovery timeout never erases the committed receipt",
+      "result": "PASS",
+      "proofLayer": [
+        "POSTGRESQL",
+        "FAILURE_INJECTION"
+      ],
+      "details": {
+        "timeoutMs": 25,
+        "afterRelease": "COMMITTED",
+        "newWritePermission": false,
+        "receiptPreserved": true
+      }
+    }
+  ],
+  "production": false,
+  "limitations": [
+    "Synthetic runtime admission substitution",
+    "No provider IO capacity claim",
+    "Worker5s separate delivery suite",
+    "Finite timeout does not guarantee latency under hosted resource pressure"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 3,
+  "auditedAt": "2026-09-30T05:03:27.756405+00:00",
+  "scope": "ALL_CHANGED_TRACKED_AND_UNTRACKED_TEXT_FILES_INCLUDING_STAGED_NEW_FILES",
+  "scannedTextFiles": 174,
+  "binaryFiles": [],
+  "credentialPatternFindings": [],
+  "limitation": "Pattern scan only, not a guarantee of detecting all possible sensitive data. No credential values printed.",
+  "nativePackageDeployConfigChanges": [],
+  "migrationIdsUnique": true,
+  "unchangedReadOnlyTranslatorAndRpcTransport": [
+    "lib/production-shadow-read-adapters.js",
+    "lib/scoring-shadow.js"
+  ],
+  "approvedTwoAdapterCorrectionsImplemented": true,
+  "approvedHistoryRpcCorrectionImplemented": true,
+  "pendingApprovalFiles": [],
+  "gitDiffCheck": "PASS_SOURCE_AND_DOCS_WITH_EXPLICIT_VERBATIM_EVIDENCE_EXCEPTIONS",
+  "fullRawDiffCheckExitCode": 2,
+  "verbatimWhitespaceExceptions": [
+    "docs/reliability/phase2c1-closure/P0F-FINANCIAL-REVIEW-PREVIEW.md",
+    "docs/reliability/phase2c1-closure/evidence/p0f-approved/application-attempt-01.tap",
+    "docs/reliability/phase2c1-closure/evidence/p0f-approved/application.tap",
+    "docs/reliability/phase2c1-closure/evidence/p0f-approved/build-attempt-01.tap",
+    "docs/reliability/phase2c1-closure/evidence/p0f-approved/build.tap",
+    "docs/reliability/phase2c1-closure/evidence/p0f-approved/pre-history-rpc/application.tap",
+    "docs/reliability/phase2c1-closure/evidence/p0f-approved/pre-history-rpc/build.tap",
+    "docs/reliability/phase2c1-closure/evidence/p0f-approved/pre-read-extension/application.tap",
+    "docs/reliability/phase2c1-closure/evidence/p0f-approved/pre-read-extension/build.tap",
+    "docs/reliability/phase2c1-closure/evidence/p0f-approved/pre-read-extension/routing.tap",
+    "docs/reliability/phase2c1-closure/evidence/p0f-approved/release-attempt-04.tap",
+    "docs/reliability/phase2c1-closure/evidence/p0f-approved/release-attempt-06.tap",
+    "docs/reliability/phase2c1-closure/evidence/p0f-final-closure/routing-safety.tap",
+    "docs/reliability/phase2c1-closure/evidence/p0f-final-closure/routing.tap"
+  ],
+  "whitespaceExceptionReason": "Raw TAP whitespace and unified-diff context lines are preserved byte-for-byte; exceptions are evidence only, not runtime source or tests.",
+  "sourceAndDocsDiffCheckExitCode": 0,
+  "productionQueried": false,
+  "stagingDeployed": false,
+  "realGoogleAccessed": false,
+  "lintFormat": "No dedicated repository lint/format script; local build plus source/document diff-check."
+}

@@ -1,0 +1,117 @@
+{
+  "result": "7_REQUIRED_GAPS_REPRODUCED",
+  "counts": {
+    "gapIdentities": 7,
+    "missingCapabilityResponses": 7,
+    "unsupportedControlOperations": 5,
+    "fetchCalls": 0,
+    "downstreamCalls": 0,
+    "authorizationStubCalls": 2
+  },
+  "rows": [
+    {
+      "id": "BROAD-NEW-007",
+      "status": 404,
+      "body": {
+        "error": "Not found."
+      },
+      "authorizationStubCalls": 0,
+      "downstreamStubCalls": 0,
+      "fetchCalls": 0
+    },
+    {
+      "id": "BROAD-NEW-008",
+      "status": 404,
+      "body": {
+        "error": "Not found."
+      },
+      "authorizationStubCalls": 0,
+      "downstreamStubCalls": 0,
+      "fetchCalls": 0
+    },
+    {
+      "id": "BROAD-NEW-009",
+      "status": 404,
+      "body": {
+        "error": "Not found."
+      },
+      "authorizationStubCalls": 0,
+      "downstreamStubCalls": 0,
+      "fetchCalls": 0
+    },
+    {
+      "id": "BROAD-NEW-010",
+      "status": 404,
+      "body": {
+        "error": "Not found."
+      },
+      "authorizationStubCalls": 0,
+      "downstreamStubCalls": 0,
+      "fetchCalls": 0
+    },
+    {
+      "id": "BROAD-NEW-011",
+      "status": 404,
+      "body": {
+        "error": "Not found."
+      },
+      "authorizationStubCalls": 0,
+      "downstreamStubCalls": 0,
+      "fetchCalls": 0
+    },
+    {
+      "id": "BROAD-NEW-012",
+      "status": 400,
+      "body": {
+        "code": "DIRECTOR_CANONICAL_INPUT_INVALID",
+        "error": "The canonical operation could not be confirmed. Refresh current authority before retrying the same operation."
+      },
+      "authorizationStubCalls": 1,
+      "downstreamStubCalls": 0,
+      "fetchCalls": 0
+    },
+    {
+      "id": "BROAD-NEW-174",
+      "status": 400,
+      "body": {
+        "code": "DIRECTOR_CANONICAL_INPUT_INVALID",
+        "error": "The canonical operation could not be confirmed. Refresh current authority before retrying the same operation."
+      },
+      "authorizationStubCalls": 1,
+      "downstreamStubCalls": 0,
+      "fetchCalls": 0
+    }
+  ],
+  "controls": [
+    {
+      "operation": "MARK_LIVE",
+      "status": 409,
+      "code": "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY",
+      "result": "UNSUPPORTED_REPRODUCED"
+    },
+    {
+      "operation": "SCORING_LOCK",
+      "status": 409,
+      "code": "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY",
+      "result": "UNSUPPORTED_REPRODUCED"
+    },
+    {
+      "operation": "SCORING_UNLOCK",
+      "status": 409,
+      "code": "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY",
+      "result": "UNSUPPORTED_REPRODUCED"
+    },
+    {
+      "operation": "ACCESS_ACTIVATE",
+      "status": 409,
+      "code": "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY",
+      "result": "UNSUPPORTED_REPRODUCED"
+    },
+    {
+      "operation": "ACCESS_REVOKE",
+      "status": 409,
+      "code": "OPERATION_NOT_SUPPORTED_UNDER_SUPABASE_AUTHORITY",
+      "result": "UNSUPPORTED_REPRODUCED"
+    }
+  ]
+}

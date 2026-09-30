@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 2,
+  "status": "PASS",
+  "baseSha": "7b6ca99510dc2f44cc411bfe7769e7f0c05ed962",
+  "executionHead": "7b6ca99510dc2f44cc411bfe7769e7f0c05ed962",
+  "branch": "codex/reliability-phase2c1-capability-closure",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "directorCapabilities": {
+    "total": 7,
+    "pass": 7
+  },
+  "routing": {
+    "total": 3,
+    "pass": 3,
+    "fail": 0,
+    "layer": "LOCAL_ACTUAL_ADAPTER_SERVICE_CHAINS_WITH_SYNTHETIC_TRANSPORT",
+    "originalSelectorAssertionsPass": 3,
+    "actualHistoryTransport": "PASS"
+  },
+  "p0": {
+    "A": "PASS_SCOPED",
+    "B": "PASS_SCOPED",
+    "C": "PASS_SCOPED",
+    "D": "PASS_SCOPED",
+    "E": "PASS_SCOPED",
+    "F": "PASS_SCOPED"
+  },
+  "pendingApproval": [],
+  "application": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "unchangedBaselineFailures": 20,
+  "routingFailures": 0,
+  "newFailureIdentities": 0,
+  "productionInteraction": false,
+  "stagingDeployment": false,
+  "realGoogleAccess": false,
+  "nativeChanges": false,
+  "commitPushGate": "MET",
+  "receipts": [
+    {
+      "suite": "context",
+      "path": "context.json",
+      "sha256": "fab28d6b9991f2e2bee5c144ca58263f650b6b2d775541b7a47ece3e676f8623",
+      "result": "PASS",
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "setup",
+      "path": "setup.json",
+      "sha256": "6e05187d09eca76790769b046dc93786b3e753b47d0d19410d0f931b3c7f1dde",
+      "result": "PASS",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "financial",
+      "path": "financial.json",
+      "sha256": "c0d525f635d427a2d44d9ffab9895bd25f61a0218291bd89dda4095a9051c88d",
+      "result": "PASS",
+      "counts": {
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "capabilities",
+      "path": "capabilities.json",
+      "sha256": "a7141e6805916964b9e42aa1b6ead443ae513b988645f5e74c45519ef4c43927",
+      "result": "PASS",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "api",
+      "path": "api.json",
+      "sha256": "527662a1dccd584fe17959555bc6f84a6d7a9fa0efdd0f70bf2f25e5cf2b35a6",
+      "result": "PASS",
+      "counts": {
+        "tests": 38,
+        "pass": 38,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "workspace",
+      "path": "workspace.json",
+      "sha256": "f1bab2efe26b72030c3e83fd7d716ac630fdf3c82393c710c81150bd1678fd0f",
+      "result": "PASS",
+      "counts": {
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "routing",
+      "path": "routing.json",
+      "sha256": "f0cb209694b9b8ef96799d1aa071c347673ea9b85162000fa3a47247ee92b0d3",
+      "result": "PASS",
+      "counts": {
+        "tests": 42,
+        "pass": 42,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "retirement",
+      "path": "retirement.json",
+      "sha256": "99414f39aa40f90bb2ff8390f79faddf7687154b5a7ec9839f97f4f68f21b6bb",
+      "result": "PASS",
+      "counts": {
+        "tests": 45,
+        "pass": 45,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "security",
+      "path": "security.json",
+      "sha256": "68948d416155519784b7f27091a863e81c11b59778e9fd3ed366038a1d8cb332",
+      "result": "PASS",
+      "counts": {
+        "tests": 84,
+        "pass": 84,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "release",
+      "path": "release.json",
+      "sha256": "bdf98c118840599514aaa0f2fef78ce27fc64c0b8c7adcd7d30cbc5d2058fdae",
+      "result": "PASS",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "annual-create",
+      "path": "annual-create.json",
+      "sha256": "8e77cb2608be2473e547a8430e29a1c829ff8c318911597ca70142bd1769e95d",
+      "result": "PASS",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "full-sequence",
+      "path": "full-sequence.json",
+      "sha256": "57a5ca6850139e0017ac18e62f72ac5d7418c362eb928b137ee5e8c3e6b77ab3",
+      "result": "PASS",
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "finite",
+      "path": "finite.json",
+      "sha256": "11a57e29bfc0aa715d50d95a5a1e811978e13a73d18362d930ebf95c4094a5b1",
+      "result": "PASS",
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "recovery",
+      "path": "recovery.json",
+      "sha256": "ea7a225dc067631f256c1d9c3a761ae32378be1d40b9e9f2dde2b7b0fad6cc37",
+      "result": "PASS",
+      "counts": {
+        "tests": 50,
+        "pass": 50,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "delivery",
+      "path": "delivery.json",
+      "sha256": "b890e56a08dc853e1d4189338624d5dba5b529e13cde251736b21aabc90440c4",
+      "result": "PASS",
+      "counts": {
+        "tests": 54,
+        "pass": 54,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "deadlock",
+      "path": "deadlock.json",
+      "sha256": "d8bcf3f4dc4c66a2eb104bbd49fbe8bdea4167c949b41a992503e5b98ae15748",
+      "result": "PASS",
+      "counts": {
+        "tests": 10,
+        "pass": 10,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "annual",
+      "path": "annual.json",
+      "sha256": "c0aa744a696735c95fc116c100cccb7fe820b7b137ba3358779490a23e7bdbad",
+      "result": "PASS",
+      "counts": {
+        "tests": 26,
+        "pass": 26,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "harness",
+      "path": "harness.json",
+      "sha256": "653fcb9ba9ad708a031bfa10edb02686f28cdfd0b3183fd1b52c80a54572e7c7",
+      "result": "PASS",
+      "counts": {
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "application",
+      "path": "application.json",
+      "sha256": "49885dbf23ec5ac29f770c1608b9e361af70856e627b20b18bcff2da8220d2ae",
+      "result": "FAIL",
+      "counts": {
+        "tests": 4097,
+        "pass": 4077,
+        "fail": 20,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    },
+    {
+      "suite": "build",
+      "path": "build.json",
+      "sha256": "50abe74f4a08975c1380e6a05866a1fed2bb2ca5b47a1f7d42318963f27174f8",
+      "result": "PASS",
+      "counts": null
+    },
+    {
+      "suite": "read-adapters",
+      "path": "read-adapters.json",
+      "sha256": "e1c5ea6ea1cac5b3c487b0e953d4381d245a81bb22c0dbaca1a2e69b49911e65",
+      "result": "PASS",
+      "counts": {
+        "tests": 112,
+        "pass": 112,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      }
+    }
+  ],
+  "applicationTestsAdded": 2,
+  "applicationTestsDeleted": 0,
+  "testInventoryScope": "Fixed original493-file application selection only; focused P0F suites are separate and must not be summed as unique tests.",
+  "supportingAudits": [
+    {
+      "path": "evidence-freshness.json",
+      "sha256": "1a70f5e7773401b9d06d40e0a29b2c6831139771c1540682d252e90748584c96"
+    },
+    {
+      "path": "source-hygiene.json",
+      "sha256": "016a1bc566403b37b7696cf7dfae304cbc049223e9ac462bcee4ecd1cf2fa515"
+    }
+  ],
+  "focusedRequiredFailures": 0,
+  "focusedReadAdapterTestsAdded": 55,
+  "newFailureIdentitiesScope": "Frozen493-file application selection compared by complete normalized diagnostics; separately required adapter suite112/112PASS.",
+  "candidateCommitReference": "Enclosing Git commit containing this final index; execution remains base SHA plus exact source manifests.",
+  "allSixClosedAtRequiredNonProductionLayer": true,
+  "readyForOwnerReviewBeforeSeparateStaging": true,
+  "productionCertified": false,
+  "stagingCertified": false,
+  "physicalCertified": false,
+  "tournament2027Ready": false,
+  "sourceHygiene": "PASS_SOURCE_AND_DOCS; VERBATIM_RAW_EVIDENCE_WHITESPACE_PRESERVED"
+}

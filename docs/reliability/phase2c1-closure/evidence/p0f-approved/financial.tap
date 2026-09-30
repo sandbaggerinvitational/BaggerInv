@@ -1,0 +1,113 @@
+TAP version 13
+# Subtest: P0-F reduced financial cores preserve canonical authority, receipts and isolated provenance
+    # Subtest: migration refuses owner/attribute/ACL/default-privilege drift and rolls back all partial installation
+    ok 1 - migration refuses owner/attribute/ACL/default-privilege drift and rolls back all partial installation
+      ---
+      duration_ms: 6.725417
+      type: 'test'
+      ...
+    # Subtest: catalog public OIDs/owners/ACL/search paths preserved; only three private cores introduced
+    ok 2 - catalog public OIDs/owners/ACL/search paths preserved; only three private cores introduced
+      ---
+      duration_ms: 6.578958
+      type: 'test'
+      ...
+    # Subtest: runtime roles cannot forge provenance or invoke private cores; public Production rejects isolated scope
+    ok 3 - runtime roles cannot forge provenance or invoke private cores; public Production rejects isolated scope
+      ---
+      duration_ms: 83.335417
+      type: 'test'
+      ...
+    # Subtest: Net Skins BB/SC/Singles entry authority uses exact immutable bindings and receipts
+    ok 4 - Net Skins BB/SC/Singles entry authority uses exact immutable bindings and receipts
+      ---
+      duration_ms: 453.869292
+      type: 'test'
+      ...
+    # Subtest: Net Skins started-round/current-entry guards are unchanged
+    ok 5 - Net Skins started-round/current-entry guards are unchanged
+      ---
+      duration_ms: 161.028708
+      type: 'test'
+      ...
+    # Subtest: Calcutta ownership/purchase replacement preserves rules, amounts, publication authority and idempotency
+    ok 6 - Calcutta ownership/purchase replacement preserves rules, amounts, publication authority and idempotency
+      ---
+      duration_ms: 143.578042
+      type: 'test'
+      ...
+    # Subtest: existing receipt resolves after context revision changes without new mutation or rebind
+    ok 7 - existing receipt resolves after context revision changes without new mutation or rebind
+      ---
+      duration_ms: 80.405
+      type: 'test'
+      ...
+    # Subtest: single-entry clear retains immutable history, other entries, CAS and publication/result guards
+    ok 8 - single-entry clear retains immutable history, other entries, CAS and publication/result guards
+      ---
+      duration_ms: 173.620292
+      type: 'test'
+      ...
+    # Subtest: failure before required isolated audit rolls back financial facts, receipt, marker and all audit
+    ok 9 - failure before required isolated audit rolls back financial facts, receipt, marker and all audit
+      ---
+      duration_ms: 87.342916
+      type: 'test'
+      ...
+    # Subtest: auction supersession records isolated handling and unchanged originating activation atomically
+    ok 10 - auction supersession records isolated handling and unchanged originating activation atomically
+      ---
+      duration_ms: 82.983
+      type: 'test'
+      ...
+    # Subtest: outside approved transaction provenance trigger is a no-op and previous audit history remains intact
+    ok 11 - outside approved transaction provenance trigger is a no-op and previous audit history remains intact
+      ---
+      duration_ms: 39.240708
+      type: 'test'
+      ...
+    # Subtest: failure after derived supersession rolls back job, delivery audit, receipt and transaction marker
+    ok 12 - failure after derived supersession rolls back job, delivery audit, receipt and transaction marker
+      ---
+      duration_ms: 97.592958
+      type: 'test'
+      ...
+    # Subtest: a live isolated transaction marker cannot relabel another backend delivery event
+    ok 13 - a live isolated transaction marker cannot relabel another backend delivery event
+      ---
+      duration_ms: 378.312584
+      type: 'test'
+      ...
+    # Subtest: current actor revocation denies recovery and mutation without exposing financial receipts
+    ok 14 - current actor revocation denies recovery and mutation without exposing financial receipts
+      ---
+      duration_ms: 46.323125
+      type: 'test'
+      ...
+    # Subtest: concurrent auction commands serialize and transaction markers cannot leak across backends
+    ok 15 - concurrent auction commands serialize and transaction markers cannot leak across backends
+      ---
+      duration_ms: 283.41975
+      type: 'test'
+      ...
+    # Subtest: configuration, scoring, Odds and retired Google work remain untouched
+    ok 16 - configuration, scoring, Odds and retired Google work remain untouched
+      ---
+      duration_ms: 30.283
+      type: 'test'
+      ...
+    1..16
+ok 1 - P0-F reduced financial cores preserve canonical authority, receipts and isolated provenance
+  ---
+  duration_ms: 5036.100333
+  type: 'test'
+  ...
+1..1
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5087.800084

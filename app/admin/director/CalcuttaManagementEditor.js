@@ -83,7 +83,7 @@ function OwnerSelect({players,value,onChange,disabled,index}) {
  const [search,setSearch]=useState("");
  return <div><label>Search owner {index + 1}<input type="search" value={search} disabled={disabled} onChange={e=>setSearch(e.target.value)} placeholder="Name or Player ID" /></label><label>Owner {index + 1}<select disabled={disabled} value={value} onChange={e=>onChange(e.target.value)}><option value="">Select Owner</option>{players.filter(p=>p.player_id===value || `${p.display_name} ${p.player_id}`.toLowerCase().includes(search.toLowerCase())).map(p=><option key={p.player_id} value={p.player_id}>{p.display_name} · {p.player_id}</option>)}</select></label></div>;
 }
-export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange, externalPublicationRevision, transport = request }) {
+export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange, externalPublicationRevision, transport = request, auctionOnly = false }) {
   const [model, setModel] = useState(null),
     [rows, setRows] = useState([]),
     [entry, setEntry] = useState(null),
@@ -108,6 +108,7 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
     setConfirm(false);
   };
   const load = async () => {
+    if (auctionOnly && pending.current) return;
     setBusy(true);
     try {
       apply((await transport("management-read")).data);
@@ -194,6 +195,7 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
     invalid = tab === "auction" && entry && !entry.purchasePrice ? "Purchase price required." : e.message;
   }
   const discard = () => {
+    if (auctionOnly && pending.current) return;
     if (
       (!dirty && !pending.current) ||
       window.confirm(
@@ -208,6 +210,7 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
     setBusy(true);
     setMessage("");
     try {
+      if (auctionOnly && tab === "configuration") throw new Error("Financial configuration is unavailable in this workspace.");
       if (!pending.current) {
         const requestFingerprint = [
           ...crypto.getRandomValues(new Uint8Array(32)),
@@ -250,7 +253,7 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
       }
     } catch (e) {
       setMessage(
-        `${e.message} Retry uses the same request identity; discard/reload to inspect current state.`,
+        auctionOnly ? `${e.message} Keep this review open. Retry uses the same saved request; editing and reload remain disabled until confirmed.` : `${e.message} Retry uses the same request identity; discard/reload to inspect current state.`,
       );
     } finally {
       setBusy(false);
@@ -259,7 +262,7 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
   return (
     <section className={styles.editor} aria-label="Calcutta management">
       <h3>Calcutta Auction — {model.tournament_id}</h3>
-      <p className={styles.steps}>1 · Enter Auction → 2 · Review Auction → 3 · Publish Auction → 4 · Results / Values</p>
+      <p className={styles.steps}>{auctionOnly ? "Enter and review auction ownership. Publication is a separate operation." : "1 · Enter Auction → 2 · Review Auction → 3 · Publish Auction → 4 · Results / Values"}</p>
       <p>
         Configuration revision {model.configuration_revision} ·
         Auction revision {model.auction_revision} · {model.publication_state}
@@ -272,7 +275,7 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
         . {count} active golfers · {teams} Scramble teams.
       </p>
       <div className={styles.actions}>
-        <button
+        {!auctionOnly ? <button
           disabled={busy || Boolean(pending.current) || dirty}
           aria-pressed={tab === "configuration"}
           onClick={() => {
@@ -281,7 +284,7 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
           }}
         >
           Points &amp; Payouts
-        </button>
+        </button> : null}
         <button
           disabled={busy || Boolean(pending.current) || dirty}
           aria-pressed={tab === "auction"}
@@ -292,7 +295,7 @@ export default function CalcuttaManagementEditor({ onChanged, onDraftStateChange
         >
           Enter Auction
         </button>
-        <button disabled={busy} onClick={discard}>
+        <button disabled={busy || (auctionOnly && Boolean(pending.current))} onClick={discard}>
           {dirty || pending.current
             ? "Discard Changes / Reload"
             : "Reload saved auction"}

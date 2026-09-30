@@ -112,7 +112,7 @@ test("exact Production-shadow candidate tuple enables Supabase Auth without sele
   });
   assert.deepEqual(state.safety, {
     liveProductionSelected: false,
-    scoringAuthority: "google",
+    scoringAuthority: "none",
     scoringIngressEnabled: false,
     googleMirrorDeliveryEnabled: false,
     oddsPublicationEnabled: false,
@@ -137,10 +137,9 @@ test("candidate fails closed on hostname, resource, CAPTCHA, or authority drift"
     [{ ...candidateEnv, VERCEL_PROJECT_ID: "prj_wrong" }, "exact-vercel-project-required"],
     [{ ...candidateEnv, PRODUCTION_SUPABASE_PROJECT_REF: "idgigvjjqkfbqjeredpb" }, "production-project-ref-required"],
     [{ ...candidateEnv, NEXT_PUBLIC_SUPABASE_AUTH_URL: "https://idgigvjjqkfbqjeredpb.supabase.co" }, "production-public-auth-url-required"],
-    [{ ...candidateEnv, GOOGLE_SHEETS_ID: "1hSn6uABZwYftU3DrtoOz08ygX4x-c1JAWzuohtQ31Ts" }, "production-workbook-required"],
     [{ ...candidateEnv, PARTICIPANT_AUTH_CAPTCHA_CONFIGURED: "false" }, "captcha-configuration-required"],
     [{ ...candidateEnv, PARTICIPANT_AUTH_RATE_LIMIT_SECRET: "short" }, "auth-rate-limit-secret-required"],
-    [{ ...candidateEnv, SCORING_AUTHORITY: "supabase" }, "google-scoring-authority-required"],
+    [{ ...candidateEnv, SCORING_AUTHORITY: "invalid-provider" }, "canonical-read-authority-required"],
     [{ ...candidateEnv, PRODUCTION_SUPABASE_PUBLIC_READS_ENABLED: "true" }, "authoritative-feature-forbidden"],
   ];
   for (const [env, reason] of cases) {

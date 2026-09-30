@@ -1,0 +1,514 @@
+TAP version 13
+# Subtest: Supabase identity resolves verified claims to a stable Player ID without email or browser identity
+ok 1 - Supabase identity resolves verified claims to a stable Player ID without email or browser identity
+  ---
+  duration_ms: 1.844083
+  type: 'test'
+  ...
+# Subtest: missing, expired, suspended, revoked, inactive, and wrong-tournament identity fail deterministically
+ok 2 - missing, expired, suspended, revoked, inactive, and wrong-tournament identity fail deterministically
+  ---
+  duration_ms: 0.907417
+  type: 'test'
+  ...
+# Subtest: Director Preview impersonation is an audited lease bound to the real Auth account
+ok 3 - Director Preview impersonation is an audited lease bound to the real Auth account
+  ---
+  duration_ms: 1.120292
+  type: 'test'
+  ...
+# Subtest: Supabase scoring and Finalization validate the current Auth-linked player without Google freshness
+ok 4 - Supabase scoring and Finalization validate the current Auth-linked player without Google freshness
+  ---
+  duration_ms: 0.701208
+  type: 'test'
+  ...
+# Subtest: authority-boundary, link mismatch, revoked permission, and locked/final scoring cannot silently fall back
+ok 5 - authority-boundary, link mismatch, revoked permission, and locked/final scoring cannot silently fall back
+  ---
+  duration_ms: 0.400541
+  type: 'test'
+  ...
+# Subtest: cutover migration and routes preserve RLS, audit, rollback, and zero-Google identity semantics
+ok 6 - cutover migration and routes preserve RLS, audit, rollback, and zero-Google identity semantics
+  ---
+  duration_ms: 5.768333
+  type: 'test'
+  ...
+# Subtest: provider-test and public SMS flags remain separate and Preview-only
+ok 7 - provider-test and public SMS flags remain separate and Preview-only
+  ---
+  duration_ms: 2.255917
+  type: 'test'
+  ...
+# Subtest: client rate-limit fingerprint is keyed and contains no raw request values
+ok 8 - client rate-limit fingerprint is keyed and contains no raw request values
+  ---
+  duration_ms: 0.673584
+  type: 'test'
+  ...
+# Subtest: Auth phone comparison accepts hosted normalization without weakening collision checks
+ok 9 - Auth phone comparison accepts hosted normalization without weakening collision checks
+  ---
+  duration_ms: 0.674834
+  type: 'test'
+  ...
+# Subtest: same-user enrollment begins with authenticated updateUser and never signInWithOtp
+ok 10 - same-user enrollment begins with authenticated updateUser and never signInWithOtp
+  ---
+  duration_ms: 0.250458
+  type: 'test'
+  ...
+# Subtest: pending phone_change resend uses the documented phone_change resend flow
+ok 11 - pending phone_change resend uses the documented phone_change resend flow
+  ---
+  duration_ms: 0.144333
+  type: 'test'
+  ...
+# Subtest: phone enrollment verifies phone_change and preserves Auth UUID A
+ok 12 - phone enrollment verifies phone_change and preserves Auth UUID A
+  ---
+  duration_ms: 0.195667
+  type: 'test'
+  ...
+# Subtest: unexpected Auth UUID B is rejected by both enrollment and login gates
+ok 13 - unexpected Auth UUID B is rejected by both enrollment and login gates
+  ---
+  duration_ms: 0.154917
+  type: 'test'
+  ...
+# Subtest: subsequent phone login is a separate shouldCreateUser:false sms flow resolving to A
+ok 14 - subsequent phone login is a separate shouldCreateUser:false sms flow resolving to A
+  ---
+  duration_ms: 0.17375
+  type: 'test'
+  ...
+# Subtest: controlled phone-login proof is signed, short-lived, HttpOnly, and tamper-evident
+ok 15 - controlled phone-login proof is signed, short-lived, HttpOnly, and tamper-evident
+  ---
+  duration_ms: 0.97475
+  type: 'test'
+  ...
+# Subtest: Operation B route is signed-out, one-proof scoped, and never accepts a client phone or ownership id
+ok 16 - Operation B route is signed-out, one-proof scoped, and never accepts a client phone or ownership id
+  ---
+  duration_ms: 5.18325
+  type: 'test'
+  ...
+# Subtest: fully signed-out controlled surface resolves exactly one VERIFIED rehearsal identity server-side
+ok 17 - fully signed-out controlled surface resolves exactly one VERIFIED rehearsal identity server-side
+  ---
+  duration_ms: 0.946875
+  type: 'test'
+  ...
+# Subtest: controlled phone-login migration snapshots VERIFIED A ownership and exact Director entitlement parity
+ok 18 - controlled phone-login migration snapshots VERIFIED A ownership and exact Director entitlement parity
+  ---
+  duration_ms: 0.935583
+  type: 'test'
+  ...
+# Subtest: pre-existing Director phone login retains the same role, scope, source, revision, and count
+ok 19 - pre-existing Director phone login retains the same role, scope, source, revision, and count
+  ---
+  duration_ms: 0.209667
+  type: 'test'
+  ...
+# Subtest: ordinary non-Director fixture remains non-Director after phone login
+ok 20 - ordinary non-Director fixture remains non-Director after phone login
+  ---
+  duration_ms: 0.077
+  type: 'test'
+  ...
+# Subtest: unknown, unverified, revoked, duplicate, and stale phone ownership cannot reach provider send
+ok 21 - unknown, unverified, revoked, duplicate, and stale phone ownership cannot reach provider send
+  ---
+  duration_ms: 0.923125
+  type: 'test'
+  ...
+# Subtest: one owner request uses shouldCreateUser false and one sms verification uses type sms
+ok 22 - one owner request uses shouldCreateUser false and one sms verification uses type sms
+  ---
+  duration_ms: 1.049583
+  type: 'test'
+  ...
+# Subtest: wrong returned UUID is locally terminated and cannot complete Passport or scoring authorization
+ok 23 - wrong returned UUID is locally terminated and cannot complete Passport or scoring authorization
+  ---
+  duration_ms: 1.056708
+  type: 'test'
+  ...
+# Subtest: successful login preserves ownership/scoring and establishes a refreshable CB01 session
+ok 24 - successful login preserves ownership/scoring and establishes a refreshable CB01 session
+  ---
+  duration_ms: 1.916875
+  type: 'test'
+  ...
+# Subtest: successful email and phone verification navigate immediately to Home without duplicate auth reads
+ok 25 - successful email and phone verification navigate immediately to Home without duplicate auth reads
+  ---
+  duration_ms: 0.882958
+  type: 'test'
+  ...
+# Subtest: performance diagnostics retain bounded login-to-Home stages without PII
+ok 26 - performance diagnostics retain bounded login-to-Home stages without PII
+  ---
+  duration_ms: 1.67825
+  type: 'test'
+  ...
+# Subtest: final UI is SMS-first, restores pending login, retains email fallback, and removes proof jargon
+ok 27 - final UI is SMS-first, restores pending login, retains email fallback, and removes proof jargon
+  ---
+  duration_ms: 0.70475
+  type: 'test'
+  ...
+# Subtest: Operation B functions are service-role only and automated coverage contains no provider credentials or OTP storage
+ok 28 - Operation B functions are service-role only and automated coverage contains no provider credentials or OTP storage
+  ---
+  duration_ms: 0.796833
+  type: 'test'
+  ...
+# Subtest: Auth state phases require empty phone, staged phone_change, then confirmed phone on A
+ok 29 - Auth state phases require empty phone, staged phone_change, then confirmed phone on A
+  ---
+  duration_ms: 0.478833
+  type: 'test'
+  ...
+# Subtest: hosted Supabase User new_phone shape preserves A and ignores phone identity ids
+ok 30 - hosted Supabase User new_phone shape preserves A and ignores phone identity ids
+  ---
+  duration_ms: 0.094208
+  type: 'test'
+  ...
+# Subtest: real hosted updateUser new_phone fixture advances Stage B before phone_change persistence catches up
+ok 31 - real hosted updateUser new_phone fixture advances Stage B before phone_change persistence catches up
+  ---
+  duration_ms: 0.221292
+  type: 'test'
+  ...
+# Subtest: Stage B reserves Auth mismatch for an Auth user UUID mismatch
+ok 32 - Stage B reserves Auth mismatch for an Auth user UUID mismatch
+  ---
+  duration_ms: 0.154166
+  type: 'test'
+  ...
+# Subtest: residual unconfirmed Auth phone blocks before provider use and repaired empty state is ready
+ok 33 - residual unconfirmed Auth phone blocks before provider use and repaired empty state is ready
+  ---
+  duration_ms: 0.100125
+  type: 'test'
+  ...
+# Subtest: OTP input and provider errors stay in bounded safe categories
+ok 34 - OTP input and provider errors stay in bounded safe categories
+  ---
+  duration_ms: 0.341917
+  type: 'test'
+  ...
+# Subtest: Twilio trial recipient rejection is classified without exposing provider details
+ok 35 - Twilio trial recipient rejection is classified without exposing provider details
+  ---
+  duration_ms: 0.112541
+  type: 'test'
+  ...
+# Subtest: Production enrollment uses the separately authenticated send hook and hides provider details
+ok 36 - Production enrollment uses the separately authenticated send hook and hides provider details
+  ---
+  duration_ms: 1.394083
+  type: 'test'
+  ...
+# Subtest: send-stage uncertainty cannot claim possession verification
+ok 37 - send-stage uncertainty cannot claim possession verification
+  ---
+  duration_ms: 0.311416
+  type: 'test'
+  ...
+# Subtest: Stage B record accepts normalized updateUser evidence without weakening UUID or collision gates
+ok 38 - Stage B record accepts normalized updateUser evidence without weakening UUID or collision gates
+  ---
+  duration_ms: 0.876541
+  type: 'test'
+  ...
+# Subtest: migration binds enrollment to actor A, active link, email, phone revision, and phone_change
+ok 39 - migration binds enrollment to actor A, active link, email, phone revision, and phone_change
+  ---
+  duration_ms: 0.57525
+  type: 'test'
+  ...
+# Subtest: migration never creates users, relinks Players, or accepts B
+ok 40 - migration never creates users, relinks Players, or accepts B
+  ---
+  duration_ms: 0.71775
+  type: 'test'
+  ...
+# Subtest: same-user enrollment RPCs remain service-role only and store no OTP
+ok 41 - same-user enrollment RPCs remain service-role only and store no OTP
+  ---
+  duration_ms: 0.530416
+  type: 'test'
+  ...
+# Subtest: Preview repair is one-attempt guarded, preserves A/email/link, and never deletes an Auth user
+ok 42 - Preview repair is one-attempt guarded, preserves A/email/link, and never deletes an Auth user
+  ---
+  duration_ms: 0.545375
+  type: 'test'
+  ...
+# Subtest: residual Preview repair is PII-safe, exact-attempt scoped, and leaves enrollment ready
+ok 43 - residual Preview repair is PII-safe, exact-attempt scoped, and leaves enrollment ready
+  ---
+  duration_ms: 1.076875
+  type: 'test'
+  ...
+# Subtest: compromised real send is cancellable without accepting its OTP or changing ownership
+ok 44 - compromised real send is cancellable without accepting its OTP or changing ownership
+  ---
+  duration_ms: 0.787416
+  type: 'test'
+  ...
+# Subtest: latest compromised Stage B attempt repair is exact, PII-safe, and sends no SMS
+ok 45 - latest compromised Stage B attempt repair is exact, PII-safe, and sends no SMS
+  ---
+  duration_ms: 0.793917
+  type: 'test'
+  ...
+# Subtest: Director cannot send enrollment SMS; participant email session owns Operation A
+ok 46 - Director cannot send enrollment SMS; participant email session owns Operation A
+  ---
+  duration_ms: 1.2605
+  type: 'test'
+  ...
+# Subtest: Operation A phone-change verification remains backend regression infrastructure
+ok 47 - Operation A phone-change verification remains backend regression infrastructure
+  ---
+  duration_ms: 0.508042
+  type: 'test'
+  ...
+# Subtest: email sign-in remains enabled alongside CAPTCHA-gated public phone login
+ok 48 - email sign-in remains enabled alongside CAPTCHA-gated public phone login
+  ---
+  duration_ms: 0.7565
+  type: 'test'
+  ...
+# Subtest: unlinked Auth UUID B receives no participant or scoring identity
+ok 49 - unlinked Auth UUID B receives no participant or scoring identity
+  ---
+  duration_ms: 1.3415
+  type: 'test'
+  ...
+# Subtest: enrollment route never dispatches Twilio directly; approved hook owns dispatch
+ok 50 - enrollment route never dispatches Twilio directly; approved hook owns dispatch
+  ---
+  duration_ms: 0.854333
+  type: 'test'
+  ...
+# Subtest: linked Director access follows the verified Supabase account with no Passport or Google inspection
+ok 51 - linked Director access follows the verified Supabase account with no Passport or Google inspection
+  ---
+  duration_ms: 2.976625
+  type: 'test'
+  ...
+# Subtest: capability follows account changes and a different participant account is denied
+ok 52 - capability follows account changes and a different participant account is denied
+  ---
+  duration_ms: 0.284417
+  type: 'test'
+  ...
+# Subtest: retired Passport bootstrap cannot create a canonical Director entitlement
+ok 53 - retired Passport bootstrap cannot create a canonical Director entitlement
+  ---
+  duration_ms: 1.011
+  type: 'test'
+  ...
+# Subtest: revocation is central, fail-closed, and a stale Passport cannot reactivate it
+ok 54 - revocation is central, fail-closed, and a stale Passport cannot reactivate it
+  ---
+  duration_ms: 0.366625
+  type: 'test'
+  ...
+# Subtest: an entitlement cannot bypass expired, revoked, missing, or mismatched impersonation leases
+ok 55 - an entitlement cannot bypass expired, revoked, missing, or mismatched impersonation leases
+  ---
+  duration_ms: 0.651333
+  type: 'test'
+  ...
+# Subtest: active entitlement plus an account-bound current lease preserves Preview impersonation
+ok 56 - active entitlement plus an account-bound current lease preserves Preview impersonation
+  ---
+  duration_ms: 1.8975
+  type: 'test'
+  ...
+# Subtest: Production without canonical admission denies before account or retired Passport transport
+ok 57 - Production without canonical admission denies before account or retired Passport transport
+  ---
+  duration_ms: 0.171041
+  type: 'test'
+  ...
+# Subtest: schema is narrow, RLS-closed, account-bound, audited, and 2026-only
+ok 58 - schema is narrow, RLS-closed, account-bound, audited, and 2026-only
+  ---
+  duration_ms: 4.550542
+  type: 'test'
+  ...
+# Subtest: menu warms account capability and every Director surface uses canonical account authorization
+ok 59 - menu warms account capability and every Director surface uses canonical account authorization
+  ---
+  duration_ms: 2.625541
+  type: 'test'
+  ...
+# Subtest: canonical Director missing database fails closed even with an active legacy Passport
+ok 60 - canonical Director missing database fails closed even with an active legacy Passport
+  ---
+  duration_ms: 0.357167
+  type: 'test'
+  ...
+# Subtest: canonical Director unapproved project fails closed even with an active legacy Passport
+ok 61 - canonical Director unapproved project fails closed even with an active legacy Passport
+  ---
+  duration_ms: 0.11075
+  type: 'test'
+  ...
+# Subtest: canonical Director Auth/database origin mismatch fails closed even with an active legacy Passport
+ok 62 - canonical Director Auth/database origin mismatch fails closed even with an active legacy Passport
+  ---
+  duration_ms: 0.075792
+  type: 'test'
+  ...
+# Subtest: canonical Director credential missing fails closed even with an active legacy Passport
+ok 63 - canonical Director credential missing fails closed even with an active legacy Passport
+  ---
+  duration_ms: 0.069917
+  type: 'test'
+  ...
+# Subtest: canonical Director retired Passport configured fails closed even with an active legacy Passport
+ok 64 - canonical Director retired Passport configured fails closed even with an active legacy Passport
+  ---
+  duration_ms: 0.087958
+  type: 'test'
+  ...
+# Subtest: retired Director migration endpoints reject without identity/provider transport
+ok 65 - retired Director migration endpoints reject without identity/provider transport
+  ---
+  duration_ms: 14.141584
+  type: 'test'
+  ...
+# Subtest: A: Director Passport, active lease, and signed cookie are all required
+ok 66 - A: Director Passport, active lease, and signed cookie are all required
+  ---
+  duration_ms: 3.301
+  type: 'test'
+  ...
+# Subtest: normal Director capability requires a valid Passport but no impersonation lease
+ok 67 - normal Director capability requires a valid Passport but no impersonation lease
+  ---
+  duration_ms: 0.525833
+  type: 'test'
+  ...
+# Subtest: impersonation token lifetime honors the lease-sized lifetime without a one-hour floor
+ok 68 - impersonation token lifetime honors the lease-sized lifetime without a one-hour floor
+  ---
+  duration_ms: 0.188916
+  type: 'test'
+  ...
+# Subtest: B-D: expired, revoked, and missing leases fail closed before Director freshness
+ok 69 - B-D: expired, revoked, and missing leases fail closed before Director freshness
+  ---
+  duration_ms: 0.30625
+  type: 'test'
+  ...
+# Subtest: E-F, J-K: mismatched player, wrong/3026 tournament, and inactive membership are denied
+ok 70 - E-F, J-K: mismatched player, wrong/3026 tournament, and inactive membership are denied
+  ---
+  duration_ms: 0.366875
+  type: 'test'
+  ...
+# Subtest: G-H: tampered cookies and another Director/session cannot replay a lease
+ok 71 - G-H: tampered cookies and another Director/session cannot replay a lease
+  ---
+  duration_ms: 0.285083
+  type: 'test'
+  ...
+# Subtest: I: retaining the cookie after End Impersonation cannot restore a revoked lease
+ok 72 - I: retaining the cookie after End Impersonation cannot restore a revoked lease
+  ---
+  duration_ms: 0.223792
+  type: 'test'
+  ...
+# Subtest: expired or revoked lease denials clear the cached impersonation presentation shell
+ok 73 - expired or revoked lease denials clear the cached impersonation presentation shell
+  ---
+  duration_ms: 5.033667
+  type: 'test'
+  ...
+# Subtest: participant identity binds impersonation to Auth before rejecting expired/revoked/missing leases
+ok 74 - participant identity binds impersonation to Auth before rejecting expired/revoked/missing leases
+  ---
+  duration_ms: 2.612667
+  type: 'test'
+  ...
+# Subtest: L: normal Supabase participant identity and scoring remain unaffected
+ok 75 - L: normal Supabase participant identity and scoring remain unaffected
+  ---
+  duration_ms: 0.825875
+  type: 'test'
+  ...
+# Subtest: expired impersonation cannot authorize an existing scoring session
+ok 76 - expired impersonation cannot authorize an existing scoring session
+  ---
+  duration_ms: 0.417917
+  type: 'test'
+  ...
+# Subtest: M: Production hard-blocks Preview impersonation even with a valid signed cookie and lease
+ok 77 - M: Production hard-blocks Preview impersonation even with a valid signed cookie and lease
+  ---
+  duration_ms: 0.131292
+  type: 'test'
+  ...
+# Subtest: UNIT requested invalid candidate cannot inherit otherwise valid Preview identity
+ok 78 - UNIT requested invalid candidate cannot inherit otherwise valid Preview identity
+  ---
+  duration_ms: 2.229667
+  type: 'test'
+  ...
+# Subtest: UNIT invalid candidate blocks administrative authority and Auth client construction
+ok 79 - UNIT invalid candidate blocks administrative authority and Auth client construction
+  ---
+  duration_ms: 0.637958
+  type: 'test'
+  ...
+# Subtest: UNIT unknown and retired identity authority cannot acquire administrative capability
+ok 80 - UNIT unknown and retired identity authority cannot acquire administrative capability
+  ---
+  duration_ms: 0.545875
+  type: 'test'
+  ...
+# Subtest: UNIT mismatched Auth origin cannot acquire administrative capability
+ok 81 - UNIT mismatched Auth origin cannot acquire administrative capability
+  ---
+  duration_ms: 0.143042
+  type: 'test'
+  ...
+# Subtest: UNIT invalid candidate is denied before Director claims, entitlement, or Passport lookup
+ok 82 - UNIT invalid candidate is denied before Director claims, entitlement, or Passport lookup
+  ---
+  duration_ms: 0.964667
+  type: 'test'
+  ...
+# Subtest: UNIT invalid candidate is denied before participant claims or canonical context lookup
+ok 83 - UNIT invalid candidate is denied before participant claims or canonical context lookup
+  ---
+  duration_ms: 0.414583
+  type: 'test'
+  ...
+# Subtest: UNIT ordinary admitted Preview identity and administration remain supported without Google
+ok 84 - UNIT ordinary admitted Preview identity and administration remain supported without Google
+  ---
+  duration_ms: 0.205708
+  type: 'test'
+  ...
+1..84
+# tests 84
+# suites 0
+# pass 84
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 681.858583

@@ -1,0 +1,632 @@
+TAP version 13
+# Subtest: 2026 History source is explicitly Preview-only, year-bound, and Production-hard-blocked
+ok 1 - 2026 History source is explicitly Preview-only, year-bound, and Production-hard-blocked
+  ---
+  duration_ms: 1.565167
+  type: 'test'
+  ...
+# Subtest: current finalized-snapshot selection is coherent, unique, and excludes audit revisions
+ok 2 - current finalized-snapshot selection is coherent, unique, and excludes audit revisions
+  ---
+  duration_ms: 15.92725
+  type: 'test'
+  ...
+# Subtest: LIVE matches cannot carry a current finalized snapshot
+ok 3 - LIVE matches cannot carry a current finalized snapshot
+  ---
+  duration_ms: 0.73675
+  type: 'test'
+  ...
+# Subtest: finalized snapshots fail closed on noncanonical identities and scoring context
+ok 4 - finalized snapshots fail closed on noncanonical identities and scoring context
+  ---
+  duration_ms: 4.860917
+  type: 'test'
+  ...
+# Subtest: strictly unstarted empty match-hole context does not compete with the canonical course definition
+ok 5 - strictly unstarted empty match-hole context does not compete with the canonical course definition
+  ---
+  duration_ms: 68.423042
+  type: 'test'
+  ...
+# Subtest: the current TPGC01 Gold definition survives one cleared unstarted match context
+ok 6 - the current TPGC01 Gold definition survives one cleared unstarted match context
+  ---
+  duration_ms: 32.62425
+  type: 'test'
+  ...
+# Subtest: actual competing canonical course-hole definitions still fail closed
+ok 7 - actual competing canonical course-hole definitions still fail closed
+  ---
+  duration_ms: 0.616125
+  type: 'test'
+  ...
+# Subtest: empty or partial course context with scoring evidence remains fail-closed
+ok 8 - empty or partial course context with scoring evidence remains fail-closed
+  ---
+  duration_ms: 1.000166
+  type: 'test'
+  ...
+# Subtest: a course with only empty unstarted contexts still fails closed
+ok 9 - a course with only empty unstarted contexts still fails closed
+  ---
+  duration_ms: 0.788083
+  type: 'test'
+  ...
+# Subtest: correction and re-Finalization select only the newest coherent current revision
+ok 10 - correction and re-Finalization select only the newest coherent current revision
+  ---
+  duration_ms: 0.656209
+  type: 'test'
+  ...
+# Subtest: adapter represents the complete current 24/17/46/828 lifecycle boundary
+ok 11 - adapter represents the complete current 24/17/46/828 lifecycle boundary
+  ---
+  duration_ms: 66.58575
+  type: 'test'
+  ...
+# Subtest: Best Ball, Singles, and Scramble use stable canonical logical identities
+ok 12 - Best Ball, Singles, and Scramble use stable canonical logical identities
+  ---
+  duration_ms: 64.532208
+  type: 'test'
+  ...
+# Subtest: 2026 team history summarizes canonical rounds without duplicating match scorecards
+ok 13 - 2026 team history summarizes canonical rounds without duplicating match scorecards
+  ---
+  duration_ms: 65.307667
+  type: 'test'
+  ...
+# Subtest: 2026-R3-4 Singles preserves official identities and all authoritative gross values
+ok 14 - 2026-R3-4 Singles preserves official identities and all authoritative gross values
+  ---
+  duration_ms: 64.964875
+  type: 'test'
+  ...
+# Subtest: 2026-R2-1 Scramble creates two team scorecards and resolves both golfer pairings
+ok 15 - 2026-R2-1 Scramble creates two team scorecards and resolves both golfer pairings
+  ---
+  duration_ms: 65.433667
+  type: 'test'
+  ...
+# Subtest: all six finalized Scramble matches preserve the two-team historical contract
+ok 16 - all six finalized Scramble matches preserve the two-team historical contract
+  ---
+  duration_ms: 64.337916
+  type: 'test'
+  ...
+# Subtest: 2026-R1-6 exposes Jack Keffler's corrected current Best Ball scorecard
+ok 17 - 2026-R1-6 exposes Jack Keffler's corrected current Best Ball scorecard
+  ---
+  duration_ms: 66.065708
+  type: 'test'
+  ...
+# Subtest: history source fingerprint is order-insensitive and correction-sensitive
+ok 18 - history source fingerprint is order-insensitive and correction-sensitive
+  ---
+  duration_ms: 3.366916
+  type: 'test'
+  ...
+# Subtest: public History DTO redacts snapshot, archive, mutation, and service administration
+ok 19 - public History DTO redacts snapshot, archive, mutation, and service administration
+  ---
+  duration_ms: 87.329041
+  type: 'test'
+  ...
+# Subtest: migrated 2026 routes use the Supabase service branch and fail locally without a legacy fallback
+ok 20 - migrated 2026 routes use the Supabase service branch and fail locally without a legacy fallback
+  ---
+  duration_ms: 5.376125
+  type: 'test'
+  ...
+# Subtest: historical RPC is service-only, 2026-scoped, and rejects Production/3026 context
+ok 21 - historical RPC is service-only, 2026-scoped, and rejects Production/3026 context
+  ---
+  duration_ms: 1.087958
+  type: 'test'
+  ...
+# Subtest: Step 5 preserves the canonical 15-Final/9-Live reopened History contract
+ok 22 - Step 5 preserves the canonical 15-Final/9-Live reopened History contract
+  ---
+  duration_ms: 74.70175
+  type: 'test'
+  ...
+# Subtest: Step 5 History follows current lifecycle through Final to Reopen to re-Finalize
+ok 23 - Step 5 History follows current lifecycle through Final to Reopen to re-Finalize
+  ---
+  duration_ms: 172.932709
+  type: 'test'
+  ...
+# Subtest: Step 5 Google to Supabase rollback is explicit, Preview-only, and year-isolated
+ok 24 - Step 5 Google to Supabase rollback is explicit, Preview-only, and year-isolated
+  ---
+  duration_ms: 0.960792
+  type: 'test'
+  ...
+# Subtest: one versioned bundle composes canonical tournament, history, settings, evidence, and provenance
+ok 25 - one versioned bundle composes canonical tournament, history, settings, evidence, and provenance
+  ---
+  duration_ms: 14.623542
+  type: 'test'
+  ...
+# Subtest: current canonical lifecycle keeps a populated reopened scorecard unofficial
+ok 26 - current canonical lifecycle keeps a populated reopened scorecard unofficial
+  ---
+  duration_ms: 2.38675
+  type: 'test'
+  ...
+# Subtest: scorecard evidence is complete, partial, or unavailable without zero filling
+ok 27 - scorecard evidence is complete, partial, or unavailable without zero filling
+  ---
+  duration_ms: 2.372583
+  type: 'test'
+  ...
+# Subtest: historical and current course configurations remain temporally distinct
+ok 28 - historical and current course configurations remain temporally distinct
+  ---
+  duration_ms: 1.807959
+  type: 'test'
+  ...
+# Subtest: bundle fingerprint excludes preparation time and changes with deterministic pairing order
+ok 29 - bundle fingerprint excludes preparation time and changes with deterministic pairing order
+  ---
+  duration_ms: 6.097583
+  type: 'test'
+  ...
+# Subtest: championship compatibility derives the unchanged deterministic engine contract
+ok 30 - championship compatibility derives the unchanged deterministic engine contract
+  ---
+  duration_ms: 334.477666
+  type: 'test'
+  ...
+# Subtest: championship compatibility exposes only canonical Final points
+ok 31 - championship compatibility exposes only canonical Final points
+  ---
+  duration_ms: 133.798458
+  type: 'test'
+  ...
+# Subtest: War Room, optimizer, intelligence, calibration, and championship requirements are complete
+ok 32 - War Room, optimizer, intelligence, calibration, and championship requirements are complete
+  ---
+  duration_ms: 1.725083
+  type: 'test'
+  ...
+# Subtest: structural shadow validation resolves identities and warns only for read-only UNKNOWN freshness
+ok 33 - structural shadow validation resolves identities and warns only for read-only UNKNOWN freshness
+  ---
+  duration_ms: 1.759625
+  type: 'test'
+  ...
+# Subtest: pending pairings in the same round do not collide as duplicate official pairings
+ok 34 - pending pairings in the same round do not collide as duplicate official pairings
+  ---
+  duration_ms: 1.795125
+  type: 'test'
+  ...
+# Subtest: partial pairings in the same round do not collide as duplicate official pairings
+ok 35 - partial pairings in the same round do not collide as duplicate official pairings
+  ---
+  duration_ms: 1.734458
+  type: 'test'
+  ...
+# Subtest: complete pairings in the same round still reject duplicate participants
+ok 36 - complete pairings in the same round still reject duplicate participants
+  ---
+  duration_ms: 1.776333
+  type: 'test'
+  ...
+# Subtest: local shadow preparation reports transformation time and serialized diagnostic size separately from engine execution
+ok 37 - local shadow preparation reports transformation time and serialized diagnostic size separately from engine execution
+  ---
+  duration_ms: 6.340958
+  type: 'test'
+  ...
+# {"sample":"local-structural-shadow-fixture","transformations":5,"medianTransformMs":1.196,"serializedBytes":85999,"monteCarloIterations":0,"googleForegroundRequests":0}
+# Subtest: structural validation preserves explicit missing-handicap evidence while failing on malformed canonical facts
+ok 38 - structural validation preserves explicit missing-handicap evidence while failing on malformed canonical facts
+  ---
+  duration_ms: 2.359167
+  type: 'test'
+  ...
+# Subtest: Prediction Settings must be valid; UNKNOWN is read-only and CURRENT is cutover eligible
+ok 39 - Prediction Settings must be valid; UNKNOWN is read-only and CURRENT is cutover eligible
+  ---
+  duration_ms: 3.571208
+  type: 'test'
+  ...
+# Subtest: Step 7B shared configuration adapter is reused without a second settings parser
+ok 40 - Step 7B shared configuration adapter is reused without a second settings parser
+  ---
+  duration_ms: 0.134167
+  type: 'test'
+  ...
+# Subtest: future Google/Supabase diagnostics classify order, configuration, evidence, identity, and revision
+ok 41 - future Google/Supabase diagnostics classify order, configuration, evidence, identity, and revision
+  ---
+  duration_ms: 3.174166
+  type: 'test'
+  ...
+# Subtest: bounded scopes retain server calculation inputs without creating page-specific contracts
+ok 42 - bounded scopes retain server calculation inputs without creating page-specific contracts
+  ---
+  duration_ms: 1.08875
+  type: 'test'
+  ...
+# Subtest: Preview gate is isolated and Production is hard blocked
+ok 43 - Preview gate is isolated and Production is hard blocked
+  ---
+  duration_ms: 0.633958
+  type: 'test'
+  ...
+# Subtest: server service has zero Google imports, no fallback, and no runtime consumer selects it
+ok 44 - server service has zero Google imports, no fallback, and no runtime consumer selects it
+  ---
+  duration_ms: 7.268083
+  type: 'test'
+  ...
+# Subtest: NA-P0F-HISTORY-READ-01: exact diagnostic History needs neither Google nor the mirror writer flag
+ok 45 - NA-P0F-HISTORY-READ-01: exact diagnostic History needs neither Google nor the mirror writer flag
+  ---
+  duration_ms: 2.195708
+  type: 'test'
+  ...
+# Subtest: NA-P0F-PREDICTION-READ-01: exact diagnostic Prediction keeps the existing read contract without Google
+ok 46 - NA-P0F-PREDICTION-READ-01: exact diagnostic Prediction keeps the existing read contract without Google
+  ---
+  duration_ms: 0.254042
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects VERCEL_ENV drift
+ok 47 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects VERCEL_ENV drift
+  ---
+  duration_ms: 0.38425
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects VERCEL_BRANCH_URL drift
+ok 48 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects VERCEL_BRANCH_URL drift
+  ---
+  duration_ms: 0.101958
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects VERCEL_URL drift
+ok 49 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects VERCEL_URL drift
+  ---
+  duration_ms: 0.087416
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects VERCEL_GIT_COMMIT_SHA drift
+ok 50 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects VERCEL_GIT_COMMIT_SHA drift
+  ---
+  duration_ms: 0.088333
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects VERCEL_PROJECT_ID drift
+ok 51 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects VERCEL_PROJECT_ID drift
+  ---
+  duration_ms: 0.098209
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects VERCEL_PROJECT_NAME drift
+ok 52 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects VERCEL_PROJECT_NAME drift
+  ---
+  duration_ms: 0.089959
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SHADOW_CANDIDATE_HOSTNAME drift
+ok 53 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SHADOW_CANDIDATE_HOSTNAME drift
+  ---
+  duration_ms: 0.098583
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SHADOW_CANDIDATE_EXPECTED_COMMIT_SHA drift
+ok 54 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SHADOW_CANDIDATE_EXPECTED_COMMIT_SHA drift
+  ---
+  duration_ms: 0.108292
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SHADOW_CANDIDATE_EXPECTED_VERCEL_PROJECT_ID drift
+ok 55 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SHADOW_CANDIDATE_EXPECTED_VERCEL_PROJECT_ID drift
+  ---
+  duration_ms: 0.078292
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_FOUNDATION_ENABLED drift
+ok 56 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_FOUNDATION_ENABLED drift
+  ---
+  duration_ms: 0.091833
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_PROJECT_REF drift
+ok 57 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_PROJECT_REF drift
+  ---
+  duration_ms: 0.060917
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_URL drift
+ok 58 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_URL drift
+  ---
+  duration_ms: 0.057625
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_SECRET_KEY drift
+ok 59 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_SECRET_KEY drift
+  ---
+  duration_ms: 0.068958
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects NEXT_PUBLIC_SUPABASE_AUTH_URL drift
+ok 60 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects NEXT_PUBLIC_SUPABASE_AUTH_URL drift
+  ---
+  duration_ms: 0.059167
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY drift
+ok 61 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects NEXT_PUBLIC_SUPABASE_AUTH_PUBLISHABLE_KEY drift
+  ---
+  duration_ms: 0.055709
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SHADOW_CANDIDATE_AUTH_ENABLED drift
+ok 62 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SHADOW_CANDIDATE_AUTH_ENABLED drift
+  ---
+  duration_ms: 0.045541
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects SCORING_AUTHORITY drift
+ok 63 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects SCORING_AUTHORITY drift
+  ---
+  duration_ms: 0.0695
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PARTICIPANT_IDENTITY_AUTHORITY drift
+ok 64 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PARTICIPANT_IDENTITY_AUTHORITY drift
+  ---
+  duration_ms: 0.281333
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PARTICIPANT_AUTH_CAPTCHA_REQUIRED drift
+ok 65 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PARTICIPANT_AUTH_CAPTCHA_REQUIRED drift
+  ---
+  duration_ms: 0.213625
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PARTICIPANT_AUTH_CAPTCHA_CONFIGURED drift
+ok 66 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PARTICIPANT_AUTH_CAPTCHA_CONFIGURED drift
+  ---
+  duration_ms: 0.181791
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects NEXT_PUBLIC_PARTICIPANT_AUTH_TURNSTILE_SITE_KEY drift
+ok 67 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects NEXT_PUBLIC_PARTICIPANT_AUTH_TURNSTILE_SITE_KEY drift
+  ---
+  duration_ms: 0.151042
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PARTICIPANT_AUTH_RATE_LIMIT_SECRET drift
+ok 68 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PARTICIPANT_AUTH_RATE_LIMIT_SECRET drift
+  ---
+  duration_ms: 0.15625
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_SCORING_INGRESS_ENABLED drift
+ok 69 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_SCORING_INGRESS_ENABLED drift
+  ---
+  duration_ms: 0.178417
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_GOOGLE_MIRROR_ENABLED drift
+ok 70 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_GOOGLE_MIRROR_ENABLED drift
+  ---
+  duration_ms: 0.150625
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_PUBLIC_READS_ENABLED drift
+ok 71 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_PUBLIC_READS_ENABLED drift
+  ---
+  duration_ms: 0.164375
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED drift
+ok 72 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_ODDS_PUBLICATION_ENABLED drift
+  ---
+  duration_ms: 0.202834
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_AUTH_USER_CREATION_ENABLED drift
+ok 73 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SUPABASE_AUTH_USER_CREATION_ENABLED drift
+  ---
+  duration_ms: 0.134625
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects SUPABASE_SCORING_MIRROR_ENABLED drift
+ok 74 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects SUPABASE_SCORING_MIRROR_ENABLED drift
+  ---
+  duration_ms: 0.116542
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SHADOW_CANDIDATE_TRANSPORT_ASSERTED drift
+ok 75 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects PRODUCTION_SHADOW_CANDIDATE_TRANSPORT_ASSERTED drift
+  ---
+  duration_ms: 0.127459
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects SUPABASE_SCORING_MIRROR_URL drift
+ok 76 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects SUPABASE_SCORING_MIRROR_URL drift
+  ---
+  duration_ms: 0.124917
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: requested diagnostic rejects SUPABASE_SCORING_MIRROR_SECRET_KEY drift
+ok 77 - NA-P0F-READ-BOUNDARY: requested diagnostic rejects SUPABASE_SCORING_MIRROR_SECRET_KEY drift
+  ---
+  duration_ms: 0.122875
+  type: 'test'
+  ...
+# Subtest: NA-P0F-PREDICTION-READ-02: invalid requested diagnostic cannot fall through to otherwise valid Preview
+ok 78 - NA-P0F-PREDICTION-READ-02: invalid requested diagnostic cannot fall through to otherwise valid Preview
+  ---
+  duration_ms: 1.001375
+  type: 'test'
+  ...
+# Subtest: NA-P0F-PREDICTION-READ-03: invalid requested diagnostic cannot borrow protected Production cutover
+ok 79 - NA-P0F-PREDICTION-READ-03: invalid requested diagnostic cannot borrow protected Production cutover
+  ---
+  duration_ms: 0.41375
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BASELINE-01: ordinary Preview retains its previous History and Prediction requirements
+ok 80 - NA-P0F-READ-BASELINE-01: ordinary Preview retains its previous History and Prediction requirements
+  ---
+  duration_ms: 0.351875
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BASELINE-02: ordinary protected Production keeps current-read and later Prediction phases
+ok 81 - NA-P0F-READ-BASELINE-02: ordinary protected Production keeps current-read and later Prediction phases
+  ---
+  duration_ms: 0.222083
+  type: 'test'
+  ...
+# Subtest: NA-P0F-HISTORY-READ-02: diagnostic History remains 2026-scoped and rejects wrong target before transport
+ok 82 - NA-P0F-HISTORY-READ-02: diagnostic History remains 2026-scoped and rejects wrong target before transport
+  ---
+  duration_ms: 0.6635
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: exact request host, origin, and HTTPS remain required before the read marker
+ok 83 - NA-P0F-READ-BOUNDARY: exact request host, origin, and HTTPS remain required before the read marker
+  ---
+  duration_ms: 8.32325
+  type: 'test'
+  ...
+# Subtest: NA-P0F-READ-BOUNDARY: History and Prediction read admission cannot authorize writes
+ok 84 - NA-P0F-READ-BOUNDARY: History and Prediction read admission cannot authorize writes
+  ---
+  duration_ms: 0.625292
+  type: 'test'
+  ...
+# Subtest: NA-P0F-HISTORY-TRANSPORT-01: previously certified History read translation stays read-only
+ok 85 - NA-P0F-HISTORY-TRANSPORT-01: previously certified History read translation stays read-only
+  ---
+  duration_ms: 2.079333
+  type: 'test'
+  ...
+# Subtest: NA-P0F-HISTORY-TRANSPORT-02: actual canonical History reader reaches certified read-only transport
+not ok 86 - NA-P0F-HISTORY-TRANSPORT-02: actual canonical History reader reaches certified read-only transport
+  ---
+  duration_ms: 0.215
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-p0f-read-adapter-extension.test.mjs:288:1'
+  failureType: 'testCodeFailure'
+  error: 'The Production-shadow candidate permits certified read RPCs only.'
+  code: 'PRODUCTION_SHADOW_CANDIDATE_RPC_FORBIDDEN'
+  stack: |-
+    scoringShadowRpc (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/lib/scoring-shadow.js:349:19)
+    readHistory2026SupabaseView (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/lib/history-2026-supabase.js:48:10)
+    withMockTransport.ok (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-p0f-read-adapter-extension.test.mjs:292:24)
+    withMockTransport (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-p0f-read-adapter-extension.test.mjs:83:22)
+    TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-p0f-read-adapter-extension.test.mjs:291:9)
+    Test.runInAsyncScope (node:async_hooks:226:14)
+    Test.run (node:internal/test_runner/test:1397:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+    Test.postRun (node:internal/test_runner/test:1537:19)
+    Test.run (node:internal/test_runner/test:1462:12)
+  ...
+# Subtest: NA-P0F-PREDICTION-SERVICE-01: denied diagnostic request invokes neither current nor history dependency
+ok 87 - NA-P0F-PREDICTION-SERVICE-01: denied diagnostic request invokes neither current nor history dependency
+  ---
+  duration_ms: 0.157875
+  type: 'test'
+  ...
+# Subtest: NA-P0F-PREDICTION-SERVICE-02: admitted canonical dependency failure is local and never a provider fallback
+ok 88 - NA-P0F-PREDICTION-SERVICE-02: admitted canonical dependency failure is local and never a provider fallback
+  ---
+  duration_ms: 0.29
+  type: 'test'
+  ...
+# Subtest: READ_CUTOVER sources resolve only at their exact active Production phase
+ok 89 - READ_CUTOVER sources resolve only at their exact active Production phase
+  ---
+  duration_ms: 2.500208
+  type: 'test'
+  ...
+# Subtest: CURRENT_READS sources fail closed before phase and resolve after phase
+ok 90 - CURRENT_READS sources fail closed before phase and resolve after phase
+  ---
+  duration_ms: 1.268084
+  type: 'test'
+  ...
+# Subtest: ODDS_WAR_ROOM inputs require their later phase and publication uses one exact authority tuple
+ok 91 - ODDS_WAR_ROOM inputs require their later phase and publication uses one exact authority tuple
+  ---
+  duration_ms: 0.694833
+  type: 'test'
+  ...
+# Subtest: invalid, incomplete, and malformed active Production requests never resolve to Google
+ok 92 - invalid, incomplete, and malformed active Production requests never resolve to Google
+  ---
+  duration_ms: 0.14
+  type: 'test'
+  ...
+# Subtest: Activation disabled fails closed without retired Production resolution
+ok 93 - Activation disabled fails closed without retired Production resolution
+  ---
+  duration_ms: 0.225042
+  type: 'test'
+  ...
+# Subtest: optional side-game reads preserve canonical empty states without an obsolete deployment-configuration gate
+ok 94 - optional side-game reads preserve canonical empty states without an obsolete deployment-configuration gate
+  ---
+  duration_ms: 0.161458
+  type: 'test'
+  ...
+# Subtest: active read transport is bounded, exact-resource, and cannot be caller-overridden
+ok 95 - active read transport is bounded, exact-resource, and cannot be caller-overridden
+  ---
+  duration_ms: 0.513459
+  type: 'test'
+  ...
+# Subtest: maintenance reads send the exact bound OBSERVATION ceiling while database phase remains authoritative
+ok 96 - maintenance reads send the exact bound OBSERVATION ceiling while database phase remains authoritative
+  ---
+  duration_ms: 0.111208
+  type: 'test'
+  ...
+# Subtest: Guide course context is readable in READ_CUTOVER without opening general current reads
+ok 97 - Guide course context is readable in READ_CUTOVER without opening general current reads
+  ---
+  duration_ms: 0.284584
+  type: 'test'
+  ...
+# Subtest: active response metadata is top-level and never rewrites nested domain objects
+ok 98 - active response metadata is top-level and never rewrites nested domain objects
+  ---
+  duration_ms: 0.562958
+  type: 'test'
+  ...
+# Subtest: scoring transport uses the active wrapper and rejects incomplete activation before fetch
+ok 99 - scoring transport uses the active wrapper and rejects incomplete activation before fetch
+  ---
+  duration_ms: 11.997708
+  type: 'test'
+  ...
+# Subtest: server-only read control binds activate and inspect calls to the exact frozen release
+ok 100 - server-only read control binds activate and inspect calls to the exact frozen release
+  ---
+  duration_ms: 41.161208
+  type: 'test'
+  ...
+# Subtest: read activation migration is inert, audited, phase-bound, reversible, and service-role only
+ok 101 - read activation migration is inert, audited, phase-bound, reversible, and service-role only
+  ---
+  duration_ms: 4.642458
+  type: 'test'
+  ...
+1..101
+# tests 101
+# suites 0
+# pass 100
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1848.297958

@@ -1,0 +1,170 @@
+TAP version 13
+# Subtest: migration 078 rebinds future annual normal releases without mutating annual state
+    # Subtest: future annual authorization, replay, stale and invariance
+    not ok 1 - future annual authorization, replay, stale and invariance
+      ---
+      duration_ms: 2387.10125
+      type: 'test'
+      location: 'annual-normal-release-rebind-generated.mjs:25:13'
+      failureType: 'testCodeFailure'
+      error: |-
+        Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -qAt -v ON_ERROR_STOP=1 -d annual_normal_release_frozen_2026
+        ERROR:  invalid input syntax for type integer: "PROTECTED"
+        CONTEXT:  SQL statement "select coalesce(pg_catalog.jsonb_agg(pg_catalog.jsonb_build_object(
+            'matchId', match_value.match_id,
+            'roundNumber', match_value.round_number,
+            'matchNumber', coalesce(detail.match_number,
+              nullif(pg_catalog.regexp_replace(match_value.match_id, '^.*-', ''), '')::integer),
+            'format', match_value.format,
+            'status', match_value.status,
+            'scoringLocked', match_value.scoring_locked,
+            'matchRevision', match_value.match_revision,
+            'permissionRevision', match_value.permission_revision,
+            'courseId', coalesce(detail.course_id, snapshot.course_id),
+            'courseName', coalesce(course.display_name,
+              history_course.canonical_name, snapshot.course_id),
+            'tee', coalesce(detail.tee_id, snapshot.tee),
+            'teeTime', coalesce(detail.tee_time::text, presentation.tee_time),
+            'startingHole', coalesce(detail.starting_hole,
+              nullif(presentation.starting_hole, '')::integer, 1),
+            'participantCount', (
+              select pg_catalog.count(*)::integer
+              from scoring_authority.match_participants participant
+              where participant.match_id = match_value.match_id
+            ),
+            'scoredHoles', match_value.scored_holes,
+            'scoring_ready', coalesce(
+              (scoring_readiness.value->>'ready')::boolean, false
+            ),
+            'scoring_readiness_code', case
+              when coalesce((scoring_readiness.value->>'ready')::boolean, false)
+                then 'PRODUCTION_MATCH_SCORING_READY'
+              else 'PRODUCTION_MATCH_NOT_SCORING_READY'
+            end,
+            'scoring_readiness_reasons', coalesce(
+              scoring_readiness.value->'reasons', '[]'::jsonb
+            ),
+            'participants', coalesce((
+              select pg_catalog.jsonb_agg(pg_catalog.jsonb_build_object(
+                'playerId', participant.player_id,
+                'displayName', player.display_name,
+                'teamSide', participant.team_side,
+                'playerSlot', participant.player_slot,
+                'tournamentHandicap', participant.tournament_handicap,
+                'finalStrokes', participant.final_strokes
+              ) order by participant.team_side, participant.player_slot)
+              from scoring_authority.match_participants participant
+              join scoring_authority.players player
+                on player.player_id = participant.player_id
+              where participant.match_id = match_value.match_id
+            ), '[]'::jsonb),
+            'prepared', detail.prepared_setup_revision is not null
+              or (snapshot.snapshot_id is not null
+                and pg_catalog.jsonb_array_length(snapshot.hole_definitions) = 18),
+            'preparedSetupRevision', detail.prepared_setup_revision,
+            'strictlyUnstarted', production_control.handicap_v1_match_is_unstarted(
+              match_value.match_id
+            ),
+            'accessActive', exists (
+              select 1 from scoring_authority.scoring_permissions permission
+              where permission.match_id = match_value.match_id
+                and permission.can_score and permission.revoked_at is null
+            ),
+            'locked', not production_control.handicap_v1_match_is_unstarted(
+              match_value.match_id
+            ),
+            'blockers', case
+              when not production_control.handicap_v1_match_is_unstarted(
+                match_value.match_id
+              ) then pg_catalog.jsonb_build_array(
+                'Match setup is locked because scoring has started.'
+              )
+              else '[]'::jsonb end,
+            'warnings', case
+              when (select pg_catalog.count(*)
+                from scoring_authority.match_participants participant
+                where participant.match_id = match_value.match_id)
+                <> (case when match_value.format = 'SI' then 2 else 4 end)
+              then pg_catalog.jsonb_build_array('Complete the match pairings.')
+              when snapshot.handicap_revision_id is null
+              then pg_catalog.jsonb_build_array(
+                'Prepare the scoring context with the current approved handicaps.'
+              )
+              else '[]'::jsonb end,
+            'snapshot', pg_catalog.jsonb_build_object(
+              'id', snapshot.snapshot_id,
+              'snapshotId', snapshot.snapshot_id,
+              'revision', snapshot.snapshot_revision,
+              'prepared', detail.prepared_setup_revision is not null
+                or (snapshot.snapshot_id is not null
+                  and pg_catalog.jsonb_typeof(snapshot.hole_definitions) = 'array'
+                  and pg_catalog.jsonb_array_length(snapshot.hole_definitions) = 18),
+              'current', snapshot.snapshot_id = match_value.scoring_snapshot_id,
+              'courseId', snapshot.course_id,
+              'tee', snapshot.tee,
+              'rating', snapshot.rating,
+              'slope', snapshot.slope,
+              'par', snapshot.par,
+              'holeCount', case
+                when pg_catalog.jsonb_typeof(snapshot.hole_definitions) = 'array'
+                  then pg_catalog.jsonb_array_length(snapshot.hole_definitions)
+                else 0 end,
+              'handicapRevisionId', snapshot.handicap_revision_id,
+              'canonicalHash', snapshot.canonical_hash
+            )
+          ) order by match_value.round_number,
+            coalesce(detail.match_number, 999), match_value.match_id), '[]'::jsonb)
+                               from scoring_authority.matches match_value
+          left join scoring_authority.tournament_setup_match_details_v1 detail
+            on detail.match_id = match_value.match_id
+          left join scoring_authority.scoring_snapshots snapshot
+            on snapshot.snapshot_id = match_value.scoring_snapshot_id
+          left join scoring_authority.tournament_setup_course_tees_v1 course
+            on course.tournament_id = match_value.tournament_id
+           and course.course_id = coalesce(detail.course_id, snapshot.course_id)
+           and course.tee_id = coalesce(detail.tee_id, snapshot.tee)
+          left join scoring_authority.completed_history_course_identities history_course
+            on history_course.course_id = snapshot.course_id
+          left join scoring_authority.game_center_presentations presentation
+            on presentation.match_id = match_value.match_id
+          left join lateral (
+            select production_control.assert_production_match_scoring_ready_v1(
+              match_value.match_id
+            ) value
+          ) scoring_readiness on true
+          where match_value.tournament_id = '2026'"
+        PL/pgSQL function read_tournament_setup_before_round_workspace_v1(jsonb) line 326 at SQL statement
+        PL/pgSQL function public.read_production_tournament_setup_v1(jsonb) line 4 at assignment
+      code: 'ERR_TEST_FAILURE'
+      name: 'CommandFailure'
+      stack: |-
+        runCommand (annual-normal-release-rebind-generated.mjs:134:11)
+        psql (annual-normal-release-rebind-generated.mjs:150:10)
+        query (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/p0f-production-equivalence.mjs:12:17)
+        read (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/p0f-production-equivalence.mjs:43:41)
+        runP0FProductionEquivalence (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/p0f-production-equivalence.mjs:44:19)
+        TestContext.<anonymous> (annual-normal-release-rebind-generated.mjs:2176:32)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+      ...
+    1..1
+not ok 1 - migration 078 rebinds future annual normal releases without mutating annual state
+  ---
+  duration_ms: 4141.92475
+  type: 'test'
+  location: 'annual-normal-release-rebind-generated.mjs:18:10'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4204.688875

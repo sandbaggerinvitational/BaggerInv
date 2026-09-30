@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "scope": "CHANGED_TRACKED_AND_UNTRACKED_TEXT_FILES",
+  "scannedTextFiles": 159,
+  "credentialPatternFindings": [],
+  "limitation": "Pattern scan only, not a guarantee of detecting all possible sensitive data. No credential values printed.",
+  "nativePackageDeployConfigChanges": [],
+  "migrationIdsUnique": true,
+  "pendingApprovalFilesUnchanged": [
+    "lib/history-2026-supabase.js",
+    "lib/production-shadow-read-adapters.js",
+    "lib/scoring-shadow.js"
+  ],
+  "approvedTwoAdapterCorrectionsImplemented": true,
+  "gitDiffCheck": "PASS",
+  "productionQueried": false,
+  "stagingDeployed": false,
+  "realGoogleAccessed": false
+}

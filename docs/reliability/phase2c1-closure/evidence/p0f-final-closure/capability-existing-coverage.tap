@@ -1,0 +1,352 @@
+TAP version 13
+# Subtest: Mission Control exposes one active-year Course Tees bulk editor
+ok 1 - Mission Control exposes one active-year Course Tees bulk editor
+  ---
+  duration_ms: 2.409792
+  type: 'test'
+  ...
+# Subtest: Course Tees mobile cards separate finalized and editable presentation
+ok 2 - Course Tees mobile cards separate finalized and editable presentation
+  ---
+  duration_ms: 0.751
+  type: 'test'
+  ...
+# Subtest: course tee writes remain year-scoped, field-scoped, and use verified existing configurations
+ok 3 - course tee writes remain year-scoped, field-scoped, and use verified existing configurations
+  ---
+  duration_ms: 1.140583
+  type: 'test'
+  ...
+# Subtest: UNIT canonical course/tee mutation requires all holes and explicit prepared-context readback
+ok 4 - UNIT canonical course/tee mutation requires all holes and explicit prepared-context readback
+  ---
+  duration_ms: 1.986584
+  type: 'test'
+  ...
+# Subtest: Mission Control exposes one searchable collapsible operations console
+ok 5 - Mission Control exposes one searchable collapsible operations console
+  ---
+  duration_ms: 1.168167
+  type: 'test'
+  ...
+# Subtest: UNIT canonical Director operations preserve revision and operation identity
+ok 6 - UNIT canonical Director operations preserve revision and operation identity
+  ---
+  duration_ms: 1.043875
+  type: 'test'
+  ...
+# Subtest: operational editors mount on demand and close only after verified success
+ok 7 - operational editors mount on demand and close only after verified success
+  ---
+  duration_ms: 0.231125
+  type: 'test'
+  ...
+# Subtest: UNIT canonical round pairings preserve format slots and one revision-bound batch
+ok 8 - UNIT canonical round pairings preserve format slots and one revision-bound batch
+  ---
+  duration_ms: 0.226125
+  type: 'test'
+  ...
+# Subtest: Round Pairings renders every format as an always-editable lineup sheet
+ok 9 - Round Pairings renders every format as an always-editable lineup sheet
+  ---
+  duration_ms: 0.224875
+  type: 'test'
+  ...
+# Subtest: Mission Control writes remain field-scoped and protected-map aware
+ok 10 - Mission Control writes remain field-scoped and protected-map aware
+  ---
+  duration_ms: 0.505916
+  type: 'test'
+  ...
+# Subtest: Starting Hole is capability-gated by both the protected map and active sheet header
+ok 11 - Starting Hole is capability-gated by both the protected map and active sheet header
+  ---
+  duration_ms: 0.573916
+  type: 'test'
+  ...
+# Subtest: UNIT canonical Net Skins entries remain round-scoped and binding-aware
+ok 12 - UNIT canonical Net Skins entries remain round-scoped and binding-aware
+  ---
+  duration_ms: 0.723542
+  type: 'test'
+  ...
+# Subtest: UNIT canonical Calcutta entry preserves exact price and complete ownership together
+ok 13 - UNIT canonical Calcutta entry preserves exact price and complete ownership together
+  ---
+  duration_ms: 12.489375
+  type: 'test'
+  ...
+# Subtest: UNIT canonical match controls honor complete scorecard, permissions, lock and Final state
+ok 14 - UNIT canonical match controls honor complete scorecard, permissions, lock and Final state
+  ---
+  duration_ms: 1.638375
+  type: 'test'
+  ...
+# Subtest: match status and scoring access remain separate authoritative capabilities
+ok 15 - match status and scoring access remain separate authoritative capabilities
+  ---
+  duration_ms: 0.316333
+  type: 'test'
+  ...
+# Subtest: INTEGRATION NA-2026-DIRECTOR-CANONICAL-ROUTING: shipping client reaches canonical route with zero Google
+ok 16 - INTEGRATION NA-2026-DIRECTOR-CANONICAL-ROUTING: shipping client reaches canonical route with zero Google
+  ---
+  duration_ms: 15.296417
+  type: 'test'
+  ...
+# Subtest: SECURITY Director inactive denied before canonical read
+ok 17 - SECURITY Director inactive denied before canonical read
+  ---
+  duration_ms: 0.699166
+  type: 'test'
+  ...
+# Subtest: SECURITY Director forbidden denied before canonical read
+ok 18 - SECURITY Director forbidden denied before canonical read
+  ---
+  duration_ms: 0.519125
+  type: 'test'
+  ...
+# Subtest: SECURITY Director unavailable denied before canonical read
+ok 19 - SECURITY Director unavailable denied before canonical read
+  ---
+  duration_ms: 0.559
+  type: 'test'
+  ...
+# Subtest: SECURITY Director read denies {"source":"production-shadow-entitlement"}
+ok 20 - SECURITY Director read denies {"source":"production-shadow-entitlement"}
+  ---
+  duration_ms: 0.244292
+  type: 'test'
+  ...
+# Subtest: SECURITY Director read denies {"identity":{"authUserId":"00000000-0000-4000-8000-000000000001","actor":{"id":"D1","role":"DIRECTOR"},"tournamentId":"2098","impersonating":true}}
+ok 21 - SECURITY Director read denies {"identity":{"authUserId":"00000000-0000-4000-8000-000000000001","actor":{"id":"D1","role":"DIRECTOR"},"tournamentId":"2098","impersonating":true}}
+  ---
+  duration_ms: 0.04875
+  type: 'test'
+  ...
+# Subtest: SECURITY Director read denies {"identity":{"authUserId":"00000000-0000-4000-8000-000000000001","actor":{"id":"P1","role":"PLAYER"},"tournamentId":"2098"}}
+ok 22 - SECURITY Director read denies {"identity":{"authUserId":"00000000-0000-4000-8000-000000000001","actor":{"id":"P1","role":"PLAYER"},"tournamentId":"2098"}}
+  ---
+  duration_ms: 0.044333
+  type: 'test'
+  ...
+# Subtest: SECURITY Production URL cannot be used by isolated Director adapter
+ok 23 - SECURITY Production URL cannot be used by isolated Director adapter
+  ---
+  duration_ms: 0.050125
+  type: 'test'
+  ...
+# Subtest: API canonical outage stays local and never selects legacy fallback
+ok 24 - API canonical outage stays local and never selects legacy fallback
+  ---
+  duration_ms: 0.865375
+  type: 'test'
+  ...
+# Subtest: SECURITY canonical result for another tournament fails closed
+ok 25 - SECURITY canonical result for another tournament fails closed
+  ---
+  duration_ms: 0.151
+  type: 'test'
+  ...
+# Subtest: UNIT client rejects a forged fallback success instead of retrying Google
+ok 26 - UNIT client rejects a forged fallback success instead of retrying Google
+  ---
+  duration_ms: 0.116208
+  type: 'test'
+  ...
+# Subtest: SOURCE guard: active Director page selects canonical console and no retired route
+ok 27 - SOURCE guard: active Director page selects canonical console and no retired route
+  ---
+  duration_ms: 0.733958
+  type: 'test'
+  ...
+# Subtest: API GET thrown authorization failure is sanitized and feature-local
+ok 28 - API GET thrown authorization failure is sanitized and feature-local
+  ---
+  duration_ms: 0.489166
+  type: 'test'
+  ...
+# Subtest: API POST thrown authorization failure is sanitized and feature-local
+ok 29 - API POST thrown authorization failure is sanitized and feature-local
+  ---
+  duration_ms: 0.594375
+  type: 'test'
+  ...
+# Subtest: SECURITY POST rejects missing origin before authorization
+ok 30 - SECURITY POST rejects missing origin before authorization
+  ---
+  duration_ms: 0.5125
+  type: 'test'
+  ...
+# Subtest: SECURITY POST rejects https://untrusted.invalid origin before authorization
+ok 31 - SECURITY POST rejects https://untrusted.invalid origin before authorization
+  ---
+  duration_ms: 0.423125
+  type: 'test'
+  ...
+# Subtest: UNIT malformed canonical read JSON returns typed error without fallback
+ok 32 - UNIT malformed canonical read JSON returns typed error without fallback
+  ---
+  duration_ms: 0.11275
+  type: 'test'
+  ...
+# Subtest: UNIT malformed canonical mutation JSON returns typed error without fallback
+ok 33 - UNIT malformed canonical mutation JSON returns typed error without fallback
+  ---
+  duration_ms: 0.109375
+  type: 'test'
+  ...
+# Subtest: FAILURE_INJECTION committed Director operation survives canonical readback transport failure
+ok 34 - FAILURE_INJECTION committed Director operation survives canonical readback transport failure
+  ---
+  duration_ms: 2.6305
+  type: 'test'
+  ...
+# Subtest: FAILURE_INJECTION shipping Director mutation client retains same identity on response loss and committed readback failure
+ok 35 - FAILURE_INJECTION shipping Director mutation client retains same identity on response loss and committed readback failure
+  ---
+  duration_ms: 0.14475
+  type: 'test'
+  ...
+# Subtest: UNIT Director clears rejected predecessor only after explicit canonical NOT_COMMITTED classification
+ok 36 - UNIT Director clears rejected predecessor only after explicit canonical NOT_COMMITTED classification
+  ---
+  duration_ms: 1.485791
+  type: 'test'
+  ...
+# Subtest: Players roles are data-driven and safely default to PLAYER
+ok 37 - Players roles are data-driven and safely default to PLAYER
+  ---
+  duration_ms: 0.878459
+  type: 'test'
+  ...
+# Subtest: Director menu is exposed only after canonical Director authorization resolves
+ok 38 - Director menu is exposed only after canonical Director authorization resolves
+  ---
+  duration_ms: 160.886208
+  type: 'test'
+  ...
+# Subtest: round and tournament health summarize authoritative match statuses
+ok 39 - round and tournament health summarize authoritative match statuses
+  ---
+  duration_ms: 2.3275
+  type: 'test'
+  ...
+# Subtest: Mission Control resolves operating round and the next scheduled event
+ok 40 - Mission Control resolves operating round and the next scheduled event
+  ---
+  duration_ms: 28.662209
+  type: 'test'
+  ...
+# Subtest: health rolls actionable issues into healthy, attention, and action-needed states
+ok 41 - health rolls actionable issues into healthy, attention, and action-needed states
+  ---
+  duration_ms: 0.209208
+  type: 'test'
+  ...
+# Subtest: operational intelligence identifies stale scoring and concrete configuration failures
+ok 42 - operational intelligence identifies stale scoring and concrete configuration failures
+  ---
+  duration_ms: 0.102584
+  type: 'test'
+  ...
+# Subtest: countdown labels remain operational across minutes, hours, and tomorrow
+ok 43 - countdown labels remain operational across minutes, hours, and tomorrow
+  ---
+  duration_ms: 0.032917
+  type: 'test'
+  ...
+# Subtest: Director no longer invents a Next Event from round tee times when Timeline has no remaining event
+ok 44 - Director no longer invents a Next Event from round tee times when Timeline has no remaining event
+  ---
+  duration_ms: 0.165166
+  type: 'test'
+  ...
+# Subtest: adaptive primary action follows the official round workflow
+ok 45 - adaptive primary action follows the official round workflow
+  ---
+  duration_ms: 0.178625
+  type: 'test'
+  ...
+# Subtest: LIVE matches with disabled participant scoring require Director action
+ok 46 - LIVE matches with disabled participant scoring require Director action
+  ---
+  duration_ms: 0.103291
+  type: 'test'
+  ...
+# Subtest: UNIT canonical Mark Live preserves separate scoring-lock and participant-access authority
+ok 47 - UNIT canonical Mark Live preserves separate scoring-lock and participant-access authority
+  ---
+  duration_ms: 1.147167
+  type: 'test'
+  ...
+# Subtest: natural next-event wording includes the event name and action
+ok 48 - natural next-event wording includes the event name and action
+  ---
+  duration_ms: 0.405
+  type: 'test'
+  ...
+# Subtest: repeated operational issues are grouped with expandable match detail
+ok 49 - repeated operational issues are grouped with expandable match detail
+  ---
+  duration_ms: 0.127042
+  type: 'test'
+  ...
+# Subtest: automation becomes due only within the configured 30-minute opening window
+ok 50 - automation becomes due only within the configured 30-minute opening window
+  ---
+  duration_ms: 0.09725
+  type: 'test'
+  ...
+# Subtest: SOURCE canonical Director APIs require active account authority and canonical receipts
+ok 51 - SOURCE canonical Director APIs require active account authority and canonical receipts
+  ---
+  duration_ms: 0.120667
+  type: 'test'
+  ...
+# Subtest: Director dashboard contains operations, health, attention, automation, and Full Admin access
+ok 52 - Director dashboard contains operations, health, attention, automation, and Full Admin access
+  ---
+  duration_ms: 0.548833
+  type: 'test'
+  ...
+# Subtest: PLAYER accounts are redirected away from the Director page
+ok 53 - PLAYER accounts are redirected away from the Director page
+  ---
+  duration_ms: 3.457417
+  type: 'test'
+  ...
+# Subtest: transient Director authorization remains on Mission Control while the protected API recovers
+ok 54 - transient Director authorization remains on Mission Control while the protected API recovers
+  ---
+  duration_ms: 0.352667
+  type: 'test'
+  ...
+# Subtest: Director page, actions, impersonation, and sandbox share one account-aware authorization resolver
+ok 55 - Director page, actions, impersonation, and sandbox share one account-aware authorization resolver
+  ---
+  duration_ms: 0.626084
+  type: 'test'
+  ...
+# Subtest: Director identity is reused safely within a signed session
+ok 56 - Director identity is reused safely within a signed session
+  ---
+  duration_ms: 0.054667
+  type: 'test'
+  ...
+# Subtest: SOURCE canonical Director confirms receipt and canonical readback without workbook acknowledgement
+ok 57 - SOURCE canonical Director confirms receipt and canonical readback without workbook acknowledgement
+  ---
+  duration_ms: 0.094042
+  type: 'test'
+  ...
+1..57
+# tests 57
+# suites 0
+# pass 57
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 404.711125

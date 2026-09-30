@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "baseSha": "7b6ca99510dc2f44cc411bfe7769e7f0c05ed962",
+  "status": "PASS_SCOPED_CONTEXT_ONLY",
+  "proofLayers": [
+    "POSTGRESQL",
+    "SECURITY",
+    "INTEGRATION"
+  ],
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "test": "test/reliability-p0f-isolated-context.integration.test.mjs",
+  "command": "BAGGER_PHASE2C1_CANDIDATE=1 BAGGER_PHASE2C1_CLOSURE=1 node --test test/reliability-p0f-isolated-context.integration.test.mjs",
+  "tests": 1,
+  "pass": 1,
+  "fail": 0,
+  "skip": 0,
+  "durationMs": 2743.598125,
+  "clusterStoppedAndRemoved": true,
+  "newContextGuardsSubstituted": false,
+  "canonicalActorVerifierSubstituted": false,
+  "inheritedUnusedLegacyRuntimeSubstitutions": [
+    "assert_production_scoring_runtime",
+    "assert_production_cutover_read_scope"
+  ],
+  "checks": [
+    "no binding on install",
+    "disabled default denied",
+    "exact local resource accepted after owner fixture provisioning",
+    "anon/authenticated public execution denied",
+    "service role binding writes/private-core execution denied",
+    "wrong binding/project/Production URL denied",
+    "wrong tournament/player role denied",
+    "participant/actor mismatch denied",
+    "revoked Director entitlement denied",
+    "revoked identity link denied",
+    "wrong database name denied",
+    "stale context denied",
+    "wrong epoch denied",
+    "unknown operation rejected",
+    "malformed operation identity rejected",
+    "Production resource and activation byte-equivalent before/after",
+    "no Net Skins entry mutation"
+  ],
+  "financialMigrationWritten": false,
+  "financialCapabilitiesProven": false,
+  "productionQueried": false,
+  "productionMutated": false,
+  "hostedStagingUsed": false,
+  "realGoogleAccessed": false,
+  "sourceHashes": {
+    "supabase/production_migrations/202609300128_isolated_director_context_v1.sql": "ecb9d40af8359f18c6044e49ae0b5799a341958d6b156a6692f27ff2fef7b8ef",
+    "test/reliability-p0f-isolated-context.integration.test.mjs": "4e00a241b959b816cc40679a2b5c9a1ef383ceb958fca4bb3b03e1dc7184b999"
+  },
+  "limitations": [
+    "Context-only proof; rejected financial/setup core migrations were not installed",
+    "Inherited synthetic score fixture substitutes two legacy hosted runtime assertions, neither called by this new context",
+    "No real hosted Auth/PostgREST proof",
+    "No financial or setup capability proof",
+    "Accepted context source may be restored to the frozen candidate by root while review artifacts remain"
+  ]
+}

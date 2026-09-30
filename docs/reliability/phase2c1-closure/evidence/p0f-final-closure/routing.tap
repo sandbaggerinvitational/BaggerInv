@@ -1,0 +1,161 @@
+TAP version 13
+# Subtest: Production-shadow reads require the asserted exact Production server transport
+ok 1 - Production-shadow reads require the asserted exact Production server transport
+  ---
+  duration_ms: 1.012
+  type: 'test'
+  ...
+# Subtest: all migrated candidate selectors resolve only certified Production shadow reads
+not ok 2 - all migrated candidate selectors resolve only certified Production shadow reads
+  ---
+  duration_ms: 0.725042
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/step10b-production-shadow-read-routing.test.mjs:143:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    tournament
+    + actual - expected
+    
+    + 'unavailable'
+    - 'supabase'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'supabase'
+  actual: 'unavailable'
+  operator: 'strictEqual'
+  stack: |-
+    assertCandidateSupabase (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/step10b-production-shadow-read-routing.test.mjs:118:10)
+    TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/step10b-production-shadow-read-routing.test.mjs:171:46)
+    Test.runInAsyncScope (node:async_hooks:226:14)
+    Test.run (node:internal/test_runner/test:1397:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+    Test.postRun (node:internal/test_runner/test:1537:19)
+    Test.run (node:internal/test_runner/test:1462:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: missing candidate transport fails closed without a Google fallback
+ok 3 - missing candidate transport fails closed without a Google fallback
+  ---
+  duration_ms: 0.651292
+  type: 'test'
+  ...
+# Subtest: unadmitted Production fails closed and rejects injected candidate read selection
+ok 4 - unadmitted Production fails closed and rejects injected candidate read selection
+  ---
+  duration_ms: 0.353417
+  type: 'test'
+  ...
+# Subtest: candidate can never acquire Odds publication authority
+not ok 5 - candidate can never acquire Odds publication authority
+  ---
+  duration_ms: 0.128167
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/step10b-production-shadow-read-routing.test.mjs:263:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'unavailable'
+    - 'supabase'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'supabase'
+  actual: 'unavailable'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/step10b-production-shadow-read-routing.test.mjs:268:10)
+    Test.runInAsyncScope (node:async_hooks:226:14)
+    Test.run (node:internal/test_runner/test:1397:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+    Test.postRun (node:internal/test_runner/test:1537:19)
+    Test.run (node:internal/test_runner/test:1462:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+  ...
+# Subtest: candidate War Room cannot select the Google rollback adapter
+ok 6 - candidate War Room cannot select the Google rollback adapter
+  ---
+  duration_ms: 0.077875
+  type: 'test'
+  ...
+# Subtest: candidate transport bypasses the legacy Preview gate for allowlisted reads only
+ok 7 - candidate transport bypasses the legacy Preview gate for allowlisted reads only
+  ---
+  duration_ms: 14.501625
+  type: 'test'
+  ...
+# Subtest: Step 11 worker installs v6, activates immediately, and evicts only older SBI shells
+ok 8 - Step 11 worker installs v6, activates immediately, and evicts only older SBI shells
+  ---
+  duration_ms: 9.920459
+  type: 'test'
+  ...
+# Subtest: Step 11 worker never intercepts Auth, APIs, scoring, admin, Game Center, or Next assets
+ok 9 - Step 11 worker never intercepts Auth, APIs, scoring, admin, Game Center, or Next assets
+  ---
+  duration_ms: 1.262417
+  type: 'test'
+  ...
+# Subtest: Step 11 navigations are network-only with a static offline shell and never persist route data
+ok 10 - Step 11 navigations are network-only with a static offline shell and never persist route data
+  ---
+  duration_ms: 1.334208
+  type: 'test'
+  ...
+# Subtest: first worker install does not reload-loop and an existing controller reloads at most once
+ok 11 - first worker install does not reload-loop and an existing controller reloads at most once
+  ---
+  duration_ms: 0.597
+  type: 'test'
+  ...
+# Subtest: SMS stays absent from the Production-shadow launch even when Preview phone variables leak in
+ok 12 - SMS stays absent from the Production-shadow launch even when Preview phone variables leak in
+  ---
+  duration_ms: 1.524542
+  type: 'test'
+  ...
+# Subtest: representative candidate Supabase services fail closed with zero Google fallback
+not ok 13 - representative candidate Supabase services fail closed with zero Google fallback
+  ---
+  duration_ms: 52.025708
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/step11-pwa-network-boundaries.test.mjs:242:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    completed History
+    + actual - expected
+    
+    + 'COMPLETED_HISTORY_SUPABASE_CONFIGURATION_REQUIRED'
+    - 'DATA_AUTHORITY_SUPABASE_OUTAGE_INJECTED'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'DATA_AUTHORITY_SUPABASE_OUTAGE_INJECTED'
+  actual: 'COMPLETED_HISTORY_SUPABASE_CONFIGURATION_REQUIRED'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/step11-pwa-network-boundaries.test.mjs:290:12)
+    Test.runInAsyncScope (node:async_hooks:226:14)
+    Test.run (node:internal/test_runner/test:1397:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+    Test.postRun (node:internal/test_runner/test:1537:19)
+    Test.run (node:internal/test_runner/test:1462:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+  ...
+# Subtest: the request-scoped route covers the Step 11 website/PWA matrix without write adapters
+ok 14 - the request-scoped route covers the Step 11 website/PWA matrix without write adapters
+  ---
+  duration_ms: 0.884917
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 11
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 179.323209

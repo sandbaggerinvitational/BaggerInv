@@ -1,0 +1,88 @@
+TAP version 13
+# Subtest: NA-CANONICAL-ROUTING-01: exact diagnostic read authority needs no Google configuration
+not ok 1 - NA-CANONICAL-ROUTING-01: exact diagnostic read authority needs no Google configuration
+  ---
+  duration_ms: 0.867875
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c1-closure-routing.test.mjs:10:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c1-closure-routing.test.mjs:12:9)
+    Test.runInAsyncScope (node:async_hooks:226:14)
+    Test.run (node:internal/test_runner/test:1397:25)
+    Test.start (node:internal/test_runner/test:1257:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+  ...
+# Subtest: NA-CANONICAL-ROUTING-02: readable candidate never acquires publication or scoring writes
+not ok 2 - NA-CANONICAL-ROUTING-02: readable candidate never acquires publication or scoring writes
+  ---
+  duration_ms: 0.473292
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c1-closure-routing.test.mjs:16:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'unavailable'
+    - 'supabase'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'supabase'
+  actual: 'unavailable'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c1-closure-routing.test.mjs:17:9)
+    Test.runInAsyncScope (node:async_hooks:226:14)
+    Test.run (node:internal/test_runner/test:1397:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+    Test.postRun (node:internal/test_runner/test:1537:19)
+    Test.run (node:internal/test_runner/test:1462:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: canonical candidate retains exact security admission and cannot fallback to Preview
+not ok 3 - canonical candidate retains exact security admission and cannot fallback to Preview
+  ---
+  duration_ms: 0.834375
+  type: 'test'
+  location: '/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c1-closure-routing.test.mjs:28:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    SUPABASE_SCORING_MIRROR_URL
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/reliability-phase2c1-closure-routing.test.mjs:43:10)
+    Test.runInAsyncScope (node:async_hooks:226:14)
+    Test.run (node:internal/test_runner/test:1397:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+    Test.postRun (node:internal/test_runner/test:1537:19)
+    Test.run (node:internal/test_runner/test:1462:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 0
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 51.533083

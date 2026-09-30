@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { closureReadCandidate as env } from "./support/reliability/closure-routing-fixture.mjs";
-import { productionShadowCandidateReadEnvironment, productionShadowCandidateScoringMutationDecision } from "../lib/production-shadow-candidate.js";
+import { productionShadowCandidateReadEnvironment, productionShadowCandidateEnvironment, productionShadowCandidateScoringMutationDecision } from "../lib/production-shadow-candidate.js";
 import { canonicalReadEnvironment } from "../lib/canonical-runtime-source.js";
 import { oddsCalculationEnvironment } from "../lib/odds-calculation-source.js";
 import { scoringShadowRpc } from "../lib/scoring-shadow.js";
@@ -41,5 +41,20 @@ test("canonical candidate retains exact security admission and cannot fallback t
  for(const [key,value] of Object.entries(invalid)) {
   const bad={...env,[key]:value};assert.equal(productionShadowCandidateReadEnvironment(bad).eligible,false,key);
   assert.equal(canonicalReadEnvironment(bad,"HOME_READ_SOURCE").blocked,true,key);
+ }
+});
+
+// Approved A: provider configuration is informational, never read/write authority.
+test("diagnostic Google absence or stale configuration cannot select provider fallback", () => {
+ for(const vars of [{},{GOOGLE_SHEETS_ID:"wrong-retired-sheet",GOOGLE_SERVICE_ACCOUNT_EMAIL:"unused@example.invalid",GOOGLE_PRIVATE_KEY:"unused-synthetic"}]){
+  for(const authority of [undefined,"supabase","google"]){
+   const candidate={...env,...vars,SCORING_AUTHORITY:authority};
+   const read=productionShadowCandidateReadEnvironment(candidate);
+   assert.equal(read.eligible,true);
+   assert.equal(productionShadowCandidateEnvironment(candidate).googleConfigurationRequired,false);
+   assert.equal(productionShadowCandidateEnvironment(candidate).workbookApproved,false);
+   assert.equal(productionShadowCandidateEnvironment(candidate).safety.scoringAuthority,"none");
+   assert.equal(canonicalReadEnvironment(candidate,"HOME_READ_SOURCE").resolved,"supabase");
+  }
  }
 });

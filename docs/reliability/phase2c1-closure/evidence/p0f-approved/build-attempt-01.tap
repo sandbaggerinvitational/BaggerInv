@@ -1,0 +1,129 @@
+   ▲ Next.js 15.5.18
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/historical.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/draft/draft.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/live/live.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/history/historical-match-row.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/draft/draft.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/historical.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/live/live.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/odds-center/odds.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/war-room/war-room.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 2 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/admin/admin-center.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/admin/director/ProductionFutureYearAdministrationPanel.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/admin/cms-manager.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/admin/player-passport-admin.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/app/admin/director/net-skins-entries.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+Failed to compile.
+
+./lib/draft-service.js
+Error:   [31mx[0m You're importing a component that needs "server-only". That only works in a Server Component which is not supported in the pages/ directory. Read more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  [31m|[0m
+
+   ,-[[36;1;4m/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/lib/draft-service.js[0m:1:1]
+ [2m1[0m | import "server-only";
+   : [35;1m^^^^^^^^^^^^^^^^^^^^^[0m
+ [2m2[0m | 
+ [2m3[0m | import { cache } from "react";
+   `----
+
+Import trace for requested module:
+./lib/draft-service.js
+./lib/production-director-console.js
+./app/admin/director/CanonicalDirectorMatchControls.js
+./app/admin/director/CanonicalDirectorOperations.js
+./app/admin/director/CanonicalDirectorConsole.js
+
+./lib/production-calcutta-server.js
+Error:   [31mx[0m You're importing a component that needs "server-only". That only works in a Server Component which is not supported in the pages/ directory. Read more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  [31m|[0m
+
+   ,-[[36;1;4m/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/lib/production-calcutta-server.js[0m:1:1]
+ [2m1[0m | import "server-only";
+   : [35;1m^^^^^^^^^^^^^^^^^^^^^[0m
+ [2m2[0m | import { derivedFailureCode } from './score-derived-worker.js';
+ [2m3[0m | import { observedJsonRpc, operationalPhase } from "./operational-telemetry.js";
+   `----
+
+Import trace for requested module:
+./lib/production-calcutta-server.js
+./lib/production-director-console.js
+./app/admin/director/CanonicalDirectorMatchControls.js
+./app/admin/director/CanonicalDirectorOperations.js
+./app/admin/director/CanonicalDirectorConsole.js
+
+./lib/production-current-participant-identity-server.js
+Error:   [31mx[0m You're importing a component that needs "server-only". That only works in a Server Component which is not supported in the pages/ directory. Read more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  [31m|[0m
+
+   ,-[[36;1;4m/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/lib/production-current-participant-identity-server.js[0m:2:1]
+ [2m1[0m | import { PRODUCTION_PHONE_IDENTITY_OPERATIONS } from "./production-phone-identity-operations.js";
+ [2m2[0m | import "server-only";
+   : [35;1m^^^^^^^^^^^^^^^^^^^^^[0m
+ [2m3[0m | 
+ [2m4[0m | import { readProductionCurrentTournamentRuntime } from "./production-current-tournament-runtime.js";
+   `----
+
+Import trace for requested module:
+./lib/production-current-participant-identity-server.js
+./lib/participant-identity-supabase.js
+./lib/production-director-console.js
+./app/admin/director/CanonicalDirectorMatchControls.js
+./app/admin/director/CanonicalDirectorOperations.js
+./app/admin/director/CanonicalDirectorConsole.js
+
+./lib/production-current-read-dispatch.js
+Error:   [31mx[0m You're importing a component that needs "server-only". That only works in a Server Component which is not supported in the pages/ directory. Read more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  [31m|[0m
+
+   ,-[[36;1;4m/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/lib/production-current-read-dispatch.js[0m:1:1]
+ [2m1[0m | import "server-only";
+   : [35;1m^^^^^^^^^^^^^^^^^^^^^[0m
+ [2m2[0m | 
+ [2m3[0m | import { cache } from "react";
+   `----
+
+Import trace for requested module:
+./lib/production-current-read-dispatch.js
+./lib/scoring-shadow.js
+./lib/prediction-settings-supabase.js
+./lib/production-director-console.js
+./app/admin/director/CanonicalDirectorMatchControls.js
+./app/admin/director/CanonicalDirectorOperations.js
+./app/admin/director/CanonicalDirectorConsole.js
+
+./lib/production-current-tournament-runtime.js
+Error:   [31mx[0m You're importing a component that needs "server-only". That only works in a Server Component which is not supported in the pages/ directory. Read more: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+  [31m|[0m
+
+   ,-[[36;1;4m/Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/lib/production-current-tournament-runtime.js[0m:1:1]
+ [2m1[0m | import "server-only";
+   : [35;1m^^^^^^^^^^^^^^^^^^^^^[0m
+ [2m2[0m | import { observedJsonRpc } from "./operational-telemetry.js";
+ [2m3[0m | 
+   `----
+
+Import trace for requested module:
+./lib/production-current-tournament-runtime.js
+./lib/production-director-console.js
+./app/admin/director/CanonicalDirectorMatchControls.js
+./app/admin/director/CanonicalDirectorOperations.js
+./app/admin/director/CanonicalDirectorConsole.js
+
+
+> Build failed because of webpack errors

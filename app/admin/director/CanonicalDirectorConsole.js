@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CanonicalDirectorOdds from "./CanonicalDirectorOdds.js";
+import CanonicalDirectorOperations from "./CanonicalDirectorOperations.js";
 import { loadCanonicalDirectorOverview, submitCanonicalDirectorOperation, canonicalDirectorFailureDisposition } from "../../../lib/canonical-director-client.js";
 
 export default function CanonicalDirectorConsole({ directorName = "Tournament Director" }) {
@@ -55,9 +56,10 @@ export default function CanonicalDirectorConsole({ directorName = "Tournament Di
           {data.capabilities.matchControls && !pending && match.status?.toUpperCase() !== "FINAL" && match.scorecardComplete && !match.scoringLocked ? <button type="button" disabled={operationBusy} onClick={() => operate("finalize", match)}>Finalize Match</button> : null}
         </li>)}</ul>
       </section>)}
-      <p>Finalize and Reopen confirm saved tournament state before reporting success. Other editing tools are unavailable in this isolated environment.</p>
+      <p>Finalize and Reopen confirm saved tournament state before reporting success.</p>
     </> : !error && <p role="status">Loading current tournament…</p>}
     {pending ? <button type="button" disabled={operationBusy} onClick={() => operate(pending.action, { id: pending.matchId })}>Retry same {pending.action} operation</button> : null}
+    <CanonicalDirectorOperations />
     <CanonicalDirectorOdds />
     <nav aria-label="Tournament reads"><Link href="/live">Matches</Link>{" · "}<Link href="/history">History</Link>{" · "}<Link href="/records">Records</Link></nav>
   </section>;

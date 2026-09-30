@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "baseSha": "7b6ca99510dc2f44cc411bfe7769e7f0c05ed962",
+  "environment": "LOCAL_NON_PRODUCTION_NO_NETWORK",
+  "scope": "Only two newly obsolete broad-suite Google prerequisite expectations after owner-approved A. No runtime implementation changed by this addendum.",
+  "originalSelectedFiles": 493,
+  "entryPointSelectionChanged": false,
+  "priorFixedSelectionTestTotal": 4095,
+  "addedTests": 2,
+  "deletedTests": 0,
+  "renamedTests": 1,
+  "expectedFixedSelectionTestTotal": 4097,
+  "baseline20FailuresChanged": false,
+  "entries": [
+    {
+      "file": "test/step11-6-candidate-control-authorization.test.mjs",
+      "oldTest": "candidate control rejects SHA, branch, deployment, project, and Production resource drift",
+      "newTest": "candidate control rejects SHA, branch, deployment, project, and Production resource drift",
+      "action": "REWRITE_RETIRED_ADMISSION_ASSERTIONS",
+      "oldExpectation": "Mismatched GOOGLE_SHEETS_ID and SCORING_AUTHORITY=supabase deny candidate admission.",
+      "newExpectation": "Google workbook configuration is not admission authority; canonical supabase label is supported. Unknown provider labels remain denied.",
+      "reason": "Owner-approved A removes Google configuration as a runtime prerequisite without relaxing canonical database, signed deployment or request authorization.",
+      "preserved": "Every original SHA, branch, deployment, project, canonical database resource, host, origin, method, path, HTTPS, CB01 entitlement and actor-brand denial remains.",
+      "replacementTest": "candidate control requires canonical resources but no Google workbook configuration",
+      "classification": "RETIRED_BEHAVIOR; EQUIVALENT_RETAINED_SECURITY"
+    },
+    {
+      "file": "test/step11-production-odds-calculation.test.mjs",
+      "oldTest": "Step 11 Production Odds gate requires the exact isolated candidate and keeps publication Google",
+      "newTest": "Step 11 Production Odds gate requires the exact isolated candidate and forbids candidate publication",
+      "action": "REWRITE_RETIRED_ADMISSION_ASSERTION_AND_RENAME",
+      "oldExpectation": "Mismatched GOOGLE_SHEETS_ID denies the diagnostic calculation gate.",
+      "newExpectation": "Google workbook configuration does not control admission; candidate publication, mirroring and external writes remain forbidden.",
+      "reason": "Owner-approved A retains immutable workbook provenance in stored database authority but removes Google configuration as admission. The historical Step11 rehearsal fixture still uses its existing disabled-publication compatibility label; no delivery behavior is restored or changed.",
+      "preserved": "All project, canonical database ref, publication-enable, external-write, rehearsal-secret denials and subsequent stored-job identity/publication boundaries remain.",
+      "replacementTest": "Step 11 diagnostic Odds admission ignores retired Google workbook config and never enables publication",
+      "classification": "RETIRED_BEHAVIOR; EQUIVALENT_RETAINED_SECURITY"
+    },
+    {
+      "file": "test/step11-6-candidate-control-authorization.test.mjs",
+      "test": "candidate control requires canonical resources but no Google workbook configuration",
+      "action": "ADD_ZERO_GOOGLE_REGRESSION",
+      "coverage": "Absent and mismatched Sheet IDs with canonical scoring label admit only the already scoped diagnostic control. Immutable database provenance is unchanged. Scoring ingress, Google mirror and Odds publication remain disabled; scoring mutation is explicitly blocked.",
+      "classification": "STRONGER"
+    },
+    {
+      "file": "test/step11-production-odds-calculation.test.mjs",
+      "test": "Step 11 diagnostic Odds admission ignores retired Google workbook config and never enables publication",
+      "action": "ADD_ZERO_GOOGLE_REGRESSION",
+      "coverage": "Absent and mismatched Sheet IDs preserve exact rehearsal admission with canonical scoring label and immutable provenance; canonical publication remains unavailable.",
+      "classification": "STRONGER"
+    }
+  ],
+  "focusedResult": {
+    "tests": 14,
+    "pass": 14,
+    "fail": 0,
+    "skip": 0,
+    "rawLog": "/private/tmp/p0f-approved-google-prerequisite-tests.tap",
+    "method": "NODE_OPTIONS=--require ./tools/reliability/phase2-network-deny.cjs --conditions=react-server; node --test --test-reporter=tap two exact files",
+    "limitations": "Pure source/unit and simulated authorization/worker proof; no Production, hosted or Google call; final source-bound broad receipt supersedes this development log."
+  },
+  "fileSha256": {
+    "test/step11-6-candidate-control-authorization.test.mjs": "00bd0562d07de3d9659f817275f59ebef4bb478805ac0ca7caa6aec5d2034fec",
+    "test/step11-production-odds-calculation.test.mjs": "2e92d5f3f48080c6348c3c323e1ca23ab09ae99a4f73e32a1c8c4d9cf171a976"
+  },
+  "focusedReadAdapterCoverage": {
+    "file": "test/reliability-p0f-read-adapter-extension.test.mjs",
+    "outsideFrozenBroadSelection": true,
+    "initialIdentities": 44,
+    "finalApprovalAdditionalTests": 11,
+    "currentTotal": 55,
+    "deleted": 0,
+    "renamed": 0,
+    "skipped": 0,
+    "requiredHistoryTransport": "PASS_POSITIVE_ASSERTION",
+    "combinedCompatibilityTotal": 112,
+    "combinedCompatibilityPass": 112,
+    "sourceSha256": "55713693c8a92139d5fce808103085c04ad12b947d5875f0bb2820d829d6c7d7",
+    "receipt": "evidence/p0f-approved/read-adapters.json"
+  }
+}

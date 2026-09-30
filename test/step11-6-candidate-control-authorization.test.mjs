@@ -14,6 +14,8 @@ import {
   PRODUCTION_SUPABASE_PROJECT_REF,
   PRODUCTION_SUPABASE_URL,
 } from "../lib/production-foundation-resource-contract.js";
+import { productionShadowCandidateScoringMutationDecision } from "../lib/production-shadow-candidate.js";
+import { oddsCalculationEnvironment } from "../lib/odds-calculation-source.js";
 import { productionGoogleWriterCriticalWindowRequestDisposition } from
   "../lib/production-google-writer-critical-window-waf.js";
 
@@ -145,8 +147,7 @@ test("candidate control rejects SHA, branch, deployment, project, and Production
     { VERCEL_PROJECT_NAME: "another-project" },
     { PRODUCTION_SUPABASE_PROJECT_REF: "idgigvjjqkfbqjeredpb" },
     { PRODUCTION_SUPABASE_URL: "https://idgigvjjqkfbqjeredpb.supabase.co" },
-    { GOOGLE_SHEETS_ID: "preview-workbook" },
-    { SCORING_AUTHORITY: "supabase" },
+    { SCORING_AUTHORITY: "unsupported-provider" },
   ];
   for (const drift of cases) {
     const state = productionWriterFenceCandidateControlRequestEnvironment(
@@ -154,6 +155,23 @@ test("candidate control rejects SHA, branch, deployment, project, and Production
       { ...candidateEnv, ...drift },
     );
     assert.equal(state.allowed, false, JSON.stringify(drift));
+  }
+});
+
+test("candidate control requires canonical resources but no Google workbook configuration", () => {
+  const { GOOGLE_SHEETS_ID: _retiredWorkbook, ...withoutGoogle } = candidateEnv;
+  for (const env of [withoutGoogle, { ...withoutGoogle, GOOGLE_SHEETS_ID: "obsolete-unrelated-workbook" }]) {
+    const canonical = { ...env, SCORING_AUTHORITY: "supabase" };
+    const state = productionWriterFenceCandidateControlRequestEnvironment(request(branchHostname), canonical);
+    assert.equal(state.allowed, true);
+    assert.equal(state.candidate.googleConfigurationRequired, false);
+    assert.equal(state.candidate.resources.sourceWorkbookId, PRODUCTION_GOOGLE_WORKBOOK_ID);
+    assert.equal(state.candidate.safety.scoringAuthority, "none");
+    assert.equal(state.candidate.safety.scoringIngressEnabled, false);
+    assert.equal(state.candidate.safety.googleMirrorDeliveryEnabled, false);
+    assert.equal(state.candidate.safety.oddsPublicationEnabled, false);
+    assert.equal(productionShadowCandidateScoringMutationDecision(request(branchHostname), canonical).blocked, true);
+    assert.equal(oddsCalculationEnvironment(canonical).publicationAuthority, "unavailable");
   }
 });
 

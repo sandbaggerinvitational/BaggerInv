@@ -1,0 +1,53 @@
+TAP version 13
+# Subtest: migration 078 rebinds future annual normal releases without mutating annual state
+    # Subtest: future annual authorization, replay, stale and invariance
+    not ok 1 - future annual authorization, replay, stale and invariance
+      ---
+      duration_ms: 2692.861291
+      type: 'test'
+      location: 'annual-normal-release-rebind-generated.mjs:25:13'
+      failureType: 'testCodeFailure'
+      error: |-
+        Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -qAt -v ON_ERROR_STOP=1 -d annual_normal_release_frozen_2026
+        NOTICE:  identifier "assert_production_maintenance_runtime_capability_pre_normal_release" will be truncated to "assert_production_maintenance_runtime_capability_pre_normal_rel"
+        ERROR:  PRODUCTION_CUTOVER_READ_SCOPE_REQUIRED
+        CONTEXT:  PL/pgSQL function production_control.assert_production_cutover_read_scope(jsonb,text) line 105 at RAISE
+        SQL statement "SELECT production_control.assert_production_cutover_read_scope(
+            input, 'OBSERVATION'
+          )"
+        PL/pgSQL function assert_production_calcutta_v1_runtime(jsonb) line 10 at PERFORM
+        SQL statement "SELECT production_control.assert_production_calcutta_v1_runtime(input)"
+        PL/pgSQL function public.replace_production_calcutta_v1_auction_facts(jsonb) line 24 at PERFORM
+      code: 'ERR_TEST_FAILURE'
+      name: 'CommandFailure'
+      stack: |-
+        runCommand (annual-normal-release-rebind-generated.mjs:134:11)
+        psql (annual-normal-release-rebind-generated.mjs:150:10)
+        query (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/p0f-protected-financial.mjs:18:17)
+        run (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/p0f-protected-financial.mjs:38:17)
+        runProtectedFinancialEquivalence (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/p0f-protected-financial.mjs:46:16)
+        runP0FProductionEquivalence (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/p0f-production-equivalence.mjs:77:18)
+        TestContext.<anonymous> (annual-normal-release-rebind-generated.mjs:2176:32)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+      ...
+    1..1
+not ok 1 - migration 078 rebinds future annual normal releases without mutating annual state
+  ---
+  duration_ms: 4404.4975
+  type: 'test'
+  location: 'annual-normal-release-rebind-generated.mjs:18:10'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4471.192208

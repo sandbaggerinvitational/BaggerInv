@@ -1,0 +1,45 @@
+{
+  "environment": "LOCAL_SELECTOR_ONLY_NO_TRANSPORT",
+  "rows": [
+    {
+      "label": "zero-google-declared-diagnostic",
+      "diagnostic": {
+        "requested": true,
+        "eligible": false,
+        "reason": "production-workbook-required"
+      },
+      "canonical": {
+        "resolved": "unavailable",
+        "blocked": true,
+        "productionShadowCandidate": false,
+        "reason": "isolated-database-required"
+      },
+      "odds": {
+        "inputSource": "unavailable",
+        "publicationAuthority": "unavailable",
+        "publicationBlocked": true
+      }
+    },
+    {
+      "label": "invalid-diagnostic-resource-with-otherwise-valid-preview-url",
+      "diagnostic": {
+        "requested": true,
+        "eligible": false,
+        "reason": "production-workbook-required"
+      },
+      "canonical": {
+        "resolved": "supabase",
+        "blocked": false,
+        "productionShadowCandidate": false,
+        "reason": "canonical-database-ready"
+      },
+      "odds": {
+        "inputSource": "supabase",
+        "publicationAuthority": "supabase",
+        "publicationBlocked": false
+      }
+    }
+  ],
+  "fetchCalls": 0,
+  "limitation": "Selector admission only. Does not prove any write passed route authorization or SQL; no write attempted."
+}

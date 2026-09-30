@@ -1,0 +1,48 @@
+TAP version 13
+# Production Future Tournament mutation failed {
+#   action: 'create',
+#   code: 'PRODUCTION_FUTURE_YEAR_IDEMPOTENCY_CONFLICT',
+#   status: 409
+# }
+# Production Future Tournament mutation failed {
+#   action: 'create',
+#   code: 'FUTURE_TOURNAMENT_CREATE_PREDECESSOR_INVALID',
+#   status: 400
+# }
+# Production Future Tournament mutation failed { action: 'create', code: 'ANNUAL_FIXTURE_FAILURE', status: 503 }
+# Production Future Tournament mutation failed { action: 'create', code: 'ANNUAL_FIXTURE_FAILURE', status: 503 }
+# Production Future Tournament mutation failed { action: 'create', code: 'ANNUAL_FIXTURE_FAILURE', status: 503 }
+# Production Future Tournament mutation failed {
+#   action: 'create',
+#   code: 'FUTURE_TOURNAMENT_CREATE_PREDECESSOR_INVALID',
+#   status: 400
+# }
+# Production Future Tournament mutation failed {
+#   action: 'promote-runtime',
+#   code: 'PRODUCTION_FUTURE_RUNTIME_IDEMPOTENCY_CONFLICT',
+#   status: 503
+# }
+# {"fixture":"phase2c1-zero-google-release-v1","environment":"OWNED_SOCKET_ONLY_POSTGRESQL17","schema":130,"result":"PASS","runtimeGuardsSubstituted":false,"GoogleWriterRows":0,"GoogleCalls":0,"GoogleCredentialsRequired":false,"frozen2026Release":"PASS","frozen2026Replay":"PASS","annual2099Release":"PASS","annualReplay":"PASS","secondAnnualRelease":"PASS","staleAuthorityDenied":true,"conflictingReplayDenied":true,"canonicalActiveWorkerDenied":true,"orphanCanonicalLeaseDenied":true,"activeAnnualTransitionDenied":true,"GoogleFlagsRejected":5,"retiredMirrorHistoryIgnored":true,"annualRowsUnchanged":true,"canonicalSideGameCertification":"fc6e3c5a6cca29086d5bc486026899428563db015a66d975d144327c4c499876","limitations":["Synthetic annual authority fixture; not a full CREATE/PREPARE/ACTIVATE annual initialization","Historical platform bootstrap models prior Google cutover locally; candidate normal release phase requires no Google","No hosted, Production, real Google or physical proof"],"timestamp":"2026-09-30T03:38:37.134Z"}
+# {"result":"ANNUAL_RELEASE_REVIEW_OK","migrations":25,"annualSnapshot":"8b9b4fa1e6c44d6b47015e46c32a5c4ce3d574e4c09c8b020a70999e6e67f435","authorization":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_AUTHORIZED","status":"PENDING","idempotent":false,"release_sequence":2,"release_intent_id":"8fe5ed5a-2c9c-432a-8b21-c3f939d2e3ce","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","target_deployment_commit":"56ded61379e3308ab5c465ce186140550f3827a7","authorization_fingerprint":"b16f93e12f67b70a231c3aaf985274e0e7f2e73dadfbe4feaca706fc10830d7f"},"rebind":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_REBOUND","ingress":"OPEN","authority":"SUPABASE","idempotent":false,"boundary_mode":"MAINTENANCE_WINDOW_V1","cutover_phase":"OBSERVATION","deployment_id":"dpl_PostcutoverNormalRelease054","workers_enabled":true,"release_sequence":2,"deployment_commit":"56ded61379e3308ab5c465ce186140550f3827a7","maintenance_state":"NORMAL","release_rebind_id":"b6ebfecc-d542-4224-ae59-9330c297bea1","admission_revision":12,"capability_ceiling":"OBSERVATION","activation_revision":23,"capability_contract":"production-maintenance-single-deployment-capability-v1","runtime_fingerprint":"4d9e68504bac8a97a1c19482436d80be7f4f5537be3cc502ae15594de080abef","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","admission_generation_id":"14b6ca18-334f-4926-98ab-47c1625d986b","authority_generation_id":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb","predecessor_deployment_id":"dpl_PostcutoverApplication053","predecessor_release_sequence":1,"participant_identity_authority":"SUPABASE"},"secondRebind":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_REBOUND","ingress":"OPEN","authority":"SUPABASE","idempotent":false,"boundary_mode":"MAINTENANCE_WINDOW_V1","cutover_phase":"OBSERVATION","deployment_id":"dpl_PostcutoverNormalRelease055","workers_enabled":true,"release_sequence":3,"deployment_commit":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","maintenance_state":"NORMAL","release_rebind_id":"7674e8ac-50b0-4f10-97d8-287deb7536a3","admission_revision":13,"capability_ceiling":"OBSERVATION","activation_revision":24,"capability_contract":"production-maintenance-single-deployment-capability-v1","runtime_fingerprint":"258ec43b65a9126f94398d7c074f1029a08b7660c9ce49c95c80b1211d17871e","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","admission_generation_id":"14b6ca18-334f-4926-98ab-47c1625d986b","authority_generation_id":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb","predecessor_deployment_id":"dpl_PostcutoverNormalRelease054","predecessor_release_sequence":2,"participant_identity_authority":"SUPABASE"}}
+# Subtest: migration 078 rebinds future annual normal releases without mutating annual state
+    # Subtest: future annual authorization, replay, stale and invariance
+    ok 1 - future annual authorization, replay, stale and invariance
+      ---
+      duration_ms: 5153.825625
+      type: 'test'
+      ...
+    1..1
+ok 1 - migration 078 rebinds future annual normal releases without mutating annual state
+  ---
+  duration_ms: 6830.378583
+  type: 'test'
+  ...
+1..1
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6889.95925

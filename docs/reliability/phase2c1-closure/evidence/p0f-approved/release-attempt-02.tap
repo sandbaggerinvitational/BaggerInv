@@ -1,0 +1,47 @@
+TAP version 13
+# Subtest: migration 078 rebinds future annual normal releases without mutating annual state
+    # Subtest: future annual authorization, replay, stale and invariance
+    not ok 1 - future annual authorization, replay, stale and invariance
+      ---
+      duration_ms: 2344.7725
+      type: 'test'
+      location: 'annual-normal-release-rebind-generated.mjs:25:13'
+      failureType: 'testCodeFailure'
+      error: |-
+        Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -qAt -v ON_ERROR_STOP=1 -d annual_normal_release_frozen_2026
+        ERROR:  syntax error at or near "CREATE"
+        LINE 346: CREATE OR REPLACE FUNCTION production_control.read_tournamen...
+                  ^
+      code: 'ERR_TEST_FAILURE'
+      name: 'CommandFailure'
+      stack: |-
+        runCommand (annual-normal-release-rebind-generated.mjs:134:11)
+        psql (annual-normal-release-rebind-generated.mjs:150:10)
+        query (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/p0f-production-equivalence.mjs:12:17)
+        read (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/p0f-production-equivalence.mjs:43:41)
+        runP0FProductionEquivalence (file:///Users/claybeltran/.codex/worktrees/reliability-phase2-score-path/BaggerInv/test/support/reliability/p0f-production-equivalence.mjs:44:19)
+        TestContext.<anonymous> (annual-normal-release-rebind-generated.mjs:2176:32)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+      ...
+    1..1
+not ok 1 - migration 078 rebinds future annual normal releases without mutating annual state
+  ---
+  duration_ms: 4036.996458
+  type: 'test'
+  location: 'annual-normal-release-rebind-generated.mjs:18:10'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4103.1845

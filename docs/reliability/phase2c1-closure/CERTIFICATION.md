@@ -1,46 +1,41 @@
 # Certification
 
-PHASE 2C.1 CANONICAL CAPABILITY & PROOF CLOSURE: **PARTIAL**.
+**PHASE 2C.1 CANONICAL CAPABILITY & PROOF CLOSURE: PASS AT THE REQUIRED NON-PRODUCTION LAYER.**
 
-**CAN I APPROVE THIS CANDIDATE TO MOVE TO A SEPARATE HOSTED/STAGING CERTIFICATION TASK? NO.** Required Director authoring/lifecycle capability proof and three read-only canonical-routing cases remain incomplete. This is a score-path P0-F blocker, distinct from later Production capacity or physical-device gates.
+This current addendum supersedes the prior PARTIAL checkpoints. Earlier reports and failed receipts remain historical evidence, including `pre-history-rpc/` and `pre-read-extension/`. Executed source is base `7b6ca99510dc2f44cc411bfe7769e7f0c05ed962` plus exact per-run manifests. The final candidate is identified by the enclosing Git commit containing this certification; no future SHA is invented.
 
-## Proven at the stated local layer
-
-| Claim | Verdict | Evidence / limit |
+| Gate | Verdict | Evidence |
 |---|---|---|
-| Annual CREATE canonical year protocol | PASS scoped | Actual client → handler → server → owned PostgreSQL → readback; 21-case matrix, including retry/conflict/rollback/security/future-year cases. Synthetic identity/activation and socket transport are explicit seams. |
-| Annual canonical readback | PASS scoped | Reproduces SQLSTATE42703 before correction; exact tournament/team-side lookup after correction. |
-| Annual v2 request wire hash | PASS scoped | Actual PostgreSQL JSONB hashing comparison; legacy v1 CREATE hash retained. Full annual activation chronology not certified. |
-| Director overview, Finalize and Reopen | PASS scoped | Actual isolated client/API/SQL, entitlement/origin/scope/receipt/readback and error-locality cases. Other capabilities not inferred. |
-| Google absence | PASS in exercised paths | Credentials scrubbed; remote Node sockets denied; current sequence has zero Google calls/jobs/intents. Candidate-wide capability completeness remains PARTIAL. |
-| Full score sequence | PASS scoped | R1 108/108, R2 108/108, R3 216/216; 24/24 Finals; 432 receipts; zero unresolved mutations; zero required automatic backlog. Starts from synthetic prepared/Live authority, not full Open/Prepare proof. |
-| Build and boot | PASS | Local Production compilation and loopback boot only. No deployment. |
-| Performance | NO SYSTEMATIC REGRESSION DETECTED | 12,000 rollback-only local RPC samples across three controlled batches and four scales. No Production or durable-commit capacity claim. |
-| Broad regression accounting | See final accounting | Fixed original493-file selection. Obsolete deletions are not passes; known routing failures remain failures. |
+|Seven required Director identities|PASS 7/7 scoped|capabilities 10, setup 10, financial 17, context 1, API 38, workspace 17|
+|Three canonical routing cases|PASS 3/3 scoped|routing 42/42; actual History service and adjacent adapters in expanded 112/112 suite|
+|Authority/private-core/provenance|PASS scoped|catalog, authorization, replay, atomic audit and protected 4 + 3 comparisons|
+|Annual CREATE|PASS scoped|21 behavioral cases under 2 runner tests; installed profile through 130, CREATE contract 127|
+|Zero-Google tournament|PASS scoped|432 holes / 24 Finals; zero Google calls/jobs; zero remaining required automatic work|
+|Broad accounting|PASS relative to accounted baseline|4,077 pass / 20 fail; 20 unchanged baseline failures, zero new unexplained identities|
+|Local Production build|PASS|fresh build receipt; compilation only, no deployment|
+|P0-A post-revocation recovery|PASS scoped|50/50|
+|P0-B autonomous derived delivery|PASS scoped|54/54; Google retired, owner-controlled publication preserved|
+|P0-C annual PostgreSQL 42883|PASS scoped|26/26 known 14-function inventory, distinct from annual CREATE|
+|P0-D Net Skins deadlock|PASS scoped|10/10|
+|P0-E finite timeout|PASS scoped|7/7|
+|P0-F client/control/release|PASS scoped|seven actual Director chains, exact read routing, backend contracts, security 84/84, release 2/2|
 
-## Phase 2 P0 status
+**ALL SIX SCORE-PATH P0 GATES CLOSED AT THE REQUIRED NON-PRODUCTION LAYER: YES.**
 
-| P0 | Status | Scope |
-|---|---|---|
-| A post-revocation recovery | PASS | Fresh local50/50 selection and full sequence; no physical/hosted proof. |
-| B autonomous derived delivery | PASS scoped | Fresh54/54 selection; Calcutta, Competition and Intelligence autonomous families. Google retired, not delivery-certified. Owner-controlled Net Skins/Odds publication stays owner-controlled. |
-| C annual42883 | PASS | Fresh26/26 worker selection, known14-function inventory; separate from CREATE21-case proof. |
-| D Net Skins deadlock | PASS | Fresh10/10 selection; local real PostgreSQL lock/recovery proof. |
-| E finite timeout | PASS | Fresh7/7 selection; finite local timeout, typed rollback/recovery proof. |
-| F client/control/release | PARTIAL | Required isolated capability context and three routing cases remain. |
+**CAN I APPROVE THIS CANDIDATE TO MOVE TO A SEPARATE HOSTED/STAGING CERTIFICATION TASK? YES.** The remaining proof layer is hosted/staging execution, not an unresolved local capability or routing gate. This answer does not authorize staging.
 
-ALL SIX SCORE-PATH P0 GATES CLOSED AT REQUIRED NON-PRODUCTION PROOF LAYER: **NO**.
+The owner-approved History/Prediction selectors and final History RPC correction are implemented through normal review. Exact diagnostic History selection uses validated read authority without enabling the mirror writer. The History RPC context preserves a separate validated diagnostic bit; it remains distinct from `productionCutover` and selects the existing certified `read_preview_2026_historical_view` alias. The unchanged translator routes that alias to the already-allowlisted `read_production_candidate_current_view` / `HISTORY_2026` surface. Ordinary isolated History retains `read_canonical_2026_historical_view`; actual Production-cutover selection remains unchanged. Explicitly invalid Prediction diagnostic lanes fail closed before ordinary Preview/Production selection. No allowlist, SQL, role, RLS, target/year, scoring, control or publication authority was added by these read corrections.
 
-## Remaining required proofs
+Actual History reader and service proof now passes through the existing translators, adapter and sanitizer. The synthetic fixture retains 24 matches, 17 Final / 7 Live, 46 scorecards and 828 gross values; private audit/administrative fields are absent from the public DTO. Guide, leaderboard, completed-history and player-editorial readers also pass their actual mapped adapter paths. The expanded adapter selection is 112/112 PASS: 55 focused tests plus 57 existing History/Prediction/cutover tests. All original 44 focused identities were retained; the final extension added 11, deleted/renamed zero. Public History remains public; the negative role-hint test proves it does not grant privileged inspection, not a new denial of public reads.
 
-The exact eleven capability identities are classified in [CAPABILITY-GAPS.md](CAPABILITY-GAPS.md). The three original routing gaps and additional no-fallback regression remain RED in [CANONICAL-ROUTING-GAPS.md](CANONICAL-ROUTING-GAPS.md). Bulk Preview imports would violate canonical setup/financial invariants; they were not substituted. The rejected admission edit did not execute. No required unknown is converted to PASS by test cleanup.
+The approved isolated API is additive. Server-bound actor/resource/context and same-operation receipt/readback remain required. Original Production wrappers retain admission; positive protected local comparisons preserve canonical effects. The approved isolated wrapper boundary performs separate admission before invoking shared private canonical domain cores. Required domain checks, including fresh context revalidation after locks where required, remain in those cores; original Production wrappers retain their own admission. This changes admission placement and operation context without broadening the intended actor or domain authority. No Calcutta configuration or additional financial/publication authority was extracted.
 
-## Boundaries and non-claims
+All results are LOCAL / NON-PRODUCTION. Provider credentials were removed and remote sockets denied. Synthetic Auth/session transport is an explicit test seam; the local PostgreSQL proofs exercise installed actor, domain, receipt and audit enforcement. The protected fixture uses original runtime guards, not Production. The History and adjacent-reader chains use real application adapters, translation and sanitization with mocked canonical transport; they do not prove hosted database execution. Virtual component tests do not certify browser usability. Unknown-outcome handles are retained in memory; tab/browser-crash persistence is not certified. No new performance or Production capacity claim is made.
 
-Production queried/mutated/deployed/configured: NO. Hosted staging deployed: NO. Real Google account accessed/changed: NO. Real competitive data changed: NO. Build11 implemented: NO. Shipping native source changed: NO.
+Earlier performance evidence is retained according to source dependency freshness, not rerun or relabeled as new performance proof. This phase does not prove Production capacity/I/O/connections/p99/provider stability, backup restoration, server-enforced diagnostic admission, complete Round Control/annual/tournament chronology, physical native scoring, native queue/navigation, owner rehearsal or 2027 Tournament Ready. The full sequence begins at prepared/Live synthetic authority; fsync-disabled disposable fixtures are not power-loss durability proof. Google reporting/export is not the disaster-recovery strategy.
 
-This does not prove Production capacity, Disk I/O, connection headroom, p99, provider stability, backup restoration, server-enforced diagnostic admission, full Round Control/annual chronology, physical native scoring, native queue/navigation, owner rehearsal or 2027 Tournament Ready. Google reporting/export is not the database disaster-recovery strategy. External Google cleanup remains gated by later staging, authorized Production deployment, observation, rollback and historical-preservation review.
+Migration and rollback requirements are recorded in [P0F-FINAL-CLOSURE.md](P0F-FINAL-CLOSURE.md) and must be verified in the separately authorized next phase. The [evidence index](EVIDENCE.md) and [machine-readable receipts](evidence/p0f-approved/final-index.json) define exact test and freshness scope.
 
-Evidence is bound to exact file hashes captured before and after each run. Tests executed on base4f5 plus recorded candidate bytes, not on a fabricated future commit. Final source/evidence commit identities are recorded in the candidate manifest.
+Production queried/mutated/deployed/configured: NO. Staging deployed: NO. Real Google accessed/changed: NO. Google credentials changed: NO. Real competitive data changed: NO. Native shipping source changed: NO. Build 11 implemented: NO. No infrastructure change. Hosted/staging and Production actions require separate authorization; this task stops after candidate commit/push and owner review.
 
-Scoped Odds addendum: the existing canonical calculation and owner publication path is now connected through the isolated Director API. Actual13-test proof covers no Google job, historical preservation, stale inputs, owner/role/scope checks, audit rollback and same-calculation replay/readback. Seven required Director capability identities remain PARTIAL; three are scoped PASS and one is optional maintenance.
+PHASE 2C.1 P0-F FINAL CLOSURE: PASS AT THE REQUIRED NON-PRODUCTION PROOF LAYER.

@@ -1,0 +1,39 @@
+{
+  "suite": "routing",
+  "executionHead": "7b6ca99510dc2f44cc411bfe7769e7f0c05ed962",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "remoteNetwork": "DENIED_AT_NET_TLS_SOCKET",
+  "providerCredentials": "SCRUBBED",
+  "fixtureSecrets": "SYNTHETIC_ONLY",
+  "args": [
+    "node",
+    "--conditions=react-server",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "test/step10b-production-shadow-read-routing.test.mjs",
+    "test/step11-pwa-network-boundaries.test.mjs"
+  ],
+  "node": "v26.7.0",
+  "counts": {
+    "tests": 14,
+    "pass": 11,
+    "fail": 3,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "exitCode": 1,
+  "failures": [
+    "all migrated candidate selectors resolve only certified Production shadow reads",
+    "candidate can never acquire Odds publication authority",
+    "representative candidate Supabase services fail closed with zero Google fallback"
+  ],
+  "entryPointHashes": {
+    "test/step10b-production-shadow-read-routing.test.mjs": "2a764397420f9a14c2d50b1ed5f3ec5ba5d064d9d39ebf03bafb29d59f3c850c",
+    "test/step11-pwa-network-boundaries.test.mjs": "c0de5480dbe7379ca149b04a4980ddce9bea4a505cd808abcaad0f52f614607e"
+  },
+  "sourcesUnchanged": true,
+  "rawSha256": "1abe5a57d817b67a1c8ef0ead882bc4727821a8fe27a20eea7982dadf8124973",
+  "rawArtifact": "/private/tmp/bagger-p0f-routing-7b6ca995-20260930T015537Z/routing.tap",
+  "limitation": "Read-only test invocation; uses same network guard but omits old evidence-output redirection to avoid historical evidence mutation. Existing tests are UNIT/API adapter fakes, not hosted proof."
+}

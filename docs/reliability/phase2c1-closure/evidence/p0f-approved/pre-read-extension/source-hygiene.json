@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "scope": "CHANGED_TRACKED_AND_UNTRACKED_TEXT_FILES",
+  "scannedTextFiles": 140,
+  "credentialPatternFindings": [],
+  "limitation": "Pattern scan, not a guarantee that all possible sensitive data is detectable. No secret values printed.",
+  "nativePackageDeployConfigChanges": [],
+  "migrationIdsUnique": true,
+  "pendingApprovalFilesUnchanged": true,
+  "gitDiffCheck": "PASS",
+  "lint": "No repository lint/format script configured; local Next production build passed",
+  "productionQueried": false,
+  "stagingDeployed": false,
+  "realGoogleAccessed": false
+}
