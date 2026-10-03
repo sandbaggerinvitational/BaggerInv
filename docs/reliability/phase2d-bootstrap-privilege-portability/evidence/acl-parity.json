@@ -1,0 +1,70 @@
+{
+  "status": "PASS",
+  "environment": "OWNED_LOCAL_POSTGRESQL17_NON_PRODUCTION",
+  "shapes": [
+    {
+      "shape": "OWNED_LOCAL",
+      "functions": 1117,
+      "publicFunctions": 444,
+      "publicAnonAuthenticatedDenied": 444,
+      "publicServiceRoleDenied": 162,
+      "intentionalPublicGrants": 17,
+      "serviceExecutable": 305,
+      "exactAclParity": true,
+      "replacedDefinitions": 1117,
+      "runtimeDenials": 3,
+      "allowedWrapperReachedCanonicalDenial": true
+    },
+    {
+      "shape": "SUPABASE_DEFAULT_FUNCTION_GRANTS",
+      "oldControl": {
+        "anon": 444,
+        "service_role": 444,
+        "authenticated": 444
+      },
+      "functions": 1117,
+      "publicFunctions": 444,
+      "publicAnonAuthenticatedDenied": 444,
+      "publicServiceRoleDenied": 162,
+      "intentionalPublicGrants": 17,
+      "serviceExecutable": 305,
+      "exactAclParity": true,
+      "replacedDefinitions": 1117,
+      "runtimeDenials": 3,
+      "allowedWrapperReachedCanonicalDenial": true
+    }
+  ],
+  "exactFunctionCatalog": {
+    "artifact": "supabase/canonical_bootstrap/catalog-manifest.json",
+    "sha256": "b764e284667b8117764aa11500414cdb3f800b3b4cda20d08297538fcf882a74",
+    "functions": 1117
+  },
+  "privateCoreEvidence": [
+    {
+      "artifact": "private-core-security-1.json",
+      "counts": {
+        "newPrivateFunctions": 169,
+        "retainedPrivateGuardsAsserted": 1,
+        "newPublicWrappers": 16,
+        "touchedPublicWrappers": 77,
+        "actualDeniedCalls": 510
+      }
+    },
+    {
+      "artifact": "private-core-security-2.json",
+      "counts": {
+        "newPrivateFunctions": 169,
+        "retainedPrivateGuardsAsserted": 1,
+        "newPublicWrappers": 16,
+        "touchedPublicWrappers": 77,
+        "actualDeniedCalls": 510
+      }
+    }
+  ],
+  "actualPrivateCoreDenials": 1020,
+  "additionalPublicAclDenials": 6,
+  "authorizedWrapperCanonicalDenials": 2,
+  "providerObjectsAndDefaultRowsUnchanged": true,
+  "ownersSecurityPathsRlsDependenciesUnchanged": true,
+  "limitation": "Local provider-shaped fixture; managed hosted readback remains required."
+}

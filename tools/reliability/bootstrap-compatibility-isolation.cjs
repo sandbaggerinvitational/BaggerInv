@@ -3,7 +3,9 @@ require('./phase2-network-deny.cjs');
 const fs=require('node:fs'),path=require('node:path'),{fileURLToPath}=require('node:url');
 const {syncBuiltinESMExports}=require('node:module');
 const root=path.resolve(__dirname,'../..');
-const destinationRoot=path.join(root,'docs/reliability/phase2d-bootstrap-compatibility/evidence');
+const packageName=process.env.BAGGER_BOOTSTRAP_PRIVILEGE_PORTABILITY_PROOF==='1'
+ ?'phase2d-bootstrap-privilege-portability':'phase2d-bootstrap-compatibility';
+const destinationRoot=path.join(root,'docs/reliability',packageName,'evidence');
 let privateProof=0;
 function destination(file){
  const value=file instanceof URL?fileURLToPath(file):file;

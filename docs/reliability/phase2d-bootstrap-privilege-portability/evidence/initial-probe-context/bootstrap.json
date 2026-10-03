@@ -1,0 +1,70 @@
+{
+  "suite": "bootstrap",
+  "baseSha": "b992bc6501423e038fb5db5e424ae91f880bd9b6",
+  "executionHead": "b992bc6501423e038fb5db5e424ae91f880bd9b6",
+  "startedAt": "2026-10-03T12:59:26.911Z",
+  "completedAt": "2026-10-03T13:00:29.108Z",
+  "environment": "OWNED_LOCAL_POSTGRESQL17_NON_PRODUCTION",
+  "network": "OUTBOUND_NET_TLS_SOCKET_DENIED",
+  "credentials": "REMOVED_FROM_CHILD_ENV",
+  "sourceManifest": [
+    {
+      "file": "supabase/canonical_bootstrap/catalog-manifest.json",
+      "sha256": "b764e284667b8117764aa11500414cdb3f800b3b4cda20d08297538fcf882a74"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/manifest.json",
+      "sha256": "1d0d576e21cc48160bcbe82a56d4bc3a81adbc13032145296f1c0d6baa9ae4b2"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/schema.sql",
+      "sha256": "7c371dc677c6b5ff244dcce68a71674482c6f500d814371517fd6f0fa2dabf42"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/static-contracts.sql",
+      "sha256": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d"
+    },
+    {
+      "file": "tools/reliability/bootstrap-compatibility-isolation.cjs",
+      "sha256": "bbd2bf9801a4ddd7a6807ec4a63102f7632d1f4061878cafe76098597e77563e"
+    },
+    {
+      "file": "tools/reliability/canonical-bootstrap-artifacts.mjs",
+      "sha256": "d6bb329df66d24c6f3b65ae122c33022be1a89432a15a3940b5f1dbdc67a4542"
+    },
+    {
+      "file": "tools/reliability/canonical-bootstrap.integration.test.mjs",
+      "sha256": "4a5f8dbf4197227d4fd6f81a2d5af20274f79f93ee758ee6f73531cb7773cb0b"
+    },
+    {
+      "file": "tools/reliability/run-bootstrap-compatibility.mjs",
+      "sha256": "36f37f2e897010183d79f8292ec6fd8fa7b0324e673c1ea7e17d7c008680d5db"
+    }
+  ],
+  "sourcesStable": true,
+  "counts": {
+    "tests": 15,
+    "pass": 12,
+    "fail": 3,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "failures": [
+    {
+      "name": "R2 deterministic canonical bootstrap \u2014 owned local PostgreSQL17 only",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/tools/reliability/canonical-bootstrap.integration.test.mjs:85:1'\n  failureType: 'subtestsFailed'\n  error: '2 subtests failed'\n  code: 'ERR_TEST_FAILURE'\n  ...\n# {\"environment\":\"OWNED_LOCAL_POSTGRESQL17\",\"provisional\":false,\"finalBaselineArtifactsRead\":true,\"artifactsEmittedByTest\":false,\"functions\":1117,\"sourceFiles\":149,\"forwardMigrations\":[\"supabase/production_migrations/202609300131_canonical_resource_control_v1.sql\",\"supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql\",\"supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql\",\"supabase/production_migrations/202609300134_certification_annual_administration_v1.sql\",\"supabase/production_migrations/202609300135_certification_read_contracts_v1.sql\",\"supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql\",\"supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql\",\"supabase/production_migrations/202609300138_certification_annual_transition_v1.sql\",\"supabase/production_migrations/202609300139_certification_future_authoring_v1.sql\",\"supabase/production_migrations/202609300140_certification_future_scoring_v1.sql\",\"supabase/production_migrations/202609300141_certification_future_workers_v1.sql\",\"supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql\",\"supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql\",\"supabase/production_migrations/202609300144_certification_release_rebind_v1.sql\",\"supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql\",\"supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql\",\"supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql\",\"supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql\",\"supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql\",\"supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql\",\"supabase/production_migrations/202609300151_certification_annual_reopen_lineage_v1.sql\",\"supabase/production_migrations/202609300152_certification_closed_release_admission_v1.sql\"],\"completeCandidateCertified\":false,\"authorityRowsCopied\":0,\"hostedAccess\":false}\n"
+    }
+  ],
+  "exitCode": 1,
+  "error": null,
+  "result": "FAIL",
+  "rawArtifact": "bootstrap.log.gz",
+  "rawSha256": "d54604ce4b34fcebdf2278f256237b261885344ef2d56fdbd56460d23d380f94",
+  "hosted": false,
+  "production": false,
+  "limitations": [
+    "Supabase-shaped local fixture is not hosted provider certification.",
+    "Broad raw failures require exact identity/diagnostic accounting; no baseline exclusion."
+  ],
+  "archiveSha256": "8449bf6306da7d6436a343be154dd1068bf897e823c998396c8d52f03546f5c5"
+}

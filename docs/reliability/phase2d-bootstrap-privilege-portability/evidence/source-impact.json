@@ -1,0 +1,56 @@
+{
+  "status": "PROVEN_SOURCE_IMPACT_BOUNDED",
+  "baseSha": "b992bc6501423e038fb5db5e424ae91f880bd9b6",
+  "candidateMeaning": "Containing commit; proof records tested source hashes and execution HEAD independently.",
+  "bootstrapContract": "bagger-canonical-bootstrap-v1",
+  "bootstrapProfile": "phase2-p0f-portrait-v1",
+  "receiptHashes": {
+    "manifest.json": "1d0d576e21cc48160bcbe82a56d4bc3a81adbc13032145296f1c0d6baa9ae4b2",
+    "schema.sql": "7c371dc677c6b5ff244dcce68a71674482c6f500d814371517fd6f0fa2dabf42",
+    "static-contracts.sql": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d",
+    "catalog-manifest.json": "b764e284667b8117764aa11500414cdb3f800b3b4cda20d08297538fcf882a74"
+  },
+  "oldSchemaSha256": "4e67e3084e341c543a192cc0e665a0a776bd7badc22d9bf9b821ebf21aa0ef04",
+  "sourceFilesUnchanged": 149,
+  "forwardMigrationCount": 22,
+  "unchangedStaticContracts": true,
+  "unchangedApplicationCatalog": true,
+  "inventory": {
+    "functions": 1117,
+    "relations": 269,
+    "rlsTables": 260,
+    "triggers": 218,
+    "indexes": 691,
+    "dependencies": 12994
+  },
+  "defaultPrivilegesAltered": false,
+  "providerObjectsAltered": false,
+  "authorityRowsCopied": 0,
+  "retainedR2Evidence": {
+    "p0A": "PASS_UNCHANGED_SOURCE",
+    "p0B": "PASS_UNCHANGED_SOURCE",
+    "p0C": "PASS_AFFECTED_BOOTSTRAP_RECERTIFIED",
+    "p0D": "PASS_UNCHANGED_SOURCE",
+    "p0E": "PASS_UNCHANGED_SOURCE",
+    "p0F": "PASS_UNCHANGED_SOURCE",
+    "chronology864": "RETAINED_NOT_RERUN_APPLICATION_CATALOG_AND_STATIC_DATA_BYTE_IDENTICAL",
+    "historical048": "NOT_REPRODUCIBLE_FROM_RETAINED_EVIDENCE_NOT_PROVEN_UNCHANGED",
+    "historical057": "NOT_REPRODUCIBLE_FROM_RETAINED_EVIDENCE_NOT_PROVEN_UNCHANGED",
+    "correction069": "PRESERVED_SOURCE_HASH_IDENTICAL"
+  },
+  "boundary": {
+    "hostedAccess": false,
+    "productionAccess": false,
+    "oldPreviewAccess": false,
+    "googleAccess": false,
+    "vercelChanged": false,
+    "deployment": false,
+    "nativeChanged": false
+  },
+  "existingHostedProject": {
+    "ref": "trmcwrljjxwhgtikfdgu",
+    "mutated": false,
+    "secondProjectCreated": false,
+    "state": "Prior Part1A evidence: clean/uninstalled/unregistered; not re-queried during remediation."
+  }
+}

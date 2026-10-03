@@ -31,6 +31,16 @@ difference; application owners, effective privileges, security modes, search pat
 RLS and dependencies remain exact. Raw target ownership must remain in readback
 evidence. See the [local portability certification](../../docs/reliability/phase2d-bootstrap-compatibility/README.md).
 
+The function privilege portability correction appends a transaction-bound
+normalization block generated from the exact compiler catalog. It removes actual
+creation-time function grants and restores only the certified per-function ACL,
+including intentional PUBLIC execution. All 1117 application signatures are
+enumerated; provider functions and shared default privileges are not changed.
+Normalization follows all function/trigger installation and precedes static data
+and the installation receipt in the same transaction. Exact replay validates the
+receipt and complete catalog rather than rerunning CREATE or privilege repair.
+See the [local privilege certification](../../docs/reliability/phase2d-bootstrap-privilege-portability/README.md).
+
 ## Limits
 
 Generated artifacts are not authority registration, hosted installation approval, staging certification, or Production deployment permission. Local migration replay and catalog convergence do not prove managed Auth configuration, hosted role membership, Storage, cron, provider messaging, or database recovery. No tool in this directory accepts a hosted URL or credential.

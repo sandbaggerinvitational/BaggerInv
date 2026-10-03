@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import {
  createCanonicalCompilerFixture,installLocalCanonicalPlatform,staticContractTables,
 } from '../../test/support/reliability/phase2d-resource-bootstrap.mjs';
-import {createDatabase,createIsolatedCluster,destroyIsolatedCluster,sql,runResult,binaries,repositoryRoot} from '../../test/support/reliability/postgres17.mjs';
+import {createDatabase,createIsolatedCluster,destroyIsolatedCluster,sql,sqlResult,runResult,binaries,repositoryRoot} from '../../test/support/reliability/postgres17.mjs';
 import {certificationProvisionalProfile} from '../../test/support/reliability/certification-provisional-profile.mjs';
 import {certificationPrivateCoreSecurityProof} from '../../test/support/reliability/certification-private-core-security-proof.mjs';
 import {
  readCanonicalArtifacts,buildCanonicalArtifacts,validateCanonicalArtifacts,
- installCanonicalBaseline,canonicalTableCounts,canonicalCatalog,assertCatalogConvergence,serialize,
+ installCanonicalBaseline,canonicalTableCounts,canonicalCatalog,assertCatalogConvergence,serialize,canonicalFunctionPrivilegeSql,
 } from './canonical-bootstrap-artifacts.mjs';
 
 // Test-only provider setup. This alternate login exists only inside a newly
@@ -28,9 +28,58 @@ function platformSnapshot(cluster,database){
  'extensions',(select jsonb_agg(jsonb_build_object('oid',e.oid,'name',e.extname,'version',e.extversion,
   'owner',pg_get_userbyid(e.extowner),'schema',n.nspname) order by e.extname)
   from pg_extension e join pg_namespace n on n.oid=e.extnamespace where e.extname='pgcrypto'),
+ 'defaults',(select coalesce(jsonb_agg(jsonb_build_object('role',pg_get_userbyid(defaclrole),
+  'schema',coalesce(n.nspname,'global'),'type',defaclobjtype,'acl',defaclacl::text)
+  order by defaclrole,defaclnamespace,defaclobjtype),'[]')
+  from pg_default_acl a left join pg_namespace n on n.oid=a.defaclnamespace),
  'functions',(select jsonb_agg(jsonb_build_object('oid',p.oid,'definition',pg_get_functiondef(p.oid),
   'owner',pg_get_userbyid(p.proowner),'acl',p.proacl::text) order by p.oid)
-  from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='extensions'))`,{role:''}));
+  from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+  where n.nspname in('extensions','auth','storage','realtime')
+   or n.nspname='public' and p.proname='rls_auto_enable'))`,{role:''}));
+}
+
+async function functionPrivilegeProof(cluster,database,recorded){
+ const actual=await canonicalCatalog(cluster,database);
+ assertCatalogConvergence(actual,recorded.catalog);
+ assert.deepEqual(actual.functions,recorded.catalog.functions,'Every exact ACL/owner/security/path/definition/effective privilege');
+ const publicFunctions=actual.functions.filter(row=>row.identity.startsWith('public.'));
+ assert.equal(publicFunctions.length,444);
+ assert.equal(publicFunctions.filter(row=>row.anonExecute||row.authenticatedExecute||row.publicExecute).length,0);
+ assert.equal(publicFunctions.filter(row=>!row.serviceExecute).length,162);
+ assert.equal(actual.functions.filter(row=>row.publicExecute).length,17,'Retain intentional PUBLIC execution');
+ assert.equal(actual.functions.filter(row=>row.serviceExecute).length,305,'Retain exact legitimate server grants');
+ for(const role of ['anon','authenticated']){
+  const result=sqlResult(cluster,database,`\\set VERBOSITY verbose\nset role ${role};select public.read_certification_projection_v1('{}'::jsonb);`,{role:''});
+  assert.notEqual(result.status,0);assert.match(result.stderr,/42501: permission denied for function/);
+ }
+ const denied=sqlResult(cluster,database,`\\set VERBOSITY verbose\nset role service_role;
+  select public.sync_prod_director_projection_before_draft_retirement_v1('{}'::jsonb);`,{role:''});
+ assert.notEqual(denied.status,0);assert.match(denied.stderr,/42501: permission denied for function/);
+ // Allowed wrapper must reach its canonical fail-closed body, not fail its ACL.
+ const admitted=sqlResult(cluster,database,`\\set VERBOSITY verbose\nset role service_role;
+  select public.read_certification_projection_v1('{}'::jsonb);`,{role:'service_role'});
+ assert.notEqual(admitted.status,0,'Uninitialized authority remains unavailable');
+ assert.doesNotMatch(admitted.stderr,/permission denied for function/);
+ assert.match(admitted.stderr,/CERTIFICATION|CANONICAL_RESOURCE/);
+ const platform=platformSnapshot(cluster,database),rows=canonicalTableCounts(cluster,database);
+ // PostgreSQL replacement preserves ACLs even while permissive defaults remain.
+ // Exercise all exact application definitions without changing their bodies.
+ const identities=JSON.stringify(actual.functions.map(row=>row.identity)).replaceAll("'","''");
+ sql(cluster,database,`set check_function_bodies=false;set search_path=pg_catalog;
+  do $$declare definition text;begin
+   for definition in select pg_get_functiondef(p.oid) from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+    where n.nspname||'.'||p.proname||'('||pg_get_function_identity_arguments(p.oid)||')'
+     in(select jsonb_array_elements_text('${identities}'::jsonb)) order by p.oid
+   loop execute definition;end loop;
+  end$$;`,{role:''});
+ assertCatalogConvergence(await canonicalCatalog(cluster,database),recorded.catalog);
+ assert.deepEqual(platformSnapshot(cluster,database),platform,'Replacement leaves provider objects/defaults unchanged');
+ assert.equal((await installCanonicalBaseline(cluster,database,recorded)).replayed,true);
+ assert.deepEqual(canonicalTableCounts(cluster,database),rows,'No duplicate receipt or authority after replacement/replay');
+ return {functions:actual.functions.length,publicFunctions:444,publicAnonAuthenticatedDenied:444,
+  publicServiceRoleDenied:162,intentionalPublicGrants:17,serviceExecutable:305,
+  exactAclParity:true,replacedDefinitions:actual.functions.length,runtimeDenials:3,allowedWrapperReachedCanonicalDenial:true};
 }
 
 test('R2 deterministic canonical bootstrap — owned local PostgreSQL17 only',async t=>{
@@ -78,9 +127,12 @@ test('R2 deterministic canonical bootstrap — owned local PostgreSQL17 only',as
    assert.equal(result.replayed,true);
    assert.deepEqual(canonicalTableCounts(cluster,'r2_clean_a'),before);
   });
+  await t.test('all local function privileges match the certified manifest through replacement and replay',async()=>{
+   t.diagnostic(JSON.stringify({shape:'OWNED_LOCAL',...await functionPrivilegeProof(cluster,'r2_clean_a',recorded)}));
+  });
   await t.test('Supabase-shaped non-superuser postgres preserves provider namespace/extension and converges',async()=>{
    const managed=await createIsolatedCluster();
-   const databases=['r2_managed_existing','r2_managed_ext_absent','r2_managed_local_absent','r2_managed_wrong'];
+   const databases=['r2_managed_existing','r2_managed_ext_absent','r2_managed_local_absent','r2_managed_wrong','r2_managed_acl_control'];
    try{
     for(const database of databases){
      createDatabase(managed,database);installLocalCanonicalPlatform(managed,database);
@@ -100,11 +152,32 @@ test('R2 deterministic canonical bootstrap — owned local PostgreSQL17 only',as
      grant usage on schema auth to postgres;
      grant references,trigger on auth.users,auth.identities to postgres;
      ${database!=='r2_managed_local_absent'?'grant usage on schema extensions to postgres,anon,authenticated,service_role;':''}`);
+    for(const database of ['r2_managed_existing','r2_managed_acl_control'])providerSql(managed,database,`
+     alter default privileges for role postgres in schema public grant execute on functions to anon,authenticated,service_role;
+     create schema storage;create schema realtime;
+     create function auth.provider_sentinel()returns integer language sql as 'select 2';
+     create function storage.provider_sentinel()returns integer language sql as 'select 3';
+     create function realtime.provider_sentinel()returns integer language sql as 'select 4';
+     grant execute on function auth.provider_sentinel(),storage.provider_sentinel(),realtime.provider_sentinel() to anon,authenticated,service_role;`);
     assert.equal(sql(managed,'r2_managed_existing',`select current_user||':'||session_user||':'||rolsuper
      from pg_roles where rolname=current_user`,{role:''}),'postgres:postgres:false');
     const before=platformSnapshot(managed,'r2_managed_existing');
     assert.equal(before.namespace.owner,'supabase_admin');
     assert.equal(before.extensions[0].owner,'supabase_admin');
+    assert.equal(before.defaults.filter(row=>row.role==='postgres'&&row.schema==='public'&&row.type==='f').length,1);
+    const normalization=canonicalFunctionPrivilegeSql(recorded.catalog);
+    assert.ok(recorded.schema.endsWith(normalization.trimEnd()+'\n'),'Normalization is the final schema step');
+    assert.ok(!/^\s*(?:CREATE|GRANT|REVOKE|ALTER)\b/m.test(recorded.staticData),'Static installation cannot recreate functions/grants');
+    // Exact prior package control demonstrates the hosted defect locally, then
+    // rolls back. This cannot create usable authority or touch a hosted target.
+    const previousSchema=recorded.schema.slice(0,-(normalization.trimEnd()+'\n').length).trimEnd()+'\n';
+    const oldResult=JSON.parse(sql(managed,'r2_managed_acl_control',`begin;${previousSchema}
+     select jsonb_build_object('anon',count(*)filter(where has_function_privilege('anon',p.oid,'EXECUTE')),
+      'authenticated',count(*)filter(where has_function_privilege('authenticated',p.oid,'EXECUTE')),
+      'service_role',count(*)filter(where has_function_privilege('service_role',p.oid,'EXECUTE')))
+     from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.proname<>'rls_auto_enable';rollback;`,{role:''}));
+    assert.deepEqual(oldResult,{anon:444,authenticated:444,service_role:444},'Old PUBLIC-only revokes reproduce unwanted explicit defaults');
+    assert.equal(sql(managed,'r2_managed_acl_control',"select to_regnamespace('production_control') is null",{role:''}),'t');
     const installed=await installCanonicalBaseline(managed,'r2_managed_existing',recorded);
     assert.equal(installed.replayed,false);
     assert.deepEqual(platformSnapshot(managed,'r2_managed_existing'),before,'Provider OIDs/owners/ACLs/bodies unchanged');
@@ -112,6 +185,8 @@ test('R2 deterministic canonical bootstrap — owned local PostgreSQL17 only',as
     assert.deepEqual(canonicalTableCounts(managed,'r2_managed_existing'),canonicalTableCounts(cluster,'r2_clean_a'));
     assert.equal((await installCanonicalBaseline(managed,'r2_managed_existing',recorded)).replayed,true);
     assert.deepEqual(platformSnapshot(managed,'r2_managed_existing'),before);
+    t.diagnostic(JSON.stringify({shape:'SUPABASE_DEFAULT_FUNCTION_GRANTS',oldControl:oldResult,
+     ...await functionPrivilegeProof(managed,'r2_managed_existing',recorded)}));
     await certificationPrivateCoreSecurityProof({cluster:managed,database:'r2_managed_existing',forwardMigrations,expectedOwner:'postgres'});
     for(const database of ['r2_managed_ext_absent','r2_managed_local_absent']){
      const namespace=platformSnapshot(managed,database).namespace;

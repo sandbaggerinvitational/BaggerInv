@@ -54,7 +54,64 @@ export async function canonicalCatalog(cluster,database){
  for(const fn of catalog.functions){fn.definitionSha256=digest(fn.definition);delete fn.definition;}
  return stableJson(catalog);
 }
-export async function dumpCanonicalSchema(cluster,database){
+export function canonicalFunctionPrivilegeSql(catalog){
+ // The compiler's exact final catalog is the authority, including intentional
+ // PUBLIC grants. Never infer execution rights from a wrapper/core name.
+ const functions=catalog.functions.map(({identity,owner,acl})=>({identity,owner,acl}));
+ assert.equal(new Set(functions.map(row=>row.identity)).size,functions.length);
+ assert.ok(functions.length>0&&functions.every(row=>row.owner==='postgres'&&Array.isArray(row.acl)));
+ const expected=safeLiteral(JSON.stringify(functions));
+ return `
+-- Final application-only ACL normalization. Provider defaults/objects stay unchanged.
+DO $bootstrap_function_acl$
+DECLARE expected record; installed record; permission record; desired aclitem[];
+ target text; recipient text; actual_acl text[]; expected_acl text[];
+BEGIN
+ FOR expected IN SELECT * FROM pg_catalog.jsonb_to_recordset(${expected}::jsonb)
+  AS contract(identity text,owner text,acl jsonb) LOOP
+  SELECT p.oid,p.proowner,p.proacl,n.nspname,p.proname,p.proargtypes INTO STRICT installed
+   FROM pg_catalog.pg_proc p JOIN pg_catalog.pg_namespace n ON n.oid=p.pronamespace
+   WHERE n.nspname||'.'||p.proname||'('||pg_catalog.pg_get_function_identity_arguments(p.oid)||')'=expected.identity
+    AND NOT EXISTS(SELECT 1 FROM pg_catalog.pg_depend d
+     WHERE d.classid='pg_catalog.pg_proc'::regclass AND d.objid=p.oid AND d.deptype='e');
+  IF pg_catalog.pg_get_userbyid(installed.proowner)<>expected.owner OR current_user<>expected.owner THEN
+   RAISE EXCEPTION 'BOOTSTRAP_FUNCTION_OWNER_MISMATCH:%',expected.identity;
+  END IF;
+  target:=pg_catalog.format('%I.%I(%s)',installed.nspname,installed.proname,
+   pg_catalog.oidvectortypes(installed.proargtypes));
+  desired:=ARRAY(SELECT value::aclitem FROM pg_catalog.jsonb_array_elements_text(expected.acl));
+  FOR permission IN SELECT * FROM pg_catalog.aclexplode(desired) LOOP
+   IF permission.grantor<>installed.proowner OR permission.privilege_type<>'EXECUTE' THEN
+    RAISE EXCEPTION 'BOOTSTRAP_FUNCTION_ACL_CONTRACT_MISMATCH:%',expected.identity;
+   END IF;
+  END LOOP;
+  -- Reset every actual grantee, including defaults absent from the contract.
+  -- RESTRICT fails closed on an unexpected dependent grant; no CASCADE repair.
+  FOR permission IN SELECT DISTINCT grantee FROM pg_catalog.aclexplode(
+   COALESCE(installed.proacl,pg_catalog.acldefault('f',installed.proowner))) LOOP
+   recipient:=CASE WHEN permission.grantee=0 THEN 'PUBLIC'
+    ELSE pg_catalog.quote_ident(pg_catalog.pg_get_userbyid(permission.grantee)) END;
+   EXECUTE 'REVOKE ALL ON FUNCTION '||target||' FROM '||recipient||' RESTRICT';
+  END LOOP;
+  FOR permission IN SELECT * FROM pg_catalog.aclexplode(desired) LOOP
+   recipient:=CASE WHEN permission.grantee=0 THEN 'PUBLIC'
+    ELSE pg_catalog.quote_ident(pg_catalog.pg_get_userbyid(permission.grantee)) END;
+   EXECUTE 'GRANT EXECUTE ON FUNCTION '||target||' TO '||recipient||
+    CASE WHEN permission.is_grantable THEN ' WITH GRANT OPTION' ELSE '' END;
+  END LOOP;
+  SELECT ARRAY(SELECT a::text FROM pg_catalog.unnest(COALESCE(p.proacl,
+   pg_catalog.acldefault('f',p.proowner)))a ORDER BY a::text) INTO actual_acl
+   FROM pg_catalog.pg_proc p WHERE p.oid=installed.oid;
+  expected_acl:=ARRAY(SELECT a::text FROM pg_catalog.unnest(desired)a ORDER BY a::text);
+  IF actual_acl IS DISTINCT FROM expected_acl THEN
+   RAISE EXCEPTION 'BOOTSTRAP_FUNCTION_ACL_MISMATCH:%',expected.identity;
+  END IF;
+ END LOOP;
+END
+$bootstrap_function_acl$;
+`;
+}
+export async function dumpCanonicalSchema(cluster,database,catalog){
  const archive=path.join(cluster.directory,'canonical.dump');
  const tocFile=path.join(cluster.directory,'canonical.list');
  try{
@@ -107,6 +164,7 @@ $bootstrap_extension$;`);
     schema+=`ALTER TABLE ${trigger.table} ${mode} TRIGGER ${safeIdentifier(trigger.name)};\n`;
    }
   }
+  schema+=canonicalFunctionPrivilegeSql(catalog);
   return '-- Generated final canonical definitions. No resource, tournament, activation or job data.\n'+schema.trim()+'\n';
  }finally{await Promise.all([rm(archive,{force:true}),rm(tocFile,{force:true})]);}
 }
@@ -128,8 +186,8 @@ export function dumpStaticContracts(cluster,database){
 }
 export async function buildCanonicalArtifacts(fixture,{write=false}={}){
  const {cluster,database}=fixture;
- const schema=await dumpCanonicalSchema(cluster,database);const contracts=dumpStaticContracts(cluster,database);
  const catalog=await canonicalCatalog(cluster,database);const catalogText=serialize(catalog);
+ const schema=await dumpCanonicalSchema(cluster,database,catalog);const contracts=dumpStaticContracts(cluster,database);
  const toolSources=await Promise.all(['tools/reliability/canonical-bootstrap-artifacts.mjs',
   'tools/reliability/generate-canonical-bootstrap.mjs','test/support/reliability/phase2d-resource-bootstrap.mjs',
   'test/support/reliability/release139-schema.mjs','test/support/reliability/postgres17.mjs',

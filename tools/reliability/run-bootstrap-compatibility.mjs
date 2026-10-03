@@ -7,12 +7,16 @@ import path from 'node:path';
 import {repositoryRoot} from '../../test/support/reliability/postgres17.mjs';
 
 const suite=process.argv[2];
-assert.ok(['bootstrap','application','build','check'].includes(suite)&&process.argv.length===3);
-const directory=path.join(repositoryRoot,'docs/reliability/phase2d-bootstrap-compatibility/evidence');
+const privilege=process.argv[3]==='--privilege-portability';
+assert.ok(['bootstrap','application','build','check'].includes(suite)&&(process.argv.length===3||privilege&&process.argv.length===4));
+const packageName=privilege?'phase2d-bootstrap-privilege-portability':'phase2d-bootstrap-compatibility';
+const directory=path.join(repositoryRoot,'docs/reliability',packageName,'evidence');
 await mkdir(directory,{recursive:true});
 const env={...process.env};
 for(const key of Object.keys(env))if(/SUPABASE|VERCEL|GOOGLE|SHEETS|DRIVE|WORKBOOK|SERVICE_ACCOUNT|DATABASE_URL|DIRECT_URL|^PG|PRODUCTION_|PREVIEW_|TOKEN|SECRET|PASSWORD|API_KEY|CREDENTIAL|BAGGER_PHASE|BAGGER_P0F|BAGGER_CLOSURE/i.test(key))delete env[key];
 delete env.BAGGER_R2_PROVISIONAL_BOOTSTRAP_PROOF;
+delete env.BAGGER_BOOTSTRAP_PRIVILEGE_PORTABILITY_PROOF;
+if(privilege)env.BAGGER_BOOTSTRAP_PRIVILEGE_PORTABILITY_PROOF='1';
 env.NODE_OPTIONS=`--require ${path.join(repositoryRoot,'tools/reliability/bootstrap-compatibility-isolation.cjs')}`;
 env.NEXT_TELEMETRY_DISABLED='1';env.BAGGER_PHASE2C1_CANDIDATE='1';env.BAGGER_PHASE2C1_CLOSURE='1';
 const files=suite==='application'?JSON.parse(await readFile(path.join(repositoryRoot,'docs/reliability/phase2/evidence/application-selection.json'),'utf8'))
@@ -35,7 +39,7 @@ const counts=['bootstrap','application'].includes(suite)?Object.fromEntries(['te
 const failures=[...raw.matchAll(/^not ok \d+ - (.+)\n([\s\S]*?)(?=^(?:ok|not ok|# Subtest:|1\.\.|# tests )|$(?![\s\S]))/gm)]
  .map(match=>({name:match[1],diagnostic:match[2].replaceAll(repositoryRoot,'<CHECKOUT>').replace(/duration_ms: [\d.]+/g,'duration_ms: <TIME>').slice(0,6000)}));
 const stable=JSON.stringify(before)===JSON.stringify(await snapshot());
-const receipt={suite,baseSha:'9f09f6f15afe1f1a0b326edd078cd54ab4001f71',
+const receipt={suite,baseSha:privilege?'b992bc6501423e038fb5db5e424ae91f880bd9b6':'9f09f6f15afe1f1a0b326edd078cd54ab4001f71',
  executionHead:execFileSync('git',['rev-parse','HEAD'],{cwd:repositoryRoot,encoding:'utf8'}).trim(),
  startedAt,completedAt:new Date().toISOString(),environment:'OWNED_LOCAL_POSTGRESQL17_NON_PRODUCTION',
  network:'OUTBOUND_NET_TLS_SOCKET_DENIED',credentials:'REMOVED_FROM_CHILD_ENV',sourceManifest:before,sourcesStable:stable,
