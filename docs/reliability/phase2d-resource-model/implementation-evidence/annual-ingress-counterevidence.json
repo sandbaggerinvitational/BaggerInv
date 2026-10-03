@@ -1,0 +1,221 @@
+{
+  "contract": "phase2dr2-annual-ingress-counterevidence-v1",
+  "status": "PARTIAL_OWNER_SECTION_6_STOP",
+  "baseSha": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "branch": "codex/reliability-phase2d-staging-admission",
+  "environment": "OWNED_LOCAL_POSTGRESQL17_UNIX_SOCKET",
+  "schemaProfile": "IN_MEMORY_PROVISIONAL_131_THROUGH_135",
+  "timestamp": "2026-09-30T18:24:52.187Z",
+  "fixture": "createCertificationFixture; synthetic Certification resource; provisional forward profile131\u2013135",
+  "method": "Fresh local installation; exact service-role context RPC; one missing-match canonical gateway request; gate/certificate/catalog metadata readback; teardown.",
+  "sourceHashes": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "lib/certification-runtime-server.js": "d8787d95ac951ebd22c15c404eede84e48bfbb7bb6930f6ae663401d74722053",
+    "lib/scoring-authority-supabase.js": "1591779c5e511a82457912c935e470ee7fd6dbc09f07977ab80a42ecb49254ec",
+    "lib/scoring-mutation-authority-server.js": "0a474c1f0f30c6d643b3f88a6ccd73b96164c8c601d9612bb2b02cc70944f54a",
+    "test/support/reliability/phase2d-certification-fixture.mjs": "cc8021d7f785e2d8e505c2da5d2111620be6f6a9b964a2ed7a0c95289674ce62"
+  },
+  "sourceHashesUnchanged": true,
+  "contextFields": [
+    "activation_revision",
+    "admission_revision",
+    "authority_epoch_id",
+    "binding_id",
+    "context_token",
+    "current_tournament_id",
+    "current_tournament_year",
+    "deployment_class",
+    "deployment_id",
+    "deployment_origin",
+    "git_branch",
+    "governance_tournament_id",
+    "installation_id",
+    "manifest_digest",
+    "phase",
+    "pointer_revision",
+    "project_ref",
+    "project_url",
+    "registration_revision",
+    "release_commit",
+    "resource_class",
+    "resource_fingerprint",
+    "resource_id",
+    "schema_contract",
+    "schema_digest",
+    "tournament_id",
+    "vercel_project_id",
+    "vercel_team_id"
+  ],
+  "contextSummary": {
+    "phase": "SCORING",
+    "resource_class": "CERTIFICATION",
+    "schema_contract": "canonical-resource-v1",
+    "deployment_class": "preview",
+    "pointer_revision": 1,
+    "admission_revision": 2,
+    "activation_revision": 1,
+    "current_tournament_id": "2026",
+    "current_tournament_year": 2026,
+    "governance_tournament_id": "2026"
+  },
+  "admissionSummary": {
+    "enabled": true,
+    "capabilities": [
+      "READS",
+      "SCORING",
+      "DIRECTOR",
+      "WORKERS",
+      "ANNUAL"
+    ],
+    "resource_class": "CERTIFICATION",
+    "admission_revision": 2,
+    "activation_revision": 1
+  },
+  "gateSummary": {
+    "state": "OPEN",
+    "authority": "SUPABASE",
+    "boundary_mode": "PROVIDER_FENCE_V2",
+    "admission_state": "OPEN",
+    "admission_revision": 0,
+    "admission_opened_at": null,
+    "admission_enforced_at": null,
+    "admission_deployment_id": null,
+    "admission_contract_version": "production-scoring-admission-v2",
+    "admission_protocol_enforced": false,
+    "unresolved_client_queues": 0,
+    "external_fence_evidence_id": null,
+    "google_writer_provider_fence_id": null,
+    "google_writer_provider_verification_id": null
+  },
+  "gateAdmissionGenerationPresent": true,
+  "before": {
+    "holeScores": 0,
+    "closureRecords": 0,
+    "durableIngressLeases": 0,
+    "productionCutoverRows": 0,
+    "productionResourceRows": 0,
+    "transactionContextMarkers": 0
+  },
+  "domainResult": {
+    "ok": false,
+    "code": "MATCH_NOT_FOUND"
+  },
+  "after": {
+    "holeScores": 0,
+    "closureRecords": 0,
+    "durableIngressLeases": 0,
+    "productionCutoverRows": 0,
+    "productionResourceRows": 0,
+    "transactionContextMarkers": 0
+  },
+  "certificate": {
+    "blockers": [
+      "PREDECESSOR_SCORING_CLOSE_CERTIFICATE_UNAVAILABLE"
+    ],
+    "certified": false,
+    "fingerprint": "24c9b9994daced21a0dc12741cd932f5d8d2b214fb5b128a47d2c0f81c5ca545",
+    "tournamentId": "2026",
+    "sideGameDrain": {
+      "oddsMirrorRows": 0,
+      "oddsUnresolved": 0,
+      "calcuttaUnresolved": 0,
+      "generationMismatch": 0,
+      "netSkinsUnresolved": 0,
+      "runtimeGenerationId": null
+    },
+    "derivedWorkerDrain": {
+      "runtimeGenerationId": null,
+      "competitionUnresolved": 0,
+      "intelligenceUnresolved": 0,
+      "competitionGenerationMismatch": 0,
+      "intelligenceGenerationMismatch": 0
+    }
+  },
+  "catalogCounts": {
+    "functionCount": 995,
+    "triggerCount": 204
+  },
+  "installedLeaseWriters": [
+    "production_control.close_annual_scoring_predecessor_pre_derived_workers_v1(jsonb,text)",
+    "abort_production_precommit_release_legacy_v1(jsonb)",
+    "begin_production_scoring_ingress_v2(jsonb)",
+    "begin_production_scoring_ingress_v3(jsonb)",
+    "begin_production_scoring_maintenance(jsonb)",
+    "close_production_scoring_admission(jsonb)",
+    "complete_production_scoring_ingress(jsonb)",
+    "drain_production_scoring_admission(jsonb)",
+    "drain_production_scoring_maintenance(jsonb)",
+    "mark_production_scoring_ingress_write_started(jsonb)",
+    "report_production_scoring_ingress_outcome_v2_base(jsonb)",
+    "resolve_production_legacy_scoring_ingress(jsonb)",
+    "resolve_production_scoring_ingress_ambiguity(jsonb)"
+  ],
+  "lexicalGraph": {
+    "entryPoints": [
+      "public.read_certification_runtime_context_v1",
+      "public.execute_certification_operation_v1"
+    ],
+    "reachableFunctionCount": 257,
+    "reachableLeaseWriters": []
+  },
+  "conclusions": {
+    "boundAdmissionGenerationInContext": false,
+    "boundLeaseInContext": false,
+    "durableLeaseCaptureDemonstrated": false,
+    "emptyLeaseRowsAreSafetyEvidence": false,
+    "canonicalScoringSuccessProven": false,
+    "runtimePathReachedCanonicalDomainRejection": true,
+    "annualTransitionCertified": false,
+    "stopCondition": "OWNER_EXTENSION_CLAUSE_6_MISSING_CERTIFICATION_INGRESS_LEASE_CONTROL_CONTRACT"
+  },
+  "boundaries": {
+    "hostedAccess": false,
+    "productionAccess": false,
+    "googleCalls": 0,
+    "finalBaselineEmitted": false,
+    "newMigrationAuthored": false
+  },
+  "cleanup": "OWNED_CLUSTER_STOPPED_AND_DIRECTORY_REMOVED",
+  "analysisCorrection": "Derived lease-key detector corrected to match lease field tokens; the initial scratch detector matched release_commit. Database observations are unchanged; raw log is preserved.",
+  "rawArtifacts": [
+    {
+      "path": "/private/tmp/r2-certification-ingress-counterevidence.json",
+      "sha256": "c1eb5c50d0de20af34307b7a08c78f3f014f57db8feb304fbb509677f0fb7f00",
+      "bytes": 18093
+    },
+    {
+      "path": "/private/tmp/r2-certification-ingress-probe.log",
+      "sha256": "542f75f78606a3837f9aa99c7831be0ebeb42a87cf09adc79713ac5aacfbe152",
+      "bytes": 14987
+    },
+    {
+      "path": "/private/tmp/r2-certification-ingress-probe.raw.log",
+      "sha256": "e83957dd4bc24d5bb3101df4c3f18f70b4b8bfc47008066d41706289d4a5bde3",
+      "bytes": 14781
+    },
+    {
+      "path": "/private/tmp/r2-certification-ingress-catalog.json",
+      "sha256": "5dea01385c33a790b211cd96e60383839606125b134f997492335e744e8ae593",
+      "bytes": 9557991
+    },
+    {
+      "path": "/private/tmp/r2-certification-ingress-probe.mjs",
+      "sha256": "f558a901e5d75659ea8c81eff02823c4483a2315d482422fb481e5b1a4558e03",
+      "bytes": 7102
+    }
+  ],
+  "probeArtifact": "annual-ingress-probe.mjs",
+  "probeArtifactSha256": "f558a901e5d75659ea8c81eff02823c4483a2315d482422fb481e5b1a4558e03",
+  "limitations": [
+    "Single local synthetic fixture. Not hosted, Production, performance, complete security, or successful scoring proof.",
+    "MATCH_NOT_FOUND demonstrates dispatch to canonical validation, not score commit or late-write behavior.",
+    "Zero lease rows are not drain or unknown-outcome proof.",
+    "Lexical fully qualified graph over-approximates explicit branches; dynamic SQL/trigger reachability requires complementary source audit.",
+    "Raw artifacts remain preserved locally; this structured copy omits synthetic context token and unneeded identity values.",
+    "No new passing test count claimed. Broad suite, full sequence, two-database behavioral proof and transition implementation not run."
+  ]
+}

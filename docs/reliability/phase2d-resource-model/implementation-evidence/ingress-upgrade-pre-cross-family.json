@@ -1,0 +1,15 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "cases": [
+    {
+      "id": "INFLIGHT_UPGRADE_FENCE",
+      "migrationCompletedWhilePredecessorTransactionActive": false
+    },
+    {
+      "id": "BLOCKED_OLD_EXECUTE",
+      "result": {
+        "error": "Owned SQL session closed (3): ERROR:  CANONICAL_RESOURCE_CONTEXT_STALE\nCONTEXT:  PL/pgSQL function production_control.assert_certification_context_v1(jsonb,text,boolean) line 77 at RAISE\nPL/pgSQL function production_control.push_certification_context_v1(jsonb,text,boolean) line 4 at assignment\nPL/pgSQL function public.execute_certification_operation_v1(jsonb) line 5 at assignment\n"
+      }
+    }
+  ]
+}

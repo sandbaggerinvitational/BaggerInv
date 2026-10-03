@@ -1,0 +1,18 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17_NON_PRODUCTION",
+  "migration143": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+  "apiBooleanImpersonationDenied": true,
+  "observed": [
+    {
+      "name": "dispatch_certification_odds_v1",
+      "denied": true,
+      "error": "/opt/homebrew/opt/postgresql@17/bin/psql\nERROR:  CERTIFICATION_ODDS_DIRECTOR_REQUIRED\nCONTEXT:  PL/pgSQL function public.dispatch_certification_odds_v1(jsonb) line 29 at RAISE\n"
+    },
+    {
+      "name": "read_certification_odds_operation_v1",
+      "denied": true,
+      "error": "/opt/homebrew/opt/postgresql@17/bin/psql\nERROR:  CERTIFICATION_ODDS_RECOVERY_DENIED\nCONTEXT:  PL/pgSQL function public.read_certification_odds_operation_v1(jsonb) line 14 at RAISE\n"
+    }
+  ],
+  "canonicalSnapshots": 1
+}

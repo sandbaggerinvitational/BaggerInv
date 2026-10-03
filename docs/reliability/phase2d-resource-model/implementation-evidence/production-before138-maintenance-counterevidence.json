@@ -1,0 +1,16 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "result": "FAIL",
+  "proofLayer": "POSTGRESQL",
+  "migrationPath": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+  "migrationSha256": "d60c50065b65481b7a2b71f059fa22bf26a83eeee588c4fdf91f28cc45aeb20a",
+  "failure": "scoring_admission_closures_resource_provenance rejects valid existing MAINTENANCE_WINDOW_V1 CONSUMED historical row",
+  "originalContract": "044 production_scoring_closure_boundary_evidence_check requires all three IDs NULL for maintenance, all nonnull for provider fence",
+  "rowEvidence": "production-before138-maintenance-closures.json",
+  "ProductionAccess": false,
+  "GoogleCalls": 0,
+  "limitations": [
+    "Historical root is a declared synthetic initial fixture fact, not nonempty lease or provider-fence execution proof",
+    "No golf/source mutation ran; installation transaction rolled back; cluster destroyed"
+  ]
+}

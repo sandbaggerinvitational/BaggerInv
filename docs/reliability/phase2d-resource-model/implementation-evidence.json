@@ -1,0 +1,323 @@
+{
+  "contract": "phase2d-r2-implementation-checkpoint-v1",
+  "status": "PARTIAL",
+  "generatedAt": "2026-09-30T18:11:14.182718+00:00",
+  "baseSha": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "executionHead": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "newCandidateSha": null,
+  "branch": "codex/reliability-phase2d-staging-admission",
+  "sourceState": "UNCOMMITTED_DRAFT_NOT_CERTIFIED",
+  "environment": "OWNED_LOCAL_POSTGRESQL17_AND_LOCAL_NODE",
+  "node": "v26.7.0",
+  "profile": "PROVISIONAL_131_THROUGH_135",
+  "finalBaselineEmitted": false,
+  "sourceManifest": [
+    {
+      "path": "config/certification-resource-registration.json",
+      "sha256": "7ff467e11e3ae1e9e679b4c5630ddcea2116bf38eaf3d4429517d219532a5d5e"
+    },
+    {
+      "path": "lib/canonical-director-overview.js",
+      "sha256": "7dc8a50640da10bee91c43f7041a394d1d69f854d475e9f081aa9be06a440d72"
+    },
+    {
+      "path": "lib/canonical-resource-registration.js",
+      "sha256": "0f2647d93c0f37c8d2ee92a77f6270408345f1e09e6ac5964ce88f7f83fe28f1"
+    },
+    {
+      "path": "lib/canonical-runtime-source.js",
+      "sha256": "1907a9b4d5cccadce45bfb587f6da78fa0a16c5aadc004b2fac0f38a8c7591f0"
+    },
+    {
+      "path": "lib/certification-read-adapters.js",
+      "sha256": "0513ad18409533c81efb346a04bdffd7ca77a5783e3b84e237aceae3f1a75f87"
+    },
+    {
+      "path": "lib/certification-runtime-server.js",
+      "sha256": "d8787d95ac951ebd22c15c404eede84e48bfbb7bb6930f6ae663401d74722053"
+    },
+    {
+      "path": "lib/certification-worker-adapter.js",
+      "sha256": "33f6c84b25c6cf36a149038700892482f05baeaa9ed7cf4f86c54dfb08f6435e"
+    },
+    {
+      "path": "lib/competition-derived-supabase.js",
+      "sha256": "79e209265c143ed2f97260a848a05a841a649ed98098bc4191a9b7dca5a5088c"
+    },
+    {
+      "path": "lib/history-2026-read-source.js",
+      "sha256": "61cf48b692a1915f4791355201a1fd3ccb03cb6e8e60292e99817e5e09346271"
+    },
+    {
+      "path": "lib/intelligence-derived-supabase.js",
+      "sha256": "583ebeefccd8b835d8bc96a1a790c5246516e819e3858b59d86bc24a01f192bd"
+    },
+    {
+      "path": "lib/isolated-director-operations.js",
+      "sha256": "1a6f5b846d96e094f26a89608164156b8050bb78f28590573b47c121089ff01e"
+    },
+    {
+      "path": "lib/participant-identity-authority.js",
+      "sha256": "3d58f92dddd330db6705c52f7d4eb35dfb5425272462461703da614ada45043c"
+    },
+    {
+      "path": "lib/participant-identity-supabase.js",
+      "sha256": "4cd64323da21cf956f0d393fbb28a9f1ce72193a6b69956bc428be09511960d5"
+    },
+    {
+      "path": "lib/prediction-input-bundle-source.js",
+      "sha256": "44bd7fcc544872564d2c3fa9e719201247d5c74fb160eb1049ed6b3d38be2073"
+    },
+    {
+      "path": "lib/production-calcutta-server.js",
+      "sha256": "506224c1f3f668cf69fbd488fe5ee93fd1ad79d0237ac8cf24b8740ca06a9143"
+    },
+    {
+      "path": "lib/score-derived-delivery.js",
+      "sha256": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2"
+    },
+    {
+      "path": "lib/scoring-authority-supabase.js",
+      "sha256": "1591779c5e511a82457912c935e470ee7fd6dbc09f07977ab80a42ecb49254ec"
+    },
+    {
+      "path": "lib/scoring-authority.js",
+      "sha256": "eb364b5cf3be383bf1b0f09ebf26c0d432781b4cfeb49114bf1f02739139e654"
+    },
+    {
+      "path": "lib/scoring-shadow.js",
+      "sha256": "7df8341e7e39148f2bb5d99b7382fed5361ff81ca06b74afd5a28baadb8d7c33"
+    },
+    {
+      "path": "lib/supabase-auth-admin.js",
+      "sha256": "64496f94a041788c22b4493ebfa289b6b17a5c43d10dd84b10b16412ed4ea67b"
+    },
+    {
+      "path": "lib/supabase-auth-server.js",
+      "sha256": "4cfaaf576e6670047ceb570a953439ceae69a7f574bb9f52b385a7dfb28d8bf9"
+    },
+    {
+      "path": "next.config.mjs",
+      "sha256": "8ef3fcd3665e6f09141d1bc385344566dc74d17239ea206a3029a425e2259c7c"
+    },
+    {
+      "path": "supabase/canonical_bootstrap/README.md",
+      "sha256": "50af876e1fcd8deabf7603d4424a8f67a72d3abf5da8b52dfbfda616f0fabd9d"
+    },
+    {
+      "path": "supabase/canonical_bootstrap/catalog.sql",
+      "sha256": "95b4994868868dc2d775bb438b2dce93d3ca608aac6a416d8d60550abf3f8db5"
+    },
+    {
+      "path": "supabase/canonical_bootstrap/source-profile.json",
+      "sha256": "0e6ea7abcef83d4a1e708b21fe64e74fd536331416930a12b9c912d27f95c0bd"
+    },
+    {
+      "path": "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+      "sha256": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2"
+    },
+    {
+      "path": "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql",
+      "sha256": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298"
+    },
+    {
+      "path": "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql",
+      "sha256": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d"
+    },
+    {
+      "path": "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql",
+      "sha256": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc"
+    },
+    {
+      "path": "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql",
+      "sha256": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7"
+    },
+    {
+      "path": "test/certification-adapter-routing.test.mjs",
+      "sha256": "0e321e9862aa0b1cd347f6c36ab50407d1583f4abcc798ccffe0c711755bff69"
+    },
+    {
+      "path": "test/certification-resource-registration.test.mjs",
+      "sha256": "9c4ca13c708a69e513515e0eea1284b16bc950f63d5402d796bd05d094fffb2e"
+    },
+    {
+      "path": "test/certification-runtime-server.test.mjs",
+      "sha256": "b4b15024468cc14dd2b3ae00e5c765d3dd680f27c5b057da075a46e3238677ca"
+    },
+    {
+      "path": "test/reliability-phase2dr2-annual.integration.test.mjs",
+      "sha256": "829bc103cbdb4ef38491d0a20f5fbc787e4fe1f4bcfbc5f55742f1125b934008"
+    },
+    {
+      "path": "test/support/reliability/certification-runtime-fixture.mjs",
+      "sha256": "e0a7c3c2a290d5e7a2d5b6d380d080354edc4942e7692c650aa0f4be76bb1e83"
+    },
+    {
+      "path": "test/support/reliability/phase2d-certification-fixture.mjs",
+      "sha256": "cc8021d7f785e2d8e505c2da5d2111620be6f6a9b964a2ed7a0c95289674ce62"
+    },
+    {
+      "path": "test/support/reliability/phase2d-resource-bootstrap.mjs",
+      "sha256": "81abc4be2912f3fa404179198fb9de474dfa97fa642552045d8383bcd9a43f18"
+    },
+    {
+      "path": "tools/reliability/canonical-bootstrap-artifacts.mjs",
+      "sha256": "cec60a553218498a9cc5481eef45c0fbc8a6eccb851d766f8c2d7e62fc275208"
+    },
+    {
+      "path": "tools/reliability/canonical-bootstrap.integration.test.mjs",
+      "sha256": "32e82cf88d51c563331e3be5684d9a17c96ab98ab4987cbb19274be4ba29244e"
+    },
+    {
+      "path": "tools/reliability/generate-canonical-bootstrap.mjs",
+      "sha256": "74854551911d541b11aa0c5157a6725ba845cb390801ad444a866838df6a4d36"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "implementation-evidence/javascript-tests.log",
+      "sha256": "bce6dc194e24e292cfa13dd8a42a32ecd9fcdff212d978c7e8082795a7825f55"
+    },
+    {
+      "path": "implementation-evidence/bootstrap-provisional.log",
+      "sha256": "d0c9cbc4aa1365572009c41609ec337c520ee12f749f04ed35baf7560633bc95"
+    },
+    {
+      "path": "implementation-evidence/annual-create.log",
+      "sha256": "2c4fe36e818e217a4d30a3bc06235a8eca24a984ab03712a1c2c56706c889033"
+    },
+    {
+      "path": "implementation-evidence/build.log",
+      "sha256": "af6800ed9de5d92ff3e2940b398d3057e17b908332fc04533c5c2e7f2f053ad9"
+    }
+  ],
+  "claims": [
+    {
+      "id": "R2-JS",
+      "classification": "PROVEN",
+      "layers": [
+        "UNIT",
+        "API_TRANSPORT_INJECTED"
+      ],
+      "result": "PASS",
+      "tests": 186,
+      "pass": 186,
+      "fail": 0,
+      "skip": 0,
+      "artifact": "implementation-evidence/javascript-tests.log",
+      "limitation": "Injected synthetic registration/fetch; not actual SQL domain, two-resource, hosted, physical or full client proof."
+    },
+    {
+      "id": "R2-BOOTSTRAP",
+      "classification": "PROVEN",
+      "layers": [
+        "POSTGRESQL",
+        "INTEGRATION",
+        "PERSISTENCE",
+        "FAILURE_INJECTION"
+      ],
+      "result": "PASS_SCOPED",
+      "tests": 11,
+      "pass": 11,
+      "fail": 0,
+      "skip": 0,
+      "leafSubcases": 10,
+      "functions": 994,
+      "sourceFiles": 131,
+      "authorityRowsCopied": 0,
+      "artifact": "implementation-evidence/bootstrap-provisional.log",
+      "command": "BAGGER_R2_PROVISIONAL_BOOTSTRAP_PROOF=1 node --test tools/reliability/canonical-bootstrap.integration.test.mjs",
+      "limitation": "Provisional in-memory artifacts, local platform emulation, not final baseline or behavioral two-database authority isolation. Historical compiler uses synthetic baseline only; fresh target receives zero authority/history/job rows."
+    },
+    {
+      "id": "R2-ANNUAL-CREATE",
+      "classification": "PROVEN",
+      "layers": [
+        "POSTGRESQL",
+        "RPC",
+        "INTEGRATION",
+        "PERSISTENCE",
+        "FAILURE_INJECTION"
+      ],
+      "result": "PASS_SCOPED",
+      "tests": 9,
+      "pass": 9,
+      "fail": 0,
+      "skip": 0,
+      "leafSubcases": 8,
+      "artifact": "implementation-evidence/annual-create.log",
+      "command": "node --test test/reliability-phase2dr2-annual.integration.test.mjs",
+      "limitation": "CREATE/read only via service-role SQL RPC. Not Director HTTP/UI, annual transitions, complete security matrix, full future-year runtime or Production equivalence."
+    },
+    {
+      "id": "R2-BUILD",
+      "classification": "PROVEN",
+      "layers": [
+        "BUILD"
+      ],
+      "result": "PASS",
+      "artifact": "implementation-evidence/build.log",
+      "command": "env -i PATH=\"$PATH\" HOME=\"$HOME\" TMPDIR=\"$TMPDIR\" NEXT_TELEMETRY_DISABLED=1 npm run build",
+      "limitation": "Compilation only, registration disabled, no configured Certification boot. Static sitemap attempted retired adapter calls, which denied locally; bundled fallback/static routes rendered. No live Google call. CSS/autoprefixer/cache warnings retained."
+    },
+    {
+      "id": "R2-DOMAIN-PROBE",
+      "classification": "PROVEN",
+      "layers": [
+        "POSTGRESQL",
+        "RPC"
+      ],
+      "result": "FAIL_COUNTEREVIDENCE",
+      "artifact": "implementation-evidence/domain-counterevidence.json",
+      "limitation": "Cause remains UNKNOWN; do not relabel missing canonical fact as a passing scoring test."
+    },
+    {
+      "id": "R2-TRANSITION",
+      "classification": "PROVEN",
+      "layers": [
+        "SOURCE"
+      ],
+      "result": "OWNER_REVIEW_REQUIRED",
+      "artifact": "ANNUAL-TRANSITION-BLOCKER.md",
+      "limitation": "Additional Certification-origin closure authority was not implemented. Production legacy-root/provider-fence predicates not weakened."
+    }
+  ],
+  "openProof": [
+    "Production equivalence",
+    "two-database resource/receipt/worker/financial isolation",
+    "complete role/ACL/RLS/nested-caller/pg_depend admission matrix",
+    "score/context/control/recovery/worker positive runtime",
+    "annual transition authority",
+    "Director finalize/reopen status SQL gateway",
+    "reopen text mutation ID vs DIRECTOR UUID validation mismatch",
+    "all affected P0 A-F",
+    "full 432-hole/24-Final sequence",
+    "broad 493-file regression",
+    "score/history/worker performance",
+    "rollback/upgrade compatibility",
+    "hosted/Production/physical proof"
+  ],
+  "boundaries": {
+    "realProductionQueried": false,
+    "productionMutated": false,
+    "productionDeployed": false,
+    "productionConfigChanged": false,
+    "oldPreviewMutated": false,
+    "hostedResourcesCreated": false,
+    "vercelChanged": false,
+    "realGoogleAccessed": false,
+    "realParticipantMessagesSent": false,
+    "realCompetitiveDataChanged": false,
+    "nativeShippingChanged": false,
+    "committed": false,
+    "pushed": false
+  },
+  "hygiene": {
+    "gitDiffCheck": "PASS",
+    "historicalMigrationChanges": 0,
+    "dependencyManifestChanges": 0,
+    "nativeShippingChanges": 0,
+    "secretPatternScanFindings": 0,
+    "secretScanLimitation": "Limited changed-file literal pattern scan; not a general credential audit."
+  }
+}

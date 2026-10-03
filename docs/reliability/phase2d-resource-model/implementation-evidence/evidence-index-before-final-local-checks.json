@@ -1,0 +1,501 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-02T23:57:56.982985+00:00",
+  "kind": "SOURCE_BOUND_ARTIFACT_INDEX_NOT_CERTIFICATION",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "baseSha": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "completeCandidateCertified": false,
+  "migration144": "PENDING_APPROVAL_CORRECTION_EXCLUDED_FROM_SUCCESSFUL_PROFILES",
+  "currentSuccessfulInstallProfile": "131\u2013143,145\u2013147",
+  "annualFinalChronology": "PENDING_CURRENT_SOURCE_RERUN",
+  "applicationBoot": "PENDING_ROOT",
+  "performance": "PENDING_ROOT",
+  "broadAndBuild": "ROOT_OWNS_FINAL_FREEZE_AND_REVALIDATION",
+  "entries": [
+    {
+      "claim": "BOOTSTRAP_PROFILE147",
+      "artifact": "bootstrap-provisional-profile147.json",
+      "artifactSha256": "9b9c82f46d11eae2d2a6af6b8617828e50ca458430579aea7bf3c8a9096c0765",
+      "indexedStatus": "PASS_SCOPED",
+      "counts": {
+        "tests": 12,
+        "pass": 12,
+        "fail": 0
+      },
+      "limitation": "Fresh local install of131\u2013143,145\u2013147 only. Final candidate/144 and hosted installation are not certified.",
+      "freshness": {
+        "sourceFilesCompared": 0,
+        "unchangedCount": 0,
+        "changed": [],
+        "missingExplicitSourceMap": true
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "PRIVATE_CORE_PRIVILEGES_PROFILE147",
+      "artifact": "bootstrap-private-core-security.json",
+      "artifactSha256": "5233088b0609ce4d0e29cd9b4ea80ab31abcf4d2f12b1d0f1bff9f077a3ccb19",
+      "indexedStatus": "PASS_SCOPED",
+      "counts": {
+        "newPrivateFunctions": 164,
+        "newPublicWrappers": 16,
+        "touchedPublicWrappers": 77,
+        "actualDeniedCalls": 492
+      },
+      "limitation": "Installed owner/ACL/search_path/security/semantic pg_depend and role denials. Textual nested PL/pgSQL calls and positive domain semantics require separate behavioral proof.",
+      "freshness": {
+        "sourceFilesCompared": 16,
+        "unchangedCount": 16,
+        "changed": [],
+        "missingExplicitSourceMap": false
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "DIRECTOR_FINANCIAL",
+      "artifact": "director-financial-2026-10-02T21-39-54.863Z.json",
+      "artifactSha256": "54a577f4522854203597297325739f3c67c08cfe0376ca4161ab13aa8d63d2ed",
+      "indexedStatus": "PASS_RETAINED_QUALIFIED",
+      "counts": {
+        "nodeTests": 14,
+        "behavioralCases": 13,
+        "capabilities": 7
+      },
+      "limitation": "Actual local client/route/SQL initial-generation proof through142. Later consumed source changes are listed; not blanket final-profile proof.",
+      "freshness": {
+        "sourceFilesCompared": 18,
+        "unchangedCount": 15,
+        "changed": [
+          {
+            "file": "lib/certification-runtime-server.js",
+            "recordedSha256": "cbb17b9dca9c8857cade4c1e715be933c90b0c810ca52c1fc56117f0a9dc7081",
+            "currentSha256": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779"
+          },
+          {
+            "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+            "recordedSha256": "c837f915ba1f3a28919a8a7a3d836bb578f074ebb9a484ce97d3430f2c5c8916",
+            "currentSha256": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae"
+          },
+          {
+            "file": "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+            "recordedSha256": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+            "currentSha256": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13"
+          }
+        ],
+        "missingExplicitSourceMap": false
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "NET_SKINS_CONCURRENCY",
+      "artifact": "net-skins-concurrency-2026-10-02T22-05-01.623Z.json",
+      "artifactSha256": "51d7adf3cc23d327731d9df0828824a989de1574aa411be7c6d23b82851231c9",
+      "indexedStatus": "PASS_RETAINED_QUALIFIED",
+      "counts": {
+        "nodeTests": 7,
+        "behavioralCases": 6
+      },
+      "limitation": "Known mixed-round, stale-completion and injected40P01 retry scenario. Initial-generation proof, not universal deadlock freedom or future-generation proof.",
+      "freshness": {
+        "sourceFilesCompared": 19,
+        "unchangedCount": 16,
+        "changed": [
+          {
+            "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+            "recordedSha256": "c837f915ba1f3a28919a8a7a3d836bb578f074ebb9a484ce97d3430f2c5c8916",
+            "currentSha256": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae"
+          },
+          {
+            "file": "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+            "recordedSha256": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+            "currentSha256": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13"
+          },
+          {
+            "file": "test/support/reliability/phase2d-certification-fixture.mjs",
+            "recordedSha256": "8dbeccb14fd6531657e81051aa4c0016a262dbea0345f1f0137a2bda2364ba78",
+            "currentSha256": "095a5115e5d3bda6a96420b39b1ec4fd955447f9c586124f4be259fff8ac5d06"
+          }
+        ],
+        "missingExplicitSourceMap": false
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "CERTIFICATION_ODDS",
+      "artifact": "odds-expanded-runtime.json",
+      "artifactSha256": "073a98580934c2be73c9bbf01e530314c2f3e244fa600521224c81abc4006ea0",
+      "indexedStatus": "PASS_RETAINED_QUALIFIED",
+      "counts": {
+        "tests": 26,
+        "pass": 26,
+        "fail": 0,
+        "skip": 0
+      },
+      "limitation": "Actual isolated API/SQL calculation, explicit owner publication, privacy/authorization/recovery/duplicate/failure evidence; later profile/source changes remain separately qualified.",
+      "freshness": {
+        "sourceFilesCompared": 26,
+        "unchangedCount": 21,
+        "changed": [
+          {
+            "file": "lib/certification-runtime-server.js",
+            "recordedSha256": "2dd09cee57324cb1f17445cddf0f7507719d65afc880911ba9312dea89557726",
+            "currentSha256": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779"
+          },
+          {
+            "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+            "recordedSha256": "c837f915ba1f3a28919a8a7a3d836bb578f074ebb9a484ce97d3430f2c5c8916",
+            "currentSha256": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae"
+          },
+          {
+            "file": "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+            "recordedSha256": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+            "currentSha256": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13"
+          },
+          {
+            "file": "test/reliability-phase2dr2-odds.integration.test.mjs",
+            "recordedSha256": "3be14e1962ee4197f6b3e8f9ad9ecaa3a50fc394be4fbd52872a132b49017d42",
+            "currentSha256": "559518c1a7182d8011ea5f93798bc0ba13648e16210e247a06c4afc23c9b31d1"
+          },
+          {
+            "file": "test/support/reliability/phase2d-certification-fixture.mjs",
+            "recordedSha256": "8dbeccb14fd6531657e81051aa4c0016a262dbea0345f1f0137a2bda2364ba78",
+            "currentSha256": "095a5115e5d3bda6a96420b39b1ec4fd955447f9c586124f4be259fff8ac5d06"
+          }
+        ],
+        "missingExplicitSourceMap": false
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "ODDS_FUNCTION_DEPENDENCIES",
+      "artifact": "odds-pg-depend-graph.json",
+      "artifactSha256": "09a2b55cf7aa8f8bc6ba80a1f5b09ca5cd74e469b27b522e441cd627da83a65d",
+      "indexedStatus": "CAPTURED",
+      "counts": null,
+      "limitation": "14 touched143 function semantic dependency/owner/ACL/search_path graph. Does not replace broad final-profile behavior.",
+      "freshness": {
+        "sourceFilesCompared": 0,
+        "unchangedCount": 0,
+        "changed": [],
+        "missingExplicitSourceMap": true
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "PROTECTED_PRODUCTION_ODDS",
+      "artifact": "production-odds-equivalence.json",
+      "artifactSha256": "33868da1ca23a3d84ad2b942ef6d6ff209c192f52fa48c995e4afbb7fe87beb6",
+      "indexedStatus": "PASS_SCOPED",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0
+      },
+      "limitation": "Synthetic admitted local Production-shaped baseline. Canonical calculation/reference/retry pass and missing historical first-publication adoption is correctly rejected; no positive historical publication proof.",
+      "freshness": {
+        "sourceFilesCompared": 0,
+        "unchangedCount": 0,
+        "changed": [],
+        "missingExplicitSourceMap": true
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "PROTECTED_PRODUCTION_ANNUAL",
+      "artifact": "production-annual-golden.json",
+      "artifactSha256": "4c2ad0405682ffd172068e293d473f7a4988d877ca1450ae956ff3e354d454a7",
+      "indexedStatus": "PARTIAL",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0
+      },
+      "limitation": "Only supported distinct-course future setup is positive. Complete protected annual publication/FinalRecap/close/activation remains NOT PROVEN.",
+      "freshness": {
+        "sourceFilesCompared": 0,
+        "unchangedCount": 0,
+        "changed": [],
+        "missingExplicitSourceMap": true
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "SAME_COURSE_PROMOTION",
+      "artifact": "production-annual-final-profile-counterevidence.json",
+      "artifactSha256": "008c95459b03f9439b3a4e526847676dfb6e783c4f44c47982e538ad596144a6",
+      "indexedStatus": "COUNTEREVIDENCE",
+      "counts": null,
+      "limitation": "Actual23505 from unchanged066/139 duplicate hole-copy logic when one canonical course/tee is assigned to multiple rounds. No shipping fix; separate scoped distinct-course proof does not close it.",
+      "freshness": {
+        "sourceFilesCompared": 0,
+        "unchangedCount": 0,
+        "changed": [],
+        "missingExplicitSourceMap": true
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "PROTECTED_CLASS_ISOLATION",
+      "artifact": "production-certification-isolation-final-profile.json",
+      "artifactSha256": "9010d7932b042022f824f019cd620b12d2b6b02f0332614b52fc610f8cddb0bc",
+      "indexedStatus": "PASS_RETAINED_QUALIFIED",
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0
+      },
+      "limitation": "Same installed canonical schema with separately admitted synthetic Production and Certification authority; no hosted/realProduction access; later profile changes not included.",
+      "freshness": {
+        "sourceFilesCompared": 0,
+        "unchangedCount": 0,
+        "changed": [],
+        "missingExplicitSourceMap": true
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "TWO_CERTIFICATION_DATABASES",
+      "artifact": "resource-isolation-final-profile.json",
+      "artifactSha256": "2d0af93f90f7448cbd47ad4b2c3e1175478815628b42fab53c69db07d6882b66",
+      "indexedStatus": "PASS_RETAINED_QUALIFIED",
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0
+      },
+      "limitation": "Two actual databases, foreign contexts/leases/receipts/jobs denied, one owned cluster. Through146 excluding144 and before latest141 binder.",
+      "freshness": {
+        "sourceFilesCompared": 21,
+        "unchangedCount": 19,
+        "changed": [
+          {
+            "file": "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+            "recordedSha256": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+            "currentSha256": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13"
+          },
+          {
+            "file": "test/support/reliability/phase2d-certification-fixture.mjs",
+            "recordedSha256": "d3506fd608338cf174048ea865e028811b4f437c410500dbdb0468ea83dc3049",
+            "currentSha256": "095a5115e5d3bda6a96420b39b1ec4fd955447f9c586124f4be259fff8ac5d06"
+          }
+        ],
+        "missingExplicitSourceMap": false
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "DURABLE_INGRESS_STRESS",
+      "artifact": "ingress-stress-final-profile.json",
+      "artifactSha256": "873cf151b678d1972fbf7ab1f09ca979a90d1159e9ea6f1d6aae95704cde9b2d",
+      "indexedStatus": "PASS_RETAINED_QUALIFIED",
+      "counts": {
+        "tests": 9,
+        "behavioralCases": 8,
+        "pass": 9,
+        "fail": 0,
+        "skip": 0
+      },
+      "limitation": "Actual concurrency, backend connection termination, restart,300second elapsed lease expiry, durable core close/reopen. Through146 excluding144; not annual ABORT/REOPEN or power-loss proof.",
+      "freshness": {
+        "sourceFilesCompared": 21,
+        "unchangedCount": 19,
+        "changed": [
+          {
+            "file": "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+            "recordedSha256": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+            "currentSha256": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13"
+          },
+          {
+            "file": "test/support/reliability/phase2d-certification-fixture.mjs",
+            "recordedSha256": "d3506fd608338cf174048ea865e028811b4f437c410500dbdb0468ea83dc3049",
+            "currentSha256": "095a5115e5d3bda6a96420b39b1ec4fd955447f9c586124f4be259fff8ac5d06"
+          }
+        ],
+        "missingExplicitSourceMap": false
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "DURABLE_INGRESS_STRESS_RECEIPT",
+      "artifact": "ingress-stress-final-profile-receipt.json",
+      "artifactSha256": "a817ed6363987715f96675e0613a5129ec1caa92a87c667e393442d399e176da",
+      "indexedStatus": "PASS_SCOPED",
+      "counts": null,
+      "limitation": "Actual306971.706ms suite; owned cluster cleanup recorded. Performance/capacity not inferred from chronology waits.",
+      "freshness": {
+        "sourceFilesCompared": 0,
+        "unchangedCount": 0,
+        "changed": [],
+        "missingExplicitSourceMap": true
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "HISTORICAL_PROVIDER_FORWARD_PATH",
+      "artifact": "provider-history-2026-10-02-partial.json",
+      "artifactSha256": "0c15ed5dccd5ff7d371709d4003129f8a414611076a89493cbccb906f398ff8a",
+      "indexedStatus": "PARTIAL",
+      "counts": null,
+      "limitation": "Actual038m48s protocol chronology with synthetic provider observations, no fake timestamps.039\u2013068 reached;069 blocked by missing legitimate current-epoch maintenance binding. Complete upgrade NOT PROVEN.",
+      "freshness": {
+        "sourceFilesCompared": 156,
+        "unchangedCount": 153,
+        "changed": [
+          {
+            "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+            "recordedSha256": "c837f915ba1f3a28919a8a7a3d836bb578f074ebb9a484ce97d3430f2c5c8916",
+            "currentSha256": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae"
+          },
+          {
+            "file": "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+            "recordedSha256": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+            "currentSha256": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13"
+          },
+          {
+            "file": "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql",
+            "recordedSha256": "cdda46ff5eec5ae4b011828fccf1ddf153c404e08c3bbe959f7280aa9df03c80",
+            "currentSha256": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295"
+          }
+        ],
+        "missingExplicitSourceMap": false
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "CERTIFICATION_RELEASE144",
+      "artifact": "release-transition-2026-10-02T22-02-53.797Z.json",
+      "artifactSha256": "58a69115dad989cda7e8164b050987f6de248844c0f174252c13eed38c811d65",
+      "indexedStatus": "PARTIAL",
+      "counts": null,
+      "limitation": "Original reviewed installation reached actual initial rebind and denied CERTIFICATION_RELEASE_CONTEXT_STALE. Exact generation/drain correction remains pending owner approval; no workaround.",
+      "freshness": {
+        "sourceFilesCompared": 13,
+        "unchangedCount": 10,
+        "changed": [
+          {
+            "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+            "recordedSha256": "c837f915ba1f3a28919a8a7a3d836bb578f074ebb9a484ce97d3430f2c5c8916",
+            "currentSha256": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae"
+          },
+          {
+            "file": "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+            "recordedSha256": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+            "currentSha256": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13"
+          },
+          {
+            "file": "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql",
+            "recordedSha256": "2ed2788a23861672810fcf51931038d69193e5f5c03de64be1e6ba929dacabca",
+            "currentSha256": "10c5d4180a185759f8488a1a1890c367df7cd2c52f6fdf577e12c22b47f08bf8"
+          }
+        ],
+        "missingExplicitSourceMap": false
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "ANNUAL_RUN12_MILESTONES",
+      "artifact": "annual-transition-2026-10-02T23-34-44-303Z.json",
+      "artifactSha256": "7c7eb6d76264ce56cd6670072f130a491017f01c0d57e18e14c7bf874c0bc9ca",
+      "indexedStatus": "PARTIAL",
+      "counts": null,
+      "limitation": "Two genuine synthetic tournaments reached864holes/48Finals before NULL successor worker generation counterevidence.141 now corrected separately; this earlier artifact is not a complete annual PASS.",
+      "freshness": {
+        "sourceFilesCompared": 38,
+        "unchangedCount": 31,
+        "changed": [
+          {
+            "file": "lib/certification-read-adapters.js",
+            "recordedSha256": "0aea6e4163d86cd74485ffae6c37f327d168ed2e5f7fc261cb5f84dec68bdf9c",
+            "currentSha256": "374e7f35a2f3e578f9705802e1284fb996e2bb5be44b98cd2d52c3edd80767b4"
+          },
+          {
+            "file": "lib/certification-runtime-server.js",
+            "recordedSha256": "2dd09cee57324cb1f17445cddf0f7507719d65afc880911ba9312dea89557726",
+            "currentSha256": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779"
+          },
+          {
+            "file": "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+            "recordedSha256": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+            "currentSha256": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13"
+          },
+          {
+            "file": "test/reliability-phase2dr2-annual-transition.integration.test.mjs",
+            "recordedSha256": "f6a31a840af29d3bce435f6097878f1491dc74664ae81061ca798f785f3c441d",
+            "currentSha256": "104f9475e5cb16a71ce6ff1cf40bc7f86537d2109ee2c2a1594ae0ac09560718"
+          },
+          {
+            "file": "test/support/reliability/certification-annual-chronology-proof.mjs",
+            "recordedSha256": "64f927b8e2350d7cc2a1d683146c15cae74af998d60cf0d4d59c7b11c4d9fd44",
+            "currentSha256": "ec14660778c7e15bb06ba56fb60d03fc96858338f4bc5fb27d10abd3294e9570"
+          },
+          {
+            "file": "test/support/reliability/certification-annual-observations.mjs",
+            "recordedSha256": "331478409cbac2441ada0c2b61c4ee49d70371c91480654786a413f14b06094c",
+            "currentSha256": "e66870ca59f1044d7c445b664fdcebcde9004d40bce11a812c3ab5ffb927614b"
+          },
+          {
+            "file": "test/support/reliability/phase2d-certification-fixture.mjs",
+            "recordedSha256": "d3506fd608338cf174048ea865e028811b4f437c410500dbdb0468ea83dc3049",
+            "currentSha256": "095a5115e5d3bda6a96420b39b1ec4fd955447f9c586124f4be259fff8ac5d06"
+          }
+        ],
+        "missingExplicitSourceMap": false
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "ANNUAL_RUN13_HISTORY_COUNTEREVIDENCE",
+      "artifact": "annual-transition-2026-10-02T23-48-42-346Z.json",
+      "artifactSha256": "7ed59ca0e0acf73d4a3d64c3b3d06c6a01974136db19630466c0fdb2c4edfda8",
+      "indexedStatus": "PARTIAL",
+      "counts": null,
+      "limitation": "Latest147 chronology run reached432holes/24Finals then initial display-match-number fixture defect on actual History DTO. Fixture-only repair and new chronology pending; no full147 History PASS inferred.",
+      "freshness": {
+        "sourceFilesCompared": 43,
+        "unchangedCount": 40,
+        "changed": [
+          {
+            "file": "test/reliability-phase2dr2-annual-transition.integration.test.mjs",
+            "recordedSha256": "8ba928429cee041bc9469c08b7cf6d546474f7d9a404e7d492ac8348ad96b037",
+            "currentSha256": "104f9475e5cb16a71ce6ff1cf40bc7f86537d2109ee2c2a1594ae0ac09560718"
+          },
+          {
+            "file": "test/support/reliability/certification-history-service-proof.mjs",
+            "recordedSha256": "a8af59522c79fdd938a5b221c896b2819e9e4dbb96305d59a0d21ba35b39585f",
+            "currentSha256": "b8381bb5707cd767fe97f3fb89db65f21a8e5e66071af5551309d7bb592fe4b4"
+          },
+          {
+            "file": "test/support/reliability/phase2d-certification-fixture.mjs",
+            "recordedSha256": "d3506fd608338cf174048ea865e028811b4f437c410500dbdb0468ea83dc3049",
+            "currentSha256": "095a5115e5d3bda6a96420b39b1ec4fd955447f9c586124f4be259fff8ac5d06"
+          }
+        ],
+        "missingExplicitSourceMap": false
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    },
+    {
+      "claim": "SOURCE_SAFETY",
+      "artifact": "source-safety-audit.json",
+      "artifactSha256": "85dd6c5a8913773ab0825bb8af9521dcc27ec15da6d3dc7ee58f65ba458e05b8",
+      "indexedStatus": "SOURCE_REVIEW_COMPLETE",
+      "counts": null,
+      "limitation": "49 source hashes; no runtime certification. Root owns final freeze/broad/build/boot/performance.",
+      "freshness": {
+        "sourceFilesCompared": 49,
+        "unchangedCount": 49,
+        "changed": [],
+        "missingExplicitSourceMap": false
+      },
+      "interpretation": "Artifact-local result only. Changed source requires impact analysis or rerun; this index does not upgrade retained evidence."
+    }
+  ],
+  "pendingOwnerBoundary": "RELEASE-CONTROL-APPROVAL-BLOCK.md",
+  "globalLimits": [
+    "No Production/hosted/Google access or native/physical proof.",
+    "No final artifact/package/source SHA exists yet; uncommitted candidate.",
+    "Do not sum heterogeneous test totals as one certification suite.",
+    "Passing an expected historical rejection is not positive publication or complete annual proof.",
+    "Artifact and source hashes are a timestamped snapshot, not automatic freshness certification."
+  ]
+}

@@ -29,6 +29,8 @@ import {
   readProductionOddsPublicationState,
 } from "../../../../lib/production-odds-publication-server.js";
 import { assertProductionCutoverRequest } from "../../../../lib/production-cutover-activation-contract.js";
+import { certificationRequested } from "../../../../lib/canonical-resource-registration.js";
+import { mutateCertificationDirectorOdds } from "../../../../lib/certification-odds-server.js";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -361,6 +363,26 @@ async function publishProjection(request) {
 }
 
 async function telemetryPOST(request) {
+  if (certificationRequested()) {
+    // The resource comes exclusively from server registration. Certification
+    // never enters legacy workbook diagnostics or Production activation.
+    try {
+      let origin; try { origin = new URL(request.headers.get("origin")).origin; } catch { origin = ""; }
+      if (origin !== new URL(request.url).origin) return NextResponse.json({code:"DIRECTOR_ODDS_ORIGIN_REQUIRED"}, {status:403});
+      const authorization = await authorizePreviewDirector({request, allowBootstrap:false});
+      const input = await request.json();
+      if (input?.action !== undefined && input.action !== "publish") return NextResponse.json({code:"DIRECTOR_ODDS_INPUT_INVALID"}, {status:400});
+      const result = await mutateCertificationDirectorOdds({authorization, input:{...input, action:"publish"}});
+      return NextResponse.json({...result, source:{inputs:"supabase", publication:"supabase"},
+        googlePublication:"RETIRED", googleMirror:"RETIRED"}, {headers:{"Cache-Control":"private, no-store"}});
+    } catch (error) {
+      recordOperationalError(error);
+      return NextResponse.json({code:error?.code || "DIRECTOR_ODDS_UNAVAILABLE",
+        error:"Publication could not be confirmed. Retain the same operation identity for recovery.",
+        ...(error?.operationRequestId ? {operationRequestId:error.operationRequestId, outcome:"UNKNOWN", recovery:"CHECK_STATUS_RETRY_SAME_OPERATION"} : {})},
+      {status:[400,403,409].includes(error?.status) ? error.status : 503, headers:{"Cache-Control":"private, no-store"}});
+    }
+  }
   if (clean(process.env.VERCEL_ENV).toLowerCase() === "production") {
     return publishProjection(request);
   }

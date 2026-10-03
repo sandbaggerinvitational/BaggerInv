@@ -1,0 +1,63 @@
+{
+  "claim": "FOCUSED_INGRESS_GATE_ONLY",
+  "status": "PASS",
+  "proofLayers": [
+    "POSTGRESQL",
+    "INTEGRATION",
+    "FAILURE_INJECTION",
+    "CONCURRENCY",
+    "SECURITY"
+  ],
+  "environment": "OWNED_LOCAL_POSTGRESQL17_UNIX_SOCKET",
+  "fixture": "fresh canonical131-136 synthetic Certification resource; no authority rows copied",
+  "applicationBaseSha": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "sourceState": "UNCOMMITTED_FORWARD_CANDIDATE",
+  "counts": {
+    "testsIncludingParent": 16,
+    "behavioralCases": 15,
+    "pass": 16,
+    "fail": 0,
+    "skip": 0,
+    "admittedLeases": 11
+  },
+  "sources": [
+    {
+      "path": "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql",
+      "sha256": "8b7cdc4783acfbc1a41a05bc162e568a0700b2fa6fc7a8c2d7ee5c60ec7588fe"
+    },
+    {
+      "path": "test/reliability-phase2dr2-ingress.integration.test.mjs",
+      "sha256": "1ed11929a203100048bbd4c46c0cea294b592a0efb80dc01cdc1663b39a3460d"
+    },
+    {
+      "path": "test/support/reliability/certification-ingress-js-proof.mjs",
+      "sha256": "c286afad56720917d75b7a3fc17efa335a8896d8efa553bfd603ec6ee90947ff"
+    },
+    {
+      "path": "test/support/reliability/phase2d-certification-fixture.mjs",
+      "sha256": "58d9e957ac318f975f4289966f4c46cb46e48879b9a7c3591f4940d75a15a5a0"
+    },
+    {
+      "path": "lib/certification-runtime-server.js",
+      "sha256": "cdc0f42a9bb61c8b6f6f156694820dd6484e7e83f2d3c4db2f9af0c747f5b722"
+    }
+  ],
+  "log": {
+    "path": "docs/reliability/phase2d-resource-model/implementation-evidence/ingress-focused.log",
+    "sha256": "d418a2e772c91c2038959ad10890bc60aa20da44a10d5d6b596019c1eb604f9f"
+  },
+  "limitations": [
+    "No complete nine-family score-path certification yet",
+    "Future-year historical identity helper deferred to138; future recovery fails closed until installed",
+    "Default-ACL-negative upgrade, prepared public OID, physical restart, expiry,20-way contention and full tournament proof pending",
+    "No hosted, Production, physical device or final baseline certification"
+  ],
+  "boundaries": {
+    "productionAccess": false,
+    "hostedAccess": false,
+    "googleCalls": 0,
+    "sourceMocks": false,
+    "outboundEnvelopeRewrites": false,
+    "ownedClusterDestroyed": true
+  }
+}

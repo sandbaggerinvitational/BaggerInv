@@ -1,0 +1,1391 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "hosted": false,
+  "production": false,
+  "googleCalls": 0,
+  "sourceBefore": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+    "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql": "5ef34c3bd09feda3a4cacdac275764166ea82319d20a59235efed091016b0343",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql": "0d610b350d76b27f4f63942758cfd7e12bafeddac48f3c8c0ff8c94c74fb37ff",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql": "410f4b2681442ff99cee1ab7f291f0b006fed069262584540ddbfc2e2eb36ffb",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql": "080cdaf863a5f0bc70670f15e0aa658916cda439e0df10110de7d428675334f6",
+    "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql": "d2c7e20327392826882e3451daab8594fd1187ea2672cece7889cbeb4768d245",
+    "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql": "1f7ea4800f11204dd8016269f65291b213666e642fb65a899df883b32462044d",
+    "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql": "ff89ea6218d6692e7f669e1b057d0f5ac2d7bf35131bab972bec38e2a1b93510",
+    "supabase/production_migrations/202609300151_certification_annual_reopen_lineage_v1.sql": "049479ddd58887dedc374a685eae12a6939dc834619b573070a29b44c27e029a",
+    "supabase/production_migrations/202609300152_certification_closed_release_admission_v1.sql": "6e5ea854a7e7baa51f18af7bd8f9436fa2e4a487416cb61649c32ace60238e8b",
+    "test/reliability-phase2dr2-calcutta-post-commit.integration.test.mjs": "90081b112b609bd1023a54b07042b8748d3f8f8e949d091f83dafe620e7574f4",
+    "lib/calcutta-post-commit.js": "589210e3eee402d393c1279a89ad9f7dd48fcca034fa3711e498465fb3d95e7f",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "lib/certification-worker-adapter.js": "33f6c84b25c6cf36a149038700892482f05baeaa9ed7cf4f86c54dfb08f6435e",
+    "lib/production-calcutta-server.js": "a4e88cbe7bef7458b4b25f3ab4e9056b4ecb165d9448413242a053de1c269733",
+    "lib/certification-runtime-server.js": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779"
+  },
+  "cases": [
+    {
+      "name": "wrong target and missing target stop after canonical context read without worker writes",
+      "status": "PASS"
+    },
+    {
+      "name": "actual scored tournament completes Calcutta calculation through existing durable processor without publication",
+      "status": "PASS"
+    },
+    {
+      "name": "repeat wakeup is idempotent and preserves canonical financial facts",
+      "status": "PASS"
+    },
+    {
+      "name": "real admission revision change after context read conflicts before materialization",
+      "status": "PASS"
+    },
+    {
+      "name": "disabled admission and unprivileged database roles cannot enter worker authority",
+      "status": "PASS"
+    }
+  ],
+  "firstHook": {
+    "result": {
+      "ok": true,
+      "code": "PRODUCTION_CALCUTTA_V1_RECALCULATION_COMPLETED",
+      "job_id": "91d09414-2a54-4fa7-91ce-3ac934890976",
+      "idempotent": false,
+      "result_state": "PROVISIONAL",
+      "result_revision": 1,
+      "auction_revision": 1,
+      "publication_state": "UNPUBLISHED",
+      "result_fingerprint": "b10b4cfdfe07d4f8890e889617a72efb5038f15fa2f77ef9d8908aaa36296a12",
+      "auction_fingerprint": "4d66c03b0f4a7bba9e787796448220698beaeabb3ea0697d7f39e27ccb81767e",
+      "configuration_revision": 1,
+      "configuration_fingerprint": "0fb18f6570331d18eb798e4fd41845d7eb61de6e341604673b6fdd41d59687af",
+      "empty": false,
+      "calculation": {
+        "scoreSource": "shared frozen PLAYER/TEAM Full Net",
+        "handicapPolicy": "production-full-course-handicap-v1",
+        "completedRounds": [],
+        "officialRoundRows": 0,
+        "purchasedAssets": 1,
+        "scramblePairingRows": 0,
+        "matchupNetUsed": false
+      }
+    },
+    "calls": [
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.CALCUTTA_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.CALCUTTA_COMPLETE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      }
+    ],
+    "queues": {
+      "jobs": [
+        {
+          "job_id": "91d09414-2a54-4fa7-91ce-3ac934890976",
+          "reason": "CANONICAL_MATCH_LIFECYCLE_CHANGED",
+          "status": "SUCCEEDED",
+          "attempts": 1,
+          "claimed_by": null,
+          "started_at": "2026-10-02T21:43:09.855986-05:00",
+          "updated_at": "2026-10-02T21:43:09.914388-05:00",
+          "claim_token": null,
+          "completed_at": "2026-10-02T21:43:09.914388-05:00",
+          "requested_at": "2026-10-02T21:43:09.805224-05:00",
+          "requested_by": "score-derived-intent-v1",
+          "tournament_id": "2026",
+          "delivery_cycle": 1,
+          "last_error_code": null,
+          "last_error_safe": null,
+          "source_revision": {
+            "holes": [
+              {
+                "match_id": "2026-R1-1",
+                "hole_number": 1,
+                "hole_winner": "Halved",
+                "round_number": 1,
+                "hole_revision": 1,
+                "team_1_strokes": [
+                  0,
+                  0
+                ],
+                "team_2_strokes": [
+                  1,
+                  1
+                ],
+                "team_1_net_score": 4,
+                "team_2_net_score": 4,
+                "team_1_gross_scores": [
+                  4,
+                  4
+                ],
+                "team_2_gross_scores": [
+                  5,
+                  5
+                ]
+              }
+            ],
+            "rounds": [
+              {
+                "format": "BB",
+                "status": "UPCOMING",
+                "round_number": 1
+              },
+              {
+                "format": "SC",
+                "status": "UPCOMING",
+                "round_number": 2
+              },
+              {
+                "format": "SI",
+                "status": "UPCOMING",
+                "round_number": 3
+              }
+            ],
+            "matches": [
+              {
+                "format": "BB",
+                "status": "LIVE",
+                "match_id": "2026-R1-1",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P01",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -5.84070796460177,
+                    "playing_handicap": -6,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P02",
+                    "team_side": 1,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": -5.3097345132743365,
+                    "playing_handicap": -5,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P13",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 0.5309734513274337,
+                    "playing_handicap": 1,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P14",
+                    "team_side": 2,
+                    "player_slot": 2,
+                    "final_strokes": 6,
+                    "course_handicap": 1.0619469026548674,
+                    "playing_handicap": 1,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 1,
+                "scored_holes": 1,
+                "result_winner": "",
+                "match_revision": 4,
+                "scorecard_complete": false,
+                "permission_revision": 2,
+                "scoring_snapshot_id": "2026-R1-1:S2"
+              },
+              {
+                "format": "BB",
+                "status": "UPCOMING",
+                "match_id": "2026-R1-2",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P03",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -4.778761061946903,
+                    "playing_handicap": -5,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P04",
+                    "team_side": 1,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": -4.247787610619469,
+                    "playing_handicap": -4,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P15",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 1.592920353982301,
+                    "playing_handicap": 2,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P16",
+                    "team_side": 2,
+                    "player_slot": 2,
+                    "final_strokes": 6,
+                    "course_handicap": 2.1238938053097347,
+                    "playing_handicap": 2,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 1,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R1-2:S1"
+              },
+              {
+                "format": "BB",
+                "status": "UPCOMING",
+                "match_id": "2026-R1-3",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P05",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -3.7168141592920354,
+                    "playing_handicap": -4,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P06",
+                    "team_side": 1,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": -3.185840707964602,
+                    "playing_handicap": -3,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P17",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 2.6548672566371683,
+                    "playing_handicap": 3,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P18",
+                    "team_side": 2,
+                    "player_slot": 2,
+                    "final_strokes": 6,
+                    "course_handicap": 3.185840707964602,
+                    "playing_handicap": 3,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 1,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R1-3:S1"
+              },
+              {
+                "format": "BB",
+                "status": "UPCOMING",
+                "match_id": "2026-R1-4",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P07",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -2.6548672566371683,
+                    "playing_handicap": -3,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P08",
+                    "team_side": 1,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": -2.1238938053097347,
+                    "playing_handicap": -2,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P19",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 3.7168141592920354,
+                    "playing_handicap": 4,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P20",
+                    "team_side": 2,
+                    "player_slot": 2,
+                    "final_strokes": 6,
+                    "course_handicap": 4.247787610619469,
+                    "playing_handicap": 4,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 1,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R1-4:S1"
+              },
+              {
+                "format": "BB",
+                "status": "UPCOMING",
+                "match_id": "2026-R1-5",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P09",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -1.592920353982301,
+                    "playing_handicap": -2,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P10",
+                    "team_side": 1,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": -1.0619469026548674,
+                    "playing_handicap": -1,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P21",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 4.778761061946903,
+                    "playing_handicap": 5,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P22",
+                    "team_side": 2,
+                    "player_slot": 2,
+                    "final_strokes": 6,
+                    "course_handicap": 5.3097345132743365,
+                    "playing_handicap": 5,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 1,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R1-5:S1"
+              },
+              {
+                "format": "BB",
+                "status": "UPCOMING",
+                "match_id": "2026-R1-6",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P11",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -0.5309734513274337,
+                    "playing_handicap": -1,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P12",
+                    "team_side": 1,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": 0,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P23",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 5.84070796460177,
+                    "playing_handicap": 6,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P24",
+                    "team_side": 2,
+                    "player_slot": 2,
+                    "final_strokes": 6,
+                    "course_handicap": 6.371681415929204,
+                    "playing_handicap": 6,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 1,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R1-6:S1"
+              },
+              {
+                "format": "SC",
+                "status": "UPCOMING",
+                "match_id": "2026-R2-1",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P01",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -5.84070796460177,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P02",
+                    "team_side": 1,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": -5.3097345132743365,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P13",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": 0.5309734513274337,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P14",
+                    "team_side": 2,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": 1.0619469026548674,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 2,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R2-1:S1"
+              },
+              {
+                "format": "SC",
+                "status": "UPCOMING",
+                "match_id": "2026-R2-2",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P03",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -4.778761061946903,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P04",
+                    "team_side": 1,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": -4.247787610619469,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P15",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": 1.592920353982301,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P16",
+                    "team_side": 2,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": 2.1238938053097347,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 2,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R2-2:S1"
+              },
+              {
+                "format": "SC",
+                "status": "UPCOMING",
+                "match_id": "2026-R2-3",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P05",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -3.7168141592920354,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P06",
+                    "team_side": 1,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": -3.185840707964602,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P17",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": 2.6548672566371683,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P18",
+                    "team_side": 2,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": 3.185840707964602,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 2,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R2-3:S1"
+              },
+              {
+                "format": "SC",
+                "status": "UPCOMING",
+                "match_id": "2026-R2-4",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P07",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -2.6548672566371683,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P08",
+                    "team_side": 1,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": -2.1238938053097347,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P19",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": 3.7168141592920354,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P20",
+                    "team_side": 2,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": 4.247787610619469,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 2,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R2-4:S1"
+              },
+              {
+                "format": "SC",
+                "status": "UPCOMING",
+                "match_id": "2026-R2-5",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P09",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -1.592920353982301,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P10",
+                    "team_side": 1,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": -1.0619469026548674,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P21",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": 4.778761061946903,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P22",
+                    "team_side": 2,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": 5.3097345132743365,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 2,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R2-5:S1"
+              },
+              {
+                "format": "SC",
+                "status": "UPCOMING",
+                "match_id": "2026-R2-6",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P11",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -0.5309734513274337,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P12",
+                    "team_side": 1,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": 0,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P23",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": 5.84070796460177,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P24",
+                    "team_side": 2,
+                    "player_slot": 2,
+                    "final_strokes": 0,
+                    "course_handicap": 6.371681415929204,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 2,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R2-6:S1"
+              },
+              {
+                "format": "SI",
+                "status": "UPCOMING",
+                "match_id": "2026-R3-1",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P01",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -5.84070796460177,
+                    "playing_handicap": -6,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P13",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 0.5309734513274337,
+                    "playing_handicap": 1,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 3,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R3-1:S1"
+              },
+              {
+                "format": "SI",
+                "status": "UPCOMING",
+                "match_id": "2026-R3-10",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P10",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -1.0619469026548674,
+                    "playing_handicap": -1,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P22",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 5.3097345132743365,
+                    "playing_handicap": 5,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 3,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R3-10:S1"
+              },
+              {
+                "format": "SI",
+                "status": "UPCOMING",
+                "match_id": "2026-R3-11",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P11",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -0.5309734513274337,
+                    "playing_handicap": -1,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P23",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 5.84070796460177,
+                    "playing_handicap": 6,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 3,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R3-11:S1"
+              },
+              {
+                "format": "SI",
+                "status": "UPCOMING",
+                "match_id": "2026-R3-12",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P12",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": 0,
+                    "playing_handicap": 0,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P24",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 6.371681415929204,
+                    "playing_handicap": 6,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 3,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R3-12:S1"
+              },
+              {
+                "format": "SI",
+                "status": "UPCOMING",
+                "match_id": "2026-R3-2",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P02",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -5.3097345132743365,
+                    "playing_handicap": -5,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P14",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 1.0619469026548674,
+                    "playing_handicap": 1,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 3,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R3-2:S1"
+              },
+              {
+                "format": "SI",
+                "status": "UPCOMING",
+                "match_id": "2026-R3-3",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P03",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -4.778761061946903,
+                    "playing_handicap": -5,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P15",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 1.592920353982301,
+                    "playing_handicap": 2,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 3,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R3-3:S1"
+              },
+              {
+                "format": "SI",
+                "status": "UPCOMING",
+                "match_id": "2026-R3-4",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P04",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -4.247787610619469,
+                    "playing_handicap": -4,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P16",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 2.1238938053097347,
+                    "playing_handicap": 2,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 3,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R3-4:S1"
+              },
+              {
+                "format": "SI",
+                "status": "UPCOMING",
+                "match_id": "2026-R3-5",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P05",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -3.7168141592920354,
+                    "playing_handicap": -4,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P17",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 2.6548672566371683,
+                    "playing_handicap": 3,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 3,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R3-5:S1"
+              },
+              {
+                "format": "SI",
+                "status": "UPCOMING",
+                "match_id": "2026-R3-6",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P06",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -3.185840707964602,
+                    "playing_handicap": -3,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P18",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 3.185840707964602,
+                    "playing_handicap": 3,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 3,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R3-6:S1"
+              },
+              {
+                "format": "SI",
+                "status": "UPCOMING",
+                "match_id": "2026-R3-7",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P07",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -2.6548672566371683,
+                    "playing_handicap": -3,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P19",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 3.7168141592920354,
+                    "playing_handicap": 4,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 3,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R3-7:S1"
+              },
+              {
+                "format": "SI",
+                "status": "UPCOMING",
+                "match_id": "2026-R3-8",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P08",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -2.1238938053097347,
+                    "playing_handicap": -2,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P20",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 4.247787610619469,
+                    "playing_handicap": 4,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 3,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R3-8:S1"
+              },
+              {
+                "format": "SI",
+                "status": "UPCOMING",
+                "match_id": "2026-R3-9",
+                "finalized_at": null,
+                "participants": [
+                  {
+                    "player_id": "P09",
+                    "team_side": 1,
+                    "player_slot": 1,
+                    "final_strokes": 0,
+                    "course_handicap": -1.592920353982301,
+                    "playing_handicap": -2,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  },
+                  {
+                    "player_id": "P21",
+                    "team_side": 2,
+                    "player_slot": 1,
+                    "final_strokes": 6,
+                    "course_handicap": 4.778761061946903,
+                    "playing_handicap": 5,
+                    "handicap_revision_id": "10000000-0000-4000-8000-000000000001"
+                  }
+                ],
+                "round_number": 3,
+                "scored_holes": 0,
+                "result_winner": "",
+                "match_revision": 0,
+                "scorecard_complete": false,
+                "permission_revision": 1,
+                "scoring_snapshot_id": "2026-R3-9:S1"
+              }
+            ],
+            "tournament_id": "2026",
+            "calculation_policy": "production-full-course-handicap-v1",
+            "full_net_authority": {
+              "policy": "production-full-course-handicap-v1",
+              "matches": [],
+              "tournamentId": "2026"
+            }
+          },
+          "auction_revision": 1,
+          "lease_expires_at": null,
+          "delivery_attempts": 1,
+          "source_fingerprint": "80090c857e32c2077af710620c886682cd28b63ae8c21074ab12b5874419d44a",
+          "activation_revision": 1,
+          "auction_fingerprint": "4d66c03b0f4a7bba9e787796448220698beaeabb3ea0697d7f39e27ccb81767e",
+          "auction_revision_id": "09f8f144-16b7-4801-ac82-25700a36e7a4",
+          "request_fingerprint": null,
+          "delivery_error_class": null,
+          "request_payload_hash": null,
+          "delivery_available_at": "-infinity",
+          "delivery_score_origin": true,
+          "runtime_generation_id": null,
+          "configuration_revision": 1,
+          "delivery_dead_letter_at": null,
+          "configuration_fingerprint": "0fb18f6570331d18eb798e4fd41845d7eb61de6e341604673b6fdd41d59687af",
+          "configuration_revision_id": "6a934101-4f5e-4d9d-98ae-9cd0ea0e112d"
+        }
+      ],
+      "intents": [
+        {
+          "family": "CALCUTTA",
+          "reason": "CANONICAL_MATCH_LIFECYCLE_CHANGED",
+          "status": "SUCCEEDED",
+          "attempts": 1,
+          "match_id": "2026-R1-1",
+          "intent_id": "92e9aaa5-6ac9-4c6f-8ae9-7f3fe77150f5",
+          "created_at": "2026-10-02T21:43:09.746392-05:00",
+          "updated_at": "2026-10-02T21:43:09.814428-05:00",
+          "available_at": "2026-10-02T21:43:09.748411-05:00",
+          "completed_at": "2026-10-02T21:43:09.814428-05:00",
+          "round_number": 1,
+          "last_sqlstate": null,
+          "tournament_id": "2026",
+          "delivery_cycle": 1,
+          "contract_version": "score-derived-intent-v1",
+          "canonical_revision": {
+            "holeNumber": 1,
+            "mutationKey": "aa89ed2f-103e-4ee4-80d8-6d7d964533cd",
+            "holeRevision": 1,
+            "matchRevision": 4
+          },
+          "source_transaction": 985,
+          "runtime_generation_id": null
+        }
+      ]
+    }
+  },
+  "canonicalResult": {
+    "result_state": "AUCTION_COMPLETE",
+    "result_revision": 1,
+    "publication_state": "UNPUBLISHED"
+  },
+  "calls": [
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "execute_certification_operation_v1",
+      "operation": "WORKERS.DELIVERY_TICK",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "execute_certification_operation_v1",
+      "operation": "WORKERS.DELIVERY_TICK",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "execute_certification_operation_v1",
+      "operation": "WORKERS.DELIVERY_TICK",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "execute_certification_operation_v1",
+      "operation": "WORKERS.CALCUTTA_CLAIM",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "execute_certification_operation_v1",
+      "operation": "WORKERS.CALCUTTA_COMPLETE",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "execute_certification_operation_v1",
+      "operation": "WORKERS.DELIVERY_TICK",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "execute_certification_operation_v1",
+      "operation": "WORKERS.DELIVERY_TICK",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "execute_certification_operation_v1",
+      "operation": "WORKERS.DELIVERY_TICK",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "execute_certification_operation_v1",
+      "operation": "WORKERS.DELIVERY_TICK",
+      "phase": "WORKERS"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "WORKERS"
+    }
+  ],
+  "result": "PASS",
+  "sourceAfter": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+    "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql": "5ef34c3bd09feda3a4cacdac275764166ea82319d20a59235efed091016b0343",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql": "0d610b350d76b27f4f63942758cfd7e12bafeddac48f3c8c0ff8c94c74fb37ff",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql": "410f4b2681442ff99cee1ab7f291f0b006fed069262584540ddbfc2e2eb36ffb",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql": "080cdaf863a5f0bc70670f15e0aa658916cda439e0df10110de7d428675334f6",
+    "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql": "d2c7e20327392826882e3451daab8594fd1187ea2672cece7889cbeb4768d245",
+    "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql": "1f7ea4800f11204dd8016269f65291b213666e642fb65a899df883b32462044d",
+    "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql": "ff89ea6218d6692e7f669e1b057d0f5ac2d7bf35131bab972bec38e2a1b93510",
+    "supabase/production_migrations/202609300151_certification_annual_reopen_lineage_v1.sql": "049479ddd58887dedc374a685eae12a6939dc834619b573070a29b44c27e029a",
+    "supabase/production_migrations/202609300152_certification_closed_release_admission_v1.sql": "6e5ea854a7e7baa51f18af7bd8f9436fa2e4a487416cb61649c32ace60238e8b",
+    "test/reliability-phase2dr2-calcutta-post-commit.integration.test.mjs": "90081b112b609bd1023a54b07042b8748d3f8f8e949d091f83dafe620e7574f4",
+    "lib/calcutta-post-commit.js": "589210e3eee402d393c1279a89ad9f7dd48fcca034fa3711e498465fb3d95e7f",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "lib/certification-worker-adapter.js": "33f6c84b25c6cf36a149038700892482f05baeaa9ed7cf4f86c54dfb08f6435e",
+    "lib/production-calcutta-server.js": "a4e88cbe7bef7458b4b25f3ab4e9056b4ecb165d9448413242a053de1c269733",
+    "lib/certification-runtime-server.js": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779"
+  },
+  "sourceStable": true
+}

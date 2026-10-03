@@ -1,0 +1,15 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "cases": [
+    {
+      "id": "INFLIGHT_UPGRADE_FENCE",
+      "migrationCompletedWhilePredecessorTransactionActive": false
+    },
+    {
+      "id": "BLOCKED_OLD_EXECUTE",
+      "result": {
+        "value": "{\"ok\": true, \"code\": \"TOURNAMENT_SETUP_UPDATED\", \"action\": \"UPDATE_TOURNAMENT\", \"target\": \"2026\", \"changed\": true, \"revision\": 2, \"targetId\": \"2026\", \"warnings\": [], \"readiness\": {\"ready\": false, \"state\": \"NEEDS_ATTENTION\", \"summary\": {\"teams\": 2, \"rounds\": 3, \"matches\": 24, \"activeRoster\": 24, \"pairedMatches\": 24, \"startedMatches\": 0, \"expectedMatches\": 24, \"handicapCovered\": 24, \"preparedScoringContexts\": 24}, \"blockers\": [{\"code\": \"TEAM_CAPTAIN_REQUIRED\", \"target\": \"T1\", \"message\": \"Synthetic Team One needs an active roster captain.\", \"section\": \"teams\"}, {\"code\": \"TEAM_CAPTAIN_REQUIRED\", \"target\": \"T2\", \"message\": \"Synthetic Team Two needs an active roster captain.\", \"section\": \"teams\"}], \"messages\": [\"Synthetic Team One needs an active roster captain.\", \"Synthetic Team Two needs an active roster captain.\"], \"sections\": {\"teams\": \"NEEDS_ATTENTION\", \"roster\": \"COMPLETE\", \"rounds\": \"COMPLETE\", \"courses\": \"COMPLETE\", \"matches\": \"COMPLETE\", \"tournament\": \"COMPLETE\", \"scoringContext\": \"COMPLETE\"}, \"sideGames\": {\"calcutta\": {\"state\": \"NOT_CONFIGURED\", \"optional\": true, \"blocksTournamentReadiness\": false}, \"netSkins\": {\"ready\": true, \"state\": \"READY\", \"derivedFromCanonicalSetup\": true}}}, \"timestamp\": \"2026-09-30T14:14:02.620308-05:00\", \"idempotent\": false, \"snapshotPrepared\": false, \"scoringMutationCreated\": false, \"scoringPermissionGranted\": false}"
+      }
+    }
+  ]
+}

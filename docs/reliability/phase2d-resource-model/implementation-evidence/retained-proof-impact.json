@@ -1,0 +1,211 @@
+{
+  "recordedAt": "2026-10-03T04:53:57.131194+00:00",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "entries": [
+    {
+      "artifact": "annual-transition-2026-10-03T02-08-24-102Z.json",
+      "sha256": "c796e88b3999b61dbda6b0c0aa3379671ed65ef3c60e085a65ac3b224754450b",
+      "filesCompared": 50,
+      "changed": [
+        {
+          "file": "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+          "recordedSha256": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+          "currentSha256": "636d107c84f28096717cab20cad14759cbbad1df4c87a05c38fe03f54b215640"
+        },
+        {
+          "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+          "recordedSha256": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+          "currentSha256": "d4bf918963490416e74e6c2049af306d52fc51d4f740de9f494363c9c54df838"
+        }
+      ],
+      "retainedStatus": "PASS_SCOPED_TO_RECORDED_EXERCISED_PATHS",
+      "originalScopeReason": "Recorded50 source hashes unchanged. Calcutta unconfigured, zero CALCUTTA jobs; claim processor branch never executed. Later Certification-only claim DTO validator therefore does not change the exercised annual path. No configured successor financial claim inferred.",
+      "retentionReason": "Retain only the originally exercised paths: the focused final069/131/138 impact proof establishes exact final catalog convergence, unchanged076 getter/manifest, actual Certification readiness equivalence and negative admission; installer repro/security separately prove the current compiler. Later Calcutta claim parsing is covered by its separate configured6-case proof. No runtime algorithm, actor, lease, lock, receipt, worker or publication body used by these Certification cases changed.",
+      "missingOriginalCompilerDependencies": "Original per-test manifests do not uniformly include historical069, compiler helpers and generated catalog. The final focused catalog proof and deterministic installer provide that missing impact boundary; original manifests are not rewritten.",
+      "statusNotEquivalentToRerun": true
+    },
+    {
+      "artifact": "application-boot-2026-10-03T02-21-52-716Z.json",
+      "sha256": "1494aae66b7b079b8fc67a63203e08b1c269ca44da5bfe21613811cd1e6e4aec",
+      "filesCompared": 995,
+      "changed": [
+        {
+          "file": "lib/production-calcutta-server.js",
+          "recordedSha256": "506224c1f3f668cf69fbd488fe5ee93fd1ad79d0237ac8cf24b8740ca06a9143",
+          "currentSha256": "a4e88cbe7bef7458b4b25f3ab4e9056b4ecb165d9448413242a053de1c269733"
+        }
+      ],
+      "retainedStatus": "PASS_SCOPED_TO_RECORDED_EXERCISED_PATHS",
+      "originalScopeReason": "Only later changed file is production-calcutta-server.js. Actual boot records configured Calcutta hook context/ticks but CALCUTTA not ready; no claim. Retain8/8 only for those exact exercised paths. New real configured claim is separately proven6/6.",
+      "retentionReason": "Retain only the originally exercised paths: the focused final069/131/138 impact proof establishes exact final catalog convergence, unchanged076 getter/manifest, actual Certification readiness equivalence and negative admission; installer repro/security separately prove the current compiler. Later Calcutta claim parsing is covered by its separate configured6-case proof. No runtime algorithm, actor, lease, lock, receipt, worker or publication body used by these Certification cases changed.",
+      "missingOriginalCompilerDependencies": "Original per-test manifests do not uniformly include historical069, compiler helpers and generated catalog. The final focused catalog proof and deterministic installer provide that missing impact boundary; original manifests are not rewritten.",
+      "statusNotEquivalentToRerun": true
+    },
+    {
+      "artifact": "director-financial-2026-10-03T02-28-02.225Z.json",
+      "sha256": "ba194feb4b6a5bd5757b2a36ded410ed9484870950c7e9bf40528eb91f934343",
+      "filesCompared": 29,
+      "changed": [
+        {
+          "file": "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+          "recordedSha256": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+          "currentSha256": "636d107c84f28096717cab20cad14759cbbad1df4c87a05c38fe03f54b215640"
+        },
+        {
+          "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+          "recordedSha256": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+          "currentSha256": "d4bf918963490416e74e6c2049af306d52fc51d4f740de9f494363c9c54df838"
+        }
+      ],
+      "retainedStatus": "PASS_SCOPED_TO_RECORDED_EXERCISED_PATHS",
+      "originalScopeReason": "Recorded29 sources unchanged; seven Director identities do not execute the changed worker claim validator.",
+      "retentionReason": "Retain only the originally exercised paths: the focused final069/131/138 impact proof establishes exact final catalog convergence, unchanged076 getter/manifest, actual Certification readiness equivalence and negative admission; installer repro/security separately prove the current compiler. Later Calcutta claim parsing is covered by its separate configured6-case proof. No runtime algorithm, actor, lease, lock, receipt, worker or publication body used by these Certification cases changed.",
+      "missingOriginalCompilerDependencies": "Original per-test manifests do not uniformly include historical069, compiler helpers and generated catalog. The final focused catalog proof and deterministic installer provide that missing impact boundary; original manifests are not rewritten.",
+      "statusNotEquivalentToRerun": true
+    },
+    {
+      "artifact": "finite-timeout-matrix-2026-10-03T02-26-09.590Z.json",
+      "sha256": "d5a74a49f0c49afa78cab32965a11128b6fb627dd10443c9ce3c8ed2918d19db",
+      "filesCompared": 567,
+      "changed": [
+        {
+          "file": "lib/production-calcutta-server.js",
+          "recordedSha256": "506224c1f3f668cf69fbd488fe5ee93fd1ad79d0237ac8cf24b8740ca06a9143",
+          "currentSha256": "a4e88cbe7bef7458b4b25f3ab4e9056b4ecb165d9448413242a053de1c269733"
+        },
+        {
+          "file": "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+          "recordedSha256": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+          "currentSha256": "636d107c84f28096717cab20cad14759cbbad1df4c87a05c38fe03f54b215640"
+        },
+        {
+          "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+          "recordedSha256": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+          "currentSha256": "d4bf918963490416e74e6c2049af306d52fc51d4f740de9f494363c9c54df838"
+        },
+        {
+          "file": "test/support/reliability/certification-private-core-security-proof.mjs",
+          "recordedSha256": "0aaa0d29cfc77336bc3fd551ca74d805ec2e73828127044f5867324637234332",
+          "currentSha256": "ec0bbe47d28ac4f0827ac95bafec7269880134fea45e0c2f75e959aafa19e958"
+        },
+        {
+          "file": "test/support/reliability/phase2d-resource-bootstrap.mjs",
+          "recordedSha256": "81abc4be2912f3fa404179198fb9de474dfa97fa642552045d8383bcd9a43f18",
+          "currentSha256": "cd466af2886c48f82cddf5d002e8f6a57196fa8af5c6cc175d1819ed6436fa41"
+        },
+        {
+          "file": "test/support/reliability/release139-schema.mjs",
+          "recordedSha256": "231c8a3b52988ce53055204f4f583446038b33d15c0d2f8d9e24ec2ee4e1e3c8",
+          "currentSha256": "ce006cdf32606635136200a7d9aa69124f3e99001055c2aedbcb045b868f4aa8"
+        }
+      ],
+      "retainedStatus": "PASS_SCOPED_TO_RECORDED_EXERCISED_PATHS",
+      "originalScopeReason": "Changed Calcutta claim validator is not exercised in this timeout matrix; required derived materialization fault is COMPETITION. All affected SQL/score/Odds/publication fault paths unchanged.",
+      "retentionReason": "Retain only the originally exercised paths: the focused final069/131/138 impact proof establishes exact final catalog convergence, unchanged076 getter/manifest, actual Certification readiness equivalence and negative admission; installer repro/security separately prove the current compiler. Later Calcutta claim parsing is covered by its separate configured6-case proof. No runtime algorithm, actor, lease, lock, receipt, worker or publication body used by these Certification cases changed.",
+      "missingOriginalCompilerDependencies": "Original per-test manifests do not uniformly include historical069, compiler helpers and generated catalog. The final focused catalog proof and deterministic installer provide that missing impact boundary; original manifests are not rewritten.",
+      "statusNotEquivalentToRerun": true
+    },
+    {
+      "artifact": "release-transition-2026-10-03T02-24-05.900Z.json",
+      "sha256": "1389fd8e0bfb9a3a27d872cbbd80cee1283629ff69ab8a3f4742faafe6511dc0",
+      "filesCompared": 568,
+      "changed": [
+        {
+          "file": "lib/production-calcutta-server.js",
+          "recordedSha256": "506224c1f3f668cf69fbd488fe5ee93fd1ad79d0237ac8cf24b8740ca06a9143",
+          "currentSha256": "a4e88cbe7bef7458b4b25f3ab4e9056b4ecb165d9448413242a053de1c269733"
+        },
+        {
+          "file": "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+          "recordedSha256": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+          "currentSha256": "636d107c84f28096717cab20cad14759cbbad1df4c87a05c38fe03f54b215640"
+        },
+        {
+          "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+          "recordedSha256": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+          "currentSha256": "d4bf918963490416e74e6c2049af306d52fc51d4f740de9f494363c9c54df838"
+        },
+        {
+          "file": "test/support/reliability/certification-private-core-security-proof.mjs",
+          "recordedSha256": "0aaa0d29cfc77336bc3fd551ca74d805ec2e73828127044f5867324637234332",
+          "currentSha256": "ec0bbe47d28ac4f0827ac95bafec7269880134fea45e0c2f75e959aafa19e958"
+        },
+        {
+          "file": "test/support/reliability/phase2d-resource-bootstrap.mjs",
+          "recordedSha256": "81abc4be2912f3fa404179198fb9de474dfa97fa642552045d8383bcd9a43f18",
+          "currentSha256": "cd466af2886c48f82cddf5d002e8f6a57196fa8af5c6cc175d1819ed6436fa41"
+        },
+        {
+          "file": "test/support/reliability/release139-schema.mjs",
+          "recordedSha256": "231c8a3b52988ce53055204f4f583446038b33d15c0d2f8d9e24ec2ee4e1e3c8",
+          "currentSha256": "ce006cdf32606635136200a7d9aa69124f3e99001055c2aedbcb045b868f4aa8"
+        }
+      ],
+      "retainedStatus": "PASS_SCOPED_TO_RECORDED_EXERCISED_PATHS",
+      "originalScopeReason": "Recorded release SQL and tests unchanged; Calcutta claimed response validation not invoked.",
+      "retentionReason": "Retain only the originally exercised paths: the focused final069/131/138 impact proof establishes exact final catalog convergence, unchanged076 getter/manifest, actual Certification readiness equivalence and negative admission; installer repro/security separately prove the current compiler. Later Calcutta claim parsing is covered by its separate configured6-case proof. No runtime algorithm, actor, lease, lock, receipt, worker or publication body used by these Certification cases changed.",
+      "missingOriginalCompilerDependencies": "Original per-test manifests do not uniformly include historical069, compiler helpers and generated catalog. The final focused catalog proof and deterministic installer provide that missing impact boundary; original manifests are not rewritten.",
+      "statusNotEquivalentToRerun": true
+    },
+    {
+      "artifact": "net-skins-concurrency-2026-10-03T02-28-17.784Z.json",
+      "sha256": "aca659fc6a2c2da34359c5e3406b56602f3fc245b458fe031a10c6be1d340f07",
+      "filesCompared": 30,
+      "changed": [
+        {
+          "file": "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+          "recordedSha256": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+          "currentSha256": "636d107c84f28096717cab20cad14759cbbad1df4c87a05c38fe03f54b215640"
+        },
+        {
+          "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+          "recordedSha256": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+          "currentSha256": "d4bf918963490416e74e6c2049af306d52fc51d4f740de9f494363c9c54df838"
+        }
+      ],
+      "retainedStatus": "PASS_SCOPED_TO_RECORDED_EXERCISED_PATHS",
+      "originalScopeReason": "Recorded Net Skins SQL and tests unchanged; no Calcutta claim validator invoked.",
+      "retentionReason": "Retain only the originally exercised paths: the focused final069/131/138 impact proof establishes exact final catalog convergence, unchanged076 getter/manifest, actual Certification readiness equivalence and negative admission; installer repro/security separately prove the current compiler. Later Calcutta claim parsing is covered by its separate configured6-case proof. No runtime algorithm, actor, lease, lock, receipt, worker or publication body used by these Certification cases changed.",
+      "missingOriginalCompilerDependencies": "Original per-test manifests do not uniformly include historical069, compiler helpers and generated catalog. The final focused catalog proof and deterministic installer provide that missing impact boundary; original manifests are not rewritten.",
+      "statusNotEquivalentToRerun": true
+    }
+  ],
+  "newBranchProof": "calcutta-postcommit-final-receipt.json",
+  "newBranchLimit": "Initial actual configured provisional result only; future DTO binding modeled, no future configured worker calculation claimed.",
+  "blanketLatestSourceCertification": false,
+  "final069ImpactProof": "069-certification-impact-final.json",
+  "final069ImpactProofSha256": "c4092c553a47d1de3c2f068323c42c5c90cf583ae3b4df7df5eb711317256477",
+  "providerFinalProof": "provider-069-final-source-revalidation.json",
+  "catalogConvergence": "Full final catalog contains only the approved three Production body changes and new private helper; Certification readiness DTO equivalence is proven under rollback-only predecessor comparison. Bridge arg-default drift is denied before either path.",
+  "retainedBuild": {
+    "artifact": "../evidence/build.json",
+    "sha256": "d7d26577306880c4c682ee70783ce1f02075e21b2e6b9219e505252e28175719",
+    "result": "PASS_RETAINED_UNCHANGED_BUILD_INPUTS",
+    "changedAfterBuild": [
+      {
+        "file": "supabase/canonical_bootstrap/manifest.json",
+        "before": "401169e2bb653960f8d5a040b2a3a4b9d9ab38622f37fde30222911a1a8b663e",
+        "after": "1a3bff6b84fe206d98c7fde6e32216f76ef91aea9410379fab82066da294d94d"
+      },
+      {
+        "file": "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+        "before": "b2b430d31b45310311a0dab0b3ff6dba9539a36afed2a58598e1f5ecc34edea3",
+        "after": "636d107c84f28096717cab20cad14759cbbad1df4c87a05c38fe03f54b215640"
+      },
+      {
+        "file": "test/reliability-phase2dr2-069-certification-impact.integration.test.mjs",
+        "before": "60d4af802c12689006ea852379e3191c02ce332facf5a409e7f1e87a87bcc3b5",
+        "after": "dcbc600976ef2a824607d2d269df30aa5e610e803516228b4cc91ce47a35e63b"
+      }
+    ],
+    "reason": "Only installation SQL guard, its tests and generated installer manifest changed. Application/client/config/dependency/Next build inputs are unchanged; build was source-stable and network-disabled. No new build run is necessary for SQL-only installation validation."
+  },
+  "providerGuardImpact": {
+    "sourceChangedAfterCheckpointProof": [
+      "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql"
+    ],
+    "reason": "Later addition only rejects altered argument defaults before bridge paths. Embedded installed bodies,069 source and138 are unchanged. Final impact proof exercises original130 and corrected bridge under actual canonical defaults, with catalog and076 equality. No provider runtime state or missing historical payload is reconstructed."
+  },
+  "annual864Rerun": false,
+  "historical048057": "NOT REPRODUCIBLE FROM RETAINED EVIDENCE \u2014 NOT PROVEN"
+}

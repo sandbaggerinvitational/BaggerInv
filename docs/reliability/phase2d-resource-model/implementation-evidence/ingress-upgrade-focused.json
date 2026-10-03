@@ -1,0 +1,37 @@
+{
+  "claim": "FOCUSED_AND_FORWARD_UPGRADE_INGRESS_GATE",
+  "status": "PASS",
+  "environment": "OWNED_LOCAL_POSTGRESQL17_UNIX_SOCKET",
+  "counts": {
+    "testRunnerPass": 20,
+    "fail": 0,
+    "skip": 0,
+    "behavioralCases": 18,
+    "parentTests": 2
+  },
+  "migration": {
+    "path": "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql",
+    "sha256": "2812334e19ef95b77b360cf8f8fcdbbb13881be263d44868bfd01ecbf443b107"
+  },
+  "proof": [
+    "Real canonical mutation with atomic receipt/audit/outcome",
+    "Admitted rollback and timeout remain unresolved until fencing",
+    "Participant recovery after permission revocation and origin privacy",
+    "Same-operation concurrency and conflict",
+    "Close/drain/closed retry and new-generation fence",
+    "Real JS to local service-role RPC and lost acknowledgements",
+    "Old cached invocation denied after migration fence/admission revision",
+    "Prepared public OID retained; no-lease call denied",
+    "Unknown default function/table grants abort installation",
+    "Preexisting non-Certification function body/owner/ACL/config unchanged"
+  ],
+  "counterevidence": "ingress-upgrade-before.log",
+  "log": "ingress-upgrade-after.log",
+  "limitations": [
+    "Full lifecycle stress pending",
+    "Future historical identity helper138 pending",
+    "Full scoring/Director operation-family integration137 pending",
+    "No hosted or Production evidence"
+  ],
+  "ownedClustersDestroyed": true
+}

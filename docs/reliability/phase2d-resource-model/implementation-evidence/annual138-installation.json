@@ -1,0 +1,51 @@
+{
+  "strength": "PROVEN",
+  "proofLayer": "POSTGRESQL",
+  "scope": "PROVISIONAL_SCHEMA_INSTALL_AND_SYNTHETIC_INITIALIZATION_ONLY",
+  "result": "PASS",
+  "baseSha": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "environment": "OWNED_LOCAL_POSTGRESQL17_UNIX_SOCKET",
+  "forwardThrough": 138,
+  "sourceFiles": [
+    {
+      "path": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+      "sha256": "c1ff73d79523bfa4d2bac5c52b6a5fe6109cf3a63092e2bde9932b58da3e13b0"
+    }
+  ],
+  "observed": {
+    "environment": "OWNED_SOCKET_POSTGRESQL17",
+    "stage": "138_INSTALL_AND_INITIALIZATION_ONLY",
+    "origin": {
+      "resource_id": "CERTIFICATION:2be9787c-4d16-49de-80b0-7488059b4be0",
+      "resource_class": "CERTIFICATION",
+      "origin_kind": "CERTIFICATION_INITIALIZATION",
+      "installation_id": "2be9787c-4d16-49de-80b0-7488059b4be0",
+      "database_name": "r2_certification_0",
+      "project_ref": "aaaaaaaaaaaaaaaaaaaa",
+      "project_url": "https://aaaaaaaaaaaaaaaaaaaa.supabase.co",
+      "registration_revision": 1,
+      "installation_contract": "bagger-canonical-bootstrap-v1",
+      "registration_manifest_digest": "377a77f7ade3bc66ec49c459f346233f98b7605393a12fa47daeb8b24a5058a0",
+      "installation_manifest_digest": "377a77f7ade3bc66ec49c459f346233f98b7605393a12fa47daeb8b24a5058a0",
+      "schema_digest": "9ac6685029436c10a428b9d67c73b81bed91ff799cc87cd81e732a6a7467e6b3",
+      "static_data_digest": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d",
+      "authority_epoch_id": "74558213-231b-435e-b9e9-ba2bc08c7ddf",
+      "admission_generation_id": "5996ad2a-7e4c-4d3a-9c72-13b52bb2048f",
+      "initial_tournament_id": "2026",
+      "initial_pointer_revision": 1,
+      "initial_lifecycle_revision": 1,
+      "binding_id": "048e783e-10c2-4964-8800-c3057e22f909",
+      "initialization_fingerprint": "f493f50d8793b341301de3709454514583d2e5ec31dc2d0caf9a54df0b5dbfc8",
+      "created_by": "postgres",
+      "created_at": "2026-09-30T14:44:48.110576-05:00"
+    },
+    "functions": 1046
+  },
+  "limitations": [
+    "No first/later annual transition exercised",
+    "No final bootstrap baseline emitted",
+    "No hosted/Supabase provider proof",
+    "Compiler reference uses synthetic historical Production-shaped prerequisite rows; fresh target copies canonical schema/static rows only",
+    "Owned cluster destroyed after successful probe"
+  ]
+}

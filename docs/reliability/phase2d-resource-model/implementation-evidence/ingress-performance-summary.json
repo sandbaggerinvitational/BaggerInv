@@ -1,0 +1,496 @@
+{
+  "recordedAt": "2026-10-03T02:52:40.645900+00:00",
+  "status": "PASS_SCOPED_LOCAL_IRRELEVANT_INGRESS_HISTORY_MEASUREMENT",
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "profile": [
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql",
+    "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql",
+    "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql",
+    "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql",
+    "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql",
+    "supabase/production_migrations/202609300151_certification_annual_reopen_lineage_v1.sql",
+    "supabase/production_migrations/202609300152_certification_closed_release_admission_v1.sql"
+  ],
+  "completeCandidateCertified": false,
+  "fixture": "CERTIFICATION_INGRESS_HISTORY_V1",
+  "sampleCount": 6800,
+  "samplesPerPrimaryOperationPerScale": 300,
+  "samplesPerFingerprintOrClosePerScale": 100,
+  "warmupSamplesExcluded": 100,
+  "sourceStable": true,
+  "googleJobs": 0,
+  "method": "psql timing of one real RPC inside a rollback-only sample; persistent socket within each batch",
+  "statementTimeoutMs": 5000,
+  "workerActivity": "NO_CONCURRENT_WORKERS",
+  "clusterCleanup": "Owned fixture destroyed after completed run; exit0.",
+  "rows": [
+    {
+      "scale": 1,
+      "terminalHistory": 432,
+      "operations": {
+        "admission": {
+          "count": 300,
+          "p50": 0.588,
+          "p95": 1.446,
+          "p99": null,
+          "max": 12.159,
+          "mean": 0.8892066666666659,
+          "standardDeviation": 1.157243894182303
+        },
+        "canonicalExecutionIncludingTerminal": {
+          "count": 300,
+          "p50": 2.128,
+          "p95": 2.856,
+          "p99": null,
+          "max": 15.585,
+          "mean": 2.3336133333333335,
+          "standardDeviation": 1.2974613278073277
+        },
+        "recovery": {
+          "count": 300,
+          "p50": 0.137,
+          "p95": 0.316,
+          "p99": null,
+          "max": 3.317,
+          "mean": 0.1813033333333335,
+          "standardDeviation": 0.31389240936275564
+        },
+        "contextHandshake": {
+          "count": 300,
+          "p50": 0.085,
+          "p95": 0.154,
+          "p99": null,
+          "max": 3.364,
+          "mean": 0.12222000000000004,
+          "standardDeviation": 0.3024833189891084
+        },
+        "currentRead": {
+          "count": 300,
+          "p50": 3.258,
+          "p95": 4.212,
+          "p99": null,
+          "max": 13.379,
+          "mean": 3.4995766666666674,
+          "standardDeviation": 0.8896593640951699
+        },
+        "fingerprint": {
+          "count": 100,
+          "p50": 0.076,
+          "p95": 0.11,
+          "p99": null,
+          "max": 1.824,
+          "mean": 0.09747999999999996,
+          "standardDeviation": 0.17402163543651705
+        },
+        "closeDrain": {
+          "count": 100,
+          "p50": 0.262,
+          "p95": 0.339,
+          "p99": null,
+          "max": 3.115,
+          "mean": 0.2994,
+          "standardDeviation": 0.28447878655534226
+        }
+      }
+    },
+    {
+      "scale": 2,
+      "terminalHistory": 864,
+      "operations": {
+        "admission": {
+          "count": 300,
+          "p50": 0.433,
+          "p95": 0.92,
+          "p99": null,
+          "max": 7.133,
+          "mean": 0.5304433333333335,
+          "standardDeviation": 0.6361735089231203
+        },
+        "canonicalExecutionIncludingTerminal": {
+          "count": 300,
+          "p50": 1.936,
+          "p95": 2.767,
+          "p99": null,
+          "max": 14.04,
+          "mean": 2.1429199999999997,
+          "standardDeviation": 1.1656717549407585
+        },
+        "recovery": {
+          "count": 300,
+          "p50": 0.138,
+          "p95": 0.331,
+          "p99": null,
+          "max": 3.525,
+          "mean": 0.18290666666666677,
+          "standardDeviation": 0.3245023337700709
+        },
+        "contextHandshake": {
+          "count": 300,
+          "p50": 0.086,
+          "p95": 0.142,
+          "p99": null,
+          "max": 3.003,
+          "mean": 0.1182266666666666,
+          "standardDeviation": 0.2784193514985783
+        },
+        "currentRead": {
+          "count": 300,
+          "p50": 3.21,
+          "p95": 3.497,
+          "p99": null,
+          "max": 9.135,
+          "mean": 3.3059166666666653,
+          "standardDeviation": 0.5880954313620272
+        },
+        "fingerprint": {
+          "count": 100,
+          "p50": 0.076,
+          "p95": 0.119,
+          "p99": null,
+          "max": 1.872,
+          "mean": 0.09755999999999997,
+          "standardDeviation": 0.17888534428510347
+        },
+        "closeDrain": {
+          "count": 100,
+          "p50": 0.266,
+          "p95": 0.345,
+          "p99": null,
+          "max": 3.021,
+          "mean": 0.3033600000000002,
+          "standardDeviation": 0.27511083293829053
+        }
+      }
+    },
+    {
+      "scale": 5,
+      "terminalHistory": 2160,
+      "operations": {
+        "admission": {
+          "count": 300,
+          "p50": 0.445,
+          "p95": 0.909,
+          "p99": null,
+          "max": 8.377,
+          "mean": 0.551183333333333,
+          "standardDeviation": 0.7008771906610238
+        },
+        "canonicalExecutionIncludingTerminal": {
+          "count": 300,
+          "p50": 2.053,
+          "p95": 3.473,
+          "p99": null,
+          "max": 14.664,
+          "mean": 2.371646666666667,
+          "standardDeviation": 1.282047927531919
+        },
+        "recovery": {
+          "count": 300,
+          "p50": 0.149,
+          "p95": 0.363,
+          "p99": null,
+          "max": 3.992,
+          "mean": 0.20249666666666696,
+          "standardDeviation": 0.3756392196273202
+        },
+        "contextHandshake": {
+          "count": 300,
+          "p50": 0.088,
+          "p95": 0.164,
+          "p99": null,
+          "max": 3.543,
+          "mean": 0.13082666666666673,
+          "standardDeviation": 0.32488071137299307
+        },
+        "currentRead": {
+          "count": 300,
+          "p50": 3.515,
+          "p95": 5.031,
+          "p99": null,
+          "max": 14.513,
+          "mean": 3.724649999999999,
+          "standardDeviation": 0.9816369360240405
+        },
+        "fingerprint": {
+          "count": 100,
+          "p50": 0.074,
+          "p95": 0.103,
+          "p99": null,
+          "max": 2.21,
+          "mean": 0.09886999999999999,
+          "standardDeviation": 0.21278236087608385
+        },
+        "closeDrain": {
+          "count": 100,
+          "p50": 0.268,
+          "p95": 0.352,
+          "p99": null,
+          "max": 3.242,
+          "mean": 0.3072100000000002,
+          "standardDeviation": 0.2968363958479486
+        }
+      }
+    },
+    {
+      "scale": 10,
+      "terminalHistory": 4320,
+      "operations": {
+        "admission": {
+          "count": 300,
+          "p50": 0.458,
+          "p95": 0.959,
+          "p99": null,
+          "max": 7.224,
+          "mean": 0.5679799999999996,
+          "standardDeviation": 0.6813652615154363
+        },
+        "canonicalExecutionIncludingTerminal": {
+          "count": 300,
+          "p50": 1.967,
+          "p95": 2.942,
+          "p99": null,
+          "max": 17.12,
+          "mean": 2.2994366666666664,
+          "standardDeviation": 1.5560801219695886
+        },
+        "recovery": {
+          "count": 300,
+          "p50": 0.139,
+          "p95": 0.332,
+          "p99": null,
+          "max": 3.303,
+          "mean": 0.1829166666666668,
+          "standardDeviation": 0.31334529897365465
+        },
+        "contextHandshake": {
+          "count": 300,
+          "p50": 0.085,
+          "p95": 0.146,
+          "p99": null,
+          "max": 2.855,
+          "mean": 0.11662666666666674,
+          "standardDeviation": 0.2701707372919746
+        },
+        "currentRead": {
+          "count": 300,
+          "p50": 3.224,
+          "p95": 3.557,
+          "p99": null,
+          "max": 9.19,
+          "mean": 3.3103099999999994,
+          "standardDeviation": 0.5944819934755521
+        },
+        "fingerprint": {
+          "count": 100,
+          "p50": 0.079,
+          "p95": 0.103,
+          "p99": null,
+          "max": 1.955,
+          "mean": 0.10121000000000002,
+          "standardDeviation": 0.18680922327337052
+        },
+        "closeDrain": {
+          "count": 100,
+          "p50": 0.272,
+          "p95": 0.345,
+          "p99": null,
+          "max": 3.14,
+          "mean": 0.30973999999999985,
+          "standardDeviation": 0.286047779924963
+        }
+      }
+    }
+  ],
+  "queryPlans": [
+    {
+      "scale": 1,
+      "query": "exactActorOperation",
+      "node": "Index Scan",
+      "index": "certification_ingress_leases__resource_id_operation_id_targ_key",
+      "actualRows": 1
+    },
+    {
+      "scale": 1,
+      "query": "currentGeneration",
+      "node": "Index Scan",
+      "index": "certification_ingress_generation_sequence_v1",
+      "actualRows": 1
+    },
+    {
+      "scale": 1,
+      "query": "resourceSingleton",
+      "node": "Index Scan",
+      "index": "canonical_resource_v1_pkey",
+      "actualRows": 1
+    },
+    {
+      "scale": 1,
+      "query": "currentPointer",
+      "node": "Index Scan",
+      "index": "current_tournament_pointer_v1_pkey",
+      "actualRows": 1
+    },
+    {
+      "scale": 2,
+      "query": "exactActorOperation",
+      "node": "Index Scan",
+      "index": "certification_ingress_leases__resource_id_operation_id_targ_key",
+      "actualRows": 1
+    },
+    {
+      "scale": 2,
+      "query": "currentGeneration",
+      "node": "Index Scan",
+      "index": "certification_ingress_generation_sequence_v1",
+      "actualRows": 1
+    },
+    {
+      "scale": 2,
+      "query": "resourceSingleton",
+      "node": "Index Scan",
+      "index": "canonical_resource_v1_pkey",
+      "actualRows": 1
+    },
+    {
+      "scale": 2,
+      "query": "currentPointer",
+      "node": "Index Scan",
+      "index": "current_tournament_pointer_v1_pkey",
+      "actualRows": 1
+    },
+    {
+      "scale": 5,
+      "query": "exactActorOperation",
+      "node": "Index Scan",
+      "index": "certification_ingress_leases__resource_id_operation_id_targ_key",
+      "actualRows": 1
+    },
+    {
+      "scale": 5,
+      "query": "currentGeneration",
+      "node": "Index Scan",
+      "index": "certification_ingress_generation_sequence_v1",
+      "actualRows": 1
+    },
+    {
+      "scale": 5,
+      "query": "resourceSingleton",
+      "node": "Index Scan",
+      "index": "canonical_resource_v1_pkey",
+      "actualRows": 1
+    },
+    {
+      "scale": 5,
+      "query": "currentPointer",
+      "node": "Index Scan",
+      "index": "current_tournament_pointer_v1_pkey",
+      "actualRows": 1
+    },
+    {
+      "scale": 10,
+      "query": "exactActorOperation",
+      "node": "Index Scan",
+      "index": "certification_ingress_leases__resource_id_operation_id_targ_key",
+      "actualRows": 1
+    },
+    {
+      "scale": 10,
+      "query": "currentGeneration",
+      "node": "Index Scan",
+      "index": "certification_ingress_generation_sequence_v1",
+      "actualRows": 1
+    },
+    {
+      "scale": 10,
+      "query": "resourceSingleton",
+      "node": "Index Scan",
+      "index": "canonical_resource_v1_pkey",
+      "actualRows": 1
+    },
+    {
+      "scale": 10,
+      "query": "currentPointer",
+      "node": "Index Scan",
+      "index": "current_tournament_pointer_v1_pkey",
+      "actualRows": 1
+    }
+  ],
+  "maximumObservedStatementMs": 17.12,
+  "canonicalExecutionMedian10xTo1x": 0.9243421052631579,
+  "sourceArtifact": "ingress-performance.json",
+  "sourceArtifactSha256": "37d32db7d2bf0220ec15fcff16e69f07917d3688cd1fbc977bc9d685d7624151",
+  "limitations": [
+    "Local warm-cache query-path evidence, not hosted/Production capacity.",
+    "Sample execution rolls back; durable commit/restart semantics are proven by separate behavioral suites.",
+    "Terminal outcome/receipt/audit are atomic inside canonical execution; no independent terminal transaction exists.",
+    "p99 is NOT PROVEN with300 samples per operation/scale.",
+    "Internal statement count and separately instrumented lock-hold duration are not measured here.",
+    "Only the explicitly listed forward migration profile is measured; performance alone does not certify the complete candidate."
+  ],
+  "sameMethodComparisonWithProfile147": [
+    {
+      "scale": 1,
+      "beforeP50": 1.939,
+      "afterP50": 2.128,
+      "deltaP50Ms": 0.18900000000000006,
+      "beforeP95": 2.691,
+      "afterP95": 2.856,
+      "beforeMax": 13.378,
+      "afterMax": 15.585
+    },
+    {
+      "scale": 2,
+      "beforeP50": 2.002,
+      "afterP50": 1.936,
+      "deltaP50Ms": -0.06599999999999984,
+      "beforeP95": 2.733,
+      "afterP95": 2.767,
+      "beforeMax": 13.911,
+      "afterMax": 14.04
+    },
+    {
+      "scale": 5,
+      "beforeP50": 1.948,
+      "afterP50": 2.053,
+      "deltaP50Ms": 0.10499999999999998,
+      "beforeP95": 2.764,
+      "afterP95": 3.473,
+      "beforeMax": 13.577,
+      "afterMax": 14.664
+    },
+    {
+      "scale": 10,
+      "beforeP50": 2.017,
+      "afterP50": 1.967,
+      "deltaP50Ms": -0.04999999999999982,
+      "beforeP95": 2.822,
+      "afterP95": 2.942,
+      "beforeMax": 14.377,
+      "afterMax": 17.12
+    }
+  ],
+  "interpretation": {
+    "historyScaling": "NO_SYSTEMATIC_HISTORY_SCALE_REGRESSION_DETECTED",
+    "strength": "STRONGLY_SUPPORTED_IN_THIS_LOCAL_FIXTURE",
+    "betweenRunTailAttribution": "UNKNOWN",
+    "p95Caveat": "All four p95 values exceed prior-profile measurements;5x increases0.709ms (~26%). Medians vary in both directions. No claim of identical latency or Production capacity.",
+    "p99": "NOT_PROVEN",
+    "lockDuration": "NOT_PROVEN",
+    "internalStatementCount": "NOT_PROVEN"
+  }
+}

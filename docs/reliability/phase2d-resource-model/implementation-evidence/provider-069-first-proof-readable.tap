@@ -1,0 +1,232 @@
+TAP version 13
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":301,"elapsedSeconds":0}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":271,"elapsedSeconds":30}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":241,"elapsedSeconds":60}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":211,"elapsedSeconds":90}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":181,"elapsedSeconds":120}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":151,"elapsedSeconds":150}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":121,"elapsedSeconds":180}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":91,"elapsedSeconds":210}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":61,"elapsedSeconds":240}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":31,"elapsedSeconds":270}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":1,"elapsedSeconds":300}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":301,"elapsedSeconds":0}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":271,"elapsedSeconds":30}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":241,"elapsedSeconds":60}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":211,"elapsedSeconds":90}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":181,"elapsedSeconds":120}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":151,"elapsedSeconds":150}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":121,"elapsedSeconds":180}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":91,"elapsedSeconds":210}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":61,"elapsedSeconds":240}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":31,"elapsedSeconds":270}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":1,"elapsedSeconds":300}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":202,"elapsedSeconds":0}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":172,"elapsedSeconds":30}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":142,"elapsedSeconds":60}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":112,"elapsedSeconds":90}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":82,"elapsedSeconds":120}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":52,"elapsedSeconds":150}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":22,"elapsedSeconds":180}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:second-readback","remainingSeconds":11,"elapsedSeconds":0}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":995,"elapsedSeconds":0}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":965,"elapsedSeconds":30}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":935,"elapsedSeconds":60}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":905,"elapsedSeconds":90}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":875,"elapsedSeconds":120}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":845,"elapsedSeconds":150}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":815,"elapsedSeconds":180}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":785,"elapsedSeconds":210}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":755,"elapsedSeconds":240}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":725,"elapsedSeconds":270}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":695,"elapsedSeconds":300}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":665,"elapsedSeconds":330}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":635,"elapsedSeconds":360}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":605,"elapsedSeconds":390}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":575,"elapsedSeconds":420}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":545,"elapsedSeconds":450}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":515,"elapsedSeconds":480}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":485,"elapsedSeconds":510}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":454,"elapsedSeconds":540}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":424,"elapsedSeconds":570}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":394,"elapsedSeconds":600}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":364,"elapsedSeconds":630}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":334,"elapsedSeconds":660}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":304,"elapsedSeconds":690}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":274,"elapsedSeconds":720}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":244,"elapsedSeconds":750}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":214,"elapsedSeconds":780}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":184,"elapsedSeconds":810}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":154,"elapsedSeconds":840}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":124,"elapsedSeconds":870}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":94,"elapsedSeconds":900}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":64,"elapsedSeconds":930}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":34,"elapsedSeconds":960}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":4,"elapsedSeconds":990}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":301,"elapsedSeconds":0}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":271,"elapsedSeconds":30}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":241,"elapsedSeconds":60}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":211,"elapsedSeconds":90}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":181,"elapsedSeconds":120}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":151,"elapsedSeconds":150}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":121,"elapsedSeconds":180}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":91,"elapsedSeconds":210}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":61,"elapsedSeconds":240}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":31,"elapsedSeconds":270}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":1,"elapsedSeconds":300}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":202,"elapsedSeconds":0}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":172,"elapsedSeconds":30}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":142,"elapsedSeconds":60}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":112,"elapsedSeconds":90}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":82,"elapsedSeconds":120}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":52,"elapsedSeconds":150}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":22,"elapsedSeconds":180}
+# {"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:second-readback","remainingSeconds":11,"elapsedSeconds":0}
+# Subtest: R2 preserves actual V4 provider-bound closure through historical forward install
+    # Subtest: 069 provider runtime rejects resource-ingress
+    ok 1 - 069 provider runtime rejects resource-ingress
+      ---
+      duration_ms: 33.487291
+      type: 'test'
+      ...
+    # Subtest: 069 provider runtime rejects tournament-authority
+    ok 2 - 069 provider runtime rejects tournament-authority
+      ---
+      duration_ms: 31.924792
+      type: 'test'
+      ...
+    # Subtest: 069 provider runtime rejects deployment-lineage
+    ok 3 - 069 provider runtime rejects deployment-lineage
+      ---
+      duration_ms: 31.65825
+      type: 'test'
+      ...
+    # Subtest: 069 provider runtime rejects epoch-lineage
+    ok 4 - 069 provider runtime rejects epoch-lineage
+      ---
+      duration_ms: 30.991042
+      type: 'test'
+      ...
+    # Subtest: 069 provider runtime rejects provider-fence-lineage
+    ok 5 - 069 provider runtime rejects provider-fence-lineage
+      ---
+      duration_ms: 31.162167
+      type: 'test'
+      ...
+    # Subtest: 069 provider runtime rejects ingress-paused
+    ok 6 - 069 provider runtime rejects ingress-paused
+      ---
+      duration_ms: 31.673625
+      type: 'test'
+      ...
+    # Subtest: 069 provider runtime rejects request resource
+    ok 7 - 069 provider runtime rejects request resource
+      ---
+      duration_ms: 22.051958
+      type: 'test'
+      ...
+    # Subtest: 069 provider runtime rejects request tournament
+    ok 8 - 069 provider runtime rejects request tournament
+      ---
+      duration_ms: 22.325875
+      type: 'test'
+      ...
+    # Subtest: 069 provider runtime rejects request deployment
+    ok 9 - 069 provider runtime rejects request deployment
+      ---
+      duration_ms: 22.104166
+      type: 'test'
+      ...
+    # Subtest: 069 provider runtime rejects request epoch
+    ok 10 - 069 provider runtime rejects request epoch
+      ---
+      duration_ms: 22.739167
+      type: 'test'
+      ...
+    # Subtest: 069 provider runtime rejects request maintenance-capability
+    ok 11 - 069 provider runtime rejects request maintenance-capability
+      ---
+      duration_ms: 21.896958
+      type: 'test'
+      ...
+    # Subtest: 069 provider runtime retains role authorization
+    ok 12 - 069 provider runtime retains role authorization
+      ---
+      duration_ms: 22.020458
+      type: 'test'
+      ...
+    # Subtest: 069 provider runtime retains current-tournament pointer fence
+    ok 13 - 069 provider runtime retains current-tournament pointer fence
+      ---
+      duration_ms: 15.748584
+      type: 'test'
+      ...
+    # Subtest: 069 preserves supported provider rollback worker drain with fresh external evidence
+    not ok 14 - 069 preserves supported provider rollback worker drain with fresh external evidence
+      ---
+      duration_ms: 14.388959
+      type: 'test'
+      location: '<GENERATED_LOCAL_HELPER>'... 219816 more characters
+      failureType: 'testCodeFailure'
+      error: |-
+        Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -qAt -v ON_ERROR_STOP=1 -d r2_provider_history
+        ERROR:  PRODUCTION_SCORING_EXTERNAL_ACL_FENCE_REVISION_CONFLICT
+        CONTEXT:  PL/pgSQL function public.record_production_scoring_external_fence_evidence(jsonb) line 104 at RAISE
+        PL/pgSQL assignment "evidence_value := public.record_production_scoring_external_fence_evidence((select '{"environment":"PRODUCTION","project_ref":"ymqhhtxaywtqllynrmxe","project_url":"https://ymqhhtxaywtqllynrmxe.supabase.co","source_workbook_id":"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4","tournament_id":"2026","deployment_id":"dpl_PostgresAdmission034","deployment_commit":"1234567890abcdef1234567890abcdef12345678","actor_id":"postgres-admission-integration-test"}'::jsonb || jsonb_build_object('expected_activation_revision',activation.activation_revision,'expected_authority_generation',activation.authority_generation_id,'expected_admission_generation',gate.admission_generation_id,'expected_admission_revision',gate.admission_revision)from production_control.cutover_activation_state activation cross join scoring_authority.ingress_gates gate where activation.scope_key='BAGGER_INV_PRODUCTION' and gate.tournament_id='2026') || '{"operation":"RECORD_PRODUCTION_SCORING_EXTERNAL_FENCE_EVIDENCE","quiesce_evidence_id":"f6bbccd3-f2d7-48da-b1a8-88626131323d","provider_fence_id":"166f216c-b475-40c3-98d8-22f0fea37128","provider_fence_verification_id":"84d1b6cb-93c4-4eac-b24d-827822421686","request_fingerprint":"d9faafa7a556e34e5a6379a546db35e153b10f58bd9654f9beda3a16f1da6d2b"}'::jsonb)"
+        PL/pgSQL function inline_code_block line 4 at assignment
+      code: 'ERR_TEST_FAILURE'
+      name: 'CommandFailure'
+      stack: |-
+        runCommand (<GENERATED_LOCAL_HELPER>:936:11)
+        psql (<GENERATED_LOCAL_HELPER>:953:10)
+        psql (<GENERATED_LOCAL_HELPER>:4009:9)
+        <GENERATED_LOCAL_HELPER>:4120:3
+        TestContext.<anonymous> (<GENERATED_LOCAL_HELPER>:4058:69)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+        check (<GENERATED_LOCAL_HELPER>:4058:43)
+      ...
+    # Subtest: 069 denies annual certification and transition operations without fabrication
+    ok 15 - 069 denies annual certification and transition operations without fabrication
+      ---
+      duration_ms: 80.828
+      type: 'test'
+      ...
+    # Subtest: 069 provider helper is private and security definer has fixed search path
+    ok 16 - 069 provider helper is private and security definer has fixed search path
+      ---
+      duration_ms: 6.333583
+      type: 'test'
+      ...
+    1..16
+not ok 1 - R2 preserves actual V4 provider-bound closure through historical forward install
+  ---
+  duration_ms: 2329920.296292
+  type: 'test'
+  location: '<GENERATED_LOCAL_HELPER>'... 219815 more characters
+  failureType: 'testCodeFailure'
+  error: |-
+    Migration069 provider compatibility checks failed: Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -qAt -v ON_ERROR_STOP=1 -d r2_provider_history
+    ERROR:  PRODUCTION_SCORING_EXTERNAL_ACL_FENCE_REVISION_CONFLICT
+    CONTEXT:  PL/pgSQL function public.record_production_scoring_external_fence_evidence(jsonb) line 104 at RAISE
+    PL/pgSQL assignment "evidence_value := public.record_production_scoring_external_fence_evidence((select '{"environment":"PRODUCTION","project_ref":"ymqhhtxaywtqllynrmxe","project_url":"https://ymqhhtxaywtqllynrmxe.supabase.co","source_workbook_id":"1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4","tournament_id":"2026","deployment_id":"dpl_PostgresAdmission034","deployment_commit":"1234567890abcdef1234567890abcdef12345678","actor_id":"postgres-admission-integration-test"}'::jsonb || jsonb_build_object('expected_activation_revision',activation.activation_revision,'expected_authority_generation',activation.authority_generation_id,'expected_admission_generation',gate.admission_generation_id,'expected_admission_revision',gate.admission_revision)from production_control.cutover_activation_state activation cross join scoring_authority.ingress_gates gate where activation.scope_key='BAGGER_INV_PRODUCTION' and gate.tournament_id='2026') || '{"operation":"RECORD_PRODUCTION_SCORING_EXTERNAL_FENCE_EVIDENCE","quiesce_evidence_id":"f6bbccd3-f2d7-48da-b1a8-88626131323d","provider_fence_id":"166f216c-b475-40c3-98d8-22f0fea37128","provider_fence_verification_id":"84d1b6cb-93c4-4eac-b24d-827822421686","request_fingerprint":"d9faafa7a556e34e5a6379a546db35e153b10f58bd9654f9beda3a16f1da6d2b"}'::jsonb)"
+    PL/pgSQL function inline_code_block line 4 at assignment
+  code: 'ERR_TEST_FAILURE'
+  name: 'AggregateError'
+  stack: |-
+    verifyProvider069 (<GENERATED_LOCAL_HELPER>:4140:27)
+    async TestContext.<anonymous> (<GENERATED_LOCAL_HELPER>:4178:18)
+    async Test.run (node:internal/test_runner/test:1404:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+1..1
+# tests 17
+# suites 0
+# pass 15
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2330004.3895

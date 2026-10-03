@@ -1,0 +1,80 @@
+▶ Certification Odds real calculation, durable owner publication and isolation
+  ✔ fresh state has no historical publication; real canonical read works (54.685875ms)
+  ✔ client and database deny absent, participant, spectator, wrong target and impersonated Director authority (112.338583ms)
+  ✔ two independently installed resources reject cross read, target and wrong release (37.797125ms)
+  ✔ Director calculation request creates truthful durable job and no publication (85.3465ms)
+  ✔ unfinished calculation cannot be published and absent operation remains UNKNOWN (38.37025ms)
+  ✔ job request and required audit roll back together at receipt failure (90.263958ms)
+  ✔ forged provenance, stale context, worker owner-operation and cross-resource write fail closed (145.067333ms)
+  ✔ same logical calculation retry ignores timing telemetry; conflict remains denied (98.087708ms)
+  ✔ claim race admits one lease; expired lease recovers and old token is rejected (210.93675ms)
+  ✔ calculator interruption preserves real checkpoint and resumes without publication (673.314208ms)
+  ✔ existing canonical calculator checkpoints and completes; never publishes (5532.609ms)
+  ✔ completed calculator duplicate delivery does not recalculate or publish (39.429166ms)
+  ✔ durable calculator exactly matches unchanged canonical domain engine and exposes no private provenance (5964.461375ms)
+  ✔ concurrent duplicate committed calculation operations resolve one durable outcome (31.706166ms)
+  ✔ first publication validates result/source/milestone/generation and never adopts historical provider data (173.154542ms)
+  ✔ snapshot, pointer, job publication and audit roll back together at receipt fault (118.196208ms)
+  ✔ explicit Director first publication commits genuine result and immutable provenance (54.0235ms)
+  ✔ actual public published snapshots and unchanged mobile DTOs omit private Certification provenance (22.19825ms)
+  ✔ lost publication acknowledgement recovers same receipt; stale first CAS conflicts (118.609666ms)
+  ✔ owned PostgreSQL restart retains publication and exact operation recovery (307.697166ms)
+  ✔ committed replay and status reject explicit impersonation without widening recovery authority (28.0595ms)
+  ✔ worker cannot publish, historical publication is immutable and audit provenance is truthful (34.984584ms)
+  ✔ private cores inaccessible and Production legacy publication remains denied (76.206959ms)
+  ✔ real request supersedes stale unpublished work after preserved synthetic canonical input advances (21438.317958ms)
+  ✖ second explicit owner publication preserves old snapshot facts and commits pointer changes atomically (253.483083ms)
+  ✔ exact current job, publication and recovery reads retain bounded indexed authority (30.021667ms)
+✖ Certification Odds real calculation, durable owner publication and isolation (44688.03625ms)
+ℹ {"domainEquivalence":{"source":[{"file":"lib/tournament-odds.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"c45c557f03eb630b3998e7a61ea03638ace591ae3df15cb55d0028c2efb8fcc1","unchanged":true},{"file":"lib/prediction-engine.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"9260def65c1eb4b6fc9f520c4e5158768ad309ad59206b5e3ab1fc9fe408ace3","unchanged":true},{"file":"lib/tournament-context.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"0423715b1d4e93c6decc39cfcb27cb0fbc6fffb5c6a9a936c306c4eab4686db4","unchanged":true},{"file":"lib/championship-odds-resilience.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"2a9b9776279ba849bbab128d1d56920b99a7fb38257cbb28a8bb164e26aa6c28","unchanged":true},{"file":"lib/championship-odds-supabase.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"26b143371df2359e0bbdf571e544afdd232fccd29f58ac316bd40747e7aec1be","unchanged":true},{"file":"lib/published-odds-supabase.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"081d157585e0795e999b4071ce36a2e7f3ff52f599574df571b332a56c984e9b","unchanged":true},{"file":"lib/mobile-v1-odds.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"608858f8b1fd2900469c259e767cf14ac2d553e8e6dc231946524a61aa269fcd","unchanged":true}],"reference":{"ok":true,"jobId":"c062eac0bfc86871eaded3b2d4006df17cf19106c9fa90ccfbaf5f3aa8619e60","iterations":10000,"referenceFingerprint":"2bc241d0afebf456ff36c6617a3d34854cae40484e1eb55668f9520f889e1e9c","resilientFingerprint":"2bc241d0afebf456ff36c6617a3d34854cae40484e1eb55668f9520f889e1e9c","exactEquality":true,"storedFingerprintValid":true,"referenceMetrics":{"durationMs":5850.168584000001,"cpuMs":5843.277,"rssBeforeBytes":198737920,"rssAfterBytes":198901760,"heapBeforeBytes":52917648,"heapAfterBytes":44223096}}}}
+ℹ {"layer":"LOCAL_POSTGRESQL_RPC_ACTUAL_CALCULATOR","rpcCalls":109,"actualDirectorApi":true,"independentResources":2,"concurrentReplay":8,"googleCalls":0,"googleJobs":0,"autoPublication":0}
+ℹ tests 27
+ℹ suites 0
+ℹ pass 25
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 44790.017666
+
+✖ failing tests:
+
+test at test/reliability-phase2dr2-odds.integration.test.mjs:332:11
+✖ second explicit owner publication preserves old snapshot facts and commits pointer changes atomically (253.483083ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /PRODUCTION_ODDS_PUBLISHED_SNAPSHOT_IMMUTABLE/. Input:
+  
+  'Error: /opt/homebrew/opt/postgresql@17/bin/psql\n' +
+    '{"phase": "DIRECTOR", "binding_id": "4fc9a6b6-4fb1-4166-a6b4-fcc1778a492d", "git_branch": "codex/synthetic-resource-proof", "project_ref": "aaaaaaaaaaaaaaaaaaaa", "project_url": "https://aaaaaaaaaaaaaaaaaaaa.supabase.co", "resource_id": "CERTIFICATION:88a7a403-5cb6-46af-ad04-936243f6ba2d", "authorization": {"role": "DIRECTOR", "player_id": "P01", "auth_user_id": "10000000-0000-4000-8000-000000000001", "tournament_id": "2026"}, "context_token": "bd64b140e12fe6afc0db78252512d2abbbf5db2df056f71c09350eb1a2cc33bd", "deployment_id": "dpl_SyntheticCertification0", "schema_digest": "ed30bad2fd6ea87fc4f08c2c8a597356510b2a23edfb3d5908d0acff55943732", "tournament_id": "2026", "release_commit": "cccccccccccccccccccccccccccccccccccccccc", "resource_class": "CERTIFICATION", "vercel_team_id": "team_syntheticcertification", "actor_player_id": "P01", "installation_id": "88a7a403-5cb6-46af-ad04-936243f6ba2d", "manifest_digest": "0295172e49185f242fa41119c1eabdabf9408f1c4db88ceac763da6d389dfbd5", "schema_contract": "canonical-resource-v1", "deployment_class": "preview", "pointer_revision": 1, "deployment_origin": "https://synthetic-certification-0.vercel.app", "vercel_project_id": "prj_syntheticcertification", "actor_auth_user_id": "10000000-0000-4000-8000-000000000001", "admission_revision": 2, "authority_epoch_id": "a673b59d-cfa3-47a5-84d5-84ada915cbb1", "activation_revision": 1, "operation_request_id": "ee90045c-ae79-4dc9-ba27-bcfac1ccc626", "resource_fingerprint": "bc6f99388fe065f63d3c6f479810c4ab661fd737ed7964924db5050c1754a17c", "current_tournament_id": "2026", "registration_revision": 1, "current_tournament_year": 2026, "governance_tournament_id": "2026"}\n' +
+    '\n' +
+    'ERROR:  trailing junk after numeric literal at or near "1where"\n' +
+    'LINE 1: ...ots set publication_revision=publication_revision+1where id=...\n' +
+    '                                                             ^\n'
+  
+      at TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-odds.integration.test.mjs:352:12)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-odds.integration.test.mjs:332:3)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: /opt/homebrew/opt/postgresql@17/bin/psql
+    {"phase": "DIRECTOR", "binding_id": "4fc9a6b6-4fb1-4166-a6b4-fcc1778a492d", "git_branch": "codex/synthetic-resource-proof", "project_ref": "aaaaaaaaaaaaaaaaaaaa", "project_url": "https://aaaaaaaaaaaaaaaaaaaa.supabase.co", "resource_id": "CERTIFICATION:88a7a403-5cb6-46af-ad04-936243f6ba2d", "authorization": {"role": "DIRECTOR", "player_id": "P01", "auth_user_id": "10000000-0000-4000-8000-000000000001", "tournament_id": "2026"}, "context_token": "bd64b140e12fe6afc0db78252512d2abbbf5db2df056f71c09350eb1a2cc33bd", "deployment_id": "dpl_SyntheticCertification0", "schema_digest": "ed30bad2fd6ea87fc4f08c2c8a597356510b2a23edfb3d5908d0acff55943732", "tournament_id": "2026", "release_commit": "cccccccccccccccccccccccccccccccccccccccc", "resource_class": "CERTIFICATION", "vercel_team_id": "team_syntheticcertification", "actor_player_id": "P01", "installation_id": "88a7a403-5cb6-46af-ad04-936243f6ba2d", "manifest_digest": "0295172e49185f242fa41119c1eabdabf9408f1c4db88ceac763da6d389dfbd5", "schema_contract": "canonical-resource-v1", "deployment_class": "preview", "pointer_revision": 1, "deployment_origin": "https://synthetic-certification-0.vercel.app", "vercel_project_id": "prj_syntheticcertification", "actor_auth_user_id": "10000000-0000-4000-8000-000000000001", "admission_revision": 2, "authority_epoch_id": "a673b59d-cfa3-47a5-84d5-84ada915cbb1", "activation_revision": 1, "operation_request_id": "ee90045c-ae79-4dc9-ba27-bcfac1ccc626", "resource_fingerprint": "bc6f99388fe065f63d3c6f479810c4ab661fd737ed7964924db5050c1754a17c", "current_tournament_id": "2026", "registration_revision": 1, "current_tournament_year": 2026, "governance_tournament_id": "2026"}
+    
+    ERROR:  trailing junk after numeric literal at or near "1where"
+    LINE 1: ...ots set publication_revision=publication_revision+1where id=...
+                                                                 ^
+    
+        at run (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/postgres17.mjs:54:19)
+        at sql (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/postgres17.mjs:196:10)
+        at Object.q (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/phase2d-certification-fixture.mjs:50:31)
+        at attempt (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-odds.integration.test.mjs:346:56)
+        at file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-odds.integration.test.mjs:352:23
+        at getActual (node:assert:580:5)
+        at strict.throws (node:assert:728:24)
+        at TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-odds.integration.test.mjs:352:12)
+        at async Test.run (node:internal/test_runner/test:1404:7)
+        at async TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-odds.integration.test.mjs:332:3),
+    expected: /PRODUCTION_ODDS_PUBLISHED_SNAPSHOT_IMMUTABLE/,
+    operator: 'throws',
+    diff: 'simple'
+  }

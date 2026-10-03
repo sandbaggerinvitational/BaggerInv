@@ -1,0 +1,1804 @@
+{
+  "environment": "OWNED_LOCAL_NEXT_PRODUCTION_BUILD_POSTGRESQL17",
+  "hosted": false,
+  "production": false,
+  "googleCalls": 0,
+  "realMessages": 0,
+  "proofLayer": "APPLICATION/API/POSTGRESQL/INTEGRATION",
+  "auth": "SYNTHETIC_ES256_SIGNATURE_AND_LOCAL_JWKS_NOT_HOSTED_AUTH",
+  "provisional": true,
+  "completeCandidateCertified": false,
+  "gates": [
+    "actual application boot and public current authority succeed without Google configuration",
+    "actual signed-out and participant sessions cannot obtain Director authority",
+    "real Auth signature validation and canonical entitlement produce the Director context",
+    "actual participant current reads use the same installed resource and zero-Google authority",
+    "real Director Odds route begins truthfully unpublished and refuses cross-origin mutation",
+    "actual Director HTTP control, participant score and authenticated receipt recovery commit canonically"
+  ],
+  "initialIdentityFixture": {
+    "players": 24,
+    "emailsSent": 0,
+    "source": "urn:bagger:synthetic:cd3ea7cb-1e8f-4efd-aa6e-442069639126",
+    "configurationFingerprint": "6795d9eb49996540638a6610b4231d53f07e5b636a7bc0db45dac01f44498cd9"
+  },
+  "schemaSha256": "3e08b550eae6ac1d88786fe6ad71813008c118f33b5ce99662b150e298edf16e",
+  "bootstrapManifest": {
+    "contract": "bagger-canonical-bootstrap-v1",
+    "profile": "phase2-p0f-portrait-v1",
+    "baseSha": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+    "compiler": {
+      "purpose": "OWNED_LOCAL_SCHEMA_REFERENCE_ONLY",
+      "platform": "POSTGRESQL17",
+      "serverVersion": "17.11 (Homebrew)",
+      "includesHistoricalSyntheticProductionSeeds": true,
+      "copiesAuthorityData": false
+    },
+    "sourceFiles": [
+      {
+        "path": "supabase/production_migrations/202608230001_production_control_plane.sql",
+        "sha256": "42c14b75aef5519709a987fa64fca5ca2d4965865d60cf634b83e817f4b8fd74"
+      },
+      {
+        "path": "supabase/production_migrations/202608230002_production_final_domain_schema.sql",
+        "sha256": "7a3b34ee326482f0c3c903cf14f925c30aabd0594cf040ce5db2a10d3d3e9d89"
+      },
+      {
+        "path": "supabase/production_migrations/202608230003_production_history_current_shadow_import.sql",
+        "sha256": "ddbc7b0a5107b1efb4ce0b679a7a5c131cdd8eb50b1250478aa1044398264842"
+      },
+      {
+        "path": "supabase/production_migrations/202608230004_production_projection_imports.sql",
+        "sha256": "103fdd2028529055be373e3643e2aa2c63eac1b7ccd864e6d483b20d8482967d"
+      },
+      {
+        "path": "supabase/production_migrations/202608230005_production_dormant_worker_contracts.sql",
+        "sha256": "64d76c2b066940b7d28a835e0cb53136639595c3460d2878326623a9bbdce350"
+      },
+      {
+        "path": "supabase/production_migrations/202608230006_production_import_evidence_hardening.sql",
+        "sha256": "dbb1aa9a82c70fb2ef1e508b1b7cd7b6d32d897c67e5a7367f3aaac3f32c1da0"
+      },
+      {
+        "path": "supabase/production_migrations/202608230007_production_current_shadow_v2.sql",
+        "sha256": "d58a744477b48409a3d0b838eedb6cd72ba90e219d951242295a60476768bf32"
+      },
+      {
+        "path": "supabase/production_migrations/202608230009_production_published_odds_import_fix.sql",
+        "sha256": "ded65aec90282b7e8b7f5b69349bf55cd63da24c57a63fda3ddcfb80a6adaeea"
+      },
+      {
+        "path": "supabase/production_migrations/202608230010_production_odds_input_bootstrap.sql",
+        "sha256": "313f01e24d71f5af6b1d6899adcdbc4ae630eccd8a681aa11973f1a823b2fe5d"
+      },
+      {
+        "path": "supabase/production_migrations/202608230011_production_candidate_read_views.sql",
+        "sha256": "951abea62adcaee7572f463c1578a6e6284042ba25d1ce8d93977f51254c8bdb"
+      },
+      {
+        "path": "supabase/production_migrations/202608230012_production_auth_director_foundation.sql",
+        "sha256": "4cfa519dd8d93bb82c61b187d33f10470929e1808671ca2a3e3d375399f51017"
+      },
+      {
+        "path": "supabase/production_migrations/202608230013_production_director_identity_bootstrap.sql",
+        "sha256": "276a4c581384dadc63759c099c8d2aff354719b25e82e3cb3fca9b0d340bc4b2"
+      },
+      {
+        "path": "supabase/production_migrations/202608240014_production_auth_otp_request_fix.sql",
+        "sha256": "4e4317ef1c6e4721c3be4a67fd59be81cb61d117f46dcc6d762b287ad8d56344"
+      },
+      {
+        "path": "supabase/production_migrations/202608240015_production_auth_otp_verification_type.sql",
+        "sha256": "591bda79aebb84f0e6cc813c308561d34597e2585ff02badfe1821c3ea34e9fa"
+      },
+      {
+        "path": "supabase/production_migrations/202608240016_production_presentation_shadow_import.sql",
+        "sha256": "51f83799b179134b95f66ccbcd86f971f7a627dac528ad07077ee6665167a6d0"
+      },
+      {
+        "path": "supabase/production_migrations/202608240017_production_auth_provider_rate_limit_observability.sql",
+        "sha256": "9ffa2a4cccc783e14e48ed7d214ca7497101d3a79c9501e8af9356304c44276d"
+      },
+      {
+        "path": "supabase/production_migrations/202608240018_production_step11_scoring_rehearsal.sql",
+        "sha256": "0d2c53f02767a000d43d45071aa837ba5e1ac596386895f893002b1340aff5c2"
+      },
+      {
+        "path": "supabase/production_migrations/202608240019_production_cutover_activation.sql",
+        "sha256": "da7ed17f656e39447156859c30828585eba29d71bfb6516e3797e1187c9c9106"
+      },
+      {
+        "path": "supabase/production_migrations/202608240020_production_participant_identity_cutover.sql",
+        "sha256": "f6a1fe6cb903ed7e0447871879a0b4a4799850e59277e6f7cb9709e8a076e9a2"
+      },
+      {
+        "path": "supabase/production_migrations/202608240021_production_scoring_operations.sql",
+        "sha256": "b1c92cb8f763d28fb1923f4a8978f02d7ce01d6f13531282c7c55bfc2ba67a81"
+      },
+      {
+        "path": "supabase/production_migrations/202608240022_production_cutover_read_sources.sql",
+        "sha256": "ba1db402eab77bf1dfbbb36dfaa36f6df78b8b004206f6adfa54b5b5d9ca4386"
+      },
+      {
+        "path": "supabase/production_migrations/202608240023_production_odds_calculation_orchestration.sql",
+        "sha256": "ca08523d22b8fb69a058fd5adf40b75892701eee46a6d8eb2ec9b2cc64be88d9"
+      },
+      {
+        "path": "supabase/production_migrations/202608240024_production_security_preflight_hardening.sql",
+        "sha256": "f1860d1e27db00cda7bc9f66e6ee19c62efa0d2d7ed22f2c875cea26644a1fe0"
+      },
+      {
+        "path": "supabase/production_migrations/202608240025_production_director_projection_synchronization.sql",
+        "sha256": "5e00f6b2abde097815cd4e4b493cab23279399925c5e5993d7b20c512356341e"
+      },
+      {
+        "path": "supabase/production_migrations/202608240026_production_odds_rehearsal_job_isolation.sql",
+        "sha256": "f998551a8279e6f664acfc90fcea5737966e2c2902d7df91f57ca5662ce199c3"
+      },
+      {
+        "path": "supabase/production_migrations/202608240027_production_step11_completed_history_fixture.sql",
+        "sha256": "2517b2a40fef54512f4f554449b9850a292d9fb7b911abb2454d392e5602087d"
+      },
+      {
+        "path": "supabase/production_migrations/202608240028_production_step11_odds_service_authorization.sql",
+        "sha256": "13f8b62f6a97fe4312b30cddd2cc75fbc70a9a6bb2684923afe7b18ac4fc7c86"
+      },
+      {
+        "path": "supabase/production_migrations/202608240029_production_odds_observation_phase_rebind.sql",
+        "sha256": "6a28035966c9cca9240de340e64031f6fd86bacdae87d6363d9228a825ebb587"
+      },
+      {
+        "path": "supabase/production_migrations/202608240030_production_odds_runtime_transition_nonce.sql",
+        "sha256": "db2054fd36a5d63c4cad89b9dbb2dab0696645ce4a8c40414aadc53e7c8678e4"
+      },
+      {
+        "path": "supabase/production_migrations/202608240031_production_staged_release_abort.sql",
+        "sha256": "e35b847efb10d5bcab18b347eba0ce7dbf6dd08372a39043a321f969bff3788d"
+      },
+      {
+        "path": "supabase/production_migrations/202608240032_production_odds_runtime_input_read.sql",
+        "sha256": "c80570d796e1053f33809b9e11996d2b3e50248e31429721b10c41e01bb6f791"
+      },
+      {
+        "path": "supabase/production_migrations/202608240033_production_precommit_release_abort.sql",
+        "sha256": "941655182ba3e2cc8897aeac6258700935160f73c11925af1cde7615964dd636"
+      },
+      {
+        "path": "supabase/production_migrations/202608260034_production_scoring_admission_fence_v2.sql",
+        "sha256": "71878547ea7537e97f3d4d18324dbc1cdb046f7f6ff5a78e53c64df5690ade35"
+      },
+      {
+        "path": "supabase/production_migrations/202608260035_production_reviewed_post_capture_preview_deployments.sql",
+        "sha256": "59006c3115e2014e6ee8e0a50cfb75593fee0b0a6bda8918e8d78fd3defd1b7d"
+      },
+      {
+        "path": "supabase/production_migrations/202608260036_production_reviewed_post_capture_preview_deployments_v2.sql",
+        "sha256": "9bd71c750583519eb42d2e61ddca2ec08b703d1338cf18fac9dd2712c310fe7c"
+      },
+      {
+        "path": "supabase/production_migrations/202608260037_production_provider_rpc_name_and_inventory_v3.sql",
+        "sha256": "a81ea3d10d5da3c66b89f169d46bd1510ffc806a3bbaeb1dbfe810409d45c9b3"
+      },
+      {
+        "path": "supabase/production_migrations/202608260038_production_provider_preview_target_inventory_v4.sql",
+        "sha256": "32cc5994570aaa77679b19e14a71a917dcc7fe297bc559ebe82dd320bff94c4c"
+      },
+      {
+        "path": "supabase/production_migrations/202608260039_production_all_project_provider_inventory_v3.sql",
+        "sha256": "14f1233ac8c61461ffdeae1df8b8be90a81c1236076d7493168a3542fddcda96"
+      },
+      {
+        "path": "supabase/production_migrations/202608260040_production_provider_inventory_recertification_v4.sql",
+        "sha256": "c2a444dea85aaf432a8a7087521f771f1271ee98d2bb7a7967e2156a07f5afa4"
+      },
+      {
+        "path": "supabase/production_migrations/202608270041_production_rejected_waf_epoch_retirement.sql",
+        "sha256": "cedbb24d66c53e6c664c0026efbe21b28f4786d5d13798c59998eded616ce6cd"
+      },
+      {
+        "path": "supabase/production_migrations/202608270042_production_dormant_scoring_admission_inspection.sql",
+        "sha256": "3bed2e895136e888234a01ded33bc5cfae9e9291a2f292a3e69b2e83f9b16665"
+      },
+      {
+        "path": "supabase/production_migrations/202608270043_production_rejected_waf_epoch_recovery_inspection.sql",
+        "sha256": "7849b1d7545f84c08024222b5963e8bf5d3516f840cbb9f8001e5547154c4077"
+      },
+      {
+        "path": "supabase/production_migrations/202608270044_production_maintenance_window_cutover.sql",
+        "sha256": "3f9e16a6d446fbb1ece569c704d21ff8025125cb2aca32d838f1b5e5bbe23d18"
+      },
+      {
+        "path": "supabase/production_migrations/202608270045_production_maintenance_preprepare_abort.sql",
+        "sha256": "45d857c738765b4d8c08864a70c2aabd008512b96ecb8793320eed4a594b934a"
+      },
+      {
+        "path": "supabase/production_migrations/202608270046_production_staged_release_abort_static_fingerprint.sql",
+        "sha256": "5e873e8940425526e0d03bc9e4d2814b6f5fb137588b9dab35d8fd0de4588baf"
+      },
+      {
+        "path": "supabase/production_migrations/202608270047_production_partial_roster_participant_identity.sql",
+        "sha256": "3b8be15e84a85ddb224b16f6c3f8341e4d980953b9020f69c0ae50bf4b1e1c20"
+      },
+      {
+        "path": "supabase/production_migrations/202608270048_production_current_shadow_semantic_fingerprint.sql",
+        "sha256": "876fc2e493ff96f7c8b3d4082e7c127c548b3cd31b6eccace42682266b26454a"
+      },
+      {
+        "path": "supabase/production_migrations/202608280049_production_maintenance_staging_provenance.sql",
+        "sha256": "bb6b592b14fc2569cfa2c740ec98d0a59cab6d72ee0d68c8d427046eeba5b5d0"
+      },
+      {
+        "path": "supabase/production_migrations/202608280050_production_maintenance_precommit_deployment_rebind.sql",
+        "sha256": "10c67af4ba9ada1887a4731ea2d225cf894d9a198f6bed119462e62688ca35fc"
+      },
+      {
+        "path": "supabase/production_migrations/202608280051_production_maintenance_single_deployment_capability.sql",
+        "sha256": "c117533631cffddb85a6fadc3111abf45312fd29fa91132d56f20ca0d5003365"
+      },
+      {
+        "path": "supabase/production_migrations/202608280052_production_maintenance_precommit_capability_guard.sql",
+        "sha256": "02e196b2fff2adc7905e1d5fbc3fb3df287246817ddb188dc2f33c0af36a8edc"
+      },
+      {
+        "path": "supabase/production_migrations/202608280053_production_postcutover_application_release_rebind.sql",
+        "sha256": "6dd03ed59d116fabc5563a26aca41f36feafef123dd0c440463065410ac20d95"
+      },
+      {
+        "path": "supabase/production_migrations/202608280054_production_postcutover_normal_release_rebind.sql",
+        "sha256": "2110194749661a8300ec8ae67e1df09f56a19717d025aa7f10828fbc3d05890e"
+      },
+      {
+        "path": "supabase/production_migrations/202608290055_production_net_skins_v1.sql",
+        "sha256": "f83950606d77392a8cc853484eb4a5ba37ba657ffda95cbb70ed5318571c1e56"
+      },
+      {
+        "path": "supabase/production_migrations/202608290056_production_calcutta_v1.sql",
+        "sha256": "cf1987b7e7ad3d69d0836aed214a77c85ac1daa68c19aeab6408d82e0296399f"
+      },
+      {
+        "path": "supabase/production_migrations/202608290057_production_odds_publication_authority_v1.sql",
+        "sha256": "c45c3b418539aa9532f9dcfb0fb796318ad2eef5d2e9bc8056439da0048f8dc6"
+      },
+      {
+        "path": "supabase/production_migrations/202608290058_production_handicap_revisions_v1.sql",
+        "sha256": "0ad4e285fb79eafbf945631d19c4d6b921c03ea5a63855a59c1bd21a576c5c59"
+      },
+      {
+        "path": "supabase/production_migrations/202608300059_production_director_private_operations_v1.sql",
+        "sha256": "74cdcc821cb66f8dfaa34aeddc82547f94a1dd62b0e8c16b8ce6a906a9a86ecf"
+      },
+      {
+        "path": "supabase/production_migrations/202608300060_production_players_access_v1.sql",
+        "sha256": "b4f6e97572e0c4ea29f1ffd7b608cc3861bf8e2f7d1af1ee7b0b21ae90685c6c"
+      },
+      {
+        "path": "supabase/production_migrations/202608300061_production_access_governance_v1.sql",
+        "sha256": "fbb14638a4f785588ff6c469d34e289e474fdcd5f4febeae3b791b05c2b73511"
+      },
+      {
+        "path": "supabase/production_migrations/202608300062_initial_owner_adoption_guard_correction.sql",
+        "sha256": "12e0d3ef76c21053b557a967bb4cee74c81352d760875b52d41173164a0a6cd9"
+      },
+      {
+        "path": "supabase/production_migrations/202608300063_production_tournament_setup_v1.sql",
+        "sha256": "b95d80814bc582548562d6838ac282637cdf95e5c4f379acb69727aadb903b1e"
+      },
+      {
+        "path": "supabase/production_migrations/202608300064_production_future_year_administration_v1.sql",
+        "sha256": "efd191d5021e161c14cd570bac22e3d673dbb1b7a7364c6c902953e02d803a71"
+      },
+      {
+        "path": "supabase/production_migrations/202608300065_production_future_year_runtime_role_guard.sql",
+        "sha256": "1855fc6d9ead6fca44dbb2b4443c15ae75c33c8fd9a7770e6b1af5f957d8c725"
+      },
+      {
+        "path": "supabase/production_migrations/202608300066_production_future_runtime_activation_v1.sql",
+        "sha256": "dd8fcec00948d369df4f56a41cba686621d4f162640cafb6bfaebb102067b3ce"
+      },
+      {
+        "path": "supabase/production_migrations/202608300067_production_current_scoring_runtime_v1.sql",
+        "sha256": "fea6478fc720946dab7171413c85fae7fc5d0a3c40c3ca3b62f6b4ffb8d93fb2"
+      },
+      {
+        "path": "supabase/production_migrations/202608300068_production_future_participant_identity_runtime_v1.sql",
+        "sha256": "afcbb22855edd39b96a8df605d689373ca375b1b202a5676219e4ad5bb1efd64"
+      },
+      {
+        "path": "supabase/production_migrations/202608300069_production_annual_scoring_authority_v1.sql",
+        "sha256": "697abe93c2f82002e95b01a2c4ef062507a6f56ac4785111f510e3d1b2fe6152"
+      },
+      {
+        "path": "supabase/production_migrations/202608300070_production_future_identity_mobile_dispatch_v1.sql",
+        "sha256": "7ad4d9b594a9375a7d453f5e5adbba80b5a22fa0328476a731473d4f1e4a8b81"
+      },
+      {
+        "path": "supabase/production_migrations/202608300071_production_annual_reads_workers_v1.sql",
+        "sha256": "02de498eb79ffb0a3f28480c3ef2bb3092c9451bf6931d1d7875c80a72299882"
+      },
+      {
+        "path": "supabase/production_migrations/202608300072_production_annual_google_writer_certification_v1.sql",
+        "sha256": "28bf46565beb68feb49502e10b27fc3d93ee958a221bd3b82422eadcc31ed5ce"
+      },
+      {
+        "path": "supabase/production_migrations/202608300073_production_annual_odds_v1.sql",
+        "sha256": "6bb29413e2791fc1d8647327bf1eb8167413719ada78a0134a0c3948c6fedd7e"
+      },
+      {
+        "path": "supabase/production_migrations/202608300074_production_annual_net_skins_v1.sql",
+        "sha256": "0838084ba8501f234a09e73dd4d2711870e1bdffce2379cfd2d640dbac1617a8"
+      },
+      {
+        "path": "supabase/production_migrations/202608300075_production_annual_calcutta_v1.sql",
+        "sha256": "0b033dd6793965ee5c246531b3b87d831b148477eeec998a47413b7b10bbacd3"
+      },
+      {
+        "path": "supabase/production_migrations/202608300076_production_annual_side_game_activation_v1.sql",
+        "sha256": "21630622adeaf01c19be0579f9e9cda064269b997a20b115658c42b42861b9be"
+      },
+      {
+        "path": "supabase/production_migrations/202608300077_production_annual_derived_worker_close_fence_v1.sql",
+        "sha256": "51b9136652bd84ec1701923ab5c06e1cba4e2269046db852fc654a4271e8d00a"
+      },
+      {
+        "path": "supabase/production_migrations/202608300078_production_annual_normal_release_rebind_v1.sql",
+        "sha256": "0d0ea2694ad315e652eaadc0e266347b94736c9dccbef61293dfb6f15f815f13"
+      },
+      {
+        "path": "supabase/production_migrations/202608300079_production_current_match_authorization_v1.sql",
+        "sha256": "b6a865dab9b3ff3a2c00580414f3caa0015510990446056867f2019a4bf00e19"
+      },
+      {
+        "path": "supabase/production_migrations/202608310080_production_prediction_settings_authoring_v1.sql",
+        "sha256": "8d1cf655ce8009a2581868609a17943a3ea90749ffb69149e2074c2b591f988e"
+      },
+      {
+        "path": "supabase/production_migrations/202608310081_production_draft_authoring_v1.sql",
+        "sha256": "2d3e5e391682666787ac3ed4b122bac42276915211d344d7664cc5247fe16974"
+      },
+      {
+        "path": "supabase/production_migrations/202608310082_production_guide_authoring_v1.sql",
+        "sha256": "77193070ab77cff40fb7ba6a2492fb610dcadf804689a99dc453afb18563c5c5"
+      },
+      {
+        "path": "supabase/production_migrations/202609030083_production_empty_pairings_v1.sql",
+        "sha256": "577ed58e8136da9ad397d3074c915e521991ee8a3fcb62a2703eaec661818c79"
+      },
+      {
+        "path": "supabase/production_migrations/202609040084_production_starting_hole_retirement_v1.sql",
+        "sha256": "775942d3b68cb9e14da3aeb0710f1e0512e7a965a607460f9cac142d2d12983b"
+      },
+      {
+        "path": "supabase/production_migrations/202609040085_production_calcutta_full_course_handicap_v2.sql",
+        "sha256": "43735a10bb4804a123ab0b41865fa02068afc6c2a4359067db1bd411aac68021"
+      },
+      {
+        "path": "supabase/production_migrations/202609040086_production_identical_legacy_course_adoption_v1.sql",
+        "sha256": "4228c17de53907302cfe6e8fd03110b39a6e702f483416014b966f73f2ed26c5"
+      },
+      {
+        "path": "supabase/production_migrations/202609040087_production_odds_publication_withdrawal_v1.sql",
+        "sha256": "46bf52fd6df63cc40b5e409b6c72b478b18a09c7e35165363bf87b32f02a0064"
+      },
+      {
+        "path": "supabase/production_migrations/202609050088_production_odds_legacy_projection_compatibility_v1.sql",
+        "sha256": "b6ed084084e31427140d3b28c48fbfddcf2ff3cf8554fcd2f4a5f4b6bc26c8d7"
+      },
+      {
+        "path": "supabase/production_migrations/202609050089_production_tournament_awards_v1.sql",
+        "sha256": "1bed7020e29b8256fbbc5d2da8c2138e67312cb0312fb1e15116d28a7771194a"
+      },
+      {
+        "path": "supabase/production_migrations/202609050090_production_tournament_awards_service_scope_v1.sql",
+        "sha256": "1b5c91d4827d80ed9714dc5e2007a71b6f79a2bbd5b75bac53c7d0785443bb19"
+      },
+      {
+        "path": "supabase/production_migrations/202609050091_production_ghin_hybrid_foundation_v1.sql",
+        "sha256": "0934ec54e74a3a424c7f5b5e31e0b2cdeb1bf6103a0b61ee93415fb2273489d7"
+      },
+      {
+        "path": "supabase/production_migrations/202609050092_production_handicap_source_bulk_import_v1.sql",
+        "sha256": "912542da6eb7eec714d36018dc38de24b097562a34ae5280c726feab8e741530"
+      },
+      {
+        "path": "supabase/production_migrations/202609070093_production_guide_incremental_drafts_v1.sql",
+        "sha256": "267ac22cc7683dd83436639d914b3fb0a9ddbd7ad512beba0d3da4be50a0a144"
+      },
+      {
+        "path": "supabase/production_migrations/202609080094_production_guide_optional_content_v1.sql",
+        "sha256": "ab2e660d116009bdbbf8afca936704343d1a0f22395d192ace617a7d0027cf45"
+      },
+      {
+        "path": "supabase/production_migrations/202609090095_production_round_pairings_v1.sql",
+        "sha256": "3e70203056f6a6e0f59aa7f06161cc01352057027ec4643e41e92948ebf99919"
+      },
+      {
+        "path": "supabase/production_migrations/202609090096_production_round_pairing_read_envelope_v1.sql",
+        "sha256": "0c2c5894aebe7d1cde4eb7fa9b8ead6c2f246df24f7cfaecd6e24257cba07af7"
+      },
+      {
+        "path": "supabase/production_migrations/202609090097_production_late_r3_initialization_v1.sql",
+        "sha256": "ba6af5585889b956b9d336c02deeff0db8cefdc67a22e1c35175dcb130002109"
+      },
+      {
+        "path": "supabase/production_migrations/202609090098_production_net_skins_entries_v1.sql",
+        "sha256": "a7a3ebca7d552934e3ff0531362098467ac5a7c0c5ee84e9a4bb4869b979c8e8"
+      },
+      {
+        "path": "supabase/production_migrations/202609090099_production_full_net_consumers_v3.sql",
+        "sha256": "0f8524925e62ab21243c81511f258990fb4acee5da7e9dc80193bdf3bcf7d59d"
+      },
+      {
+        "path": "supabase/production_migrations/202609100100_production_native_guide_delivery_context.sql",
+        "sha256": "247d1e47fcc947e092609330d90d9683110eadf09be5e3798aebcbae68b1f3ec"
+      },
+      {
+        "path": "supabase/production_migrations/202609110101_account_deletion_review_access_v1.sql",
+        "sha256": "920bda48ed3ea3ace67da9e412d16e641d1b56062de65fd5f45a8598c0789a41"
+      },
+      {
+        "path": "supabase/production_migrations/202609110102_account_deletion_audit_attribution_v1.sql",
+        "sha256": "2f3a368bcc2ef6088fad55e74608399039f9ca60514af6ec7a7c5bfd2eb1f956"
+      },
+      {
+        "path": "supabase/production_migrations/202609110103_native_published_skins_labels.sql",
+        "sha256": "6018d9f485cc2c9d142d9d58cb265f078e2f3293983944b8f9ebfc2558a26f09"
+      },
+      {
+        "path": "supabase/production_migrations/202609110104_native_review_identity_v1.sql",
+        "sha256": "b1c48c479cfdb3045031aa57e5394c07c69de0906664c09d236a6faf0f9b0a31"
+      },
+      {
+        "path": "supabase/production_migrations/202609110105_native_review_published_calcutta_v1.sql",
+        "sha256": "59614ee423dd8ae5e4c75c0fbdecbc2623efee45d6d6a8300b36f42a269ed172"
+      },
+      {
+        "path": "supabase/production_migrations/202609110106_review_historical_fixture_v1.sql",
+        "sha256": "c50f91fd62ddfda840b26a3e9bb55316403280b4a00d36f3f6ef53ccd8d9a5c4"
+      },
+      {
+        "path": "supabase/production_migrations/202609220107_expired_identity_recovery_v1.sql",
+        "sha256": "dfbd6e4a2c14260654b2b3984208bb788f9e75b189256feed9f2437814e5855e"
+      },
+      {
+        "path": "supabase/production_migrations/202609220108_atomic_round_scoring_v1.sql",
+        "sha256": "8523d3a2b39e12b1810c162db1e3e2b2570a45b53e5b66c2b4b3c3136b9082bc"
+      },
+      {
+        "path": "supabase/production_migrations/202609250118_production_first_write_audit_revision_v1.sql",
+        "sha256": "099158fbf6440090ccc71fc5bf5c6420d53af1aa578f8ebee746de1223a39521"
+      },
+      {
+        "path": "supabase/production_migrations/202609260119_existing_r3_dependency_preserving_preparation_v1.sql",
+        "sha256": "4b8a4e9bd9f1c067ac4ccbd082505d85df685803ca5fdcf9820dfaeef3dbd862"
+      },
+      {
+        "path": "supabase/production_migrations/202609270120_bounded_late_r3_result_compatibility_v1.sql",
+        "sha256": "c8f25f9a15345d32655aed7dcd4f37d646d6cfd21be53224bf76bf8ce2e05b48"
+      },
+      {
+        "path": "supabase/production_migrations/202609280121_score_derived_intents_v1.sql",
+        "sha256": "cd9f6a784741d9e41c7f2e267bf4135549aeeb61333a22e4a31d9a174a3651a8"
+      },
+      {
+        "path": "supabase/production_migrations/202609280122_score_mutation_recovery_v1.sql",
+        "sha256": "122080a69e1045c4e189e4cd14752edacd5684f4298183c0524f0bd528a696ce"
+      },
+      {
+        "path": "supabase/production_migrations/202609280123_annual_worker_sql_and_net_skins_locks_v1.sql",
+        "sha256": "4159acdfa22d5cd6699cfe2d4c985261ffbf41f3fbf6087d4eeed5a4aec3bee0"
+      },
+      {
+        "path": "supabase/production_migrations/202609280124_score_derived_delivery_v1.sql",
+        "sha256": "69821b9d98a585c0545e9b5e68968fa7c1a0cebf12e0ba9699c4590f5763bc48"
+      },
+      {
+        "path": "supabase/production_migrations/202609290125_google_runtime_retirement_v1.sql",
+        "sha256": "355be26c45d1e52ad0fd8a8e1520b7b0ad06dedba6a48b4aa15c6e2d3ee6b7dc"
+      },
+      {
+        "path": "supabase/production_migrations/202609290126_google_retired_release_admission_v1.sql",
+        "sha256": "4e14777857cd69b893662761c621753bfb5f1d48ceaed49c8283968e58d8c5a3"
+      },
+      {
+        "path": "supabase/production_migrations/202609300127_canonical_annual_create_contract_v1.sql",
+        "sha256": "f1d6a293eaeb56a899d897ed3f182549529f3af4efe2da1dfbfe004f6017ec57"
+      },
+      {
+        "path": "supabase/production_migrations/202609300128_isolated_director_context_v1.sql",
+        "sha256": "63d9b83d5cf332f3a53876612ad8c866993588adef77977242a62b66fe204483"
+      },
+      {
+        "path": "supabase/production_migrations/202609300129_isolated_financial_cores_v1.sql",
+        "sha256": "05248182beb2dc123ecbbffc6c9bf712244e1375630f41cc723ad1a6b9a0b15a"
+      },
+      {
+        "path": "supabase/production_migrations/202609300130_isolated_setup_control_cores_v1.sql",
+        "sha256": "1dbccb261ba4c44d5dc338fae4293f6019d212a9ce436cabc79a11ef37cc38d9"
+      },
+      {
+        "path": "candidates/scored-match-resume.sql",
+        "sha256": "aec2c3051f89c655030cacee54cb1711a3f00bf143cab0625a400dd221931c46"
+      },
+      {
+        "path": "supabase/production_incremental/net-skins-sql-expressions-v1.sql",
+        "sha256": "8f5c61645fd720ba5142373a91a9186691050b3a445e0219a2271f291646f62f"
+      },
+      {
+        "path": "supabase/production_incremental/calcutta-exact-job-activation-recovery-v1.sql",
+        "sha256": "13ffd68f44e0ca37272802433afebd1afa7f2297af089027f9ca450808f55bcd"
+      },
+      {
+        "path": "supabase/production_incremental/director-calcutta-management-read-v1.sql",
+        "sha256": "5ef573739842968358490928ad219b78f79073f0af474d0938beb4041292ec00"
+      },
+      {
+        "path": "supabase/production_incremental/director-calcutta-clear-entry-v1.sql",
+        "sha256": "47a930c4f292d422a771d621d00da12f6afe5bbe7f7f59258ed8c3999fa56dc3"
+      },
+      {
+        "path": "supabase/production_incremental/player-portrait-policy-v1.sql",
+        "sha256": "f4514d830fa3721a10c3ba04a33e1a57c61e4e952695ec74c3ae06cccbfb8f92"
+      },
+      {
+        "path": "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+        "sha256": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2"
+      },
+      {
+        "path": "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql",
+        "sha256": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298"
+      },
+      {
+        "path": "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql",
+        "sha256": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d"
+      },
+      {
+        "path": "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql",
+        "sha256": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc"
+      },
+      {
+        "path": "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql",
+        "sha256": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7"
+      },
+      {
+        "path": "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql",
+        "sha256": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245"
+      },
+      {
+        "path": "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql",
+        "sha256": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8"
+      },
+      {
+        "path": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+        "sha256": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae"
+      },
+      {
+        "path": "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql",
+        "sha256": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b"
+      },
+      {
+        "path": "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql",
+        "sha256": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564"
+      },
+      {
+        "path": "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+        "sha256": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13"
+      },
+      {
+        "path": "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql",
+        "sha256": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352"
+      },
+      {
+        "path": "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql",
+        "sha256": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295"
+      },
+      {
+        "path": "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql",
+        "sha256": "5ef34c3bd09feda3a4cacdac275764166ea82319d20a59235efed091016b0343"
+      },
+      {
+        "path": "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql",
+        "sha256": "0d610b350d76b27f4f63942758cfd7e12bafeddac48f3c8c0ff8c94c74fb37ff"
+      },
+      {
+        "path": "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql",
+        "sha256": "410f4b2681442ff99cee1ab7f291f0b006fed069262584540ddbfc2e2eb36ffb"
+      },
+      {
+        "path": "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql",
+        "sha256": "080cdaf863a5f0bc70670f15e0aa658916cda439e0df10110de7d428675334f6"
+      },
+      {
+        "path": "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql",
+        "sha256": "d2c7e20327392826882e3451daab8594fd1187ea2672cece7889cbeb4768d245"
+      },
+      {
+        "path": "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql",
+        "sha256": "1f7ea4800f11204dd8016269f65291b213666e642fb65a899df883b32462044d"
+      },
+      {
+        "path": "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql",
+        "sha256": "ff89ea6218d6692e7f669e1b057d0f5ac2d7bf35131bab972bec38e2a1b93510"
+      },
+      {
+        "path": "supabase/production_migrations/202609300151_certification_annual_reopen_lineage_v1.sql",
+        "sha256": "049479ddd58887dedc374a685eae12a6939dc834619b573070a29b44c27e029a"
+      },
+      {
+        "path": "supabase/production_migrations/202609300152_certification_closed_release_admission_v1.sql",
+        "sha256": "6e5ea854a7e7baa51f18af7bd8f9436fa2e4a487416cb61649c32ace60238e8b"
+      }
+    ],
+    "toolSources": [
+      {
+        "path": "tools/reliability/canonical-bootstrap-artifacts.mjs",
+        "sha256": "cec60a553218498a9cc5481eef45c0fbc8a6eccb851d766f8c2d7e62fc275208"
+      },
+      {
+        "path": "tools/reliability/generate-canonical-bootstrap.mjs",
+        "sha256": "74854551911d541b11aa0c5157a6725ba845cb390801ad444a866838df6a4d36"
+      },
+      {
+        "path": "test/support/reliability/phase2d-resource-bootstrap.mjs",
+        "sha256": "81abc4be2912f3fa404179198fb9de474dfa97fa642552045d8383bcd9a43f18"
+      },
+      {
+        "path": "test/support/reliability/release139-schema.mjs",
+        "sha256": "231c8a3b52988ce53055204f4f583446038b33d15c0d2f8d9e24ec2ee4e1e3c8"
+      },
+      {
+        "path": "test/support/reliability/postgres17.mjs",
+        "sha256": "c2942a243fa0af4f56025f7f027aeba49c69710d561f36093542407c16b59bd6"
+      },
+      {
+        "path": "supabase/canonical_bootstrap/catalog.sql",
+        "sha256": "95b4994868868dc2d775bb438b2dce93d3ca608aac6a416d8d60550abf3f8db5"
+      },
+      {
+        "path": "supabase/canonical_bootstrap/source-profile.json",
+        "sha256": "0e6ea7abcef83d4a1e708b21fe64e74fd536331416930a12b9c912d27f95c0bd"
+      }
+    ],
+    "excludedOptionalArtifacts": [
+      "candidates/access-readiness.sql",
+      "supabase/production_incremental/account-deletion-attribution-minimization.sql",
+      "supabase/production_incremental/account-deletion-completion-queue.sql",
+      "supabase/production_incremental/account-deletion-completion-work-item.sql",
+      "supabase/production_incremental/account-deletion-external-identifier-redaction.sql",
+      "supabase/production_incremental/participant-phone-authority-v1.sql",
+      "supabase/production_incremental/participant-phone-enrollment-v1.sql",
+      "supabase/production_incremental/participant-phone-enforcement-v1.sql",
+      "supabase/production_incremental/phone-hook-acceptance-v1.sql"
+    ],
+    "artifacts": {
+      "schema": {
+        "path": "supabase/canonical_bootstrap/schema.sql",
+        "sha256": "3e08b550eae6ac1d88786fe6ad71813008c118f33b5ce99662b150e298edf16e"
+      },
+      "staticData": {
+        "path": "supabase/canonical_bootstrap/static-contracts.sql",
+        "sha256": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d"
+      },
+      "catalog": {
+        "path": "supabase/canonical_bootstrap/catalog-manifest.json",
+        "sha256": "c814748eb06b7ec6ed92dacf0185c25315970c43db463186967bb56ccc4aeb3a"
+      }
+    },
+    "staticTables": [
+      {
+        "table": "production_control.annual_scoring_rpc_allowlist_v1",
+        "columns": [
+          "operation_name",
+          "target_rpc",
+          "required_phase",
+          "operation_class",
+          "required_worker",
+          "allowlist_revision",
+          "enabled"
+        ],
+        "rowCount": 43,
+        "rowsSha256": "7f1bec66a811b769ea6d7d0ce2e3718621896106acb8f14b11f69b7618e71720"
+      },
+      {
+        "table": "production_control.annual_odds_operation_allowlist_v1",
+        "columns": [
+          "operation_name",
+          "operation_class",
+          "enabled"
+        ],
+        "rowCount": 11,
+        "rowsSha256": "df64d94ea0866aa6cd2f775a3f8cffa2cee5f1a54f40eea661b015b0dfbf83cb"
+      },
+      {
+        "table": "production_control.annual_odds_2026_body_certifications_v1",
+        "columns": [
+          "function_identity",
+          "function_definition_hash",
+          "certification_contract"
+        ],
+        "rowCount": 12,
+        "rowsSha256": "d6a8706323bf2dff0dd379656f0cc38c9391760657e4c601349ae2b1a129fb96"
+      },
+      {
+        "table": "production_control.prediction_setting_definitions_v1",
+        "columns": [
+          "setting_key",
+          "sort_order",
+          "category",
+          "value_type",
+          "default_value",
+          "minimum_value",
+          "maximum_value",
+          "allowed_values",
+          "aliases",
+          "legacy_recalibration_default"
+        ],
+        "rowCount": 30,
+        "rowsSha256": "926dd042e79373d24c18e0f3818f43b8dc053afef74050a4785a754cbd7d5bfa"
+      },
+      {
+        "table": "participant_identity.player_portrait_policy_clock_v1",
+        "columns": [
+          "singleton",
+          "revision"
+        ],
+        "rowCount": 1,
+        "rowsSha256": "db3c5c5aea06ca2385ccdab66bddafb39e9c296c35837efcd2badcda74d75c0d"
+      }
+    ],
+    "forwardMigrations": [
+      "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+      "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql",
+      "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql",
+      "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql",
+      "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql",
+      "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql",
+      "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql",
+      "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+      "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql",
+      "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql",
+      "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+      "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql",
+      "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql",
+      "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql",
+      "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql",
+      "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql",
+      "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql",
+      "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql",
+      "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql",
+      "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql",
+      "supabase/production_migrations/202609300151_certification_annual_reopen_lineage_v1.sql",
+      "supabase/production_migrations/202609300152_certification_closed_release_admission_v1.sql"
+    ],
+    "platformPrerequisites": [
+      "PostgreSQL17",
+      "Supabase-managed auth.users/auth.identities/auth.role()",
+      "anon/authenticated/service_role roles",
+      "postgres application owner",
+      "pgcrypto extension"
+    ],
+    "authorityRowsCopied": 0,
+    "registrationPerformed": false,
+    "productionAccess": false,
+    "hostedAccess": false
+  },
+  "sourceManifest": {
+    "app/(app-information)/information.module.css": "cdeda2c9b6c8f41d10f23f1dd86e2548cc6d8f7dc897e36d5ac89add7455103c",
+    "app/(app-information)/layout.js": "1914c3a4afb17988939d852fa7427cf6c026ed07ec603ff6165a8802d869ee09",
+    "app/(app-information)/privacy/page.js": "65f167eef497abf234f4663801b96e9b978cb73bd8d05a22014b4909360e893b",
+    "app/(app-information)/support/page.js": "b2b562972faf23bbcfad93fc09272dd2df439fea4012c354508ce0fe759c5dc4",
+    "app/AssetImage.js": "e85966b22dffef6f0409fa201f36c464d4ee71729cd3edb74e664583517dc5da",
+    "app/ContextBackLink.js": "e6fae1c5dfc0200cdfb17bf2597fff4ef9b23d5e0a88b9c947d41a6bd0d46b82",
+    "app/DeferredHomeContent.js": "763e154aeac9665258fb17ddf60186b02a1334e6fffb97b759b1bd5c298d0c01",
+    "app/DirectorTransactionStatus.js": "587a21aedf2b2b37ccb8fc36d96355f5188f10437c36320cab937a9f21474a59",
+    "app/ExternalLinkConfirm.js": "80e4faed02eba4ece93a893e1dc5c014b436dbdadcc6d99a0fb76eb9ffa35e5f",
+    "app/HistoricalDetailNavigation.js": "8e5a6cf70b497ba7b88c24f7c9893971a8d090573b50f0f90873a59df9226511",
+    "app/HonorBadges.js": "b7f9961b1f98b5ae5d8b0752cd4ef110f6377a65b14781c8ee7e688bda3993bd",
+    "app/MatchProgressionSummary.js": "3e4746f5cf787454cef74c302b9574baf201af43bc4685bb15fba49d3eee4860",
+    "app/MatchStatusBlock.js": "109d3e7a96e239a9a437cefc3c11492e4966bdcccca6ac803afee3f801b34978",
+    "app/Menu.js": "a2488e85951a66dc7240a9f5d02d8a98fa105544fc9deb757bb43eefc4b0560a",
+    "app/MobileIdentityImage.js": "5c51e1a2d4f1905850ad0a36c83494dea14cf4c86c965917f33f579bd83872e1",
+    "app/MobileTournamentHome.js": "e5940c1e69e571388036a3a8898ec551a2149f9f9a31f2eb3f008051999b2138",
+    "app/ParticipantAppHeader.js": "c8625fbab0ed0335c9b964c51d7d0681d627df590a0a8dcce98a0a9515dddbf6",
+    "app/ParticipantAuthDiagnostics.js": "c432d706e86bd245a3c32849ce07204bf36c7a85cf4a940e037439dd73c34858",
+    "app/ParticipantIdentity.js": "fd490861680ad9a327d453815311d92f06ab68f01d2755e721359ba79a1c2779",
+    "app/ParticipantRouteFrame.js": "aba0e9c04223400520772f85bcad22e71ba058fd45880cd34071ab1b9e643673",
+    "app/ParticipantSupabaseHome.js": "2c3f6163850d275260cd0d068875567c57770f24fb781f4d2091875af4e4012a",
+    "app/PersonalizedPlayerHome.js": "6368bc5f4f42f685c42c3bca0a0e6456b102e4d3fd4637da3a0fda2ccc8b0475",
+    "app/PlayerAvatar.js": "1abe5fd5699089a435f8ef9852ab60bc7ab0316aa11122b1445f77adacba7b8c",
+    "app/PlayerProfileReturnNavigation.js": "1406be4a9fb5a084efa6ccb484792c8fe1b94964483b65c0c430eaf9bfc2a373",
+    "app/PlayerSetupBanner.js": "884aac64b7f185f3ceffdfe0a44b00c8f020c15564edfb69a27c0012c3216a89",
+    "app/PreviewModeBadge.js": "0c10b84ab8fee145062f36d746c381cdd05f190187f908085a607e3e7f95b1f8",
+    "app/PublicMatchCard.js": "a57d2b9e28c863f0402882900231e95146baf30bf7d84b21d774145ec8f78f29",
+    "app/PwaFoundation.js": "c58fece2567d72bf7287efcdec7b6968bd6559a43b98640eca95cc6caf1aab54",
+    "app/PwaLaunchSplash.js": "846664171534c042901b0e6ffb7ca56628ee98acfc6dc19ed9abe6896c606f98",
+    "app/PwaSplashIdentityBridge.js": "9472de88ce3bdceda3f81b46cd81462e3ddd46681efc565c0d83feb4c89c7d05",
+    "app/ResponsiveDisclosure.js": "6a209ab6fec63ff8dfd8234687ad91c8161566c3b5de98ba4939bde993184fcd",
+    "app/ScorecardTable.js": "85c39f8e494f0f5bb8b087b67cf99645504bd8b4b2fed464f5e1d586c966bb6e",
+    "app/ScoringStatGrid.js": "43359942b6c13ad8720480f726305fe752fad58a619acdbfeca5f95a61c9a74a",
+    "app/StatusBadge.js": "b01195e1a015a14f800e4f01442ee5e75880f9e5dbfa0e5d87a184f58c386e3d",
+    "app/TeamIdentity.js": "d87b4cf325abb2743711a70645154a72ac0ec21a6a93c5880260e43f19b8bf8d",
+    "app/TeamLogoPlate.js": "eec44a5781209aa6d11550b5bf0feccf0683bac17a60277fae5f1f4009b94813",
+    "app/TournamentCommandCenter.js": "1b20e046afcc7aaf8e2024715019d09f29e40ab0a690bac0dcd83a7c8d1441f3",
+    "app/TournamentDayLabel.js": "6f2f5fc7fd283b549e80de0f72a5ce37ff6d1233d2132d1bc0dda8e52940c0f4",
+    "app/TournamentIdentityHeader.js": "34ba7b8dc454fa14a6a412946c55e1450529e68be109f14afe5ecfbc6942272f",
+    "app/TournamentInitializationRecovery.js": "344a905f26a7643621f11a48c17c5fae0041ee19c525b48db130578284fa98dc",
+    "app/TournamentLeaderboard.js": "ca14ad80456f723e758dce7a7b8f1fe3e998dd4c4f945d4bb213175a2763d73d",
+    "app/TournamentMoments.js": "2f734322ca401568f3bc5f9a8a6aaf0a541f58f26d196bcfb4fde76c0c593731",
+    "app/TournamentSchedule.js": "765c07838b49f6cfe87727c61aed6782daa4cce54a3cd7cdc84b0b5b8e1b1dea",
+    "app/TournamentStatusHero.js": "50fb0b46b518622651b848d6b2965f907e3c2641151c1c4d5e2e14e4e424eb39",
+    "app/activate/PlayerPassportActivation.js": "46711be7d097fca7340ddf392ffe0efb21767c81457a946f86efa42fbd85b9dd",
+    "app/activate/activate.module.css": "4042a61c45e6e2eaab7301ebc3b217ebf41424af23195056ce6b583e4425d33e",
+    "app/activate/page.js": "9f095f7c2cbdb339a852c479adf06c195514c1263005cd22fc0388ce5d7b1190",
+    "app/admin/AdminCenter.js": "a74a8212f0d06b107e01c13323f6c96f4772c71b4cfc00013116ac170a2e36e0",
+    "app/admin/CmsManager.js": "b08fe38b37d433a14808220a4b426a557ebd517652f9a306f5fe84b49a6ccb78",
+    "app/admin/PlayerPassportAdmin.js": "e44bb0c0d1077713854ad57493645ccbace5e10383da2345583e231ff1fcbdb7",
+    "app/admin/ScorecardCalibration.js": "d7bc567c0e54e009eb5179743353e1ac5da82871d1b409736665880d453ed2fb",
+    "app/admin/TournamentEditor.js": "e460aa10e13d8c06282522121cce92afe592f589f5b6e02ea5d1062ab536a5e2",
+    "app/admin/admin-center.module.css": "553c1aba4d90144130b41dba9b8d05363d2b0361fcae56db766957961b2cfc7e",
+    "app/admin/cms-manager.module.css": "7eb9795d957c5a365db5b563227e2887d50425ca1f2cba9e3c64e0b05f0fbed6",
+    "app/admin/data-health/page.js": "3b229ebdbbc00e58395c438d88a2a8186047faa825f7d0e275cf4b589f818141",
+    "app/admin/director/CalcuttaManagementEditor.js": "57453ecea40e7ad0a70e0a1f54799623a89c02ef9918897fcfc8ea229b0f2ae5",
+    "app/admin/director/CanonicalDirectorConsole.js": "5224c4540134dd7cd2e29ffdc9c5f28a09622532038eb397cf682cc4532f7139",
+    "app/admin/director/CanonicalDirectorMatchControls.js": "d95bdefcebf97fa865c71e8537e505c1eb41372994e0d6f2c46d065078c6bd8c",
+    "app/admin/director/CanonicalDirectorOdds.js": "7d6674f13f58835c2e2440cbb62a2f4a670b719742c10028e69f7800fdcad562",
+    "app/admin/director/CanonicalDirectorOperations.js": "901b4934a730901f023900d2c1eb154db0fae0df2cf68d44a02b2f7162ec07ae",
+    "app/admin/director/DirectorDashboard.js": "ad771f4fbcfe53bd57cd0856ccb7038661005d6d3469bd3ccb6476dc132da934",
+    "app/admin/director/DirectorGuideRefreshControl.js": "41991ba0d10d6fbf0553abd902bb510d5afa706c131cd96fbdbe8831484563ab",
+    "app/admin/director/DirectorGuideRefreshControl.module.css": "f3308f5ca936b085f64fcd0b05fee8ab88825798596881f3b9314bf242708b9b",
+    "app/admin/director/DirectorOperationEditors.js": "99f2789140049786b33eff7b1083550da08d3e48e1ad6dce99eaf47360296135",
+    "app/admin/director/DirectorOperationsConsole.js": "5d9851f16ef2a7990221b16d8c354859b5122a9775d800e58c2a8ee5990fd115",
+    "app/admin/director/ParticipantIdentityFoundationPanel.js": "b32dab371ed820dbe0c12ae3b3f4e8615dd0c9f7b4274d98bc0e7b36bdb7e914",
+    "app/admin/director/ProductionDirectorConsole.js": "ae5f82da0f51a9e5b2888bd3b417fb4d1c15693e3259767ed66c6470dfa2dd42",
+    "app/admin/director/ProductionDirectorOperations.js": "e1275974ece272a3d21d8388322ce4dc2384bbbddee9cae48e5d41513d012635",
+    "app/admin/director/ProductionDraftEditor.js": "c73ac8baaa8d7df83016491d393c847df934e3e280127b66d70fe3ec09deb399",
+    "app/admin/director/ProductionFutureYearAdministrationPanel.js": "c477c055f470025ffe5599d40863f8d791d9c54cae6f437fb3df516d803d3017",
+    "app/admin/director/ProductionFutureYearAdministrationPanel.module.css": "8406d25662440d5f3700185358e5395e4b4f497770c290096a73703feed72340",
+    "app/admin/director/ProductionGuideEditor.js": "0de6bc24dd9ed88938275110673184e3c694b193d52ecf2a2c9e8cc3d0ef969b",
+    "app/admin/director/ProductionNetSkinsEntries.js": "17316d02d8c0c270dc8e23516e6bcb5c4534b31997148666ec61c21665e825ef",
+    "app/admin/director/ProductionOddsSnapshotReview.js": "b1a7debba548465688d358f1ea13adf23d4c4afd00fef7b117b1b3f80ed8170e",
+    "app/admin/director/ProductionPlayersAccessPanel.js": "754373b47aa7cd056a941068147b3141cbf35cda1b8eaef85122c30cb72c73f8",
+    "app/admin/director/ProductionPlayersAccessPanel.module.css": "7ac3b1f0654c173d69242ecdfe6db68af927c8f6f03a5892f42a7c1ad9485637",
+    "app/admin/director/ProductionPredictionSettingsEditor.js": "a0283137e39056822eaec91c71dd7946943eee03eede75a0624c65fec68139b1",
+    "app/admin/director/ProductionRoundScoringControls.js": "cfe50e5631bf980f75e54dfc8c26cdde7bb7482042a0373617509e59affa8eb9",
+    "app/admin/director/ProductionTournamentAwardsPanel.js": "89ca47b4af92648a8d6b05db9d130ed0d5e37f5afaadc14f42fbfe07330e45eb",
+    "app/admin/director/ProductionTournamentSetupPanel.js": "8f3bccc19e52e3f3bd31433562559d2e0d3fbed4fa5643b34a9b0caeb55612b5",
+    "app/admin/director/ProductionTournamentSetupPanel.module.css": "c6437d1c572edd9f0538edb78813ceaf710170a5b1dc4a71ae37fd150e2d72c4",
+    "app/admin/director/RoundPairingWorkspace.js": "548d87d8233d7d5a6a49fc0b94313b15e1086e3bd8a9540303e0592e5dc9fbc2",
+    "app/admin/director/WeeklyHandicapPanel.js": "297caa2d3c0f45c6a65e842002aebeabcffe343969d6daa3dc9e345293b81d30",
+    "app/admin/director/WeeklyHandicapPanel.module.css": "57e4ce4152917f79867a783a6d101414f39caa32d8c2c0933a89ca2c8e02e1e6",
+    "app/admin/director/calcutta-management.module.css": "b33075307198c3a563aaa078cbc19735c3a2683d4d14c537336a42a9f7d5d928",
+    "app/admin/director/completed-history/CompletedHistoryClient.js": "4a998283fb2f75c441e0320bda8002fe8daeaae96d79f5058904c1512ff081f7",
+    "app/admin/director/completed-history/page.js": "6fa3ab474f01d458ff779fa942c6cc96697a9071133ae4fcfe07fea7ecf9e4dc",
+    "app/admin/director/director.module.css": "9f7b3a236727c0e79b447cba07845154c49ace203cf41d00a8301e451425d967",
+    "app/admin/director/game-center-readiness/GameCenterReadinessClient.js": "36cdf791369e189da282b2c75c65788a1acdf99c9fc1baf09022c830fd17169b",
+    "app/admin/director/game-center-readiness/page.js": "618fdc2b9fe4e592bb92761d863107e6e72a03cd447ba4f8d8c10da9a4030e07",
+    "app/admin/director/net-skins-entries.module.css": "01974f45153ba6ff1d7e94f6293f16ea125b60ebc98e9713ee2dc50c14ea4e75",
+    "app/admin/director/odds-snapshot-review.module.css": "4b5298cb57b2752c892488183b518befcfdae46d9493fff26d9899769d882c1e",
+    "app/admin/director/page.js": "e77826508856cac9ecec28f855b60d514c220cf777ca1e11f434ef36691ad981",
+    "app/admin/director/production-director.module.css": "c0d5b092f90417b46475cc4064bba9ade8b3b07d586c670413fa4cb96131ba62",
+    "app/admin/director/production-guide-editor.module.css": "93e05d036db6bc1ff640062d4a52e5a7abc2233ee771ecf27b2bb74fbddef200",
+    "app/admin/director/round-scoring.module.css": "6f5c576f88db59e4e8284568231433674a40e1009a6300044f25fa8f89a355b4",
+    "app/admin/layout.js": "8f25eda1bdb6a5e9948468c3d5a78c933dcb189c2d9b6812b181c5dd4846153f",
+    "app/admin/live-matches/LiveMatchControl.js": "b01de8318d5ed8132a6b70b948a6e30d4a2e9194d3199449791f6a329cb4c53d",
+    "app/admin/live-matches/live-match-control.module.css": "f835c1e6376812e22035bd5989c606c8bf3e249dfcfc3e42f0916feacf2535b7",
+    "app/admin/live-matches/page.js": "8ac27af7f3f0ec689c5cdb492e6041116ec79c5b0f2cd4d2106dc8db5a795de2",
+    "app/admin/live-matches/pairing-editor.module.css": "c3a2f1f8056c4c9a62b966414e44a4ce3b4a26cdef537eced24a85729d8c1ba5",
+    "app/admin/live-matches/participant-access.module.css": "4008b6a58be920f319a8d8cb60493cbcab1d3b2b629ae9c213c98fc004c4d82d",
+    "app/admin/page.js": "c1d2494004e229e4ac44e890d15420b4b9b33ff767afc696cc9adde811243371",
+    "app/admin/player-passport-admin.module.css": "8e86236cc01915b0e9e7c1261f28e16316de198ae3c1a95636bcb9e4da3d911e",
+    "app/admin/publish-odds/page.js": "fda304469414a0a6e6fb22f25ee526975fc43a6a42bfd21b75ac949e0dbc1971",
+    "app/admin/scorecard-calibration.module.css": "48a41111fd631c3a98e7eeb5e57403fc08776b67dd1c83e87913e1ee95869e95",
+    "app/admin/source-audit/SourceAuditClient.js": "dc322c35265d4e339f41f7613ba47a862d6491274ae14164bc98f54286508d65",
+    "app/admin/source-audit/page.js": "7af6e8786f9ccd4aba3d5c54f6e223d94c06184cb9fcfa5e6e92f71584d53a81",
+    "app/admin/step11-6-production-google-writer-fence/WriterFenceClient.js": "fad6c985c639b0c0051855bb6ea03511fedf836797b33e23da25187b28a4c301",
+    "app/admin/step11-6-production-google-writer-fence/page.js": "6d1e2e094e73bb9a00dc31237abe36a9e416b6bb76217a1d63b1ecc3ce40ee06",
+    "app/admin/step11-6-production-google-writer-fence/writer-fence.module.css": "e0880c5c23521e2300eec05236c6db612274f10c9af38c6ecb12515080c9d74c",
+    "app/admin/step12-production-google-writer-provider-fence/PersistentWriterFenceClient.js": "87841b674bb06f45e76bb38bea3587798fdf01386e4b3303eaa5344528ff6cf7",
+    "app/admin/step12-production-google-writer-provider-fence/page.js": "f120998beae0f206a1b823494b8d6b289fe50d603ac68c50feb524fe1490a422",
+    "app/admin/tournament-guide/GuideEditor.js": "b5fdf372eb4dc698f15bd1399330898679f707d463a72d4a32ad54bf05017af5",
+    "app/admin/tournament-guide/guide-editor.module.css": "103c5c90e847b7cbb9092e0be66d5b31a9678e2e00071a723538aebc1534d08a",
+    "app/admin/tournament-guide/page.js": "b533b638d6c71107a130b66ffaf425307b4d1587a05c211cacd83a7b6e23a86d",
+    "app/api/admin/cms/route.js": "613049e7d5e4696fe3f089c47a5d88993353402df3291fd585b9dcfa610965ff",
+    "app/api/admin/data-authority-certification/route.js": "a872cd0655bf31c178c1ecf58274a5e22e3e1239caa43de9c6519969a465b65c",
+    "app/api/admin/draft-projection/route.js": "b7b4e27346e57eb70f527977e99b88b3e777445699cbf945aa86415cb854e4f6",
+    "app/api/admin/production-calcutta-v1/route.js": "18ebfe673a670ded1893b2e8f7b13fa2d32a05036ac94ef384b3d74284a22254",
+    "app/api/admin/production-director-synchronization/route.js": "56cde269df413701bd8f8aa363340aa78230c91975c67f6ac4069c30e2477535",
+    "app/api/admin/production-maintenance-precommit-deployment-rebind/route.js": "08c208583a82f2232dc71d1a6ce76f7df0ddd4397a812448ddd145fcd551cbc7",
+    "app/api/admin/production-net-skins-v1/route.js": "6a34e31f28dfcaa4da5d6894f7dd1ce836319764551b3f85d4212a4c0406e223",
+    "app/api/admin/production-odds-calculations/route.js": "28ed285db664e0f2b4cda4088d810eb0812c79de2e817d30440c8f9d3aeb5b0c",
+    "app/api/admin/scorecard-calibration/route.js": "d3fde372a98434dc88f294448d64a20de3de0425e2594db945b355979812d158",
+    "app/api/admin/session/route.js": "66d8f8dbb08f95028a88c6ca865f0deaf0a486e79a00f02048b368aa7d00e5c4",
+    "app/api/admin/step11-6-production-google-writer-fence/route.js": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e",
+    "app/api/admin/step11-production-google-certificate/route.js": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e",
+    "app/api/admin/step11-production-google-metadata/route.js": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e",
+    "app/api/admin/step11-scoring-rehearsal/route.js": "b27a9c4bc0e45c765de385c4fcb5181ad4317f1adaf3d720e420676e7e81999f",
+    "app/api/admin/tournament/route.js": "c704982ebd800aafe521857267da9a9dfb4a27e4e9eff99237c767c7478a368a",
+    "app/api/admin/war-room-calculation-parity/route.js": "098140d737e375370ed725e0f5557aaeb22e2a5b0433ba66e239fbf5ca30a902",
+    "app/api/admin/war-room-input-parity/route.js": "e12681c5c364e02f5bf8668e87a0411d0eca371a35cec7d806317750ee37ab8b",
+    "app/api/auth/hooks/send-sms/route.js": "05cdc7ff09ae21f4649659d6c1121762bffe93a6efb5f72856d3400b876ca206",
+    "app/api/captains-briefing/route.js": "e64f3b90bd009f3c9d901715b996e61293b7688670ebf86511818ab084b69172",
+    "app/api/cron/account-deletion/route.js": "b3fa72c463e2e85afe1efed7c2370d606a6767cd67f5ab16925e51875d22fd26",
+    "app/api/cron/future-match-google-compatibility/route.js": "28613420397be9f7b6d26eb592bd14586844410f8625c639c2047446d8177a28",
+    "app/api/cron/guide-sync/diagnostics/route.js": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e",
+    "app/api/cron/guide-sync/route.js": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e",
+    "app/api/cron/round-scorecards-archive/route.js": "6322a323f1813aec3d9695c2c77b6c5c37636df634b78fee2ca2d3295a14820b",
+    "app/api/cron/scoring-google-outbox/route.js": "68cd4c0af6b4f6660e944a92f9aebfa65bc9dda8f0755ff449e4c9de112254ae",
+    "app/api/director/access/route.js": "ac33d0ddba9782bbed9a926ac486d4321a10641cbcc5d491041916e0df23d62a",
+    "app/api/director/canonical-odds/route.js": "ccf05dd9bd22098ff18f43cf1f649317c599f32dc96933007fd712cfc2036086",
+    "app/api/director/canonical-operations/route.js": "cbc0446b5fd60f7f867531fa64126a65891e6df66a153379897765c91760078c",
+    "app/api/director/canonical-overview/route.js": "e667bf29f98f04b4641a71fc96a6c34a3d52260d7cbd63720fe8d14690d83e36",
+    "app/api/director/completed-history/route.js": "5ead6b182f54ba6f89676631a978d247e8910d9c7f5983e1d18704e48ec6f7dc",
+    "app/api/director/draft/route.js": "ab7ab5bd4481747a8d7af5bffb8b31fb41a50776adc2a6b1dbda42ba3b2f2fc6",
+    "app/api/director/entitlement/route.js": "db8058cb44e1da941b34d8eb58a6e5a3dd7951625db45f2e2ce301546b74437c",
+    "app/api/director/future-tournaments/google-writer/route.js": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e",
+    "app/api/director/future-tournaments/route.js": "09cb2f164316e182974715a0b2451312de6d321833cadd5798cb69d3ebda386b",
+    "app/api/director/guide-content/route.js": "9ffed3bede4e1c13e5e365b627b083c1be28d6451ff7df1067001e82fece2383",
+    "app/api/director/guide/route.js": "ba07041d090a7ded7f22faa4d8144a1ea1cdca0841fd213265d8f034e6ae200a",
+    "app/api/director/handicaps/route.js": "a9ba3dd5f929a0b80c4ac0423611b17ea137e55f36d643c8efb38961df090092",
+    "app/api/director/identity-shadow-diagnostics/route.js": "a9c5664aed6a4b165a68f9fe0f341f30b14e0871f40a6f2e0837253f0f441bed",
+    "app/api/director/impersonation/route.js": "d025937b0ea2e3c546c59a9773dc16876313dd6d664244ba652de8a96d97ae8c",
+    "app/api/director/net-skins-entries/route.js": "e656ed40d0c5786a9512fa74b5f36b86cc07b3d74c9c3e047b4e6ec3a961bdf8",
+    "app/api/director/notifications/sandbox/route.js": "8f415442e8e8d76eb183151f0c3c4a8450c98fda087b3bf2d34bab3890c4c3e1",
+    "app/api/director/odds-publication/route.js": "27f92d3d014bdbdbc74dfa6a07954494e178259fef20e4c2873dca3ffba60ff4",
+    "app/api/director/participant-identity/route.js": "6e7a4414403a2cab8ec3fb23c7d7b8d34e77a66a6ed430f7a4776f2ec604be88",
+    "app/api/director/players-access/route.js": "fc232452d373b18c96c6c0df2c0fcf301bb6dbcb6d0222a53435ec8b0835640f",
+    "app/api/director/prediction-settings/route.js": "26927ee21f9f7479ac8c2f5d45d3c1f9fb04156fabb1441697cb05d419384682",
+    "app/api/director/production-overview/route.js": "fe83ad75ebae1d892d5f1b61525b8013c63dd71246dbe0374ae0b244df794972",
+    "app/api/director/reset-preview/route.js": "098e39334b4cfa93bbcd631e36fb688e7fc3fcc995f846592bb9fbb3eeebe73f",
+    "app/api/director/round-scoring/route.js": "9b8db86a318ca5108f3a8084f7894b5e2d0a5f407b03187b75bac98dcbabc8f8",
+    "app/api/director/route.js": "38281903fa36cf1a239da27476f674187c6fefa2674f0cd0f91da0a99854e9c8",
+    "app/api/director/scoring-authority/route.js": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e",
+    "app/api/director/scoring-shadow/benchmark/route.js": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e",
+    "app/api/director/scoring-shadow/phase2-dry-run/route.js": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e",
+    "app/api/director/scoring-shadow/route.js": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e",
+    "app/api/director/tournament-awards/route.js": "30c95d4b556cf31d818b69834d29255e902a2cbbe7f029f4c5117f90340c1b09",
+    "app/api/director/tournament-setup/route.js": "2b2e17a9d6c956ea8a5613f72cbe4b6403f460c311edc88705f9150912c4b813",
+    "app/api/draft-analysis/route.js": "dc38f1f9be1486aa14f5fa9e948087a419afe24cbb8eed9f2774244c3c43d2d0",
+    "app/api/draft-analytics/route.js": "1d2f72ac5bbd6fdb7f456ea468109eb82ba75eb4209dcad01798195920acb63f",
+    "app/api/entry/route.js": "e0f78e54bbd36bf5abbc8c54b2f77f6d9b249addb991f1997b02b0b79550bed5",
+    "app/api/game-center/[matchId]/route.js": "66a4ecc276177a9b3e1445cb8a5578db03c00f7c0da26695b190e38983a5b76e",
+    "app/api/leaderboards/calcutta/route.js": "ddaccfee2cbe0ff090d82017ebf2c3cfdc8e7d372c1b8ea2d3a11359c9c3e374",
+    "app/api/leaderboards/core/route.js": "b54115492f89dde45c4ffc7828d7b9d81038d28bbb64df5b9e35983ec4c58f1e",
+    "app/api/leaderboards/insights/route.js": "ea3048e76b3f9ff99e117b3d5fd15e76c525c62779fe799f9fae1d30684f1c88",
+    "app/api/leaderboards/net-skins/route.js": "0a3c67119262d384c7817ecedb44b6e593af556e5cd8ac19747611469056fd54",
+    "app/api/live-matches/route.js": "5a58e84196d3bd4cc47f12923c8653f4dac2568d5a87add21077300c55d25e77",
+    "app/api/live/route.js": "02e403a3a06c9317a01f7a050dbe2bdfb9fc18e0b12e9223f86b0c0c4c474bd2",
+    "app/api/mobile/v1/account/deletion/route.js": "284f314cdd57f96ef8098f4b4de4f2792408d834029fa63653838868fd35587e",
+    "app/api/mobile/v1/auth/captcha/route.js": "3511108b24e0b90738bcc512d258dc101b5ef6661d9934a3df1cad95c4c42dbb",
+    "app/api/mobile/v1/auth/certification/renew/route.js": "311115a0b3758327ccb836badc3c1cf77a48b32debb5283aee318800dd275905",
+    "app/api/mobile/v1/auth/otp/certify/route.js": "f914f40ed33f2fea5c96717aa6216c25273ddcb3bb29498346759003e25c3c50",
+    "app/api/mobile/v1/auth/otp/phone/route.js": "98e71aafe5666ea7e02126eb4301c54550c6329d0593da9037b5731aeef0a637",
+    "app/api/mobile/v1/auth/otp/request/route.js": "666fe4e236779a4afbbe2827890d4a2704def39447a16c1ba6c02a9716b46bc4",
+    "app/api/mobile/v1/calcutta/route.js": "ecfc7a6924b3e512e8941fbdc0d9ee3e406c824e26dd77234f27c4bdd5b64dc1",
+    "app/api/mobile/v1/guide/route.js": "cb0bbda3f48422fcf1d449a2df6acef84a551e6f7da7a09576961eaf40603ce8",
+    "app/api/mobile/v1/health/route.js": "df745cb34751bc08ce1f0539db4ac623faf8efe3784caea3a7ac7ecd8064d8f2",
+    "app/api/mobile/v1/history/[year]/route.js": "e58058f9a43b69257ed578c10556271df45936a0225faced92283e43adfbaf9d",
+    "app/api/mobile/v1/history/route.js": "6bd69655ac63cf2418bb27047bf48559fd3ff8ddf7f2a84e584662945f6f9fd5",
+    "app/api/mobile/v1/leaders/route.js": "3472354e71fab958a2c5edf3dd90ae327b909410a0519d68e9beffb14e5ef868",
+    "app/api/mobile/v1/matches/[matchId]/route.js": "b69bca7a018dfb09f5650a5f5c9e10981edeb93e6294e2f685676709f4215867",
+    "app/api/mobile/v1/matches/route.js": "79ffa4bc62e69ccbda48bded0a80b71a16df9aeb95d562a75f7860476c415b53",
+    "app/api/mobile/v1/net-skins/route.js": "bb3d090be0f0f3eae5c4024ee95687414648e55f4f613861ca16f6cc31176555",
+    "app/api/mobile/v1/odds/route.js": "8b3981a6c05cb6488b008b95597d417ada881c9636c3e1d59c24aad9b24a9403",
+    "app/api/mobile/v1/passport/route.js": "a4a405db59a8c407132757e0e55cda97d8c03b1c5c4c44bb2292f188ee479e0c",
+    "app/api/mobile/v1/portrait-policy/route.js": "d7ac717feb1029295afb92cfff01d546f3ccddb5d603d090137789b047062a6c",
+    "app/api/mobile/v1/records/route.js": "47ee93437e167dbd746f9e9e4a9c091c2b007f5abfa373c1b9fe20444c29c092",
+    "app/api/mobile/v1/schedule/route.js": "ec4a61c851c53de4ccf5afda16bf3e8becf78c0ab44ea1e629e87edbafd8d1c7",
+    "app/api/mobile/v1/scoring/current/route.js": "7f89bfd1bb196bd7ae482bd9d0f8d56b748f2116e62f5600cfc77342de2d3d30",
+    "app/api/mobile/v1/scoring/finalize/route.js": "6bd022e8d2d68b5e508c22064ccbb20c5484a94cc5b8583890cb40df9d3605cc",
+    "app/api/mobile/v1/scoring/hole/route.js": "aefaaa98119ca5ce742f6d1ebe6d8508f0b0e3f4a045c66e9ef09903ddc0b96d",
+    "app/api/mobile/v1/scoring/mutation-status/route.js": "6d4ffb20d5dd156c8ed4af1fd71a0a275304debdb550d8b477bed470931878d9",
+    "app/api/mobile/v1/session/route.js": "0f347b3d1730652dcf0da72c0a94118b47d9e38945c4ff2084146e0840026fe7",
+    "app/api/mobile/v1/today/route.js": "11ff29a5d075e3c3406d913cfffcdf954ff1345a8871c5493d1c08f5b1547cd3",
+    "app/api/my-match/route.js": "27bf72e26e0ce2d40f5c6b50c1060e572f3a32e3f5eb6f3956e0f0c35c6fc5f5",
+    "app/api/odds/calculations/route.js": "8cf4912032e117dad55ec4b0461f8186bebe3d18b0db819b1ed9cd2c327e799b",
+    "app/api/odds/inputs/route.js": "8d2523571aa9a7d6360180b0f080d9e0e498455e4c57b704f85e8732d23c09dd",
+    "app/api/odds/prediction-settings/route.js": "68749eb91a946411d47e489eea874b49782db51ec995125fcbcd90df86c78cfd",
+    "app/api/odds/publication-operations/route.js": "0588e51dd1aa5c9cd52219477e8c5a6ef4186949fe7559424401684faa6b6d1e",
+    "app/api/odds/publish-preview/route.js": "7f082d96de496a095884e7a24e7e6fb35fc68446d3bc67e418144a85ed56117b",
+    "app/api/odds/publish/route.js": "95d35ac18052cf535cee5484d98d840ae0cd41e74e4ac555ea45e44dca2fb876",
+    "app/api/participant/auth/diagnostics/route.js": "bbbf44e42e351d75da895e0649215d2fe9836eaf1a03e0009cc5b88f3ba0f705",
+    "app/api/participant/auth/otp/request/route.js": "b638c91b7fdb52eed1d1ce8599e699f5c792056037b8bf5039d06c254b3b4890",
+    "app/api/participant/auth/otp/verify/route.js": "74fba6576caa20679f1573def5efeda3a1bdf8278cde976f676aeb0cd8bb8457",
+    "app/api/participant/auth/phone-enrollment/route.js": "1b60cac9d1ec997f1843e4a18cdb3c7397e3e554f47567682a624830f5b4a067",
+    "app/api/participant/auth/phone-login-proof/route.js": "4abedafb6c0016455601c5067f508dfa82e003bfa383b4bf91f53c54205fa0fc",
+    "app/api/participant/auth/phone/route.js": "70e367945552109f5bc9c5fc0b7296e9c422c79926e9c0ede1288e18dfc42ef3",
+    "app/api/participant/auth/session/route.js": "d430f96bc751b3116c93a962d80978fc80c266386dd128398bf9c15ec214193d",
+    "app/api/participant/context/route.js": "09435da29dd6b74e56a46cd4259fdf71dd7128234ad34e8c90c4602cefb7fc37",
+    "app/api/participant/home/route.js": "fc4f71d2e75cb849067629e06069fe01aecb7e7ccb7ba87a6778cbae17fa534a",
+    "app/api/participant/tournament-guide/route.js": "a280b57e8381da0310d608611ebf0f27d91d12382eb9ad0bb065714e62b4bf6e",
+    "app/api/player-passport/activation/route.js": "53f4c8884ea035e61d70b72938ea85fbe1370e1a7535add6947ad909a6259680",
+    "app/api/player-passport/admin/route.js": "3375d9992bc8a1a33acb2bbce498c1d16246dd0f2e109516ce3b6f05e27cd432",
+    "app/api/player-passport/initialize/route.js": "9036dbac8974089d6a00ea7735ef7a1309d1690c3b9a6d61d0ba765c25f58214",
+    "app/api/player-passport/matches/route.js": "158522f4a212027b0f48d530439cb17784a372af68fc1cc571d5c8d9972235c0",
+    "app/api/player-passport/notifications/route.js": "299277e8a82d52cbd5cc2633741d07f68e036539aaa6417814433c21a4504801",
+    "app/api/player-passport/readiness/route.js": "9d627fb569a76d653ce948f606b2461ed50e08eaa7a83fc6057a99f1b792af19",
+    "app/api/player-passport/session/route.js": "4303ebf6d5b649bcb655cb08320184cc65831d400006c58b82bbd238fa5190bd",
+    "app/api/preview-environment/route.js": "b18904cb7ef5269e513d746400da615840e5b6435d39a90a39936a4c96f007e2",
+    "app/api/preview-reliability/route.js": "7435efe43dc535808abd54f2e531bfb2b37ac96660f972f0d657b8e5e67f59c1",
+    "app/api/scoring/access/route.js": "a6b3071922291afc4dbf3b354b0a8f87be758ff850c71fb3f5d4abec22a492e5",
+    "app/api/scoring/current/route.js": "0c4b0cc915259c2e94d5c072d9d79e57a16b17d0c32c3c2f859d3edf6012d717",
+    "app/api/scoring/diagnostics/route.js": "c5cac9a07ba4e056704552a50cc4e937783a0d4121d86acd3a57f36baf60f867",
+    "app/api/scoring/matches/[matchId]/route.js": "29080b7cb9f20c6fc9b1a6d3b812db91d75dc08f451e074200d5f57a7925c936",
+    "app/api/scoring/matches/route.js": "0827d475acbf3d20e51c0d753c73c1852628aaa6c3bcd06eda1fffca00234300",
+    "app/api/scoring/mutation-status/route.js": "39e35bfe30419eb87ae092e7b17feb5e8164abb963c5dc861ba0a3e585cd0c2a",
+    "app/api/scoring/session/route.js": "c0cd56828d66d54bc47ad4c5e9fad225e5b87a2a3bc5800d26507279b4228bce",
+    "app/api/spectator/[resource]/route.js": "6e839677d39432432f66ef43f03822bbc4410fd8e8bbbacef7a15edd89090e79",
+    "app/api/spectator/golf/[...path]/route.js": "636190681774ee1c34d2b108f13b947ed6f24e36f0517b01708fb8dc24962a73",
+    "app/api/tournament-guide/route.js": "f5b44d6c7f2933f1eb2f40f32a50666cb7a2882775b27b866b5d1c4c5109f85f",
+    "app/api/tournament-guide/schema/route.js": "5452d237faf2cb0e0a3327480c20020b5c7bfc17b04f0b2923321664d731f7b3",
+    "app/api/tournament/foundation/route.js": "eff049ecf1e38a8cf22c5870f538571fa91b83cbac924ada93942616bfdf787a",
+    "app/api/tournament/live/route.js": "2ec6f09805f7c37f9b9886cce8a3c40e726a776ffdbb2718fde491d2da412894",
+    "app/api/tournament/secondary/route.js": "7216be2839f7a95ff79560b5eedc5050f03f5633d50a135412a2420ec7d0718e",
+    "app/app/courses/[courseId]/holes/[holeNumber]/page.js": "81acc448a06731e3a9962a8c2901b679813ddfd9859d0c2f76cf4747b32ebe74",
+    "app/app/courses/[courseId]/page.js": "dfcbdf2ff1ca6b5a47ad093b6faf4e537a0629367f0bb86b40d8c62837e85e48",
+    "app/app/courses/page.js": "18fda96400135a54314a2110045a255855aa211968c708f68a9aa277243921b9",
+    "app/app/guide/[section]/page.js": "0324b3c13654f4ecc6f6c73edba8f56cf645e5ce30b911f3f6a6e7b3c18c22c1",
+    "app/app/guide/page.js": "10bc32079e4cdd597ac49bd401c8eae97b39fb3f9c63b27bbd23f704f910e323",
+    "app/app/history/[year]/page.js": "8eba93b7887dee565e7d572f83ba894501ef5f3e0bf2e6535ba7090c22d2ba9a",
+    "app/app/history/[year]/round/[round]/page.js": "e0e551659502bdadbb49c983bb152b9eb52f3b5c20c4474ff6e26af2d8add187",
+    "app/app/history/[year]/team/[side]/page.js": "28090829a59c1c7eaf3a8efda81de1b2a6460d45b5837938a0ac6d9db43c4400",
+    "app/app/history/page.js": "c6ca736c0a7dfa02250b23352365e19d3cdd940f492565a4626b9f026f973026",
+    "app/app/layout.js": "8fa2da88a29f7d2cbe6d316232a1e6690e3791c9d83d825854037b4162df948b",
+    "app/app/leaderboards/page.js": "e729aa069556d1e2c61a9c9ca12deee93a8615ee486936c449b3884938715bdf",
+    "app/app/odds/page.js": "46f02635ce80bf6ce34d3b67d7b08d0cf9a4583357936d53291d9685097f401c",
+    "app/app/page.js": "a1bcd14468beab517e700abb37cb3ed96d21f54ff0ff8f6aab47c3e9e10ce18f",
+    "app/app/players/[slug]/page.js": "234bb942ce83be2227df8cb5dce60137c6b018914586d9b24c26eb230f4ce214",
+    "app/app/players/page.js": "490bb1515c4d7da52162e0aac81181b1de6ea639c7d1e1b52395ac6cd4c36285",
+    "app/app/tournament/page.js": "de5183d2561116893eb8127bf29ea93a4474374563f991757434abd8a7c79649",
+    "app/apple-icon.png": "3d3ebbdd58e9f61688dbbb42309d1bb5c3fbe4d2202a15eaaf54f62b620de10a",
+    "app/board-of-governors/page.js": "8e7bcfac2d1e3ee78014249e6e28b3bbfde114549ea3a38f11935870faf53a80",
+    "app/champions/[year]/page.js": "27b91a2b15deaccdd0b5dda9313c98addbf79eea376e9f1926518a2daf7099d7",
+    "app/champions/page.js": "b13f53db0a1b23084669836e739b8985ab026d3e76ea65a8641b954db4cac96a",
+    "app/compare/CompareTool.js": "751ff05f023f91b94070fd25a20b7a648a1db4a7f5501f1f3b1e4e3412eb2480",
+    "app/compare/compare.module.css": "0be4a33502d8a47657269100cb2d4b11d9d431d07ac96e3ed4a7373de64e4962",
+    "app/compare/page.js": "ac1cb1c1aec4a93ca56c6eef50ed1c3ad71fa3fcc1c889713204ff32525d6104",
+    "app/components.js": "e604b873755b27f15459f59ddf7b7e93961cfdd14d5ebe62af3b7cbbed8dcf2b",
+    "app/courses/PublicCoursesPage.js": "48fd9d446aade44913135b53555f4b94f162dbbaa65ab41c69e47bff400f3950",
+    "app/courses/[courseId]/PublicCoursePage.js": "207444166fae8913c0d0a067915adc3c1557550d0df5d26b51edd82ea6db19f5",
+    "app/courses/[courseId]/course-detail.module.css": "df413a7ccaa5c2494daa79ae883af0f9f3979e4f979a6cc352943dd10a3e9b78",
+    "app/courses/[courseId]/holes/[holeNumber]/page.js": "aabfeb8bf1b6f33f940892f4043925aa9d0f4db0df8f848f4a9249ae77c76c69",
+    "app/courses/[courseId]/page.js": "bcbae5dfa7787959e180d1266d7f38ac444d116fd7c067570da777b4bcd0bff6",
+    "app/courses/[courseId]/public-course-profile.module.css": "54e8978dc4d33d56dd9eb538b6e30c19c17984e129d916fec1e871166b4f62ab",
+    "app/courses/course-directory.module.css": "df36480dac662f85c32839c7df4a52655f2e08b50ff5b65441dd0f0a7b5f8ffe",
+    "app/courses/error.js": "edca7371eb8e0e860befd9c3fdf5936ac7dbda3ef89b47069891b98662f6f007",
+    "app/courses/loading.js": "3df94aa86c5d16bde56bceb046dcd020af949ec773543de348176b6ce3385c48",
+    "app/courses/page.js": "b1633a7a1aa6d168848df7de7f779a8e8911c28af21753793b36fee8466f55d8",
+    "app/courses/public-course-model.js": "7efea57b9ca6361d2cee47213ab7d111da5119e57cb8ee81c58a57ec11469005",
+    "app/data-health/data-health.module.css": "61d8872cc7b4c5741e8de72c776780aa728e09ac00cf91d524ff5a586ad7b108",
+    "app/data-health/page.js": "ba65ac132cbe7cbc6ad57d03aa8eda79f958ba8cb94b2570db3c57fc3fbcfdff",
+    "app/draft/DraftAnalysisSummary.js": "b2d7c46819b582f8e08661aa226d1e9e866c5d28e690e1c80cd6b08531e257a6",
+    "app/draft/DraftExperience.js": "1a132e949f85c39f7c93ed8073393823df2cad0ea7c5740bfe465c58a5e1942c",
+    "app/draft/DraftPickCard.js": "240f3b46ab15e1503adbb2ea89fb5d1fd69584e6ac0f4a52e6a657393f545273",
+    "app/draft/[year]/page.js": "869f3da8c76e35dee977b560d50b2c589424ad437861a7ca34c82c0747d0de89",
+    "app/draft/analytics/DraftAnalyticsSummary.js": "7899394c8440cdc068889794de6860ec7e2f2d7f6a01627ad60ecb46c7b21051",
+    "app/draft/analytics/DraftAnalyticsView.js": "22009f6867f32ace2c287c918fcae87d308ed01b68cf97e105222f43efa85aa4",
+    "app/draft/analytics/draft-analytics.module.css": "8247dfd70615cd760a0592fffc8b94bf78a535707d8e2cd097a36433aa5d465a",
+    "app/draft/analytics/page.js": "3b743e52cfcfd8233cc85a2ddc27e502b3fa27c101fe72edf0822a52e8d1590a",
+    "app/draft/draft.module.css": "0cbd9ebc9cde35776db5d60568a60ac53f55f9b96fec5ed0d1a257b6c749d01e",
+    "app/draft/error.js": "5f10a0230b7477f712ffb58e35f1aa6874b3712164a7aecf7799fb9cc929406c",
+    "app/draft/page.js": "51b118e032bd7db5afa1bf536d105f450c3879dde87e51f0222e34ca306a7c56",
+    "app/enter/page.js": "41d4a2d7b2943c595ac5a48cb5ea2d829f457c38498c42e264a8aaeb7227ded2",
+    "app/error.js": "2cba6fd9b793c8c3bc601cc262a93a342b7908c15ab03f7d63aa997b798869dc",
+    "app/favicon.ico": "9363de7f7a575d98cd70cbcf650ab89e3c799600fa6234578d87fbc2305e9815",
+    "app/follow/BaggerEntry.js": "48d305a355f32436c25cccf6df6897291734496f541a1d89c4153802c3e99ff4",
+    "app/follow/FollowingApp.js": "fdcc574df63b40054894b4f034e0cc4a6e2e1f7d4a70061eb8852c353a1dfda9",
+    "app/follow/ParticipantEntryGate.js": "3fb8ddd189ea2a0b8676e5282181b70e3eccffdcad1a66032ff60265ff6eb70b",
+    "app/follow/[[...path]]/page.js": "94628b231094e6600d601230e6f80d6fb3355243891a15aaad0a2b8d5063262b",
+    "app/follow/following.module.css": "49cd0ba1b7fec9b68d972c0cc2d680b664e9d28488cf1f72ad4a180118fc6d3b",
+    "app/game-center/GameCenter.js": "69bd767f8e88e30af0f42c9b5c9568c9432c29fb10805d8b04ead88588a153e6",
+    "app/game-center/[matchId]/error.js": "3533b32252061af085843307cc0233e9b1040b23ff31aa00eb9adc8b0b9ed7f4",
+    "app/game-center/[matchId]/loading.js": "52c18051fc2ec737c14407f275614a54d1157b147935771a62769dbf1fc4cee4",
+    "app/game-center/[matchId]/not-found.js": "0631b6a08bf1cc0050624940d0b30b692b75cdfd504511b24ca28b9950c7fd58",
+    "app/game-center/[matchId]/page.js": "27e40b2d123836fab77ccbddd484f5672b86681af4f7e9e5c9f9c894bbf14e62",
+    "app/game-center/game-center.module.css": "09081f8b249319db77217d696e6441ad9096b016de3d392ce396334dba83f951",
+    "app/game-center/gameCenterData.js": "6ad7eae0724f66dcfa01e41c9cf330183a54885916193fb4e61d2e01b19303d9",
+    "app/globals.css": "c5f94eb532d3e0eba539fab8e16c28a22615955ca416a96ca56870a0734f3921",
+    "app/historical.module.css": "be53c42963419269336604513790ec051d830e43a49720c28d0d15b1a700743f",
+    "app/history/HistoricalMatchRow.js": "edb851702552ef96671af5a398594c3ea5518e7a5eea11d87a746fd09d9b0bc1",
+    "app/history/HistoryArchiveNav.js": "b1b29619b6331576f3cdd90184dae4a68e948d57c40369b1b16c6005ffa39557",
+    "app/history/HistoryBackToTop.js": "fe12822e85a6d36284a5445cd687fabbd9073eceebb8d1d454b2bf0cfaa6383a",
+    "app/history/HistoryMatchAnchorTarget.js": "5fc66b877d7a78d862748f07860bb9841c76ca35df9865d1a83871a269af660e",
+    "app/history/HistoryNavigation.js": "045e9c6da16eed61062c35419142ff742e9f09f419494ac2460aaf466e92a4d1",
+    "app/history/HistoryUnavailable.js": "92544c4d88bf20c40a4edbc2271df81cbe83218628693c4298b78240d8e0b377",
+    "app/history/PublicHistoricalDetailNavigation.js": "6c023a9e7b0a731a84629247866c5f73b2d5eba5daf551111544f8f7b5b97f4a",
+    "app/history/[year]/completed-year-2025.module.css": "3515728775a6322ec52476b052217720ddefa6b2c13e1025f23b671ac06e1bb8",
+    "app/history/[year]/page.js": "38b51a654034f74c884ba755124078613cf1ca3d3946b65fd1f7697fcfd059a9",
+    "app/history/[year]/round/[round]/completed-round-2025.module.css": "b1a125af6d16917fdae43e9f0a4c4701aa3ff1f7ad59814c8a6e868ef2540659",
+    "app/history/[year]/round/[round]/page.js": "e86ddf6906212a803f309231e3296baf996aa5edc765e2293f389028f817a789",
+    "app/history/[year]/team/[side]/page.js": "ae8baba53e8be2e7dfd9e14fbaaf7602f18c153a2afde42f3a5c637ecc914ea7",
+    "app/history/error.js": "bbbd3fe06c46ec42bb55d25c5ad991f96ea8f1680f8ed576f7a7b1e539a5363b",
+    "app/history/historical-match-result.module.css": "cf495324b6898ed0e67730e6186510253236bb5f8ef036b73ccb34b6e42c1be0",
+    "app/history/historical-match-row.module.css": "97229c2aa7560c4493e5e8e51edb2e7d5dd5e38395b78e9eea1c1a9e9349d25f",
+    "app/history/history-archive-nav.module.css": "bac354a1f68e82d7ce3d194b8b5d2fffa9cac8fa27ce5c4d210899b58bc00076",
+    "app/history/history-density.module.css": "1b9664d4513c742b59200a799e1e3bdaffb6ced62525c2fbafe7570fe52ef9b6",
+    "app/history/history-navigation.module.css": "8b9a1335deef933c124f5077238ed65dcb80458dd9f1eb1347cd849ec11dd86c",
+    "app/history/history-participant.module.css": "5755c281a304bc2fab7a296219324a82dd13bbc0bb63b833258cdb45947b4499",
+    "app/history/loading.js": "e988303e1d37d3fc0356bb3c789655d7c8a20dd3f903d3f80274954eb9825277",
+    "app/history/page.js": "b3da4d386e52233420e2806f4a19ba0382d3ab331ee94eff27504ee3095735e5",
+    "app/history/public-history.module.css": "f8c7dfa1c55d7694d6134518def87d3841425ae2889d8a7d857d3a83a24d1727",
+    "app/home/loading.js": "c8d604493d1e8fd68d496274e6650f767442c4e685cd3c5fac56f7b1c0219795",
+    "app/home/page.js": "14bda657d04d7ed5c5e12dd0193f630599247cff4ed5e668faab81df9afc024b",
+    "app/homepage-history-card.js": "a9fb2bf4772f1fb2e3f077474ff2bdad2dc28fe3f21fd7a1f5360b98fedae696",
+    "app/icon.png": "29456f7f02c49792c94aee78e4120ca2d7d297121462d3c70198200128906a2f",
+    "app/layout.js": "5a5958621f40a05d2f13f8a8c80adee15f6e1f8341735b02cdcbb028ad9c2ddc",
+    "app/live/CalcuttaExperience.js": "e4b04f7592bda39a915aea7aa1bb0e0f3948e2030e0c8772f26fbc2f86787060",
+    "app/live/LeaderboardRow.js": "2d7c92073bb77c0e05153fca31587482c9278dc3b1327b47d42b955ee62baec3",
+    "app/live/LeaderboardsDashboard.js": "f8eced223d6c9672c0fe7bbe0fde938b883775e4534032e5fdb2b2d12c8a720b",
+    "app/live/LeaderboardsSupabaseRead.js": "2ec5ccc6f40c0f890ceef3b300418c64746f6362a807c123bf3ae0aba183b827",
+    "app/live/MatchCenter.js": "c3d17b4e3c09ff93bfe902579944852c7d014328b787c07c4030f0ff8377d085",
+    "app/live/MatchFilterEmptyState.js": "5d92460c95856b0ed6b43e408dca2ec093fa39898c0b8bc908a030e93c62f37e",
+    "app/live/ParticipantSideGames.js": "fd748874a12168b9a9644bcff1b8237c31c41f3ac02f86de3d5d8d050118490e",
+    "app/live/ScrambleLeaderboard.js": "03c6fdaec0c245c40b8fe18cc6a6cc240cf230be6b822243d573db9272fbc91e",
+    "app/live/ScrambleTeamIdentity.js": "408633d8561d7528156c4fc128ce5b3b0e6519a1d18fa6e9c7a9e34e666c254c",
+    "app/live/TournamentDashboard.js": "bbdef14f2b16e2e8d402d444d22133a3469d1302cb4e4619ea86733b1a312c76",
+    "app/live/TournamentIntelligenceStorylines.js": "5c53c6b5118ff3927e343f0f26b1fe6105dcf726742b726b661b87cb22c417c9",
+    "app/live/TournamentSupabaseRead.js": "40d62b816a84799f9aad64c96ac49a3f3d4738b0fbf845c609a8b7fc2592660a",
+    "app/live/calcutta.module.css": "832f5f750ac96783872b795dd1ae18db213f8e36bc4d61d5493ccfdb32f4bc69",
+    "app/live/leaderboards-dashboard.module.css": "44298f76ef8ed0b9998eeb9f07abc85a6b2e0da8f9ef644d1de74dbfffb391c9",
+    "app/live/leaderboards-insights.module.css": "0917e181c3f87a0b18ed6f8d3be23e9bd73161d0bd874a62d95a7a5276ffdc3a",
+    "app/live/live.module.css": "1d02244ac7fc1804d3ccd5b8d2410fa8185f333d49f7eba658c07c8d62570402",
+    "app/live/loading.js": "5257526def22a3e41ffc2dcb8839afe521cc3f0b4cb97d13e622749ef6296660",
+    "app/live/net-skins.module.css": "b566e52c6045f72e5433db88b37e175692df6a571b153a1ea8d8705150feccfd",
+    "app/live/page.js": "501c99335216c0bd766071e2d7f886fd88876e79d66f0070b280aacab0bd4b38",
+    "app/live/participant-side-games.module.css": "38c1c7159d11565be524a346334e47acfc72d0b727fe2e29c594e7cb918347ee",
+    "app/live/scramble-leaderboard.module.css": "cf2c5835dbcfb281b63ce10c9f50a279de312946dda0640e996f5528ae7e091b",
+    "app/live/sheetData.js": "8791b8d3a18596973fdce1649c91d14b0ac76368a6f70b1efe2d35b4fcab7ff4",
+    "app/live/teams-leaderboard.module.css": "02ca85bb5238951c9428938157ed43443b1accf0bfa64c25cee27b787b62ed0c",
+    "app/live/tournament-dashboard.module.css": "952603ea1d168b397e0fa52a362ee3b78d3fac6ec9a990efe8db828d048ae78f",
+    "app/live/tournament-intelligence-storylines.module.css": "0a41c350ce6eb061677a8d99fddc37f29c6f93f64550d4e400bdf1abb8bf015a",
+    "app/loading.js": "15223f7d6dc13df2db67b69e11f7a051ea8aac5ebc3d39359037f4dbf45bec03",
+    "app/manifest.webmanifest/route.js": "3d4d4348028117d4c44a3c6296f94b027c056efb8a5e868b6a1f95c8367ed7d4",
+    "app/match-status-block.module.css": "6ef157a30767e91fc12ab65f958b7527035e2ac72679bd1c1430af9d51b6248f",
+    "app/me/ParticipantProfile.js": "a27b7aa49c9b6d5458c828501f94227b634054fd1a40d9b7e95293d0e8fc44e4",
+    "app/me/loading.js": "6073de7203c37d03e5a3c2b27923f395c48a02b4c9eb0ce002632e8c28b19f38",
+    "app/me/me.module.css": "e1d12569c1ddacf7f6d61214c82cc62a527da4c79d296dcc54ee1c9808cdd84c",
+    "app/me/native-actions.module.css": "664c3ec94b515460ce943f0b5e5151678bc75c4f3ad8befa7c505ee54061eddd",
+    "app/me/page.js": "ae0bf5bf2624d3f70315238ac60ee0c78e96aab6ffa93df5c33e408af3caaa77",
+    "app/me/verify-mobile/ApprovedMobileEnrollment.js": "9dc1e5aa2a1b6abce97607d3e4b84d5ed15ad5794c3f83673cfc6e66bc0df5fa",
+    "app/me/verify-mobile/page.js": "f9da5fcdec8cec3a49d336affa0ba41208e43653172238adbcb694146fe63835",
+    "app/my-match/loading.js": "96267193af9f1aeeae019acac1114fbbea7d4cda6199fca4a380214b694cdf55",
+    "app/my-match/page.js": "5152dd9037809fc8a68c808f909521975f4158d64bfab74398113c15a9ec8d4f",
+    "app/navigation.js": "9cb36b839b6f0932eb059811744f65586b95a599405ddffef7df2e42f96db79a",
+    "app/odds-center/MobilePlayerProjection.js": "b5d54888b8a955a650c16d3e06432b89aa5f6c6a4be6288eef4d57e164b89be3",
+    "app/odds-center/OddsCenter.js": "674a77902ecac9230175072e1a261526b7f6406c00cd3bb195dc21110201d232",
+    "app/odds-center/OddsCenterPresentation.js": "7a7471a6ea75a8bbb95f3014b322872e6fb798912536e3c29bd4537eaa7d5a2a",
+    "app/odds-center/admin/OddsAdmin.js": "b1ea3e3eaa1fc8994a013cea6b4627cb0c607ce565873e2eddc0f2214bb3e85c",
+    "app/odds-center/admin/page.js": "13a4686c2ece4eaa701d178fd8efd471cefaa8828c3f106c038dc37696f7ebfc",
+    "app/odds-center/loading.js": "c70575adc06e17e1acac2f3f027635a2ee65eb93780bbebb647911e66345dcce",
+    "app/odds-center/odds.module.css": "d9ee546f55240bc2c0ea6c43dec26957b48b43984232acec7e657526dfa2d01c",
+    "app/odds-center/page.js": "5b5fbde7789271934590a1ef0a9f9728611a302d497f0aa073931d1f11f74c0c",
+    "app/page.js": "1bb5ed872ba1cc804488ec836665e0e324b92da4307a45f3750c1ff2405d3b6e",
+    "app/participant-app-header.module.css": "f78c32857fac2207a8f0c01bd0393bfc055442dc476fdd7026c6f472daa1f375",
+    "app/participant-auth/ParticipantAuthRehearsal.js": "98e04fbcbc271d4ed63aa882272bff2e96269fd873a1d062564d78a1b97fa13b",
+    "app/participant-auth/ParticipantAuthTurnstile.js": "4b96d3ac924e76584e1a150e2b86448131bdca430c1bf537f093951e5003870b",
+    "app/participant-auth/page.js": "2d41b619f7ec3ad3379114e9f4cb97cc17783cfb77e3ae3a2c164daad1f3aad8",
+    "app/participant-auth/participant-auth.module.css": "2f325308426a3acba9a5b7a2a721373b808857a117019652e8f9818b0871fd4d",
+    "app/participant-navigation.module.css": "d112e450bf97d51bcacdeeb34e4dcd9477a7f1ba914747706a8bfe0b28c2410f",
+    "app/personalized-player-home.module.css": "a6300e782abd3c70fdeda14e0ddc0aed40ef3f42ba25d36c2af229c46d64b9f6",
+    "app/player-setup-banner.module.css": "a0b469dda0ed68145be3caa968594e66cb469ac956de60783830bf841698a96b",
+    "app/players/[slug]/PlayerFormatMatchHistory.js": "2a7becfe606707de19df753b3c6a841d34dd049686f05fb9fbf9f4e41689c9e5",
+    "app/players/[slug]/PlayerIntelligenceSections.js": "f4ae6888cafd9562a99c9a5aea87069c2c9f82550cf8aa62404b593c9df05801",
+    "app/players/[slug]/page.js": "43a76130a9ec02f68178405cbbf463d811c9aeed9ec80d655ae1dd236ac920ad",
+    "app/players/page.js": "a0e2c401d7109559aefc9aa6cda4bc6db975b9d8619d65cbe9bf14fde5d8d2b4",
+    "app/preview-mode.module.css": "caf97e4448aff563a6075e63baf60131ad5b52720c84fe357b55fd44aff9988e",
+    "app/pwa-foundation.module.css": "9ac6510deac2a53b82a8eaf1f038ee26633b361837fc2b1b121f0346e3029684",
+    "app/pwa-launch-splash.module.css": "d73617af888806f95159b277e908f1accd5adfb5ffcb978bef9b8c1085424b26",
+    "app/ratings/RatingsTable.js": "eb5b6e0d2a1b74394b353f8f7e08801da3bf5d23747189f78df53114bb649339",
+    "app/ratings/page.js": "818e5080954181ee4a538f1f0b1fcde499ad241af12dc9e944f7cc366c78df80",
+    "app/ratings/ratings.module.css": "f6fb171e904747f9d9aa1d77c4945938ae9de1f0b5b5d24d6e5c2bcf52c2f2bc",
+    "app/records/SortableLeaderboard.js": "de897e92702cccb45471a4a8cf17bb582c6d9db2b5654db03a4e574dc84e922c",
+    "app/records/[slug]/page.js": "e263681d9fe020698204aeadc4849a6e4e5aa11f11dba6f3f574405c8b6f0dcb",
+    "app/records/page.js": "02b809a0302acc644fd39f93022ca4d247721e6ed82d6f398fae51ac7935ac88",
+    "app/responsive-player-badge.module.css": "eafddfae8a6e3bc9dfb35cc7043a8a9f7f9072ac03140bcc093e1d324aea349d",
+    "app/robots.js": "bf45ef514ef2154c3ad04d1da7cfda10f6c9be6a84d74bc9e9831d2944ffbb18",
+    "app/rules/page.js": "a4d10fa4a2b19d4af1e8a7fbf46decf20425daba8244e546816eb25b6d8f1c13",
+    "app/score-typography.module.css": "c765508ba659028e04fe9acbd6c54dabddd292bc7aace2653b7f839d96d0565f",
+    "app/score/MyMatchDashboard.js": "890e7d5f440a6ee13440a2d37650ff9204621c0766811faad0c774225de3ce37",
+    "app/score/ScoreEntry.js": "ca3553f25c18583ca6b78ae16f9b91e09ee4dc03b59fcdef6674ae7aa3ff4746",
+    "app/score/ScoringKeypad.js": "4ccd9cf4a027c3253c1553f9f561508c4bddbc390852ee9b7896e5a8d402decd",
+    "app/score/ScoringSyncIndicator.js": "2d926ff8dcc1df5d21571344f936151741afd03ba74020cefa3ebcaf647413df",
+    "app/score/access/[token]/route.js": "f79447117b405fd50cb2c54624d2bbbcae358c02ef1d303067f3e6b5d18de5a3",
+    "app/score/loading.js": "3ce59b97d157e303767ef72bd76f949ee53d4f3595c12a41d75659def3d23bf1",
+    "app/score/my-match-dashboard.module.css": "75add4935fa321d5bb5f5def6cc4c38b0764e75c7eaaa7c9b2e31050015b7981",
+    "app/score/page.js": "c9adc2fd37c977de524d5295acfe3d5ff5b300a60aa915b882de0cadfb91713d",
+    "app/score/score.module.css": "db4d61c8d1f25b77f58770ae81c93e193da0d1f8644dd7e557da29ea2210a71e",
+    "app/scorecard-pairing.module.css": "0aafa0f0d4c53afe334ed54c66868de1fda1b458584234cb59d30b8d4420bbe3",
+    "app/scorecard-summary.module.css": "8ea62da06e47b10235f8018f19862e082950a495c3c7acd9c35f2665e61f53b1",
+    "app/scorecard.module.css": "288623d36151f3ed811d556828145f72d243634bc9376d1edaf1422babdfd67d",
+    "app/scoring-stats.module.css": "1908ccc917f7fa08ef23e62d66071477ac57c0dc45e1e7d3b7e8d2ce2e18d0b5",
+    "app/sitemap.js": "e6f74aae3b86842e540081ba26e619503a70a04597a80389f46fef15abcb8f54",
+    "app/statistics/AdvancedTable.js": "33c5a4dc8c0b4c6d2fe4a5b16ea516481ed7ded1c5d2269a990971c2296de581",
+    "app/statistics/handicaps/page.js": "5ceb7c7267ad5bf949dfb8da71b1623a7cd90f8e91cc29defdf50ada613e91f1",
+    "app/statistics/page.js": "3dbc857cbddd5e1cbf6ac8798d67f43a873af60e391f88eee671e311b654b192",
+    "app/statistics/partnerships/page.js": "d80b29846d991e32ee8133cbe452e1207ba5c9af443212b51b1185d1e7da2a22",
+    "app/statistics/rivalries/page.js": "c0d3c9601e500633d568bdea9da28bc7f7b9977abd8b1cfae41a06f731c3e277",
+    "app/status-badge.module.css": "0e67194a15892309d605a9751f4df4aac9346023e457a9df9af9842a6c5d108c",
+    "app/tournament-command-center.module.css": "df4634bd9d5ed437b9ac6b9b806505179135bd089f842969148e5c28db3f2d36",
+    "app/tournament-guide/AnnualGuideHeroMedia.js": "dd8324ccd34b26c58a9c0afe76a3c0f68415591590414c26d38863804259c1bb",
+    "app/tournament-guide/DiningItinerary.js": "733da3b9d89883954697f9eb6b0dd70c6b2e382b4d2a431e7e42af6400a9d6da",
+    "app/tournament-guide/GuideDetailPage.js": "e3679f4f6c366423ecce0f93049e412e8389c94294f35ea079c188f7b11dd680",
+    "app/tournament-guide/GuideDirectoryIcon.js": "81dac383ac450f796af9f3545f3c98cf827b111af15b0a8cced07163a67a76ba",
+    "app/tournament-guide/ImportantContacts.js": "0b37e77c64082fd36d0122849125df40d2c15353fff580775ecb3ab6dcf00c42",
+    "app/tournament-guide/LocalGuide.js": "40e2d770dc99a2bfda741e8b3fb441db1a4f4f922169d7b2ec4a122637f144ad",
+    "app/tournament-guide/PublicTournamentGuide.js": "3599b5bd4b96f3ab4a4555c82bdd2b019b011de1c01cc0a1bf47acdf5da35889",
+    "app/tournament-guide/ScheduleItinerary.js": "cf1ba8e3c1508961f4207316c0474902b88e68f48d29906031025edb637ac532",
+    "app/tournament-guide/TournamentGuideHero.js": "53ace33c33d1ec2988b3ac15a108db08f61b65f48cdca9a717abc9f1840765af",
+    "app/tournament-guide/[section]/page.js": "a763c0ec13b207226fdea5ffbe74e8fb49b4a2fa9c358e664ea7af16969fc38b",
+    "app/tournament-guide/error.js": "186be71cd2e780e22c6b1aadbbb08c66d09c08ee25d34e05dac9bf03d7362a8f",
+    "app/tournament-guide/loading.js": "3e6992ebfc3d16fe1a810eaa4e7700980c77a7f5db8ebbfaacac836642773f42",
+    "app/tournament-guide/page.js": "4541e0dd5866af541139f3d385798c8325129f113c78a56794fa359467646f30",
+    "app/tournament-guide/public-tournament-guide.module.css": "4f09af2bbb815d53a4c4470215d935806a51ef30269becfa3bfb0d1a810b652f",
+    "app/tournament-guide/resolveGuideContent.js": "5fbbfab9009debde13efa96a8a54ed72bcc9a31dfbaa41ab882bf70a3563936a",
+    "app/tournament-guide/resolveGuideContentGoogle.js": "6f5a2fd97e423b8fff572f9a314c46c23c232c797e5229cd75cbf6aeccb485af",
+    "app/tournament-guide/tournament-guide.module.css": "4fe5027f52576107d214f6d83c2d3436f403e28448796f3bedcf847b62e04ac4",
+    "app/tournament-identity-header.module.css": "3cc8b1f91c2ad69d6d4028dabdb9f55300c8d3cf6a67f946297bd12f58ec8b7b",
+    "app/tournament-leaderboard.module.css": "c9ce5be02cc30630862d894abc3677d9851439dc424bf291c17b7e14b59f1426",
+    "app/tournament-moments.module.css": "c3d382c90a9849761551b5bde7080de18054baca118c88f17af90f599598fe77",
+    "app/tournament-status-hero.module.css": "91862f47c9784ab2f4de66c73feb449b3667242e438e049d379ee884216388d9",
+    "app/ui/AlertSheet.js": "03dbab0f5f88445ce72b35374aafdf7982b4ac224c998e67a825383298bd85ac",
+    "app/ui/Sheet.js": "7c7fb818ef803a4eabd946632b4c8ee680ef0c48a931efc90454c44b843fac01",
+    "app/ui/StatePrimitives.js": "d50bec16d204a5c9cc656baf0c00cc801c0316a6a06028394f069f24edbb4708",
+    "app/ui/alert-sheet.module.css": "2673003a8652b252dacc5ad19bdd08b9827974cf4323d69da8a078efa48f248e",
+    "app/ui/sheet.module.css": "61754f71406ffba3c0fca54c387cb08d11e0cedc35e7c114d3d339264e640630",
+    "app/ui/state-primitives.module.css": "e24df7a71af840e38027acc09e17e0db88d6e1d6d77d938fae6770c03af080fc",
+    "app/useTournamentClock.js": "d6250331d6fa232cf526b220fc423feddb39f20847f61f0ebfff9e487167fd21",
+    "app/war-room/MatchAnalyst.js": "a89f9ca65cb8d2fa97a2ed7639cabcb15c9164a98ffede4f9e56c8cbaf89a369",
+    "app/war-room/RecordedScoringIntelligence.js": "c4b5abb8ed2fe17a626324069f1c84f1dd80590a567e013f1736112787fa2523",
+    "app/war-room/SimulationResults.js": "aa2502c3dbb177eced6aebfc24a43fffc19baa7c52f6d2d2cb97a2c29794d99f",
+    "app/war-room/WarRoom.js": "23c162a6cdac8629d9f7e4aa6e98fd088aa99ed50388a73a5e4568ac986fc91a",
+    "app/war-room/lineup-optimizer/LineupOptimizer.js": "d6e8e7f6a44dc39a562f089fffa76115190b6854766426e6773e515cd6607113",
+    "app/war-room/lineup-optimizer/page.js": "6d39acee3a2c7e8f2f059d66b01ad3b552eec64e868aaa86dba896893cd0a973",
+    "app/war-room/page.js": "cdcd46a813f7c40df6febdebef453c1c5d1034720f14ec48c8a23d8ffed467a4",
+    "app/war-room/simulator/MatchSimulator.js": "a6cee47656cde5b5d50b992b183435811e588b70c3234f92dcd7e9d3b68f6a97",
+    "app/war-room/simulator/page.js": "c610d78896ab479daedeebaec1f2e296f49942fe11611f6a73b266c8dce741d3",
+    "app/war-room/team-intelligence/TeamIntelligence.js": "debe2ac11e63e412cc5e269c75f4d7d2844d210da7d44eae1f1413d7dd0d98e3",
+    "app/war-room/team-intelligence/page.js": "10974ad1fc09f8df09e521cc95e30ff4436c9ea3a9b17f7764fd927a0f055d53",
+    "app/war-room/team-intelligence/team-intelligence.module.css": "3f9e8a89fc9546c82ab34db922486066282242dce1cdc55b0c5514206582d0ab",
+    "app/war-room/war-room.module.css": "fdf4f8f95f8b8a7b254cb23d752f91ba65bbaf844dc57ed72a0d437cdd74db91",
+    "lib/account-deletion-completion-worker.js": "70d313926c56684282b3b1f675e5e1f3ee59b4cdaa5994975de47588106d5e49",
+    "lib/account-deletion-policy.js": "fffa6e2e33986402bc0fccf17245dd216f1fb672dea85ebd09c7d282b1403d21",
+    "lib/account-deletion-provider-client.js": "7e6b19957a0e8aa7dc68bb42a55fe727715bcddc7ba5db8f259e0283f8490282",
+    "lib/account-deletion-scheduled-worker.js": "d4d0ad7032b6eba38133d6820568546a3ad6a0737bc0b266d0d0d36e03301733",
+    "lib/admin-cms-config.js": "6405613d7375a9e5d5127aa0d0569a69cbc7718e6778d59b96b7a4a79abeb9fe",
+    "lib/advisory-match-simulation.js": "cdb27409d087b985d1b26a82bf51ae3f3c254438e33a2c1e765f0f088a19b4e3",
+    "lib/annual-runtime-request-hash.js": "da6a2faa6800136a99e26b69c6cd2cf4277f9b9b4cac48cf649fcab07160132e",
+    "lib/approved-mobile-enrollment-client.js": "1d56bf6cb1132d4c82d6835884378f6261af3f8b30abc2c8d4257347eb1f7db7",
+    "lib/asset-paths.js": "bc15bd4eb87dd9bba5aa582a583f46826edec8709ba322206d57bfd6bb692e5a",
+    "lib/browser-installability-policy.js": "b07f86925c80250030465d634e2e89d352db26d52d55c2d420cf6f4c4050a17b",
+    "lib/calcutta-leaderboards.js": "16c10716d20972d1d35c5a7099424a5f26dd68e2d81bb5cb54e8f7b344a5628c",
+    "lib/calcutta-management-model.js": "4db6c3ab2e6c068d3b0f83498d6c6b78612ee06284b6da53984031e57314fa24",
+    "lib/calcutta-management-server.js": "bcae65659942de16ccbcf98d19c7e2ada7f1fa97c8fa9209a5ac7cbba9ffaee9",
+    "lib/calcutta-post-commit.js": "2c861d91b90046190ac6c4c523aea7e20559c9e6d9016c660776bf1ae4c6cf78",
+    "lib/calcutta-presentation-availability.js": "a2ae2275c2eb7dfdb93d0aaa1a3b191aa243dd5e71c98292b37ab78e473b97ef",
+    "lib/calcutta-read-source.js": "d695c4706559676a70942ea4bac70735272c214ccb6906491686a4f4b7c62a62",
+    "lib/calcutta-supabase.js": "8b4012b6f99ae9f91903ab48b25479e39cf66c1225842c337e14cc1bda080b41",
+    "lib/calcutta.js": "095621494ce7f8783d27f45a387e31ae4ca22eeee346c82fe4622b02cad14dc0",
+    "lib/canonical-director-client.js": "ad0e4aba8e5fccd46b0af605ee0ace7682a2e05fc8413b95a60cc6ba5f4dcea3",
+    "lib/canonical-director-odds-client.js": "14125cbf9f69f16d362f9e69563fd410c0467edebf19cf57ce29091e06f708b7",
+    "lib/canonical-director-odds.js": "3b897836d1d044fa8286e330c9be10a71e64435092fc5514bd4799cc24dabcaa",
+    "lib/canonical-director-operations-client.js": "8f2ae30067d0844d44500a4306e151b94bf15f5e916653a946ac424decf381c4",
+    "lib/canonical-director-overview.js": "5b6b79368c144df9cffd921a123a709dd7ec9c0068f7335004980dc32a8e53dd",
+    "lib/canonical-player-presentation-service.js": "9053810d180e9b7cda6d1545f912145cafec94e5ee672c48d219691ce0bd2f59",
+    "lib/canonical-resource-registration.js": "0f2647d93c0f37c8d2ee92a77f6270408345f1e09e6ac5964ce88f7f83fe28f1",
+    "lib/canonical-runtime-source.js": "1907a9b4d5cccadce45bfb587f6da78fa0a16c5aadc004b2fac0f38a8c7591f0",
+    "lib/captains-briefing.js": "0661725dfbfcccb139d5ecd9089d8c0a297d5787fcd5bcca60b3b4884e223421",
+    "lib/career-history-authority.js": "401163badeda64cc71e0ffcf89746cb6d7eb838942f837f9d97793e708159a7d",
+    "lib/certification-odds-server.js": "3e1d0b8f21336463a67b3fdfcebd49b874e3496c3454df594782e863397bad39",
+    "lib/certification-read-adapters.js": "374e7f35a2f3e578f9705802e1284fb996e2bb5be44b98cd2d52c3edd80767b4",
+    "lib/certification-runtime-server.js": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779",
+    "lib/certification-worker-adapter.js": "33f6c84b25c6cf36a149038700892482f05baeaa9ed7cf4f86c54dfb08f6435e",
+    "lib/championship-odds-format.js": "088d0eccac611c43839dc6e62cdd0b045d06d9af426499f7ae8262f864e6ba4a",
+    "lib/championship-odds-google-mirror.js": "f55cafa4f6ddb9392dc5ea8e930a25fe5050be9537b90ed5cb926349fe40981b",
+    "lib/championship-odds-insights.js": "750d3ca1415b4fd039b848b58df56ec160894a485bea3282761be5cec8fdfbbc",
+    "lib/championship-odds-resilience.js": "2a9b9776279ba849bbab128d1d56920b99a7fb38257cbb28a8bb164e26aa6c28",
+    "lib/championship-odds-supabase.js": "26b143371df2359e0bbdf571e544afdd232fccd29f58ac316bd40747e7aec1be",
+    "lib/client-mutation-operation-identity.js": "9696c654323aa9925fb2a3c4f1e263851b43bfc1ad6de9f7019c16aacb266303",
+    "lib/competition-derived-read-source.js": "36be9959e2a697362a84f0e9af5583348a12b3a3174db23e098e2fe8e66b9c30",
+    "lib/competition-derived-supabase.js": "79e209265c143ed2f97260a848a05a841a649ed98098bc4191a9b7dca5a5088c",
+    "lib/completed-history-contract.js": "31d08fd0a781a0696b6811abee8937849752e036e87942e3366602b583cfead5",
+    "lib/completed-history-parity.js": "fe29f0258d120bae849c16232f4350ccade0269f0477fca05be65e8253eb8758",
+    "lib/completed-history-presentation-adapter.js": "75d3c0d4edd28e09737a3e0fb036cb2c99cc5e205efc132a3ae194a7d42b4c1a",
+    "lib/completed-history-read-source.js": "8118e4854a8f2a815291946da4a93500fe3507e47904678795bdad7d86cf8a90",
+    "lib/completed-history-round-statistics.js": "b50b6e53c21a155d8e97cc0b9455cb70bd86db0392a24c2a971a751e42001e06",
+    "lib/completed-history-service.js": "b28e98b1eceace4ea3d6a7d4ec02b17cb169db66ae871f95e5a967dbc229b919",
+    "lib/completed-history-shadow.js": "25a5f7b959c4779b239bb0a5f883f306bbb0bbe7d2360d1edb2374aff75626f4",
+    "lib/completed-history-supabase.js": "022ccc5bb8b9cf9628ccdf3804bbc21e5f90d239eb6ae5a13ee3dfe5117c4cf2",
+    "lib/context-navigation.js": "dc13a8be7f3226e372403a4d5d5f4b649980ebf801de785e357789e63cea9ed2",
+    "lib/course-archive.js": "746619e067367182eddbca3674a5619308d691950684fce4023f39594e1536a8",
+    "lib/course-detail.js": "f1af833165b85979c6023661f05b7bffd45dd06a0e2b4a8999a95de1c8d58bb9",
+    "lib/course-guide-content.js": "42e124639892bb867aa1e37d344cc3b4326e602791fef4a5341ee6b7e07e3776",
+    "lib/course-navigation.js": "cdf9b3e5fec63defe7f995df5a3d5c85e41a62e1f81e9a2c25296efa605e3ed8",
+    "lib/data-authority-request.js": "297150fd54d699937ed6816957a5da1172558abca0bbcfecbede11d73ef19547",
+    "lib/director-access-discovery.js": "d88c786f88b33d90caa8a56c2e8531670dd3d2eac81a38cb42213fe9bf1dd688",
+    "lib/director-client-transaction.js": "891bdc74d5f1a7dbe710aa9b220d3fe9c349d98680ad30e241162dc5959bb9f7",
+    "lib/director-guide-status.js": "c10fe30f2d5cf4501bde07cf4138bdfd3506fc9a6b8385ad2095bbc9fb013bad",
+    "lib/director-mutation-authority.js": "18686279050c6c020fcfbe5814138680637d0e0c87b832ad727e825886feefdd",
+    "lib/director-readback-verification.js": "7119287fa048f2cce801047b8dd2d25ff17c5ae9057696a67c7a112f0dcdf6cd",
+    "lib/director-transaction-error.js": "108fe63b1f1a7613eb490f258478105136af784fac645aa01dc7e3fddea02276",
+    "lib/director-weekly-handicaps.js": "2bfc24bec0850b501ea46ecade054eb3476faba8952ed47281c27e9711226658",
+    "lib/draft-analysis.js": "63efb1ecfa8383216f36962b5a16bffed30873b3c34678fe90e847163abd94d6",
+    "lib/draft-analytics-config.js": "db8baaac8bcf3f813ad913f91ef31f318bb8f80b8bfb0ce6230061687da70fbe",
+    "lib/draft-analytics.js": "ee6032120f43c33fa7446d2af1bf277c55aeea8caa0a63f0ecd871c227af4539",
+    "lib/draft-contract.js": "74c907154126a280133321127bde4d18d026f8bb415cf162e6e9f100ed45df79",
+    "lib/draft-freshness.js": "da98dce4bb6e8d8be641dbe84839c98819c45624af129c193daabd4ea095ac8a",
+    "lib/draft-read-source.js": "0f18318bfb3b527cbc85ccdbc7389fa64740a87e440b74d3513d9d362a89a951",
+    "lib/draft-runtime.js": "21ed0b6b7f46cbfb7323048309f085dffb84f7cc1b26829243afb61bbd3049d8",
+    "lib/draft-service.js": "4936c2f3904a12c8c49c312dc908b7f3583437e8c3386b6b4c1bf690d9ec1c76",
+    "lib/draft-state.js": "92f5fcababfc4f4426bbc5b6002a319d207298075eea50830663ebcb8749e15e",
+    "lib/draft-supabase.js": "d6590ec1eaeac405e1ade79f1158c4f7fc6220da074edf661143cc48203d608c",
+    "lib/draft-synchronization.js": "0ede71cbcd202c87c5b6fd6b19aca46dfa7356a545c0d8ac30efc197f19cdca0",
+    "lib/draft-team-handicap.js": "8c6dbce9d72e17ac9092a6ca01996aab29315790ac0cc1e741e51684a606697c",
+    "lib/draft-value.js": "b723320bd0a5f6d1cb3146d8df370d2bf7d2be964c27237a183b04013f2b6a28",
+    "lib/draft.js": "5d99fa8c437f5a137ab289f8d075f3497c71385ef80926be9816ab6684de0479",
+    "lib/expired-identity-recovery.js": "31157b1bc4a6494f241715db8c26258efcefdfc82d43830c197fc68bbba0af98",
+    "lib/finalized-match-archive.js": "cf53e405c7e0811fc5906b3a3e438a4dce0665f69f8353a77171d4d17721e48c",
+    "lib/formatters.js": "4978251ad9766bcdc59cc2db7ec168366d5ff75c948cd6f819405e503429238e",
+    "lib/future-match-google-compatibility-worker.js": "c721cd87fb0f16faf63851c298a3829585bd0d51d2ef8bb85f90ca0f9aac02d3",
+    "lib/future-year-administration-client.js": "fbed6c828e34eacd3c1ceda20f75e5dae26c69ec12bd84fb5fcbd8e471dbf6fd",
+    "lib/game-center-display.js": "3d4ba0d64d4f56e7f69704515cf50a47f22b7d7867b05c78fb3af0736afdb459",
+    "lib/game-center-read-source.js": "c727a0ae35c2c2dbc61d0fafa734fe8796abddf8377e707df1d8ca1c5180235d",
+    "lib/game-center-supabase.js": "ec902c33ad475dbd940f49deceaa2b8f2b4694ccd8d91025e54deca1ba661b12",
+    "lib/game-center.js": "4be832df6cb9c14646487b507b57b5480a7d71d417657d82e91bfbebbf0afe70",
+    "lib/ghin-provider-contract.js": "0ba9005b8cad0d9cf2628d18edc2a754e62a1204f7edc74ac77da8a1296aef66",
+    "lib/ghost-match.js": "48e07906e923dfd6c5cd5dac9fffc136cce352b6df3a4384f220ee270bd3e69e",
+    "lib/google-api-reliability.js": "1e27a65749f2d814e2d367493d92a74274a99f2ebc78bbbc758a81422ff529d1",
+    "lib/google-runtime-retirement.js": "edfe3c873a0fef69bcd756ad534c225095c4bf0c742e51ab875c3285a1793fff",
+    "lib/google-service-account-credential-context.js": "ec4fc1ef1240504f73a7efc926ebc10aaba23305047593661f1c6500482dd461",
+    "lib/google-sheet-field-types.js": "c88801e14b97815aee84ed0fc2051e614e61c370cb9d6e4b9e80cea4fd010d43",
+    "lib/google-sheets-data.js": "fd7a16453665a42ff450dcd2f1bb0dfe411eed04b2278de4bd78ec56de679cb6",
+    "lib/google-sheets-server-read.js": "916323091ac6d6987a751236e98cfbb8830426c92bb80235b1a90cbb2d5eefb6",
+    "lib/google-sheets-write.js": "9c312ab52fa7c318ded8e9afb98cbf9d9f945d06939d1e44cc591d7d15b09c4e",
+    "lib/google-workbook-mutation-intent.js": "cefb264b1fc87f3bc050a197e0fd36d6c360005ba3e7e8f6200394a5d7d86b4a",
+    "lib/guide-editor-presentation.js": "5eb035946ca495eb00fcaf563632180d35513ac4c3d3f42997099cef45903103",
+    "lib/guide-participant-adapter.js": "84fe59b8dd8ddfc8f1b189b174acc3fd6b4aceb35a58da753d711f280c7bb3af",
+    "lib/guide-publication-policy.js": "2c213e830e39f11c0ec658e7e6ec7aac26ca8434e5e07e25bf01a0a0b4d82696",
+    "lib/guide-read-source.js": "10ba0407bd4f3edbc9468962d8a7461cdc2df94f1fadec7846d71456cf8b3f01",
+    "lib/guide-supabase.js": "f334cf71438b1ff5eea261cecf01936e9c71f129308b3ac2385a62f41acb97a2",
+    "lib/guide-sync-service.js": "88b0f827b3830a9a6420777b2db58d09911f111757d78b2d007b90f03f48c756",
+    "lib/historical-analytics-reuse.js": "2e8172909c310ea559e0072aedfaad28f335da8efa9a2ea7ecfd03eb1d7dd98f",
+    "lib/historical-awards.js": "23c5fb8f80e9e2c7831e107581ee981ab410f05e2af33ce41677af206bd41e60",
+    "lib/historical-captains.js": "adb1ed04e75c4ac03a55b761be0daf445de2b2904aef045755fbd3abd1ca5939",
+    "lib/historical-course-model.js": "42babd1e50b0a404b70ea4dece81a9b91988e0163903d4cab9457daf0e62f160",
+    "lib/historical-course-read-source.js": "7261e83330f3b6b67d9e07af5c30b18a71f5ad586859c69ec668f9638316e364",
+    "lib/historical-course-service.js": "e35898da2d048989e17ec8841394d6af9f9619867895402fdd872a4a35d56804",
+    "lib/historical-data.json": "154493150aa5b8aaf689a7c54ae5de32e25ebda0ade97ebe1353d359e84c4db1",
+    "lib/history-2017-2022-migration.js": "9bb78fb53690b54ce31e40aa754f0df6af0e27fb6d85c2e2ef3117016c6e5f55",
+    "lib/history-2023-projection.js": "02a6c32c7111d85b0d99827076cbf4f9e93b33f63e998ebadc8b68d99d030b7b",
+    "lib/history-2024-net-projection.js": "d6768a8bda65cf5e891f5194e3a6bacfc7a88561435e3cc23b1da63e1dc21797",
+    "lib/history-2025-tournament-records.js": "b8831e59b397f62b5ec444db6e49b48a196887d2bd3cfc7a80c5a351b365c0d9",
+    "lib/history-2026-adapter.js": "a3944f67a9d1647ab13727f5be0a97a3fb05db65376ece3da9a81ca52d007ff5",
+    "lib/history-2026-read-source.js": "61cf48b692a1915f4791355201a1fd3ccb03cb6e8e60292e99817e5e09346271",
+    "lib/history-2026-round-presentation.js": "324b7f671f9aa9f5bc1449dc612d73c09f67e891071d4cddd121d4462ba52808",
+    "lib/history-2026-service.js": "4a5c8ca644cddb88ae3afa87c3491b845880385acbafae8619d2c021ae8646af",
+    "lib/history-2026-supabase.js": "20151f6d60d223f3cf393f7eab21f31b33ebf1d8dcbd5c72a74bd55f6a6776b0",
+    "lib/history-course-navigation.js": "02f61c2177ddf029f6dda9b9bc011c1d025251bd66461f9eb63fdfe8f2a5f7a5",
+    "lib/history-match-presentation.js": "f039bf90d1319873a716765e7abc48f82e35231efb088efeda2aabec01b64b00",
+    "lib/history-presentation.js": "247cd57b5735f5a2cad5f2369046450080a12059ab7b8cbbc6d7f9a9efa8d1e1",
+    "lib/history-team-metadata.js": "df2202f696c9346a8c11c147618cdfe814b0109025f66472622e742acef38338",
+    "lib/hole-by-hole-analytics.js": "8eef4a79231ccb72efc79c9f7b0b2c0d7ffc695a15470763cb8c72529e5948a7",
+    "lib/home-dashboard.js": "5deae926763e864bb6ffe114970ef0e7863ebe60cc7b53fa4e718bbdf2b91976",
+    "lib/home-read-source.js": "da6087325378b7a13aa555cad8994af127128c8b271f79fb6ad367ae77a7f12a",
+    "lib/homepage-current-tournament.js": "34407ca9c8ccb1297f13942abb61dfae9770a75991d6dc02f79167a64bba8365",
+    "lib/intelligence-derived-read-source.js": "fef745bbef7fe9babe8e9bbbc019726acb8d9d52684015f6734d66b4c1f8161a",
+    "lib/intelligence-derived-supabase.js": "583ebeefccd8b835d8bc96a1a790c5246516e819e3858b59d86bc24a01f192bd",
+    "lib/isolated-director-operations.js": "de01168a85256452260c88456b26232c71bdda05c1f8b1764ed2a70ec98ed15d",
+    "lib/leaderboard-round-breakdown.js": "504320a9e3c0b0266bbdfdf010332f5e7060dc196b42ec73ca6a1683c2c39f09",
+    "lib/leaderboards-core-cache.js": "6a845d5eb5f77123c0ac1c62b1ba7442843fec71df1028c6a7bafb0e83b66bd5",
+    "lib/leaderboards-core-engine.js": "7d3e4ad76cd5b2599c8c09ea2904c2d73b77422d0213763e3492b901284dd5f5",
+    "lib/leaderboards-core-read-source.js": "fe9938b2425debc8e9e580a67c8709e1ac69928931a4236ef39827bb7e5c80e8",
+    "lib/leaderboards-core-supabase.js": "bb7882c0a1814563ae9660415531dbd1bdca6023cc86df93b74fbe5f74d840cf",
+    "lib/leaderboards-navigation.js": "4328bc269bb80f2b378097cf65e56366df11e6d077a54d494c6d0f564059c828",
+    "lib/leaderboards.js": "00a5ce538834cb874be79836e2ece11286402d23a581fcc4676335d31399107e",
+    "lib/legacy-history-analytics.js": "95904caa92dd9de8a446a4dae013bd4c420da2da831612d5b281e6e26bd98883",
+    "lib/legacy-history-player-identity.js": "a9afdad9be2bd88dffd33901495e8845df742064d7b0614ed98426cba2ad0add",
+    "lib/legacy-history-scorecard-coverage.js": "7593cdc8f86792f31ce3d6b23ddbe133808318bc7fce13a965901e19b78d116c",
+    "lib/lineup-optimizer.js": "e88d33d11655046c1e1ef77f4f657ec812e2bf3ddda2530ddb0c4675887b2b86",
+    "lib/live-admin-ux.js": "8ceb6358b0b220957e44d9fa386bcbbaf1709df3688842e61e90c2c5da411af6",
+    "lib/live-command-center.js": "137a828f3cb7e4cbe98bb3c7c17fb4cbcb41e254426ca95029e0c032278a690c",
+    "lib/live-hole-scoring.js": "a516a57d2af63515cec1267c8aa27293d40a5a3ba434ed09ff258bb21a081e60",
+    "lib/live-match-pairing.js": "3f01b1465a9f27e3656eedfd9f2b5c2d8c57e6c91f11d3b0b82127afb85f3b2e",
+    "lib/live-match-schema.js": "dceb54100e4f4d799266fd743c597d17aee6706c2e1bf37dde73759665995be2",
+    "lib/live-match-source.js": "5142b16eea413da667fb6be8754244aa1880cb1728a7cee6921ddf6980cf747a",
+    "lib/live-match-ux.js": "218151ce0bcc5b7933dfa07cbe7ead5eea3bbce80bc5260ba73ff23f7c044133",
+    "lib/live-score-values.js": "3192b808a16bd8c2145514b91c67b2c2654cd53879d73cde82775df8bb58e143",
+    "lib/live-tournament.js": "e5101c7b7069c81c0defc3d235d093ead45d5146a309f50b1af0d6bdb7292db1",
+    "lib/match-authorization-source.js": "f2232d9b04889c99b7e7a35623956a9c465b4bae2db7a919ec415076c9b214b8",
+    "lib/match-authorization-supabase.js": "2f7dceac08bf3a8ff6acab9f4cad2532ea75ff3e4946d9700f3ca690dd6d6c2e",
+    "lib/match-center-handicap-presentation.js": "d23a406b70914fb8a26b2a9d768c8c41e87f1bbbb0b566ffe5ac10d11f7bdb83",
+    "lib/match-center-player-handicap-display.js": "2a0fb5826866adcfbcc89ca94cced268e0cef1d0eaaac8c259067dbe03a922a2",
+    "lib/match-control-actions.js": "e6df4c31b18192d9bb39c07a2dfcacdcabcb36d9855e3531b189a38d98b38983",
+    "lib/match-intelligence.js": "bd2b374bde73606bcdb06b6450faf24a7feffe5eadb5398b085e0e0ae8f7fd42",
+    "lib/match-progression.js": "df70fccedda7a073510fd6deb0f2f2ad197d3dc9d64931392833df6754a87661",
+    "lib/match-result.js": "c0cb05e62146862e75207a93ee27256aa3ad3328bd4eaafd58e36569c81e83d1",
+    "lib/match-simulator.js": "c784e66f0edb5c05a60fde8952dcc709591d410d92e2ca8d0bb3808810c078c6",
+    "lib/mobile-account-deletion.js": "516090f1dc41fc59a0e8a1bdcc90b3d8add1a104b61755182d98de69cb3bfb24",
+    "lib/mobile-api-v1.js": "54f2d4b070887250c688e7331684b05e9b776f6df9064c344c4e8ec1bd885abb",
+    "lib/mobile-bearer-identity.js": "3c3684ec21bbe4a09ad9a44f5b69d13908a858b22b18f614e4cf6ac9d87be672",
+    "lib/mobile-course-handicap.js": "fed74b1fc038bbbd6a655eac017d1dbc569e93402096363dd73a7e6631a5da2e",
+    "lib/mobile-leaderboards.js": "58a3b4f7893da453db409bd89a5a127cd673e16c4223629c00ac30262a97bdd5",
+    "lib/mobile-match-id-path.js": "770dd0127a640f0a0a46cf249b7267953b49e3975b9312cc72eb99561246f353",
+    "lib/mobile-native-admission.js": "865253d8cc55a17c88825d6437762c3183170157dfe7beb22620f01e106bff29",
+    "lib/mobile-native-auth.js": "52eb45f44da72681b0b8120dbace6664325b07df3d059990aa316aedfc2597c1",
+    "lib/mobile-native-certification-renewal.js": "d9c9bd2132f6b47f8f8e4f9ff7dacdbb329801d99b4283c9061de7a3838ee9d2",
+    "lib/mobile-native-certification.js": "28f09be76c053c72b58d7ff61fa927ec79b9d823c5133d211d41167a98dd7f56",
+    "lib/mobile-native-development-authority.js": "6357508f46f90728c5756336bcee8b6fbdbe31c2e830ea14b0df740c5a895c0b",
+    "lib/mobile-native-development-host-boundary.js": "4b50404cf0a71ca4c9e03841c02183b04f5ea3d7e9d61c4d792799290034eb97",
+    "lib/mobile-native-participant-certification.js": "4b9298f08165f6c7466c756c836cb86fd7c69123f4f56a4b69cf0463fa07ea20",
+    "lib/mobile-native-production-authority.js": "5a5ac5d6a63b19af48429c8206699ee1123623ea3e2c74272a1192ff1c8b4e20",
+    "lib/mobile-native-production-environment.js": "3e2a1129e2e318e76b62515e5e3c1b2a4026fe828c69c7bc82bcabb110cd36ac",
+    "lib/mobile-native-session-authority.js": "d0fa124e57c4627091aa2b12481566b3c4f0782f4d9cc8aaaf633283ed4628a5",
+    "lib/mobile-opaque-match-id.js": "4dd53acc88414c4181d6e651ad8538e840ea7531e90d2792b301570293fc2c5b",
+    "lib/mobile-portrait-policy.js": "60d4de73c05085e9c1ce6c97da33e80472c4ac9604b9e4b807664d28e33245b4",
+    "lib/mobile-reviewer-history.js": "37ea9a0f0baa50a523de70d039ba4c7588cb702345d6689490101e6d4e228e25",
+    "lib/mobile-reviewer-identity.js": "97d9f8f3fe8342160269a2c2c806153d72b91749b2ca46ee3afa8512ba130065",
+    "lib/mobile-tournament-app.js": "e11a0052a2132c74634690f7d844a9cd2548c253826924b8b350b50532f1af26",
+    "lib/mobile-v1-calcutta-presentation.js": "67a4b2e24a95ed18bfcae229c36e2130c28a316fbcd7ea70394328eab3c4a47c",
+    "lib/mobile-v1-calcutta.js": "c2728f183c070be74cb274f00321e233543900ff7f5ef0cb5b474e69a2b4762c",
+    "lib/mobile-v1-career-authority.js": "8c8d91dd9c04673826517db83a60af537e133dc8c30651cb7dc27e8fae82bf86",
+    "lib/mobile-v1-guide.js": "b36c91b5f0a6666e117d18eec85e635e1a7380da77e79bd121ed594f9c05b39d",
+    "lib/mobile-v1-history.js": "b157cb48f99ed6bdb2992aaa476c782c1a8a9f7250e3dd242c218f23c04a2d12",
+    "lib/mobile-v1-leaders-intelligence.js": "b9fb4cc270caceab1242ec7eb9b809d0c59b0550237ffcda33e7887d38be0f30",
+    "lib/mobile-v1-match-detail.js": "59329f0345cd3379605457b09ecc555d06e1508128e4a1b2cffd607aa5907b7d",
+    "lib/mobile-v1-net-skins-presentation.js": "836a179986f306754c090eb68b2b5c92570d46ee0b28ed5c6f2feff01b55ab33",
+    "lib/mobile-v1-net-skins.js": "27ab988cd547934c144b85da7fb954f8c9e2c673445c5c682668aeda6a877c67",
+    "lib/mobile-v1-odds.js": "608858f8b1fd2900469c259e767cf14ac2d553e8e6dc231946524a61aa269fcd",
+    "lib/mobile-v1-participant-content-authority.js": "e3031f799dd2b21548b8533ee1d6dce34052f46232055071aff7e8a513d0dc5e",
+    "lib/mobile-v1-passport.js": "4e71672a3378d60c8db346243029e076d76efa3df0cca1ec9e5e685952dd367e",
+    "lib/mobile-v1-player-round-performance.js": "777ac2d99cca8ed0998189ce088db3ebabecb43d3670d20141efd255bcd5b5e0",
+    "lib/mobile-v1-preview-leaders-products.js": "31e1c6118cd8d58690295eef9f5d900bba61c8fd52009b6813fbdbfd9d8d1f4d",
+    "lib/mobile-v1-production-match-detail.js": "bd45886e1b74ac558e252a4613905f2f70e8df4ac5945331a5adab982bb7d47c",
+    "lib/mobile-v1-production-read-context.js": "8eece3125eda65e63af3cb820f8f4c8f31de4697ee23a5225f1b2ca8f7dfd846",
+    "lib/mobile-v1-r1-round-competition.js": "3731d41640513dfd411059bc4d4840417f30849004c460bb176c5587ed929e40",
+    "lib/mobile-v1-r2-pair-competition.js": "d59f0f4d7e23586034fce5b826fd688bd2b21d120fcd444092773c2547d6205a",
+    "lib/mobile-v1-r3-round-competition.js": "1caa0480818b4a8c165a0c3748b71e2fdeb5eab23060e022a9da7c0141c7d7e1",
+    "lib/mobile-v1-records.js": "108c591218c3b80d8f95c837c1f7f315248aa5344c4bc5b244a4f236fb75c368",
+    "lib/mobile-v1-round-scorecard-summary.js": "82e34980638053f2911c2e84eaef04a252f7010eda3154ea2e3aea23199fdd07",
+    "lib/mobile-v1-round-scorecard.js": "c6cb3f1e49aa2eb0ce4e12aa5b27654a4e9cb4c023ccf6c5bcdc601425e8ed34",
+    "lib/mobile-v1-route.js": "e1a49f0b101acfd2e1e16d14dfa9143048530c4b6769e446472445f021813811",
+    "lib/mobile-v1-scoring-post-commit.js": "c7c15ab13cc17efdbd312a6aee58909b05f658c8419603c28925f236a2e4c4ee",
+    "lib/mobile-v1-scoring-route.js": "03be807ebe93784cf289546a765986adb3f4df3dafd66354770562a7015a4148",
+    "lib/mobile-v1-scoring.js": "5c2e6841dbbd276f268de689a242770785d9c40b5adb61b29ddcb13b8b2f0f47",
+    "lib/mobile-v1-tournament-reads.js": "14bec1f24c5e4a56d0f832f8da65f53ba746544c1388f1a61e8479070ac0395a",
+    "lib/my-match-read-source.js": "c7ad5dbd6ff6166a971dc6e36e0b0dd1b56ed0d6d6e40774a7b636f318e6720d",
+    "lib/my-match-supabase.js": "9fa884faa3b1b37865de5833d259c72ea89f36517a7f9e2d492a2b564088cfdc",
+    "lib/native-phone-challenge-envelope.js": "0226ec42de43e556c14a17048b62fb945a3977e3d945e685e4fabc1c58ab1e34",
+    "lib/net-skins-configuration-readiness.js": "99ef85d331c4183aea8f2bc30ce069645927d0be8fe8e2cbdd5f28e9d9e63b5c",
+    "lib/net-skins-entry-workspace.js": "75bd01c20ffffd47538e5d9173c8b310a9ad27455a66f287432510816ff068a3",
+    "lib/net-skins-presentation.js": "51ec353255980a178cef67e6ea0701ef1b28b45fe5c941487f6a344d09f0507f",
+    "lib/net-skins-read-source.js": "e5b1f25e1f552429e2b2a8037b9e42862d403315ef15e90075d8d02bfe2a792f",
+    "lib/net-skins-supabase.js": "5d67262866fd6cb1c7addb6dc59d454e3ea2633da8abadf30fb62187e077ff8c",
+    "lib/net-skins.js": "99629f0e5e850cc2bf61751a6085709f31d87127f8bb401547d9f496e9c24cee",
+    "lib/notification-templates.js": "13eea327086417e8f311e6d84db62f01544f83af33613b5f2b7937a13670841c",
+    "lib/odds-calculation-source.js": "c82093034fd00f20d2c9a64eb2440db72589a57adb1a3cb7468bb9cbe8384c69",
+    "lib/odds-center-loading-recovery.js": "6de96343321bf2f467ccf133e2351d6c51a6e5752ddf6c2d9646aef4f3dfc572",
+    "lib/odds-center-selection.js": "ea74d18a5aa5aa893143c6469a342deacdd7794f3a710b0dd61344bf649d1147",
+    "lib/odds-data.js": "9b052301fa71e4733257f321271ebc0a69832fe9c7ef5fee4c12497fab5066a2",
+    "lib/odds-pairing-source.js": "6b5201a16565dea990da39a8d4d2ee580197142435f57bffae13c4cccc084f0d",
+    "lib/odds-publication-date.js": "d9397e9bdc0aabc39874fc1ab581c38a533eca18bfca01cbfda3fbbb70e497be",
+    "lib/odds-snapshot-review.js": "754a8b56d7c141ee963695280890593babf577e80f7474dc3357284c5f93e0e3",
+    "lib/odds-workbook-persistence.js": "7c5e1ccf621efee2e4595c7acfdc02a0efa37788b9b04437152456b0fc212c4c",
+    "lib/operational-rpc-contract.js": "ad32efdf6e0ee2b0c9af0d851c9fe9c66bf22b5971d477f5341ebaa335c93140",
+    "lib/operational-telemetry.js": "df48f990abc600d04c7f281b184d8f765de7e241e95f38be8ba7e168be5bcc6c",
+    "lib/participant-auth-certification-recovery.js": "ae4052fdd4871fb73e5586903c41ca24b73073837f70d007eb3b9412c78e40aa",
+    "lib/participant-auth-client-diagnostics.js": "8ace343a17837574caa72be6ecfbd762cc5fe18cf5e5fd7c5c3b342c89bdadc1",
+    "lib/participant-auth-error-presentation.js": "a85b684966a2f307614c12f4f931c882b83718baf0b84f16f6feaa532c6d9c6f",
+    "lib/participant-auth-phone-input.js": "ebf1d6677a22e5fc1cd8e2d78d2e8a80844d1a4583710f7ede861fde62fa2cb3",
+    "lib/participant-auth-phone.js": "afe3744cdd30d2b8c99a31d7ee2e2cc44e0f141512965921f85522647847c7aa",
+    "lib/participant-auth-rehearsal.js": "a61874b9b45f3c1ea47131ebd83bf7ed634ad52988d89e64a07a81759c071b3e",
+    "lib/participant-auth-return-path.js": "8715cf423f0c1b80dabab60557fc8b3a7f206133273022522741685880e5a62a",
+    "lib/participant-email-otp-authorization.js": "d8ea0d552bf27921c900f4d9142547ffe8c7001973aabb45136293e11d90af7b",
+    "lib/participant-email-otp-mode.js": "3d7d1a672312646eb7e38dc4816bcd1d61a100bece939ee7aab69683bab54e2c",
+    "lib/participant-home-cache.js": "d2f1272434ac2e684ca335b750f736a80dcb6450ac85a47fe28e9f0e7f53c8c1",
+    "lib/participant-home-supabase.js": "45b37274dbc6b07016668c62768e085bb7b800a6f40225f0d70023de9d20d3a4",
+    "lib/participant-identity-authority.js": "3d58f92dddd330db6705c52f7d4eb35dfb5425272462461703da614ada45043c",
+    "lib/participant-identity-resolver.js": "1a1b805e02e3fe5980e7e55689b637a7485932a6c559ac6941dc744bcc22b921",
+    "lib/participant-identity-shadow.js": "43e17c823c4210ed3947db4175668740e05cba7aa78efaaefb142dc9852df189",
+    "lib/participant-identity-supabase.js": "5b9e5d92b7ca1f471ded189eab22713c4d75b2491e2e235aa2929703eb32e9a0",
+    "lib/participant-identity-workbook.js": "c04c05053767a8a1c9405c1037e9acb2063641d5b511ebf1a584576b6ee11a74",
+    "lib/participant-identity.js": "946962e2358df1251b01fdc9b9b837dee443b1039c55df3a82bbe3c9a9dc3591",
+    "lib/participant-impersonation-recovery.js": "763b6ae747bdef2cefcfc9630ca6984db079bf091c678f83afbd7e70601f8648",
+    "lib/participant-initialization-cache.js": "213e3d2466e3bc6fb6dd8f72e9a3b23aef173345f2e6e2abb9986cbbe69e6d26",
+    "lib/participant-initialization.js": "ffebd52a0ad244b6ff5074d3dda535605fceea4770d8a13c38485c259268a54f",
+    "lib/participant-phone-cookie-transaction.js": "6101a7d5eaf8b6a2042e2fa320d4c1ee50b3f1bc5fc654c3d9a2a8496aba53b6",
+    "lib/participant-phone-login-handler.js": "f8b873345efdc845140163b6500fb75347e2dd1c7bebcb53991a8512355e0286",
+    "lib/participant-phone-otp.js": "79bd1871b8fe7e300ee7ef17b65cfa9cc633cce7873caa589282691181c07a34",
+    "lib/participant-request-context.js": "342b72fd0eb4586d6f61ebcbbabb5818471dbfbdb1c00f5ad2785796fa0f058c",
+    "lib/participant-session-client.js": "742151b7a778f813e37b0b62ca249abd8d388baab2630b7e1ea5588004d861a1",
+    "lib/participant-shell.js": "1b78475ecee110551bfdf5d8892daca0c3d10622395279e5215bca6cde890bbf",
+    "lib/participant-sms-auth-feature.js": "1a0f1c9a53146aa23b7ec2d028ef4659832915f6ff0f209e9a01a5ee3d802e6e",
+    "lib/player-career.js": "d004cb00de9a17c327114a8de405b452bebaa3e6f1cc983676f6ec3b78d9643c",
+    "lib/player-comparison-utils.js": "7b99777d7f0692c1e6b2b18efbb1989f3ad48291306cc8bfde70491fd036026a",
+    "lib/player-comparison.js": "19fd89dd54f87870dab40749f0a2888164e0a64dfa60fbe119990ea5c4fe4fc8",
+    "lib/player-home.js": "f9548a683c600f7ca834bcac0e4a9f5d93a8f12fd465b56271964a1c473f5dac",
+    "lib/player-intelligence.js": "c2f2079ebaaa21dc181235e2fc83bd2a2a78a4741e21d2138e35a407e0d90be6",
+    "lib/player-passport-server.js": "fda5e3593dedf6c8114d2d8fefada15484fb0b3ed793e4d62d154ab0109acf6f",
+    "lib/player-passport.js": "f4fec494194a93008f63e7030b9449058e9fdd14ac1eddc44662bcdf17be1a8e",
+    "lib/player-portrait-assets.js": "208d1ae1c234edc2ff866c4383219fe17fd182e39178f2add6226c6f1843f428",
+    "lib/player-presentation.js": "e9521d0d1c0afca444f7814ac2804f820151e2ab1c3f5a3fbc5519db2c9be7df",
+    "lib/player-public-profile-contract.js": "d92629aca3cbadde2952cd545d945dc004a579d6687e3b966c636aea93c2e5e1",
+    "lib/player-public-profile-projection.js": "d99dabc961e3b7c468f62d2cf16be05785904cfbfef20b1acb33ffe8dbd2621e",
+    "lib/player-role.js": "79d2b3e66d036eea010e1fab05a8933c20639ab751e43c7001371b41d25c541f",
+    "lib/player-round-performance.js": "d5fe92e023355c895529c6468064cba0a13b9092d964abe159748d8a7e1c7c73",
+    "lib/prediction-data.js": "667c7654ad4418946935b66a438eed3b16a5c0b7e813f098e7cc420aed57063b",
+    "lib/prediction-engine.js": "9260def65c1eb4b6fc9f520c4e5158768ad309ad59206b5e3ab1fc9fe408ace3",
+    "lib/prediction-input-bundle-contract.js": "9b175c60f5df919cf679cc4f852baf8508cfbc789d6d7576ed340d6fe720ae73",
+    "lib/prediction-input-bundle-service.js": "3260184b5c89d25dc3b97bdc95b6d6402315ed1fd63c821cf07556cea5dd54ed",
+    "lib/prediction-input-bundle-source.js": "44bd7fcc544872564d2c3fa9e719201247d5c74fb160eb1049ed6b3d38be2073",
+    "lib/prediction-settings-contract.js": "8dd845f19075846e729b7cd2adaa9d5af0028b2d3bc350011d55102559d46f84",
+    "lib/prediction-settings-source.js": "2542beb7e361076c46b52e0501ca729318d1b6634502db6414f77b0a0671b9c0",
+    "lib/prediction-settings-supabase.js": "818f158af620377285a358057b5ac7d1b9a0b5c6027666e41f54d773ea790e2b",
+    "lib/preview-director-authorization.js": "a887205c98c841617f2ab6cdb9459847c91a6e64f1e9961058d96a0084d87b6d",
+    "lib/preview-tournament-reset.js": "d06c4117ce751cb28f58304e8b015a7de93d038087656eace2f030b0a0ba79d0",
+    "lib/production-access-governance-contract.js": "f55ee34f85deacc6704cafc2bfd464d1c2939374ddb4d161fc702bdad104e7a0",
+    "lib/production-access-governance-server.js": "2eb7b86dbc3512d35ccd8176de0ca7b726f7c0c1253f11786ec2c39400ceae41",
+    "lib/production-approved-sms-hook.js": "c616805293366221bad02cdbcd58c7b126422c6ebe1712a74465838cee30d4b8",
+    "lib/production-auth-preprovision-contract.js": "6c6fdda716f5d638a04813942ed7af6adecaefd474ea30876738d987a8180025",
+    "lib/production-calcutta-server.js": "506224c1f3f668cf69fbd488fe5ee93fd1ad79d0237ac8cf24b8740ca06a9143",
+    "lib/production-calcutta-v1.js": "078d82d059ca68b5b832618de204bbd1b2c775a0545ea2cf1fca27985ae908ce",
+    "lib/production-current-participant-identity-server.js": "530a64c2485c28b5d1c277e2a755a9d4286111bf29976bf4a88492141029b05f",
+    "lib/production-current-read-dispatch.js": "3c9ca2e22c1ef3730720ecaca5fd672005aa11e085622018a906f3cedb71f4be",
+    "lib/production-current-shadow-semantic-parity.js": "463699f1333be0a56101235f9a67b4e63ab546c62eefdf8affeea2a2f0773d4c",
+    "lib/production-current-tournament-runtime.js": "1415037c4e5e5576d6838e309aa6533b6dcb765ee14e0c64e5bfaab392ab6382",
+    "lib/production-cutover-activation-contract.js": "b5e9d133eae4ccf51e605f4ced68c3d13adb5305ed69ecd55f075ad831377a2e",
+    "lib/production-cutover-participant-auth-server.js": "05a8bc05b4fc2a80d4567549d3953f483a3814a39804f25f5ae2686edb0fb461",
+    "lib/production-cutover-read-control.js": "8e61905bf8d77e75cc095ca0147031a1b55aacd27752f64d9d3ed57cfc717018",
+    "lib/production-cutover-read-source.js": "d74a9bc1a583510d394023b5966f7e70b1b956097f4256394f7cba0fd18920ea",
+    "lib/production-cutover-read-transport.js": "97cd2f7404d58f397605a34af5d421291445039610153b9a497dfe2e1f993b5f",
+    "lib/production-cutover-scoring-ingress.js": "3fa28b934f222044ac976e597828b2979479ffa95546cf04400b9ce613e7be8d",
+    "lib/production-director-console.js": "3a4249fc86b6cda05cdd1b29d835cfe9ce66297e0765c97147da3d68dcdc16f5",
+    "lib/production-director-identity-bootstrap-admin.js": "88d5d47c6df98e819f2dd5df995e4295543a7570c4b1f6534b332f9892b99707",
+    "lib/production-director-identity-bootstrap.js": "10bc44d0e135c9a8c2ef77b042c94aadd7ead4a4963d1c31c54e9577652382e8",
+    "lib/production-director-players-access.js": "6bf1b0d17879d7c164cc132573a7d306a5ae40243458a08920447f864c8e5909",
+    "lib/production-director-private-operations.js": "663712a8f95581d06b85e2b3b848e51975362a1715ecb3816260edb3bb1b3635",
+    "lib/production-director-projection-synchronization.js": "7676b9627002ea48d542fb7196ae8cf66d49227f86c03f0e52f9f09b888aa275",
+    "lib/production-draft-authoring-contract.js": "67b86c4b47b07cd4fee8c9d247488238d2252586aa2a0221d0e110989ab2c125",
+    "lib/production-draft-authoring-server.js": "9edf1e4e845855c5e08a55dbcb761e30dc8bbb2aca970f4fba0c7b68595cef1c",
+    "lib/production-foundation-resource-contract.js": "e274c897321338a8e972b6b0e7109504042bb741108375195501eb111cd3f779",
+    "lib/production-foundation-transport.js": "1dcbe668eece9119cf50032fdcdcc70e2e63cf57cb7909c5816110ee4b26af26",
+    "lib/production-full-net.js": "fb854e2036d1082e12a885397f8648c74ab0e31a7126f05b31302b75c629780b",
+    "lib/production-future-google-writer-certification-server.js": "2ed18fc22ba19361723dfdcd8b03eb19c02e50038b90195ce753d628230bc74b",
+    "lib/production-future-google-writer-server.js": "2235cdfc3b764ee7eb7dad1eb2ba6b69e56e6703c5782dbfbedd3289139569ba",
+    "lib/production-future-year-administration-contract.js": "627eb61eb98933c88c69955bd9d5538ce6a5488151aa28fe77c8cdff177bdc96",
+    "lib/production-future-year-administration-server.js": "2487524e49fb51f473273235fa5bc4fdc81941baf101f4db1a6851fc379fda47",
+    "lib/production-google-admission-capability.js": "c59bcc0f134cb4c9bd5ac08645a266a19e7a362fa19b63e21de91b1c4aa063de",
+    "lib/production-google-authoring.js": "0f9555dc5f0d95af297737c8c27f54d21a0658a9ce646aa87842af4283e70fa2",
+    "lib/production-google-credential-confinement.js": "597c949cd70c626afc6deee1d5aa37d837761b8f96eeb4ca16c9e53ec1c8131d",
+    "lib/production-google-drive-acl-db-dispatch.js": "6c6850b53f8f74d3cfe98719776a06e8db3cbfe402e0c8dadd698c8307e5a021",
+    "lib/production-google-drive-acl-fence.js": "4a8eb891e32f9da368eafce330b2b990fcb8bd10443687f0f6443a474cd72d47",
+    "lib/production-google-historical-safe-method-writer.js": "e0b02d43d42da06603fdd0b10b96908ca3cb2cd71facba19b9af4c5cd5bece52",
+    "lib/production-google-historical-writer-scope.js": "c29899f87c524b5d211640c7581c5802e5e63b0540f8dc5dd4a153c42df825db",
+    "lib/production-google-service-account-server.js": "544ddddc4b073196c8c04f3733a0d91771a6300f8716db70ae90c759c9e1e702",
+    "lib/production-google-writer-critical-window-waf.js": "6117aeec6ff61d2b486aff7243cb7b00bda0ff902738ddde9483eede14368c6d",
+    "lib/production-google-writer-fence-attestation-client.js": "bd04ca5a590052d690f3d98808173e890706ba80753bd465ae0650914b1b096a",
+    "lib/production-google-writer-fence-provider-claim.js": "6b65ed35fb6fc60cf8b2eeea59f3d4560b05fd48c3e5514092daa7f9568e8e7a",
+    "lib/production-google-writer-fence-quiesce.js": "390ee3bb4c159089c2d69cacb3ae5de5e2a239cf6bdfca57c81e8e7dc633e56c",
+    "lib/production-google-writer-fence-receipt-server.js": "2ee6b96a4a57a3594fd73edfaddaa347bd67b9e4dc5afb5148c45d9aac5893df",
+    "lib/production-google-writer-fence-rehearsal-server.js": "0f08a312016d83a4df2a28bf30829133e78574a0d14424a15bd5e0f228dd691b",
+    "lib/production-google-writer-fence-rehearsal.js": "a007a2f4893781222d8bd54350691fccc655628f2b7e042570299af33bd0fa9f",
+    "lib/production-google-writer-inventory.js": "251373add09bfc7c973bb8cc5a1d11a5bb0e2822c5fb735bb86fb3b970f8c7a6",
+    "lib/production-google-writer-provider-abort-evidence.js": "a2a99052430e99e2589ac0b801e33b238c0a49f4603c3007cad15dc9d4c89677",
+    "lib/production-guide-authoring-contract.js": "f962e64d296bf66363f5ef14c9430a9b48a4ec45566b59ec13f2cbdf772cf517",
+    "lib/production-guide-authoring-server.js": "7c0d5dee299f6630f96db9858dfa546fca3de80bb8db96d37d5b666a04a08264",
+    "lib/production-handicap-contract.js": "105835e2f8dec0c36f2dba7bd6388629b6c29ff870642612b91d7710680e6d03",
+    "lib/production-handicap-management-server.js": "de9e725c5dc2dbcb78f479f4ec9afc3152e1d13b08dc68d5edd19ebdb715a9b3",
+    "lib/production-handicap-source-contract.js": "faf6211f5e611319ecd62091053a2bacf3c6541aa528acdffda9ba1e35003a36",
+    "lib/production-handicap-source-server.js": "c3849e700765b5ee4e5b350cdad4aaa7d321bb07d6f4a05053c0e2075ef80d9c",
+    "lib/production-maintenance-precommit-deployment-rebind.js": "f88bb8ee5aba7c8b17cf95bd6bef1b2ffe2857b5906071e92f46e88eaacd2dd7",
+    "lib/production-net-skins-server.js": "4007eee4e309d18ae2e2d89f80980c306de29e7e78b5e9fad07f68f408690952",
+    "lib/production-net-skins-v1.js": "d98a910b08e167b387789ce94fcaaf494f053afe945eb82825066a19e45a7990",
+    "lib/production-odds-calculation-contract.js": "0b34ede4980698e7e4349142987c50dfc2eb32f75c9b562e7e8826cb32a82739",
+    "lib/production-odds-calculation-server.js": "21516b4d6393d4319551abe0b959b4ca37fccc39038375f124075bc2d71a14c5",
+    "lib/production-odds-input-bootstrap.js": "089bbc0bc7f943c22b78bf0edcf302609398cc5c9c4a7817629198bf3f7d4481",
+    "lib/production-odds-publication-server.js": "c510f789de6c9f60f0d72c02cebf05daf67c8d4f658a5d281eadb027229d89d3",
+    "lib/production-odds-rehearsal-fixture.js": "eee5c930b19e07aea1d3c5acd94aa102cab9b7d2f160c9737c1a437cddd713cc",
+    "lib/production-odds-snapshot-review-server.js": "354db958caec36c95f89d970d3a731a75abe86031da8dc9e8df6e6642bca33be",
+    "lib/production-participant-auth-enrollment.js": "1611fe9440eeca0cf6279d9691550fbded79acadcc67d1512c71795ff9e4c0bc",
+    "lib/production-phone-enrollment-proof.js": "8782531f77577187695556c8ed930687306d6f7073009d2b4d22fce728f5b1f7",
+    "lib/production-phone-enrollment.js": "6f9a63e45eea92515a007ae53206f7ea940c472d84f357c98e344f238fc626ae",
+    "lib/production-phone-identity-operations.js": "04cc586b88c01014d5f705e7343e1a1d161938aac8f9dbd12bb20831fef9a830",
+    "lib/production-player-access-contract.js": "54299203e27753f9d1930245d5f5943cb1aaaa798ffd526ef32400efcae2d6d7",
+    "lib/production-player-access-server.js": "c7bbc7d0ad27b56f997ed49d04586f90367ec27ff2b512b6ff3150801381e071",
+    "lib/production-prediction-settings-contract.js": "33e24b63607903358f57d47df1686a24a5c23096207e19b7b994ccd9a5cc3208",
+    "lib/production-prediction-settings-server.js": "91fe0aaebc6ab8472b6335e7a395bbdc3f14224333d23679c73570e6cfd98dea",
+    "lib/production-presentation-shadow-cli-source.js": "a6013c6d6eabb4526222576c4ac075cd5d53a4d80979ba9f0569737bbfe62f0b",
+    "lib/production-presentation-shadow-source.js": "a2ce3ede0c3e40b58fc36e0afbfcccd07fb3e8aca0c93adc053e7a6454587fb0",
+    "lib/production-presentation-shadow.js": "ca2f8d32c4df301d5e1967da95dc12c640cc23d8e840e16b4f0c50dddff5531d",
+    "lib/production-round-scoring-contract.js": "bc8c4a094a5f91b9f77adcc9c333f1cab635996de1e52ad9f2cc9cb525e69be8",
+    "lib/production-scoring-operations-server.js": "d8784df786c3c1260a3720b67f109dc7d81d475983ea1a5ccb59dc5e41ae7286",
+    "lib/production-shadow-candidate-server.js": "ecb5650116ea9c1e749ba31aef7db6c87ef0b8cc9ea07a011342515a6bbdb02a",
+    "lib/production-shadow-candidate.js": "e12217970d87da67b7f1cd05d7eb51b8da9ed1055952ee6891ed34413b60c781",
+    "lib/production-shadow-payload-cli-source.js": "5247e79e7da81841ca82f02a5d8eb59c31214c74729a762ae02e6c5e217b0629",
+    "lib/production-shadow-payload-preparation.js": "fedde92233b4d90e5db9d346d1f399480ef0dafaa7b43f6c7e096b0955adea79",
+    "lib/production-shadow-payload-source.js": "574f884016e6ff52b2b5d1f898d22bb1dfbc2470a80f264cdb2a9c647b1c4524",
+    "lib/production-shadow-read-adapters.js": "29721858f645bc737b7e12c20a4858bdd2979acd64339ac6eee7b5a00f174996",
+    "lib/production-shadow-request-environment.js": "ec216379a1c251b37789bef4ccfb6811326942e6c5e1baa791dc0b7f5283cb8f",
+    "lib/production-shadow-scoring-safety.js": "e09d00ae16e8aa092744af1bd808b947f17a00e7c2e53fc18d593ab42878f8e2",
+    "lib/production-sms-hook-acceptance.js": "0fc67133cd3a028fc54bedb3fa5e0060f58d1680ec6df2d36a86ef42169b58e6",
+    "lib/production-step11-scoring-rehearsal.js": "e66908f449b98ebec139c7ced2c6ef0afe82c2a99d08bb2725757b3f183e218f",
+    "lib/production-tournament-awards-contract.js": "3158d2697fb6e605c1ae5133ed29400374696eb4596c1b72f625811c2f8e3428",
+    "lib/production-tournament-awards-server.js": "17de8b64385a3329a63c146dd6178f02035ac9a647be9332a8f904d4430b0cb8",
+    "lib/production-tournament-setup-contract.js": "2a242a6bf200515eac2cc9c88f578cbaa446b588c5ec5f53c3ff8b85b81b95f7",
+    "lib/production-tournament-setup-server.js": "1dc4ef02676755c7aad0ecf09c9f8f36f081e80a71fef4d698f9b2ef87871b2a",
+    "lib/production-vercel-waf-provider-executor.js": "701d2789d03fd2d38651ec2e4a6e3e36970ca7628cfa82bea1e75ea82a374967",
+    "lib/production-verify-feedback.js": "d2699544d2b5ee392c507465130cae71922c7616d9afa42d0a7908ad98918382",
+    "lib/projection-editorial.js": "d682a9959502de022b94105ab1a94c4bc8c9f2cf8a3734c48826c377520e3cce",
+    "lib/projection-mission-control.js": "afbe41c01a2d0b11bf666e8e1225b3a8c9f2c8c9e612ec4786c6f92c0b3e7f1b",
+    "lib/projection-phases.js": "c34d38008dd2dbc68e6d8a7517a25845a412153ff4a07ce09406d44ad04f69b2",
+    "lib/projection-publication-diagnostics.js": "275578fbf4ced542b262a912cbe07d0fefeaf887211626323972969f7a2238cb",
+    "lib/public-record-routes.js": "fa1ca1ea3acc3c21032fbf2b35ce65e238cde44f6147d1c986717b227920514b",
+    "lib/published-odds-read-source.js": "38901aede6f87070283243f9493ab84e325d3050f8e9313104f0e4fd5a6a5a7c",
+    "lib/published-odds-supabase.js": "081d157585e0795e999b4071ce36a2e7f3ff52f599574df571b332a56c984e9b",
+    "lib/rankings.js": "f54b2d9aad47b29708152991074db0d711d1dd958931c22db6cc501312ff3d97",
+    "lib/rate-limit.js": "8a5f002de2fe87fedd54c1252aafbbc55d72700b9a25c9627d34de286ae3c511",
+    "lib/record-holder-authority.js": "afdc5f2141235e981202dea8bae22e53aa3592c2b9d10acf4e07dcc8685c8c02",
+    "lib/reliability-diagnostic-policy.js": "a8d6fdd04d3ef55e524d3d5bea4feef2a6a454e706bc3b13faf43d42d41fd277",
+    "lib/round-pairing-workspace.js": "0a6a00d83ccc5b2bd79c741b3af5aca450d212b0bf548d271d081e655213e86f",
+    "lib/round-pairings.js": "86f38b5ce9fca70d282f61afba9b544354f6444e3028be5837a5c9df32692686",
+    "lib/round-scorecards-archive.js": "f5d4d42a5516e7f76911db955f32fe4324065caba68c2e4c3f61ab421447641a",
+    "lib/rules-format-summary.js": "f320a04853fa287e238d3a946226aa8899be058c52cb760b5bc834735a12c697",
+    "lib/runtime-performance.js": "4da5f605e9e8430fc82ffcc370217f47519aafa0a91df23a4bf6a88e89ea52d8",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/scorecard-analytics.js": "1a3723c7ad0386731abc9c491a48507c856725a1bea18ce4fe87cd81bf729792",
+    "lib/scorecard-archive-worker.js": "3cedea426a3df5ff11eba0e12f4e43934c1e4a1f967300d95ee214db6cdd1ba8",
+    "lib/scorecard-calibration-report.js": "37239d27f678b3cdbb6ab007109f62c7fce1ba9ce92592cc1d0b6dc4da749c50",
+    "lib/scorecard-calibration.js": "496c4639dfb85e3c40564e9e3c7561622796ca1309cfb68c8166e764f23b6b7d",
+    "lib/scorecard-data.js": "ee37844d4e0f96726e02b9ebe8e7af2b20d214c2e144e60884b281a94dc970e0",
+    "lib/scorecard-index.js": "364d0dc7267a9022bac82513c3e474317faedafc7578a47fabfd8b5800b93215",
+    "lib/scorecard-intelligence-presentation.js": "482358c9f69ad31f0fd3330b509305225df14341c3a821b11226b2eedcec5bc5",
+    "lib/scorecard-intelligence.js": "0928a882748d74205bfbd469865f64a18062c7ec5f809cc707f98fc16dad42b2",
+    "lib/scorecard-net.js": "acde7ba531cf3ee6f545cd0a672efc5ee329fe67d750786d764b329b48981546",
+    "lib/scorecard-presentation.js": "d5c54df17d90a86ff584f83dba77d82cacbd9a1a207e2ceac8c1bb6546eefa52",
+    "lib/scorecard-record-eligibility.js": "b899bf0bb6255ba3ab4e8bf204362299222f83c8df3d3e3d78741ff6007602ec",
+    "lib/scorecard-record-leaderboards.js": "7304bfac1b0e0e43f8412fba6b0e2c7e533583a84bd1d577600b0bf6b3b521ee",
+    "lib/scoring-access.js": "abb432568b7d56230744f9d0cd89487285dcf0859841a645e6ce61939ee74471",
+    "lib/scoring-api-errors.js": "8d5f7b38b62b4504232f86e0a04f0981b3afa2e6573d5283839995daac16c2dc",
+    "lib/scoring-authority-dry-run.js": "4d8ec2d40d9ef351a3d55b4a84a23cf3d1b848a943a19a62a3aed0ef3f4440e6",
+    "lib/scoring-authority-supabase.js": "1591779c5e511a82457912c935e470ee7fd6dbc09f07977ab80a42ecb49254ec",
+    "lib/scoring-authority.js": "eb364b5cf3be383bf1b0f09ebf26c0d432781b4cfeb49114bf1f02739139e654",
+    "lib/scoring-client-diagnostics.js": "27b93a3484d89861471824d1a8511a799b11c87e6ae1b1cd50151f3034d3a071",
+    "lib/scoring-experience.js": "d4b128f72f3aad36b2b2bf4b34b77009e8ef9b21bc8f271c258635a0c38088f2",
+    "lib/scoring-finalization-state.js": "3e5899834e384cf536c934d065deab109bcbe82ea48363eb289c8c28e62d1374",
+    "lib/scoring-google-outbox.js": "094e65cf7b18785fdcbfb3f8e1c2d594c73aad89e835d999c088e88a40a630cc",
+    "lib/scoring-keypad.js": "1e301f3b8c3e298f345b00866079d3d94ca6cf89bbb8303f5e48d599f8930fb3",
+    "lib/scoring-lifecycle-contract.js": "f5ffbd8d2baa913a93379496fbd9a6d463b3977f8712215ade67d6875a182ca5",
+    "lib/scoring-mutation-authority-contract.js": "844b0176d9a94a3e1c4f5d5564235f4182aecf568342051dc0df6d61970ce338",
+    "lib/scoring-mutation-authority-server.js": "0a474c1f0f30c6d643b3f88a6ccd73b96164c8c601d9612bb2b02cc70944f54a",
+    "lib/scoring-mutation-recovery-route.js": "0e98f14294d531e33b08cc23493c1f326e796e1107f63c30c7404fcf1a6a4cfb",
+    "lib/scoring-mutation-recovery.js": "0f6b5aa1c5f042f846861cee22e61c113cfb98cd058d160c6982f458d77359b3",
+    "lib/scoring-participant-authority-state.js": "d3c54dd35a88ceb10831c4293423a9e561ca90a3581aa1acaeb7b8c86b9f57da",
+    "lib/scoring-participant-authorization.js": "1b4f0b11ada558566809350470b70926ad9e84921cc662891edf74de251ced6e",
+    "lib/scoring-persistence-adapter.js": "78f0f41b80ec88c47d86775f2777738760349de2be896212826e451ab1c0e064",
+    "lib/scoring-read-service.js": "e5ef7d08a84c2f1b93fbd96bc7640c84aebc2119da4f590e01d2a85ea02773e2",
+    "lib/scoring-read-source.js": "9c651a159615543cda110eda1a821221d32539174af40d3493526b09ede4df44",
+    "lib/scoring-read-supabase.js": "5e0ce04db999b5be7f29d8945fbe5c5dc963110e97b0c4fe0bbd4a5fc95ba71e",
+    "lib/scoring-shadow-benchmark.js": "a878f8b8cee3b215a0a2de18fd16fd69ef3bc90b1f69db581118ef2508da5065",
+    "lib/scoring-shadow-gate.js": "953d33e97250343ced335b43abf176d3eff58d2c74409534dbed4abce480e77f",
+    "lib/scoring-shadow-reconciliation.js": "66532d2ad106cf5e1a89fd32508c4bd4525690eefcf23143502c6a53c7e3ffc2",
+    "lib/scoring-shadow.js": "7df8341e7e39148f2bb5d99b7382fed5361ff81ca06b74afd5a28baadb8d7c33",
+    "lib/scoring-sync-queue.js": "2e4e5f4210f8af409c8eb6092d4a21664b08b59313afc967199bf6d1e8b6bdc9",
+    "lib/secondary-history-model.js": "e7e7454d9071375e3472c26079d66a5a2dd8d1fb355790e919106319fccfeb02",
+    "lib/secondary-history-read-source.js": "9b5404c4d6303da8ce4e5291104dfb0d5ba0ec45fb40c3ec2be851840d04b08e",
+    "lib/secondary-history-service.js": "9a3a7de93f5e14d8a547139272b61cd9d6c8ef3d7aeb0278518975d6e71296ad",
+    "lib/seo.js": "0106fbcf288be7247cf4a6c0a00a03cd47b68b9101925870f5500c71d73662b9",
+    "lib/site-config.js": "3bf329339e9e318a9ef2787e1f5a3446b39a805caa8d5fd42f76abc29beaa5b5",
+    "lib/spectator-golf-projection.js": "a1ffffbe6a414e31cd7d5a7b8188d4ce413dfd251d28d817fc443d8d74ae8cd1",
+    "lib/spectator-golf-server.js": "b439c7e0bd34acdc376bc88b0a6c702636f15814c188f55d78e855a37e39ccc5",
+    "lib/spectator-golf-service.js": "3c563d84b1bb0001c8e1cccd9012e0a832cf47f26345cd7fb55fdeaf09d476c6",
+    "lib/spectator-match-navigation.js": "be0cf8e6c2d33a1a504c415c2f101034a1031436f463ed300492f436f3adf85e",
+    "lib/spectator-navigation.js": "964f6d319f10cd1b72ac1375e56de1524df8769f1931e219403598ed76f70a33",
+    "lib/spectator-projection.js": "f5e042cfbb34b31db9d8c9af58a4d4d4ffb7b7f427d372dc0891f0678108bae4",
+    "lib/spectator-read-server.js": "c6372d69c6a131f1cd575779c768cc45f226392a1de988fa580ee725a6952657",
+    "lib/spreadsheet-environment.js": "9c2205d444112621dda1b7f75a396baa53c23497e0e63a06603a1e55d13db771",
+    "lib/stats.js": "f5d70c23b0fc1f5fbc0cfb44d0db27fae8a9fc0b0131648dec152a913c05848e",
+    "lib/supabase-auth-admin.js": "64496f94a041788c22b4493ebfa289b6b17a5c43d10dd84b10b16412ed4ea67b",
+    "lib/supabase-auth-browser.js": "49500ddb377d86591ed82965a1f2843dd704eabf22eee30e3921c2bc1ee1cb90",
+    "lib/supabase-auth-server.js": "4cfaaf576e6670047ceb570a953439ceae69a7f574bb9f52b385a7dfb28d8bf9",
+    "lib/team-intelligence-lineup-runtime.js": "81b5637db815cfef1c8a78eb86e5aaddef6a19eff4f5324ef7ca99d02abc8aa6",
+    "lib/team-intelligence-utils.js": "1e0e1964697f3b1a7c22508c1742e5b1afc2a178b9af631a7202e7d937bc5b08",
+    "lib/team-intelligence.js": "f5b58766aec5bdf96602e08553170d65adac63e4fb25082d9d103c057b50eb8a",
+    "lib/team-round-recap.js": "da095295ee431ada92b042a2cc2f0679e087dd2c9e7b9b129a78a1e1ba285de9",
+    "lib/tournament-branding.js": "ba92080421ba4f6ed4d63c178b39e352542035f89545cd9719273e75b0408ffb",
+    "lib/tournament-context.js": "0423715b1d4e93c6decc39cfcb27cb0fbc6fffb5c6a9a936c306c4eab4686db4",
+    "lib/tournament-countdown.js": "c3ba05cea99a47826dde6a02bf8e9aaf80293c3b57eb7a701342f7f238c90cf8",
+    "lib/tournament-director.js": "e9ef3ca285b34b5d17d3d11c5882d57823c187c16dc02667a9fd3b2cb0a44d1e",
+    "lib/tournament-foundation.js": "e707001b091f19bc5c24b7fce57fffcf4e49c45a8b3f370d982bdee0af701e2a",
+    "lib/tournament-guide-contacts.js": "b601aa5a034c07065719033ca1f669426ce9ba2f2d6dc831968e7c9b26c2161e",
+    "lib/tournament-guide-content.js": "dc73af71613146d3862d53abf6553a852efd234b0932f9c21e6a010ec3b839c5",
+    "lib/tournament-guide-dining.js": "3fb95f9921a312fc63916b95b2b3ac9fa294762101dad34be344bb2ffe614ebd",
+    "lib/tournament-guide-hero.js": "06d0a93b8ae2653354b33a568c49eab7e5aee2a33bec591b602920ed4d5a52e7",
+    "lib/tournament-guide-local.js": "a84815d3663c2535d4ae89b4abf2cb3c6d3d24ada38cf5bcef648aaf078eb9d4",
+    "lib/tournament-guide-overview.js": "06445abc6490d9be26701091e6389bbc80056621cab7938310e71a6add7518d4",
+    "lib/tournament-guide-projection.js": "d7e0051ac7ccd49463401ad09aae431bfb609dbe2b54a20807a004b8c7af727f",
+    "lib/tournament-guide-rules.js": "4b32a6787408f420c7f97fc72d9000870de19183b216e5534ab77b383ea19577",
+    "lib/tournament-guide-schedule.js": "26722c1cf14ec5031399b5e08681d369bddf01cc5a4758077131de0643676174",
+    "lib/tournament-guide.js": "237f39f5403804b65f80e55372c4819f0655a92fab284ebad7d0becb5ccd9c7e",
+    "lib/tournament-identifiers.js": "59743f535d49aa664e7e41117ab21d760dcca460661a99d639a078cb769e710b",
+    "lib/tournament-intelligence-storylines.js": "785ebc04f09f5cacf443171cdf6d658d3f5e8ada342c88b2b61c8aa8e39ccf4e",
+    "lib/tournament-live-cache.js": "d0a31d721261452e89374bfff11241e18e69161fe4f560af53ecb3298b5b4bbb",
+    "lib/tournament-live-supabase.js": "1489169d6f0ead97e72c225ce1c4e2d5c1ff193dba798d8a64717bf00580a82e",
+    "lib/tournament-notifications.js": "e0eebad582da817cf221bb5bc9c68c22e7fc551107a5b5e51f331eea86c2e7ec",
+    "lib/tournament-odds.js": "c45c557f03eb630b3998e7a61ea03638ace591ae3df15cb55d0028c2efb8fcc1",
+    "lib/tournament-read-source.js": "dc0652b44a9628e2b54e4e07bebb6eff004fbf9b6933ff178f1229cb9dceebdd",
+    "lib/tournament-readiness.js": "dd3411db6eb42bf4bff98a488d32f1870a9009a085bade1273ad42b0e65b210c",
+    "lib/tournament-recap-intelligence.js": "43b3620ba8088905aab8b26caf01f8f5099eb723acf3dd95374de6ad6e39110f",
+    "lib/tournament-storylines.js": "eae2146639bf4e9960478cdaac986cc311c248b4f1a60111746f19cff1b5e58d",
+    "lib/tournament-timeline.js": "929221a8c448c9895ff154304fe0794277ff27118a380afdf55168932d46bba2",
+    "lib/tournament-workbook-initialization.js": "cb25584b13e559ce1959eac14127ceb2e3a8c0a4c6f7ccb6ec2138aff5fb3615",
+    "lib/transient-fetch.js": "926126f75de05bbc4857750d5508ed76a1129e24421b01aa765c4193bba5c8a0",
+    "lib/vercel-environment-resource-review.js": "a26ab937380e8c433575e793bd020b267c37b5b232743d0b9d8f1ab4497040ad",
+    "lib/vercel-provider-attestation.js": "dab90ea88898d48d3a18d1b9e02596d24201693f47a3105afb5dd36dccc2b666",
+    "lib/war-room-calculation-parity-service.js": "0f4a60969273ecbadc5ad011d9c4798059660c37bb3c97a89b4dfa7fdc78acb7",
+    "lib/war-room-calculation-parity.js": "b0445c1c6b44079c511d25ca4cabf32f4c47148ed8cc9b1337de31f37bc7e3c0",
+    "lib/war-room-input-contract.js": "430dd022eff87bb402be650e8845094dcbee05511f08142edfad992f35dc428b",
+    "lib/war-room-input-google.js": "bf450a63b3ce2f17de6f65faab55d20f3179db37f9dcbf5354e83f9f6a32dd34",
+    "lib/war-room-input-service.js": "76366184ada4fc06dc36776005a7e9ae48b5a442c3a45775914336a41c1da030",
+    "lib/war-room-input-source.js": "ed3d5d0d733c2808ad174ea8987ac1636f6839d185fc7e6f91660d1868f95688",
+    "lib/war-room-input-supabase.js": "f5c51f89ba7917c0b23d9051f91fcada4e4c9cf2735ecf7bafd36bae945d6c08",
+    "lib/web-app-manifest.js": "a514567b8277552cb4585ff3a2a10c7ad5d7c217602c2d5254f58081c14c82a4",
+    "lib/web-push-notifications.js": "a9b879f99a4ab2e1d4ab9690203533ad689872e2334c4ea347a7f864e16e9e7c",
+    "lib/workbook-protection.js": "cf6c617c2eb8a863b85fbd68d7a4ee46c8dbd6cf4842ccd4a56319eecdffe941",
+    "contracts/mobile/v1/README.md": "7f31bcb4a02a98724f747bb788817e037b9da5f3b56e9598efc35a28c50b54c8",
+    "contracts/mobile/v1/auth-otp-certify-response.schema.json": "fb6ddbc6ccd788fb10b891e96b3e0b8cd74dcb7e6b3c99944731697fe8c1e46f",
+    "contracts/mobile/v1/auth-otp-request-response.schema.json": "59d886a08e3be726ffcda463af6d2256ae97817eaf3d812f0745560623b50965",
+    "contracts/mobile/v1/calcutta.schema.json": "a9c7169b51c94ceb7269b16b70d850b93c1e5d8248a41a3e0f4271c8f12549bd",
+    "contracts/mobile/v1/error.schema.json": "b960423ef674068d98d21b59ebf54bc70d2485e69c615e4a9445535e5f31bbc8",
+    "contracts/mobile/v1/fixtures.json": "1ac58fcbadc2d5d8e8da553b32d7d7c7beac70f86ae65d1f3463652f415bac67",
+    "contracts/mobile/v1/guide.schema.json": "bbd06d41fcf8d0661233b9a01d9bd1a3ccd1bc81771b4956f699203c00dbe3db",
+    "contracts/mobile/v1/health.schema.json": "301c44026bbd239c56b417f209e4b5e194b6e085c3fc05d745473b9f474c8ee9",
+    "contracts/mobile/v1/history-detail.schema.json": "ca7c5ca49bceb6777da0c177bdb2aeee458ab9c8475a959ed09e61f45a47020d",
+    "contracts/mobile/v1/history.schema.json": "e62c3ff163d83d288d067f6a55dac1ef14dd4347995a4756155e6207f6cfa5ff",
+    "contracts/mobile/v1/leaders.schema.json": "f3f09397380ffade8250f26a1999a9cc8265eb32f665bba96b9519e6bcacb9dd",
+    "contracts/mobile/v1/match-detail-fixtures.json": "e8c71b54584b2b2e530d1f0c14bb33789b2fba698925ad50a3312cbf9247957a",
+    "contracts/mobile/v1/match-detail.schema.json": "7ce961fd543be5b5c85b1a9bfe71b44ef179add97a893cb633a1f72ab9b2fe9c",
+    "contracts/mobile/v1/matches.schema.json": "6ae82f31a5f2b3d64a8e7ead5e0d8c7fb180f7e026967c68d8bc3da1a4dd64a4",
+    "contracts/mobile/v1/net-skins.schema.json": "1ae2dee7f398cd6a3f75e8ee0beaea524d4acf68c7035d5e3d9bed5251a4d1a8",
+    "contracts/mobile/v1/odds.schema.json": "f84455930149dbac822deecb03f0d57de04fb0cd8587a1e13f991f799ac2b5b5",
+    "contracts/mobile/v1/opaque-match-id-fixtures.json": "f8cb7bc1df0290fcf4e5a2f04dcbec3a7d39e60e2839976df873f05e2467e581",
+    "contracts/mobile/v1/participant-certification-14d.md": "347da4b7bad750ee6b55d9d5f6327602704c8a34da376776893a0a6dcf5b7b56",
+    "contracts/mobile/v1/participant-content-fixtures.json": "614869e23c952236e7151fbbd37ce4c4d949db0b85c343708c9d9ebd532be4e7",
+    "contracts/mobile/v1/passport.schema.json": "5e73212ff5dcf3877ad8e17adf274bb673b029d0b7756f75d24c64997865aa4b",
+    "contracts/mobile/v1/portrait-policy.schema.json": "e78721453d62a8789c816c515294613cf31b7fbd8f354949350948b792c7607e",
+    "contracts/mobile/v1/production-health.schema.json": "e5ea8536d5afc9b54c2b3a4c38148c1ceb3b8cb33d3c097bd7c31e64500d1210",
+    "contracts/mobile/v1/records.schema.json": "259f527bc2e3041558838ee03c0a02ef5bc9235acab3e2e57664b0c884b49a18",
+    "contracts/mobile/v1/schedule.schema.json": "dd6a956f227abe4b97e9b2e819a743f6ef6dbedadedea0992ecf568aca135fb1",
+    "contracts/mobile/v1/scoring-current.schema.json": "0a4a0e97f5a6510e963020b9c7886a8bd0d40e29ea07d399305db976b5b37be5",
+    "contracts/mobile/v1/scoring-finalize-request.schema.json": "3d6c6bee71de9c6b27ae65cd9142fb1a825c2ae826b4625a3129aa8db16b4942",
+    "contracts/mobile/v1/scoring-finalize-response.schema.json": "bb34867464cf47c092a1a5decd1c3f45cd6b8a421e805282207761999e152f95",
+    "contracts/mobile/v1/scoring-fixtures.json": "5384847d4ba567152270b9fb9908865e472a780cb3b85125b28ba1ce3e1e8932",
+    "contracts/mobile/v1/scoring-hole-request.schema.json": "4087405467dff3c23d60ad971669dc04d5d405e97b2173a8b60a7c42170a4c72",
+    "contracts/mobile/v1/scoring-hole-response.schema.json": "95d183ae3a100a0b35dbe16ebf5fe946f8e4c6f70c05570b50b46a1a285a2fc2",
+    "contracts/mobile/v1/scoring-shared.schema.json": "d31e1abae75a03ab4a7ff78a15866df6e6e156279d7fafdf11516ed0413c687c",
+    "contracts/mobile/v1/session.schema.json": "d02e04d38758a9bb5321dd74934ca603997f0b2f9779953e5b1406612bdec68b",
+    "contracts/mobile/v1/shared.schema.json": "7b027c309458d068f7e9b79802082993c6b2f67b29f9d74d08ab87726342f0a4",
+    "contracts/mobile/v1/today.schema.json": "af5793f4ec77a9d965e4f6174e933818c21f875b81a5e963f63b087b8179c304",
+    "contracts/spectator/public-golf-fields-v1.json": "f20b720df3c03d14ffbe2e5f4f90d3e3e007e6ea82656f89cd3e141f4094dec2",
+    "docs/evidence/step11-6-production-google-credential-confinement-v4.json": "b546bc554e4bcd5cfbf8cf61aa9414a26d4d2e8fcac0d4a6b2467a4826794bb7",
+    "docs/evidence/step11-6-historical-safe-method-google-writer-v2.json": "5588416bd272c55684a5ab769d2dd2d4e99edd1341a199baaf85d71995740c6c",
+    "docs/evidence/step11-6-historical-production-google-writer-scope-v1.json": "6a09a750f74cb767176a8093ed82c5ff03b2c37394639f6424f3a6d349c5d62b",
+    "docs/evidence/step11-6-production-origin-inventory-v4.json": "4e882fc26f436cb7cf8babc754bf1d680cf88981382850ff2ada65844c552047"
+  },
+  "buildExitCode": 0,
+  "httpScoreRecovery": {
+    "matchId": "2026-R1-6",
+    "mutationId": "4165fc76-7737-4725-a77f-895b4acfcc9a",
+    "state": "COMMITTED",
+    "canonicalHoles": 1
+  },
+  "httpTransportFailures": [
+    {
+      "route": "/api/director/canonical-odds?job=079f9c61cbb2c3c8703c449c06188ec78313de571d1b3e868db07d3f4bb2a099",
+      "method": "GET",
+      "code": null,
+      "cause": "ECONNRESET",
+      "message": "read ECONNRESET"
+    }
+  ],
+  "result": "FAIL",
+  "failure": {
+    "code": "DIRECTOR_ODDS_UNAVAILABLE",
+    "message": "Odds response could not be confirmed. Retain the same operation for recovery."
+  },
+  "finishedAt": "2026-10-03T02:15:15.828Z",
+  "startedAt": "2026-10-03T02:14:44.871Z"
+}

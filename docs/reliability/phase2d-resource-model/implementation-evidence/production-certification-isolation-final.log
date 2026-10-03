@@ -1,0 +1,25 @@
+TAP version 13
+# {"fixture":"phase2c1-zero-google-release-v1","environment":"OWNED_SOCKET_ONLY_POSTGRESQL17","schema":137,"result":"PASS","runtimeGuardsSubstituted":false,"GoogleWriterRows":0,"GoogleCalls":0,"GoogleCredentialsRequired":false,"frozen2026Release":"PASS","frozen2026Replay":"PASS","annual2099Release":"PASS","annualReplay":"PASS","secondAnnualRelease":"PASS","staleAuthorityDenied":true,"conflictingReplayDenied":true,"canonicalActiveWorkerDenied":true,"orphanCanonicalLeaseDenied":true,"activeAnnualTransitionDenied":true,"GoogleFlagsRejected":5,"retiredMirrorHistoryIgnored":true,"annualRowsUnchanged":true,"canonicalSideGameCertification":"cd1bb2a635e97f8e0caf8ab42a26b21fc19f8ca2158e07bc5e1e2339a15826ec","limitations":["Synthetic annual authority fixture; not a full CREATE/PREPARE/ACTIVATE annual initialization","Historical platform bootstrap models prior Google cutover locally; candidate normal release phase requires no Google","No hosted, Production, real Google or physical proof"],"timestamp":"2026-09-30T20:25:07.224Z","r2ForwardMigrations":["202609300131_canonical_resource_control_v1.sql","202609300132_certification_domain_gateways_v1.sql","202609300133_certification_derived_gateways_v1.sql","202609300134_certification_annual_administration_v1.sql","202609300135_certification_read_contracts_v1.sql","202609300136_certification_durable_ingress_v1.sql","202609300137_certification_domain_resource_recovery_v1.sql","202609300138_certification_annual_transition_v1.sql"]}
+# {"result":"ANNUAL_RELEASE_REVIEW_OK","migrations":25,"annualSnapshot":"2fe7d74ccafed07d795a534cc4fbebe9d1e251e1dcd2147e41758a87c2edbe96","authorization":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_AUTHORIZED","status":"PENDING","idempotent":false,"release_sequence":2,"release_intent_id":"e34d7880-9ef2-4120-9a33-0d857e4c14e3","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","target_deployment_commit":"56ded61379e3308ab5c465ce186140550f3827a7","authorization_fingerprint":"eeeccadad05f405e85dea107f843a1a5b2d69018ceed1711c462ac5bccfb74f3"},"rebind":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_REBOUND","ingress":"OPEN","authority":"SUPABASE","idempotent":false,"boundary_mode":"MAINTENANCE_WINDOW_V1","cutover_phase":"OBSERVATION","deployment_id":"dpl_PostcutoverNormalRelease054","workers_enabled":true,"release_sequence":2,"deployment_commit":"56ded61379e3308ab5c465ce186140550f3827a7","maintenance_state":"NORMAL","release_rebind_id":"36ae6de9-a1fb-4380-89d2-82a152484003","admission_revision":12,"capability_ceiling":"OBSERVATION","activation_revision":23,"capability_contract":"production-maintenance-single-deployment-capability-v1","runtime_fingerprint":"45abce7cbeef4dd063e30c0347a9a02dc39b452d4c0fa1ddb8176671854cdbcc","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","admission_generation_id":"779d85e5-8281-42b0-852c-ce7b1d667a56","authority_generation_id":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb","predecessor_deployment_id":"dpl_PostcutoverApplication053","predecessor_release_sequence":1,"participant_identity_authority":"SUPABASE"},"secondRebind":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_REBOUND","ingress":"OPEN","authority":"SUPABASE","idempotent":false,"boundary_mode":"MAINTENANCE_WINDOW_V1","cutover_phase":"OBSERVATION","deployment_id":"dpl_PostcutoverNormalRelease055","workers_enabled":true,"release_sequence":3,"deployment_commit":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","maintenance_state":"NORMAL","release_rebind_id":"3517b3a1-3fe8-4cbd-83e4-fb823710be8c","admission_revision":13,"capability_ceiling":"OBSERVATION","activation_revision":24,"capability_contract":"production-maintenance-single-deployment-capability-v1","runtime_fingerprint":"1143af306976ccb933bbc20f3a3123563ff325da8beb1be82aef7eed9037a798","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","admission_generation_id":"779d85e5-8281-42b0-852c-ce7b1d667a56","authority_generation_id":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb","predecessor_deployment_id":"dpl_PostcutoverNormalRelease054","predecessor_release_sequence":2,"participant_identity_authority":"SUPABASE"}}
+# Subtest: migration 078 rebinds future annual normal releases without mutating annual state
+    # Subtest: future annual authorization, replay, stale and invariance
+    ok 1 - future annual authorization, replay, stale and invariance
+      ---
+      duration_ms: 15404.134667
+      type: 'test'
+      ...
+    1..1
+ok 1 - migration 078 rebinds future annual normal releases without mutating annual state
+  ---
+  duration_ms: 18465.396125
+  type: 'test'
+  ...
+1..1
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 18608.904208

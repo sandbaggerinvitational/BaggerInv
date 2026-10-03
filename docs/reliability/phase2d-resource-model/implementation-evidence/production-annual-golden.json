@@ -1,0 +1,645 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_PRODUCTION_SHAPED_POSTGRESQL17",
+  "hostedAccess": false,
+  "productionAccess": false,
+  "googleCalls": 0,
+  "runtimeGuardsSubstituted": false,
+  "readinessSubstituted": false,
+  "drainSubstituted": false,
+  "seededScores": 0,
+  "seededFinals": 0,
+  "operations": [
+    {
+      "operation": "CREATE_TOURNAMENT",
+      "requestId": "d34ad271-6ea6-43cd-a133-347f4672acae",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_CREATE_TOURNAMENT_COMPLETED"
+    },
+    {
+      "operation": "CONFIGURE_TEAM",
+      "requestId": "8aed2695-fd02-4c0d-b5ac-5f7c1fc9f2c6",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_CONFIGURE_TEAM_COMPLETED"
+    },
+    {
+      "operation": "CONFIGURE_TEAM",
+      "requestId": "d3fafa44-98ad-4b44-b22e-2ec12739f53b",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_CONFIGURE_TEAM_COMPLETED"
+    },
+    {
+      "operation": "REPLACE_ROSTER",
+      "requestId": "6f64b5df-6b33-435d-bf1f-8222777a8835",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_REPLACE_ROSTER_COMPLETED"
+    },
+    {
+      "operation": "CONFIGURE_ROUND",
+      "requestId": "a0c76124-a6d3-41a4-84bc-66a984618ae4",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_CONFIGURE_ROUND_COMPLETED"
+    },
+    {
+      "operation": "GENERATE_MATCH_STRUCTURE",
+      "requestId": "f8287973-a439-4f24-8279-5053ed5a13e2",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_GENERATE_MATCH_STRUCTURE_COMPLETED"
+    },
+    {
+      "operation": "CONFIGURE_ROUND",
+      "requestId": "04a35cfd-8759-4810-a5bb-b48b17f067b8",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_CONFIGURE_ROUND_COMPLETED"
+    },
+    {
+      "operation": "GENERATE_MATCH_STRUCTURE",
+      "requestId": "a4bb30c7-71ca-40d4-890c-f52c3a84cabd",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_GENERATE_MATCH_STRUCTURE_COMPLETED"
+    },
+    {
+      "operation": "CONFIGURE_ROUND",
+      "requestId": "2a68bd0f-be4b-4643-8e6b-fd47462928ce",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_CONFIGURE_ROUND_COMPLETED"
+    },
+    {
+      "operation": "GENERATE_MATCH_STRUCTURE",
+      "requestId": "dcccd2f3-f7e6-4010-b4b7-7e14fe8d8044",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_GENERATE_MATCH_STRUCTURE_COMPLETED"
+    },
+    {
+      "operation": "ASSIGN_COURSE",
+      "requestId": "fadac133-1502-4c8b-91b4-4eca44a34d76",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_ASSIGN_COURSE_COMPLETED"
+    },
+    {
+      "operation": "ASSIGN_COURSE",
+      "requestId": "5b3a71b5-b286-4294-8256-308d24f84c83",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_ASSIGN_COURSE_COMPLETED"
+    },
+    {
+      "operation": "ASSIGN_COURSE",
+      "requestId": "da8a758d-86a0-43e7-8ff1-afaadda392bc",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_ASSIGN_COURSE_COMPLETED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PROMOTE_RUNTIME_STRUCTURE",
+      "requestId": "fbe27a52-765b-4c14-afd4-b2bd914051ab",
+      "resultCode": "PRODUCTION_FUTURE_RUNTIME_PROMOTED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "STAGE_HANDICAPS",
+      "requestId": "5f554b79-2bc5-44f8-995e-f14edf3a02fc",
+      "resultCode": "PRODUCTION_FUTURE_HANDICAPS_STAGED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "APPROVE_HANDICAPS",
+      "requestId": "79309016-8bea-4911-9cb2-f6a4e001a481",
+      "resultCode": "PRODUCTION_FUTURE_HANDICAPS_APPROVED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "01263ad3-cbf7-4541-94ee-8f04f9d229e8",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "1a7ad961-4d2f-4608-abfb-4d552de3dc1d",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "dd9d9858-7ab8-43b8-b821-a901c014f9a0",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "aadb35d9-8f65-460c-8a11-a592fe4bad54",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "66edfb67-1c98-4014-a2a3-36d59af4202b",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "43e97c96-31c0-4fe7-92c7-cd06233945bd",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "3e0aad9b-b791-4f8d-9b03-35134ba23fa0",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "16b10c10-53a7-4226-ae1d-a062b4bb19f4",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "5cacb43c-afd3-49f4-b36b-074e6f650cda",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "687e5cce-b689-4cac-bfc1-10775ebe9277",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "0ab43000-69aa-44a5-b427-81696be38229",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "e6ef1bf1-ca34-462a-b4ec-9dbc8d39ca59",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "954c7f7f-4519-490d-b98b-832fef8ddb25",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "58555257-a6e4-4a0e-bf83-fea5da8635c4",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "b19a295b-94b9-48fc-ae7a-c0d8a98dd7f6",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "9950b56a-326b-4f87-9579-cac817651223",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "56d912ce-bf07-4119-92a6-8193bcd5f234",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "8c1b8bc2-a4ec-4fde-87c2-99ba74713411",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "b3aade03-54eb-47a3-81d6-96fedc9e04f0",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "90c17922-d4bf-4bd9-b4d7-88baa08aecbf",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "ad390ef3-8631-4429-b96a-a0d05e19a1f2",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "61795176-7dc6-4773-8045-6a27a47c99e2",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "77884efd-61a8-4244-93de-18448fe995a3",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "7cea2a50-4416-4f71-abcd-a0072aafd6d5",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "65e7f695-8e66-4ade-a34c-3896ca6ccb4b",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "74fbadd8-8bf1-425a-b68c-2920283217c0",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "eed9e00a-b0f4-416a-a404-75d00dbf258d",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "d2a2c74b-5fe2-4353-8ca0-e5bea8342fa8",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "83424b80-4d3c-4a9b-8e6a-898dc28c203c",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "83f92d69-8037-48c4-900c-0b9e4bbbced1",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "21df8fa1-1fb0-4c4b-8399-a7935c27ddd7",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "081eb4d2-bdeb-437f-a10a-dd24bc41b5b3",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "aa070529-4271-4afd-a3db-ec591d2fc596",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "564cce05-4c56-43db-a0cb-557b0e39ca0f",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "40119d16-24db-4b8c-a9b0-4ed14c4278c2",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "9a67faa9-4f52-4711-a51e-822956199186",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "d18bfca0-3d96-4d54-b997-9cde2cad33da",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "c2700b4a-6dbf-411e-9889-890262ea775c",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "6b80f3d9-1349-4849-a5c6-ae6f6955684b",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "3926c29d-6685-4733-86ae-a352d08cbf25",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "f8133cc6-62e6-49af-8b61-e7d3e91e5c25",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "3971b6df-9368-4a5e-9201-c6fb2934b474",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "7c0d8ac2-1efb-4efb-9d24-3a482fde947b",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "b509e802-a196-412c-9cb2-52a7719539e7",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "9212e996-4753-420a-9bf6-88700d024fe4",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "2aa7547a-a5e2-444c-8a49-b211e40f79ac",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "46d77961-6c06-41a3-86ec-1dade5fb67cd",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "ad698eb2-c993-4de7-96e4-963cfc533783",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "59df80c4-963d-4f90-83f7-7ce6efcad329",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "48feda7a-bd68-4bf4-9f42-88b965ef138f",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "302702b4-9fc5-439e-9391-fbe50e1c3193",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "703f3be5-9c14-46cc-9f7f-3b262b505205",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "72495a62-08fc-474d-9870-fd0fda971386",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "e8a98bbf-3138-4132-a2af-503d80bb70be",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "553b9720-fd65-4cdc-b4cc-57525921b536",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "338ca739-7dba-48e4-b773-93b7791d2605",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "0bf3ef98-3a9e-42ca-a42f-4ff16b5a43dd",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "2526a2bb-87e4-4865-87d4-4cb0279a5286",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "74f2356e-054f-4c07-93e2-ffa567a41c7f",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "85b792cd-6144-49e9-9735-44e8fcf3a77d",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "891821ce-4800-4674-9d72-80bca4ccf728",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "e0523545-0821-4770-a46d-f5371951cb04",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "565e9874-29b6-4a20-938d-6dd2f16c4bc5",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "a3c548c8-a069-4f19-af94-4a2e9330b1b1",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "b285ff8c-7157-4e69-b72f-85f11b5e176d",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "2fc3008c-f850-4d13-a184-9f5be7512667",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "6c4f3664-97a8-4610-b3af-5fd8714bc291",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "9b89e17a-99ac-4b44-bd40-1089d65620a8",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "b9a74ea1-f160-4af1-a997-36a048cb5fb5",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_MATCH",
+      "requestId": "19410667-d909-4c6d-92d8-1269e1371f92",
+      "resultCode": "PRODUCTION_FUTURE_MATCH_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "REPLACE_PAIRINGS",
+      "requestId": "08fb6a80-c0ca-4c16-87b0-087f566c4d39",
+      "resultCode": "PRODUCTION_FUTURE_PAIRINGS_REPLACED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "PREPARE_SCORING_CONTEXT",
+      "requestId": "95f3995a-3db1-4820-9635-6066b6b02d95",
+      "resultCode": "PRODUCTION_FUTURE_SCORING_CONTEXT_PREPARED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "GRANT_FUTURE_DIRECTOR",
+      "requestId": "b95d1457-36de-4f0e-8ddc-1ca88b570584",
+      "resultCode": "PRODUCTION_FUTURE_DIRECTOR_GRANTED"
+    },
+    {
+      "operation": "ANNUAL.GUIDE_CREATE",
+      "requestId": "b3d5efd5-5331-434d-b010-b2e73133a03b",
+      "resultCode": "GUIDE_DRAFT_CREATED"
+    },
+    {
+      "operation": "ANNUAL.GUIDE_VALIDATE",
+      "requestId": "9b49133f-bd28-4910-93d0-ce1b62f2b88f",
+      "resultCode": "GUIDE_DRAFT_VALIDATED"
+    },
+    {
+      "operation": "ANNUAL.GUIDE_PUBLISH",
+      "requestId": "0c6690aa-2b39-40bf-b4e9-425fb45fe569",
+      "resultCode": "GUIDE_REVISION_PUBLISHED"
+    },
+    {
+      "operation": "ANNUAL.DRAFT_STAGE",
+      "requestId": "3405805f-d503-4433-b89d-18359e36a636",
+      "resultCode": "DRAFT_REVISION_STAGED"
+    },
+    {
+      "operation": "ANNUAL.DRAFT_VALIDATE",
+      "requestId": "a59e0acf-2d5b-4349-a8ae-dcc6ab1d02e8",
+      "resultCode": "DRAFT_REVISION_VALIDATED"
+    },
+    {
+      "operation": "ANNUAL.DRAFT_COMMIT",
+      "requestId": "014c2f88-23aa-4575-aa69-59066ba388fb",
+      "resultCode": "DRAFT_REVISION_COMMITTED"
+    },
+    {
+      "operation": "ANNUAL.PREDICTION_STAGE",
+      "requestId": "539338cb-0dc9-4d0c-8db5-f47638a800ad",
+      "resultCode": "PREDICTION_SETTINGS_REVISION_STAGED"
+    },
+    {
+      "operation": "ANNUAL.PREDICTION_VALIDATE",
+      "requestId": "2b752bc9-7d83-4583-a58d-c1b0262a666d",
+      "resultCode": "PREDICTION_SETTINGS_REVISION_VALIDATED"
+    },
+    {
+      "operation": "ANNUAL.PREDICTION_COMMIT",
+      "requestId": "77c8b684-4bbc-468b-ba6a-1ee1e650d01c",
+      "resultCode": "PREDICTION_SETTINGS_REVISION_COMMITTED"
+    }
+  ],
+  "status": "PARTIAL",
+  "initialInputs": {
+    "players": 24,
+    "emailsSent": 0,
+    "configurationFingerprint": "6795d9eb49996540638a6610b4231d53f07e5b636a7bc0db45dac01f44498cd9",
+    "provenanceClass": "REGISTERED_LOCAL_PRODUCTION_PROVENANCE",
+    "provenanceSha256": "c5afd4cfc0f3b86e44f96110075ae458830cdfc1d9a5f51e704bbc36d289d5a3"
+  },
+  "futurePreparation": {
+    "matches": 24,
+    "readiness": {
+      "ok": true,
+      "ready": false,
+      "blockers": [
+        {
+          "code": "FUTURE_PREDECESSOR_SCORING_CLOSE_FENCE_NOT_CERTIFIED",
+          "details": [
+            "PREDECESSOR_SCORING_ADMISSION_NOT_CLOSED",
+            "PREDECESSOR_FINAL_SCORING_FACTS_REQUIRED"
+          ],
+          "message": "The current tournament scoring close and drain boundary is not certified.",
+          "section": "Activation"
+        }
+      ],
+      "fingerprint": "acdc9210f79a9c76828f117a645b6bb019c09176336d88aabcbe8820a0b10aee",
+      "contractVersion": "production-annual-scoring-transition-readiness-v1",
+      "targetTournamentId": "2027",
+      "predecessorCertificate": {
+        "blockers": [
+          "PREDECESSOR_SCORING_ADMISSION_NOT_CLOSED",
+          "PREDECESSOR_FINAL_SCORING_FACTS_REQUIRED"
+        ],
+        "certified": false,
+        "closureId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "fingerprint": "d8aae1218303a48a336c33e14a466b2a3656a64a34de000a973995f232d364e6",
+        "tournamentId": "2026",
+        "sideGameDrain": {
+          "oddsMirrorRows": 0,
+          "oddsUnresolved": 0,
+          "calcuttaUnresolved": 0,
+          "generationMismatch": 0,
+          "netSkinsUnresolved": 0,
+          "runtimeGenerationId": null
+        },
+        "derivedWorkerDrain": {
+          "runtimeGenerationId": null,
+          "competitionUnresolved": 0,
+          "intelligenceUnresolved": 0,
+          "competitionGenerationMismatch": 0,
+          "intelligenceGenerationMismatch": 0
+        },
+        "legacyRootClosureId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "postCloseLeaseCount": 0,
+        "admissionGenerationId": "92520ad2-700b-4566-8338-abdf436fab64",
+        "authorityGenerationId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+        "legacyAdmissionBlockers": 0
+      },
+      "expectedPointerRevision": 1,
+      "predecessorTournamentId": "2026"
+    }
+  },
+  "futureSetup": "PASS",
+  "scope": "SUPPORTED_DISTINCT_COURSE_FUTURE_SETUP_ONLY",
+  "completeProtectedAnnual": "NOT_PROVEN",
+  "blocker": "UNCHANGED_PRODUCTION_2026_HISTORICAL_PUBLICATION_ADOPTION_REQUIRED",
+  "historicalAdoptionFabricated": false
+}

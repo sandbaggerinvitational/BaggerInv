@@ -1,0 +1,16 @@
+▶ R2 two-database resource, receipt, ingress, read and worker isolation
+  ✔ same operation ID in distinct registered databases has independent canonical outcome (356.607292ms)
+  ✔ foreign resource, deployment and lease never rebind to local authority (125.348959ms)
+  ✔ same-ID recovery returns only locally bound receipt and full hash conflict (45.41925ms)
+  ✔ canonical current reads and financial projections reject the other resource (235.483458ms)
+  ✔ worker command cannot claim or materialize against a different registered database (101.25225ms)
+  ✔ private relations remain unavailable and neither database acquires Production or Google authority (72.406292ms)
+✔ R2 two-database resource, receipt, ingress, read and worker isolation (9821.74775ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9892.929917

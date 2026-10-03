@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "environment": "OWNED_LOCAL_NON_PRODUCTION",
+  "proofLayer": "BROAD_REGRESSION_COMPARISON",
+  "baseSha": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "candidateHead": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "candidateIsUncommittedDraft": true,
+  "baseline": "docs/reliability/phase2c1-closure/evidence/p0f-approved/application.json",
+  "candidate": "docs/reliability/phase2d-resource-model/evidence/application.json",
+  "countsBefore": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "countsAfter": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "testSelectionFiles": 493,
+  "newFailureIdentities": [],
+  "removedFailureIdentities": [],
+  "changedFailureDiagnostics": [],
+  "unchangedFailures": [
+    "analytics implementation digest requires an explicit version update",
+    "Google-backed secondary failures are isolated from the core route",
+    "Players uses one compact accessible Round and Rank By control surface",
+    "polish is presentation-only and does not add a leaderboard request path",
+    "Supabase verification distinguishes rejected tokens from provider outages",
+    "native certification receives only a server-verified Auth UUID and confirmed email",
+    "OTP route is no-signup, six-digit, scoped, durably audited, and returns generic unapproved behavior",
+    "SSR session, logout, shadow comparison, and participant context stay Passport-authoritative",
+    "participant navigation uses one fixed safe-area-aware native shell",
+    "every compiled mobile route denies Production before Auth, database, provider or worker transport",
+    "Email provider flow remains byte-identical apart from optional enrollment proof issuance",
+    "Phase 2 public pages consume the shared scorecard analytics service",
+    "CLI writes one immutable local artifact and never calls a provider",
+    "historical writer-scope evidence is generated from exact retained inputs",
+    "historical READY deployments with the safe-method Google writer are exact",
+    "the provider contract uses one exact all-method path OR group",
+    "v4 credential confinement classifies the complete provider and environment inventories",
+    "phone lifecycle dispatch is individually enumerated for frozen and future Production, with no Director namespace",
+    "phone candidate introduces no identity tables or Director mutation and keeps service-only grants",
+    "routes report feedback only after canonical completion; no client-selected receipt"
+  ],
+  "comparison": "EXACT_NORMALIZED_DIAGNOSTICS",
+  "result": "PASS_NO_NEW_REGRESSION_IN_PRESERVED_SELECTION",
+  "rawSuiteResult": "FAIL_20_ESTABLISHED_BASELINE_FAILURES",
+  "sourcesStable": true,
+  "artifactHashes": {
+    "docs/reliability/phase2c1-closure/evidence/p0f-approved/application.json": "49885dbf23ec5ac29f770c1608b9e361af70856e627b20b18bcff2da8220d2ae",
+    "docs/reliability/phase2d-resource-model/evidence/application.json": "003957d5fe5ee5a2e50d0dc99cc9c6d68ab1e1412449c7863b9e175988ef669b",
+    "docs/reliability/phase2d-resource-model/evidence/application.tap": "d4626f717d0b9c4889aa14b94fa1d963cec84cf45c43c68350f331dab4268b47"
+  },
+  "limitations": [
+    "New R2 tests are reported separately.",
+    "These results apply only to the source manifests embedded in the referenced artifacts.",
+    "An unconfigured local build is not configured application boot or hosted proof."
+  ],
+  "recordedAt": "2026-10-03T00:30:00.486772+00:00",
+  "candidateStartedAt": "2026-10-03T00:26:58.155Z",
+  "candidateCompletedAt": "2026-10-03T00:29:35.796Z"
+}

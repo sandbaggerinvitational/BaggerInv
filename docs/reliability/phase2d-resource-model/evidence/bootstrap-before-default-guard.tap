@@ -1,0 +1,84 @@
+TAP version 13
+# Subtest: R2 deterministic canonical bootstrap — owned local PostgreSQL17 only
+    # Subtest: reviewed source profile reproduces schema, static data, catalog and manifest
+    ok 1 - reviewed source profile reproduces schema, static data, catalog and manifest
+      ---
+      duration_ms: 627.872875
+      type: 'test'
+      ...
+    # Subtest: tampered schema/catalog/source manifest rejected before installation
+    ok 2 - tampered schema/catalog/source manifest rejected before installation
+      ---
+      duration_ms: 79.079375
+      type: 'test'
+      ...
+    # Subtest: fresh database has convergent definitions and zero authority/history/job seeds
+    ok 3 - fresh database has convergent definitions and zero authority/history/job seeds
+      ---
+      duration_ms: 4139.430375
+      type: 'test'
+      ...
+    # Subtest: exact replay verifies receipt and makes no new authority
+    ok 4 - exact replay verifies receipt and makes no new authority
+      ---
+      duration_ms: 3615.571584
+      type: 'test'
+      ...
+    # Subtest: new private cores retain owner-only execution and exact source-defined security attributes
+    ok 5 - new private cores retain owner-only execution and exact source-defined security attributes
+      ---
+      duration_ms: 2874.097416
+      type: 'test'
+      ...
+    # Subtest: failure at after-schema rolls back all application schemas and retry succeeds
+    ok 6 - failure at after-schema rolls back all application schemas and retry succeeds
+      ---
+      duration_ms: 4809.9355
+      type: 'test'
+      ...
+    # Subtest: failure at after-static rolls back all application schemas and retry succeeds
+    ok 7 - failure at after-static rolls back all application schemas and retry succeeds
+      ---
+      duration_ms: 5236.120209
+      type: 'test'
+      ...
+    # Subtest: failure at before-commit rolls back all application schemas and retry succeeds
+    ok 8 - failure at before-commit rolls back all application schemas and retry succeeds
+      ---
+      duration_ms: 4804.120959
+      type: 'test'
+      ...
+    # Subtest: fresh independent database converges; no cloned resource or control authority
+    ok 9 - fresh independent database converges; no cloned resource or control authority
+      ---
+      duration_ms: 7004.052333
+      type: 'test'
+      ...
+    # Subtest: replay detects changed RLS rather than accepting only a matching receipt
+    ok 10 - replay detects changed RLS rather than accepting only a matching receipt
+      ---
+      duration_ms: 351.956083
+      type: 'test'
+      ...
+    # Subtest: unowned database handles rejected; no remote connection interface
+    ok 11 - unowned database handles rejected; no remote connection interface
+      ---
+      duration_ms: 55.018958
+      type: 'test'
+      ...
+    1..11
+ok 1 - R2 deterministic canonical bootstrap — owned local PostgreSQL17 only
+  ---
+  duration_ms: 37715.636833
+  type: 'test'
+  ...
+# {"environment":"OWNED_LOCAL_POSTGRESQL17","provisional":false,"finalBaselineArtifactsRead":true,"artifactsEmittedByTest":false,"functions":1117,"sourceFiles":149,"forwardMigrations":["supabase/production_migrations/202609300131_canonical_resource_control_v1.sql","supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql","supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql","supabase/production_migrations/202609300134_certification_annual_administration_v1.sql","supabase/production_migrations/202609300135_certification_read_contracts_v1.sql","supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql","supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql","supabase/production_migrations/202609300138_certification_annual_transition_v1.sql","supabase/production_migrations/202609300139_certification_future_authoring_v1.sql","supabase/production_migrations/202609300140_certification_future_scoring_v1.sql","supabase/production_migrations/202609300141_certification_future_workers_v1.sql","supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql","supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql","supabase/production_migrations/202609300144_certification_release_rebind_v1.sql","supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql","supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql","supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql","supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql","supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql","supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql","supabase/production_migrations/202609300151_certification_annual_reopen_lineage_v1.sql","supabase/production_migrations/202609300152_certification_closed_release_admission_v1.sql"],"completeCandidateCertified":false,"authorityRowsCopied":0,"hostedAccess":false}
+1..1
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 37781.760125

@@ -1,0 +1,119 @@
+{
+  "recordedAt": "2026-10-02T23:55:29.009261+00:00",
+  "classification": "STRONGLY_SUPPORTED",
+  "proofLayer": "SOURCE",
+  "status": "SCOPED_REVIEW_COMPLETE_NOT_RUNTIME_CERTIFICATION",
+  "baseSha": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "branch": "codex/reliability-phase2d-staging-admission",
+  "networkUsed": false,
+  "postgresqlStarted": false,
+  "runtimeSourceChangedByAudit": false,
+  "sourceHashes": {
+    "app/admin/director/CanonicalDirectorOdds.js": "7d6674f13f58835c2e2440cbb62a2f4a670b719742c10028e69f7800fdcad562",
+    "app/api/director/canonical-odds/route.js": "ccf05dd9bd22098ff18f43cf1f649317c599f32dc96933007fd712cfc2036086",
+    "app/api/odds/publish/route.js": "95d35ac18052cf535cee5484d98d840ae0cd41e74e4ac555ea45e44dca2fb876",
+    "config/certification-resource-registration.json": "7ff467e11e3ae1e9e679b4c5630ddcea2116bf38eaf3d4429517d219532a5d5e",
+    "lib/canonical-director-odds-client.js": "14125cbf9f69f16d362f9e69563fd410c0467edebf19cf57ce29091e06f708b7",
+    "lib/canonical-director-odds.js": "3b897836d1d044fa8286e330c9be10a71e64435092fc5514bd4799cc24dabcaa",
+    "lib/canonical-director-operations-client.js": "8f2ae30067d0844d44500a4306e151b94bf15f5e916653a946ac424decf381c4",
+    "lib/canonical-director-overview.js": "5b6b79368c144df9cffd921a123a709dd7ec9c0068f7335004980dc32a8e53dd",
+    "lib/canonical-resource-registration.js": "0f2647d93c0f37c8d2ee92a77f6270408345f1e09e6ac5964ce88f7f83fe28f1",
+    "lib/canonical-runtime-source.js": "1907a9b4d5cccadce45bfb587f6da78fa0a16c5aadc004b2fac0f38a8c7591f0",
+    "lib/certification-odds-server.js": "0e626cdccc8296e6119858d43f27fc7506e661af9e15477f02bd400b9f8ef1d0",
+    "lib/certification-read-adapters.js": "374e7f35a2f3e578f9705802e1284fb996e2bb5be44b98cd2d52c3edd80767b4",
+    "lib/certification-runtime-server.js": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779",
+    "lib/certification-worker-adapter.js": "33f6c84b25c6cf36a149038700892482f05baeaa9ed7cf4f86c54dfb08f6435e",
+    "lib/competition-derived-supabase.js": "79e209265c143ed2f97260a848a05a841a649ed98098bc4191a9b7dca5a5088c",
+    "lib/history-2026-read-source.js": "61cf48b692a1915f4791355201a1fd3ccb03cb6e8e60292e99817e5e09346271",
+    "lib/history-2026-service.js": "4a5c8ca644cddb88ae3afa87c3491b845880385acbafae8619d2c021ae8646af",
+    "lib/history-2026-supabase.js": "20151f6d60d223f3cf393f7eab21f31b33ebf1d8dcbd5c72a74bd55f6a6776b0",
+    "lib/intelligence-derived-supabase.js": "583ebeefccd8b835d8bc96a1a790c5246516e819e3858b59d86bc24a01f192bd",
+    "lib/isolated-director-operations.js": "de01168a85256452260c88456b26232c71bdda05c1f8b1764ed2a70ec98ed15d",
+    "lib/participant-identity-authority.js": "3d58f92dddd330db6705c52f7d4eb35dfb5425272462461703da614ada45043c",
+    "lib/participant-identity-supabase.js": "5b9e5d92b7ca1f471ded189eab22713c4d75b2491e2e235aa2929703eb32e9a0",
+    "lib/prediction-input-bundle-source.js": "44bd7fcc544872564d2c3fa9e719201247d5c74fb160eb1049ed6b3d38be2073",
+    "lib/preview-director-authorization.js": "a887205c98c841617f2ab6cdb9459847c91a6e64f1e9961058d96a0084d87b6d",
+    "lib/production-calcutta-server.js": "506224c1f3f668cf69fbd488fe5ee93fd1ad79d0237ac8cf24b8740ca06a9143",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "lib/scoring-authority-supabase.js": "1591779c5e511a82457912c935e470ee7fd6dbc09f07977ab80a42ecb49254ec",
+    "lib/scoring-authority.js": "eb364b5cf3be383bf1b0f09ebf26c0d432781b4cfeb49114bf1f02739139e654",
+    "lib/scoring-shadow.js": "7df8341e7e39148f2bb5d99b7382fed5361ff81ca06b74afd5a28baadb8d7c33",
+    "lib/supabase-auth-admin.js": "64496f94a041788c22b4493ebfa289b6b17a5c43d10dd84b10b16412ed4ea67b",
+    "lib/supabase-auth-server.js": "4cfaaf576e6670047ceb570a953439ceae69a7f574bb9f52b385a7dfb28d8bf9",
+    "next.config.mjs": "8ef3fcd3665e6f09141d1bc385344566dc74d17239ea206a3029a425e2259c7c",
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+    "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql": "10c5d4180a185759f8488a1a1890c367df7cd2c52f6fdf577e12c22b47f08bf8",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql": "0d610b350d76b27f4f63942758cfd7e12bafeddac48f3c8c0ff8c94c74fb37ff",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql": "410f4b2681442ff99cee1ab7f291f0b006fed069262584540ddbfc2e2eb36ffb",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql": "080cdaf863a5f0bc70670f15e0aa658916cda439e0df10110de7d428675334f6"
+  },
+  "secretScan": {
+    "textFilesScanned": 261,
+    "patterns": [
+      "private_key",
+      "supabase_secret_format",
+      "google_oauth_token",
+      "github_token",
+      "slack_token",
+      "jwt_shape"
+    ],
+    "matchesWithoutValues": [],
+    "limitation": "Pattern scan only; does not prove absence of every possible secret format."
+  },
+  "nativeFilesChanged": [],
+  "packageManifestOrLockChanges": [],
+  "repositoryDatabaseOrKeyFiles": [],
+  "repositoryLocalEnvFilesNamesOnly": [],
+  "preexistingCandidateControlTestSeamUnchanged": true,
+  "ownPriorClusterCleanup": "Completed for owned Director,NetSkins,release,provider,resource-isolation,protected-operation,and ingress-stress fixtures; root/other agents may own a later coordinated cluster.",
+  "reviewedBoundaries": [
+    "Exact checked-in Certification registration and public/server URL/key hash binding; explicit request fails closed.",
+    "Server-owned actor/resource context, logical RPC allowlists, durable ingress and same-operation recovery.",
+    "Director verified Auth/account/entitlement/non-impersonation and SQL actor validation.",
+    "Participant identity reads only; Certification provider administration/OTP unavailable.",
+    "Scoring/current reads/workers select explicit Certification paths before legacy providers; no fallback authority found.",
+    "Odds read DTO privacy, exact job/resource/generation/release binding, explicit owner publication and canonical atomic receipts/audit.",
+    "141 binder sets canonical current generation only after resource-aware gate/future-current checks.",
+    "147 draft closed2026 History reads existing145 lineage plus exact preclosure Guide authority; no INITIAL_FIXTURE bypass."
+  ],
+  "exclusions": [
+    "144 release-generation/drain predicate remains pending; no PASS or modification.",
+    "147 is a reviewed draft requiring actual runtime/security/compatibility proof.",
+    "This audit does not replace actual ACL/owner/OID/pg_depend/RLS or negative-authorization runtime tests.",
+    "No hosted,Production,physical-device,capacity,restore or complete historical-upgrade certification."
+  ],
+  "unresolvedProtectedHistoricalProofs": [
+    {
+      "id": "R2-PROVIDER-FORWARD-LINEAGE",
+      "status": "NOT_PROVEN",
+      "detail": "Actual V4 COMMITTED provider path stops at069 requiring maintenance binding for current epoch; no truthful supported synthetic continuation established."
+    },
+    {
+      "id": "R2-PRODUCTION-ODDS-ADOPTION",
+      "status": "NOT_PROVEN",
+      "detail": "Actual protected calculation succeeds; first publication correctly rejects missing frozen2026 historical adoption. Positive publication not proven."
+    },
+    {
+      "id": "R2-PRODUCTION-FULL-ANNUAL",
+      "status": "PARTIAL",
+      "detail": "Supported distinct-course future setup passes; complete predecessor publication/FinalRecap/close/activate dependent on missing adoption and not executed."
+    },
+    {
+      "id": "R2-ANNUAL-SAME-COURSE-PROMOTION",
+      "status": "PROVEN_BASE_DEFECT_UNRESOLVED",
+      "detail": "066 and139 retain byte-identical repeated-course hole-copy query; actual same-course multi-round promotion raises23505."
+    }
+  ]
+}

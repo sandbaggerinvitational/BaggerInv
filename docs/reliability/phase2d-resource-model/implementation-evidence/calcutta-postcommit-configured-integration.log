@@ -1,0 +1,15 @@
+▶ actual Certification Calcutta postcommit hook uses durable canonical workers
+  ✔ wrong target and missing target stop after canonical context read without worker writes (31.49625ms)
+  ✔ actual scored tournament completes Calcutta calculation through existing durable processor without publication (167.604167ms)
+  ✔ repeat wakeup is idempotent and preserves canonical financial facts (67.795792ms)
+  ✔ real admission revision change after context read conflicts before materialization (53.875ms)
+  ✔ disabled admission and unprivileged database roles cannot enter worker authority (55.232959ms)
+✔ actual Certification Calcutta postcommit hook uses durable canonical workers (6841.107583ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6932.535916

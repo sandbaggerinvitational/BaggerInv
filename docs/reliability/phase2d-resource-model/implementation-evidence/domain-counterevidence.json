@@ -1,0 +1,21 @@
+{
+  "classification": "PROVEN_COUNTEREVIDENCE",
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "canonicalRead": {
+    "contextResourceClass": "CERTIFICATION",
+    "contractVersion": "production-tournament-setup-v1",
+    "readiness": "NEEDS_ATTENTION",
+    "note": "Read succeeded; this does not mean setup was ready."
+  },
+  "mutation": "prepare-scoring-context",
+  "result": "FAIL",
+  "code": "TOURNAMENT_SETUP_SCORING_CONTEXT_REQUIRED_FACT_MISSING",
+  "cause": "UNKNOWN \u2014 fixture or missing domain fact not diagnosed before architecture stop",
+  "stack": "ERROR:  TOURNAMENT_SETUP_SCORING_CONTEXT_REQUIRED_FACT_MISSING\nCONTEXT:  PL/pgSQL function apply_tournament_setup_scoring_context_v1(jsonb,bigint,text) line 235 at RAISE\nPL/pgSQL function mutate_setup_before_late_r3_v1(jsonb) line 134 at assignment\nPL/pgSQL function production_control.mutate_late_r3_dispatch_v1(jsonb,boolean) line 31 at RETURN\nPL/pgSQL function production_control.canonical_director_setup_operation_v2(jsonb,jsonb,boolean) line 91 at RETURN\nPL/pgSQL function production_control.dispatch_certification_operation_v1(jsonb,jsonb,boolean) line 81 at RETURN\nPL/pgSQL function public.execute_certification_operation_v1(jsonb) line 6 at assignment",
+  "reproductionSource": "test/support/reliability/phase2d-certification-fixture.mjs",
+  "limitations": [
+    "Ad-hoc runtime probe, not full certification",
+    "Private credentials/context tokens omitted",
+    "Positive scoring/control/worker proof incomplete"
+  ]
+}

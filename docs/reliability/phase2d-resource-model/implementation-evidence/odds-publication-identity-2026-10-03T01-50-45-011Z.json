@@ -1,0 +1,149 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "hosted": false,
+  "production": false,
+  "googleCalls": 0,
+  "priorCounterevidence": "release-transition-2026-10-03T01-29-40.988Z.json",
+  "sourceBefore": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+    "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql": "5ef34c3bd09feda3a4cacdac275764166ea82319d20a59235efed091016b0343",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql": "0d610b350d76b27f4f63942758cfd7e12bafeddac48f3c8c0ff8c94c74fb37ff",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql": "410f4b2681442ff99cee1ab7f291f0b006fed069262584540ddbfc2e2eb36ffb",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql": "080cdaf863a5f0bc70670f15e0aa658916cda439e0df10110de7d428675334f6",
+    "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql": "d2c7e20327392826882e3451daab8594fd1187ea2672cece7889cbeb4768d245",
+    "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql": "1f7ea4800f11204dd8016269f65291b213666e642fb65a899df883b32462044d",
+    "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql": "ff89ea6218d6692e7f669e1b057d0f5ac2d7bf35131bab972bec38e2a1b93510",
+    "test/reliability-phase2dr2-odds-publication-identity.integration.test.mjs": "581a14f1cbbcbd8a90feb591a7c994ae8c022c453d4152d902905ecfc1117caf",
+    "lib/certification-odds-server.js": "3e1d0b8f21336463a67b3fdfcebd49b874e3496c3454df594782e863397bad39",
+    "lib/certification-runtime-server.js": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779",
+    "test/support/reliability/certification-odds-proof.mjs": "414b3b738b7eca47a4bf489c578969faed6a047f894a55d9910e970fb1ad0a67",
+    "test/support/reliability/certification-annual-transition-fixture.mjs": "5fb7ef25980c3d700517b8f5bef16891e2ec55f6206f83d7c8b7a1c879871aab"
+  },
+  "cases": [
+    {
+      "name": "real first calculation and explicit publication record both canonical source components",
+      "status": "PASS"
+    },
+    {
+      "name": "genuine scoring produces a fresh job with the identical numerical result and unchanged configuration",
+      "status": "PASS"
+    },
+    {
+      "name": "required receipt failure rolls back second snapshot, current flags, job and audit",
+      "status": "PASS"
+    },
+    {
+      "name": "same-result fresh-source publication commits revision2 with immutable predecessor and accurate audit",
+      "status": "PASS"
+    },
+    {
+      "name": "same-operation replay and lost-response recovery do not duplicate publication; changed request conflicts",
+      "status": "PASS"
+    },
+    {
+      "name": "same source and result retains the existing job and never creates duplicate logical publication",
+      "status": "PASS"
+    },
+    {
+      "name": "actual public freshness and PWA/Build10 projections remain current without exposing private provenance",
+      "status": "PASS"
+    },
+    {
+      "name": "stale source, forged identity, wrong resource, wrong actor and worker publication remain denied",
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent owner CAS publishes a single revision for the same fresh equal-result job",
+      "status": "PASS"
+    },
+    {
+      "name": "index definition, private privileges and immutable identity components remain protected",
+      "status": "PASS"
+    }
+  ],
+  "equalResults": {
+    "firstJob": "a32599af4a18c80e2dcf2af0e43772323b5c67f622d76ae0146e21b01a95367a",
+    "secondJob": "c71eccaedde74afa0e071052121fab40025e25d38d57c626d7349cdb3bf625b5",
+    "resultFingerprint": "2bc241d0afebf456ff36c6617a3d34854cae40484e1eb55668f9520f889e1e9c",
+    "iterations": 10000,
+    "sameConfiguration": true,
+    "differentLiveSource": true,
+    "algorithmEqual": true
+  },
+  "publicationIdentity": {
+    "first": {
+      "fingerprint": "bc7b035d8d2ebb3807aba0559a77944a9527e3ebd28628bb1887669f1f5db541",
+      "contract_version": "certification-odds-publication-source-v1",
+      "configuration_source_fingerprint": "ba6921c5fe74333f2cfce020ce7f9fa91ce8f7485e19a0f3e70b7ee0956c9abb",
+      "canonical_live_source_fingerprint": "7fffa5404bb79672bd61d8bbb326840ef3b8651112ed05a293b263ac24d5186b"
+    },
+    "second": {
+      "fingerprint": "61c1316883481a2d62fe95b07834aecc289b4549b318a1735a45cb52c62298fc",
+      "contract_version": "certification-odds-publication-source-v1",
+      "configuration_source_fingerprint": "ba6921c5fe74333f2cfce020ce7f9fa91ce8f7485e19a0f3e70b7ee0956c9abb",
+      "canonical_live_source_fingerprint": "2bc3c55ef6672f4b8e7f5b3ae19b14550c9f2c2d1f06f6891dd6edea45d9aea0"
+    },
+    "revision": 2,
+    "predecessorImmutable": true,
+    "actualClientAcknowledgementDiscarded": true,
+    "recovered": "COMMITTED"
+  },
+  "publicContracts": {
+    "freshness": "CURRENT_OFFICIAL",
+    "pwa": true,
+    "build10": true,
+    "privateProvenance": false
+  },
+  "index": "CREATE UNIQUE INDEX odds_native_publication_idempotency_idx ON scoring_authority.odds_published_snapshots USING btree (tournament_id, milestone, logical_payload_hash, source_fingerprint, settings_fingerprint, ratings_fingerprint, pairing_fingerprint, engine_version, deterministic_seed) WHERE (logical_payload_hash IS NOT NULL)",
+  "functionIdentity": {
+    "acl": "{postgres=X/postgres}",
+    "path": [
+      "search_path=pg_catalog"
+    ],
+    "owner": "postgres",
+    "definer": true,
+    "identity": "production_control.canonical_publish_odds_v2(jsonb,text,jsonb)"
+  },
+  "installationEquivalence": "EXACT_BODY_REVERSAL_AND_PG_PROC_PG_DEPEND_INDEX_OID_ASSERTIONS",
+  "sourceAfter": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+    "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql": "5ef34c3bd09feda3a4cacdac275764166ea82319d20a59235efed091016b0343",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql": "0d610b350d76b27f4f63942758cfd7e12bafeddac48f3c8c0ff8c94c74fb37ff",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql": "410f4b2681442ff99cee1ab7f291f0b006fed069262584540ddbfc2e2eb36ffb",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql": "080cdaf863a5f0bc70670f15e0aa658916cda439e0df10110de7d428675334f6",
+    "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql": "d2c7e20327392826882e3451daab8594fd1187ea2672cece7889cbeb4768d245",
+    "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql": "1f7ea4800f11204dd8016269f65291b213666e642fb65a899df883b32462044d",
+    "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql": "ff89ea6218d6692e7f669e1b057d0f5ac2d7bf35131bab972bec38e2a1b93510",
+    "test/reliability-phase2dr2-odds-publication-identity.integration.test.mjs": "581a14f1cbbcbd8a90feb591a7c994ae8c022c453d4152d902905ecfc1117caf",
+    "lib/certification-odds-server.js": "3e1d0b8f21336463a67b3fdfcebd49b874e3496c3454df594782e863397bad39",
+    "lib/certification-runtime-server.js": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779",
+    "test/support/reliability/certification-odds-proof.mjs": "414b3b738b7eca47a4bf489c578969faed6a047f894a55d9910e970fb1ad0a67",
+    "test/support/reliability/certification-annual-transition-fixture.mjs": "5fb7ef25980c3d700517b8f5bef16891e2ec55f6206f83d7c8b7a1c879871aab"
+  },
+  "sourceStable": true,
+  "result": "PASS"
+}

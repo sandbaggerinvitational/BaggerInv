@@ -1,0 +1,140 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_PRODUCTION_SHAPED_POSTGRESQL17",
+  "hostedAccess": false,
+  "productionAccess": false,
+  "googleCalls": 0,
+  "runtimeGuardsSubstituted": false,
+  "readinessSubstituted": false,
+  "drainSubstituted": false,
+  "seededScores": 0,
+  "seededFinals": 0,
+  "operations": [],
+  "status": "PASS",
+  "initialInputs": {
+    "players": 24,
+    "emailsSent": 0,
+    "configurationFingerprint": "6795d9eb49996540638a6610b4231d53f07e5b636a7bc0db45dac01f44498cd9",
+    "provenanceClass": "REGISTERED_LOCAL_PRODUCTION_PROVENANCE",
+    "provenanceSha256": "c5afd4cfc0f3b86e44f96110075ae458830cdfc1d9a5f51e704bbc36d289d5a3"
+  },
+  "initialInputDisposition": {
+    "normalizedSyntheticAppend": true,
+    "predecessorsPreserved": 1,
+    "resourceAndCapabilityPreserved": true
+  },
+  "odds": {
+    "status": "PASS",
+    "scope": "LOCAL_PRODUCTION_CALCULATION_AND_UNCHANGED_FIRST_PUBLICATION_REJECTION",
+    "jobId": "cea1ce3d356c3f28806fcbd88a5844c5f82f2daca7427c4f6cd974d04b703741",
+    "phase": "Pre-Tournament",
+    "iterations": 10000,
+    "checkpointCount": 10,
+    "deterministicRequestReplay": true,
+    "duplicateWorkerDelivery": true,
+    "domain": {
+      "source": [
+        {
+          "file": "lib/tournament-odds.js",
+          "base": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+          "sha256": "c45c557f03eb630b3998e7a61ea03638ace591ae3df15cb55d0028c2efb8fcc1",
+          "unchanged": true
+        },
+        {
+          "file": "lib/prediction-engine.js",
+          "base": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+          "sha256": "9260def65c1eb4b6fc9f520c4e5158768ad309ad59206b5e3ab1fc9fe408ace3",
+          "unchanged": true
+        },
+        {
+          "file": "lib/tournament-context.js",
+          "base": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+          "sha256": "0423715b1d4e93c6decc39cfcb27cb0fbc6fffb5c6a9a936c306c4eab4686db4",
+          "unchanged": true
+        },
+        {
+          "file": "lib/championship-odds-resilience.js",
+          "base": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+          "sha256": "2a9b9776279ba849bbab128d1d56920b99a7fb38257cbb28a8bb164e26aa6c28",
+          "unchanged": true
+        },
+        {
+          "file": "lib/championship-odds-supabase.js",
+          "base": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+          "sha256": "26b143371df2359e0bbdf571e544afdd232fccd29f58ac316bd40747e7aec1be",
+          "unchanged": true
+        },
+        {
+          "file": "lib/published-odds-supabase.js",
+          "base": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+          "sha256": "081d157585e0795e999b4071ce36a2e7f3ff52f599574df571b332a56c984e9b",
+          "unchanged": true
+        },
+        {
+          "file": "lib/mobile-v1-odds.js",
+          "base": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+          "sha256": "608858f8b1fd2900469c259e767cf14ac2d553e8e6dc231946524a61aa269fcd",
+          "unchanged": true
+        }
+      ],
+      "reference": {
+        "ok": true,
+        "jobId": "cea1ce3d356c3f28806fcbd88a5844c5f82f2daca7427c4f6cd974d04b703741",
+        "iterations": 10000,
+        "referenceFingerprint": "2bc241d0afebf456ff36c6617a3d34854cae40484e1eb55668f9520f889e1e9c",
+        "resilientFingerprint": "2bc241d0afebf456ff36c6617a3d34854cae40484e1eb55668f9520f889e1e9c",
+        "exactEquality": true,
+        "storedFingerprintValid": true,
+        "referenceMetrics": {
+          "durationMs": 6107.7813750000005,
+          "cpuMs": 6136.42,
+          "rssBeforeBytes": 121929728,
+          "rssAfterBytes": 117620736,
+          "heapBeforeBytes": 12156304,
+          "heapAfterBytes": 23522592
+        }
+      }
+    },
+    "publication": {
+      "positive": "NOT_PROVEN",
+      "firstPublicationWithoutHistoricalAdoption": "DENIED",
+      "code": "PRODUCTION_ODDS_PUBLICATION_INPUT_INVALID",
+      "historicalAdoptionFabricated": false
+    },
+    "rpcCalls": 20,
+    "googleCalls": 0,
+    "googleJobs": 0,
+    "productionAccess": false,
+    "guardsReplaced": false,
+    "timings": {
+      "environment": "LOCAL_NON_PRODUCTION",
+      "method": "performance.now including owned psql transport and canonical engine",
+      "durations": {
+        "request": {
+          "samples": 1,
+          "milliseconds": 34.107332999999926,
+          "p95": "NOT_PROVEN",
+          "p99": "NOT_PROVEN"
+        },
+        "requestReplay": {
+          "samples": 1,
+          "milliseconds": 27.131750000000466,
+          "p95": "NOT_PROVEN",
+          "p99": "NOT_PROVEN"
+        },
+        "worker10000": {
+          "samples": 1,
+          "milliseconds": 6032.332125000001,
+          "p95": "NOT_PROVEN",
+          "p99": "NOT_PROVEN"
+        },
+        "firstPublicationDenied": {
+          "samples": 1,
+          "milliseconds": 9.349207999999635,
+          "p95": "NOT_PROVEN",
+          "p99": "NOT_PROVEN"
+        }
+      }
+    },
+    "limitation": "Protected Production2026 positive publication and successor annual activation need legitimate retained historical adoption; none is manufactured."
+  }
+}

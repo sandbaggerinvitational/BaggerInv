@@ -1,0 +1,75 @@
+TAP version 13
+# Subtest: R2 ingress forward upgrade fences old executions, preserves public OID and rejects unexpected ACLs
+    # Subtest: upgrade waits for a genuinely executing predecessor mutation before creating the ingress generation
+    ok 1 - upgrade waits for a genuinely executing predecessor mutation before creating the ingress generation
+      ---
+      duration_ms: 581.4935
+      type: 'test'
+      ...
+    # Subtest: already-invoked cached predecessor execution cannot resume with its old context after upgrade
+    not ok 2 - already-invoked cached predecessor execution cannot resume with its old context after upgrade
+      ---
+      duration_ms: 364.491541
+      type: 'test'
+      location: '/private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-ingress-upgrade.integration.test.mjs:38:11'
+      failureType: 'testCodeFailure'
+      error: |-
+        The input did not match the regular expression /CONTEXT_STALE|INGRESS_LEASE_REQUIRED/. Input:
+        
+        ''
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+      actual: ''
+      operator: 'match'
+      stack: |-
+        TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-ingress-upgrade.integration.test.mjs:49:12)
+        process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+        async Test.run (node:internal/test_runner/test:1404:7)
+        async TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-ingress-upgrade.integration.test.mjs:38:3)
+        async Test.run (node:internal/test_runner/test:1404:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+      ...
+    # Subtest: unknown default EXECUTE grantee aborts entire migration; prepared public entry retains OID and denies no-lease call
+    not ok 3 - unknown default EXECUTE grantee aborts entire migration; prepared public entry retains OID and denies no-lease call
+      ---
+      duration_ms: 367.953416
+      type: 'test'
+      location: '/private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-ingress-upgrade.integration.test.mjs:53:11'
+      failureType: 'testCodeFailure'
+      error: 'Missing expected exception.'
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+      operator: 'throws'
+      stack: |-
+        TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-ingress-upgrade.integration.test.mjs:66:12)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+        TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-ingress-upgrade.integration.test.mjs:53:11)
+        process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+        async Test.run (node:internal/test_runner/test:1404:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+      ...
+    1..3
+not ok 1 - R2 ingress forward upgrade fences old executions, preserves public OID and rejects unexpected ACLs
+  ---
+  duration_ms: 23788.086209
+  type: 'test'
+  location: '/private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-ingress-upgrade.integration.test.mjs:20:1'
+  failureType: 'subtestsFailed'
+  error: '2 subtests failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 4
+# suites 0
+# pass 1
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 23973.196709

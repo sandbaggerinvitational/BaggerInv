@@ -1,0 +1,13 @@
+{
+  "suite": "bootstrap",
+  "result": "PASS",
+  "counts": {
+    "tests": 12,
+    "pass": 12,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "error": null,
+  "failures": []
+}

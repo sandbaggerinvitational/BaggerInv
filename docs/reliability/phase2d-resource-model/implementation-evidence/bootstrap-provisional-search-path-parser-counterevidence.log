@@ -1,0 +1,114 @@
+TAP version 13
+# Subtest: R2 deterministic canonical bootstrap — owned local PostgreSQL17 only
+    # Subtest: provisional source profile deterministically reproduces its in-memory artifacts
+    ok 1 - provisional source profile deterministically reproduces its in-memory artifacts
+      ---
+      duration_ms: 703.227958
+      type: 'test'
+      ...
+    # Subtest: tampered schema/catalog/source manifest rejected before installation
+    ok 2 - tampered schema/catalog/source manifest rejected before installation
+      ---
+      duration_ms: 80.477709
+      type: 'test'
+      ...
+    # Subtest: fresh database has convergent definitions and zero authority/history/job seeds
+    ok 3 - fresh database has convergent definitions and zero authority/history/job seeds
+      ---
+      duration_ms: 4157.823208
+      type: 'test'
+      ...
+    # Subtest: exact replay verifies receipt and makes no new authority
+    ok 4 - exact replay verifies receipt and makes no new authority
+      ---
+      duration_ms: 3454.574167
+      type: 'test'
+      ...
+    # Subtest: new private cores retain owner-only execution and exact source-defined security attributes
+    not ok 5 - new private cores retain owner-only execution and exact source-defined security attributes
+      ---
+      duration_ms: 3049.895667
+      type: 'test'
+      location: '/private/tmp/bagger-phase2d-staging-admission/tools/reliability/canonical-bootstrap.integration.test.mjs:58:11'
+      failureType: 'testCodeFailure'
+      error: |-
+        public.mutate_certification_annual_transition_v1(pg_catalog.jsonb) exact search_path
+        + actual - expected
+        
+          [
+        +   'pg_catalog'
+        -   "pg_catalog set lock_timeout='5s"
+          ]
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+        0: "pg_catalog set lock_timeout='5s"
+      actual:
+        0: 'pg_catalog'
+      operator: 'deepStrictEqual'
+      stack: |-
+        assertSourceSecurity (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/certification-private-core-security-proof.mjs:249:10)
+        certificationPrivateCoreSecurityProof (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/certification-private-core-security-proof.mjs:276:3)
+        async TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/tools/reliability/canonical-bootstrap.integration.test.mjs:59:4)
+        async Test.run (node:internal/test_runner/test:1404:7)
+        async TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/tools/reliability/canonical-bootstrap.integration.test.mjs:58:3)
+        async Test.run (node:internal/test_runner/test:1404:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+      ...
+    # Subtest: failure at after-schema rolls back all application schemas and retry succeeds
+    ok 6 - failure at after-schema rolls back all application schemas and retry succeeds
+      ---
+      duration_ms: 3337.821708
+      type: 'test'
+      ...
+    # Subtest: failure at after-static rolls back all application schemas and retry succeeds
+    ok 7 - failure at after-static rolls back all application schemas and retry succeeds
+      ---
+      duration_ms: 3386.375708
+      type: 'test'
+      ...
+    # Subtest: failure at before-commit rolls back all application schemas and retry succeeds
+    ok 8 - failure at before-commit rolls back all application schemas and retry succeeds
+      ---
+      duration_ms: 3639.080459
+      type: 'test'
+      ...
+    # Subtest: fresh independent database converges; no cloned resource or control authority
+    ok 9 - fresh independent database converges; no cloned resource or control authority
+      ---
+      duration_ms: 6175.481833
+      type: 'test'
+      ...
+    # Subtest: replay detects changed RLS rather than accepting only a matching receipt
+    ok 10 - replay detects changed RLS rather than accepting only a matching receipt
+      ---
+      duration_ms: 304.011625
+      type: 'test'
+      ...
+    # Subtest: unowned database handles rejected; no remote connection interface
+    ok 11 - unowned database handles rejected; no remote connection interface
+      ---
+      duration_ms: 46.558208
+      type: 'test'
+      ...
+    1..11
+not ok 1 - R2 deterministic canonical bootstrap — owned local PostgreSQL17 only
+  ---
+  duration_ms: 32173.661833
+  type: 'test'
+  location: '/private/tmp/bagger-phase2d-staging-admission/tools/reliability/canonical-bootstrap.integration.test.mjs:14:1'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# {"environment":"OWNED_LOCAL_POSTGRESQL17","provisional":true,"finalBaselineEmitted":false,"functions":1111,"sourceFiles":141,"forwardMigrations":["supabase/production_migrations/202609300131_canonical_resource_control_v1.sql","supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql","supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql","supabase/production_migrations/202609300134_certification_annual_administration_v1.sql","supabase/production_migrations/202609300135_certification_read_contracts_v1.sql","supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql","supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql","supabase/production_migrations/202609300138_certification_annual_transition_v1.sql","supabase/production_migrations/202609300139_certification_future_authoring_v1.sql","supabase/production_migrations/202609300140_certification_future_scoring_v1.sql","supabase/production_migrations/202609300141_certification_future_workers_v1.sql","supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql","supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql","supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql","supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql"],"completeCandidateCertified":false,"authorityRowsCopied":0,"hostedAccess":false}
+1..1
+# tests 12
+# suites 0
+# pass 10
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 32244.391541

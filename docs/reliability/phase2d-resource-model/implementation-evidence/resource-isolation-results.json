@@ -1,0 +1,36 @@
+{
+  "environment": "TWO_OWNED_LOCAL_POSTGRESQL17_DATABASES",
+  "productionAccess": false,
+  "hostedAccess": false,
+  "googleCalls": 0,
+  "cases": [
+    {
+      "id": "SAME_ID_DISTINCT_RESOURCE",
+      "canonicalReceiptsPerDatabase": 1
+    },
+    {
+      "id": "FOREIGN_ENVELOPE_AND_LEASE",
+      "denied": true
+    },
+    {
+      "id": "RECOVERY_RESOURCE_HASH",
+      "independent": true
+    },
+    {
+      "id": "CURRENT_FINANCIAL_READ_BOUNDARY",
+      "foreignDenied": true
+    },
+    {
+      "id": "WORKER_RESOURCE_DENIAL",
+      "foreignDenied": true,
+      "localTick": true,
+      "limitation": "Idle local tick; nonempty autonomous-family proof is separate"
+    },
+    {
+      "id": "PRIVATE_AND_RETIRED_AUTHORITY",
+      "privateDenied": true,
+      "productionRows": 0,
+      "googleJobs": 0
+    }
+  ]
+}

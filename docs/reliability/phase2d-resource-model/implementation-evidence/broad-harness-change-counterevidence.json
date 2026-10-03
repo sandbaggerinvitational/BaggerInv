@@ -1,0 +1,19 @@
+{
+  "status": "NOT_PROVEN_COMPLETE_SOURCE_CHANGED",
+  "counts": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "consumedSourceProvenanceStable": true,
+  "changedManifestPaths": [
+    "test/support/reliability/certification-application-transport.cjs",
+    "test/support/reliability/certification-history-service-proof.mjs",
+    "tools/reliability/benchmark-certification-ingress.mjs"
+  ],
+  "startedAt": "2026-10-02T23:59:26.398Z",
+  "completedAt": "2026-10-03T00:02:21.736Z",
+  "limitation": "Source snapshot changed in local test harnesses during the broad run; final stable rerun required. No suite failure was suppressed."
+}

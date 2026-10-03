@@ -1,0 +1,127 @@
+{
+  "environment": "TWO_OWNED_LOCAL_POSTGRESQL17_DATABASES",
+  "productionAccess": false,
+  "hostedAccess": false,
+  "googleCalls": 0,
+  "cases": [
+    {
+      "id": "SAME_ID_DISTINCT_RESOURCE",
+      "canonicalReceiptsPerDatabase": 1
+    },
+    {
+      "id": "FOREIGN_ENVELOPE_AND_LEASE",
+      "denied": true
+    },
+    {
+      "id": "RECOVERY_RESOURCE_HASH",
+      "independent": true
+    },
+    {
+      "id": "CURRENT_FINANCIAL_READ_BOUNDARY",
+      "foreignDenied": true
+    },
+    {
+      "id": "WORKER_RESOURCE_DENIAL",
+      "foreignDenied": true,
+      "localTick": true,
+      "limitation": "Idle local tick; nonempty autonomous-family proof is separate"
+    },
+    {
+      "id": "PRIVATE_AND_RETIRED_AUTHORITY",
+      "privateDenied": true,
+      "productionRows": 0,
+      "googleJobs": 0
+    }
+  ],
+  "profile": {
+    "migrations": [
+      "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+      "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql",
+      "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql",
+      "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql",
+      "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql",
+      "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql",
+      "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql",
+      "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+      "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql",
+      "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql",
+      "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+      "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql",
+      "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql",
+      "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql",
+      "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql",
+      "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql",
+      "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql",
+      "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql",
+      "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql",
+      "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql",
+      "supabase/production_migrations/202609300151_certification_annual_reopen_lineage_v1.sql",
+      "supabase/production_migrations/202609300152_certification_closed_release_admission_v1.sql"
+    ],
+    "excluded": []
+  },
+  "sourceBefore": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+    "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql": "5ef34c3bd09feda3a4cacdac275764166ea82319d20a59235efed091016b0343",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql": "0d610b350d76b27f4f63942758cfd7e12bafeddac48f3c8c0ff8c94c74fb37ff",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql": "410f4b2681442ff99cee1ab7f291f0b006fed069262584540ddbfc2e2eb36ffb",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql": "080cdaf863a5f0bc70670f15e0aa658916cda439e0df10110de7d428675334f6",
+    "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql": "d2c7e20327392826882e3451daab8594fd1187ea2672cece7889cbeb4768d245",
+    "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql": "1f7ea4800f11204dd8016269f65291b213666e642fb65a899df883b32462044d",
+    "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql": "ff89ea6218d6692e7f669e1b057d0f5ac2d7bf35131bab972bec38e2a1b93510",
+    "supabase/production_migrations/202609300151_certification_annual_reopen_lineage_v1.sql": "049479ddd58887dedc374a685eae12a6939dc834619b573070a29b44c27e029a",
+    "supabase/production_migrations/202609300152_certification_closed_release_admission_v1.sql": "6e5ea854a7e7baa51f18af7bd8f9436fa2e4a487416cb61649c32ace60238e8b",
+    "test/support/reliability/certification-provisional-profile.mjs": "090db49ab2fb3371a3519107e3e6fa00c3a94a4e34733b7b590195d08d3091c2",
+    "test/reliability-phase2dr2-resource-isolation.integration.test.mjs": "916da70598c1d63dda9f373d60416b3cdb38e8504884fa1f4619c498f217d4da",
+    "test/support/reliability/phase2d-certification-fixture.mjs": "095a5115e5d3bda6a96420b39b1ec4fd955447f9c586124f4be259fff8ac5d06",
+    "test/support/reliability/phase2d-resource-bootstrap.mjs": "81abc4be2912f3fa404179198fb9de474dfa97fa642552045d8383bcd9a43f18",
+    "test/support/reliability/postgres17.mjs": "c2942a243fa0af4f56025f7f027aeba49c69710d561f36093542407c16b59bd6",
+    "lib/production-tournament-setup-contract.js": "2a242a6bf200515eac2cc9c88f578cbaa446b588c5ec5f53c3ff8b85b81b95f7",
+    "tools/reliability/phase2-network-deny.cjs": "48e385b629af2beda571108badbbb4a7cdc81c7c7982ef85cded3caa02046761"
+  },
+  "sourceAfter": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+    "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql": "5ef34c3bd09feda3a4cacdac275764166ea82319d20a59235efed091016b0343",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql": "0d610b350d76b27f4f63942758cfd7e12bafeddac48f3c8c0ff8c94c74fb37ff",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql": "410f4b2681442ff99cee1ab7f291f0b006fed069262584540ddbfc2e2eb36ffb",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql": "080cdaf863a5f0bc70670f15e0aa658916cda439e0df10110de7d428675334f6",
+    "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql": "d2c7e20327392826882e3451daab8594fd1187ea2672cece7889cbeb4768d245",
+    "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql": "1f7ea4800f11204dd8016269f65291b213666e642fb65a899df883b32462044d",
+    "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql": "ff89ea6218d6692e7f669e1b057d0f5ac2d7bf35131bab972bec38e2a1b93510",
+    "supabase/production_migrations/202609300151_certification_annual_reopen_lineage_v1.sql": "049479ddd58887dedc374a685eae12a6939dc834619b573070a29b44c27e029a",
+    "supabase/production_migrations/202609300152_certification_closed_release_admission_v1.sql": "6e5ea854a7e7baa51f18af7bd8f9436fa2e4a487416cb61649c32ace60238e8b",
+    "test/support/reliability/certification-provisional-profile.mjs": "090db49ab2fb3371a3519107e3e6fa00c3a94a4e34733b7b590195d08d3091c2",
+    "test/reliability-phase2dr2-resource-isolation.integration.test.mjs": "916da70598c1d63dda9f373d60416b3cdb38e8504884fa1f4619c498f217d4da",
+    "test/support/reliability/phase2d-certification-fixture.mjs": "095a5115e5d3bda6a96420b39b1ec4fd955447f9c586124f4be259fff8ac5d06",
+    "test/support/reliability/phase2d-resource-bootstrap.mjs": "81abc4be2912f3fa404179198fb9de474dfa97fa642552045d8383bcd9a43f18",
+    "test/support/reliability/postgres17.mjs": "c2942a243fa0af4f56025f7f027aeba49c69710d561f36093542407c16b59bd6",
+    "lib/production-tournament-setup-contract.js": "2a242a6bf200515eac2cc9c88f578cbaa446b588c5ec5f53c3ff8b85b81b95f7",
+    "tools/reliability/phase2-network-deny.cjs": "48e385b629af2beda571108badbbb4a7cdc81c7c7982ef85cded3caa02046761"
+  },
+  "sourceStable": true,
+  "status": "PASS"
+}

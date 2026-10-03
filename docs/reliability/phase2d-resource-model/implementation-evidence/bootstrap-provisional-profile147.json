@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "proofLayer": "POSTGRESQL/FRESH_INSTALL/SECURITY/FAILURE_INJECTION",
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "provisionalProfile": true,
+  "completeCandidateCertified": false,
+  "pendingExcludedMigration": 144,
+  "tests": 12,
+  "pass": 12,
+  "fail": 0,
+  "securityCounts": {
+    "newPrivateFunctions": 164,
+    "newPublicWrappers": 16,
+    "touchedPublicWrappers": 77,
+    "actualDeniedCalls": 492
+  },
+  "rawArtifact": "bootstrap-provisional-profile147.log",
+  "rawSha256": "20c93fc9084bee0b41582f49263ce9395c4dd37fff94bcc0ed04ce207045a400",
+  "sourceAuthority": "bootstrap-private-core-security.json",
+  "limitations": [
+    "Final manifest not emitted; release144 remains outside the tested profile.",
+    "Local-only; no hosted/Production authority or credentials."
+  ]
+}

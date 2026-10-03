@@ -1,0 +1,22 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Complete reviewed resource-model profile required before emitting baseline
++ actual - expected
+
++ 'REVIEWED_COMPLETE_SOURCE_PROFILE'
+- 'REVIEWED_COMPLETE'
+                    ^
+
+    at buildCanonicalArtifacts (file:///private/tmp/bagger-phase2d-staging-admission/tools/reliability/canonical-bootstrap-artifacts.mjs:123:10)
+    at async file:///private/tmp/bagger-phase2d-staging-admission/tools/reliability/generate-canonical-bootstrap.mjs:25:15 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'REVIEWED_COMPLETE_SOURCE_PROFILE',
+  expected: 'REVIEWED_COMPLETE',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v26.7.0

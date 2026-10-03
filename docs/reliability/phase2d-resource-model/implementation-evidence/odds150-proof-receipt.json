@@ -1,0 +1,130 @@
+{
+  "status": "PASS",
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17_NON_PRODUCTION",
+  "profile": "EXPLICIT131_THROUGH150",
+  "counts": {
+    "total": 38,
+    "pass": 38,
+    "fail": 0,
+    "skip": 0
+  },
+  "groups": {
+    "Certification": {
+      "total": 27,
+      "behavioral": 26
+    },
+    "twoPartFreshness": {
+      "total": 9,
+      "behavioral": 8
+    },
+    "protectedWrapper": {
+      "total": 2,
+      "behavioral": 1,
+      "parent": 1,
+      "nestedGolden": "Actual protected calculation/request/replay/worker/reference and no-adoption publication denial"
+    }
+  },
+  "separateSameResultRegression": {
+    "total": 11,
+    "pass": 11,
+    "behavioral": 10,
+    "evidence": "odds-publication-identity-2026-10-03T01-50-45-011Z.json",
+    "rawLog": {
+      "path": "docs/reliability/phase2d-resource-model/implementation-evidence/odds150-publication-identity.log",
+      "sha256": "2da064f2937ac935ac57b3fbb4a7ffae92b6135f57dce610a81c60555c7e3c27",
+      "originalPath": "/private/tmp/r2-odds150-identity-first.log"
+    },
+    "sourceStable": true
+  },
+  "sourceManifest": {
+    "app/api/director/canonical-odds/route.js": "ccf05dd9bd22098ff18f43cf1f649317c599f32dc96933007fd712cfc2036086",
+    "lib/canonical-director-odds-client.js": "14125cbf9f69f16d362f9e69563fd410c0467edebf19cf57ce29091e06f708b7",
+    "lib/certification-odds-server.js": "3e1d0b8f21336463a67b3fdfcebd49b874e3496c3454df594782e863397bad39",
+    "lib/certification-runtime-server.js": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779",
+    "supabase/canonical_bootstrap/catalog.sql": "95b4994868868dc2d775bb438b2dce93d3ca608aac6a416d8d60550abf3f8db5",
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+    "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql": "5ef34c3bd09feda3a4cacdac275764166ea82319d20a59235efed091016b0343",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql": "0d610b350d76b27f4f63942758cfd7e12bafeddac48f3c8c0ff8c94c74fb37ff",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql": "410f4b2681442ff99cee1ab7f291f0b006fed069262584540ddbfc2e2eb36ffb",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql": "080cdaf863a5f0bc70670f15e0aa658916cda439e0df10110de7d428675334f6",
+    "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql": "d2c7e20327392826882e3451daab8594fd1187ea2672cece7889cbeb4768d245",
+    "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql": "1f7ea4800f11204dd8016269f65291b213666e642fb65a899df883b32462044d",
+    "test/reliability-phase2dr2-odds.integration.test.mjs": "e3ff658247d4663fea812e675fd784d1ec3e963c11cf5a7f923d27948b182e11",
+    "test/reliability-phase2dr2-production-equivalence.integration.test.mjs": "fe8fa61e9e3d4445a4afbc5c43e168b4c1463a8d3f87427c4e844cfb46b15ac7",
+    "test/reliability-phase2dr2-production-odds.integration.test.mjs": "24ddf0d761422fe6a5cc31299052adaf36f7e6791b7bd81803f9c34a6c9941f4",
+    "test/support/reliability/certification-odds-proof.mjs": "414b3b738b7eca47a4bf489c578969faed6a047f894a55d9910e970fb1ad0a67",
+    "test/support/reliability/certification-provisional-profile.mjs": "43de838cc062d94a73a8f95812b1caa03e36208a392ae896e3c0662d95e1b13d",
+    "test/support/reliability/odds-domain-equivalence.mjs": "282b34471e95027a23a3ca54b0be735bceadcff61ca0578072a5df58be8f11a9",
+    "test/support/reliability/phase2d-certification-fixture.mjs": "095a5115e5d3bda6a96420b39b1ec4fd955447f9c586124f4be259fff8ac5d06",
+    "test/support/reliability/postgres17.mjs": "c2942a243fa0af4f56025f7f027aeba49c69710d561f36093542407c16b59bd6",
+    "test/support/reliability/production-odds-equivalence.mjs": "ee6de68e602a10a6cb3a82a9ab1fa2c4faba6c0c94e0e2fa89c426e6ae6015a2",
+    "tools/reliability/phase2dr2-proof-isolation.cjs": "3f7c88b322858e41fbd4dbb047cc916fb7f017ddf2c174d319856af94aa814ca",
+    "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql": "ff89ea6218d6692e7f669e1b057d0f5ac2d7bf35131bab972bec38e2a1b93510",
+    "test/reliability-phase2dr2-odds-freshness.integration.test.mjs": "300c57989c680bb2dc8291a6aee776d0aad764ba387ee7eec9be959f2b46d63d",
+    "test/reliability-phase2dr2-odds-publication-identity.integration.test.mjs": "581a14f1cbbcbd8a90feb591a7c994ae8c022c453d4152d902905ecfc1117caf"
+  },
+  "rawLog": {
+    "path": "docs/reliability/phase2d-resource-model/implementation-evidence/odds150-expanded-freshness-production.log",
+    "sha256": "5160b15315a94ed74b5e2757f72b1b2574281fe9664cd2a0e2b1408608bf4afe",
+    "originalPath": "/private/tmp/r2-odds150-expanded-freshness-production.log"
+  },
+  "sourceFreshness": {
+    "method": "Coordinated source freeze; expanded/protected manifest captured after successful run. Focused freshness and identity evidence independently compare their consumed-source before/after hashes.",
+    "automatedBeforeAfterComparison": {
+      "expandedAndProtected": false,
+      "twoPartFreshness": true,
+      "sameResultIdentity": true
+    },
+    "postRunReportMetadataOnlyChange": {
+      "executedTestSha256": "e3ff658247d4663fea812e675fd784d1ec3e963c11cf5a7f923d27948b182e11",
+      "correctedTestSha256": "7dfbcd7a6a6622382db984fa6c6f2915b3dc3591885b85f130ba5110d36a4f7e",
+      "effect": "Report-only stale excludedMigration144 label corrected after run; no behavior or measured values changed"
+    }
+  },
+  "sameResultCase": {
+    "first": {
+      "fingerprint": "bc7b035d8d2ebb3807aba0559a77944a9527e3ebd28628bb1887669f1f5db541",
+      "contract_version": "certification-odds-publication-source-v1",
+      "configuration_source_fingerprint": "ba6921c5fe74333f2cfce020ce7f9fa91ce8f7485e19a0f3e70b7ee0956c9abb",
+      "canonical_live_source_fingerprint": "7fffa5404bb79672bd61d8bbb326840ef3b8651112ed05a293b263ac24d5186b"
+    },
+    "second": {
+      "fingerprint": "61c1316883481a2d62fe95b07834aecc289b4549b318a1735a45cb52c62298fc",
+      "contract_version": "certification-odds-publication-source-v1",
+      "configuration_source_fingerprint": "ba6921c5fe74333f2cfce020ce7f9fa91ce8f7485e19a0f3e70b7ee0956c9abb",
+      "canonical_live_source_fingerprint": "2bc3c55ef6672f4b8e7f5b3ae19b14550c9f2c2d1f06f6891dd6edea45d9aea0"
+    },
+    "revision": 2,
+    "predecessorImmutable": true,
+    "actualClientAcknowledgementDiscarded": true,
+    "recovered": "COMMITTED"
+  },
+  "publicContracts": {
+    "freshness": "CURRENT_OFFICIAL",
+    "pwa": true,
+    "build10": true,
+    "privateProvenance": false
+  },
+  "productionBranchAndIndexes": "Exact body reversal, unchanged pg_proc attributes/OID/pg_depend and all snapshot index definitions asserted during150 install",
+  "newPrivateHelpers": 0,
+  "protectedResult": "production-odds-equivalence.json",
+  "freshnessResult": "odds-two-part-freshness.json",
+  "protectedEvidenceWrittenUtc": "2026-10-03T01:53:53.005745+00:00",
+  "ProductionPositiveHistoricalPublication": "NOT_PROVEN",
+  "hostedAccess": false,
+  "ProductionAccess": false,
+  "priorCounterevidence": "release-transition-2026-10-03T01-29-40.988Z.json",
+  "remainingHigherScope": "Final-profile annual/release/bootstrap/boot and broad recertification are separate gates; this receipt is not an overall R2 PASS."
+}

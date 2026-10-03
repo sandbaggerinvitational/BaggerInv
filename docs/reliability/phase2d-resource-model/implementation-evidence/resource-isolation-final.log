@@ -1,0 +1,53 @@
+TAP version 13
+# Subtest: R2 two-database resource, receipt, ingress, read and worker isolation
+    # Subtest: same operation ID in distinct registered databases has independent canonical outcome
+    ok 1 - same operation ID in distinct registered databases has independent canonical outcome
+      ---
+      duration_ms: 615.557959
+      type: 'test'
+      ...
+    # Subtest: foreign resource, deployment and lease never rebind to local authority
+    ok 2 - foreign resource, deployment and lease never rebind to local authority
+      ---
+      duration_ms: 253.29575
+      type: 'test'
+      ...
+    # Subtest: same-ID recovery returns only locally bound receipt and full hash conflict
+    ok 3 - same-ID recovery returns only locally bound receipt and full hash conflict
+      ---
+      duration_ms: 83.693167
+      type: 'test'
+      ...
+    # Subtest: canonical current reads and financial projections reject the other resource
+    ok 4 - canonical current reads and financial projections reject the other resource
+      ---
+      duration_ms: 456.543125
+      type: 'test'
+      ...
+    # Subtest: worker command cannot claim or materialize against a different registered database
+    ok 5 - worker command cannot claim or materialize against a different registered database
+      ---
+      duration_ms: 197.973458
+      type: 'test'
+      ...
+    # Subtest: private relations remain unavailable and neither database acquires Production or Google authority
+    ok 6 - private relations remain unavailable and neither database acquires Production or Google authority
+      ---
+      duration_ms: 140.758167
+      type: 'test'
+      ...
+    1..6
+ok 1 - R2 two-database resource, receipt, ingress, read and worker isolation
+  ---
+  duration_ms: 18655.190625
+  type: 'test'
+  ...
+1..1
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 18778.449792

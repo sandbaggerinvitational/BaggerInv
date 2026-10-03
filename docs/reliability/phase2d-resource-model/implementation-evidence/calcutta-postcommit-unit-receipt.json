@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "total": 26,
+  "pass": 26,
+  "fail": 0,
+  "newBehavioralTests": 8,
+  "sourceManifest": {
+    "lib/calcutta-post-commit.js": "589210e3eee402d393c1279a89ad9f7dd48fcca034fa3711e498465fb3d95e7f",
+    "test/certification-calcutta-post-commit.test.mjs": "bea3ea2285bfeb5d6e1a4bc19bc7d223a7c9578581a05683ac4b23ccb57dde82",
+    "test/reliability-phase2dr2-calcutta-post-commit.integration.test.mjs": "6091444d3ebe60de72626fa46620ebe2cf26aa1365b4e2fd0e7243816e912f64"
+  },
+  "log": "calcutta-postcommit-unit.log",
+  "logSha256": "ce02bf1058ed2217e77ddcb4eb8e7699e022a689babeced6c216f69e2b160576",
+  "databaseIntegration": "NOT_YET_RUN",
+  "ProductionBranches": "BYTE_IDENTICAL_TO_BASE"
+}

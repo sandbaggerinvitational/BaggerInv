@@ -1,0 +1,220 @@
+{
+  "environment": "LOCAL_NON_PRODUCTION_SOURCE_AUDIT",
+  "checkedAt": "2026-10-02T23:36:48.014049+00:00",
+  "status": "QUALIFIED_RETAINED_EVIDENCE",
+  "proofs": [
+    {
+      "evidence": "director-financial-2026-10-02T21-39-54.863Z.json",
+      "originalProfileThrough": 142,
+      "freshExactProfileProof": false,
+      "unchangedFiles": [
+        {
+          "file": "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+          "recorded": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+          "current": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2"
+        },
+        {
+          "file": "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql",
+          "recorded": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+          "current": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298"
+        },
+        {
+          "file": "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql",
+          "recorded": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+          "current": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d"
+        },
+        {
+          "file": "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql",
+          "recorded": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+          "current": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc"
+        },
+        {
+          "file": "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql",
+          "recorded": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+          "current": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7"
+        },
+        {
+          "file": "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql",
+          "recorded": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+          "current": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245"
+        },
+        {
+          "file": "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql",
+          "recorded": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+          "current": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8"
+        },
+        {
+          "file": "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql",
+          "recorded": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+          "current": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b"
+        },
+        {
+          "file": "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql",
+          "recorded": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+          "current": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564"
+        },
+        {
+          "file": "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+          "recorded": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+          "current": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33"
+        },
+        {
+          "file": "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql",
+          "recorded": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+          "current": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352"
+        },
+        {
+          "file": "lib/isolated-director-operations.js",
+          "recorded": "de01168a85256452260c88456b26232c71bdda05c1f8b1764ed2a70ec98ed15d",
+          "current": "de01168a85256452260c88456b26232c71bdda05c1f8b1764ed2a70ec98ed15d"
+        },
+        {
+          "file": "lib/canonical-director-operations-client.js",
+          "recorded": "8f2ae30067d0844d44500a4306e151b94bf15f5e916653a946ac424decf381c4",
+          "current": "8f2ae30067d0844d44500a4306e151b94bf15f5e916653a946ac424decf381c4"
+        },
+        {
+          "file": "app/api/director/canonical-operations/route.js",
+          "recorded": "cbc0446b5fd60f7f867531fa64126a65891e6df66a153379897765c91760078c",
+          "current": "cbc0446b5fd60f7f867531fa64126a65891e6df66a153379897765c91760078c"
+        },
+        {
+          "file": "test/reliability-phase2dr2-director.integration.test.mjs",
+          "recorded": "e67e92663fc59e3a34f94302daf1694a88bcde93def6b96da56fe16628ab3688",
+          "current": "e67e92663fc59e3a34f94302daf1694a88bcde93def6b96da56fe16628ab3688"
+        },
+        {
+          "file": "test/support/reliability/certification-director-proof.mjs",
+          "recorded": "343e1b6c0d1ff7c1080a134b83f7d18c9eed42f19e4e9a7b83d1fc9dea6d7e73",
+          "current": "343e1b6c0d1ff7c1080a134b83f7d18c9eed42f19e4e9a7b83d1fc9dea6d7e73"
+        }
+      ],
+      "changedFiles": [
+        {
+          "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+          "recorded": "c837f915ba1f3a28919a8a7a3d836bb578f074ebb9a484ce97d3430f2c5c8916",
+          "current": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae"
+        },
+        {
+          "file": "lib/certification-runtime-server.js",
+          "recorded": "cbb17b9dca9c8857cade4c1e715be933c90b0c810ca52c1fc56117f0a9dc7081",
+          "current": "2dd09cee57324cb1f17445cddf0f7507719d65afc880911ba9312dea89557726"
+        }
+      ],
+      "disposition": "RETAINED_AT_RECORDED_SOURCE; NOT_A_FINAL_PROFILE_RERUN",
+      "scope": "Initial 2026 Director operations or mixed-round Net Skins; no successor activation or new 143 Odds/145 closed History/146 successor reads claimed"
+    },
+    {
+      "evidence": "net-skins-concurrency-2026-10-02T22-05-01.623Z.json",
+      "originalProfileThrough": 142,
+      "freshExactProfileProof": false,
+      "unchangedFiles": [
+        {
+          "file": "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+          "recorded": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+          "current": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2"
+        },
+        {
+          "file": "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql",
+          "recorded": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+          "current": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298"
+        },
+        {
+          "file": "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql",
+          "recorded": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+          "current": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d"
+        },
+        {
+          "file": "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql",
+          "recorded": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+          "current": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc"
+        },
+        {
+          "file": "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql",
+          "recorded": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+          "current": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7"
+        },
+        {
+          "file": "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql",
+          "recorded": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+          "current": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245"
+        },
+        {
+          "file": "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql",
+          "recorded": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+          "current": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8"
+        },
+        {
+          "file": "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql",
+          "recorded": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+          "current": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b"
+        },
+        {
+          "file": "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql",
+          "recorded": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+          "current": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564"
+        },
+        {
+          "file": "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+          "recorded": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+          "current": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33"
+        },
+        {
+          "file": "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql",
+          "recorded": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+          "current": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352"
+        },
+        {
+          "file": "test/reliability-phase2dr2-net-skins-concurrency.integration.test.mjs",
+          "recorded": "9741ec4b226e7f3b2646b1eb823766aacdf4217d366bd2dc49b4354e1f864e4e",
+          "current": "9741ec4b226e7f3b2646b1eb823766aacdf4217d366bd2dc49b4354e1f864e4e"
+        },
+        {
+          "file": "test/support/reliability/certification-net-skins-fixture.mjs",
+          "recorded": "7f43b53093a392bbf5cda1e3ea81cbb86c202ecf9c69cd8d887365693e4ab16f",
+          "current": "7f43b53093a392bbf5cda1e3ea81cbb86c202ecf9c69cd8d887365693e4ab16f"
+        },
+        {
+          "file": "test/support/reliability/certification-director-proof.mjs",
+          "recorded": "343e1b6c0d1ff7c1080a134b83f7d18c9eed42f19e4e9a7b83d1fc9dea6d7e73",
+          "current": "343e1b6c0d1ff7c1080a134b83f7d18c9eed42f19e4e9a7b83d1fc9dea6d7e73"
+        },
+        {
+          "file": "lib/production-full-net.js",
+          "recorded": "fb854e2036d1082e12a885397f8648c74ab0e31a7126f05b31302b75c629780b",
+          "current": "fb854e2036d1082e12a885397f8648c74ab0e31a7126f05b31302b75c629780b"
+        },
+        {
+          "file": "lib/net-skins.js",
+          "recorded": "99629f0e5e850cc2bf61751a6085709f31d87127f8bb401547d9f496e9c24cee",
+          "current": "99629f0e5e850cc2bf61751a6085709f31d87127f8bb401547d9f496e9c24cee"
+        },
+        {
+          "file": "lib/isolated-director-operations.js",
+          "recorded": "de01168a85256452260c88456b26232c71bdda05c1f8b1764ed2a70ec98ed15d",
+          "current": "de01168a85256452260c88456b26232c71bdda05c1f8b1764ed2a70ec98ed15d"
+        }
+      ],
+      "changedFiles": [
+        {
+          "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+          "recorded": "c837f915ba1f3a28919a8a7a3d836bb578f074ebb9a484ce97d3430f2c5c8916",
+          "current": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae"
+        },
+        {
+          "file": "test/support/reliability/phase2d-certification-fixture.mjs",
+          "recorded": "8dbeccb14fd6531657e81051aa4c0016a262dbea0345f1f0137a2bda2364ba78",
+          "current": "d3506fd608338cf174048ea865e028811b4f437c410500dbdb0468ea83dc3049"
+        }
+      ],
+      "disposition": "RETAINED_AT_RECORDED_SOURCE; NOT_A_FINAL_PROFILE_RERUN",
+      "scope": "Initial 2026 Director operations or mixed-round Net Skins; no successor activation or new 143 Odds/145 closed History/146 successor reads claimed"
+    }
+  ],
+  "limitations": [
+    "migration138 changed Certification successor initialization, outside exercised initial-generation scenarios",
+    "Director common runtime-server changed after its run; do not claim all consumed source is identical",
+    "Net Skins initial fixture synthetic deployment ID changed to conform to existing admitted shape",
+    "No execution of pending144; no blanket final-profile PASS"
+  ]
+}

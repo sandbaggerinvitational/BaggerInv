@@ -1,0 +1,4 @@
+LOCAL / SOURCE-MODULE EXECUTION
+Ordinary next.config.mjs import: PASS.
+Explicit unregistered Certification import: denied before network with CANONICAL_RESOURCE_UNAVAILABLE / 503 / certification-registration-disabled.
+Initial manual probe expected a nonexistent error alias and failed its assertion; corrected to the implemented documented error contract. No source correction was made for that probe.

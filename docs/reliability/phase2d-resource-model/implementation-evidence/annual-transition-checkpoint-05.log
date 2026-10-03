@@ -1,0 +1,37 @@
+▶ Certification annual transition uses real canonical preparation, ingress and closure
+  ✔ synthetic initial identities preserve existing verified contact and owner authority predicates (73.302958ms)
+  ✔ future CREATE, roster, courses, promotion, handicap, pairings, contexts and content use supported operations (64.326625ms)
+  ✔ predecessor has 432 canonical holes and 24 actual Final results with committed durable ingress (25.50075ms)
+✖ Certification annual transition uses real canonical preparation, ingress and closure (96767.09875ms)
+ℹ {"canonicalSequence":{"target":"2026","match":"2026-R1-6","holes":108}}
+ℹ {"canonicalSequence":{"target":"2026","match":"2026-R2-6","holes":216}}
+ℹ {"canonicalSequence":{"target":"2026","match":"2026-R3-3","holes":324}}
+ℹ {"canonicalSequence":{"target":"2026","match":"2026-R3-9","holes":432}}
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 96929.114875
+
+✖ failing tests:
+
+test at test/reliability-phase2dr2-annual-transition.integration.test.mjs:19:1
+✖ Certification annual transition uses real canonical preparation, ingress and closure (96767.09875ms)
+  AssertionError [ERR_ASSERTION]: Required workers failed: [{"observedAt":1790798356949,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798357457,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798357705,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798358353,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798358803,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798359061,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798359727,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798360185,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798360439,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798361105,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798361544,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798361791,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798362420,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798362879,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798363138,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798363798,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798364258,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798364505,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798365152,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798365595,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798365837,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798366483,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798366949,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798367297,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798367975,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798368427,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798368678,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"},{"observedAt":1790798369116,"type":"failed","family":"INTELLIGENCE","classification":"TERMINAL","sqlstate":null,"code":"PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED"}]
+  
+  28 !== 0
+  
+      at drainCertificationAutomaticWorkers (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/certification-worker-proof.mjs:57:9)
+      at async TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-annual-transition.integration.test.mjs:52:31)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 28,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

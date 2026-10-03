@@ -1,0 +1,18 @@
+▶ Certification two-part Odds freshness preserves actual live-source authority
+  ✔ all three new helpers deny direct runtime roles and retain safe owner attributes (64.031375ms)
+  ✔ actual score makes an old request fail while same committed operation remains recoverable (197.03875ms)
+  ✔ claim supersedes actual stale live input without publishing or losing receipt history (44.416041ms)
+  ✔ checkpoint rejects a source advance during real calculation execution (868.082375ms)
+  ✔ completed real result is superseded after live source advancement; calculation data stays immutable (6187.607666ms)
+  ✔ explicit publication rejects source advancement and commits no publication/audit receipt (6295.637333ms)
+  ✔ source writer first: publication waits then rejects the newly committed source (6294.587541ms)
+  ✔ publication first: actual score cannot commit between source validation and publication commit (6425.46975ms)
+✔ Certification two-part Odds freshness preserves actual live-source authority (32599.918209ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 32805.517583

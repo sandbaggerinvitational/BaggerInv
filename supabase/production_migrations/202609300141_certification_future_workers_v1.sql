@@ -1,0 +1,2753 @@
+-- CLI scaffold20260930200211 mapped to repository forward ordinal141.
+-- Local synthetic candidate; no hosted resource changes.
+begin;
+-- Existing future-year derived algorithms; exact resource-local admission.
+-- No publication/configuration authority or worker behavior is added.
+
+create temporary table canonical_future_worker_original_attributes on commit drop as select oid,pronamespace,proname,proargtypes,proowner,proacl,prosecdef,proconfig,provolatile from pg_proc where oid in('future_production_claim_competition_derived_jobs_v1(jsonb)'::regprocedure,'future_production_write_competition_derived_snapshot_v1(jsonb)'::regprocedure,'future_production_fail_competition_derived_job_v1(jsonb)'::regprocedure,'future_production_claim_intelligence_derived_bundle_v1(jsonb)'::regprocedure,'future_production_write_intelligence_derived_bundle_v1(jsonb)'::regprocedure,'future_production_claim_calcutta_recalculation_v1(jsonb)'::regprocedure,'future_production_complete_calcutta_recalculation_v1(jsonb)'::regprocedure,'future_production_fail_calcutta_recalculation_v1(jsonb)'::regprocedure,'future_production_claim_net_skins_recalculation_v1(jsonb)'::regprocedure,'future_production_complete_net_skins_recalculation_v1(jsonb)'::regprocedure,'future_production_fail_net_skins_recalculation_v1(jsonb)'::regprocedure);
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='future_production_claim_competition_derived_jobs_v1(jsonb)'::regprocedure),'sha256'),'hex')<>'77819f088f886b8d43bb37397976c0bc05bb931411010cdd302134e7e1d33d21' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: future_production_claim_competition_derived_jobs_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='future_production_write_competition_derived_snapshot_v1(jsonb)'::regprocedure),'sha256'),'hex')<>'55f94db2aa399af45b8176cdfdccdc5b0d76d57ecfe254149538698c89adf48c' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: future_production_write_competition_derived_snapshot_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='future_production_fail_competition_derived_job_v1(jsonb)'::regprocedure),'sha256'),'hex')<>'966f145b6a9196bb30a1919dfba35afc9c328db1a6d7dd69c9ece5bc7c588703' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: future_production_fail_competition_derived_job_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='future_production_claim_intelligence_derived_bundle_v1(jsonb)'::regprocedure),'sha256'),'hex')<>'9d2ac11f2084f4c368c587ebe01fc5a796559f9af54305033468af54ace3b90c' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: future_production_claim_intelligence_derived_bundle_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='future_production_write_intelligence_derived_bundle_v1(jsonb)'::regprocedure),'sha256'),'hex')<>'a5206fc9449802c7b837e821f73b9b03c38dccbde5b6c87f2a5f5a51b3007960' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: future_production_write_intelligence_derived_bundle_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='future_production_claim_calcutta_recalculation_v1(jsonb)'::regprocedure),'sha256'),'hex')<>'88830b40d3ee60dfd187c28657ba397768efd3b89dae802f8ef4ea75cfd94122' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: future_production_claim_calcutta_recalculation_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='future_production_complete_calcutta_recalculation_v1(jsonb)'::regprocedure),'sha256'),'hex')<>'ef9567807c28fbda3999e675f9e0ce3e6dc4efb178bae4404f316640df034978' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: future_production_complete_calcutta_recalculation_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='future_production_fail_calcutta_recalculation_v1(jsonb)'::regprocedure),'sha256'),'hex')<>'2fc9f1817718fdf867c7ebfa12c9f938cc61978db02c9038b5dd22a45f6f8589' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: future_production_fail_calcutta_recalculation_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='future_production_claim_net_skins_recalculation_v1(jsonb)'::regprocedure),'sha256'),'hex')<>'8c45a28714ca6bd0268c974359a74c4ef601ab3c46108eea887618b449a5653e' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: future_production_claim_net_skins_recalculation_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='future_production_complete_net_skins_recalculation_v1(jsonb)'::regprocedure),'sha256'),'hex')<>'2d06b882c6ceb32bf5a5fbb5686a44d0a36e1fcbf6c0421f4f65c55bcd8c7f7b' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: future_production_complete_net_skins_recalculation_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='future_production_fail_net_skins_recalculation_v1(jsonb)'::regprocedure),'sha256'),'hex')<>'237263939286e75301bc6b7c96a34059762c7b374e1b3be3002a777b283823dc' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: future_production_fail_net_skins_recalculation_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='production_control.assert_annual_calcutta_runtime_v1(jsonb,text)'::regprocedure),'sha256'),'hex')<>'87b1419c511ecaff758f3c2f03f637c187ace92a1a1ed7b1cf860a00c97c7cd9' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: assert_annual_calcutta_runtime_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='production_control.assert_annual_net_skins_v1(jsonb,text)'::regprocedure),'sha256'),'hex')<>'a0320a488a3879c14b2605f72aadd02ec56468245b2395ae4c51422b3d09fb5e' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: assert_annual_net_skins_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='production_control.enqueue_annual_calcutta_v1(text,uuid,bigint,text,text,boolean,text,text)'::regprocedure),'sha256'),'hex')<>'025e8352ba137df505903a1602624a37cd740477c8000cdb90a89e2241cf0033' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: enqueue_annual_calcutta_v1';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='production_control.enqueue_annual_net_skins_v1_round(text,uuid,integer,text,text)'::regprocedure),'sha256'),'hex')<>'1a45199b604faaa0df5f20448a691bd5f131ffe1d6e825f02b057860b6549d5c' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: enqueue_annual_net_skins_v1_round';end if;end;$check$;
+
+do $check$ begin if encode(extensions.digest((select prosrc from pg_proc where oid='production_control.intelligence_delivery_ready_v1(text,jsonb)'::regprocedure),'sha256'),'hex')<>'7e1fef893f7c83d86cc864f6840e39540a2edbd7e95a37b568ee72bbea22a8f7' then raise exception 'CERTIFICATION_FUTURE_WORKER_PREDECESSOR_MISMATCH: intelligence_delivery_ready_v1';end if;end;$check$;
+
+create function production_control.assert_canonical_future_worker_runtime_v1(input jsonb, resource_context jsonb) returns text
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+
+declare
+  pointer production_control.current_tournament_pointer_v1%rowtype;
+  catalog production_control.future_tournament_catalog_v1%rowtype;
+  generation production_control.future_annual_runtime_generations_v1%rowtype;
+  annual production_control.annual_scoring_runtime_authorities_v1%rowtype;
+  operation production_control.annual_scoring_rpc_allowlist_v1%rowtype;
+  active_generation_count integer;
+  readiness jsonb;
+  certified_writer jsonb;
+  origin production_control.certification_initialization_origins_v1%rowtype;
+  live jsonb;
+begin
+  if resource_context is null then return production_control.assert_future_production_scoring_runtime_v1(input);end if;
+  live:=production_control.assert_current_certification_future_context_v1(resource_context);
+  select * into strict origin from production_control.certification_initialization_origins_v1
+   where resource_id=live->>'resource_id';
+  -- The shared transaction lock is held through the invoked scoring RPC.
+  -- Annual close/transition/abort take the exclusive counterpart of this
+  -- exact legacy key, so an admitted mutation cannot cross the boundary.
+  perform pg_catalog.pg_advisory_xact_lock_shared(
+    production_control.scoring_admission_lock_key()
+  );
+  select value.* into operation
+  from production_control.annual_scoring_rpc_allowlist_v1 value
+  where value.operation_name = input->>'annual_scoring_operation' and value.enabled;
+  if operation.operation_name is null
+     or input->>'annual_scoring_dispatch_contract'
+       is distinct from 'production-annual-scoring-dispatch-v1'
+     or input->>'annual_scoring_operation'
+       is distinct from operation.operation_name
+     or operation.required_worker is not null then
+    raise exception using errcode = '42501',
+      message = 'PRODUCTION_ANNUAL_SCORING_OPERATION_NOT_ALLOWLISTED';
+  end if;
+  if input->>'annual_scoring_operation' not in('claim_competition_derived_jobs','write_competition_derived_snapshot','mark_competition_derived_job_failed','claim_intelligence_derived_bundle','write_intelligence_derived_bundle','claim_production_calcutta_v1_recalculation','complete_production_calcutta_v1_recalculation','fail_production_calcutta_v1_recalculation','claim_production_net_skins_v1_recalculation','complete_production_net_skins_v1_recalculation','fail_production_net_skins_v1_recalculation','score_derived_delivery_tick_v1','fail_score_derived_preclaim_v1','fail_intelligence_derived_bundle_v1','requeue_score_derived_delivery_v1')
+    or live->>'phase' is distinct from (case when input->>'annual_scoring_operation' in('claim_production_net_skins_v1_recalculation','complete_production_net_skins_v1_recalculation','fail_production_net_skins_v1_recalculation','requeue_score_derived_delivery_v1') then 'DIRECTOR' else 'WORKERS' end) then
+   raise exception using errcode='42501',message='CERTIFICATION_FUTURE_WORKER_NOT_ADMITTED';end if;
+  select value.* into strict pointer
+  from production_control.current_tournament_pointer_v1 value
+  where value.scope_key = live->>'resource_id';
+  if pointer.tournament_id = '2026' then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_ANNUAL_SCORING_TARGET_REQUIRED';
+  end if;
+  select value.* into strict catalog
+  from production_control.future_tournament_catalog_v1 value
+  where value.tournament_id = pointer.tournament_id;
+  select value.* into strict generation
+  from production_control.future_annual_runtime_generations_v1 value
+  where value.tournament_id = pointer.tournament_id
+    and value.generation_status = 'ACTIVE';
+  select value.* into strict annual
+  from production_control.annual_scoring_runtime_authorities_v1 value
+  where value.tournament_id = pointer.tournament_id
+    and value.runtime_generation_id = generation.runtime_generation_id;
+-- Google runtime retired; canonical authority checks remain below.
+  select pg_catalog.count(*)::integer into active_generation_count
+  from production_control.future_annual_runtime_generations_v1 value
+  where value.generation_status = 'ACTIVE';
+  if input->>'expected_current_tournament_id'
+       is distinct from pointer.tournament_id
+     or coalesce((input->>'expected_pointer_revision')::bigint, -1)
+       <> pointer.pointer_revision
+     or input->>'expected_runtime_generation_id'
+       is distinct from generation.runtime_generation_id::text
+     or input->>'expected_annual_authority_generation_id'
+       is distinct from generation.authority_generation_id::text
+     or input->>'expected_annual_admission_generation_id'
+       is distinct from generation.admission_generation_id::text
+     or generation.authority_generation_id
+       is distinct from annual.authority_generation_id
+     or generation.admission_generation_id
+       is distinct from annual.admission_generation_id
+     or generation.pointer_revision <> pointer.pointer_revision
+     or annual.pointer_revision <> pointer.pointer_revision
+     or active_generation_count <> 1
+     or catalog.lifecycle <> 'ACTIVE'
+     or catalog.lifecycle_revision <> pointer.lifecycle_revision
+     or annual.lifecycle_revision <> pointer.lifecycle_revision
+     or annual.platform_tournament_id <> '2026'
+     or annual.resource_class is distinct from 'CERTIFICATION'
+     or annual.certification_resource_id is distinct from origin.resource_id
+     or annual.platform_authority_generation_id is distinct from origin.authority_epoch_id
+     or annual.platform_admission_generation_id is distinct from origin.admission_generation_id
+     or generation.authority_generation_id::text is distinct from live->>'authority_epoch_id'
+     or not exists(select 1 from production_control.certification_ingress_generations_v1 ingress_generation
+       where ingress_generation.resource_id=origin.resource_id
+        and ingress_generation.generation_id=generation.admission_generation_id
+        and ingress_generation.tournament_id=pointer.tournament_id
+        and ingress_generation.pointer_revision=pointer.pointer_revision
+        and ingress_generation.authority_epoch_id=generation.authority_generation_id
+        and (operation.operation_class='READ' and ingress_generation.state in('OPEN','CLOSING','CLOSED')
+          or operation.operation_class='MUTATION' and ingress_generation.state='OPEN'
+          or operation.operation_class='WORKER' and ingress_generation.state in('OPEN','CLOSING')))
+     or annual.authority_status not in ('ACTIVE', 'CLOSED')
+     or (operation.operation_class = 'MUTATION' and (
+       annual.authority_status <> 'ACTIVE'
+       or annual.admission_state <> 'OPEN'
+     ))
+     or (operation.operation_class = 'WORKER' and (
+       annual.authority_status <> 'ACTIVE'
+       or annual.admission_state not in ('OPEN', 'CLOSING')
+     ))
+     or not exists (
+       select 1 from scoring_authority.tournaments tournament_value
+       where tournament_value.tournament_id = pointer.tournament_id
+         and tournament_value.scoring_authority = 'SUPABASE'
+     ) then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_ANNUAL_SCORING_RUNTIME_REQUIRED';
+  end if;
+  if operation.operation_name = 'mutate_production_match_control'
+     and pg_catalog.upper(coalesce(input->>'operation', '')) = 'MARK_LIVE'
+  then
+    readiness :=
+      production_control.assert_future_production_match_scoring_ready_v1(
+        input->>'match_id', pointer.tournament_id
+      );
+    if coalesce((readiness->>'ready')::boolean, false) is not true then
+      raise exception using errcode = '55000',
+        message = 'PRODUCTION_ANNUAL_MARK_LIVE_READINESS_REQUIRED';
+    end if;
+  end if;
+  perform production_control.ensure_annual_side_game_runtime_v1(pointer.tournament_id,
+   generation.runtime_generation_id,generation.authority_generation_id,generation.admission_generation_id,false);
+  return pointer.tournament_id;
+exception
+  when invalid_text_representation or numeric_value_out_of_range then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_ANNUAL_SCORING_RUNTIME_REQUIRED';
+end;
+
+
+$core$;
+revoke all on function production_control.assert_canonical_future_worker_runtime_v1(jsonb,jsonb) from public,anon,authenticated,service_role;
+
+create function production_control.assert_canonical_future_calcutta_worker_v1(input jsonb, expected_operation text, resource_context jsonb) returns text
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+declare
+  pointer production_control.current_tournament_pointer_v1%rowtype;
+  catalog production_control.future_tournament_catalog_v1%rowtype;
+  generation production_control.future_annual_runtime_generations_v1%rowtype;
+  authority production_control.annual_scoring_runtime_authorities_v1%rowtype;
+  annual_resource production_control.future_tournament_resources_v1%rowtype;
+  activation production_control.cutover_activation_state%rowtype;
+begin
+  if resource_context is null then return production_control.assert_annual_calcutta_runtime_v1(input,expected_operation);end if;
+  if input->>'annual_scoring_operation' is distinct from expected_operation then raise exception using errcode='42501',message='CERTIFICATION_FUTURE_WORKER_NOT_ADMITTED';end if;
+  -- The dispatcher and this target-side assertion both bind the exact
+  -- pointer/runtime/destination. Keeping the target-side check means a direct
+  -- service-role call cannot bypass the annual allowlist.
+  if production_control.assert_canonical_future_worker_runtime_v1(input,resource_context) = '2026' then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_ANNUAL_CALCUTTA_RUNTIME_REQUIRED';
+  end if;
+  select value.* into strict pointer
+  from production_control.current_tournament_pointer_v1 value
+  where value.scope_key = resource_context->>'resource_id';
+  select value.* into strict catalog
+  from production_control.future_tournament_catalog_v1 value
+  where value.tournament_id = pointer.tournament_id;
+  select value.* into strict generation
+  from production_control.future_annual_runtime_generations_v1 value
+  where value.tournament_id = pointer.tournament_id
+    and value.generation_status = 'ACTIVE';
+  select value.* into strict authority
+  from production_control.annual_scoring_runtime_authorities_v1 value
+  where value.tournament_id = pointer.tournament_id
+    and value.runtime_generation_id = generation.runtime_generation_id;
+  select value.* into strict annual_resource
+  from production_control.future_tournament_resources_v1 value
+  where value.tournament_id = pointer.tournament_id;
+  activation.activation_revision:=(resource_context->>'activation_revision')::bigint;
+
+  if pointer.tournament_id = '2026'
+     or input->>'contract_version' is distinct from 'production-calcutta-v1'
+     or input->>'expected_current_tournament_id'
+       is distinct from pointer.tournament_id
+     or coalesce((input->>'expected_pointer_revision')::bigint, -1)
+       <> pointer.pointer_revision
+     or input->>'expected_runtime_generation_id'
+       is distinct from generation.runtime_generation_id::text
+     or input->>'expected_annual_authority_generation_id'
+       is distinct from generation.authority_generation_id::text
+     or input->>'expected_annual_admission_generation_id'
+       is distinct from generation.admission_generation_id::text
+     or coalesce((input->>'expected_activation_revision')::bigint, -1)
+       <> activation.activation_revision
+     or generation.pointer_revision <> pointer.pointer_revision
+     or generation.authority <> 'SUPABASE'
+     or generation.ingress_state <> 'OPEN'
+     or catalog.lifecycle <> 'ACTIVE'
+     or catalog.lifecycle_revision <> pointer.lifecycle_revision
+     or authority.authority_status <> 'ACTIVE'
+     or authority.admission_state <> 'OPEN'
+     or authority.pointer_revision <> pointer.pointer_revision
+     or authority.lifecycle_revision <> pointer.lifecycle_revision
+     or authority.authority_generation_id is distinct from
+       generation.authority_generation_id
+     or authority.admission_generation_id is distinct from
+       generation.admission_generation_id
+     or annual_resource.resource_status <> 'CURRENT_RESOURCE_BOUND'
+     or annual_resource.source_workbook_id is null
+     or annual_resource.project_ref is distinct from input->>'project_ref'
+     or annual_resource.project_url is distinct from input->>'project_url'
+     or annual_resource.source_workbook_id
+       is distinct from input->>'annual_destination_workbook_id' then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_ANNUAL_CALCUTTA_RUNTIME_REQUIRED';
+  end if;
+  return pointer.tournament_id;
+exception
+  when invalid_text_representation or numeric_value_out_of_range
+    or no_data_found then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_ANNUAL_CALCUTTA_RUNTIME_REQUIRED';
+end;
+
+$core$;
+revoke all on function production_control.assert_canonical_future_calcutta_worker_v1(jsonb,text,jsonb) from public,anon,authenticated,service_role;
+
+create function production_control.assert_canonical_future_net_skins_worker_v1(input jsonb, expected_operation text, resource_context jsonb) returns text
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+declare
+  target text;
+  generation production_control.future_annual_runtime_generations_v1%rowtype;
+  resource production_control.future_tournament_resources_v1%rowtype;
+begin
+  if resource_context is null then return production_control.assert_annual_net_skins_v1(input,expected_operation);end if;
+  if input->>'annual_scoring_operation' is distinct from expected_operation then raise exception using errcode='42501',message='CERTIFICATION_FUTURE_WORKER_NOT_ADMITTED';end if;
+  target := production_control.assert_canonical_future_worker_runtime_v1(input,resource_context);
+  select value.* into strict generation
+  from production_control.future_annual_runtime_generations_v1 value
+  where value.tournament_id = target
+    and value.runtime_generation_id =
+      (input->>'expected_runtime_generation_id')::uuid
+    and value.generation_status = 'ACTIVE';
+  select value.* into strict resource
+  from production_control.future_tournament_resources_v1 value
+  where value.tournament_id = target;
+  if target = '2026'
+     or resource.resource_status <> 'CURRENT_RESOURCE_BOUND'
+     or resource.source_workbook_id is null
+     or resource.source_workbook_id is distinct from
+       input->>'annual_destination_workbook_id'
+     or generation.pointer_revision < 1 then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_ANNUAL_NET_SKINS_RUNTIME_REQUIRED';
+  end if;
+  return target;
+exception
+  when invalid_text_representation or no_data_found then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_ANNUAL_NET_SKINS_RUNTIME_REQUIRED';
+end;
+
+$core$;
+revoke all on function production_control.assert_canonical_future_net_skins_worker_v1(jsonb,text,jsonb) from public,anon,authenticated,service_role;
+
+create function production_control.canonical_future_claim_competition_derived_jobs_v1_resource(input jsonb, resource_context jsonb) returns jsonb
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+declare
+  target text;
+  generation_id uuid;
+  engine_values text[];
+  worker text := pg_catalog.left(pg_catalog.btrim(coalesce(
+    input->>'worker_id', ''
+  )), 160);
+  lease_seconds integer := greatest(15, least(
+    coalesce((input->>'lease_seconds')::integer, 90), 300
+  ));
+  token uuid := extensions.gen_random_uuid();
+  claims jsonb;
+begin
+  target := production_control.assert_canonical_future_worker_runtime_v1(input,resource_context);
+  generation_id := (input->>'expected_runtime_generation_id')::uuid;
+  if worker = '' or pg_catalog.jsonb_typeof(input->'engine_keys') <> 'array' then
+    return pg_catalog.jsonb_build_object(
+      'ok', false, 'code', 'COMPLETE_DERIVED_CLAIM_REQUIRED'
+    );
+  end if;
+  select pg_catalog.array_agg(pg_catalog.upper(pg_catalog.btrim(value)))
+    into engine_values
+  from pg_catalog.jsonb_array_elements_text(input->'engine_keys') value;
+  if engine_values is null or pg_catalog.cardinality(engine_values) = 0
+     or exists (select 1 from pg_catalog.unnest(engine_values) value
+       where value not in ('TEAM_MOMENTUM', 'TOURNAMENT_STORYLINES')) then
+    return pg_catalog.jsonb_build_object(
+      'ok', false, 'code', 'DERIVED_ENGINE_NOT_SUPPORTED'
+    );
+  end if;
+  perform production_control.flush_score_derived_intents_v1(target, 'COMPETITION', 8);
+  -- Preserve the inherited expiry domain, including any non-round0 current-
+  -- generation rows. Acquire its keys before clock-dependent eligibility changes.
+  perform 1 from scoring_authority.competition_recalculation_jobs value
+  where value.tournament_id=target and value.runtime_generation_id=generation_id
+  order by value.round_number,
+    case value.engine_key when 'TEAM_MOMENTUM' then 1 when 'TOURNAMENT_STORYLINES' then 2
+      when 'TOURNAMENT_INTELLIGENCE' then 3 when 'PROJECTION_EDITORIAL' then 4
+      when 'TOURNAMENT_FINAL_RECAP' then 5 else 6 end,value.engine_key
+  for update;
+  update scoring_authority.competition_recalculation_jobs value set
+    status = 'FAILED', claim_token = null, claimed_by = null,
+    lease_expires_at = null, completed_at = pg_catalog.clock_timestamp(),
+    last_error_code = 'DERIVED_LEASE_EXPIRED',
+    last_error_safe = 'Derived work will be retried.',
+    updated_at = pg_catalog.clock_timestamp()
+  where value.tournament_id = target
+    and value.runtime_generation_id = generation_id
+    and value.status = 'RUNNING'
+    and value.lease_expires_at < pg_catalog.clock_timestamp();
+  with candidates as (
+    select value.tournament_id, value.round_number, value.engine_key
+    from scoring_authority.competition_recalculation_jobs value
+    where value.tournament_id = target and value.round_number = 0
+      and value.runtime_generation_id = generation_id
+      and value.engine_key = any(engine_values)
+      and value.status in ('PENDING', 'FAILED') and value.delivery_dead_letter_at is null
+      and value.delivery_attempts<5 and value.delivery_available_at<=clock_timestamp()
+    order by value.engine_key for update skip locked
+  ), claimed as (
+    update scoring_authority.competition_recalculation_jobs value set
+      status = 'RUNNING', attempts = value.attempts + 1,
+      started_at = pg_catalog.clock_timestamp(), completed_at = null,
+      claim_token = token, claimed_by = worker,
+      lease_expires_at = pg_catalog.clock_timestamp()
+        + pg_catalog.make_interval(secs => lease_seconds),
+      last_error_code = null, last_error_safe = null,
+      updated_at = pg_catalog.clock_timestamp()
+    from candidates candidate
+    where value.tournament_id = candidate.tournament_id
+      and value.round_number = candidate.round_number
+      and value.engine_key = candidate.engine_key
+    returning value.engine_key, value.started_at, value.requested_at,
+      value.requested_source_revision, value.attempts, value.claim_token,
+      value.runtime_generation_id, value.lease_expires_at
+  )
+  select coalesce(pg_catalog.jsonb_agg(pg_catalog.jsonb_build_object(
+    'engine_key', engine_key, 'claim_started_at', started_at,
+    'requested_at', requested_at,
+    'requested_source_revision', requested_source_revision,
+    'attempt', attempts, 'claim_token', claim_token,
+    'runtime_generation_id', runtime_generation_id,
+    'lease_expires_at', lease_expires_at
+  ) order by engine_key), '[]'::jsonb) into claims from claimed;
+  return pg_catalog.jsonb_build_object('ok', true, 'claims', claims);
+end;
+
+$core$;
+revoke all on function production_control.canonical_future_claim_competition_derived_jobs_v1_resource(jsonb,jsonb) from public,anon,authenticated,service_role;
+
+CREATE OR REPLACE FUNCTION public.future_production_claim_competition_derived_jobs_v1(input jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+begin
+ return production_control.canonical_future_claim_competition_derived_jobs_v1_resource(input,null);
+end;
+$function$
+;
+
+create function production_control.canonical_future_write_competition_derived_snapshot_v1_resource(input jsonb, resource_context jsonb) returns jsonb
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+declare
+  target text;
+  generation_id uuid;
+  token uuid;
+  worker text := pg_catalog.left(pg_catalog.btrim(coalesce(
+    input->>'worker_id', ''
+  )), 160);
+  target_round integer := coalesce((input->>'round_number')::integer, 0);
+  target_engine text := pg_catalog.upper(pg_catalog.btrim(coalesce(
+    input->>'engine_key', ''
+  )));
+  target_engine_version text := pg_catalog.btrim(coalesce(
+    input->>'engine_version', ''
+  ));
+  target_configuration text := pg_catalog.lower(pg_catalog.btrim(coalesce(
+    input->>'configuration_fingerprint', ''
+  )));
+  target_source text := pg_catalog.lower(pg_catalog.btrim(coalesce(
+    input->>'source_fingerprint', ''
+  )));
+  target_payload_hash text := pg_catalog.lower(pg_catalog.btrim(coalesce(
+    input->>'payload_hash', ''
+  )));
+  target_payload jsonb := coalesce(input->'result_payload', 'null'::jsonb);
+  target_actor text := pg_catalog.btrim(coalesce(input->>'calculated_by', ''));
+  target_calculated_at timestamptz := coalesce(
+    (input->>'calculated_at')::timestamptz, pg_catalog.clock_timestamp()
+  );
+  target_started_at timestamptz := coalesce(
+    (input->>'started_at')::timestamptz, target_calculated_at
+  );
+  target_claim_started_at timestamptz :=
+    (input->>'claim_started_at')::timestamptz;
+  target_duration numeric := greatest(
+    0, coalesce((input->>'duration_ms')::numeric, 0)
+  );
+  snapshot_id uuid;
+  run_id uuid;
+  logical_replay boolean := false;
+begin
+  target := production_control.assert_canonical_future_worker_runtime_v1(input,resource_context);
+  generation_id := (input->>'expected_runtime_generation_id')::uuid;
+  token := nullif(input->>'claim_token', '')::uuid;
+  if token is null or worker = '' or target_round <> 0
+     or target_actor = '' or target_engine_version = ''
+     or target_engine not in ('TEAM_MOMENTUM', 'TOURNAMENT_STORYLINES')
+     or target_configuration !~ '^[0-9a-f]{64}$'
+     or target_source !~ '^[0-9a-f]{64}$'
+     or target_payload_hash !~ '^[0-9a-f]{64}$'
+     or pg_catalog.jsonb_typeof(target_payload) <> 'object'
+     or target_claim_started_at is null or not exists (
+    select 1 from scoring_authority.competition_recalculation_jobs value
+    where value.tournament_id = target and value.round_number = target_round
+      and value.engine_key = target_engine
+      and value.runtime_generation_id = generation_id
+      and value.status = 'RUNNING' and value.claim_token = token
+      and value.claimed_by = worker
+      and value.lease_expires_at >= pg_catalog.clock_timestamp()
+      and value.started_at = target_claim_started_at
+  ) then
+    return pg_catalog.jsonb_build_object(
+      'ok', false, 'code', 'STALE_DERIVED_JOB', 'superseded', true
+    );
+  end if;
+
+  select value.id into snapshot_id
+  from scoring_authority.competition_derived_snapshots value
+  where value.tournament_id = target and value.round_number = target_round
+    and value.engine_key = target_engine
+    and value.engine_version = target_engine_version
+    and value.configuration_fingerprint = target_configuration
+    and value.source_fingerprint = target_source
+    and value.payload_hash = target_payload_hash
+  limit 1;
+  logical_replay := snapshot_id is not null;
+  update scoring_authority.competition_derived_snapshots value set
+    is_current = false
+  where value.tournament_id = target and value.round_number = target_round
+    and value.engine_key = target_engine and value.is_current
+    and value.id is distinct from snapshot_id;
+  if snapshot_id is null then
+    insert into scoring_authority.competition_derived_snapshots (
+      tournament_id, round_number, engine_key, engine_version,
+      configuration_fingerprint, source_fingerprint, result_state,
+      result_payload, payload_hash, is_current, calculated_at
+    ) values (
+      target, target_round, target_engine, target_engine_version,
+      target_configuration, target_source, 'PROVISIONAL', target_payload,
+      target_payload_hash, true, target_calculated_at
+    ) returning id into snapshot_id;
+  else
+    update scoring_authority.competition_derived_snapshots value set
+      is_current = true, result_payload = target_payload,
+      calculated_at = target_calculated_at
+    where value.id = snapshot_id;
+  end if;
+  insert into scoring_authority.competition_derived_runs (
+    tournament_id, round_number, engine_key, engine_version,
+    configuration_fingerprint, source_fingerprint, payload_hash, status,
+    calculated_by, started_at, completed_at, duration_ms
+  ) values (
+    target, target_round, target_engine, target_engine_version,
+    target_configuration, target_source, target_payload_hash, 'SUCCEEDED',
+    target_actor, target_started_at, target_calculated_at, target_duration
+  ) on conflict (
+    tournament_id, round_number, engine_key, engine_version,
+    configuration_fingerprint, source_fingerprint, payload_hash, status
+  ) do update set
+    completed_at = excluded.completed_at,
+    duration_ms = excluded.duration_ms,
+    calculated_by = excluded.calculated_by
+  returning id into run_id;
+  update scoring_authority.competition_recalculation_jobs value set
+    status = 'SUCCEEDED', requested_source_revision =
+      pg_catalog.jsonb_build_object(
+        'sourceFingerprint', target_source,
+        'configurationFingerprint', target_configuration,
+        'payloadHash', target_payload_hash
+      ),
+    completed_at = pg_catalog.clock_timestamp(),
+    last_error_code = null, last_error_safe = null,
+    claim_token = null, claimed_by = null, lease_expires_at = null,
+    updated_at = pg_catalog.clock_timestamp()
+  where value.tournament_id = target and value.round_number = target_round
+    and value.engine_key = target_engine
+    and value.runtime_generation_id = generation_id
+    and value.status = 'RUNNING' and value.claim_token = token
+    and value.claimed_by = worker and value.started_at = target_claim_started_at;
+  if not found then
+    raise exception using errcode = '40001', message = 'STALE_DERIVED_JOB';
+  end if;
+  insert into scoring_authority.audit_events (
+    tournament_id, action, actor_id, metadata
+  ) values (
+    target, target_engine || '_DERIVED_STATE_CALCULATED', target_actor,
+    pg_catalog.jsonb_build_object(
+      'snapshotId', snapshot_id, 'runId', run_id,
+      'runtimeGenerationId', generation_id,
+      'sourceFingerprint', target_source,
+      'payloadHash', target_payload_hash,
+      'engineVersion', target_engine_version,
+      'logicalReplay', logical_replay,
+      'claimStartedAt', target_claim_started_at
+    )
+  );
+  return pg_catalog.jsonb_build_object(
+    'ok', true, 'snapshot_id', snapshot_id,
+    'run_id', run_id, 'logical_replay', logical_replay,
+    'runtime_generation_id', generation_id
+  );
+end;
+
+$core$;
+revoke all on function production_control.canonical_future_write_competition_derived_snapshot_v1_resource(jsonb,jsonb) from public,anon,authenticated,service_role;
+
+CREATE OR REPLACE FUNCTION public.future_production_write_competition_derived_snapshot_v1(input jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+begin
+ return production_control.canonical_future_write_competition_derived_snapshot_v1_resource(input,null);
+end;
+$function$
+;
+
+create function production_control.canonical_future_fail_competition_derived_job_v1_resource(input jsonb, resource_context jsonb) returns jsonb
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+declare
+  target text;
+  generation_id uuid;
+  updated_count integer;
+begin
+  target := production_control.assert_canonical_future_worker_runtime_v1(input,resource_context);
+  generation_id := (input->>'expected_runtime_generation_id')::uuid;
+  update scoring_authority.competition_recalculation_jobs value set
+    status = 'FAILED', completed_at = pg_catalog.clock_timestamp(),
+    claim_token = null, claimed_by = null, lease_expires_at = null,
+    last_error_code = pg_catalog.left(pg_catalog.btrim(coalesce(
+      input->>'error_code', 'DERIVED_CALCULATION_FAILED'
+    )), 120),
+    last_error_safe = pg_catalog.left(pg_catalog.btrim(coalesce(
+      input->>'error_safe', 'Prepared competition content is unavailable.'
+    )), 400), updated_at = pg_catalog.clock_timestamp()
+  where value.tournament_id = target and value.round_number = 0
+    and value.engine_key = pg_catalog.upper(input->>'engine_key')
+    and value.runtime_generation_id = generation_id
+    and value.status = 'RUNNING'
+    and value.claim_token = nullif(input->>'claim_token', '')::uuid
+    and value.claimed_by = pg_catalog.left(input->>'worker_id', 160);
+  get diagnostics updated_count = row_count;
+  return pg_catalog.jsonb_build_object(
+    'ok', true, 'marked', updated_count = 1,
+    'superseded', updated_count = 0
+  );
+end;
+
+$core$;
+revoke all on function production_control.canonical_future_fail_competition_derived_job_v1_resource(jsonb,jsonb) from public,anon,authenticated,service_role;
+
+CREATE OR REPLACE FUNCTION public.future_production_fail_competition_derived_job_v1(input jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+begin
+ return production_control.canonical_future_fail_competition_derived_job_v1_resource(input,null);
+end;
+$function$
+;
+
+create function production_control.canonical_future_claim_intelligence_derived_bundle_v1_resource(input jsonb, resource_context jsonb) returns jsonb
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+declare
+  target text;
+  generation_id uuid;
+  key_value text;
+  engine_values text[];
+  claim_time timestamptz := pg_catalog.clock_timestamp();
+  token uuid := extensions.gen_random_uuid();
+  worker text := pg_catalog.left(pg_catalog.btrim(coalesce(
+    input->>'worker_id', ''
+  )), 160);
+  lease_seconds integer := greatest(15, least(
+    coalesce((input->>'lease_seconds')::integer, 90), 300
+  ));
+begin
+  target := production_control.assert_canonical_future_worker_runtime_v1(input,resource_context);
+  generation_id := (input->>'expected_runtime_generation_id')::uuid;
+  if worker = '' or pg_catalog.jsonb_typeof(input->'engine_keys') <> 'array' then
+    return pg_catalog.jsonb_build_object(
+      'ok', false, 'code', 'COMPLETE_INTELLIGENCE_CLAIM_REQUIRED'
+    );
+  end if;
+  select pg_catalog.array_agg(pg_catalog.upper(pg_catalog.btrim(value)))
+    into engine_values
+  from pg_catalog.jsonb_array_elements_text(input->'engine_keys') value;
+  if engine_values is null or pg_catalog.cardinality(engine_values) = 0
+     or exists (
+       select 1 from pg_catalog.unnest(engine_values) value
+       where value not in (
+      'TOURNAMENT_INTELLIGENCE', 'PROJECTION_EDITORIAL',
+      'TOURNAMENT_FINAL_RECAP'
+       )
+     ) then
+    return pg_catalog.jsonb_build_object(
+      'ok', false, 'code', 'DERIVED_ENGINE_NOT_SUPPORTED'
+    );
+  end if;
+  perform production_control.flush_score_derived_intents_v1(target, 'COMPETITION', 8);
+  perform 1
+  from scoring_authority.competition_recalculation_jobs value
+  where value.tournament_id = target and value.round_number = 0
+    and value.engine_key = any(engine_values)
+  order by case value.engine_key when 'TOURNAMENT_INTELLIGENCE' then 3
+    when 'PROJECTION_EDITORIAL' then 4 when 'TOURNAMENT_FINAL_RECAP' then 5 end
+  for update;
+  if exists (
+    select 1 from scoring_authority.competition_recalculation_jobs value
+    where value.tournament_id = target and value.round_number = 0
+      and value.engine_key = any(engine_values)
+      and value.runtime_generation_id = generation_id
+      and value.status = 'RUNNING'
+      and value.lease_expires_at >= pg_catalog.clock_timestamp()
+  ) then
+    return pg_catalog.jsonb_build_object(
+      'ok', false, 'code', 'INTELLIGENCE_LEASE_ACTIVE'
+    );
+  end if;
+  if not production_control.intelligence_delivery_ready_v1(target,input->'engine_keys') then
+    return jsonb_build_object('ok',true,'empty',true,'code','NO_PENDING_INTELLIGENCE');
+  end if;
+  foreach key_value in array engine_values loop
+    insert into scoring_authority.competition_recalculation_jobs (
+      tournament_id, round_number, engine_key, status,
+      requested_source_revision, attempts, requested_at, started_at,
+      runtime_generation_id, claim_token, claimed_by, lease_expires_at,
+      updated_at
+    ) values (
+      target, 0, key_value, 'RUNNING',
+      pg_catalog.jsonb_build_object('requestedBy', input->>'requested_by'),
+      1, claim_time, claim_time, generation_id, token, worker,
+      claim_time + pg_catalog.make_interval(secs => lease_seconds),
+      pg_catalog.clock_timestamp()
+    ) on conflict (tournament_id, round_number, engine_key) do update set
+      status = 'RUNNING',
+      requested_source_revision = scoring_authority.competition_recalculation_jobs.requested_source_revision,
+      attempts = scoring_authority.competition_recalculation_jobs.attempts + 1,
+      requested_at = claim_time, started_at = claim_time,
+      completed_at = null, runtime_generation_id = generation_id,
+      claim_token = token, claimed_by = worker,
+      lease_expires_at = excluded.lease_expires_at,
+      last_error_code = null, last_error_safe = null,
+      updated_at = pg_catalog.clock_timestamp();
+  end loop;
+  return pg_catalog.jsonb_build_object(
+    'ok', true, 'claim_started_at', claim_time,
+    'claim_token', token, 'worker_id', worker,
+    'runtime_generation_id', generation_id
+  );
+end;
+
+$core$;
+revoke all on function production_control.canonical_future_claim_intelligence_derived_bundle_v1_resource(jsonb,jsonb) from public,anon,authenticated,service_role;
+
+CREATE OR REPLACE FUNCTION public.future_production_claim_intelligence_derived_bundle_v1(input jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+begin
+ return production_control.canonical_future_claim_intelligence_derived_bundle_v1_resource(input,null);
+end;
+$function$
+;
+
+create function production_control.canonical_future_write_intelligence_derived_bundle_v1_resource(input jsonb, resource_context jsonb) returns jsonb
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+declare
+  target text;
+  generation_id uuid;
+  token uuid;
+  worker text := pg_catalog.left(pg_catalog.btrim(coalesce(
+    input->>'worker_id', ''
+  )), 160);
+  engine jsonb;
+  key_value text;
+  target_source text := pg_catalog.lower(pg_catalog.btrim(coalesce(
+    input->>'source_fingerprint', ''
+  )));
+  target_actor text := pg_catalog.left(pg_catalog.btrim(coalesce(
+    input->>'calculated_by', ''
+  )), 180);
+  target_duration numeric := greatest(
+    0, coalesce((input->>'duration_ms')::numeric, 0)
+  );
+  target_engine_version text;
+  target_payload jsonb;
+  target_payload_hash text;
+  target_claim timestamptz;
+  target_configuration_fingerprint text;
+  snapshot_id uuid;
+  written jsonb := '[]'::jsonb;
+begin
+  target := production_control.assert_canonical_future_worker_runtime_v1(input,resource_context);
+  generation_id := (input->>'expected_runtime_generation_id')::uuid;
+  token := nullif(input->>'claim_token', '')::uuid;
+  if token is null or worker = '' or target_actor = ''
+     or target_source !~ '^[0-9a-f]{64}$'
+     or pg_catalog.jsonb_typeof(input->'engines') <> 'array' then
+    return pg_catalog.jsonb_build_object(
+      'ok', false, 'code', 'COMPLETE_INTELLIGENCE_BUNDLE_REQUIRED'
+    );
+  end if;
+  for engine in select value
+    from pg_catalog.jsonb_array_elements(input->'engines') value
+  loop
+    key_value := pg_catalog.upper(pg_catalog.btrim(engine->>'key'));
+    target_engine_version := pg_catalog.btrim(coalesce(
+      engine->>'version', ''
+    ));
+    target_payload := coalesce(engine->'result', 'null'::jsonb);
+    target_payload_hash := pg_catalog.lower(pg_catalog.btrim(coalesce(
+      engine->>'payload_hash', ''
+    )));
+    begin
+      target_claim := (engine->>'claim_started_at')::timestamptz;
+    exception when others then
+      target_claim := null;
+    end;
+    if key_value not in (
+      'TOURNAMENT_INTELLIGENCE', 'PROJECTION_EDITORIAL',
+      'TOURNAMENT_FINAL_RECAP'
+    ) or target_engine_version = ''
+      or pg_catalog.jsonb_typeof(target_payload) <> 'object'
+      or target_payload_hash !~ '^[0-9a-f]{64}$'
+      or target_claim is null then
+      return pg_catalog.jsonb_build_object(
+        'ok', false, 'code', 'INVALID_INTELLIGENCE_ENGINE_PAYLOAD'
+      );
+    end if;
+    if key_value = 'TOURNAMENT_FINAL_RECAP'
+       and coalesce((input#>>'{final_gate,eligible}')::boolean, false)
+         is not true then
+      return pg_catalog.jsonb_build_object(
+        'ok', false, 'code', 'FINAL_RECAP_GATE_REQUIRED'
+      );
+    end if;
+    if not exists (
+      select 1 from scoring_authority.competition_recalculation_jobs value
+      where value.tournament_id = target and value.round_number = 0
+        and value.engine_key = key_value
+        and value.runtime_generation_id = generation_id
+        and value.status = 'RUNNING' and value.claim_token = token
+        and value.claimed_by = worker
+        and value.lease_expires_at >= pg_catalog.clock_timestamp()
+        and value.started_at = target_claim
+    ) then
+      return pg_catalog.jsonb_build_object(
+        'ok', false, 'code', 'STALE_INTELLIGENCE_WORKER',
+        'superseded', true, 'engineKey', key_value
+      );
+    end if;
+    target_configuration_fingerprint := pg_catalog.encode(extensions.digest(
+      target_engine_version || ':canonical-supabase-input-v1', 'sha256'
+    ), 'hex');
+    select value.id into snapshot_id
+    from scoring_authority.competition_derived_snapshots value
+    where value.tournament_id = target and value.round_number = 0
+      and value.engine_key = key_value
+      and value.engine_version = target_engine_version
+      and value.source_fingerprint = target_source
+      and value.payload_hash = target_payload_hash
+    limit 1;
+    update scoring_authority.competition_derived_snapshots value set
+      is_current = false
+    where value.tournament_id = target and value.round_number = 0
+      and value.engine_key = key_value and value.is_current
+      and value.id is distinct from snapshot_id;
+    if snapshot_id is null then
+      insert into scoring_authority.competition_derived_snapshots (
+        tournament_id, round_number, engine_key, engine_version,
+        configuration_fingerprint, source_fingerprint, result_state,
+        result_payload, payload_hash, is_current, calculated_at
+      ) values (
+        target, 0, key_value, target_engine_version,
+        target_configuration_fingerprint, target_source,
+        case when key_value = 'TOURNAMENT_FINAL_RECAP'
+          then 'OFFICIAL' else 'PROVISIONAL' end,
+        target_payload, target_payload_hash, true,
+        pg_catalog.clock_timestamp()
+      ) returning id into snapshot_id;
+    else
+      update scoring_authority.competition_derived_snapshots value set
+        is_current = true, result_payload = target_payload,
+        calculated_at = pg_catalog.clock_timestamp()
+      where value.id = snapshot_id;
+    end if;
+    insert into scoring_authority.competition_derived_runs (
+      tournament_id, round_number, engine_key, engine_version,
+      configuration_fingerprint, source_fingerprint, payload_hash, status,
+      calculated_by, started_at, completed_at, duration_ms
+    ) values (
+      target, 0, key_value, target_engine_version,
+      target_configuration_fingerprint, target_source, target_payload_hash,
+      'SUCCEEDED', target_actor, target_claim,
+      pg_catalog.clock_timestamp(), target_duration
+    ) on conflict (
+      tournament_id, round_number, engine_key, engine_version,
+      configuration_fingerprint, source_fingerprint, payload_hash, status
+    ) do update set
+      completed_at = pg_catalog.clock_timestamp(),
+      duration_ms = excluded.duration_ms,
+      calculated_by = excluded.calculated_by;
+    update scoring_authority.competition_recalculation_jobs value set
+      status = 'SUCCEEDED',
+      requested_source_revision = pg_catalog.jsonb_build_object(
+        'sourceFingerprint', target_source,
+        'payloadHash', target_payload_hash
+      ), completed_at = pg_catalog.clock_timestamp(),
+      last_error_code = null, last_error_safe = null,
+      claim_token = null, claimed_by = null, lease_expires_at = null,
+      updated_at = pg_catalog.clock_timestamp()
+    where value.tournament_id = target and value.round_number = 0
+      and value.engine_key = key_value
+      and value.runtime_generation_id = generation_id
+      and value.status = 'RUNNING' and value.claim_token = token
+      and value.claimed_by = worker and value.started_at = target_claim;
+    if not found then
+      raise exception using errcode = '40001',
+        message = 'STALE_INTELLIGENCE_WORKER';
+    end if;
+    written := written || pg_catalog.jsonb_build_array(
+      pg_catalog.jsonb_build_object(
+        'engineKey', key_value, 'snapshotId', snapshot_id
+      )
+    );
+  end loop;
+  insert into scoring_authority.audit_events (
+    tournament_id, action, actor_id, metadata
+  ) values (
+    target, 'INTELLIGENCE_DERIVED_BUNDLE_CALCULATED', target_actor,
+    pg_catalog.jsonb_build_object(
+      'runtimeGenerationId', generation_id,
+      'sourceFingerprint', target_source,
+      'engines', written, 'finalGate', input->'final_gate'
+    )
+  );
+  return pg_catalog.jsonb_build_object(
+    'ok', true, 'written', written, 'final_gate', input->'final_gate',
+    'runtime_generation_id', generation_id
+  );
+end;
+
+$core$;
+revoke all on function production_control.canonical_future_write_intelligence_derived_bundle_v1_resource(jsonb,jsonb) from public,anon,authenticated,service_role;
+
+CREATE OR REPLACE FUNCTION public.future_production_write_intelligence_derived_bundle_v1(input jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+begin
+ return production_control.canonical_future_write_intelligence_derived_bundle_v1_resource(input,null);
+end;
+$function$
+;
+
+create function production_control.canonical_future_claim_calcutta_recalculation_v1_resource(input jsonb, resource_context jsonb) returns jsonb
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+declare
+  target text;
+  generation production_control.future_annual_runtime_generations_v1%rowtype;
+  current_value scoring_authority.calcutta_v1_current%rowtype;
+  configuration_value scoring_authority.calcutta_v1_configuration_revisions%rowtype;
+  auction_value scoring_authority.calcutta_v1_auction_fact_revisions%rowtype;
+  job_value scoring_authority.calcutta_v1_recalculation_jobs%rowtype;
+  existing_response jsonb;
+  response_value jsonb;
+  calculation_input jsonb;
+  core_view jsonb;
+  current_source jsonb;
+  current_source_fingerprint text;
+  replacement_job jsonb;
+  expected_result_revision bigint;
+  worker_value text := pg_catalog.btrim(coalesce(input->>'worker_id', ''));
+  lease_seconds_value integer := least(300,
+    greatest(15, coalesce(
+      (input->>'lease_seconds')::integer, 60
+    ))
+  );
+  claim_token_value uuid;
+begin
+  target := production_control.assert_canonical_future_calcutta_worker_v1(input,'claim_production_calcutta_v1_recalculation',resource_context);
+  existing_response := production_control.lookup_cutover_receipt(
+    'ANNUAL_CALCUTTA_V1_CLAIM', input
+  );
+  if existing_response is not null then return existing_response; end if;
+  if worker_value = '' or pg_catalog.length(worker_value) > 160 then
+    raise exception using errcode = '22023',
+      message = 'PRODUCTION_CALCUTTA_WORKER_ID_REQUIRED';
+  end if;
+  select value.* into strict generation
+  from production_control.future_annual_runtime_generations_v1 value
+  where value.tournament_id = target and value.generation_status = 'ACTIVE';
+  perform production_control.flush_score_derived_intents_v1(target, 'CALCUTTA', 8);
+  select value.* into strict current_value
+  from scoring_authority.calcutta_v1_current value
+  where value.tournament_id = target
+  for update;
+  if current_value.configuration_revision <>
+       coalesce((input->>'expected_configuration_revision')::bigint, -1)
+     or current_value.configuration_fingerprint is distinct from
+       nullif(input->>'expected_configuration_fingerprint', '') then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_CALCUTTA_CONFIGURATION_REVISION_CONFLICT';
+  end if;
+  if current_value.auction_revision <>
+       coalesce((input->>'expected_auction_revision')::bigint, -1)
+     or current_value.auction_fingerprint is distinct from
+       nullif(input->>'expected_auction_fingerprint', '') then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_CALCUTTA_AUCTION_REVISION_CONFLICT';
+  end if;
+  if current_value.auction_revision = 0 then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_CALCUTTA_AUCTION_FACTS_REQUIRED';
+  end if;
+
+
+  update scoring_authority.calcutta_v1_recalculation_jobs set
+    status = case when attempts >= 5 then 'FAILED' else 'PENDING' end,
+    claimed_by = null, claim_token = null, lease_expires_at = null,
+    completed_at = case when attempts >= 5
+      then pg_catalog.clock_timestamp() else null end,
+    last_error_code = case when attempts >= 5
+      then 'PRODUCTION_CALCUTTA_LEASE_EXHAUSTED' else null end,
+    last_error_safe = case when attempts >= 5
+      then 'Calcutta recalculation is temporarily unavailable.' else null end,
+    updated_at = pg_catalog.clock_timestamp()
+  where tournament_id = target
+    and runtime_generation_id = generation.runtime_generation_id
+    and configuration_revision = current_value.configuration_revision
+    and configuration_fingerprint = current_value.configuration_fingerprint
+    and auction_revision = current_value.auction_revision
+    and auction_fingerprint = current_value.auction_fingerprint
+    and activation_revision =
+      (input->>'expected_activation_revision')::bigint
+    and status = 'RUNNING' and lease_expires_at <= pg_catalog.clock_timestamp();
+  select value.* into job_value
+  from scoring_authority.calcutta_v1_recalculation_jobs value
+  where value.tournament_id = target
+    and value.runtime_generation_id = generation.runtime_generation_id
+    and value.configuration_revision = current_value.configuration_revision
+    and value.configuration_fingerprint =
+      current_value.configuration_fingerprint
+    and value.auction_revision = current_value.auction_revision
+    and value.auction_fingerprint = current_value.auction_fingerprint
+    and value.activation_revision =
+      (input->>'expected_activation_revision')::bigint
+    and value.status = 'PENDING' and value.delivery_dead_letter_at is null
+    and value.delivery_attempts<5 and value.delivery_available_at<=clock_timestamp() and value.attempts < 5
+  order by value.requested_at, value.job_id
+  for update skip locked limit 1;
+  if not found then
+    if exists (
+      select 1 from scoring_authority.calcutta_v1_recalculation_jobs value
+      where value.tournament_id = target
+        and value.runtime_generation_id = generation.runtime_generation_id
+        and value.configuration_revision = current_value.configuration_revision
+        and value.auction_revision = current_value.auction_revision
+        and value.status = 'FAILED'
+    ) then
+      update scoring_authority.calcutta_v1_current set
+        state = 'UNAVAILABLE', updated_at = pg_catalog.clock_timestamp()
+      where tournament_id = target;
+    end if;
+    response_value := pg_catalog.jsonb_build_object(
+      'ok', true,
+      'code', 'PRODUCTION_CALCUTTA_V1_RECALCULATION_EMPTY',
+      'tournament_id', target,
+      'runtime_generation_id', generation.runtime_generation_id,
+      'job', null, 'calculation_input', null, 'idempotent', false
+    );
+    perform production_control.store_cutover_receipt(
+      'ANNUAL_CALCUTTA_V1_CLAIM', input, response_value
+    );
+    return response_value;
+  end if;
+  current_source := production_control.calcutta_v1_source_revision(target);
+  current_source_fingerprint := production_control.calcutta_v1_hash(
+    current_source
+  );
+  if current_source_fingerprint <> job_value.source_fingerprint then
+    update scoring_authority.calcutta_v1_recalculation_jobs set
+      status = 'SUPERSEDED', completed_at = pg_catalog.clock_timestamp(),
+      updated_at = pg_catalog.clock_timestamp()
+    where job_id = job_value.job_id;
+    replacement_job := production_control.enqueue_annual_calcutta_v1(
+      target, generation.runtime_generation_id,
+      (input->>'expected_activation_revision')::bigint,
+      'SOURCE_ADVANCED_BEFORE_CLAIM', worker_value, false, null, null
+    );
+    select value.* into strict job_value
+    from scoring_authority.calcutta_v1_recalculation_jobs value
+    where value.job_id = (replacement_job->>'job_id')::uuid
+      and value.tournament_id = target
+      and value.runtime_generation_id = generation.runtime_generation_id
+    for update;
+  end if;
+  claim_token_value := extensions.gen_random_uuid();
+  update scoring_authority.calcutta_v1_recalculation_jobs set
+    status = 'RUNNING', attempts = attempts + 1,
+    claimed_by = worker_value, claim_token = claim_token_value,
+    lease_expires_at = pg_catalog.clock_timestamp()
+      + pg_catalog.make_interval(secs => lease_seconds_value),
+    started_at = pg_catalog.clock_timestamp(), completed_at = null,
+    updated_at = pg_catalog.clock_timestamp()
+  where job_id = job_value.job_id
+    and tournament_id = target
+    and runtime_generation_id = generation.runtime_generation_id
+  returning * into job_value;
+  select coalesce(pg_catalog.max(value.result_revision), 0)
+    into expected_result_revision
+  from scoring_authority.calcutta_v1_result_revisions value
+  where value.tournament_id = target;
+  select value.* into strict configuration_value
+  from scoring_authority.calcutta_v1_configuration_revisions value
+  where value.configuration_revision_id =
+    current_value.configuration_revision_id
+    and value.tournament_id = target;
+  select value.* into strict auction_value
+  from scoring_authority.calcutta_v1_auction_fact_revisions value
+  where value.auction_revision_id = current_value.auction_revision_id
+    and value.tournament_id = target;
+  core_view := public.read_leaderboards_core_view(target);
+  core_view := jsonb_set(core_view,'{data,full_net_authority}',production_control.full_net_tournament_v1(target));
+  if coalesce((core_view->>'ok')::boolean, false) is not true then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_CALCUTTA_CANONICAL_INPUT_UNAVAILABLE';
+  end if;
+  calculation_input := pg_catalog.jsonb_build_object(
+    'tournament', core_view#>'{data,tournament}',
+    'configuration', pg_catalog.jsonb_build_object(
+      'tournament_id', target, 'tournament_year', target::integer,
+      'configuration_revision', current_value.configuration_revision,
+      'configuration_fingerprint', current_value.configuration_fingerprint,
+      'auction_revision', current_value.auction_revision,
+      'auction_fingerprint', current_value.auction_fingerprint,
+      'purchases', auction_value.auction_manifest->'purchases',
+      'ownership', auction_value.auction_manifest->'ownership',
+      'point_structure',
+        configuration_value.configuration_manifest->'point_structure',
+      'payout_structure',
+        configuration_value.configuration_manifest->'payout_structure',
+      'financial_contract',
+        configuration_value.configuration_manifest->'financial_contract'
+    ), 'core_view', core_view->'data'
+  );
+  response_value := pg_catalog.jsonb_build_object(
+    'ok', true,
+    'code', 'PRODUCTION_CALCUTTA_V1_RECALCULATION_CLAIMED',
+    'tournament_id', target,
+    'runtime_generation_id', generation.runtime_generation_id,
+    'job', pg_catalog.jsonb_build_object(
+      'job_id', job_value.job_id,
+      'tournament_id', target,
+      'runtime_generation_id', job_value.runtime_generation_id,
+      'configuration_revision', job_value.configuration_revision,
+      'configuration_fingerprint', job_value.configuration_fingerprint,
+      'auction_revision', job_value.auction_revision,
+      'auction_fingerprint', job_value.auction_fingerprint,
+      'activation_revision', job_value.activation_revision,
+      'source_fingerprint', job_value.source_fingerprint,
+      'claim_token', job_value.claim_token,
+      'lease_expires_at', job_value.lease_expires_at,
+      'expected_result_revision', expected_result_revision
+    ), 'calculation_input', calculation_input, 'idempotent', false
+  );
+  perform production_control.store_cutover_receipt(
+    'ANNUAL_CALCUTTA_V1_CLAIM', input, response_value
+  );
+  return response_value;
+end;
+
+$core$;
+revoke all on function production_control.canonical_future_claim_calcutta_recalculation_v1_resource(jsonb,jsonb) from public,anon,authenticated,service_role;
+
+CREATE OR REPLACE FUNCTION public.future_production_claim_calcutta_recalculation_v1(input jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+begin
+ return production_control.canonical_future_claim_calcutta_recalculation_v1_resource(input,null);
+end;
+$function$
+;
+
+create function production_control.canonical_future_complete_calcutta_recalculation_v1_resource(input jsonb, resource_context jsonb) returns jsonb
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+declare
+  target text;
+  generation production_control.future_annual_runtime_generations_v1%rowtype;
+  current_value scoring_authority.calcutta_v1_current%rowtype;
+  job_value scoring_authority.calcutta_v1_recalculation_jobs%rowtype;
+  result_value scoring_authority.calcutta_v1_result_revisions%rowtype;
+  existing_response jsonb;
+  response_value jsonb;
+  current_source jsonb;
+  current_source_fingerprint text;
+  current_result_revision bigint;
+  job_id_value uuid := nullif(input->>'job_id', '')::uuid;
+  claim_token_value uuid := nullif(input->>'claim_token', '')::uuid;
+  worker_value text := pg_catalog.btrim(coalesce(input->>'worker_id', ''));
+  requested_result_state text := pg_catalog.upper(coalesce(
+    input->>'result_state', ''
+  ));
+  result_payload_value jsonb := input->'result_payload';
+  payload_hash_value text;
+begin
+  target := production_control.assert_canonical_future_calcutta_worker_v1(input,'complete_production_calcutta_v1_recalculation',resource_context);
+  existing_response := production_control.lookup_cutover_receipt(
+    'ANNUAL_CALCUTTA_V1_COMPLETE', input
+  );
+  if existing_response is not null then return existing_response; end if;
+  if job_id_value is null or claim_token_value is null or worker_value = ''
+     or input->>'engine_version' is distinct from 'calcutta-full-net-v3'
+     or requested_result_state not in ('PROVISIONAL', 'OFFICIAL')
+     or pg_catalog.jsonb_typeof(coalesce(
+       result_payload_value, 'null'::jsonb
+     )) <> 'object' then
+    raise exception using errcode = '22023',
+      message = 'PRODUCTION_CALCUTTA_COMPLETION_INPUT_INVALID';
+  end if;
+  select value.* into strict generation
+  from production_control.future_annual_runtime_generations_v1 value
+  where value.tournament_id = target and value.generation_status = 'ACTIVE';
+  select value.* into strict current_value
+  from scoring_authority.calcutta_v1_current value
+  where value.tournament_id = target
+  for update;
+  if current_value.configuration_revision <>
+       coalesce((input->>'expected_configuration_revision')::bigint, -1)
+     or current_value.configuration_fingerprint is distinct from
+       nullif(input->>'expected_configuration_fingerprint', '') then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_CALCUTTA_CONFIGURATION_REVISION_CONFLICT';
+  end if;
+  if current_value.auction_revision <>
+       coalesce((input->>'expected_auction_revision')::bigint, -1)
+     or current_value.auction_fingerprint is distinct from
+       nullif(input->>'expected_auction_fingerprint', '') then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_CALCUTTA_AUCTION_REVISION_CONFLICT';
+  end if;
+  select value.* into job_value
+  from scoring_authority.calcutta_v1_recalculation_jobs value
+  where value.job_id = job_id_value
+    and value.tournament_id = target
+    and value.runtime_generation_id = generation.runtime_generation_id
+  for update;
+  if not found or job_value.status <> 'RUNNING'
+     or job_value.configuration_revision <>
+       current_value.configuration_revision
+     or job_value.configuration_fingerprint <>
+       current_value.configuration_fingerprint
+     or job_value.auction_revision <> current_value.auction_revision
+     or job_value.auction_fingerprint <> current_value.auction_fingerprint
+     or job_value.activation_revision <>
+       (input->>'expected_activation_revision')::bigint
+     or job_value.claim_token <> claim_token_value
+     or job_value.claimed_by <> worker_value
+     or job_value.lease_expires_at <= pg_catalog.clock_timestamp()
+     or input->>'expected_source_fingerprint' is distinct from
+       job_value.source_fingerprint then
+    raise exception using errcode = '42501',
+      message = 'PRODUCTION_CALCUTTA_JOB_LEASE_REQUIRED';
+  end if;
+  current_source := production_control.calcutta_v1_source_revision(target);
+  current_source_fingerprint := production_control.calcutta_v1_hash(
+    current_source
+  );
+  if current_source_fingerprint <> job_value.source_fingerprint then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_CALCUTTA_SOURCE_REVISION_CONFLICT';
+  end if;
+  payload_hash_value := production_control.calcutta_v1_hash(
+    result_payload_value
+  );
+  perform production_control.validate_annual_calcutta_v1_result(
+    target, requested_result_state, result_payload_value
+  );
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(
+      'production-calcutta-v1:result:' || target, 202608300075
+    )
+  );
+  select coalesce(pg_catalog.max(value.result_revision), 0)
+    into current_result_revision
+  from scoring_authority.calcutta_v1_result_revisions value
+  where value.tournament_id = target;
+  if current_result_revision <>
+       coalesce((input->>'expected_result_revision')::bigint, -1) then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_CALCUTTA_RESULT_REVISION_CONFLICT';
+  end if;
+  update scoring_authority.calcutta_v1_result_revisions set
+    is_current = false, superseded_at = pg_catalog.clock_timestamp()
+  where tournament_id = target and is_current;
+  insert into scoring_authority.calcutta_v1_result_revisions (
+    tournament_id, configuration_revision_id, configuration_revision,
+    configuration_fingerprint, auction_revision_id, auction_revision,
+    auction_fingerprint, result_revision, job_id, engine_version,
+    source_fingerprint, result_state, engine_result_payload, payload_hash,
+    is_current, calculated_by, calculated_at
+  ) values (
+    target, job_value.configuration_revision_id,
+    job_value.configuration_revision, job_value.configuration_fingerprint,
+    job_value.auction_revision_id, job_value.auction_revision,
+    job_value.auction_fingerprint, current_result_revision + 1,
+    job_value.job_id, 'calcutta-full-net-v3', job_value.source_fingerprint,
+    requested_result_state, result_payload_value, payload_hash_value,
+    true, worker_value, pg_catalog.clock_timestamp()
+  ) returning * into result_value;
+  update scoring_authority.calcutta_v1_recalculation_jobs set
+    status = 'SUCCEEDED', claimed_by = null, claim_token = null,
+    lease_expires_at = null, completed_at = pg_catalog.clock_timestamp(),
+    last_error_code = null, last_error_safe = null,
+    updated_at = pg_catalog.clock_timestamp()
+  where job_id = job_value.job_id
+    and tournament_id = target
+    and runtime_generation_id = generation.runtime_generation_id;
+  update scoring_authority.calcutta_v1_current set
+    state = case
+      when requested_result_state = 'OFFICIAL' then 'OFFICIAL'
+      when pg_catalog.jsonb_array_length(
+        result_payload_value->'completedRounds'
+      ) > 0 then 'IN_PROGRESS'
+      else 'AUCTION_COMPLETE' end,
+    result_revision = result_value.result_revision,
+    updated_at = pg_catalog.clock_timestamp()
+  where tournament_id = target;
+  insert into scoring_authority.audit_events (
+    tournament_id, action, actor_id, metadata
+  ) values (
+    target, 'PRODUCTION_CALCUTTA_V1_RECALCULATION_COMPLETED',
+    worker_value, pg_catalog.jsonb_build_object(
+      'job_id', job_value.job_id,
+      'runtime_generation_id', generation.runtime_generation_id,
+      'configuration_revision', job_value.configuration_revision,
+      'auction_revision', job_value.auction_revision,
+      'result_revision', result_value.result_revision,
+      'result_state', requested_result_state,
+      'source_fingerprint', job_value.source_fingerprint,
+      'result_fingerprint', payload_hash_value,
+      'publication_changed', false
+    )
+  );
+  insert into production_control.operation_audit_events (
+    event_type, domain, tournament_id, actor, request_fingerprint,
+    result, details
+  ) values (
+    'PRODUCTION_CALCUTTA_V1_RECALCULATION_COMPLETED', 'CALCUTTA',
+    target, worker_value, pg_catalog.lower(input->>'request_fingerprint'),
+    'SUCCEEDED', pg_catalog.jsonb_build_object(
+      'job_id', job_value.job_id,
+      'runtime_generation_id', generation.runtime_generation_id,
+      'configuration_revision', job_value.configuration_revision,
+      'auction_revision', job_value.auction_revision,
+      'result_revision', result_value.result_revision,
+      'result_state', requested_result_state,
+      'publication_changed', false
+    )
+  );
+  response_value := pg_catalog.jsonb_build_object(
+    'ok', true,
+    'code', 'PRODUCTION_CALCUTTA_V1_RECALCULATION_COMPLETED',
+    'tournament_id', target,
+    'runtime_generation_id', generation.runtime_generation_id,
+    'job_id', job_value.job_id,
+    'configuration_revision', job_value.configuration_revision,
+    'configuration_fingerprint', job_value.configuration_fingerprint,
+    'auction_revision', job_value.auction_revision,
+    'auction_fingerprint', job_value.auction_fingerprint,
+    'result_revision', result_value.result_revision,
+    'result_state', requested_result_state,
+    'result_fingerprint', payload_hash_value,
+    'publication_state', current_value.publication_state,
+    'idempotent', false
+  );
+  perform production_control.store_cutover_receipt(
+    'ANNUAL_CALCUTTA_V1_COMPLETE', input, response_value
+  );
+  return response_value;
+end;
+
+$core$;
+revoke all on function production_control.canonical_future_complete_calcutta_recalculation_v1_resource(jsonb,jsonb) from public,anon,authenticated,service_role;
+
+CREATE OR REPLACE FUNCTION public.future_production_complete_calcutta_recalculation_v1(input jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+begin
+ return production_control.canonical_future_complete_calcutta_recalculation_v1_resource(input,null);
+end;
+$function$
+;
+
+create function production_control.canonical_future_fail_calcutta_recalculation_v1_resource(input jsonb, resource_context jsonb) returns jsonb
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+declare
+  target text;
+  generation production_control.future_annual_runtime_generations_v1%rowtype;
+  current_value scoring_authority.calcutta_v1_current%rowtype;
+  job_value scoring_authority.calcutta_v1_recalculation_jobs%rowtype;
+  existing_response jsonb;
+  response_value jsonb;
+  job_id_value uuid := nullif(input->>'job_id', '')::uuid;
+  claim_token_value uuid := nullif(input->>'claim_token', '')::uuid;
+  worker_value text := pg_catalog.btrim(coalesce(input->>'worker_id', ''));
+  error_code_value text := pg_catalog.upper(pg_catalog.left(coalesce(
+    nullif(input->>'error_code', ''),
+    'PRODUCTION_CALCUTTA_CALCULATION_FAILED'
+  ), 120));
+  error_safe_value text := pg_catalog.left(coalesce(
+    nullif(input->>'error_safe', ''),
+    'Calcutta recalculation is temporarily unavailable.'
+  ), 300);
+begin
+  target := production_control.assert_canonical_future_calcutta_worker_v1(input,'fail_production_calcutta_v1_recalculation',resource_context);
+  existing_response := production_control.lookup_cutover_receipt(
+    'ANNUAL_CALCUTTA_V1_FAIL', input
+  );
+  if existing_response is not null then return existing_response; end if;
+  if job_id_value is null or claim_token_value is null or worker_value = ''
+     or error_code_value !~ '^[A-Z0-9_:-]{3,120}$' then
+    raise exception using errcode = '22023',
+      message = 'PRODUCTION_CALCUTTA_FAILURE_INPUT_INVALID';
+  end if;
+  select value.* into strict generation
+  from production_control.future_annual_runtime_generations_v1 value
+  where value.tournament_id = target and value.generation_status = 'ACTIVE';
+  select value.* into strict current_value
+  from scoring_authority.calcutta_v1_current value
+  where value.tournament_id = target
+  for update;
+  if current_value.configuration_revision <>
+       coalesce((input->>'expected_configuration_revision')::bigint, -1)
+     or current_value.configuration_fingerprint is distinct from
+       nullif(input->>'expected_configuration_fingerprint', '') then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_CALCUTTA_CONFIGURATION_REVISION_CONFLICT';
+  end if;
+  if current_value.auction_revision <>
+       coalesce((input->>'expected_auction_revision')::bigint, -1)
+     or current_value.auction_fingerprint is distinct from
+       nullif(input->>'expected_auction_fingerprint', '') then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_CALCUTTA_AUCTION_REVISION_CONFLICT';
+  end if;
+  select value.* into job_value
+  from scoring_authority.calcutta_v1_recalculation_jobs value
+  where value.job_id = job_id_value
+    and value.tournament_id = target
+    and value.runtime_generation_id = generation.runtime_generation_id
+  for update;
+  if not found or job_value.status <> 'RUNNING'
+     or job_value.configuration_revision <>
+       current_value.configuration_revision
+     or job_value.configuration_fingerprint <>
+       current_value.configuration_fingerprint
+     or job_value.auction_revision <> current_value.auction_revision
+     or job_value.auction_fingerprint <> current_value.auction_fingerprint
+     or job_value.activation_revision <>
+       (input->>'expected_activation_revision')::bigint
+     or job_value.claim_token <> claim_token_value
+     or job_value.claimed_by <> worker_value
+     or job_value.lease_expires_at <= pg_catalog.clock_timestamp() then
+    raise exception using errcode = '42501',
+      message = 'PRODUCTION_CALCUTTA_JOB_LEASE_REQUIRED';
+  end if;
+  update scoring_authority.calcutta_v1_recalculation_jobs set
+    status = 'FAILED', claimed_by = null, claim_token = null,
+    lease_expires_at = null, completed_at = pg_catalog.clock_timestamp(),
+    last_error_code = error_code_value,
+    last_error_safe = error_safe_value,
+    updated_at = pg_catalog.clock_timestamp()
+  where job_id = job_value.job_id
+    and tournament_id = target
+    and runtime_generation_id = generation.runtime_generation_id;
+  update scoring_authority.calcutta_v1_current set
+    state = 'UNAVAILABLE', updated_at = pg_catalog.clock_timestamp()
+  where tournament_id = target;
+  insert into production_control.operation_audit_events (
+    event_type, domain, tournament_id, actor, request_fingerprint,
+    result, details
+  ) values (
+    'PRODUCTION_CALCUTTA_V1_RECALCULATION_FAILED', 'CALCUTTA',
+    target, worker_value, pg_catalog.lower(input->>'request_fingerprint'),
+    'FAILED', pg_catalog.jsonb_build_object(
+      'job_id', job_value.job_id,
+      'runtime_generation_id', generation.runtime_generation_id,
+      'configuration_revision', job_value.configuration_revision,
+      'auction_revision', job_value.auction_revision,
+      'source_fingerprint', job_value.source_fingerprint,
+      'error_code', error_code_value
+    )
+  );
+  response_value := pg_catalog.jsonb_build_object(
+    'ok', true,
+    'code', 'PRODUCTION_CALCUTTA_V1_RECALCULATION_FAILED',
+    'tournament_id', target,
+    'runtime_generation_id', generation.runtime_generation_id,
+    'job_id', job_value.job_id,
+    'configuration_revision', job_value.configuration_revision,
+    'configuration_fingerprint', job_value.configuration_fingerprint,
+    'auction_revision', job_value.auction_revision,
+    'auction_fingerprint', job_value.auction_fingerprint,
+    'state', 'UNAVAILABLE', 'idempotent', false
+  );
+  perform production_control.store_cutover_receipt(
+    'ANNUAL_CALCUTTA_V1_FAIL', input, response_value
+  );
+  return response_value;
+end;
+
+$core$;
+revoke all on function production_control.canonical_future_fail_calcutta_recalculation_v1_resource(jsonb,jsonb) from public,anon,authenticated,service_role;
+
+CREATE OR REPLACE FUNCTION public.future_production_fail_calcutta_recalculation_v1(input jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+begin
+ return production_control.canonical_future_fail_calcutta_recalculation_v1_resource(input,null);
+end;
+$function$
+;
+
+create function production_control.canonical_future_claim_net_skins_recalculation_v1_resource(input jsonb, resource_context jsonb) returns jsonb
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+declare
+  target text;
+  generation_id uuid;
+  current_value scoring_authority.net_skins_v1_configuration_current%rowtype;
+  job_value scoring_authority.net_skins_v1_recalculation_jobs%rowtype;
+  existing_response jsonb;
+  response_value jsonb;
+  calculation_input jsonb;
+  worker_value text := pg_catalog.btrim(coalesce(input->>'worker_id', ''));
+  lease_seconds_value integer := least(300, greatest(
+    15, coalesce((input->>'lease_seconds')::integer, 60)
+  ));
+  current_source jsonb;
+  current_source_fingerprint text;
+  expected_result_revision bigint;
+  claim_token_value uuid;
+  receipt_operation text;
+begin
+  target := production_control.assert_canonical_future_net_skins_worker_v1(input,'claim_production_net_skins_v1_recalculation',resource_context);
+  generation_id := (input->>'expected_runtime_generation_id')::uuid;
+  receipt_operation := pg_catalog.format(
+    'ANNUAL_NET_SKINS_V1_CLAIM:%s', target
+  );
+  existing_response := production_control.lookup_cutover_receipt(
+    receipt_operation, input
+  );
+  if existing_response is not null then return existing_response; end if;
+  if worker_value = '' or pg_catalog.length(worker_value) > 160 then
+    raise exception using errcode = '22023',
+      message = 'PRODUCTION_NET_SKINS_WORKER_ID_REQUIRED';
+  end if;
+
+  select value.* into strict current_value
+  from scoring_authority.net_skins_v1_configuration_current value
+  where value.tournament_id = target;
+  if current_value.state <> 'CONFIGURED' then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_NET_SKINS_CONFIGURATION_REQUIRED';
+  end if;
+  if current_value.configuration_revision <>
+       coalesce((input->>'expected_configuration_revision')::bigint, -1) then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_NET_SKINS_CONFIGURATION_REVISION_CONFLICT';
+  end if;
+
+  perform production_control.flush_score_derived_intents_v1(target, 'NET_SKINS', 8);
+
+  update scoring_authority.net_skins_v1_recalculation_jobs set
+    status = case when attempts >= 5 then 'FAILED' else 'PENDING' end,
+    claimed_by = null, claim_token = null, lease_expires_at = null,
+    completed_at = case when attempts >= 5
+      then pg_catalog.clock_timestamp() else null end,
+    last_error_code = case when attempts >= 5
+      then 'PRODUCTION_NET_SKINS_LEASE_EXHAUSTED' else null end,
+    last_error_safe = case when attempts >= 5
+      then 'Net Skins recalculation is temporarily unavailable.' else null end,
+    updated_at = pg_catalog.clock_timestamp()
+  where tournament_id = target
+    and runtime_generation_id = generation_id
+    and configuration_revision = current_value.configuration_revision
+    and status = 'RUNNING'
+    and lease_expires_at <= pg_catalog.clock_timestamp();
+
+  select value.* into job_value
+  from scoring_authority.net_skins_v1_recalculation_jobs value
+  where value.tournament_id = target
+    and value.runtime_generation_id = generation_id
+    and value.configuration_revision = current_value.configuration_revision
+    and value.status = 'PENDING' and value.delivery_dead_letter_at is null
+    and value.delivery_attempts<5 and value.delivery_available_at<=clock_timestamp() and value.attempts < 5
+  order by value.requested_at, value.round_number
+  for update skip locked limit 1;
+  if not found then
+    response_value := pg_catalog.jsonb_build_object(
+      'ok', true, 'code', 'PRODUCTION_NET_SKINS_V1_RECALCULATION_EMPTY',
+      'tournament_id', target, 'runtime_generation_id', generation_id,
+      'job', null, 'calculation_input', null, 'idempotent', false
+    );
+    perform production_control.store_cutover_receipt(
+      receipt_operation, input, response_value
+    );
+    return response_value;
+  end if;
+
+  current_source := production_control.net_skins_v1_round_source_revision(
+    target, job_value.round_number
+  );
+  current_source_fingerprint :=
+    production_control.net_skins_v1_hash(current_source);
+  if current_source_fingerprint <> job_value.source_fingerprint then
+    update scoring_authority.net_skins_v1_recalculation_jobs set
+      status = 'SUPERSEDED', completed_at = pg_catalog.clock_timestamp(),
+      updated_at = pg_catalog.clock_timestamp()
+    where job_id = job_value.job_id
+      and tournament_id = target
+      and runtime_generation_id = generation_id;
+    job_value := production_control.enqueue_annual_net_skins_v1_round(
+      target, generation_id, job_value.round_number,
+      'SOURCE_ADVANCED_BEFORE_CLAIM', worker_value
+    );
+    select value.* into strict job_value
+    from scoring_authority.net_skins_v1_recalculation_jobs value
+    where value.job_id = job_value.job_id
+      and value.tournament_id = target
+      and value.runtime_generation_id = generation_id for update;
+  end if;
+
+  claim_token_value := extensions.gen_random_uuid();
+  update scoring_authority.net_skins_v1_recalculation_jobs set
+    status = 'RUNNING', attempts = attempts + 1,
+    claimed_by = worker_value, claim_token = claim_token_value,
+    lease_expires_at = pg_catalog.clock_timestamp()
+      + pg_catalog.make_interval(secs => lease_seconds_value),
+    started_at = pg_catalog.clock_timestamp(), completed_at = null,
+    updated_at = pg_catalog.clock_timestamp()
+  where job_id = job_value.job_id
+    and tournament_id = target
+    and runtime_generation_id = generation_id
+  returning * into job_value;
+
+  select coalesce(pg_catalog.max(value.result_revision), 0)
+    into expected_result_revision
+  from scoring_authority.net_skins_v1_result_revisions value
+  where value.tournament_id = target
+    and value.round_number = job_value.round_number;
+  calculation_input := public.read_net_skins_input_view(target);
+  calculation_input := jsonb_set(calculation_input,'{data,full_net_authority}',production_control.full_net_tournament_v1(target));
+  calculation_input := jsonb_set(calculation_input,'{data,net_skins_entry_authority}',production_control.net_skins_entries_projection_v1(target));
+  if coalesce((calculation_input->>'ok')::boolean, false) is not true
+     or calculation_input#>>'{data,source_revision,tournamentId}'
+       is distinct from target then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_NET_SKINS_CANONICAL_INPUT_UNAVAILABLE';
+  end if;
+
+  response_value := pg_catalog.jsonb_build_object(
+    'ok', true, 'code', 'PRODUCTION_NET_SKINS_V1_RECALCULATION_CLAIMED',
+    'tournament_id', target, 'runtime_generation_id', generation_id,
+    'job', pg_catalog.jsonb_build_object(
+      'job_id', job_value.job_id, 'tournament_id', job_value.tournament_id,
+      'runtime_generation_id', job_value.runtime_generation_id,
+      'round_number', job_value.round_number,
+      'configuration_revision', job_value.configuration_revision,
+      'configuration_fingerprint', job_value.configuration_fingerprint,
+      'source_fingerprint', job_value.source_fingerprint,
+      'claim_token', job_value.claim_token,
+      'lease_expires_at', job_value.lease_expires_at,
+      'expected_result_revision', expected_result_revision
+    ),
+    'calculation_input', calculation_input->'data', 'idempotent', false
+  );
+  perform production_control.store_cutover_receipt(
+    receipt_operation, input, response_value
+  );
+  return response_value;
+end;
+
+$core$;
+revoke all on function production_control.canonical_future_claim_net_skins_recalculation_v1_resource(jsonb,jsonb) from public,anon,authenticated,service_role;
+
+CREATE OR REPLACE FUNCTION public.future_production_claim_net_skins_recalculation_v1(input jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+begin
+ return production_control.canonical_future_claim_net_skins_recalculation_v1_resource(input,null);
+end;
+$function$
+;
+
+create function production_control.canonical_future_complete_net_skins_recalculation_v1_resource(input jsonb, resource_context jsonb) returns jsonb
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+declare
+  target text;
+  generation_id uuid;
+  current_value scoring_authority.net_skins_v1_configuration_current%rowtype;
+  job_value scoring_authority.net_skins_v1_recalculation_jobs%rowtype;
+  existing_response jsonb;
+  response_value jsonb;
+  result_value scoring_authority.net_skins_v1_result_revisions%rowtype;
+  job_id_value uuid := nullif(input->>'job_id', '')::uuid;
+  claim_token_value uuid := nullif(input->>'claim_token', '')::uuid;
+  worker_value text := pg_catalog.btrim(coalesce(input->>'worker_id', ''));
+  result_state_value text := pg_catalog.upper(coalesce(
+    input->>'result_state', ''
+  ));
+  result_payload_value jsonb := input->'result_payload';
+  normalized_result_value jsonb;
+  payload_hash_value text;
+  current_source_value jsonb;
+  current_source_fingerprint text;
+  current_result_revision bigint;
+  expected_result_revision bigint := coalesce(
+    (input->>'expected_result_revision')::bigint, -1
+  );
+  receipt_operation text;
+begin
+  target := production_control.assert_canonical_future_net_skins_worker_v1(input,'complete_production_net_skins_v1_recalculation',resource_context);
+  generation_id := (input->>'expected_runtime_generation_id')::uuid;
+  receipt_operation := pg_catalog.format(
+    'ANNUAL_NET_SKINS_V1_COMPLETE:%s', target
+  );
+  existing_response := production_control.lookup_cutover_receipt(
+    receipt_operation, input
+  );
+  if existing_response is not null then return existing_response; end if;
+  if job_id_value is null or claim_token_value is null or worker_value = ''
+     or input->>'engine_version' is distinct from 'net-skins-full-net-v2'
+     or result_state_value not in ('PROVISIONAL', 'OFFICIAL')
+     or pg_catalog.jsonb_typeof(coalesce(
+       result_payload_value, 'null'::jsonb
+     )) <> 'object' then
+    raise exception using errcode = '22023',
+      message = 'PRODUCTION_NET_SKINS_COMPLETION_INPUT_INVALID';
+  end if;
+
+  perform production_control.lock_net_skins_storylines_v1(target,input);
+  select value.* into strict current_value
+  from scoring_authority.net_skins_v1_configuration_current value
+  where value.tournament_id = target for update;
+  if current_value.state <> 'CONFIGURED'
+     or current_value.configuration_revision <>
+       coalesce((input->>'expected_configuration_revision')::bigint, -1) then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_NET_SKINS_CONFIGURATION_REVISION_CONFLICT';
+  end if;
+  select value.* into job_value
+  from scoring_authority.net_skins_v1_recalculation_jobs value
+  where value.job_id = job_id_value
+    and value.tournament_id = target
+    and value.runtime_generation_id = generation_id for update;
+  if not found or job_value.status <> 'RUNNING'
+     or job_value.configuration_revision <>
+       current_value.configuration_revision
+     or job_value.claim_token <> claim_token_value
+     or job_value.claimed_by <> worker_value
+     or job_value.lease_expires_at <= pg_catalog.clock_timestamp() then
+    raise exception using errcode = '42501',
+      message = 'PRODUCTION_NET_SKINS_JOB_LEASE_REQUIRED';
+  end if;
+  if input->>'source_fingerprint'
+       is distinct from job_value.source_fingerprint then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_NET_SKINS_SOURCE_REVISION_CONFLICT';
+  end if;
+  current_source_value :=
+    production_control.net_skins_v1_round_source_revision(
+      target, job_value.round_number
+    );
+  current_source_fingerprint :=
+    production_control.net_skins_v1_hash(current_source_value);
+  if current_source_fingerprint <> job_value.source_fingerprint then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_NET_SKINS_SOURCE_REVISION_CONFLICT';
+  end if;
+  if coalesce((result_payload_value->>'round')::integer, 0) <>
+       job_value.round_number then
+    raise exception using errcode = '22023',
+      message = 'PRODUCTION_NET_SKINS_RESULT_ROUND_MISMATCH';
+  end if;
+
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(
+      pg_catalog.format('production-net-skins-v1:%s:%s:R%s', target,
+        generation_id, job_value.round_number), 202608300074
+    )
+  );
+  select coalesce(pg_catalog.max(value.result_revision), 0)
+    into current_result_revision
+  from scoring_authority.net_skins_v1_result_revisions value
+  where value.tournament_id = target
+    and value.round_number = job_value.round_number;
+  if current_result_revision <> expected_result_revision then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_NET_SKINS_RESULT_REVISION_CONFLICT';
+  end if;
+  if result_state_value = 'OFFICIAL' then
+    normalized_result_value :=
+      production_control.normalize_annual_net_skins_v1_official_result(
+        target, job_value.round_number, result_payload_value
+      );
+  else
+    normalized_result_value := null;
+    if pg_catalog.jsonb_typeof(coalesce(
+         result_payload_value->'skins', 'null'::jsonb
+       )) <> 'array'
+       or pg_catalog.jsonb_typeof(coalesce(
+         result_payload_value->'leaderboard', 'null'::jsonb
+       )) <> 'array' then
+      raise exception using errcode = '22023',
+        message = 'PRODUCTION_NET_SKINS_PROVISIONAL_RESULT_INVALID';
+    end if;
+  end if;
+  payload_hash_value := production_control.net_skins_v1_hash(
+    result_payload_value
+  );
+
+  update scoring_authority.net_skins_v1_result_revisions set
+    is_current = false, superseded_at = pg_catalog.clock_timestamp()
+  where tournament_id = target and round_number = job_value.round_number
+    and is_current;
+  insert into scoring_authority.net_skins_v1_result_revisions (
+    tournament_id, round_number, configuration_revision_id,
+    configuration_revision, result_revision, job_id, engine_version,
+    configuration_fingerprint, source_fingerprint, result_state,
+    engine_result_payload, public_result_payload, payload_hash, is_current,
+    calculated_by, calculated_at, published_at
+  ) values (
+    target, job_value.round_number, job_value.configuration_revision_id,
+    job_value.configuration_revision, current_result_revision + 1,
+    job_value.job_id, 'net-skins-full-net-v2',
+    job_value.configuration_fingerprint, job_value.source_fingerprint,
+    result_state_value, result_payload_value, normalized_result_value,
+    payload_hash_value, true, worker_value, pg_catalog.clock_timestamp(),
+    case when result_state_value = 'OFFICIAL'
+      then pg_catalog.clock_timestamp() else null end
+  ) returning * into result_value;
+  update scoring_authority.net_skins_v1_recalculation_jobs set
+    status = 'SUCCEEDED', claimed_by = null, claim_token = null,
+    lease_expires_at = null, completed_at = pg_catalog.clock_timestamp(),
+    last_error_code = null, last_error_safe = null,
+    updated_at = pg_catalog.clock_timestamp()
+  where job_id = job_value.job_id and tournament_id = target
+    and runtime_generation_id = generation_id;
+
+  insert into scoring_authority.audit_events (
+    tournament_id, action, actor_id, metadata
+  ) values (
+    target, 'PRODUCTION_NET_SKINS_V1_RECALCULATION_COMPLETED', worker_value,
+    pg_catalog.jsonb_build_object(
+      'job_id', job_value.job_id, 'round_number', job_value.round_number,
+      'configuration_revision', job_value.configuration_revision,
+      'result_revision', result_value.result_revision,
+      'result_state', result_state_value,
+      'source_fingerprint', job_value.source_fingerprint,
+      'payload_hash', payload_hash_value,
+      'runtime_generation_id', generation_id,
+      'published', result_state_value = 'OFFICIAL'
+    )
+  );
+  insert into production_control.operation_audit_events (
+    event_type, domain, tournament_id, actor, request_fingerprint,
+    result, details
+  ) values (
+    'PRODUCTION_NET_SKINS_V1_RECALCULATION_COMPLETED', 'NET_SKINS',
+    target, worker_value, pg_catalog.lower(input->>'request_fingerprint'),
+    'SUCCEEDED', pg_catalog.jsonb_build_object(
+      'job_id', job_value.job_id, 'round_number', job_value.round_number,
+      'configuration_revision', job_value.configuration_revision,
+      'result_revision', result_value.result_revision,
+      'result_state', result_state_value,
+      'runtime_generation_id', generation_id,
+      'published', result_state_value = 'OFFICIAL'
+    )
+  );
+  response_value := pg_catalog.jsonb_build_object(
+    'ok', true, 'code', 'PRODUCTION_NET_SKINS_V1_RECALCULATION_COMPLETED',
+    'tournament_id', target, 'runtime_generation_id', generation_id,
+    'job_id', job_value.job_id, 'round_number', job_value.round_number,
+    'configuration_revision', job_value.configuration_revision,
+    'result_revision', result_value.result_revision,
+    'result_state', result_state_value,
+    'published', result_state_value = 'OFFICIAL', 'idempotent', false
+  );
+  perform production_control.store_cutover_receipt(
+    receipt_operation, input, response_value
+  );
+  return response_value;
+end;
+
+$core$;
+revoke all on function production_control.canonical_future_complete_net_skins_recalculation_v1_resource(jsonb,jsonb) from public,anon,authenticated,service_role;
+
+CREATE OR REPLACE FUNCTION public.future_production_complete_net_skins_recalculation_v1(input jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+begin
+ return production_control.canonical_future_complete_net_skins_recalculation_v1_resource(input,null);
+end;
+$function$
+;
+
+create function production_control.canonical_future_fail_net_skins_recalculation_v1_resource(input jsonb, resource_context jsonb) returns jsonb
+language plpgsql security definer set search_path=pg_catalog as $core$
+
+declare
+  target text;
+  generation_id uuid;
+  current_value scoring_authority.net_skins_v1_configuration_current%rowtype;
+  job_value scoring_authority.net_skins_v1_recalculation_jobs%rowtype;
+  existing_response jsonb;
+  response_value jsonb;
+  job_id_value uuid := nullif(input->>'job_id', '')::uuid;
+  claim_token_value uuid := nullif(input->>'claim_token', '')::uuid;
+  worker_value text := pg_catalog.btrim(coalesce(input->>'worker_id', ''));
+  error_code_value text := pg_catalog.upper(pg_catalog.left(
+    coalesce(nullif(input->>'error_code', ''),
+      'PRODUCTION_NET_SKINS_CALCULATION_FAILED'), 120
+  ));
+  error_safe_value text := pg_catalog.left(coalesce(
+    nullif(input->>'error_safe', ''),
+    'Net Skins recalculation is temporarily unavailable.'
+  ), 300);
+  receipt_operation text;
+begin
+  target := production_control.assert_canonical_future_net_skins_worker_v1(input,'fail_production_net_skins_v1_recalculation',resource_context);
+  generation_id := (input->>'expected_runtime_generation_id')::uuid;
+  receipt_operation := pg_catalog.format(
+    'ANNUAL_NET_SKINS_V1_FAIL:%s', target
+  );
+  existing_response := production_control.lookup_cutover_receipt(
+    receipt_operation, input
+  );
+  if existing_response is not null then return existing_response; end if;
+  if job_id_value is null or claim_token_value is null or worker_value = ''
+     or error_code_value !~ '^[A-Z0-9_:-]{3,120}$' then
+    raise exception using errcode = '22023',
+      message = 'PRODUCTION_NET_SKINS_FAILURE_INPUT_INVALID';
+  end if;
+  select value.* into strict current_value
+  from scoring_authority.net_skins_v1_configuration_current value
+  where value.tournament_id = target;
+  if current_value.configuration_revision <>
+       coalesce((input->>'expected_configuration_revision')::bigint, -1) then
+    raise exception using errcode = '40001',
+      message = 'PRODUCTION_NET_SKINS_CONFIGURATION_REVISION_CONFLICT';
+  end if;
+  select value.* into job_value
+  from scoring_authority.net_skins_v1_recalculation_jobs value
+  where value.job_id = job_id_value and value.tournament_id = target
+    and value.runtime_generation_id = generation_id for update;
+  if not found or job_value.status <> 'RUNNING'
+     or job_value.configuration_revision <>
+       current_value.configuration_revision
+     or job_value.claim_token <> claim_token_value
+     or job_value.claimed_by <> worker_value
+     or job_value.lease_expires_at <= pg_catalog.clock_timestamp() then
+    raise exception using errcode = '42501',
+      message = 'PRODUCTION_NET_SKINS_JOB_LEASE_REQUIRED';
+  end if;
+  update scoring_authority.net_skins_v1_recalculation_jobs set
+    status = 'FAILED', claimed_by = null, claim_token = null,
+    lease_expires_at = null, completed_at = pg_catalog.clock_timestamp(),
+    last_error_code = error_code_value, last_error_safe = error_safe_value,
+    updated_at = pg_catalog.clock_timestamp()
+  where job_id = job_value.job_id and tournament_id = target
+    and runtime_generation_id = generation_id;
+  insert into production_control.operation_audit_events (
+    event_type, domain, tournament_id, actor, request_fingerprint,
+    result, details
+  ) values (
+    'PRODUCTION_NET_SKINS_V1_RECALCULATION_FAILED', 'NET_SKINS', target,
+    worker_value, pg_catalog.lower(input->>'request_fingerprint'), 'FAILED',
+    pg_catalog.jsonb_build_object(
+      'job_id', job_value.job_id, 'round_number', job_value.round_number,
+      'configuration_revision', job_value.configuration_revision,
+      'runtime_generation_id', generation_id,
+      'error_code', error_code_value
+    )
+  );
+  response_value := pg_catalog.jsonb_build_object(
+    'ok', true, 'code', 'PRODUCTION_NET_SKINS_V1_RECALCULATION_FAILED',
+    'tournament_id', target, 'runtime_generation_id', generation_id,
+    'job_id', job_value.job_id, 'round_number', job_value.round_number,
+    'configuration_revision', job_value.configuration_revision,
+    'idempotent', false
+  );
+  perform production_control.store_cutover_receipt(
+    receipt_operation, input, response_value
+  );
+  return response_value;
+end;
+
+$core$;
+revoke all on function production_control.canonical_future_fail_net_skins_recalculation_v1_resource(jsonb,jsonb) from public,anon,authenticated,service_role;
+
+CREATE OR REPLACE FUNCTION public.future_production_fail_net_skins_recalculation_v1(input jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+begin
+ return production_control.canonical_future_fail_net_skins_recalculation_v1_resource(input,null);
+end;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION production_control.enqueue_annual_calcutta_v1(target text, runtime_generation uuid, activation_revision_value bigint, reason_value text, requested_by_value text, force_value boolean DEFAULT false, request_fingerprint_value text DEFAULT NULL::text, request_payload_hash_value text DEFAULT NULL::text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+declare
+  pointer production_control.current_tournament_pointer_v1%rowtype;
+  generation production_control.future_annual_runtime_generations_v1%rowtype;
+  current_value scoring_authority.calcutta_v1_current%rowtype;
+  current_result scoring_authority.calcutta_v1_result_revisions%rowtype;
+  job_value scoring_authority.calcutta_v1_recalculation_jobs%rowtype;
+  source_revision_value jsonb;
+  source_fingerprint_value text;
+  completed_rounds_value integer[];
+begin
+  perform pg_catalog.pg_advisory_xact_lock_shared(
+    production_control.scoring_admission_lock_key()
+  );
+  select value.* into strict pointer
+  from production_control.current_tournament_pointer_v1 value
+  where value.scope_key = production_control.canonical_execution_resource_id_v1();
+  select value.* into strict generation
+  from production_control.future_annual_runtime_generations_v1 value
+  where value.tournament_id = target
+    and value.runtime_generation_id = runtime_generation
+    and value.generation_status = 'ACTIVE';
+  if target = '2026' or pointer.tournament_id <> target
+     or pointer.pointer_revision <> generation.pointer_revision then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_ANNUAL_CALCUTTA_RUNTIME_REQUIRED';
+  end if;
+  select value.* into current_value
+  from scoring_authority.calcutta_v1_current value
+  where value.tournament_id = target for update;
+  if not found or current_value.state = 'NOT_CONFIGURED'
+     or current_value.auction_revision = 0 then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_CALCUTTA_AUCTION_FACTS_REQUIRED';
+  end if;
+  source_revision_value :=
+    production_control.calcutta_v1_source_revision(target);
+  source_fingerprint_value := production_control.calcutta_v1_hash(
+    source_revision_value
+  );
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(
+      'production-calcutta-v1:enqueue:' || target, 202608300075
+    )
+  );
+  select value.* into current_result
+  from scoring_authority.calcutta_v1_result_revisions value
+  where value.tournament_id = target
+    and value.configuration_revision = current_value.configuration_revision
+    and value.configuration_fingerprint =
+      current_value.configuration_fingerprint
+    and value.auction_revision = current_value.auction_revision
+    and value.auction_fingerprint = current_value.auction_fingerprint
+    and value.source_fingerprint = source_fingerprint_value
+    and value.is_current limit 1;
+  if found and not force_value then
+    return pg_catalog.jsonb_build_object(
+      'job_id', null, 'status', 'CURRENT',
+      'tournament_id', target,
+      'runtime_generation_id', runtime_generation,
+      'configuration_revision', current_value.configuration_revision,
+      'configuration_fingerprint', current_value.configuration_fingerprint,
+      'auction_revision', current_value.auction_revision,
+      'auction_fingerprint', current_value.auction_fingerprint,
+      'source_fingerprint', source_fingerprint_value,
+      'result_revision', current_result.result_revision
+    );
+  end if;
+  select value.* into job_value
+  from scoring_authority.calcutta_v1_recalculation_jobs value
+  where value.tournament_id = target
+    and value.runtime_generation_id = runtime_generation
+    and value.configuration_revision = current_value.configuration_revision
+    and value.configuration_fingerprint =
+      current_value.configuration_fingerprint
+    and value.auction_revision = current_value.auction_revision
+    and value.auction_fingerprint = current_value.auction_fingerprint
+    and value.activation_revision = activation_revision_value
+    and value.source_fingerprint = source_fingerprint_value
+    and value.status in ('PENDING', 'RUNNING')
+  order by value.requested_at desc, value.job_id desc limit 1;
+  if found then
+    return pg_catalog.jsonb_build_object(
+      'job_id', job_value.job_id, 'status', job_value.status,
+      'tournament_id', target,
+      'runtime_generation_id', runtime_generation,
+      'configuration_revision', job_value.configuration_revision,
+      'configuration_fingerprint', job_value.configuration_fingerprint,
+      'auction_revision', job_value.auction_revision,
+      'auction_fingerprint', job_value.auction_fingerprint,
+      'source_fingerprint', job_value.source_fingerprint,
+      'result_revision', null
+    );
+  end if;
+  update scoring_authority.calcutta_v1_recalculation_jobs set
+    status = 'SUPERSEDED', claimed_by = null, claim_token = null,
+    lease_expires_at = null, completed_at = pg_catalog.clock_timestamp(),
+    updated_at = pg_catalog.clock_timestamp()
+  where tournament_id = target and runtime_generation_id = runtime_generation
+    and status in ('PENDING', 'RUNNING');
+  insert into scoring_authority.calcutta_v1_recalculation_jobs (
+    tournament_id, configuration_revision_id, configuration_revision,
+    configuration_fingerprint, auction_revision_id, auction_revision,
+    auction_fingerprint, activation_revision, source_revision,
+    source_fingerprint, status, reason, requested_by,
+    request_fingerprint, request_payload_hash, runtime_generation_id
+  ) values (
+    target, current_value.configuration_revision_id,
+    current_value.configuration_revision,
+    current_value.configuration_fingerprint,
+    current_value.auction_revision_id, current_value.auction_revision,
+    current_value.auction_fingerprint, activation_revision_value,
+    source_revision_value, source_fingerprint_value, 'PENDING',
+    pg_catalog.left(coalesce(nullif(reason_value, ''),
+      'EXPLICIT_RECALCULATION'), 120),
+    pg_catalog.left(coalesce(nullif(requested_by_value, ''),
+      'production-calcutta-v1'), 160),
+    request_fingerprint_value, request_payload_hash_value,
+    runtime_generation
+  ) returning * into job_value;
+  completed_rounds_value :=
+    production_control.calcutta_v1_completed_rounds(target);
+  update scoring_authority.calcutta_v1_current set
+    state = case
+      when current_result.result_id is not null
+        and current_result.result_state = 'OFFICIAL'
+        and 3 = any(completed_rounds_value) then 'OFFICIAL'
+      when current_result.result_id is not null
+        and coalesce(pg_catalog.array_length(
+          completed_rounds_value, 1
+        ), 0) > 0 then 'IN_PROGRESS'
+      else 'AUCTION_COMPLETE' end,
+    updated_at = pg_catalog.clock_timestamp()
+  where tournament_id = target;
+  return pg_catalog.jsonb_build_object(
+    'job_id', job_value.job_id, 'status', job_value.status,
+    'tournament_id', target,
+    'runtime_generation_id', runtime_generation,
+    'configuration_revision', job_value.configuration_revision,
+    'configuration_fingerprint', job_value.configuration_fingerprint,
+    'auction_revision', job_value.auction_revision,
+    'auction_fingerprint', job_value.auction_fingerprint,
+    'source_fingerprint', job_value.source_fingerprint,
+    'result_revision', null
+  );
+end;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION production_control.enqueue_annual_net_skins_v1_round(target text, runtime_generation uuid, target_round_number integer, reason_value text, requested_by_value text)
+ RETURNS scoring_authority.net_skins_v1_recalculation_jobs
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+declare
+  pointer production_control.current_tournament_pointer_v1%rowtype;
+  generation production_control.future_annual_runtime_generations_v1%rowtype;
+  annual production_control.annual_scoring_runtime_authorities_v1%rowtype;
+  current_value scoring_authority.net_skins_v1_configuration_current%rowtype;
+  revision_value scoring_authority.net_skins_v1_configuration_revisions%rowtype;
+  job_value scoring_authority.net_skins_v1_recalculation_jobs%rowtype;
+  round_value jsonb;
+  source_revision_value jsonb;
+  source_fingerprint_value text;
+begin
+  perform pg_catalog.pg_advisory_xact_lock_shared(
+    production_control.scoring_admission_lock_key()
+  );
+  select value.* into strict pointer
+  from production_control.current_tournament_pointer_v1 value
+  where value.scope_key = production_control.canonical_execution_resource_id_v1();
+  select value.* into strict generation
+  from production_control.future_annual_runtime_generations_v1 value
+  where value.tournament_id = target
+    and value.runtime_generation_id = runtime_generation
+    and value.generation_status = 'ACTIVE';
+  select value.* into strict annual
+  from production_control.annual_scoring_runtime_authorities_v1 value
+  where value.tournament_id = target
+    and value.runtime_generation_id = runtime_generation;
+  if target = '2026'
+     or pointer.tournament_id <> target
+     or pointer.pointer_revision <> generation.pointer_revision
+     or annual.pointer_revision <> pointer.pointer_revision
+     or annual.authority_status <> 'ACTIVE'
+     or annual.admission_state <> 'OPEN' then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_ANNUAL_NET_SKINS_RUNTIME_REQUIRED';
+  end if;
+
+  select value.* into current_value
+  from scoring_authority.net_skins_v1_configuration_current value
+  where value.tournament_id = target;
+  if not found or current_value.state <> 'CONFIGURED' then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_NET_SKINS_CONFIGURATION_REQUIRED';
+  end if;
+  select value.* into strict revision_value
+  from scoring_authority.net_skins_v1_configuration_revisions value
+  where value.configuration_revision_id =
+    current_value.configuration_revision_id
+    and value.tournament_id = target;
+  select value into round_value
+  from pg_catalog.jsonb_array_elements(
+    revision_value.configuration_manifest->'rounds'
+  ) value
+  where (value->>'round_number')::integer = target_round_number;
+  if not found then
+    raise exception using errcode = '22023',
+      message = 'PRODUCTION_NET_SKINS_ROUND_NOT_CONFIGURED';
+  end if;
+
+  source_revision_value :=
+    production_control.net_skins_v1_round_source_revision(
+      target, target_round_number
+    );
+  source_fingerprint_value :=
+    production_control.net_skins_v1_hash(source_revision_value);
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(
+      pg_catalog.format(
+        'production-net-skins-v1:enqueue:%s:%s:R%s',
+        target, runtime_generation, target_round_number
+      ), 202608300074
+    )
+  );
+
+  select value.* into job_value
+  from scoring_authority.net_skins_v1_recalculation_jobs value
+  where value.tournament_id = target
+    and value.runtime_generation_id = runtime_generation
+    and value.round_number = target_round_number
+    and value.configuration_revision = current_value.configuration_revision
+    and value.source_fingerprint = source_fingerprint_value
+    and value.status in ('PENDING', 'RUNNING')
+  order by value.requested_at desc, value.job_id desc
+  limit 1;
+  if found then return job_value; end if;
+
+  update scoring_authority.net_skins_v1_recalculation_jobs set
+    status = 'SUPERSEDED', claimed_by = null, claim_token = null,
+    lease_expires_at = null, completed_at = pg_catalog.clock_timestamp(),
+    updated_at = pg_catalog.clock_timestamp()
+  where tournament_id = target
+    and runtime_generation_id = runtime_generation
+    and round_number = target_round_number
+    and status in ('PENDING', 'RUNNING');
+
+  insert into scoring_authority.net_skins_v1_recalculation_jobs (
+    tournament_id, round_number, configuration_revision_id,
+    configuration_revision, configuration_fingerprint, source_revision,
+    source_fingerprint, status, reason, requested_by,
+    runtime_generation_id
+  ) values (
+    target, target_round_number, revision_value.configuration_revision_id,
+    revision_value.configuration_revision,
+    round_value->>'configuration_fingerprint', source_revision_value,
+    source_fingerprint_value, 'PENDING',
+    pg_catalog.left(coalesce(nullif(reason_value, ''),
+      'EXPLICIT_RECALCULATION'), 120),
+    pg_catalog.left(coalesce(nullif(requested_by_value, ''),
+      'production-net-skins-v1'), 160), runtime_generation
+  ) returning * into job_value;
+  return job_value;
+exception
+  when no_data_found then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_ANNUAL_NET_SKINS_RUNTIME_REQUIRED';
+end;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION production_control.intelligence_delivery_ready_v1(target text, engines jsonb)
+ RETURNS boolean
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+begin
+  -- The bundle is one calculation. Acquire its existing bounded rows in key order.
+  perform 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0
+    and engine_key in(select jsonb_array_elements_text(engines))
+    order by case engine_key when 'TEAM_MOMENTUM' then 1 when 'TOURNAMENT_STORYLINES' then 2
+      when 'TOURNAMENT_INTELLIGENCE' then 3 when 'PROJECTION_EDITORIAL' then 4 when 'TOURNAMENT_FINAL_RECAP' then 5 end for update;
+  if exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0
+    and engine_key in(select jsonb_array_elements_text(engines)) and
+      (delivery_dead_letter_at is not null or (delivery_attempts>=5 and status<>'SUCCEEDED') or delivery_available_at>clock_timestamp()
+       or (status='RUNNING' and coalesce(lease_expires_at,started_at+interval '90 seconds')>=clock_timestamp()))) then return false; end if;
+  if exists(select 1 from scoring_authority.competition_recalculation_jobs value where value.tournament_id=target and value.round_number=0
+    and value.engine_key in(select jsonb_array_elements_text(engines)) and (
+      value.runtime_generation_id is distinct from (select case when target='2026' then null::uuid else a.runtime_generation_id end
+        from production_control.current_tournament_pointer_v1 p left join production_control.annual_scoring_runtime_authorities_v1 a
+          on a.tournament_id=target and a.authority_status='ACTIVE' where p.scope_key=production_control.canonical_execution_resource_id_v1())
+      or value.requested_source_revision is distinct from (select demand.requested_source_revision
+        from scoring_authority.competition_recalculation_jobs demand where demand.tournament_id=target and demand.round_number=0
+          and demand.engine_key in(select jsonb_array_elements_text(engines)) and demand.status in('PENDING','FAILED')
+        order by demand.engine_key limit 1))) then return false; end if;
+  return exists(select 1 from scoring_authority.competition_recalculation_jobs where tournament_id=target and round_number=0
+    and engine_key in(select jsonb_array_elements_text(engines)) and status in('PENDING','FAILED'));
+end;
+$function$
+;
+
+create or replace function production_control.assert_canonical_derived_scope_v1(input jsonb, context jsonb)
+returns text language plpgsql security definer set search_path=pg_catalog as $$
+begin
+ if context is null then return production_control.assert_score_derived_delivery_scope_v1(input); end if;
+ if (context->>'current_tournament_year')::integer>2026 then
+  if input->>'contract_version' is distinct from 'score-derived-delivery-v1' then raise exception using errcode='42501',message='CERTIFICATION_DERIVED_CONTEXT_REQUIRED';end if;
+  return production_control.assert_canonical_future_worker_runtime_v1(input,context);
+ end if;
+ perform production_control.assert_canonical_scoring_context_v1(input,context,'RUNTIME');
+ if context->>'phase' not in('WORKERS','DIRECTOR') or input->>'contract_version' is distinct from 'score-derived-delivery-v1' then
+  raise exception using errcode='42501',message='CERTIFICATION_DERIVED_CONTEXT_REQUIRED'; end if;
+ return context->>'tournament_id';
+end;
+$$;
+CREATE OR REPLACE FUNCTION production_control.canonical_requeue_score_derived_delivery_v1_core_v2(input jsonb, canonical_context jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'pg_catalog'
+AS $function$
+declare target text; generation uuid; family_value text:=input->>'family'; identity_value text:=input->>'work_identity';
+  request_value uuid:=(input->>'request_id')::uuid; table_name text; predicate text; retained jsonb; lookup_identity text;
+  expected_cycle bigint:=(input->>'expected_cycle')::bigint;
+  expected_attempt integer:=(input->>'expected_attempt')::integer; next_cycle bigint; prior_event bigint;
+  request_hash text; prior_hash text; actor_id uuid:=(input#>>'{authorization,auth_user_id}')::uuid;
+begin
+ target:=production_control.assert_canonical_derived_scope_v1(input,canonical_context);
+ if target<>'2026' then select runtime_generation_id into strict generation from production_control.annual_scoring_runtime_authorities_v1
+  where tournament_id=target and authority_status='ACTIVE'; end if;
+ if target='2026' then perform production_control.assert_production_scoring_actor(input,true);
+ else perform production_control.assert_canonical_future_scoring_actor_v1(input,target,true,canonical_context); end if;
+ if request_value is null or identity_value is null or expected_cycle is null or expected_attempt is null
+    or length(btrim(coalesce(input->>'reason','')))<3 or length(input->>'reason')>120 then
+  raise exception using errcode='22023',message='DERIVED_REQUEUE_IDENTITY_AND_REASON_REQUIRED'; end if;
+ perform pg_advisory_xact_lock(hashtextextended(request_value::text,202609280124));
+ request_hash:=encode(extensions.digest(jsonb_build_object('target',target,'family',family_value,'identity',identity_value,
+   'cycle',expected_cycle,'attempt',expected_attempt,'reason',input->>'reason','actor',actor_id)::text,'sha256'),'hex');
+ select event_id,recovery_request_hash into prior_event,prior_hash from production_control.score_derived_delivery_attempts_v1 where recovery_request_id=request_value;
+ if found then
+  if prior_hash is distinct from request_hash then raise exception using errcode='22023',message='DERIVED_REQUEUE_REQUEST_REUSE_CONFLICT'; end if;
+  return jsonb_build_object('ok',true,'idempotent',true,'eventId',prior_event); end if;
+ if family_value='INTENT' then
+  select to_jsonb(v) into retained from scoring_authority.score_derived_intents_v1 v
+   where v.tournament_id=target and v.intent_id=identity_value::uuid for update;
+  if retained is null or retained->>'status'<>'DEAD_LETTER' or (retained->>'delivery_cycle')::bigint<>expected_cycle
+     or (retained->>'attempts')::integer<>expected_attempt then
+   raise exception using errcode='40001',message='DERIVED_REQUEUE_STATE_CHANGED'; end if;
+  if nullif(retained->>'runtime_generation_id','')::uuid is distinct from generation then
+   raise exception using errcode='55000',message='DERIVED_REQUEUE_GENERATION_CHANGED'; end if;
+  next_cycle:=expected_cycle+1;
+  update scoring_authority.score_derived_intents_v1 set status='PENDING',attempts=0,last_sqlstate=null,
+   available_at=clock_timestamp(),delivery_cycle=next_cycle,updated_at=clock_timestamp() where intent_id=identity_value::uuid;
+ else
+  table_name:=case family_value when 'CALCUTTA' then 'calcutta_v1_recalculation_jobs'
+   when 'NET_SKINS' then 'net_skins_v1_recalculation_jobs' when 'COMPETITION' then 'competition_recalculation_jobs'
+   when 'INTELLIGENCE' then 'competition_recalculation_jobs' end;
+  if table_name is null then raise exception using errcode='22023',message='DERIVED_REQUEUE_FAMILY_INVALID'; end if;
+  if table_name='competition_recalculation_jobs' then
+   lookup_identity:=substring(identity_value from length(target)+4);
+   if identity_value<>target||':0:'||lookup_identity or lookup_identity not in
+      ('TEAM_MOMENTUM','TOURNAMENT_STORYLINES','TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL','TOURNAMENT_FINAL_RECAP') then
+    raise exception using errcode='22023',message='DERIVED_REQUEUE_IDENTITY_INVALID'; end if;
+   predicate:='round_number=0 and engine_key=$2';
+  else
+   if identity_value !~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$' then
+    raise exception using errcode='22023',message='DERIVED_REQUEUE_IDENTITY_INVALID'; end if;
+   lookup_identity:=identity_value;
+   predicate:='job_id=$2::uuid';
+  end if;
+  execute format('select to_jsonb(v) from scoring_authority.%I v where tournament_id=$1 and %s for update',table_name,predicate)
+   into retained using target,lookup_identity;
+  if retained is null or retained->>'status'<>'FAILED' or retained->>'delivery_dead_letter_at' is null
+     or (retained->>'delivery_cycle')::bigint<>expected_cycle or (retained->>'delivery_attempts')::integer<>expected_attempt
+     or (table_name='competition_recalculation_jobs' and
+       (case when retained->>'engine_key' in('TEAM_MOMENTUM','TOURNAMENT_STORYLINES') then 'COMPETITION' else 'INTELLIGENCE' end)<>family_value) then
+   raise exception using errcode='40001',message='DERIVED_REQUEUE_STATE_CHANGED'; end if;
+  if nullif(retained->>'runtime_generation_id','')::uuid is distinct from generation then
+   raise exception using errcode='55000',message='DERIVED_REQUEUE_GENERATION_CHANGED'; end if;
+  if family_value='CALCUTTA' and (not exists(select 1 from scoring_authority.calcutta_v1_current c
+      where c.tournament_id=target and c.configuration_revision=(retained->>'configuration_revision')::bigint
+      and c.configuration_fingerprint=retained->>'configuration_fingerprint'
+      and c.auction_revision=(retained->>'auction_revision')::bigint and c.auction_fingerprint=retained->>'auction_fingerprint')
+    or retained->>'source_fingerprint' is distinct from production_control.calcutta_v1_hash(production_control.calcutta_v1_source_revision(target))) then
+   raise exception using errcode='55000',message='DERIVED_REQUEUE_FINANCIAL_SOURCE_CHANGED'; end if;
+  if family_value='NET_SKINS' and (not exists(select 1 from scoring_authority.net_skins_v1_configuration_current c
+      where c.tournament_id=target and c.configuration_revision=(retained->>'configuration_revision')::bigint)
+    or retained->>'source_fingerprint' is distinct from production_control.net_skins_v1_hash(
+      production_control.net_skins_v1_round_source_revision(target,(retained->>'round_number')::integer))) then
+   raise exception using errcode='55000',message='DERIVED_REQUEUE_FINANCIAL_SOURCE_CHANGED'; end if;
+  if retained->>'engine_key'='TOURNAMENT_FINAL_RECAP' and not production_control.derived_final_recap_ready_v1(target) then
+   raise exception using errcode='55000',message='DERIVED_FINAL_RECAP_GATE_REQUIRED'; end if;
+  next_cycle:=expected_cycle+1;
+  execute format('update scoring_authority.%I set status=''PENDING'',completed_at=null,attempts=0,
+   delivery_attempts=0,delivery_cycle=$3,delivery_dead_letter_at=null,delivery_error_class=null,
+   delivery_available_at=clock_timestamp(),last_error_code=null,last_error_safe=null,updated_at=clock_timestamp()
+   where tournament_id=$1 and %s',table_name,predicate) using target,lookup_identity,next_cycle;
+ end if;
+ insert into production_control.score_derived_delivery_attempts_v1
+  (tournament_id,family,work_identity,cycle,attempt,transition,safe_code,recovery_request_id,recovery_request_hash,recovery_actor_id,recovery_reason,runtime_generation_id,originating_activation_revision)
+ values(target,family_value,identity_value,next_cycle,0,'REQUEUED','AUTHORIZED_CAUSE_CORRECTION',request_value,request_hash,actor_id,input->>'reason',generation,nullif(retained->>'activation_revision','')::bigint)
+ returning event_id into prior_event;
+ return jsonb_build_object('ok',true,'idempotent',false,'eventId',prior_event,'cycle',next_cycle);
+end;
+$function$;
+create function production_control.dispatch_certification_future_worker_v1(input jsonb, context jsonb)
+returns jsonb language plpgsql security definer set search_path=pg_catalog as $dispatch$
+declare op text:=input->>'operation_id';payload jsonb:=input->'payload';command jsonb;operation_name text;
+ generation production_control.future_annual_runtime_generations_v1%rowtype;
+ resource production_control.canonical_resource_v1%rowtype;
+begin
+ perform production_control.assert_current_certification_future_context_v1(context);
+ if jsonb_typeof(payload) is distinct from 'object' or payload ?| array['resource','deployment','authorization','environment','project_ref','project_url',
+  'source_workbook_id','annual_destination_workbook_id','actor_player_id','actor_auth_user_id','auth_user_id','player_id','role','context_token','expected_context_token',
+  'binding_id','resource_id','resource_class','installation_id','release_commit','activation_revision','admission_revision','governance_tournament_id',
+  'annual_scoring_dispatch_contract','annual_scoring_operation','expected_runtime_generation_id','expected_annual_authority_generation_id',
+  'expected_annual_admission_generation_id','expected_current_tournament_id','expected_pointer_revision'] then
+  raise exception using errcode='42501',message='CERTIFICATION_OPERATION_AUTHORITY_FIELD_REJECTED';end if;
+ if(payload ? 'tournament_id' and payload->>'tournament_id' is distinct from context->>'tournament_id')
+  or(payload ? 'expected_activation_revision' and payload->>'expected_activation_revision' is distinct from context->>'activation_revision')
+  or(payload ? 'expected_epoch_id' and payload->>'expected_epoch_id' is distinct from context->>'authority_epoch_id')
+  or(input#>>'{authorization,tournament_id}' is not null and input#>>'{authorization,tournament_id}' is distinct from context->>'tournament_id') then
+  raise exception using errcode='40001',message='CERTIFICATION_DERIVED_CONTEXT_STALE';end if;
+ case op
+
+ when 'WORKERS.COMPETITION_CLAIM' then operation_name:='claim_competition_derived_jobs';
+
+ when 'WORKERS.COMPETITION_WRITE' then operation_name:='write_competition_derived_snapshot';
+
+ when 'WORKERS.COMPETITION_FAIL' then operation_name:='mark_competition_derived_job_failed';
+
+ when 'WORKERS.INTELLIGENCE_CLAIM' then operation_name:='claim_intelligence_derived_bundle';
+
+ when 'WORKERS.INTELLIGENCE_WRITE' then operation_name:='write_intelligence_derived_bundle';
+
+ when 'WORKERS.CALCUTTA_CLAIM' then operation_name:='claim_production_calcutta_v1_recalculation';
+
+ when 'WORKERS.CALCUTTA_COMPLETE' then operation_name:='complete_production_calcutta_v1_recalculation';
+
+ when 'WORKERS.CALCUTTA_FAIL' then operation_name:='fail_production_calcutta_v1_recalculation';
+
+ when 'DIRECTOR.NET_SKINS_CLAIM' then operation_name:='claim_production_net_skins_v1_recalculation';
+
+ when 'DIRECTOR.NET_SKINS_COMPLETE' then operation_name:='complete_production_net_skins_v1_recalculation';
+
+ when 'DIRECTOR.NET_SKINS_FAIL' then operation_name:='fail_production_net_skins_v1_recalculation';
+
+ when 'WORKERS.DELIVERY_TICK' then operation_name:='score_derived_delivery_tick_v1';
+
+ when 'WORKERS.FAIL_PRECLAIM' then operation_name:='fail_score_derived_preclaim_v1';
+
+ when 'WORKERS.INTELLIGENCE_FAIL' then operation_name:='fail_intelligence_derived_bundle_v1';
+
+ when 'DIRECTOR.REQUEUE_DERIVED' then operation_name:='requeue_score_derived_delivery_v1';
+
+ else raise exception using errcode='42501',message='CERTIFICATION_FUTURE_WORKER_NOT_ADMITTED';end case;
+ select * into strict resource from production_control.canonical_resource_v1 where singleton;
+ select * into strict generation from production_control.future_annual_runtime_generations_v1
+  where tournament_id=context->>'tournament_id' and generation_status='ACTIVE';
+ command:=payload||jsonb_build_object('tournament_id',context->>'tournament_id','authorization',input->'authorization',
+  'environment','CERTIFICATION','project_ref',resource.project_ref,'project_url',resource.project_url,
+  'annual_destination_workbook_id',resource.provenance_id,'source_workbook_id',resource.provenance_id,
+  'expected_epoch_id',context->>'authority_epoch_id','expected_activation_revision',context->'activation_revision',
+  'operation_id',input->>'operation_request_id','annual_scoring_dispatch_contract','production-annual-scoring-dispatch-v1',
+  'annual_scoring_operation',operation_name,'expected_current_tournament_id',context->>'current_tournament_id',
+  'expected_pointer_revision',context->'pointer_revision','expected_runtime_generation_id',generation.runtime_generation_id,
+  'expected_annual_authority_generation_id',generation.authority_generation_id,'expected_annual_admission_generation_id',generation.admission_generation_id);
+ if op like 'DIRECTOR.%' then perform production_control.assert_canonical_future_scoring_actor_v1(command,context->>'tournament_id',true,context);
+ elsif btrim(coalesce(command->>'worker_id',''))!~'^[A-Za-z0-9_.:-]{1,160}$' then
+  raise exception using errcode='22023',message='DERIVED_DELIVERY_WORKER_REQUIRED';end if;
+ if op like 'WORKERS.CALCUTTA_%' then command:=command||jsonb_build_object('contract_version','production-calcutta-v1');
+ elsif op like 'DIRECTOR.NET_SKINS_%' then command:=command||jsonb_build_object('contract_version','production-net-skins-v1');
+ else command:=command||jsonb_build_object('contract_version','score-derived-delivery-v1');end if;
+ if op='DIRECTOR.REQUEUE_DERIVED' and command->>'request_id' is distinct from input->>'operation_request_id' then
+  raise exception using errcode='22023',message='CERTIFICATION_OPERATION_ID_MISMATCH';end if;
+ case op
+
+ when 'WORKERS.COMPETITION_CLAIM' then return production_control.canonical_future_claim_competition_derived_jobs_v1_resource(command,context);
+
+ when 'WORKERS.COMPETITION_WRITE' then return production_control.canonical_future_write_competition_derived_snapshot_v1_resource(command,context);
+
+ when 'WORKERS.COMPETITION_FAIL' then return production_control.canonical_future_fail_competition_derived_job_v1_resource(command,context);
+
+ when 'WORKERS.INTELLIGENCE_CLAIM' then return production_control.canonical_future_claim_intelligence_derived_bundle_v1_resource(command,context);
+
+ when 'WORKERS.INTELLIGENCE_WRITE' then return production_control.canonical_future_write_intelligence_derived_bundle_v1_resource(command,context);
+
+ when 'WORKERS.CALCUTTA_CLAIM' then return production_control.canonical_future_claim_calcutta_recalculation_v1_resource(command,context);
+
+ when 'WORKERS.CALCUTTA_COMPLETE' then return production_control.canonical_future_complete_calcutta_recalculation_v1_resource(command,context);
+
+ when 'WORKERS.CALCUTTA_FAIL' then return production_control.canonical_future_fail_calcutta_recalculation_v1_resource(command,context);
+
+ when 'DIRECTOR.NET_SKINS_CLAIM' then return production_control.canonical_future_claim_net_skins_recalculation_v1_resource(command,context);
+
+ when 'DIRECTOR.NET_SKINS_COMPLETE' then return production_control.canonical_future_complete_net_skins_recalculation_v1_resource(command,context);
+
+ when 'DIRECTOR.NET_SKINS_FAIL' then return production_control.canonical_future_fail_net_skins_recalculation_v1_resource(command,context);
+
+ when 'WORKERS.DELIVERY_TICK' then return production_control.canonical_score_derived_delivery_tick_v1_core_v2(command,context);
+
+ when 'WORKERS.FAIL_PRECLAIM' then return production_control.canonical_fail_score_derived_preclaim_v1_core_v2(command,context);
+
+ when 'WORKERS.INTELLIGENCE_FAIL' then return production_control.canonical_fail_intelligence_derived_bundle_v1_core_v2(command,context);
+
+ when 'DIRECTOR.REQUEUE_DERIVED' then return production_control.canonical_requeue_score_derived_delivery_v1_core_v2(command,context);
+
+ else raise exception using errcode='42501',message='CERTIFICATION_FUTURE_WORKER_NOT_ADMITTED';end case;
+end;$dispatch$;
+revoke all on function production_control.dispatch_certification_future_worker_v1(jsonb,jsonb) from public,anon,authenticated,service_role;
+
+create or replace function production_control.dispatch_certification_derived_operation_v1(input jsonb, context jsonb)
+returns jsonb language plpgsql security definer set search_path=pg_catalog as $$
+declare operation_id text:=input->>'operation_id'; payload jsonb:=input->'payload'; command jsonb;
+begin
+ if (context->>'current_tournament_year')::integer>2026 then return production_control.dispatch_certification_future_worker_v1(input,context);end if;
+ perform production_control.assert_canonical_scoring_context_v1('{}',context,'RUNTIME');
+ if jsonb_typeof(payload) is distinct from 'object' or payload ?| array['resource','deployment','authorization','environment',
+  'project_ref','project_url','actor_player_id','actor_auth_user_id','auth_user_id','player_id','role','context_token',
+  'binding_id','resource_id','resource_class','installation_id','release_commit','activation_revision',
+  'admission_revision','governance_tournament_id'] then
+  raise exception using errcode='42501',message='CERTIFICATION_OPERATION_AUTHORITY_FIELD_REJECTED'; end if;
+ if (payload ? 'tournament_id' and payload->>'tournament_id' is distinct from context->>'tournament_id')
+  or (payload ? 'expected_activation_revision' and payload->>'expected_activation_revision' is distinct from context->>'activation_revision')
+  or (payload ? 'expected_epoch_id' and payload->>'expected_epoch_id' is distinct from context->>'authority_epoch_id') then
+  raise exception using errcode='40001',message='CERTIFICATION_DERIVED_CONTEXT_STALE'; end if;
+ command:=payload||jsonb_build_object('tournament_id',context->>'tournament_id','environment','CERTIFICATION',
+  'expected_activation_revision',context->'activation_revision','expected_epoch_id',context->>'authority_epoch_id',
+  'operation_id',input->>'operation_request_id','authorization',input->'authorization');
+ if operation_id like 'DIRECTOR.%' then
+  perform production_control.assert_production_scoring_actor(command,true);
+ elsif btrim(coalesce(command->>'worker_id','')) !~ '^[A-Za-z0-9_.:-]{1,160}$' then
+  raise exception using errcode='22023',message='DERIVED_DELIVERY_WORKER_REQUIRED';
+ end if;
+ case operation_id
+ when 'WORKERS.DELIVERY_TICK' then
+  return production_control.canonical_score_derived_delivery_tick_v1_core_v2(command||jsonb_build_object('contract_version','score-derived-delivery-v1'),context);
+ when 'WORKERS.FAIL_PRECLAIM' then
+  return production_control.canonical_fail_score_derived_preclaim_v1_core_v2(command||jsonb_build_object('contract_version','score-derived-delivery-v1'),context);
+ when 'WORKERS.COMPETITION_CLAIM' then
+  perform production_control.flush_score_derived_intents_v1('2026','COMPETITION',8);
+  return production_control.canonical_claim_competition_derived_jobs_core_v2(command,context);
+ when 'WORKERS.COMPETITION_WRITE' then
+  return production_control.canonical_write_competition_derived_snapshot_core_v2(command,context);
+ when 'WORKERS.COMPETITION_FAIL' then
+  return production_control.canonical_mark_competition_derived_job_failed_core_v2(command,context);
+ when 'WORKERS.INTELLIGENCE_CLAIM' then
+  perform production_control.flush_score_derived_intents_v1('2026','COMPETITION',8);
+  return production_control.canonical_claim_intelligence_derived_bundle_core_v2(command,context);
+ when 'WORKERS.INTELLIGENCE_WRITE' then
+  return production_control.canonical_write_intelligence_derived_bundle_core_v2(command,context);
+ when 'WORKERS.INTELLIGENCE_FAIL' then
+  return production_control.canonical_fail_intelligence_derived_bundle_v1_core_v2(command||jsonb_build_object('contract_version','score-derived-delivery-v1'),context);
+ when 'WORKERS.CALCUTTA_CLAIM' then
+  return production_control.canonical_claim_calcutta_v1_recalculation_core_v2(command,context);
+ when 'WORKERS.CALCUTTA_COMPLETE' then
+  return production_control.canonical_complete_calcutta_v1_recalculation_core_v2(command,context);
+ when 'WORKERS.CALCUTTA_FAIL' then
+  return production_control.canonical_fail_calcutta_v1_recalculation_core_v2(command,context);
+ when 'DIRECTOR.NET_SKINS_CLAIM' then
+  return production_control.canonical_claim_net_skins_v1_recalculation_core_v2(command,context);
+ when 'DIRECTOR.NET_SKINS_COMPLETE' then
+  return production_control.canonical_complete_net_skins_v1_recalculation_core_v2(command,context);
+ when 'DIRECTOR.NET_SKINS_FAIL' then
+  return production_control.canonical_fail_net_skins_v1_recalculation_core_v2(command,context);
+ when 'DIRECTOR.REQUEUE_DERIVED' then
+  if command->>'request_id' is distinct from input->>'operation_request_id' then
+   raise exception using errcode='22023',message='CERTIFICATION_OPERATION_ID_MISMATCH'; end if;
+  return production_control.canonical_requeue_score_derived_delivery_v1_core_v2(command||jsonb_build_object('contract_version','score-derived-delivery-v1'),context);
+ else raise exception using errcode='42501',message='CERTIFICATION_OPERATION_NOT_ADMITTED';
+ end case;
+end;
+$$;
+do $check$ begin
+ if exists(select 1 from canonical_future_worker_original_attributes b left join pg_proc a on a.oid=b.oid
+  where a.oid is null or row(a.pronamespace,a.proname,a.proargtypes,a.proowner,a.proacl,a.prosecdef,a.proconfig,a.provolatile)
+  is distinct from row(b.pronamespace,b.proname,b.proargtypes,b.proowner,b.proacl,b.prosecdef,b.proconfig,b.provolatile)) then
+  raise exception 'CANONICAL_FUTURE_WORKER_PRODUCTION_ATTRIBUTES_CHANGED';end if;
+end;$check$;
+
+do $acl$ declare candidate pg_proc%rowtype;original_owner oid;
+begin select proowner into strict original_owner from pg_proc where oid='future_production_claim_competition_derived_jobs_v1(jsonb)'::regprocedure;
+ select * into strict candidate from pg_proc where oid='production_control.canonical_future_claim_competition_derived_jobs_v1_resource(jsonb,jsonb)'::regprocedure;
+ if candidate.proowner<>original_owner or not candidate.prosecdef or candidate.proconfig<>array['search_path=pg_catalog']
+  or has_function_privilege('anon',candidate.oid,'EXECUTE') or has_function_privilege('authenticated',candidate.oid,'EXECUTE')
+  or has_function_privilege('service_role',candidate.oid,'EXECUTE') then raise exception 'CANONICAL_FUTURE_WORKER_PRIVATE_CORE_PRIVILEGE_INVALID';end if;
+end;$acl$;
+
+do $acl$ declare candidate pg_proc%rowtype;original_owner oid;
+begin select proowner into strict original_owner from pg_proc where oid='future_production_write_competition_derived_snapshot_v1(jsonb)'::regprocedure;
+ select * into strict candidate from pg_proc where oid='production_control.canonical_future_write_competition_derived_snapshot_v1_resource(jsonb,jsonb)'::regprocedure;
+ if candidate.proowner<>original_owner or not candidate.prosecdef or candidate.proconfig<>array['search_path=pg_catalog']
+  or has_function_privilege('anon',candidate.oid,'EXECUTE') or has_function_privilege('authenticated',candidate.oid,'EXECUTE')
+  or has_function_privilege('service_role',candidate.oid,'EXECUTE') then raise exception 'CANONICAL_FUTURE_WORKER_PRIVATE_CORE_PRIVILEGE_INVALID';end if;
+end;$acl$;
+
+do $acl$ declare candidate pg_proc%rowtype;original_owner oid;
+begin select proowner into strict original_owner from pg_proc where oid='future_production_fail_competition_derived_job_v1(jsonb)'::regprocedure;
+ select * into strict candidate from pg_proc where oid='production_control.canonical_future_fail_competition_derived_job_v1_resource(jsonb,jsonb)'::regprocedure;
+ if candidate.proowner<>original_owner or not candidate.prosecdef or candidate.proconfig<>array['search_path=pg_catalog']
+  or has_function_privilege('anon',candidate.oid,'EXECUTE') or has_function_privilege('authenticated',candidate.oid,'EXECUTE')
+  or has_function_privilege('service_role',candidate.oid,'EXECUTE') then raise exception 'CANONICAL_FUTURE_WORKER_PRIVATE_CORE_PRIVILEGE_INVALID';end if;
+end;$acl$;
+
+do $acl$ declare candidate pg_proc%rowtype;original_owner oid;
+begin select proowner into strict original_owner from pg_proc where oid='future_production_claim_intelligence_derived_bundle_v1(jsonb)'::regprocedure;
+ select * into strict candidate from pg_proc where oid='production_control.canonical_future_claim_intelligence_derived_bundle_v1_resource(jsonb,jsonb)'::regprocedure;
+ if candidate.proowner<>original_owner or not candidate.prosecdef or candidate.proconfig<>array['search_path=pg_catalog']
+  or has_function_privilege('anon',candidate.oid,'EXECUTE') or has_function_privilege('authenticated',candidate.oid,'EXECUTE')
+  or has_function_privilege('service_role',candidate.oid,'EXECUTE') then raise exception 'CANONICAL_FUTURE_WORKER_PRIVATE_CORE_PRIVILEGE_INVALID';end if;
+end;$acl$;
+
+do $acl$ declare candidate pg_proc%rowtype;original_owner oid;
+begin select proowner into strict original_owner from pg_proc where oid='future_production_write_intelligence_derived_bundle_v1(jsonb)'::regprocedure;
+ select * into strict candidate from pg_proc where oid='production_control.canonical_future_write_intelligence_derived_bundle_v1_resource(jsonb,jsonb)'::regprocedure;
+ if candidate.proowner<>original_owner or not candidate.prosecdef or candidate.proconfig<>array['search_path=pg_catalog']
+  or has_function_privilege('anon',candidate.oid,'EXECUTE') or has_function_privilege('authenticated',candidate.oid,'EXECUTE')
+  or has_function_privilege('service_role',candidate.oid,'EXECUTE') then raise exception 'CANONICAL_FUTURE_WORKER_PRIVATE_CORE_PRIVILEGE_INVALID';end if;
+end;$acl$;
+
+do $acl$ declare candidate pg_proc%rowtype;original_owner oid;
+begin select proowner into strict original_owner from pg_proc where oid='future_production_claim_calcutta_recalculation_v1(jsonb)'::regprocedure;
+ select * into strict candidate from pg_proc where oid='production_control.canonical_future_claim_calcutta_recalculation_v1_resource(jsonb,jsonb)'::regprocedure;
+ if candidate.proowner<>original_owner or not candidate.prosecdef or candidate.proconfig<>array['search_path=pg_catalog']
+  or has_function_privilege('anon',candidate.oid,'EXECUTE') or has_function_privilege('authenticated',candidate.oid,'EXECUTE')
+  or has_function_privilege('service_role',candidate.oid,'EXECUTE') then raise exception 'CANONICAL_FUTURE_WORKER_PRIVATE_CORE_PRIVILEGE_INVALID';end if;
+end;$acl$;
+
+do $acl$ declare candidate pg_proc%rowtype;original_owner oid;
+begin select proowner into strict original_owner from pg_proc where oid='future_production_complete_calcutta_recalculation_v1(jsonb)'::regprocedure;
+ select * into strict candidate from pg_proc where oid='production_control.canonical_future_complete_calcutta_recalculation_v1_resource(jsonb,jsonb)'::regprocedure;
+ if candidate.proowner<>original_owner or not candidate.prosecdef or candidate.proconfig<>array['search_path=pg_catalog']
+  or has_function_privilege('anon',candidate.oid,'EXECUTE') or has_function_privilege('authenticated',candidate.oid,'EXECUTE')
+  or has_function_privilege('service_role',candidate.oid,'EXECUTE') then raise exception 'CANONICAL_FUTURE_WORKER_PRIVATE_CORE_PRIVILEGE_INVALID';end if;
+end;$acl$;
+
+do $acl$ declare candidate pg_proc%rowtype;original_owner oid;
+begin select proowner into strict original_owner from pg_proc where oid='future_production_fail_calcutta_recalculation_v1(jsonb)'::regprocedure;
+ select * into strict candidate from pg_proc where oid='production_control.canonical_future_fail_calcutta_recalculation_v1_resource(jsonb,jsonb)'::regprocedure;
+ if candidate.proowner<>original_owner or not candidate.prosecdef or candidate.proconfig<>array['search_path=pg_catalog']
+  or has_function_privilege('anon',candidate.oid,'EXECUTE') or has_function_privilege('authenticated',candidate.oid,'EXECUTE')
+  or has_function_privilege('service_role',candidate.oid,'EXECUTE') then raise exception 'CANONICAL_FUTURE_WORKER_PRIVATE_CORE_PRIVILEGE_INVALID';end if;
+end;$acl$;
+
+do $acl$ declare candidate pg_proc%rowtype;original_owner oid;
+begin select proowner into strict original_owner from pg_proc where oid='future_production_claim_net_skins_recalculation_v1(jsonb)'::regprocedure;
+ select * into strict candidate from pg_proc where oid='production_control.canonical_future_claim_net_skins_recalculation_v1_resource(jsonb,jsonb)'::regprocedure;
+ if candidate.proowner<>original_owner or not candidate.prosecdef or candidate.proconfig<>array['search_path=pg_catalog']
+  or has_function_privilege('anon',candidate.oid,'EXECUTE') or has_function_privilege('authenticated',candidate.oid,'EXECUTE')
+  or has_function_privilege('service_role',candidate.oid,'EXECUTE') then raise exception 'CANONICAL_FUTURE_WORKER_PRIVATE_CORE_PRIVILEGE_INVALID';end if;
+end;$acl$;
+
+do $acl$ declare candidate pg_proc%rowtype;original_owner oid;
+begin select proowner into strict original_owner from pg_proc where oid='future_production_complete_net_skins_recalculation_v1(jsonb)'::regprocedure;
+ select * into strict candidate from pg_proc where oid='production_control.canonical_future_complete_net_skins_recalculation_v1_resource(jsonb,jsonb)'::regprocedure;
+ if candidate.proowner<>original_owner or not candidate.prosecdef or candidate.proconfig<>array['search_path=pg_catalog']
+  or has_function_privilege('anon',candidate.oid,'EXECUTE') or has_function_privilege('authenticated',candidate.oid,'EXECUTE')
+  or has_function_privilege('service_role',candidate.oid,'EXECUTE') then raise exception 'CANONICAL_FUTURE_WORKER_PRIVATE_CORE_PRIVILEGE_INVALID';end if;
+end;$acl$;
+
+do $acl$ declare candidate pg_proc%rowtype;original_owner oid;
+begin select proowner into strict original_owner from pg_proc where oid='future_production_fail_net_skins_recalculation_v1(jsonb)'::regprocedure;
+ select * into strict candidate from pg_proc where oid='production_control.canonical_future_fail_net_skins_recalculation_v1_resource(jsonb,jsonb)'::regprocedure;
+ if candidate.proowner<>original_owner or not candidate.prosecdef or candidate.proconfig<>array['search_path=pg_catalog']
+  or has_function_privilege('anon',candidate.oid,'EXECUTE') or has_function_privilege('authenticated',candidate.oid,'EXECUTE')
+  or has_function_privilege('service_role',candidate.oid,'EXECUTE') then raise exception 'CANONICAL_FUTURE_WORKER_PRIVATE_CORE_PRIVILEGE_INVALID';end if;
+end;$acl$;
+
+-- Resource-aware binding for required internal derived jobs only. The
+-- preserved Production body still owns every non-Certification invocation.
+create temporary table certification_job_binder_original on commit drop as
+select p.*, coalesce((select jsonb_agg(to_jsonb(d) order by d.classid,d.objid,d.objsubid,d.refclassid,d.refobjid,d.refobjsubid,d.deptype)
+ from pg_depend d where d.classid='pg_proc'::regclass and d.objid=p.oid),'[]'::jsonb) dependencies
+from pg_proc p where p.oid='scoring_authority.bind_annual_job_generation_v1()'::regprocedure;
+
+do $binding$ declare d text; original_body text; revised_body text;
+ marker constant text := $marker$  select value.runtime_generation_id into generation_id
+  from production_control.future_annual_runtime_generations_v1 value$marker$;
+ branch constant text := $branch$  if tg_table_schema='scoring_authority' and tg_table_name in (
+      'competition_recalculation_jobs','net_skins_v1_recalculation_jobs','calcutta_v1_recalculation_jobs')
+      and exists(select 1 from production_control.canonical_resource_v1 where singleton and resource_class='CERTIFICATION') then
+    certification_context:=production_control.current_certification_context_v1();
+    -- A future setup job remains intentionally unbound until activation.
+    if new.tournament_id is distinct from certification_context->>'current_tournament_id' then
+      if not exists(select 1 from production_control.future_tournament_catalog_v1 catalog
+        where catalog.tournament_id=new.tournament_id
+          and catalog.tournament_year>(certification_context->>'current_tournament_year')::integer
+          and catalog.lifecycle in('DRAFT','CONFIGURING','READY_FOR_ACTIVATION'))then
+        raise exception using errcode='42501',message='CERTIFICATION_JOB_TARGET_DENIED';
+      end if;
+      new.runtime_generation_id:=null;
+      return new;
+    end if;
+    perform production_control.assert_current_certification_future_context_v1(certification_context);
+    select value.runtime_generation_id into strict generation_id
+    from production_control.future_annual_runtime_generations_v1 value
+    join production_control.current_tournament_pointer_v1 pointer
+      on pointer.scope_key=certification_context->>'resource_id'
+      and pointer.tournament_id=value.tournament_id
+      and pointer.pointer_revision=value.pointer_revision
+    join production_control.annual_scoring_runtime_authorities_v1 annual
+      on annual.tournament_id=value.tournament_id
+      and annual.runtime_generation_id=value.runtime_generation_id
+      and annual.authority_generation_id=value.authority_generation_id
+      and annual.admission_generation_id=value.admission_generation_id
+      and annual.authority_status='ACTIVE'
+    where value.tournament_id=new.tournament_id and value.generation_status='ACTIVE'
+      and value.authority_generation_id::text=certification_context->>'authority_epoch_id';
+    new.runtime_generation_id:=generation_id;
+    return new;
+  end if;
+$branch$;
+begin
+ select prosrc into strict original_body from certification_job_binder_original;
+ if (length(original_body)-length(replace(original_body,marker,'')))/length(marker)<>1
+    or (length(original_body)-length(replace(original_body,'declare generation_id uuid;','')))/length('declare generation_id uuid;')<>1 then
+  raise exception 'CERTIFICATION_JOB_BINDER_PREDECESSOR_MISMATCH';
+ end if;
+ d:=pg_get_functiondef('scoring_authority.bind_annual_job_generation_v1()'::regprocedure);
+ d:=replace(d,'declare generation_id uuid;','declare generation_id uuid; certification_context jsonb;');
+ execute replace(d,marker,branch||marker);
+ select prosrc into strict revised_body from pg_proc where oid='scoring_authority.bind_annual_job_generation_v1()'::regprocedure;
+ if replace(replace(revised_body,branch,''),'declare generation_id uuid; certification_context jsonb;','declare generation_id uuid;')
+   is distinct from original_body then raise exception 'CERTIFICATION_JOB_BINDER_PRODUCTION_BODY_CHANGED';end if;
+end;$binding$;
+
+do $acl$ declare p pg_proc%rowtype;o record;deps jsonb;
+begin
+ select * into strict o from certification_job_binder_original;
+ select * into strict p from pg_proc where oid=o.oid;
+ select coalesce(jsonb_agg(to_jsonb(d) order by d.classid,d.objid,d.objsubid,d.refclassid,d.refobjid,d.refobjsubid,d.deptype),'[]'::jsonb)
+ into deps from pg_depend d where d.classid='pg_proc'::regclass and d.objid=p.oid;
+ if p.proowner<>o.proowner or p.proacl is distinct from o.proacl or p.prosecdef<>o.prosecdef
+  or p.proconfig is distinct from o.proconfig or p.provolatile<>o.provolatile
+  or deps is distinct from o.dependencies then raise exception 'CERTIFICATION_JOB_BINDER_AUTHORITY_CHANGED';end if;
+end;$acl$;
+
+notify pgrst,'reload schema';
+commit;

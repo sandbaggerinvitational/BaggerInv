@@ -1,0 +1,30 @@
+{
+  "status": "PARTIAL",
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "proof_layer": [
+    "POSTGRESQL",
+    "INTEGRATION"
+  ],
+  "source_manifest": "NOT_CAPTURED_FOR_THIS_RUN; no final-SHA claim",
+  "result": {
+    "tests": 4,
+    "pass": 3,
+    "fail": 1,
+    "skip": 0
+  },
+  "completed_gates": [
+    "24 synthetic verified contact identities and canonical owner fixture",
+    "actual future2097 CREATE/teams/roster/rounds/course assignment/promotion/handicap/pairings/context/Guide/Draft/Prediction authoring",
+    "2026 canonical sequence R1 108 R2 108 R3 216;24 actual Final results; all ingress COMMITTED"
+  ],
+  "failed_gate": "Shipping INTELLIGENCE worker input read: PRODUCTION_ODDS_EXACT_RESOURCE_REQUIRED (28 deliveries)",
+  "annual_transition": "NOT_EXECUTED",
+  "source_changes_during_run": "No start/end manifest was recorded; freshness must be re-proven",
+  "timings": "Measured in process but not persisted before failure; no timing claim",
+  "log": "annual-transition-checkpoint-05.log",
+  "log_sha256": "099709028181823c42a34d1e5ce8008a7a8650283a0dcf3676ae244854e28aea",
+  "hosted_access": false,
+  "production_access": false,
+  "google_calls": 0,
+  "owned_cluster": "DESTROYED"
+}

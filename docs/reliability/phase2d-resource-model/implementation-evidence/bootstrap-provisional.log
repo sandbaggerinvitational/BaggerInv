@@ -1,0 +1,21 @@
+▶ R2 deterministic canonical bootstrap — owned local PostgreSQL17 only
+  ✔ provisional source profile deterministically reproduces its in-memory artifacts (1077.6835ms)
+  ✔ tampered schema/catalog/source manifest rejected before installation (152.0815ms)
+  ✔ fresh database has convergent definitions and zero authority/history/job seeds (7906.668417ms)
+  ✔ exact replay verifies receipt and makes no new authority (6751.825916ms)
+  ✔ failure at after-schema rolls back all application schemas and retry succeeds (6429.260666ms)
+  ✔ failure at after-static rolls back all application schemas and retry succeeds (6550.678125ms)
+  ✔ failure at before-commit rolls back all application schemas and retry succeeds (6215.392542ms)
+  ✔ fresh independent database converges; no cloned resource or control authority (12280.510542ms)
+  ✔ replay detects changed RLS rather than accepting only a matching receipt (565.629417ms)
+  ✔ unowned database handles rejected; no remote connection interface (82.519416ms)
+✔ R2 deterministic canonical bootstrap — owned local PostgreSQL17 only (55084.263792ms)
+ℹ {"environment":"OWNED_LOCAL_POSTGRESQL17","provisional":true,"finalBaselineEmitted":false,"functions":994,"sourceFiles":131,"authorityRowsCopied":0,"hostedAccess":false}
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 55206.485833

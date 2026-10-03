@@ -1,0 +1,110 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "cases": [
+    {
+      "id": "BROAD-NEW-007 course/tee and immutable approved handicap through actual client/API",
+      "result": "PASS"
+    },
+    {
+      "id": "BROAD-NEW-008 stable operation identity, actual receipt/readback and conflict",
+      "result": "PASS"
+    },
+    {
+      "id": "BROAD-NEW-009 atomic complete round pairings retain approved handicap reference",
+      "result": "PASS"
+    },
+    {
+      "id": "BROAD-NEW-012 changed setup fails Mark Live until explicit current preparation",
+      "result": "PASS"
+    },
+    {
+      "id": "BROAD-NEW-010 all three formats use immutable Net Skins bindings and truthful financial audit",
+      "result": "PASS"
+    },
+    {
+      "id": "BROAD-NEW-011 Calcutta replacement/clear preserve ownership, values and publication rules",
+      "result": "PASS"
+    },
+    {
+      "id": "BROAD-NEW-174 Prepare/Live/Lock/Unlock/Revoke/Activate remain distinct and audited",
+      "result": "FAIL",
+      "error": "The canonical operation is unconfirmed. Retry the same operation; do not create a replacement identity."
+    }
+  ],
+  "capabilities": [
+    "BROAD-NEW-007",
+    "BROAD-NEW-008",
+    "BROAD-NEW-009",
+    "BROAD-NEW-010",
+    "BROAD-NEW-011",
+    "BROAD-NEW-012",
+    "BROAD-NEW-174"
+  ],
+  "externalNetworkCalls": 0,
+  "googleCalls": 0,
+  "productionAccess": false,
+  "sessionProof": "SYNTHETIC_SESSION_ADAPTER_REAL_DATABASE_AUTHORIZATION",
+  "databaseErrors": [
+    {
+      "name": "execute_certification_operation_v1",
+      "error": {
+        "sqlstate": null,
+        "message": "PRODUCTION_MATCH_NOT_SCORING_READY",
+        "detail": {
+          "ok": false,
+          "code": "PRODUCTION_MATCH_NOT_SCORING_READY",
+          "status": "UPCOMING",
+          "reasons": [
+            {
+              "code": "SETUP_SNAPSHOT_STALE",
+              "message": "The match setup changed after its scoring snapshot was prepared."
+            }
+          ],
+          "match_id": "2026-R1-1",
+          "audit_created": false,
+          "match_revision": 1,
+          "scoring_locked": false,
+          "permission_revision": 2,
+          "google_outbox_created": false,
+          "scoring_readiness_contract": "production-match-scoring-readiness-v1"
+        }
+      }
+    },
+    {
+      "name": "execute_certification_operation_v1",
+      "error": {
+        "sqlstate": "55000",
+        "message": "PRODUCTION_CALCUTTA_AUCTION_FACTS_REQUIRED",
+        "detail": "ERROR:  55000: PRODUCTION_CALCUTTA_AUCTION_FACTS_REQUIRED\nCONTEXT:  PL/pgSQL function production_control.assert_calcutta_nonempty_revision_v1() line 10 at RAISE\nSQL statement \"insert into scoring_authority.calcutta_v1_recalculation_jobs (\n    tournament_id, configuration_revision_id, configuration_revision,\n    configuration_fingerprint, auction_revision_id, auction_revision,\n    auction_fingerprint, activation_revision, source_revision,\n    source_fingerprint, status, reason, requested_by,\n    request_fingerprint, request_payload_hash\n  ) values (\n    '2026', current_value.configuration_revision_id,\n    current_value.configuration_revision,\n    current_value.configuration_fingerprint,\n    current_value.auction_revision_id, current_value.auction_revision,\n    current_value.auction_fingerprint, activation_revision_value,\n    source_revision_value, source_fingerprint_value, 'PENDING',\n    pg_catalog.left(coalesce(nullif(reason_value, ''),\n      'EXPLICIT_RECALCULATION'), 120),\n    pg_catalog.left(coalesce(nullif(requested_by_value, ''),\n      'production-calcutta-v1'), 160),\n    request_fingerprint_value, request_payload_hash_value\n  ) returning *\"\nPL/pgSQL function enqueue_production_calcutta_v1(text,text,boolean,text,text) line 89 at SQL statement\nSQL statement \"SELECT production_control.enqueue_production_calcutta_v1(\n      case\n        when tg_table_name = 'hole_scores' then 'CANONICAL_SCORE_CHANGED'\n        when tg_table_name = 'rounds'\n          then 'CANONICAL_ROUND_LIFECYCLE_CHANGED'\n        else 'CANONICAL_MATCH_LIFECYCLE_CHANGED'\n      end,\n      'production-calcutta-v1-trigger', false, null, null\n    )\"\nPL/pgSQL function scoring_authority.enqueue_production_calcutta_v1_change() line 82 at PERFORM\nSQL statement \"update scoring_authority.matches set\n    status = case when operation = 'MARK_LIVE' then 'LIVE' else status end,\n    scoring_locked = target_locked,\n    match_revision = next_match_revision,\n    permission_revision = next_permission_revision,\n    authority_updated_at = transition_at,\n    updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function canonical_match_control_v1(jsonb,jsonb) line 292 at SQL statement\nPL/pgSQL function production_control.canonical_director_setup_operation_v2(jsonb,jsonb,boolean) line 67 at RETURN\nPL/pgSQL function production_control.dispatch_certification_operation_v1(jsonb,jsonb,boolean) line 86 at RETURN\nPL/pgSQL function production_control.execute_certification_operation_core_v1(jsonb) line 6 at assignment\nPL/pgSQL function public.execute_certification_operation_v1(jsonb) line 21 at assignment\nLOCATION:  exec_stmt_raise, pl_exec.c:3911\n"
+      }
+    }
+  ],
+  "sourceStable": true,
+  "sourceManifest": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "c837f915ba1f3a28919a8a7a3d836bb578f074ebb9a484ce97d3430f2c5c8916",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "lib/certification-runtime-server.js": "cbb17b9dca9c8857cade4c1e715be933c90b0c810ca52c1fc56117f0a9dc7081",
+    "lib/isolated-director-operations.js": "de01168a85256452260c88456b26232c71bdda05c1f8b1764ed2a70ec98ed15d",
+    "lib/canonical-director-operations-client.js": "8f2ae30067d0844d44500a4306e151b94bf15f5e916653a946ac424decf381c4",
+    "app/api/director/canonical-operations/route.js": "cbc0446b5fd60f7f867531fa64126a65891e6df66a153379897765c91760078c",
+    "test/reliability-phase2dr2-director.integration.test.mjs": "367659a3096b03e791af5b59da0b10530450b18d953a395a083a72cd0c4d4df7",
+    "test/support/reliability/certification-director-proof.mjs": "343e1b6c0d1ff7c1080a134b83f7d18c9eed42f19e4e9a7b83d1fc9dea6d7e73"
+  },
+  "completed": 6,
+  "failures": 1,
+  "limitations": [
+    "Local HTTP/session adapter only; no hosted Auth proof",
+    "Synthetic initial Calcutta configuration is fixture provisioning, not a new configuration API",
+    "No native physical-device or hosted proof"
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "cases": [
+    {
+      "id": "known opposite-round lock cycle becomes one-way wait; concurrent score remains independent",
+      "result": "PASS",
+      "details": {
+        "graph": [
+          {
+            "pid": 57851,
+            "blockedBy": [
+              57850
+            ]
+          }
+        ],
+        "scoreMs": 93.24758399999973,
+        "deadlocks": 0
+      }
+    },
+    {
+      "id": "eight mixed-round batches retain exact current source and configuration",
+      "result": "PASS",
+      "details": [
+        {
+          "iteration": 0,
+          "workers": 3,
+          "processed": 4,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 1,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 2,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 3,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 4,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 5,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 6,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 7,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        }
+      ]
+    },
+    {
+      "id": "stale and superseded owner completion races current materialization without replacing authority",
+      "result": "FAIL",
+      "error": "/opt/homebrew/opt/postgresql@17/bin/psql\nERROR:  PRODUCTION_SERVICE_ROLE_REQUIRED\nCONTEXT:  PL/pgSQL function assert_production_service_role() line 12 at RAISE\nSQL statement \"SELECT production_control.assert_production_service_role()\"\nPL/pgSQL function production_control.assert_certification_context_v1(jsonb,text,boolean) line 8 at PERFORM\nPL/pgSQL function production_control.push_certification_context_v1(jsonb,text,boolean) line 4 at assignment\nSQL statement \"SELECT production_control.push_certification_context_v1('{\"contract_version\":\"certification-runtime-v1\",\"resource\":{\"resource_id\":\"CERTIFICATION:3aeae841-74c2-4801-8dd6-4e897041a773\",\"resource_class\":\"CERTIFICATION\",\"installation_id\":\"3aeae841-74c2-4801-8dd6-4e897041a773\",\"project_ref\":\"aaaaaaaaaaaaaaaaaaaa\",\"project_url\":\"https://aaaaaaaaaaaaaaaaaaaa.supabase.co\",\"vercel_team_id\":\"team_syntheticcertification\",\"vercel_project_id\":\"prj_syntheticcertification\",\"registration_revision\":1,\"manifest_digest\":\"f78a58b565bae3ae73beb451bba14aa05cb29abcf6f8199a359f20718b9e53d6\",\"schema_contract\":\"canonical-resource-v1\",\"schema_digest\":\"fca1eb0c3011f825ad6b89fc03d978ac5808e52ca35899a51e1324b272f06b2c\"},\"deployment\":{\"vercel_team_id\":\"team_syntheticcertification\",\"vercel_project_id\":\"prj_syntheticcertification\",\"git_branch\":\"codex/synthetic-resource-proof\",\"deployment_class\":\"preview\",\"release_commit\":\"cccccccccccccccccccccccccccccccccccccccc\",\"deployment_id\":\"dpl_synthetic_certification_0\",\"deployment_origin\":\"https://synthetic-certification-0.vercel.app\"},\"phase\":\"WORKERS\",\"authorization\":{}}'::jsonb,'WORKERS',false)\"\nPL/pgSQL function inline_code_block line 2 at PERFORM\n"
+    }
+  ],
+  "googleCalls": 0,
+  "googleJobs": 0,
+  "deadlocks": 0,
+  "externalNetwork": false,
+  "sourceManifest": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "c837f915ba1f3a28919a8a7a3d836bb578f074ebb9a484ce97d3430f2c5c8916",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "test/reliability-phase2dr2-net-skins-concurrency.integration.test.mjs": "a6386a5a5adbfeb9c0a562181172ff8186cff8c6b4d1af8f005d6e31604dfff4",
+    "test/support/reliability/certification-net-skins-fixture.mjs": "7f43b53093a392bbf5cda1e3ea81cbb86c202ecf9c69cd8d887365693e4ab16f",
+    "test/support/reliability/certification-director-proof.mjs": "343e1b6c0d1ff7c1080a134b83f7d18c9eed42f19e4e9a7b83d1fc9dea6d7e73",
+    "test/support/reliability/phase2d-certification-fixture.mjs": "8dbeccb14fd6531657e81051aa4c0016a262dbea0345f1f0137a2bda2364ba78",
+    "lib/production-full-net.js": "fb854e2036d1082e12a885397f8648c74ab0e31a7126f05b31302b75c629780b",
+    "lib/net-skins.js": "99629f0e5e850cc2bf61751a6085709f31d87127f8bb401547d9f496e9c24cee",
+    "lib/isolated-director-operations.js": "de01168a85256452260c88456b26232c71bdda05c1f8b1764ed2a70ec98ed15d"
+  },
+  "sourceStable": true,
+  "limitations": [
+    "Known mixed-round ordered lock scenario only, not universal deadlock freedom",
+    "Initial synthetic configuration is declared fixture provisioning; entry saves and owner calculator are actual supported operations",
+    "No final financial publication or hosted capacity proof"
+  ]
+}

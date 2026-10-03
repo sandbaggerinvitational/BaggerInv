@@ -1,0 +1,429 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17_NON_PRODUCTION",
+  "migration143": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+  "testSource": "e3ff658247d4663fea812e675fd784d1ec3e963c11cf5a7f923d27948b182e11",
+  "graph": {
+    "edges": [
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.assert_canonical_odds_job_v1(pg_catalog.jsonb,pg_catalog.text,scoring_authority.odds_calculation_jobs,pg_catalog.jsonb)",
+        "referenced_type": "language",
+        "referenced_identity": "plpgsql"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.assert_canonical_odds_job_v1(pg_catalog.jsonb,pg_catalog.text,scoring_authority.odds_calculation_jobs,pg_catalog.jsonb)",
+        "referenced_type": "schema",
+        "referenced_identity": "production_control"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.assert_canonical_odds_job_v1(pg_catalog.jsonb,pg_catalog.text,scoring_authority.odds_calculation_jobs,pg_catalog.jsonb)",
+        "referenced_type": "type",
+        "referenced_identity": "scoring_authority.odds_calculation_jobs"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.assert_certification_odds_actor_v1(pg_catalog.jsonb,pg_catalog.jsonb)",
+        "referenced_type": "language",
+        "referenced_identity": "plpgsql"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.assert_certification_odds_actor_v1(pg_catalog.jsonb,pg_catalog.jsonb)",
+        "referenced_type": "schema",
+        "referenced_identity": "production_control"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.canonical_odds_dispatch_v2(pg_catalog.jsonb,pg_catalog.jsonb)",
+        "referenced_type": "language",
+        "referenced_identity": "plpgsql"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.canonical_odds_dispatch_v2(pg_catalog.jsonb,pg_catalog.jsonb)",
+        "referenced_type": "schema",
+        "referenced_identity": "production_control"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.canonical_odds_inputs_v2(pg_catalog.text,pg_catalog.text,pg_catalog.jsonb,boolean,pg_catalog.jsonb)",
+        "referenced_type": "language",
+        "referenced_identity": "plpgsql"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.canonical_odds_inputs_v2(pg_catalog.text,pg_catalog.text,pg_catalog.jsonb,boolean,pg_catalog.jsonb)",
+        "referenced_type": "schema",
+        "referenced_identity": "production_control"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.canonical_odds_inputs_v2(pg_catalog.text,pg_catalog.text,pg_catalog.jsonb,boolean,pg_catalog.jsonb)",
+        "referenced_type": "type",
+        "referenced_identity": "scoring_authority.odds_input_configurations"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.canonical_publish_odds_v2(pg_catalog.jsonb,pg_catalog.text,pg_catalog.jsonb)",
+        "referenced_type": "language",
+        "referenced_identity": "plpgsql"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.canonical_publish_odds_v2(pg_catalog.jsonb,pg_catalog.text,pg_catalog.jsonb)",
+        "referenced_type": "schema",
+        "referenced_identity": "production_control"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.certification_odds_publication_state_v1(pg_catalog.text,pg_catalog.jsonb)",
+        "referenced_type": "language",
+        "referenced_identity": "plpgsql"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.certification_odds_publication_state_v1(pg_catalog.text,pg_catalog.jsonb)",
+        "referenced_type": "schema",
+        "referenced_identity": "production_control"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.certification_odds_request_hash_v1(pg_catalog.jsonb,pg_catalog.text)",
+        "referenced_type": "schema",
+        "referenced_identity": "production_control"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.certification_odds_runtime_v1(pg_catalog.jsonb)",
+        "referenced_type": "language",
+        "referenced_identity": "plpgsql"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.certification_odds_runtime_v1(pg_catalog.jsonb)",
+        "referenced_type": "schema",
+        "referenced_identity": "production_control"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.current_canonical_odds_inputs_v2(pg_catalog.text,pg_catalog.text,pg_catalog.jsonb,boolean,pg_catalog.jsonb)",
+        "referenced_type": "language",
+        "referenced_identity": "plpgsql"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.current_canonical_odds_inputs_v2(pg_catalog.text,pg_catalog.text,pg_catalog.jsonb,boolean,pg_catalog.jsonb)",
+        "referenced_type": "schema",
+        "referenced_identity": "production_control"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.current_canonical_odds_inputs_v2(pg_catalog.text,pg_catalog.text,pg_catalog.jsonb,boolean,pg_catalog.jsonb)",
+        "referenced_type": "type",
+        "referenced_identity": "scoring_authority.odds_input_configurations"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.guard_certification_odds_job_v1()",
+        "referenced_type": "language",
+        "referenced_identity": "plpgsql"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.guard_certification_odds_job_v1()",
+        "referenced_type": "schema",
+        "referenced_identity": "production_control"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.publish_annual_odds_v1(pg_catalog.jsonb,pg_catalog.text)",
+        "referenced_type": "language",
+        "referenced_identity": "plpgsql"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "production_control.publish_annual_odds_v1(pg_catalog.jsonb,pg_catalog.text)",
+        "referenced_type": "schema",
+        "referenced_identity": "production_control"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "public.dispatch_certification_odds_v1(pg_catalog.jsonb)",
+        "referenced_type": "language",
+        "referenced_identity": "plpgsql"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "public.dispatch_certification_odds_v1(pg_catalog.jsonb)",
+        "referenced_type": "schema",
+        "referenced_identity": "public"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "public.future_production_dispatch_odds_pre_withdrawal_v1(pg_catalog.jsonb)",
+        "referenced_type": "language",
+        "referenced_identity": "plpgsql"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "public.future_production_dispatch_odds_pre_withdrawal_v1(pg_catalog.jsonb)",
+        "referenced_type": "schema",
+        "referenced_identity": "public"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "public.read_certification_odds_operation_v1(pg_catalog.jsonb)",
+        "referenced_type": "language",
+        "referenced_identity": "plpgsql"
+      },
+      {
+        "deptype": "n",
+        "object_type": "function",
+        "object_identity": "public.read_certification_odds_operation_v1(pg_catalog.jsonb)",
+        "referenced_type": "schema",
+        "referenced_identity": "public"
+      },
+      {
+        "deptype": "n",
+        "object_type": "trigger",
+        "object_identity": "zz_guard_certification_odds_job_v1 on scoring_authority.odds_calculation_jobs",
+        "referenced_type": "function",
+        "referenced_identity": "production_control.guard_certification_odds_job_v1()"
+      }
+    ],
+    "functions": [
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "owner": "postgres",
+        "identity": "public.dispatch_certification_odds_v1(pg_catalog.jsonb)",
+        "language": "plpgsql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": true,
+        "definitionSha256": "3d7ba51680150f2f493e20fb1a6fe4313b88c2f72258fc33f44708888474cc12",
+        "serviceRoleExecute": true,
+        "authenticatedExecute": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "identity": "public.future_production_dispatch_odds_pre_withdrawal_v1(pg_catalog.jsonb)",
+        "language": "plpgsql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": true,
+        "definitionSha256": "e2363de800a488d182c963602ad0fae0db46e3c869a3126276bd131f78148395",
+        "serviceRoleExecute": false,
+        "authenticatedExecute": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "identity": "production_control.assert_canonical_odds_job_v1(pg_catalog.jsonb,pg_catalog.text,scoring_authority.odds_calculation_jobs,pg_catalog.jsonb)",
+        "language": "plpgsql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": true,
+        "definitionSha256": "56184b4a3a626e778b1fe2fd1f467905d3dd07d6773ccb344a73a04201050bec",
+        "serviceRoleExecute": false,
+        "authenticatedExecute": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "identity": "production_control.assert_certification_odds_actor_v1(pg_catalog.jsonb,pg_catalog.jsonb)",
+        "language": "plpgsql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": true,
+        "definitionSha256": "6bcdefc4c731a69c22d21be971d88584e001a15227a4cd9bb1bb1227dbe974f6",
+        "serviceRoleExecute": false,
+        "authenticatedExecute": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "identity": "production_control.canonical_odds_dispatch_v2(pg_catalog.jsonb,pg_catalog.jsonb)",
+        "language": "plpgsql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": true,
+        "definitionSha256": "61ac9716d979a37a7995065cf54b808991acb604c78e407b4e746d4bdb612ce8",
+        "serviceRoleExecute": false,
+        "authenticatedExecute": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "identity": "production_control.canonical_odds_inputs_v2(pg_catalog.text,pg_catalog.text,pg_catalog.jsonb,boolean,pg_catalog.jsonb)",
+        "language": "plpgsql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": true,
+        "definitionSha256": "185a49da21e2d5304506195a4db9c94de782d0a5c8bd49be853e9385f76bac7a",
+        "serviceRoleExecute": false,
+        "authenticatedExecute": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "identity": "production_control.canonical_publish_odds_v2(pg_catalog.jsonb,pg_catalog.text,pg_catalog.jsonb)",
+        "language": "plpgsql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": true,
+        "definitionSha256": "ab6ec74aec574194cf9dc0a1b755c6aa999cbf625db6bab96c1ca4a7ef926147",
+        "serviceRoleExecute": false,
+        "authenticatedExecute": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "identity": "production_control.certification_odds_publication_state_v1(pg_catalog.text,pg_catalog.jsonb)",
+        "language": "plpgsql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": true,
+        "definitionSha256": "4c8e60a5970687236dd3e7c320fb21a16f446313f36a710eeb745be91d0d2a1a",
+        "serviceRoleExecute": false,
+        "authenticatedExecute": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "identity": "production_control.certification_odds_request_hash_v1(pg_catalog.jsonb,pg_catalog.text)",
+        "language": "sql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": false,
+        "definitionSha256": "5d18d1573374238e3646c70917aaa88f84bfab606c38f23487a588881eb63a37",
+        "serviceRoleExecute": false,
+        "authenticatedExecute": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "identity": "production_control.certification_odds_runtime_v1(pg_catalog.jsonb)",
+        "language": "plpgsql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": true,
+        "definitionSha256": "5c34d79f91b2894a7a0283cbcdac113a4671ae14c8a548d6fc309d89e0699bf3",
+        "serviceRoleExecute": false,
+        "authenticatedExecute": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "identity": "production_control.current_canonical_odds_inputs_v2(pg_catalog.text,pg_catalog.text,pg_catalog.jsonb,boolean,pg_catalog.jsonb)",
+        "language": "plpgsql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": true,
+        "definitionSha256": "b0b7d36834139a51e61c2c7562ea771a923f45be61ceed9d3e523a1a032c9264",
+        "serviceRoleExecute": false,
+        "authenticatedExecute": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "identity": "production_control.guard_certification_odds_job_v1()",
+        "language": "plpgsql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": true,
+        "definitionSha256": "ee98f5f8b6134a81fe86555de185f3e7b7b8cc93c1a1027399777849d657f55d",
+        "serviceRoleExecute": false,
+        "authenticatedExecute": false
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "identity": "production_control.publish_annual_odds_v1(pg_catalog.jsonb,pg_catalog.text)",
+        "language": "plpgsql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": true,
+        "definitionSha256": "b8aeba8c154ab94f1cbbe8918c99f0aafe32cc27a927a2420fb869197de395fb",
+        "serviceRoleExecute": false,
+        "authenticatedExecute": false
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "owner": "postgres",
+        "identity": "public.read_certification_odds_operation_v1(pg_catalog.jsonb)",
+        "language": "plpgsql",
+        "searchPath": [
+          "search_path=pg_catalog"
+        ],
+        "anonExecute": false,
+        "securityDefiner": true,
+        "definitionSha256": "0589c5a87dd35028df695c1f95af449d944d701be0d56cd7bf74c4c22e70ff40",
+        "serviceRoleExecute": true,
+        "authenticatedExecute": false
+      }
+    ]
+  },
+  "limits": [
+    "Semantic catalog identities are recorded rather than installation-specific numeric OIDs",
+    "pg_depend does not record every PL/pgSQL textual body call; actual nested RPC execution is separate integration evidence",
+    "Migration143 checks predecessor wrapper OID/owner/ACL/security/search_path/volatility before and after replacement; this graph is the post-install catalog"
+  ]
+}

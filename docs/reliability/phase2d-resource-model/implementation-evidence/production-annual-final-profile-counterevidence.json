@@ -1,0 +1,102 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_PRODUCTION_SHAPED_POSTGRESQL17",
+  "hostedAccess": false,
+  "productionAccess": false,
+  "googleCalls": 0,
+  "runtimeGuardsSubstituted": false,
+  "readinessSubstituted": false,
+  "drainSubstituted": false,
+  "seededScores": 0,
+  "seededFinals": 0,
+  "operations": [
+    {
+      "operation": "CREATE_TOURNAMENT",
+      "requestId": "e11b722e-44be-42b5-b87e-9276691b1d6d",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_CREATE_TOURNAMENT_COMPLETED"
+    },
+    {
+      "operation": "CONFIGURE_TEAM",
+      "requestId": "2d9b57c6-b386-459d-9154-615e2f8ab93e",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_CONFIGURE_TEAM_COMPLETED"
+    },
+    {
+      "operation": "CONFIGURE_TEAM",
+      "requestId": "cb3a4086-3324-4997-a0fb-bb70821ff8ec",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_CONFIGURE_TEAM_COMPLETED"
+    },
+    {
+      "operation": "REPLACE_ROSTER",
+      "requestId": "eb5e931a-553d-45ec-8aaa-5bcdb367cc5c",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_REPLACE_ROSTER_COMPLETED"
+    },
+    {
+      "operation": "CONFIGURE_ROUND",
+      "requestId": "a33b61b0-1baf-475c-96d4-eb03f7363d68",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_CONFIGURE_ROUND_COMPLETED"
+    },
+    {
+      "operation": "GENERATE_MATCH_STRUCTURE",
+      "requestId": "c2bc0a04-9050-4b98-8583-c505ac6ce21e",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_GENERATE_MATCH_STRUCTURE_COMPLETED"
+    },
+    {
+      "operation": "CONFIGURE_ROUND",
+      "requestId": "20758511-748f-4821-a86b-b9ae4757326b",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_CONFIGURE_ROUND_COMPLETED"
+    },
+    {
+      "operation": "GENERATE_MATCH_STRUCTURE",
+      "requestId": "1a2bd8a7-938f-4be6-ae45-0027387423bf",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_GENERATE_MATCH_STRUCTURE_COMPLETED"
+    },
+    {
+      "operation": "CONFIGURE_ROUND",
+      "requestId": "9171f632-17ff-42dd-bcec-bda0bd872eb7",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_CONFIGURE_ROUND_COMPLETED"
+    },
+    {
+      "operation": "GENERATE_MATCH_STRUCTURE",
+      "requestId": "f575ea2d-6955-4c54-9eab-b76c649b1185",
+      "resultCode": "PRODUCTION_FUTURE_YEAR_GENERATE_MATCH_STRUCTURE_COMPLETED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "ADD_GLOBAL_COURSE",
+      "requestId": "546ae7eb-0351-4da6-87e4-ec1b6b2208b0",
+      "resultCode": "PRODUCTION_GLOBAL_COURSE_CREATED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "CONFIGURE_GLOBAL_COURSE_CONTEXT",
+      "requestId": "f4eac0ea-156b-4275-8ec6-59669114180a",
+      "resultCode": "PRODUCTION_GLOBAL_COURSE_CONTEXT_CONFIGURED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "ASSIGN_FUTURE_COURSE",
+      "requestId": "7191da46-bc22-446b-9cd8-eb0fa7e0f512",
+      "resultCode": "PRODUCTION_FUTURE_GLOBAL_COURSE_ASSIGNED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "ASSIGN_FUTURE_COURSE",
+      "requestId": "e1b24484-55be-4496-966b-d4662acdc512",
+      "resultCode": "PRODUCTION_FUTURE_GLOBAL_COURSE_ASSIGNED"
+    },
+    {
+      "operation": "ANNUAL.RUNTIME",
+      "action": "ASSIGN_FUTURE_COURSE",
+      "requestId": "a3718d1a-7f44-47be-b6c0-5549d11fe8db",
+      "resultCode": "PRODUCTION_FUTURE_GLOBAL_COURSE_ASSIGNED"
+    }
+  ],
+  "status": "FAILED",
+  "initialInputs": {
+    "players": 24,
+    "emailsSent": 0,
+    "configurationFingerprint": "6795d9eb49996540638a6610b4231d53f07e5b636a7bc0db45dac01f44498cd9",
+    "provenanceClass": "REGISTERED_LOCAL_PRODUCTION_PROVENANCE",
+    "provenanceSha256": "c5afd4cfc0f3b86e44f96110075ae458830cdfc1d9a5f51e704bbc36d289d5a3"
+  },
+  "error": "CommandFailure: Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -qAt -v ON_ERROR_STOP=1 -d annual_normal_release_frozen_2026\nERROR:  duplicate key value violates unique constraint \"tournament_setup_course_holes_v1_pkey\"\nDETAIL:  Key (tournament_id, course_id, tee_id, hole_number)=(2027, CRS000001, Synthetic, 1) already exists.\nCONTEXT:  SQL statement \"insert into scoring_authority.tournament_setup_course_holes_v1 (\n      tournament_id, course_id, tee_id, hole_number, par,\n      stroke_index, yardage, setup_revision\n    ) select target_id, source.course_id, source.tee_id,\n      source.hole_number, source.par, source.stroke_index, source.yardage,\n      catalog.setup_revision\n    from (\n      select reference.tournament_id, existing.course_id, existing.tee_id,\n        existing.hole_number, existing.par, existing.stroke_index,\n        existing.yardage\n      from production_control.future_tournament_course_references_v1 reference\n      join scoring_authority.tournament_setup_course_holes_v1 existing\n        on existing.tournament_id = reference.source_tournament_id\n       and existing.course_id = reference.course_id\n       and existing.tee_id = reference.tee_id\n      where reference.reference_status = 'EXISTING_REFERENCE'\n      union all\n      select reference.tournament_id, context.course_id, context.tee_id,\n        context.hole_number, context.par, context.stroke_index,\n        context.yardage\n      from production_control.future_tournament_course_references_v1 reference\n      join scoring_authority.global_course_hole_contexts_v1 context\n        on context.course_id = reference.course_id\n       and context.tee_id = reference.tee_id\n       and context.context_revision = reference.source_setup_revision\n      where reference.reference_status = 'GLOBAL_COURSE_CONTEXT'\n    ) source\n    where source.tournament_id = target_id\"\nPL/pgSQL function production_control.canonical_mutate_future_runtime_resource_v2(jsonb,jsonb) line 1736 at SQL statement\nPL/pgSQL function public.mutate_production_future_runtime_v2(jsonb) line 11 at RETURN\n    at runCommand (annual-normal-release-rebind-generated.mjs:135:11)\n    at psql (annual-normal-release-rebind-generated.mjs:151:10)\n    at q (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-annual-golden.mjs:17:21)\n    at row (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-annual-golden.mjs:17:80)\n    at rpc (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-annual-golden.mjs:18:26)\n    at call (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-annual-golden.mjs:69:17)\n    at run (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/certification-future-authoring-proof.mjs:58:30)\n    at preparePromotedFutureScoring (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/certification-future-authoring-proof.mjs:59:23)\n    at runProductionAnnualGolden (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-annual-golden.mjs:94:9)\n    at async TestContext.<anonymous> (annual-normal-release-rebind-generated.mjs:2190:32)"
+}

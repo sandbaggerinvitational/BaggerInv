@@ -1,0 +1,84 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_PROTECTED_PLATFORM_FIXTURE",
+  "productionQueried": false,
+  "runtimeGuardsSubstituted": false,
+  "setupControl": [
+    {
+      "function": "read_production_tournament_setup_v1",
+      "result": "PASS",
+      "exactCurrentRead": true,
+      "realRuntimeGuards": true
+    },
+    {
+      "function": "mutate_production_tournament_setup_v1",
+      "result": "PASS",
+      "realRuntimeGuards": true,
+      "originalDefinitionsRestoredWithinRollback": true,
+      "receiptReplayAndCanonicalEffectsEquivalent": true,
+      "excludedComparisonFields": [
+        "timestamps",
+        "new audit event UUIDs"
+      ],
+      "googleJobs": 0
+    },
+    {
+      "function": "mutate_production_match_control",
+      "result": "PASS",
+      "realRuntimeGuards": true,
+      "originalDefinitionsRestoredWithinRollback": true,
+      "receiptReplayAndCanonicalEffectsEquivalent": true,
+      "excludedComparisonFields": [
+        "timestamps",
+        "new audit event UUIDs"
+      ],
+      "googleJobs": 0
+    },
+    {
+      "function": "mutate_production_match_control",
+      "operation": "ACCESS_ACTIVATE",
+      "result": "PASS",
+      "realRuntimeGuards": true,
+      "protectedPostLockRevalidation": true,
+      "unchangedReadinessDenial": true,
+      "canonicalMutations": 0
+    }
+  ],
+  "financial": {
+    "environment": "OWNED_SOCKET_ONLY_PROTECTED_PLATFORM_FIXTURE",
+    "productionQueried": false,
+    "runtimeGuardsSubstituted": false,
+    "cases": [
+      {
+        "function": "save_production_net_skins_entries_v1",
+        "result": "PASS",
+        "originalBodyRestoredInsideRolledBackTransaction": true,
+        "originalDefinitionSha256": "2b8a4663293c3812aa7683a8394a2404a904066132ee3e1ca22c916594682296",
+        "realRuntimeGuards": true,
+        "exactReceiptAndCanonicalEffects": true,
+        "replay": true
+      },
+      {
+        "function": "replace_production_calcutta_v1_auction_facts",
+        "result": "PASS",
+        "originalBodyRestoredInsideRolledBackTransaction": true,
+        "originalDefinitionSha256": "8c879bd688a1cadc809be44067432059bd19b6f7d90112275c4b1f3b89606371",
+        "realRuntimeGuards": true,
+        "exactReceiptAndCanonicalEffects": true,
+        "replay": true
+      },
+      {
+        "function": "clear_production_calcutta_v1_auction_entry",
+        "result": "PASS",
+        "originalBodyRestoredInsideRolledBackTransaction": true,
+        "originalDefinitionSha256": "125ff90e189b6458bff698d113e9314251c6112ed5db8ffcf6055e1ced106475",
+        "realRuntimeGuards": true,
+        "exactReceiptAndCanonicalEffects": true,
+        "replay": true
+      }
+    ]
+  },
+  "limitations": [
+    "Synthetic protected authority admitted by unchanged runtime guards; no hosted or Production observation",
+    "Positive control equivalence covers Lock; all five lifecycle operations are additionally proven through the isolated gateway"
+  ]
+}

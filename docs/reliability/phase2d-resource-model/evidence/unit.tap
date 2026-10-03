@@ -1,0 +1,1846 @@
+TAP version 13
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.SUBMIT_HOLE
+ok 1 - score adapter preserves existing non-UUID mutation identity: SCORING.SUBMIT_HOLE
+  ---
+  duration_ms: 9.59325
+  type: 'test'
+  ...
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.FINALIZE_MATCH
+ok 2 - score adapter preserves existing non-UUID mutation identity: SCORING.FINALIZE_MATCH
+  ---
+  duration_ms: 0.506083
+  type: 'test'
+  ...
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.REOPEN_MATCH
+ok 3 - score adapter preserves existing non-UUID mutation identity: SCORING.REOPEN_MATCH
+  ---
+  duration_ms: 0.395417
+  type: 'test'
+  ...
+# Subtest: participant context adapter separates server-bound actor fields without changing caller DTO
+ok 4 - participant context adapter separates server-bound actor fields without changing caller DTO
+  ---
+  duration_ms: 0.385959
+  type: 'test'
+  ...
+# Subtest: receipt recovery remains an exact read and retains mutation identity after revocation
+ok 5 - receipt recovery remains an exact read and retains mutation identity after revocation
+  ---
+  duration_ms: 0.224041
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_tournament_live_view
+ok 6 - read alias uses admitted projection gateway: read_tournament_live_view
+  ---
+  duration_ms: 0.466042
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_leaderboards_core_view
+ok 7 - read alias uses admitted projection gateway: read_leaderboards_core_view
+  ---
+  duration_ms: 0.292375
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_canonical_2026_historical_view
+ok 8 - read alias uses admitted projection gateway: read_canonical_2026_historical_view
+  ---
+  duration_ms: 0.265292
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_completed_history
+ok 9 - read alias uses admitted projection gateway: read_preview_completed_history
+  ---
+  duration_ms: 0.189959
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_current_guide_projection
+ok 10 - read alias uses admitted projection gateway: read_current_guide_projection
+  ---
+  duration_ms: 0.238
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_draft_view
+ok 11 - read alias uses admitted projection gateway: read_preview_draft_view
+  ---
+  duration_ms: 0.246834
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_championship_odds_inputs
+ok 12 - read alias uses admitted projection gateway: read_championship_odds_inputs
+  ---
+  duration_ms: 0.163875
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_secondary_history_players
+ok 13 - read alias uses admitted projection gateway: read_preview_secondary_history_players
+  ---
+  duration_ms: 0.150709
+  type: 'test'
+  ...
+# Subtest: unlisted legacy mutation, publication, Google and import aliases never dispatch
+ok 14 - unlisted legacy mutation, publication, Google and import aliases never dispatch
+  ---
+  duration_ms: 0.287208
+  type: 'test'
+  ...
+# Subtest: read aliases reject supplied resource or historical workbook authority before transport
+ok 15 - read aliases reject supplied resource or historical workbook authority before transport
+  ---
+  duration_ms: 0.0955
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: TOURNAMENT_SETUP
+ok 16 - Director family read uses canonical context and separate actor: TOURNAMENT_SETUP
+  ---
+  duration_ms: 1.026
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: ROUND_PAIRINGS
+ok 17 - Director family read uses canonical context and separate actor: ROUND_PAIRINGS
+  ---
+  duration_ms: 0.622125
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: MATCH_CONTROL
+ok 18 - Director family read uses canonical context and separate actor: MATCH_CONTROL
+  ---
+  duration_ms: 0.204292
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: NET_SKINS_ENTRIES
+ok 19 - Director family read uses canonical context and separate actor: NET_SKINS_ENTRIES
+  ---
+  duration_ms: 0.201917
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: CALCUTTA_MANAGEMENT
+ok 20 - Director family read uses canonical context and separate actor: CALCUTTA_MANAGEMENT
+  ---
+  duration_ms: 0.165333
+  type: 'test'
+  ...
+# Subtest: Director setup mutation confirms existing receipt and canonical readback; contract stays provider-neutral
+ok 21 - Director setup mutation confirms existing receipt and canonical readback; contract stays provider-neutral
+  ---
+  duration_ms: 1.309125
+  type: 'test'
+  ...
+# Subtest: Director admits the canonical direct NET_SKINS_ENTRIES projection but never a denial or wrong target
+ok 22 - Director admits the canonical direct NET_SKINS_ENTRIES projection but never a denial or wrong target
+  ---
+  duration_ms: 1.138083
+  type: 'test'
+  ...
+# Subtest: Director admits the canonical direct CALCUTTA_MANAGEMENT projection but never a denial or wrong target
+ok 23 - Director admits the canonical direct CALCUTTA_MANAGEMENT projection but never a denial or wrong target
+  ---
+  duration_ms: 0.678083
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects PLAYER without mutation
+ok 24 - Director authorization rejects PLAYER without mutation
+  ---
+  duration_ms: 0.095709
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects SPECTATOR without mutation
+ok 25 - Director authorization rejects SPECTATOR without mutation
+  ---
+  duration_ms: 0.044375
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects signed-out without mutation
+ok 26 - Director authorization rejects signed-out without mutation
+  ---
+  duration_ms: 0.040583
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects impersonated without mutation
+ok 27 - Director authorization rejects impersonated without mutation
+  ---
+  duration_ms: 0.037042
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects wrong-target without mutation
+ok 28 - Director authorization rejects wrong-target without mutation
+  ---
+  duration_ms: 0.106084
+  type: 'test'
+  ...
+# Subtest: Director stale token fails conflict without rebinding or dispatching mutation
+ok 29 - Director stale token fails conflict without rebinding or dispatching mutation
+  ---
+  duration_ms: 0.198917
+  type: 'test'
+  ...
+# Subtest: Director recovery verifies original admitted context and full request without current admission
+ok 30 - Director recovery verifies original admitted context and full request without current admission
+  ---
+  duration_ms: 0.485
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: score_derived_delivery_tick_v1
+ok 31 - worker preserves lease and exact authority: score_derived_delivery_tick_v1
+  ---
+  duration_ms: 0.202375
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_competition_derived_jobs
+ok 32 - worker preserves lease and exact authority: claim_competition_derived_jobs
+  ---
+  duration_ms: 0.123875
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_intelligence_derived_bundle
+ok 33 - worker preserves lease and exact authority: claim_intelligence_derived_bundle
+  ---
+  duration_ms: 0.127209
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_production_calcutta_v1_recalculation
+ok 34 - worker preserves lease and exact authority: claim_production_calcutta_v1_recalculation
+  ---
+  duration_ms: 0.11225
+  type: 'test'
+  ...
+# Subtest: worker rejects unknown functions, Production-tagged payload and forged supplied context
+ok 35 - worker rejects unknown functions, Production-tagged payload and forged supplied context
+  ---
+  duration_ms: 0.077333
+  type: 'test'
+  ...
+# Subtest: current worker factory selects Certification without importing a Production runtime or requiring Google
+ok 36 - current worker factory selects Certification without importing a Production runtime or requiring Google
+  ---
+  duration_ms: 1.3175
+  type: 'test'
+  ...
+# Subtest: identity reads use admitted gateway; provider administration and participant messaging are unavailable
+ok 37 - identity reads use admitted gateway; provider administration and participant messaging are unavailable
+  ---
+  duration_ms: 0.470125
+  type: 'test'
+  ...
+# Subtest: registered 2026 postcommit uses only bound canonical worker with no Google or legacy authority
+ok 38 - registered 2026 postcommit uses only bound canonical worker with no Google or legacy authority
+  ---
+  duration_ms: 10.642875
+  type: 'test'
+  ...
+# Subtest: registered 2097 postcommit uses only bound canonical worker with no Google or legacy authority
+ok 39 - registered 2097 postcommit uses only bound canonical worker with no Google or legacy authority
+  ---
+  duration_ms: 0.664583
+  type: 'test'
+  ...
+# Subtest: wrong or absent postcommit tournament fails before worker side effects (missing)
+ok 40 - wrong or absent postcommit tournament fails before worker side effects (missing)
+  ---
+  duration_ms: 0.351666
+  type: 'test'
+  ...
+# Subtest: wrong or absent postcommit tournament fails before worker side effects (2097)
+ok 41 - wrong or absent postcommit tournament fails before worker side effects (2097)
+  ---
+  duration_ms: 0.204584
+  type: 'test'
+  ...
+# Subtest: denied worker admission never falls through to legacy Preview or Production
+ok 42 - denied worker admission never falls through to legacy Preview or Production
+  ---
+  duration_ms: 0.500916
+  type: 'test'
+  ...
+# Subtest: stale context conflicts at first tick instead of resolving a fresh target
+ok 43 - stale context conflicts at first tick instead of resolving a fresh target
+  ---
+  duration_ms: 0.4805
+  type: 'test'
+  ...
+# Subtest: invalid registered resource is denied before transport and fallback
+ok 44 - invalid registered resource is denied before transport and fallback
+  ---
+  duration_ms: 0.10725
+  type: 'test'
+  ...
+# Subtest: existing Production and ordinary Preview selection/logic remain byte-identical
+ok 45 - existing Production and ordinary Preview selection/logic remain byte-identical
+  ---
+  duration_ms: 12.308333
+  type: 'test'
+  ...
+# Subtest: canonical 2026 claim DTO passes exact target binding and reaches strict calculator validation
+ok 46 - canonical 2026 claim DTO passes exact target binding and reaches strict calculator validation
+  ---
+  duration_ms: 1.287625
+  type: 'test'
+  ...
+# Subtest: canonical 2097 claim DTO passes exact target binding and reaches strict calculator validation
+ok 47 - canonical 2097 claim DTO passes exact target binding and reaches strict calculator validation
+  ---
+  duration_ms: 0.461375
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: missing input tournament
+ok 48 - initial canonical claim fails closed: missing input tournament
+  ---
+  duration_ms: 0.353708
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: wrong input tournament
+ok 49 - initial canonical claim fails closed: wrong input tournament
+  ---
+  duration_ms: 0.278083
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: wrong configuration target
+ok 50 - initial canonical claim fails closed: wrong configuration target
+  ---
+  duration_ms: 0.266125
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: wrong core target
+ok 51 - initial canonical claim fails closed: wrong core target
+  ---
+  duration_ms: 0.242542
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: stale activation
+ok 52 - initial canonical claim fails closed: stale activation
+  ---
+  duration_ms: 0.246959
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: contradictory optional job target
+ok 53 - initial canonical claim fails closed: contradictory optional job target
+  ---
+  duration_ms: 0.221833
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: contradictory optional response target
+ok 54 - initial canonical claim fails closed: contradictory optional response target
+  ---
+  duration_ms: 0.238416
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: unexpected initial generation
+ok 55 - initial canonical claim fails closed: unexpected initial generation
+  ---
+  duration_ms: 0.249292
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: missing job target
+ok 56 - future canonical claim fails closed: missing job target
+  ---
+  duration_ms: 0.256916
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: missing response target
+ok 57 - future canonical claim fails closed: missing response target
+  ---
+  duration_ms: 0.253666
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: wrong configuration target
+ok 58 - future canonical claim fails closed: wrong configuration target
+  ---
+  duration_ms: 0.266208
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: wrong core target
+ok 59 - future canonical claim fails closed: wrong core target
+  ---
+  duration_ms: 0.724084
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: stale activation
+ok 60 - future canonical claim fails closed: stale activation
+  ---
+  duration_ms: 0.29425
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: missing generation
+ok 61 - future canonical claim fails closed: missing generation
+  ---
+  duration_ms: 0.308709
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: malformed generation
+ok 62 - future canonical claim fails closed: malformed generation
+  ---
+  duration_ms: 0.248084
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: contradictory generations
+ok 63 - future canonical claim fails closed: contradictory generations
+  ---
+  duration_ms: 0.217417
+  type: 'test'
+  ...
+# Subtest: synthetic future authoring uses canonical validators and preserves all three formats
+ok 64 - synthetic future authoring uses canonical validators and preserves all three formats
+  ---
+  duration_ms: 14.989542
+  type: 'test'
+  ...
+# Subtest: fixed future authoring transport: RUNTIME
+ok 65 - fixed future authoring transport: RUNTIME
+  ---
+  duration_ms: 9.326542
+  type: 'test'
+  ...
+# Subtest: fixed future authoring transport: GUIDE_CREATE
+ok 66 - fixed future authoring transport: GUIDE_CREATE
+  ---
+  duration_ms: 0.396292
+  type: 'test'
+  ...
+# Subtest: fixed future authoring transport: GUIDE_VALIDATE
+ok 67 - fixed future authoring transport: GUIDE_VALIDATE
+  ---
+  duration_ms: 0.351792
+  type: 'test'
+  ...
+# Subtest: fixed future authoring transport: GUIDE_PUBLISH
+ok 68 - fixed future authoring transport: GUIDE_PUBLISH
+  ---
+  duration_ms: 0.265375
+  type: 'test'
+  ...
+# Subtest: fixed future authoring transport: DRAFT_STAGE
+ok 69 - fixed future authoring transport: DRAFT_STAGE
+  ---
+  duration_ms: 0.469375
+  type: 'test'
+  ...
+# Subtest: fixed future authoring transport: DRAFT_VALIDATE
+ok 70 - fixed future authoring transport: DRAFT_VALIDATE
+  ---
+  duration_ms: 0.331959
+  type: 'test'
+  ...
+# Subtest: fixed future authoring transport: DRAFT_COMMIT
+ok 71 - fixed future authoring transport: DRAFT_COMMIT
+  ---
+  duration_ms: 0.212
+  type: 'test'
+  ...
+# Subtest: fixed future authoring transport: PREDICTION_STAGE
+ok 72 - fixed future authoring transport: PREDICTION_STAGE
+  ---
+  duration_ms: 0.184
+  type: 'test'
+  ...
+# Subtest: fixed future authoring transport: PREDICTION_VALIDATE
+ok 73 - fixed future authoring transport: PREDICTION_VALIDATE
+  ---
+  duration_ms: 0.173042
+  type: 'test'
+  ...
+# Subtest: fixed future authoring transport: PREDICTION_COMMIT
+ok 74 - fixed future authoring transport: PREDICTION_COMMIT
+  ---
+  duration_ms: 0.532958
+  type: 'test'
+  ...
+# Subtest: future authoring rejects forged authority, unknown operation and stale context before mutation
+ok 75 - future authoring rejects forged authority, unknown operation and stale context before mutation
+  ---
+  duration_ms: 0.387458
+  type: 'test'
+  ...
+# Subtest: lost authoring response remains UNKNOWN with original identity and no fallback or automatic retry
+ok 76 - lost authoring response remains UNKNOWN with original identity and no fallback or automatic retry
+  ---
+  duration_ms: 0.321292
+  type: 'test'
+  ...
+# Subtest: authoring source preserves readiness invalidation, future-only admission and private cores
+ok 77 - authoring source preserves readiness invalidation, future-only admission and private cores
+  ---
+  duration_ms: 0.530083
+  type: 'test'
+  ...
+# Subtest: future Director current target and immutable governance authority remain separately bound
+ok 78 - future Director current target and immutable governance authority remain separately bound
+  ---
+  duration_ms: 10.314125
+  type: 'test'
+  ...
+# Subtest: shipping Director client parses separately bound future current and governance from the actual server adapter
+ok 79 - shipping Director client parses separately bound future current and governance from the actual server adapter
+  ---
+  duration_ms: 0.8735
+  type: 'test'
+  ...
+# Subtest: client retains ordinary 2026 context compatibility and rejects malformed authority identifiers
+ok 80 - client retains ordinary 2026 context compatibility and rejects malformed authority identifiers
+  ---
+  duration_ms: 0.994166
+  type: 'test'
+  ...
+# Subtest: future Director rejects wrong identity target 2026
+ok 81 - future Director rejects wrong identity target 2026
+  ---
+  duration_ms: 0.182
+  type: 'test'
+  ...
+# Subtest: future Director rejects wrong identity target 2098
+ok 82 - future Director rejects wrong identity target 2098
+  ---
+  duration_ms: 0.155791
+  type: 'test'
+  ...
+# Subtest: future Director stale context remains conflict with no read or write fallback
+ok 83 - future Director stale context remains conflict with no read or write fallback
+  ---
+  duration_ms: 0.286542
+  type: 'test'
+  ...
+# Subtest: future Director PLAYER has no authority expansion
+ok 84 - future Director PLAYER has no authority expansion
+  ---
+  duration_ms: 0.063209
+  type: 'test'
+  ...
+# Subtest: future Director SPECTATOR has no authority expansion
+ok 85 - future Director SPECTATOR has no authority expansion
+  ---
+  duration_ms: 0.040458
+  type: 'test'
+  ...
+# Subtest: future Director signed-out has no authority expansion
+ok 86 - future Director signed-out has no authority expansion
+  ---
+  duration_ms: 0.051208
+  type: 'test'
+  ...
+# Subtest: future Director impersonating has no authority expansion
+ok 87 - future Director impersonating has no authority expansion
+  ---
+  duration_ms: 0.081833
+  type: 'test'
+  ...
+# Subtest: identity binds undefined only to the admitted current pointer
+ok 88 - identity binds undefined only to the admitted current pointer
+  ---
+  duration_ms: 0.405959
+  type: 'test'
+  ...
+# Subtest: identity binds null only to the admitted current pointer
+ok 89 - identity binds null only to the admitted current pointer
+  ---
+  duration_ms: 0.181625
+  type: 'test'
+  ...
+# Subtest: identity binds  only to the admitted current pointer
+ok 90 - identity binds  only to the admitted current pointer
+  ---
+  duration_ms: 0.163958
+  type: 'test'
+  ...
+# Subtest: identity binds 2097 only to the admitted current pointer
+ok 91 - identity binds 2097 only to the admitted current pointer
+  ---
+  duration_ms: 0.166
+  type: 'test'
+  ...
+# Subtest: identity never silently rebinds explicit wrong target 2026
+ok 92 - identity never silently rebinds explicit wrong target 2026
+  ---
+  duration_ms: 0.115125
+  type: 'test'
+  ...
+# Subtest: identity never silently rebinds explicit wrong target 2098
+ok 93 - identity never silently rebinds explicit wrong target 2098
+  ---
+  duration_ms: 0.082834
+  type: 'test'
+  ...
+# Subtest: identity never silently rebinds explicit wrong target BAGGER_INV_PRODUCTION
+ok 94 - identity never silently rebinds explicit wrong target BAGGER_INV_PRODUCTION
+  ---
+  duration_ms: 0.102375
+  type: 'test'
+  ...
+# Subtest: identity context denial cannot select the legacy or Production provider
+ok 95 - identity context denial cannot select the legacy or Production provider
+  ---
+  duration_ms: 0.503084
+  type: 'test'
+  ...
+# Subtest: admission response completes before canonical execution; only DB lease identity is forwarded
+ok 96 - admission response completes before canonical execution; only DB lease identity is forwarded
+  ---
+  duration_ms: 9.983542
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family SCORING.SUBMIT_HOLE
+ok 97 - durable admission applies to required canonical family SCORING.SUBMIT_HOLE
+  ---
+  duration_ms: 0.4855
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family SCORING.FINALIZE_MATCH
+ok 98 - durable admission applies to required canonical family SCORING.FINALIZE_MATCH
+  ---
+  duration_ms: 0.365458
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family SCORING.REOPEN_MATCH
+ok 99 - durable admission applies to required canonical family SCORING.REOPEN_MATCH
+  ---
+  duration_ms: 0.363416
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.MUTATE_SETUP
+ok 100 - durable admission applies to required canonical family DIRECTOR.MUTATE_SETUP
+  ---
+  duration_ms: 0.284042
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.MUTATE_PAIRINGS
+ok 101 - durable admission applies to required canonical family DIRECTOR.MUTATE_PAIRINGS
+  ---
+  duration_ms: 0.206292
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.MATCH_CONTROL
+ok 102 - durable admission applies to required canonical family DIRECTOR.MATCH_CONTROL
+  ---
+  duration_ms: 0.512667
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.SAVE_NET_SKINS_ENTRIES
+ok 103 - durable admission applies to required canonical family DIRECTOR.SAVE_NET_SKINS_ENTRIES
+  ---
+  duration_ms: 0.273042
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.REPLACE_CALCUTTA_AUCTION
+ok 104 - durable admission applies to required canonical family DIRECTOR.REPLACE_CALCUTTA_AUCTION
+  ---
+  duration_ms: 0.224917
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.CLEAR_CALCUTTA_AUCTION
+ok 105 - durable admission applies to required canonical family DIRECTOR.CLEAR_CALCUTTA_AUCTION
+  ---
+  duration_ms: 0.216833
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: WORKERS.COMPETITION_CLAIM
+ok 106 - existing job protocol stays separate: WORKERS.COMPETITION_CLAIM
+  ---
+  duration_ms: 0.171584
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: WORKERS.INTELLIGENCE_WRITE
+ok 107 - existing job protocol stays separate: WORKERS.INTELLIGENCE_WRITE
+  ---
+  duration_ms: 0.142625
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: WORKERS.CALCUTTA_COMPLETE
+ok 108 - existing job protocol stays separate: WORKERS.CALCUTTA_COMPLETE
+  ---
+  duration_ms: 0.129167
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: DIRECTOR.NET_SKINS_CLAIM
+ok 109 - existing job protocol stays separate: DIRECTOR.NET_SKINS_CLAIM
+  ---
+  duration_ms: 0.120708
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: DIRECTOR.REQUEUE_DERIVED
+ok 110 - existing job protocol stays separate: DIRECTOR.REQUEUE_DERIVED
+  ---
+  duration_ms: 0.10375
+  type: 'test'
+  ...
+# Subtest: failed admission never executes or fabricates non-commit: connection
+ok 111 - failed admission never executes or fabricates non-commit: connection
+  ---
+  duration_ms: 0.446958
+  type: 'test'
+  ...
+# Subtest: failed admission never executes or fabricates non-commit: 57014
+ok 112 - failed admission never executes or fabricates non-commit: 57014
+  ---
+  duration_ms: 0.370208
+  type: 'test'
+  ...
+# Subtest: failed admission never executes or fabricates non-commit: missing-schema
+ok 113 - failed admission never executes or fabricates non-commit: missing-schema
+  ---
+  duration_ms: 0.347209
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: contract=wrong
+ok 114 - invalid admission readback fails before execution: contract=wrong
+  ---
+  duration_ms: 0.217292
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: operation_request_id=other
+ok 115 - invalid admission readback fails before execution: operation_request_id=other
+  ---
+  duration_ms: 0.141667
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: lease_id=null
+ok 116 - invalid admission readback fails before execution: lease_id=null
+  ---
+  duration_ms: 0.139875
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: lease_id=bad
+ok 117 - invalid admission readback fails before execution: lease_id=bad
+  ---
+  duration_ms: 0.147791
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: admission_generation_id=bad
+ok 118 - invalid admission readback fails before execution: admission_generation_id=bad
+  ---
+  duration_ms: 0.130167
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: admission_sequence=0
+ok 119 - invalid admission readback fails before execution: admission_sequence=0
+  ---
+  duration_ms: 0.151167
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: admission_sequence=9007199254740992
+ok 120 - invalid admission readback fails before execution: admission_sequence=9007199254740992
+  ---
+  duration_ms: 0.16325
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: request_hash=bad
+ok 121 - invalid admission readback fails before execution: request_hash=bad
+  ---
+  duration_ms: 0.150375
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: state=EXPIRED
+ok 122 - invalid admission readback fails before execution: state=EXPIRED
+  ---
+  duration_ms: 0.134792
+  type: 'test'
+  ...
+# Subtest: terminal same-operation admission replays established result without executing: COMMITTED
+ok 123 - terminal same-operation admission replays established result without executing: COMMITTED
+  ---
+  duration_ms: 0.155792
+  type: 'test'
+  ...
+# Subtest: terminal same-operation admission replays established result without executing: NOT_COMMITTED
+ok 124 - terminal same-operation admission replays established result without executing: NOT_COMMITTED
+  ---
+  duration_ms: 0.124916
+  type: 'test'
+  ...
+# Subtest: contradictory lease outcome cannot become a client receipt: COMMITTED
+ok 125 - contradictory lease outcome cannot become a client receipt: COMMITTED
+  ---
+  duration_ms: 0.133375
+  type: 'test'
+  ...
+# Subtest: contradictory lease outcome cannot become a client receipt: NOT_COMMITTED
+ok 126 - contradictory lease outcome cannot become a client receipt: NOT_COMMITTED
+  ---
+  duration_ms: 0.143584
+  type: 'test'
+  ...
+# Subtest: contradictory lease outcome cannot become a client receipt: ADMITTED
+ok 127 - contradictory lease outcome cannot become a client receipt: ADMITTED
+  ---
+  duration_ms: 0.120959
+  type: 'test'
+  ...
+# Subtest: lost execution response attempts durable UNKNOWN with same identity and no sensitive payload
+ok 128 - lost execution response attempts durable UNKNOWN with same identity and no sensitive payload
+  ---
+  duration_ms: 0.277208
+  type: 'test'
+  ...
+# Subtest: lost acknowledgement can be recovered from terminal outcome returned by UNKNOWN marker
+ok 129 - lost acknowledgement can be recovered from terminal outcome returned by UNKNOWN marker
+  ---
+  duration_ms: 0.20875
+  type: 'test'
+  ...
+# Subtest: failed UNKNOWN marker does not replace original typed error or imply non-commit
+ok 130 - failed UNKNOWN marker does not replace original typed error or imply non-commit
+  ---
+  duration_ms: 0.233708
+  type: 'test'
+  ...
+# Subtest: marker cannot substitute another lease result even with matching operation identity
+ok 131 - marker cannot substitute another lease result even with matching operation identity
+  ---
+  duration_ms: 0.245583
+  type: 'test'
+  ...
+# Subtest: exact recovery needs no open-write context and preserves original actor: read_certification_ingress_status_v1
+ok 132 - exact recovery needs no open-write context and preserves original actor: read_certification_ingress_status_v1
+  ---
+  duration_ms: 0.108125
+  type: 'test'
+  ...
+# Subtest: exact recovery needs no open-write context and preserves original actor: resolve_certification_ingress_v1
+ok 133 - exact recovery needs no open-write context and preserves original actor: resolve_certification_ingress_v1
+  ---
+  duration_ms: 0.0705
+  type: 'test'
+  ...
+# Subtest: an absent operation status is UNKNOWN, with no implicit resolution or new admission
+ok 134 - an absent operation status is UNKNOWN, with no implicit resolution or new admission
+  ---
+  duration_ms: 0.48625
+  type: 'test'
+  ...
+# Subtest: replay-only recovery verifies full request while never obtaining write context
+ok 135 - replay-only recovery verifies full request while never obtaining write context
+  ---
+  duration_ms: 0.178833
+  type: 'test'
+  ...
+# Subtest: server hash conflict is preserved without recovery, execution or fallback
+ok 136 - server hash conflict is preserved without recovery, execution or fallback
+  ---
+  duration_ms: 0.12675
+  type: 'test'
+  ...
+# Subtest: recovery rejects authority selectors, unlisted operation families and blank identity before network
+ok 137 - recovery rejects authority selectors, unlisted operation families and blank identity before network
+  ---
+  duration_ms: 0.263583
+  type: 'test'
+  ...
+# Subtest: closed-origin recovery cannot bypass registration or use a Production endpoint
+ok 138 - closed-origin recovery cannot bypass registration or use a Production endpoint
+  ---
+  duration_ms: 0.061958
+  type: 'test'
+  ...
+# Subtest: Certification Director read returns explicit fresh state and no private worker envelope
+ok 139 - Certification Director read returns explicit fresh state and no private worker envelope
+  ---
+  duration_ms: 9.685375
+  type: 'test'
+  ...
+# Subtest: Certification Odds participant denied before transport
+ok 140 - Certification Odds participant denied before transport
+  ---
+  duration_ms: 0.227417
+  type: 'test'
+  ...
+# Subtest: Certification Odds spectator denied before transport
+ok 141 - Certification Odds spectator denied before transport
+  ---
+  duration_ms: 0.062208
+  type: 'test'
+  ...
+# Subtest: Certification Odds signed-out denied before transport
+ok 142 - Certification Odds signed-out denied before transport
+  ---
+  duration_ms: 0.053041
+  type: 'test'
+  ...
+# Subtest: Certification Odds impersonating denied before transport
+ok 143 - Certification Odds impersonating denied before transport
+  ---
+  duration_ms: 0.054584
+  type: 'test'
+  ...
+# Subtest: Certification Odds bootstrap denied before transport
+ok 144 - Certification Odds bootstrap denied before transport
+  ---
+  duration_ms: 0.042416
+  type: 'test'
+  ...
+# Subtest: Certification command requires original identity/context and rejects client authority fields
+ok 145 - Certification command requires original identity/context and rejects client authority fields
+  ---
+  duration_ms: 0.239625
+  type: 'test'
+  ...
+# Subtest: worker context cannot confer owner publication capability
+ok 146 - worker context cannot confer owner publication capability
+  ---
+  duration_ms: 0.289833
+  type: 'test'
+  ...
+# Subtest: wrong target and stale context fail closed without fallback
+ok 147 - wrong target and stale context fail closed without fallback
+  ---
+  duration_ms: 0.423125
+  type: 'test'
+  ...
+# Subtest: lost publication response retains exact operation identity; status does not imply noncommit
+ok 148 - lost publication response retains exact operation identity; status does not imply noncommit
+  ---
+  duration_ms: 0.516
+  type: 'test'
+  ...
+# Subtest: client command captures reviewed first CAS and remains stable for explicit retry
+ok 149 - client command captures reviewed first CAS and remains stable for explicit retry
+  ---
+  duration_ms: 0.420417
+  type: 'test'
+  ...
+# Subtest: status retains original receipt target after annual advance without granting a historical write
+ok 150 - status retains original receipt target after annual advance without granting a historical write
+  ---
+  duration_ms: 0.292166
+  type: 'test'
+  ...
+# Subtest: score recovery preserves public COMMITTED DTO without open-context request
+ok 151 - score recovery preserves public COMMITTED DTO without open-context request
+  ---
+  duration_ms: 9.487
+  type: 'test'
+  ...
+# Subtest: score recovery preserves public UNKNOWN DTO without open-context request
+ok 152 - score recovery preserves public UNKNOWN DTO without open-context request
+  ---
+  duration_ms: 0.405834
+  type: 'test'
+  ...
+# Subtest: Director client accepts an original committed receipt after annual advance without false current readback
+ok 153 - Director client accepts an original committed receipt after annual advance without false current readback
+  ---
+  duration_ms: 1.916042
+  type: 'test'
+  ...
+# Subtest: Director recovery contains internal ADMITTED as public UNKNOWN
+ok 154 - Director recovery contains internal ADMITTED as public UNKNOWN
+  ---
+  duration_ms: 0.328125
+  type: 'test'
+  ...
+# Subtest: Director recovery contains internal UNKNOWN as public UNKNOWN
+ok 155 - Director recovery contains internal UNKNOWN as public UNKNOWN
+  ---
+  duration_ms: 0.387209
+  type: 'test'
+  ...
+# Subtest: Director recovery contains internal NOT_COMMITTED as public UNKNOWN
+ok 156 - Director recovery contains internal NOT_COMMITTED as public UNKNOWN
+  ---
+  duration_ms: 0.353209
+  type: 'test'
+  ...
+# Subtest: missing original lease remains unconfirmed without fabricated historical context
+ok 157 - missing original lease remains unconfirmed without fabricated historical context
+  ---
+  duration_ms: 0.461125
+  type: 'test'
+  ...
+# Subtest: Director origin recovery rejects mismatched resource before replay
+ok 158 - Director origin recovery rejects mismatched resource before replay
+  ---
+  duration_ms: 0.189833
+  type: 'test'
+  ...
+# Subtest: Director origin recovery rejects mismatched context before replay
+ok 159 - Director origin recovery rejects mismatched context before replay
+  ---
+  duration_ms: 0.13875
+  type: 'test'
+  ...
+# Subtest: Director origin recovery rejects mismatched operation before replay
+ok 160 - Director origin recovery rejects mismatched operation before replay
+  ---
+  duration_ms: 0.170209
+  type: 'test'
+  ...
+# Subtest: Director changed original request conflicts and never executes or substitutes an ID
+ok 161 - Director changed original request conflicts and never executes or substitutes an ID
+  ---
+  duration_ms: 0.419417
+  type: 'test'
+  ...
+# Subtest: Director recovery denies participant before any transport
+ok 162 - Director recovery denies participant before any transport
+  ---
+  duration_ms: 0.098042
+  type: 'test'
+  ...
+# Subtest: Director recovery denies spectator before any transport
+ok 163 - Director recovery denies spectator before any transport
+  ---
+  duration_ms: 0.047458
+  type: 'test'
+  ...
+# Subtest: Director recovery denies signed-out before any transport
+ok 164 - Director recovery denies signed-out before any transport
+  ---
+  duration_ms: 0.037083
+  type: 'test'
+  ...
+# Subtest: Director recovery denies impersonated before any transport
+ok 165 - Director recovery denies impersonated before any transport
+  ---
+  duration_ms: 0.0455
+  type: 'test'
+  ...
+# Subtest: financial clear-entry recovery reconstructs only original admitted predecessor
+ok 166 - financial clear-entry recovery reconstructs only original admitted predecessor
+  ---
+  duration_ms: 0.365917
+  type: 'test'
+  ...
+# Subtest: financial replace-auction recovery reconstructs only original admitted predecessor
+ok 167 - financial replace-auction recovery reconstructs only original admitted predecessor
+  ---
+  duration_ms: 0.695917
+  type: 'test'
+  ...
+# Subtest: Director finalize lost acknowledgement recovery precedes open capability gates
+ok 168 - Director finalize lost acknowledgement recovery precedes open capability gates
+  ---
+  duration_ms: 0.407041
+  type: 'test'
+  ...
+# Subtest: Director reopen lost acknowledgement recovery precedes open capability gates
+ok 169 - Director reopen lost acknowledgement recovery precedes open capability gates
+  ---
+  duration_ms: 0.208208
+  type: 'test'
+  ...
+# Subtest: shipping registry is disabled and cannot be enabled by environment or arbitrary ref
+ok 170 - shipping registry is disabled and cannot be enabled by environment or arbitrary ref
+  ---
+  duration_ms: 3.041125
+  type: 'test'
+  ...
+# Subtest: no explicit selector does not request Certification
+ok 171 - no explicit selector does not request Certification
+  ---
+  duration_ms: 0.111459
+  type: 'test'
+  ...
+# Subtest: exact injected registration validates configuration and creates only redacted bound envelope
+ok 172 - exact injected registration validates configuration and creates only redacted bound envelope
+  ---
+  duration_ms: 0.48175
+  type: 'test'
+  ...
+# Subtest: manifest digest is stable over object key order and changes on provenance revision
+ok 173 - manifest digest is stable over object key order and changes on provenance revision
+  ---
+  duration_ms: 0.109
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong resource
+ok 174 - exact registration fails closed: wrong resource
+  ---
+  duration_ms: 0.1165
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong team
+ok 175 - exact registration fails closed: wrong team
+  ---
+  duration_ms: 0.055083
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: conflicting team alias
+ok 176 - exact registration fails closed: conflicting team alias
+  ---
+  duration_ms: 0.051709
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong project
+ok 177 - exact registration fails closed: wrong project
+  ---
+  duration_ms: 0.051167
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong branch
+ok 178 - exact registration fails closed: wrong branch
+  ---
+  duration_ms: 0.057209
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong deployment class
+ok 179 - exact registration fails closed: wrong deployment class
+  ---
+  duration_ms: 0.088208
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: missing SHA
+ok 180 - exact registration fails closed: missing SHA
+  ---
+  duration_ms: 0.066584
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: malformed SHA
+ok 181 - exact registration fails closed: malformed SHA
+  ---
+  duration_ms: 0.046458
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: missing deployment ID
+ok 182 - exact registration fails closed: missing deployment ID
+  ---
+  duration_ms: 0.059333
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong deployment origin
+ok 183 - exact registration fails closed: wrong deployment origin
+  ---
+  duration_ms: 0.048834
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: origin suffix spoof
+ok 184 - exact registration fails closed: origin suffix spoof
+  ---
+  duration_ms: 0.035458
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong server project
+ok 185 - exact registration fails closed: wrong server project
+  ---
+  duration_ms: 0.03725
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong Auth project
+ok 186 - exact registration fails closed: wrong Auth project
+  ---
+  duration_ms: 0.03025
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong server credential
+ok 187 - exact registration fails closed: wrong server credential
+  ---
+  duration_ms: 0.045458
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong public credential
+ok 188 - exact registration fails closed: wrong public credential
+  ---
+  duration_ms: 0.041458
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: missing server credential
+ok 189 - exact registration fails closed: missing server credential
+  ---
+  duration_ms: 0.036667
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: missing public credential
+ok 190 - exact registration fails closed: missing public credential
+  ---
+  duration_ms: 0.030334
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: Production overlay
+ok 191 - exact registration fails closed: Production overlay
+  ---
+  duration_ms: 0.049375
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: Production key inheritance
+ok 192 - exact registration fails closed: Production key inheritance
+  ---
+  duration_ms: 0.038417
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: Google key inheritance
+ok 193 - exact registration fails closed: Google key inheritance
+  ---
+  duration_ms: 0.0355
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: Google mirror overlay
+ok 194 - exact registration fails closed: Google mirror overlay
+  ---
+  duration_ms: 0.024667
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: class impersonation
+ok 195 - malformed owner registration rejected: class impersonation
+  ---
+  duration_ms: 0.0265
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: invalid installation
+ok 196 - malformed owner registration rejected: invalid installation
+  ---
+  duration_ms: 0.021292
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: different installation identity
+ok 197 - malformed owner registration rejected: different installation identity
+  ---
+  duration_ms: 0.019458
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: Production resource
+ok 198 - malformed owner registration rejected: Production resource
+  ---
+  duration_ms: 0.023
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: legacy Preview resource
+ok 199 - malformed owner registration rejected: legacy Preview resource
+  ---
+  duration_ms: 0.020625
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: URL userinfo
+ok 200 - malformed owner registration rejected: URL userinfo
+  ---
+  duration_ms: 0.027708
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: URL suffix
+ok 201 - malformed owner registration rejected: URL suffix
+  ---
+  duration_ms: 0.021334
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: URL query
+ok 202 - malformed owner registration rejected: URL query
+  ---
+  duration_ms: 0.02175
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: URL path
+ok 203 - malformed owner registration rejected: URL path
+  ---
+  duration_ms: 0.0215
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: URL fragment
+ok 204 - malformed owner registration rejected: URL fragment
+  ---
+  duration_ms: 0.025208
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: URL port
+ok 205 - malformed owner registration rejected: URL port
+  ---
+  duration_ms: 0.071
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: invalid revision
+ok 206 - malformed owner registration rejected: invalid revision
+  ---
+  duration_ms: 0.038375
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: schema digest missing
+ok 207 - malformed owner registration rejected: schema digest missing
+  ---
+  duration_ms: 0.024292
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: unknown privileged registration field
+ok 208 - malformed owner registration rejected: unknown privileged registration field
+  ---
+  duration_ms: 0.02125
+  type: 'test'
+  ...
+# Subtest: disabled optional flags confer no authority and do not interfere with exact registration
+ok 209 - disabled optional flags confer no authority and do not interfere with exact registration
+  ---
+  duration_ms: 0.070667
+  type: 'test'
+  ...
+# Subtest: state is a snapshot; changing injected manifest after validation cannot rewrite bound resource
+ok 210 - state is a snapshot; changing injected manifest after validation cannot rewrite bound resource
+  ---
+  duration_ms: 0.048709
+  type: 'test'
+  ...
+# Subtest: unregistered shipping runtime never performs network even with copied configuration
+ok 211 - unregistered shipping runtime never performs network even with copied configuration
+  ---
+  duration_ms: 0.977375
+  type: 'test'
+  ...
+# Subtest: registration handshake is exact, bounded and redacted; caller cannot forge context
+ok 212 - registration handshake is exact, bounded and redacted; caller cannot forge context
+  ---
+  duration_ms: 8.015083
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: resource_id
+ok 213 - wrong database/deployment readback denied: resource_id
+  ---
+  duration_ms: 0.22525
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: installation_id
+ok 214 - wrong database/deployment readback denied: installation_id
+  ---
+  duration_ms: 0.170541
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: project_ref
+ok 215 - wrong database/deployment readback denied: project_ref
+  ---
+  duration_ms: 0.201167
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: project_url
+ok 216 - wrong database/deployment readback denied: project_url
+  ---
+  duration_ms: 0.177959
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: manifest_digest
+ok 217 - wrong database/deployment readback denied: manifest_digest
+  ---
+  duration_ms: 0.158083
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: registration_revision
+ok 218 - wrong database/deployment readback denied: registration_revision
+  ---
+  duration_ms: 0.547709
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: schema_contract
+ok 219 - wrong database/deployment readback denied: schema_contract
+  ---
+  duration_ms: 0.180209
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: schema_digest
+ok 220 - wrong database/deployment readback denied: schema_digest
+  ---
+  duration_ms: 0.203542
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: release_commit
+ok 221 - wrong database/deployment readback denied: release_commit
+  ---
+  duration_ms: 0.187125
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: deployment_id
+ok 222 - wrong database/deployment readback denied: deployment_id
+  ---
+  duration_ms: 0.128583
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: deployment_origin
+ok 223 - wrong database/deployment readback denied: deployment_origin
+  ---
+  duration_ms: 0.098125
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: git_branch
+ok 224 - wrong database/deployment readback denied: git_branch
+  ---
+  duration_ms: 0.10025
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: vercel_project_id
+ok 225 - wrong database/deployment readback denied: vercel_project_id
+  ---
+  duration_ms: 0.10575
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: vercel_team_id
+ok 226 - wrong database/deployment readback denied: vercel_team_id
+  ---
+  duration_ms: 0.093875
+  type: 'test'
+  ...
+# Subtest: missing schema returns unavailable without fallback or registration attempts
+ok 227 - missing schema returns unavailable without fallback or registration attempts
+  ---
+  duration_ms: 0.452292
+  type: 'test'
+  ...
+# Subtest: known score operation reaches execute gateway with original operation identity and server context
+ok 228 - known score operation reaches execute gateway with original operation identity and server context
+  ---
+  duration_ms: 0.650916
+  type: 'test'
+  ...
+# Subtest: unknown operation, missing operation ID and payload authority are denied before any request
+ok 229 - unknown operation, missing operation ID and payload authority are denied before any request
+  ---
+  duration_ms: 0.130083
+  type: 'test'
+  ...
+# Subtest: stale token conflicts before execute and is not silently rebound
+ok 230 - stale token conflicts before execute and is not silently rebound
+  ---
+  duration_ms: 0.122625
+  type: 'test'
+  ...
+# Subtest: read context cannot confer write phase; wrong request environment cannot reuse branded context
+ok 231 - read context cannot confer write phase; wrong request environment cannot reuse branded context
+  ---
+  duration_ms: 0.16725
+  type: 'test'
+  ...
+# Subtest: lost mutation response preserves same operation ID as unknown; transport has no fallback
+ok 232 - lost mutation response preserves same operation ID as unknown; transport has no fallback
+  ---
+  duration_ms: 0.351791
+  type: 'test'
+  ...
+# Subtest: SQL statement timeout remains typed and mutation outcome retains identity
+ok 233 - SQL statement timeout remains typed and mutation outcome retains identity
+  ---
+  duration_ms: 0.338542
+  type: 'test'
+  ...
+# Subtest: worker classification retains database XX000 ahead of its HTTP envelope
+ok 234 - worker classification retains database XX000 ahead of its HTTP envelope
+  ---
+  duration_ms: 0.264084
+  type: 'test'
+  ...
+# Subtest: worker classification retains database 23514 ahead of its HTTP envelope
+ok 235 - worker classification retains database 23514 ahead of its HTTP envelope
+  ---
+  duration_ms: 0.169708
+  type: 'test'
+  ...
+# Subtest: worker classification retains database 40P01 ahead of its HTTP envelope
+ok 236 - worker classification retains database 40P01 ahead of its HTTP envelope
+  ---
+  duration_ms: 0.129625
+  type: 'test'
+  ...
+# Subtest: worker classification retains database 57014 ahead of its HTTP envelope
+ok 237 - worker classification retains database 57014 ahead of its HTTP envelope
+  ---
+  duration_ms: 0.137209
+  type: 'test'
+  ...
+# Subtest: established domain rejection preserves meaning without returning raw database details
+ok 238 - established domain rejection preserves meaning without returning raw database details
+  ---
+  duration_ms: 0.273916
+  type: 'test'
+  ...
+# Subtest: explicit invalid Certification cannot borrow legacy Preview, diagnostic, Production or Google transport
+ok 239 - explicit invalid Certification cannot borrow legacy Preview, diagnostic, Production or Google transport
+  ---
+  duration_ms: 0.537917
+  type: 'test'
+  ...
+# Subtest: isolated Preview translates only an exact server-certified mobile identity to the Preview RPC
+ok 240 - isolated Preview translates only an exact server-certified mobile identity to the Preview RPC
+  ---
+  duration_ms: 0.857167
+  type: 'test'
+  ...
+# Subtest: mismatched Preview mobile identity fails closed and cannot set RPC verification flags
+ok 241 - mismatched Preview mobile identity fails closed and cannot set RPC verification flags
+  ---
+  duration_ms: 0.107792
+  type: 'test'
+  ...
+# Subtest: Production retains its separate false/true authorization translation
+ok 242 - Production retains its separate false/true authorization translation
+  ---
+  duration_ms: 0.077791
+  type: 'test'
+  ...
+# Subtest: Production mobile remains fail-closed
+ok 243 - Production mobile remains fail-closed
+  ---
+  duration_ms: 0.2205
+  type: 'test'
+  ...
+# Subtest: authorized Preview mobile finalization reaches the canonical RPC with the same bound identity
+ok 244 - authorized Preview mobile finalization reaches the canonical RPC with the same bound identity
+  ---
+  duration_ms: 0.092541
+  type: 'test'
+  ...
+# Subtest: the effective Preview RPC resolves a bound same-ID receipt before mutable scoring guards
+ok 245 - the effective Preview RPC resolves a bound same-ID receipt before mutable scoring guards
+  ---
+  duration_ms: 2.284125
+  type: 'test'
+  ...
+# Subtest: Step 1C schemas are versioned, strict, and aligned with representative Codable fixtures
+ok 246 - Step 1C schemas are versioned, strict, and aligned with representative Codable fixtures
+  ---
+  duration_ms: 2.8075
+  type: 'test'
+  ...
+# Subtest: scoring fixtures and documentation contain no Production PII, credentials, or browser scoring secrets
+ok 247 - scoring fixtures and documentation contain no Production PII, credentials, or browser scoring secrets
+  ---
+  duration_ms: 0.7435
+  type: 'test'
+  ...
+# Subtest: the error schema exactly tracks the stable mobile v1 vocabulary and bounded conflict data
+ok 248 - the error schema exactly tracks the stable mobile v1 vocabulary and bounded conflict data
+  ---
+  duration_ms: 0.418083
+  type: 'test'
+  ...
+# Subtest: mobile routes stay thin, Bearer-only, no-store adapters over shared authority
+ok 249 - mobile routes stay thin, Bearer-only, no-store adapters over shared authority
+  ---
+  duration_ms: 0.565125
+  type: 'test'
+  ...
+# Subtest: successful mobile mutations retain internal post-commit work with retired Google unavailable
+ok 250 - successful mobile mutations retain internal post-commit work with retired Google unavailable
+  ---
+  duration_ms: 0.359916
+  type: 'test'
+  ...
+# Subtest: canonical acknowledgement enrichment is mobile-only and preserves browser scoring response shape
+ok 251 - canonical acknowledgement enrichment is mobile-only and preserves browser scoring response shape
+  ---
+  duration_ms: 0.29875
+  type: 'test'
+  ...
+# Subtest: linked Director access follows the verified Supabase account with no Passport or Google inspection
+ok 252 - linked Director access follows the verified Supabase account with no Passport or Google inspection
+  ---
+  duration_ms: 1.733125
+  type: 'test'
+  ...
+# Subtest: capability follows account changes and a different participant account is denied
+ok 253 - capability follows account changes and a different participant account is denied
+  ---
+  duration_ms: 0.143917
+  type: 'test'
+  ...
+# Subtest: retired Passport bootstrap cannot create a canonical Director entitlement
+ok 254 - retired Passport bootstrap cannot create a canonical Director entitlement
+  ---
+  duration_ms: 0.548375
+  type: 'test'
+  ...
+# Subtest: revocation is central, fail-closed, and a stale Passport cannot reactivate it
+ok 255 - revocation is central, fail-closed, and a stale Passport cannot reactivate it
+  ---
+  duration_ms: 0.193709
+  type: 'test'
+  ...
+# Subtest: an entitlement cannot bypass expired, revoked, missing, or mismatched impersonation leases
+ok 256 - an entitlement cannot bypass expired, revoked, missing, or mismatched impersonation leases
+  ---
+  duration_ms: 0.352
+  type: 'test'
+  ...
+# Subtest: active entitlement plus an account-bound current lease preserves Preview impersonation
+ok 257 - active entitlement plus an account-bound current lease preserves Preview impersonation
+  ---
+  duration_ms: 0.715
+  type: 'test'
+  ...
+# Subtest: Production without canonical admission denies before account or retired Passport transport
+ok 258 - Production without canonical admission denies before account or retired Passport transport
+  ---
+  duration_ms: 0.096042
+  type: 'test'
+  ...
+# Subtest: schema is narrow, RLS-closed, account-bound, audited, and 2026-only
+ok 259 - schema is narrow, RLS-closed, account-bound, audited, and 2026-only
+  ---
+  duration_ms: 2.370959
+  type: 'test'
+  ...
+# Subtest: menu warms account capability and every Director surface uses canonical account authorization
+ok 260 - menu warms account capability and every Director surface uses canonical account authorization
+  ---
+  duration_ms: 1.738667
+  type: 'test'
+  ...
+# Subtest: canonical Director missing database fails closed even with an active legacy Passport
+ok 261 - canonical Director missing database fails closed even with an active legacy Passport
+  ---
+  duration_ms: 0.260625
+  type: 'test'
+  ...
+# Subtest: canonical Director unapproved project fails closed even with an active legacy Passport
+ok 262 - canonical Director unapproved project fails closed even with an active legacy Passport
+  ---
+  duration_ms: 0.122542
+  type: 'test'
+  ...
+# Subtest: canonical Director Auth/database origin mismatch fails closed even with an active legacy Passport
+ok 263 - canonical Director Auth/database origin mismatch fails closed even with an active legacy Passport
+  ---
+  duration_ms: 0.071166
+  type: 'test'
+  ...
+# Subtest: canonical Director credential missing fails closed even with an active legacy Passport
+ok 264 - canonical Director credential missing fails closed even with an active legacy Passport
+  ---
+  duration_ms: 0.046917
+  type: 'test'
+  ...
+# Subtest: canonical Director retired Passport configured fails closed even with an active legacy Passport
+ok 265 - canonical Director retired Passport configured fails closed even with an active legacy Passport
+  ---
+  duration_ms: 0.042166
+  type: 'test'
+  ...
+# Subtest: retired Director migration endpoints reject without identity/provider transport
+ok 266 - retired Director migration endpoints reject without identity/provider transport
+  ---
+  duration_ms: 7.353125
+  type: 'test'
+  ...
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.682Z","event":"OUTCOME","request_id":"c0ffee00-0000-4000-8000-000000000001","correlation_id":"c0ffee00-0000-4000-8000-000000000001","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"00000000-0000-4000-8000-000000000001","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.683Z","event":"REQUEST","request_id":"c0ffee00-0000-4000-8000-000000000001","correlation_id":"c0ffee00-0000-4000-8000-000000000001","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"00000000-0000-4000-8000-000000000001","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":2.308,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.684Z","event":"DOMAIN_ERROR","request_id":"2d243568-02d4-4c2f-9975-9d7fa0b55e76","correlation_id":"2d243568-02d4-4c2f-9975-9d7fa0b55e76","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":400,"query_family":null,"phase":null,"outcome":"UNOBSERVED","error_class":"INTERNAL_ERROR","domain_error_code":"SCORE_RECOVERY_INVALID_REQUEST","sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.684Z","event":"REQUEST","request_id":"2d243568-02d4-4c2f-9975-9d7fa0b55e76","correlation_id":"2d243568-02d4-4c2f-9975-9d7fa0b55e76","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.351,"http_status":400,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":"INTERNAL_ERROR","domain_error_code":"SCORE_RECOVERY_INVALID_REQUEST","sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.684Z","event":"DOMAIN_ERROR","request_id":"14821d4c-8756-4717-b7f5-51331bdbca25","correlation_id":"14821d4c-8756-4717-b7f5-51331bdbca25","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":400,"query_family":null,"phase":null,"outcome":"UNOBSERVED","error_class":"INTERNAL_ERROR","domain_error_code":"SCORE_RECOVERY_INVALID_REQUEST","sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.684Z","event":"REQUEST","request_id":"14821d4c-8756-4717-b7f5-51331bdbca25","correlation_id":"14821d4c-8756-4717-b7f5-51331bdbca25","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.141,"http_status":400,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":"INTERNAL_ERROR","domain_error_code":"SCORE_RECOVERY_INVALID_REQUEST","sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.684Z","event":"DOMAIN_ERROR","request_id":"40bd94d2-b09c-4ae2-b3f2-e748ae83fda5","correlation_id":"40bd94d2-b09c-4ae2-b3f2-e748ae83fda5","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":400,"query_family":null,"phase":null,"outcome":"UNOBSERVED","error_class":"INTERNAL_ERROR","domain_error_code":"SCORE_RECOVERY_INVALID_REQUEST","sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.684Z","event":"REQUEST","request_id":"40bd94d2-b09c-4ae2-b3f2-e748ae83fda5","correlation_id":"40bd94d2-b09c-4ae2-b3f2-e748ae83fda5","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.099,"http_status":400,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":"INTERNAL_ERROR","domain_error_code":"SCORE_RECOVERY_INVALID_REQUEST","sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.685Z","event":"DOMAIN_ERROR","request_id":"56c01c8c-b96e-458d-a124-67066657de33","correlation_id":"56c01c8c-b96e-458d-a124-67066657de33","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"00000000-0000-4000-8000-000000000001","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":null,"outcome":"UNOBSERVED","error_class":"DATABASE_TIMEOUT","domain_error_code":null,"sqlstate":"57014","canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.685Z","event":"REQUEST","request_id":"56c01c8c-b96e-458d-a124-67066657de33","correlation_id":"56c01c8c-b96e-458d-a124-67066657de33","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"00000000-0000-4000-8000-000000000001","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.197,"http_status":503,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":"DATABASE_TIMEOUT","domain_error_code":null,"sqlstate":"57014","canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.685Z","event":"DOMAIN_ERROR","request_id":"7c40a6a1-fbad-40a7-8ed3-c9f861cdfc59","correlation_id":"7c40a6a1-fbad-40a7-8ed3-c9f861cdfc59","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"00000000-0000-4000-8000-000000000001","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":null,"outcome":"UNOBSERVED","error_class":"DATABASE_UNAVAILABLE","domain_error_code":null,"sqlstate":"08006","canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.685Z","event":"REQUEST","request_id":"7c40a6a1-fbad-40a7-8ed3-c9f861cdfc59","correlation_id":"7c40a6a1-fbad-40a7-8ed3-c9f861cdfc59","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"00000000-0000-4000-8000-000000000001","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.104,"http_status":503,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":"DATABASE_UNAVAILABLE","domain_error_code":null,"sqlstate":"08006","canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.685Z","event":"DOMAIN_ERROR","request_id":"0c053d33-c88e-4c59-80c1-742cf86e68f5","correlation_id":"0c053d33-c88e-4c59-80c1-742cf86e68f5","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"00000000-0000-4000-8000-000000000001","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":null,"outcome":"UNOBSERVED","error_class":"DATABASE_UNAVAILABLE","domain_error_code":null,"sqlstate":"57P01","canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.685Z","event":"REQUEST","request_id":"0c053d33-c88e-4c59-80c1-742cf86e68f5","correlation_id":"0c053d33-c88e-4c59-80c1-742cf86e68f5","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"00000000-0000-4000-8000-000000000001","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.09,"http_status":503,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":"DATABASE_UNAVAILABLE","domain_error_code":null,"sqlstate":"57P01","canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.685Z","event":"DOMAIN_ERROR","request_id":"158b4e58-0a0d-46ed-a47e-ddc173df4a9c","correlation_id":"158b4e58-0a0d-46ed-a47e-ddc173df4a9c","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":401,"query_family":null,"phase":null,"outcome":"UNOBSERVED","error_class":"AUTH_INVALID","domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.685Z","event":"REQUEST","request_id":"158b4e58-0a0d-46ed-a47e-ddc173df4a9c","correlation_id":"158b4e58-0a0d-46ed-a47e-ddc173df4a9c","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.074,"http_status":401,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":"AUTH_INVALID","domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.685Z","event":"DOMAIN_ERROR","request_id":"18462a9a-dcc1-4489-be28-4a7972704021","correlation_id":"18462a9a-dcc1-4489-be28-4a7972704021","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":403,"query_family":null,"phase":null,"outcome":"UNOBSERVED","error_class":"AUTHORIZATION_DENIED","domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.685Z","event":"REQUEST","request_id":"18462a9a-dcc1-4489-be28-4a7972704021","correlation_id":"18462a9a-dcc1-4489-be28-4a7972704021","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.054,"http_status":403,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":"AUTHORIZATION_DENIED","domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.686Z","event":"OUTCOME","request_id":"480c82e9-bb1c-45bc-bee1-d317c27ae292","correlation_id":"480c82e9-bb1c-45bc-bee1-d317c27ae292","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-0","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.686Z","event":"REQUEST","request_id":"480c82e9-bb1c-45bc-bee1-d317c27ae292","correlation_id":"480c82e9-bb1c-45bc-bee1-d317c27ae292","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-0","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.592,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.686Z","event":"OUTCOME","request_id":"555de9c3-73e7-4022-9c19-1eaaa08ec523","correlation_id":"555de9c3-73e7-4022-9c19-1eaaa08ec523","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-1","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.686Z","event":"REQUEST","request_id":"555de9c3-73e7-4022-9c19-1eaaa08ec523","correlation_id":"555de9c3-73e7-4022-9c19-1eaaa08ec523","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-1","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.077,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.686Z","event":"OUTCOME","request_id":"671c3f19-87a3-4a1d-8fb2-7dae69c1314d","correlation_id":"671c3f19-87a3-4a1d-8fb2-7dae69c1314d","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-2","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"671c3f19-87a3-4a1d-8fb2-7dae69c1314d","correlation_id":"671c3f19-87a3-4a1d-8fb2-7dae69c1314d","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-2","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.059,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"d6f281af-c01d-4055-a9f8-bb3f55ab3368","correlation_id":"d6f281af-c01d-4055-a9f8-bb3f55ab3368","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-3","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"d6f281af-c01d-4055-a9f8-bb3f55ab3368","correlation_id":"d6f281af-c01d-4055-a9f8-bb3f55ab3368","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-3","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.057,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"51ecb0f0-ebe5-4ee9-8312-525be09e0fa0","correlation_id":"51ecb0f0-ebe5-4ee9-8312-525be09e0fa0","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-4","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"51ecb0f0-ebe5-4ee9-8312-525be09e0fa0","correlation_id":"51ecb0f0-ebe5-4ee9-8312-525be09e0fa0","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-4","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.039,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"1dec4d33-a74e-4f65-8008-1398915cfc92","correlation_id":"1dec4d33-a74e-4f65-8008-1398915cfc92","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-5","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"1dec4d33-a74e-4f65-8008-1398915cfc92","correlation_id":"1dec4d33-a74e-4f65-8008-1398915cfc92","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-5","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.035,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"d72af675-2d72-45f9-8989-8b9d012c8cf1","correlation_id":"d72af675-2d72-45f9-8989-8b9d012c8cf1","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-6","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"d72af675-2d72-45f9-8989-8b9d012c8cf1","correlation_id":"d72af675-2d72-45f9-8989-8b9d012c8cf1","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-6","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.047,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"95647c33-a80b-4c74-be8e-b28816e5771b","correlation_id":"95647c33-a80b-4c74-be8e-b28816e5771b","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-7","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"95647c33-a80b-4c74-be8e-b28816e5771b","correlation_id":"95647c33-a80b-4c74-be8e-b28816e5771b","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-7","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.034,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"29058337-4dc9-4d31-b0a4-3d98424764bf","correlation_id":"29058337-4dc9-4d31-b0a4-3d98424764bf","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-8","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"29058337-4dc9-4d31-b0a4-3d98424764bf","correlation_id":"29058337-4dc9-4d31-b0a4-3d98424764bf","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-8","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.036,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"c2c5fc58-2a1e-4e9c-b063-741c76498a5f","correlation_id":"c2c5fc58-2a1e-4e9c-b063-741c76498a5f","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-9","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"c2c5fc58-2a1e-4e9c-b063-741c76498a5f","correlation_id":"c2c5fc58-2a1e-4e9c-b063-741c76498a5f","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-9","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.037,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"23313c03-5cb6-41f9-aceb-c202eb181c27","correlation_id":"23313c03-5cb6-41f9-aceb-c202eb181c27","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-10","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"23313c03-5cb6-41f9-aceb-c202eb181c27","correlation_id":"23313c03-5cb6-41f9-aceb-c202eb181c27","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-10","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.043,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"5bdc65cc-5e4b-434e-8ef1-0450dcdac287","correlation_id":"5bdc65cc-5e4b-434e-8ef1-0450dcdac287","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-11","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"5bdc65cc-5e4b-434e-8ef1-0450dcdac287","correlation_id":"5bdc65cc-5e4b-434e-8ef1-0450dcdac287","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-11","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.034,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"5b96f3c5-8381-4867-ad3e-11733fea6e9d","correlation_id":"5b96f3c5-8381-4867-ad3e-11733fea6e9d","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-12","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"5b96f3c5-8381-4867-ad3e-11733fea6e9d","correlation_id":"5b96f3c5-8381-4867-ad3e-11733fea6e9d","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-12","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.035,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"45f2b028-0b96-474f-803a-6894427a976c","correlation_id":"45f2b028-0b96-474f-803a-6894427a976c","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-13","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"45f2b028-0b96-474f-803a-6894427a976c","correlation_id":"45f2b028-0b96-474f-803a-6894427a976c","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-13","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.032,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"87290b8e-6bb1-4e16-a736-aa145d4e92e3","correlation_id":"87290b8e-6bb1-4e16-a736-aa145d4e92e3","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-14","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"87290b8e-6bb1-4e16-a736-aa145d4e92e3","correlation_id":"87290b8e-6bb1-4e16-a736-aa145d4e92e3","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-14","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.03,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"177c2783-0a95-41f5-9a3e-b7e480686a99","correlation_id":"177c2783-0a95-41f5-9a3e-b7e480686a99","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-15","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"177c2783-0a95-41f5-9a3e-b7e480686a99","correlation_id":"177c2783-0a95-41f5-9a3e-b7e480686a99","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-15","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.041,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"5db07326-7c67-499e-b895-2fb6c3911d16","correlation_id":"5db07326-7c67-499e-b895-2fb6c3911d16","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-16","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"5db07326-7c67-499e-b895-2fb6c3911d16","correlation_id":"5db07326-7c67-499e-b895-2fb6c3911d16","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-16","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.042,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"OUTCOME","request_id":"f629db2a-f432-458c-a7d3-febfd9e4b629","correlation_id":"f629db2a-f432-458c-a7d3-febfd9e4b629","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-17","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.687Z","event":"REQUEST","request_id":"f629db2a-f432-458c-a7d3-febfd9e4b629","correlation_id":"f629db2a-f432-458c-a7d3-febfd9e4b629","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-17","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.036,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"709a0606-c421-480a-834a-7faa79ed4e31","correlation_id":"709a0606-c421-480a-834a-7faa79ed4e31","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-18","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"709a0606-c421-480a-834a-7faa79ed4e31","correlation_id":"709a0606-c421-480a-834a-7faa79ed4e31","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-18","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.03,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"b4c46544-47f8-4619-b29b-56c52c2fef57","correlation_id":"b4c46544-47f8-4619-b29b-56c52c2fef57","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-19","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"b4c46544-47f8-4619-b29b-56c52c2fef57","correlation_id":"b4c46544-47f8-4619-b29b-56c52c2fef57","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-19","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.029,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"c2e4c893-79a5-428b-9333-d2d257578514","correlation_id":"c2e4c893-79a5-428b-9333-d2d257578514","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-20","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"c2e4c893-79a5-428b-9333-d2d257578514","correlation_id":"c2e4c893-79a5-428b-9333-d2d257578514","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-20","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.029,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"0c79f34a-5733-4613-bf40-de9dce0046e4","correlation_id":"0c79f34a-5733-4613-bf40-de9dce0046e4","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-21","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"0c79f34a-5733-4613-bf40-de9dce0046e4","correlation_id":"0c79f34a-5733-4613-bf40-de9dce0046e4","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-21","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.028,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"08eec132-3b4d-40f3-a03b-ca7dc288efaa","correlation_id":"08eec132-3b4d-40f3-a03b-ca7dc288efaa","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-22","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"08eec132-3b4d-40f3-a03b-ca7dc288efaa","correlation_id":"08eec132-3b4d-40f3-a03b-ca7dc288efaa","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-22","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.03,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"7d9e349f-19c4-48e6-b892-bcb8f973073b","correlation_id":"7d9e349f-19c4-48e6-b892-bcb8f973073b","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-23","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"7d9e349f-19c4-48e6-b892-bcb8f973073b","correlation_id":"7d9e349f-19c4-48e6-b892-bcb8f973073b","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-23","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.034,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"4b67df5b-cb2f-4247-b652-f7a06b5696a0","correlation_id":"4b67df5b-cb2f-4247-b652-f7a06b5696a0","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-24","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"4b67df5b-cb2f-4247-b652-f7a06b5696a0","correlation_id":"4b67df5b-cb2f-4247-b652-f7a06b5696a0","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-24","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.032,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"04312e33-b4ab-4dd8-94bf-0810d2ecce4a","correlation_id":"04312e33-b4ab-4dd8-94bf-0810d2ecce4a","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-25","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"04312e33-b4ab-4dd8-94bf-0810d2ecce4a","correlation_id":"04312e33-b4ab-4dd8-94bf-0810d2ecce4a","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-25","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.038,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"b10bd12c-3469-415a-96bf-989648148a35","correlation_id":"b10bd12c-3469-415a-96bf-989648148a35","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-26","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"b10bd12c-3469-415a-96bf-989648148a35","correlation_id":"b10bd12c-3469-415a-96bf-989648148a35","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-26","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.029,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"a8f99732-9f45-420e-b974-dd9a9afab894","correlation_id":"a8f99732-9f45-420e-b974-dd9a9afab894","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-27","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"a8f99732-9f45-420e-b974-dd9a9afab894","correlation_id":"a8f99732-9f45-420e-b974-dd9a9afab894","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-27","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.048,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"87e88c23-8aac-418f-bc81-c31dcfe2b938","correlation_id":"87e88c23-8aac-418f-bc81-c31dcfe2b938","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-28","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"87e88c23-8aac-418f-bc81-c31dcfe2b938","correlation_id":"87e88c23-8aac-418f-bc81-c31dcfe2b938","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-28","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.032,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"913966a0-d040-4031-92b4-0c7cdf9b56e7","correlation_id":"913966a0-d040-4031-92b4-0c7cdf9b56e7","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-29","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"913966a0-d040-4031-92b4-0c7cdf9b56e7","correlation_id":"913966a0-d040-4031-92b4-0c7cdf9b56e7","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-29","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.033,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"48e07fb9-4a3c-4523-beb1-492abaec13e9","correlation_id":"48e07fb9-4a3c-4523-beb1-492abaec13e9","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-30","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"48e07fb9-4a3c-4523-beb1-492abaec13e9","correlation_id":"48e07fb9-4a3c-4523-beb1-492abaec13e9","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-30","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.118,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"33c45830-d6f8-4c06-a34c-08fad4a2c536","correlation_id":"33c45830-d6f8-4c06-a34c-08fad4a2c536","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-31","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"33c45830-d6f8-4c06-a34c-08fad4a2c536","correlation_id":"33c45830-d6f8-4c06-a34c-08fad4a2c536","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-31","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.052,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"OUTCOME","request_id":"c1627bf6-814a-41f7-afb5-c519eb512f96","correlation_id":"c1627bf6-814a-41f7-afb5-c519eb512f96","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-32","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.688Z","event":"REQUEST","request_id":"c1627bf6-814a-41f7-afb5-c519eb512f96","correlation_id":"c1627bf6-814a-41f7-afb5-c519eb512f96","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-32","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.077,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"d59916a9-11be-47b7-a5e1-ea64311a5804","correlation_id":"d59916a9-11be-47b7-a5e1-ea64311a5804","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-33","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"d59916a9-11be-47b7-a5e1-ea64311a5804","correlation_id":"d59916a9-11be-47b7-a5e1-ea64311a5804","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-33","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.039,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"1b2340b4-6751-4b41-9d78-85596c8e32b8","correlation_id":"1b2340b4-6751-4b41-9d78-85596c8e32b8","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-34","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"1b2340b4-6751-4b41-9d78-85596c8e32b8","correlation_id":"1b2340b4-6751-4b41-9d78-85596c8e32b8","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-34","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.032,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"0209b4b1-8c6a-4a45-8a1b-d4fe5e47a6ea","correlation_id":"0209b4b1-8c6a-4a45-8a1b-d4fe5e47a6ea","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-35","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"0209b4b1-8c6a-4a45-8a1b-d4fe5e47a6ea","correlation_id":"0209b4b1-8c6a-4a45-8a1b-d4fe5e47a6ea","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-35","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.079,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"6eaab276-981e-4eea-8512-c61ebf8e14ec","correlation_id":"6eaab276-981e-4eea-8512-c61ebf8e14ec","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-36","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"6eaab276-981e-4eea-8512-c61ebf8e14ec","correlation_id":"6eaab276-981e-4eea-8512-c61ebf8e14ec","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-36","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.089,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"6e044add-8aa0-4c19-9e17-7fbd5ab37ced","correlation_id":"6e044add-8aa0-4c19-9e17-7fbd5ab37ced","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-37","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"6e044add-8aa0-4c19-9e17-7fbd5ab37ced","correlation_id":"6e044add-8aa0-4c19-9e17-7fbd5ab37ced","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-37","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.049,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"c6d777c8-6d5c-4274-a884-6516a056680f","correlation_id":"c6d777c8-6d5c-4274-a884-6516a056680f","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-38","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"c6d777c8-6d5c-4274-a884-6516a056680f","correlation_id":"c6d777c8-6d5c-4274-a884-6516a056680f","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-38","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.036,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"b4f734de-2db6-4737-a75a-91c773cf0fa0","correlation_id":"b4f734de-2db6-4737-a75a-91c773cf0fa0","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-39","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"b4f734de-2db6-4737-a75a-91c773cf0fa0","correlation_id":"b4f734de-2db6-4737-a75a-91c773cf0fa0","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-39","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.031,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"68030c7f-4bbe-416a-aeca-6f013daa55fd","correlation_id":"68030c7f-4bbe-416a-aeca-6f013daa55fd","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-40","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"68030c7f-4bbe-416a-aeca-6f013daa55fd","correlation_id":"68030c7f-4bbe-416a-aeca-6f013daa55fd","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-40","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.031,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"ea637b8a-2212-4255-8b2c-6fee92f7e686","correlation_id":"ea637b8a-2212-4255-8b2c-6fee92f7e686","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-41","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"ea637b8a-2212-4255-8b2c-6fee92f7e686","correlation_id":"ea637b8a-2212-4255-8b2c-6fee92f7e686","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-41","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.029,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"2d1d0df5-ff07-4705-9a8b-e0e882f72784","correlation_id":"2d1d0df5-ff07-4705-9a8b-e0e882f72784","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-42","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"2d1d0df5-ff07-4705-9a8b-e0e882f72784","correlation_id":"2d1d0df5-ff07-4705-9a8b-e0e882f72784","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-42","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.031,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"5b6bc086-776d-4fe8-b9ee-0d875518b1b4","correlation_id":"5b6bc086-776d-4fe8-b9ee-0d875518b1b4","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-43","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"5b6bc086-776d-4fe8-b9ee-0d875518b1b4","correlation_id":"5b6bc086-776d-4fe8-b9ee-0d875518b1b4","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-43","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.031,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"19c31a3e-3802-4296-b9ec-a8678ac33549","correlation_id":"19c31a3e-3802-4296-b9ec-a8678ac33549","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-44","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"19c31a3e-3802-4296-b9ec-a8678ac33549","correlation_id":"19c31a3e-3802-4296-b9ec-a8678ac33549","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-44","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.03,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"ae12a357-f378-410f-89d8-b0af04fb6f0b","correlation_id":"ae12a357-f378-410f-89d8-b0af04fb6f0b","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-45","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"ae12a357-f378-410f-89d8-b0af04fb6f0b","correlation_id":"ae12a357-f378-410f-89d8-b0af04fb6f0b","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-45","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.032,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"3cc3c3f8-3288-47fd-9315-310608e132d3","correlation_id":"3cc3c3f8-3288-47fd-9315-310608e132d3","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-46","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"3cc3c3f8-3288-47fd-9315-310608e132d3","correlation_id":"3cc3c3f8-3288-47fd-9315-310608e132d3","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-46","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.034,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"8e8d2c35-67f8-4d26-beb7-a4a9f52df828","correlation_id":"8e8d2c35-67f8-4d26-beb7-a4a9f52df828","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-47","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"REQUEST","request_id":"8e8d2c35-67f8-4d26-beb7-a4a9f52df828","correlation_id":"8e8d2c35-67f8-4d26-beb7-a4a9f52df828","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-47","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.031,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.689Z","event":"OUTCOME","request_id":"c3445c00-7513-4cc4-8c6a-65d8e6b490e4","correlation_id":"c3445c00-7513-4cc4-8c6a-65d8e6b490e4","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-48","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"REQUEST","request_id":"c3445c00-7513-4cc4-8c6a-65d8e6b490e4","correlation_id":"c3445c00-7513-4cc4-8c6a-65d8e6b490e4","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-48","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.029,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"OUTCOME","request_id":"eb4106e1-033d-4621-bd2b-7fd96ee01eb5","correlation_id":"eb4106e1-033d-4621-bd2b-7fd96ee01eb5","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-49","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"REQUEST","request_id":"eb4106e1-033d-4621-bd2b-7fd96ee01eb5","correlation_id":"eb4106e1-033d-4621-bd2b-7fd96ee01eb5","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-49","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.028,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"OUTCOME","request_id":"537224cf-b79a-4748-a786-74ac77ef3913","correlation_id":"537224cf-b79a-4748-a786-74ac77ef3913","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-50","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"REQUEST","request_id":"537224cf-b79a-4748-a786-74ac77ef3913","correlation_id":"537224cf-b79a-4748-a786-74ac77ef3913","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-50","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.028,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"OUTCOME","request_id":"972eaf0a-c13e-49e3-8b36-26916d3bf868","correlation_id":"972eaf0a-c13e-49e3-8b36-26916d3bf868","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-51","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"REQUEST","request_id":"972eaf0a-c13e-49e3-8b36-26916d3bf868","correlation_id":"972eaf0a-c13e-49e3-8b36-26916d3bf868","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-51","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.027,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"OUTCOME","request_id":"2670cc21-a63f-4fea-84b6-b4884d2fbdf8","correlation_id":"2670cc21-a63f-4fea-84b6-b4884d2fbdf8","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-52","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"REQUEST","request_id":"2670cc21-a63f-4fea-84b6-b4884d2fbdf8","correlation_id":"2670cc21-a63f-4fea-84b6-b4884d2fbdf8","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-52","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.026,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"OUTCOME","request_id":"ba423a64-7fad-49a3-b3fa-37e0184db122","correlation_id":"ba423a64-7fad-49a3-b3fa-37e0184db122","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-53","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"REQUEST","request_id":"ba423a64-7fad-49a3-b3fa-37e0184db122","correlation_id":"ba423a64-7fad-49a3-b3fa-37e0184db122","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-53","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.027,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"OUTCOME","request_id":"4d13b274-37ec-4e86-a89a-3182853552f5","correlation_id":"4d13b274-37ec-4e86-a89a-3182853552f5","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-54","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"REQUEST","request_id":"4d13b274-37ec-4e86-a89a-3182853552f5","correlation_id":"4d13b274-37ec-4e86-a89a-3182853552f5","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-54","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.029,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"OUTCOME","request_id":"ca76a492-96bc-465c-aed6-488c23cc2197","correlation_id":"ca76a492-96bc-465c-aed6-488c23cc2197","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-55","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"REQUEST","request_id":"ca76a492-96bc-465c-aed6-488c23cc2197","correlation_id":"ca76a492-96bc-465c-aed6-488c23cc2197","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-55","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.026,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"OUTCOME","request_id":"f16350a0-3e66-4246-bcdf-fdf566d040d3","correlation_id":"f16350a0-3e66-4246-bcdf-fdf566d040d3","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-56","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"REQUEST","request_id":"f16350a0-3e66-4246-bcdf-fdf566d040d3","correlation_id":"f16350a0-3e66-4246-bcdf-fdf566d040d3","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-56","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.027,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"OUTCOME","request_id":"aad34bbe-919b-47cc-a06a-0a3dc281599f","correlation_id":"aad34bbe-919b-47cc-a06a-0a3dc281599f","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-57","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"REQUEST","request_id":"aad34bbe-919b-47cc-a06a-0a3dc281599f","correlation_id":"aad34bbe-919b-47cc-a06a-0a3dc281599f","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-57","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.027,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"OUTCOME","request_id":"31e09731-bda6-43a3-ba5f-09c8ff767e28","correlation_id":"31e09731-bda6-43a3-ba5f-09c8ff767e28","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-58","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"REQUEST","request_id":"31e09731-bda6-43a3-ba5f-09c8ff767e28","correlation_id":"31e09731-bda6-43a3-ba5f-09c8ff767e28","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-58","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.027,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"OUTCOME","request_id":"1fbafbea-5e97-4526-be48-48646aa78dbd","correlation_id":"1fbafbea-5e97-4526-be48-48646aa78dbd","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-59","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"UNKNOWN","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"REQUEST","request_id":"1fbafbea-5e97-4526-be48-48646aa78dbd","correlation_id":"1fbafbea-5e97-4526-be48-48646aa78dbd","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"guess-59","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.028,"http_status":200,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.690Z","event":"REQUEST","request_id":"132401a4-9840-4b59-94e7-90bb7223496e","correlation_id":"132401a4-9840-4b59-94e7-90bb7223496e","route":"/api/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.026,"http_status":429,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":"INTERNAL_ERROR","domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.691Z","event":"OUTCOME","request_id":"b298175f-7e07-4ff0-953a-a31017b95f84","correlation_id":"b298175f-7e07-4ff0-953a-a31017b95f84","route":"/api/mobile/v1/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"00000000-0000-4000-8000-000000000001","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":null,"query_family":null,"phase":"mutation_recovery","outcome":"COMMITTED","error_class":null,"domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.691Z","event":"DOMAIN_ERROR","request_id":"b298175f-7e07-4ff0-953a-a31017b95f84","correlation_id":"b298175f-7e07-4ff0-953a-a31017b95f84","route":"/api/mobile/v1/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"00000000-0000-4000-8000-000000000001","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":403,"query_family":null,"phase":null,"outcome":"UNOBSERVED","error_class":"AUTHORIZATION_DENIED","domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.691Z","event":"REQUEST","request_id":"b298175f-7e07-4ff0-953a-a31017b95f84","correlation_id":"b298175f-7e07-4ff0-953a-a31017b95f84","route":"/api/mobile/v1/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"mutation_id":"00000000-0000-4000-8000-000000000001","match_id":"2026-R3-12","operation_id":null,"job_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.096,"http_status":403,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":"AUTHORIZATION_DENIED","domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.691Z","event":"DOMAIN_ERROR","request_id":"2cfaf351-0145-46ab-ad66-a28efdd91bc5","correlation_id":"2cfaf351-0145-46ab-ad66-a28efdd91bc5","route":"/api/mobile/v1/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":503,"query_family":null,"phase":null,"outcome":"UNOBSERVED","error_class":"FEATURE_UNAVAILABLE","domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# {"schema_version":1,"timestamp":"2026-10-03T04:52:54.691Z","event":"REQUEST","request_id":"2cfaf351-0145-46ab-ad66-a28efdd91bc5","correlation_id":"2cfaf351-0145-46ab-ad66-a28efdd91bc5","route":"/api/mobile/v1/scoring/mutation-status","domain":"SCORING","feature":"SCORING","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":null,"operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":0.513,"http_status":503,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":"FEATURE_UNAVAILABLE","domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+# Subtest: recovery strict request accepts only exact match/mutation IDs
+ok 267 - recovery strict request accepts only exact match/mutation IDs
+  ---
+  duration_ms: 0.819042
+  type: 'test'
+  ...
+# Subtest: recovery identity refuses signed out, observer, impersonation and invalid scope
+ok 268 - recovery identity refuses signed out, observer, impersonation and invalid scope
+  ---
+  duration_ms: 0.167458
+  type: 'test'
+  ...
+# Subtest: only exact committed receipt is projected; private fields excluded
+ok 269 - only exact committed receipt is projected; private fields excluded
+  ---
+  duration_ms: 0.27625
+  type: 'test'
+  ...
+# Subtest: unknown is never NOT_COMMITTED and does not return a canonical guess
+ok 270 - unknown is never NOT_COMMITTED and does not return a canonical guess
+  ---
+  duration_ms: 0.061333
+  type: 'test'
+  ...
+# Subtest: corrupt or mismatched provider responses fail closed without false outcome
+ok 271 - corrupt or mismatched provider responses fail closed without false outcome
+  ---
+  duration_ms: 0.168375
+  type: 'test'
+  ...
+# Subtest: route response is private no-store with request correlation preserved
+ok 272 - route response is private no-store with request correlation preserved
+  ---
+  duration_ms: 9.610584
+  type: 'test'
+  ...
+# Subtest: route denies malformed and oversized streams before database lookup
+ok 273 - route denies malformed and oversized streams before database lookup
+  ---
+  duration_ms: 1.143
+  type: 'test'
+  ...
+# Subtest: route preserves unknown on timeout, connection failure and secret-bearing errors
+ok 274 - route preserves unknown on timeout, connection failure and secret-bearing errors
+  ---
+  duration_ms: 0.774167
+  type: 'test'
+  ...
+# Subtest: auth failure does not call receipt provider
+ok 275 - auth failure does not call receipt provider
+  ---
+  duration_ms: 0.305875
+  type: 'test'
+  ...
+# Subtest: rate limiting is by authenticated account, independent of guessed mutation IDs
+ok 276 - rate limiting is by authenticated account, independent of guessed mutation IDs
+  ---
+  duration_ms: 4.889541
+  type: 'test'
+  ...
+# Subtest: mobile read authority is rechecked and revocation cannot leak receipt
+ok 277 - mobile read authority is rechecked and revocation cannot leak receipt
+  ---
+  duration_ms: 0.202541
+  type: 'test'
+  ...
+# Subtest: mobile recovery default-off denies through real factory before any identity or receipt transport
+ok 278 - mobile recovery default-off denies through real factory before any identity or receipt transport
+  ---
+  duration_ms: 0.701708
+  type: 'test'
+  ...
+# Subtest: recovery telemetry emits safe SCORING correlation and committed/unknown knowledge from actual handler
+ok 279 - recovery telemetry emits safe SCORING correlation and committed/unknown knowledge from actual handler
+  ---
+  duration_ms: 0.40225
+  type: 'test'
+  ...
+# Subtest: recovery telemetry records authentication/authorization denials without trusting requested mutation identity
+ok 280 - recovery telemetry records authentication/authorization denials without trusting requested mutation identity
+  ---
+  duration_ms: 0.206542
+  type: 'test'
+  ...
+# Subtest: recovery telemetry classifies database timeout and connection errors without logging diagnostic payloads
+ok 281 - recovery telemetry classifies database timeout and connection errors without logging diagnostic payloads
+  ---
+  duration_ms: 0.239334
+  type: 'test'
+  ...
+# Subtest: optional synchronous or asynchronous telemetry sink failure cannot turn a committed receipt read into failure
+ok 282 - optional synchronous or asynchronous telemetry sink failure cannot turn a committed receipt read into failure
+  ---
+  duration_ms: 2.006917
+  type: 'test'
+  ...
+1..282
+# tests 282
+# suites 0
+# pass 282
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 882.48025

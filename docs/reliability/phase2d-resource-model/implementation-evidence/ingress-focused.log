@@ -1,0 +1,108 @@
+TAP version 13
+# Subtest: R2 durable ingress: real canonical mutation, atomic outcomes, recovery and fencing
+    # Subtest: durable admission precedes execution and retry allocates one lease
+    ok 1 - durable admission precedes execution and retry allocates one lease
+      ---
+      duration_ms: 273.94875
+      type: 'test'
+      ...
+    # Subtest: canonical mutation receipt audit and COMMITTED outcome commit atomically
+    ok 2 - canonical mutation receipt audit and COMMITTED outcome commit atomically
+      ---
+      duration_ms: 194.760417
+      type: 'test'
+      ...
+    # Subtest: authorization and target failures allocate no lease
+    ok 3 - authorization and target failures allocate no lease
+      ---
+      duration_ms: 332.536
+      type: 'test'
+      ...
+    # Subtest: pre-execution crash remains unresolved; explicit resolution fences delayed execution
+    ok 4 - pre-execution crash remains unresolved; explicit resolution fences delayed execution
+      ---
+      duration_ms: 255.38875
+      type: 'test'
+      ...
+    # Subtest: domain failure rollback leaves durable unresolved admission for explicit recovery
+    ok 5 - domain failure rollback leaves durable unresolved admission for explicit recovery
+      ---
+      duration_ms: 308.977209
+      type: 'test'
+      ...
+    # Subtest: statement timeout after durable admission cannot report non-commit without explicit fencing
+    ok 6 - statement timeout after durable admission cannot report non-commit without explicit fencing
+      ---
+      duration_ms: 353.675417
+      type: 'test'
+      ...
+    # Subtest: concurrent same-ID admission returns one durable lease
+    ok 7 - concurrent same-ID admission returns one durable lease
+      ---
+      duration_ms: 192.921792
+      type: 'test'
+      ...
+    # Subtest: resolve waits for in-flight execution and observes the committed canonical outcome
+    ok 8 - resolve waits for in-flight execution and observes the committed canonical outcome
+      ---
+      duration_ms: 317.479625
+      type: 'test'
+      ...
+    # Subtest: participant recovery survives score-permission revocation and hides other-origin operation existence
+    ok 9 - participant recovery survives score-permission revocation and hides other-origin operation existence
+      ---
+      duration_ms: 154.51125
+      type: 'test'
+      ...
+    # Subtest: close captures nonempty generation, unresolved blocks drain, resolve then close is immutable
+    ok 10 - close captures nonempty generation, unresolved blocks drain, resolve then close is immutable
+      ---
+      duration_ms: 663.196666
+      type: 'test'
+      ...
+    # Subtest: ACLs, RLS, owners, search_path, private cores and terminal immutability
+    ok 11 - ACLs, RLS, owners, search_path, private cores and terminal immutability
+      ---
+      duration_ms: 64.241375
+      type: 'test'
+      ...
+    # Subtest: JS transport uses the exact initially registered resource and real canonical update
+    ok 12 - JS transport uses the exact initially registered resource and real canonical update
+      ---
+      duration_ms: 329.189958
+      type: 'test'
+      ...
+    # Subtest: JS lost admission acknowledgement never executes; exact recovery and fencing persist
+    ok 13 - JS lost admission acknowledgement never executes; exact recovery and fencing persist
+      ---
+      duration_ms: 259.049541
+      type: 'test'
+      ...
+    # Subtest: JS lost execution acknowledgement resolves the committed canonical result without resubmission
+    ok 14 - JS lost execution acknowledgement resolves the committed canonical result without resubmission
+      ---
+      duration_ms: 375.923625
+      type: 'test'
+      ...
+    # Subtest: JS and PostgreSQL reject wrong registered resource and actor without an admitted write
+    ok 15 - JS and PostgreSQL reject wrong registered resource and actor without an admitted write
+      ---
+      duration_ms: 253.408709
+      type: 'test'
+      ...
+    1..15
+ok 1 - R2 durable ingress: real canonical mutation, atomic outcomes, recovery and fencing
+  ---
+  duration_ms: 15939.081958
+  type: 'test'
+  ...
+# {"environment":"OWNED_LOCAL_POSTGRESQL17","forwardMigrations":["supabase/production_migrations/202609300131_canonical_resource_control_v1.sql","supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql","supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql","supabase/production_migrations/202609300134_certification_annual_administration_v1.sql","supabase/production_migrations/202609300135_certification_read_contracts_v1.sql","supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql"],"leases":11,"googleCalls":0,"hostedAccess":false,"finalBaselineEmitted":false}
+1..1
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 16072.721541

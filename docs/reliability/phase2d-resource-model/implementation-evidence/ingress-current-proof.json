@@ -1,0 +1,60 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "proof_layers": [
+    "POSTGRESQL",
+    "RPC",
+    "INTEGRATION",
+    "FAILURE_INJECTION",
+    "CONCURRENCY"
+  ],
+  "source_sha256": {
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "test/reliability-phase2dr2-ingress.integration.test.mjs": "bd84b6640c63fec85bbe8a8e978a5ec149aeadb8487f19e8479fc2f430aaa382",
+    "test/reliability-phase2dr2-ingress-upgrade.integration.test.mjs": "41164f94db7b3eaebd4c785a4247ed9afcbf376aff27b741289c89922050831d",
+    "test/reliability-phase2dr2-ingress-stress.integration.test.mjs": "85b417e3c2446408182590d7016dd499b203eadc6ea58f7c06c5b2656e26527a",
+    "test/reliability-phase2dr2-domain.integration.test.mjs": "4b71ea9e22828f42731e489c68b89a34df1feb67e0048407b20d425be1eb0b7b"
+  },
+  "final_source_run": {
+    "pass": 35,
+    "fail": 0,
+    "skip": 0,
+    "behavioral": 32,
+    "parents": 3,
+    "log": "ingress-cross-family-after.log"
+  },
+  "final_fixture_rerun": {
+    "pass": 17,
+    "fail": 0,
+    "skip": 0,
+    "reason": "Cross-family privacy assertion independent of concurrent winning family",
+    "log": "ingress-final-focused.log"
+  },
+  "retained_stress": {
+    "pass": 9,
+    "fail": 0,
+    "skip": 0,
+    "log": "ingress-complete-pre-cross-family.log",
+    "source_sha256": "13883347238fed55eefb9846fa019a901f1cbbf56cb2d2a996f5f500e9fe16e9",
+    "impact": "Final correction changes only match-family admission uniqueness/serialization; stress uses DIRECTOR.MUTATE_SETUP, whose admission namespace and execution/expiry/restart/close implementation are unchanged. Actual five-minute expiry was not rerun for an unrelated namespace correction."
+  },
+  "counterevidence": {
+    "before": "ingress-cross-family-before.json",
+    "after": "ingress-cross-family-after.json",
+    "accepted_before": 2,
+    "accepted_after": 1
+  },
+  "limitations": [
+    "Full annual lifecycle not proven",
+    "Future-year identity recovery awaits138",
+    "Full432-hole sequence not run in these suites",
+    "No hosted or Production proof",
+    "Fast process restart is not power-loss durability proof",
+    "Blanket all-mutation admission scope is under separate annual-control review"
+  ],
+  "owned_clusters_destroyed": true,
+  "hosted_access": false,
+  "production_access": false,
+  "google_calls": 0,
+  "final_baseline_emitted": false
+}

@@ -1,0 +1,54 @@
+{
+  "status": "PASS",
+  "proofLayer": "SOURCE",
+  "base": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "components": [
+    {
+      "component": "FinalRecap eligibility",
+      "source": "lib/intelligence-derived-supabase.js",
+      "sha256": "e64923b42d5d5e48ca9a19ea6601114675ceef00eb4004a28f5017e7287b82a0",
+      "unchanged": true
+    },
+    {
+      "component": "Canonical Intelligence/FinalRecap calculation",
+      "source": "lib/intelligence-derived-supabase.js",
+      "sha256": "c97c75ec64532a265e9f4812ac3e6a6cb6b13f018fb9813ab392989841699bcb",
+      "unchanged": true
+    },
+    {
+      "component": "lib/championship-odds-insights.js",
+      "source": "lib/championship-odds-insights.js",
+      "sha256": "750d3ca1415b4fd039b848b58df56ec160894a485bea3282761be5cec8fdfbbc",
+      "unchanged": true
+    },
+    {
+      "component": "lib/projection-editorial.js",
+      "source": "lib/projection-editorial.js",
+      "sha256": "d682a9959502de022b94105ab1a94c4bc8c9f2cf8a3734c48826c377520e3cce",
+      "unchanged": true
+    },
+    {
+      "component": "lib/tournament-recap-intelligence.js",
+      "source": "lib/tournament-recap-intelligence.js",
+      "sha256": "43b3620ba8088905aab8b26caf01f8f5099eb723acf3dd95374de6ad6e39110f",
+      "unchanged": true
+    },
+    {
+      "component": "lib/tournament-intelligence-storylines.js",
+      "source": "lib/tournament-intelligence-storylines.js",
+      "sha256": "785ebc04f09f5cacf443171cdf6d658d3f5e8ada342c88b2b61c8aa8e39ccf4e",
+      "unchanged": true
+    },
+    {
+      "component": "lib/published-odds-supabase.js",
+      "source": "lib/published-odds-supabase.js",
+      "sha256": "081d157585e0795e999b4071ce36a2e7f3ff52f599574df571b332a56c984e9b",
+      "unchanged": true
+    }
+  ],
+  "limitations": [
+    "No positive historical Production publication or cross-resource final output comparison is inferred",
+    "Actual Certification FinalRecap integration evidence is supplied separately by annual chronology",
+    "Resource-specific receipt IDs, provenance and dependency fingerprints need not be equal even where competitive payload semantics are identical"
+  ]
+}

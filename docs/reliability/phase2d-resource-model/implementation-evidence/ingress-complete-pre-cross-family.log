@@ -1,0 +1,189 @@
+TAP version 13
+# Subtest: R2 ingress full lifecycle stress:20 callers, connection death, restart, actual expiry and close race
+    # Subtest: twenty concurrent admission and execution attempts create one canonical receipt
+    ok 1 - twenty concurrent admission and execution attempts create one canonical receipt
+      ---
+      duration_ms: 555.349875
+      type: 'test'
+      ...
+    # Subtest: twenty conflicting payloads cannot share admitted identity
+    ok 2 - twenty conflicting payloads cannot share admitted identity
+      ---
+      duration_ms: 314.1445
+      type: 'test'
+      ...
+    # Subtest: deterministic canonical rejection records NOT_COMMITTED with the established domain result
+    ok 3 - deterministic canonical rejection records NOT_COMMITTED with the established domain result
+      ---
+      duration_ms: 235.54425
+      type: 'test'
+      ...
+    # Subtest: actual connection death before commit rolls back canonical work but retains admission
+    ok 4 - actual connection death before commit rolls back canonical work but retains admission
+      ---
+      duration_ms: 360.0385
+      type: 'test'
+      ...
+    # Subtest: terminal-audit failure atomically rolls back domain receipt and terminal outcome
+    ok 5 - terminal-audit failure atomically rolls back domain receipt and terminal outcome
+      ---
+      duration_ms: 383.478083
+      type: 'test'
+      ...
+    # Subtest: physical PostgreSQL process restart retains admitted and committed evidence
+    ok 6 - physical PostgreSQL process restart retains admitted and committed evidence
+      ---
+      duration_ms: 535.8035
+      type: 'test'
+      ...
+    # Subtest: real lease expiry remains unresolved and blocks drain until authoritative resolution
+    ok 7 - real lease expiry remains unresolved and blocks drain until authoritative resolution
+      ---
+      duration_ms: 297928.363292
+      type: 'test'
+      ...
+    # Subtest: close waits for active canonical execution; no old-generation write can land afterward
+    ok 8 - close waits for active canonical execution; no old-generation write can land afterward
+      ---
+      duration_ms: 441.742042
+      type: 'test'
+      ...
+    1..8
+ok 1 - R2 ingress full lifecycle stress:20 callers, connection death, restart, actual expiry and close race
+  ---
+  duration_ms: 312422.900833
+  type: 'test'
+  ...
+# Waiting 298 seconds for the actual five-minute lease lifetime; no clock or lease mutation.
+# Subtest: R2 ingress forward upgrade fences old executions, preserves public OID and rejects unexpected ACLs
+    # Subtest: upgrade waits for a genuinely executing predecessor mutation before creating the ingress generation
+    ok 1 - upgrade waits for a genuinely executing predecessor mutation before creating the ingress generation
+      ---
+      duration_ms: 573.339916
+      type: 'test'
+      ...
+    # Subtest: already-invoked cached predecessor execution cannot resume with its old context after upgrade
+    ok 2 - already-invoked cached predecessor execution cannot resume with its old context after upgrade
+      ---
+      duration_ms: 349.851333
+      type: 'test'
+      ...
+    # Subtest: unknown default EXECUTE grantee aborts entire migration; prepared public entry retains OID and denies no-lease call
+    ok 3 - unknown default EXECUTE grantee aborts entire migration; prepared public entry retains OID and denies no-lease call
+      ---
+      duration_ms: 658.312708
+      type: 'test'
+      ...
+    1..3
+ok 2 - R2 ingress forward upgrade fences old executions, preserves public OID and rejects unexpected ACLs
+  ---
+  duration_ms: 23170.46375
+  type: 'test'
+  ...
+# Subtest: R2 durable ingress: real canonical mutation, atomic outcomes, recovery and fencing
+    # Subtest: durable admission precedes execution and retry allocates one lease
+    ok 1 - durable admission precedes execution and retry allocates one lease
+      ---
+      duration_ms: 265.496084
+      type: 'test'
+      ...
+    # Subtest: canonical mutation receipt audit and COMMITTED outcome commit atomically
+    ok 2 - canonical mutation receipt audit and COMMITTED outcome commit atomically
+      ---
+      duration_ms: 182.8735
+      type: 'test'
+      ...
+    # Subtest: authorization and target failures allocate no lease
+    ok 3 - authorization and target failures allocate no lease
+      ---
+      duration_ms: 375.790916
+      type: 'test'
+      ...
+    # Subtest: pre-execution crash remains unresolved; explicit resolution fences delayed execution
+    ok 4 - pre-execution crash remains unresolved; explicit resolution fences delayed execution
+      ---
+      duration_ms: 247.583667
+      type: 'test'
+      ...
+    # Subtest: domain failure rollback leaves durable unresolved admission for explicit recovery
+    ok 5 - domain failure rollback leaves durable unresolved admission for explicit recovery
+      ---
+      duration_ms: 319.374792
+      type: 'test'
+      ...
+    # Subtest: statement timeout after durable admission cannot report non-commit without explicit fencing
+    ok 6 - statement timeout after durable admission cannot report non-commit without explicit fencing
+      ---
+      duration_ms: 338.6905
+      type: 'test'
+      ...
+    # Subtest: concurrent same-ID admission returns one durable lease
+    ok 7 - concurrent same-ID admission returns one durable lease
+      ---
+      duration_ms: 194.736375
+      type: 'test'
+      ...
+    # Subtest: resolve waits for in-flight execution and observes the committed canonical outcome
+    ok 8 - resolve waits for in-flight execution and observes the committed canonical outcome
+      ---
+      duration_ms: 324.497292
+      type: 'test'
+      ...
+    # Subtest: participant recovery survives score-permission revocation and hides other-origin operation existence
+    ok 9 - participant recovery survives score-permission revocation and hides other-origin operation existence
+      ---
+      duration_ms: 150.865625
+      type: 'test'
+      ...
+    # Subtest: close captures nonempty generation, unresolved blocks drain, resolve then close is immutable
+    ok 10 - close captures nonempty generation, unresolved blocks drain, resolve then close is immutable
+      ---
+      duration_ms: 703.765666
+      type: 'test'
+      ...
+    # Subtest: ACLs, RLS, owners, search_path, private cores and terminal immutability
+    ok 11 - ACLs, RLS, owners, search_path, private cores and terminal immutability
+      ---
+      duration_ms: 69.049166
+      type: 'test'
+      ...
+    # Subtest: JS transport uses the exact initially registered resource and real canonical update
+    ok 12 - JS transport uses the exact initially registered resource and real canonical update
+      ---
+      duration_ms: 346.5335
+      type: 'test'
+      ...
+    # Subtest: JS lost admission acknowledgement never executes; exact recovery and fencing persist
+    ok 13 - JS lost admission acknowledgement never executes; exact recovery and fencing persist
+      ---
+      duration_ms: 265.158417
+      type: 'test'
+      ...
+    # Subtest: JS lost execution acknowledgement resolves the committed canonical result without resubmission
+    ok 14 - JS lost execution acknowledgement resolves the committed canonical result without resubmission
+      ---
+      duration_ms: 398.049625
+      type: 'test'
+      ...
+    # Subtest: JS and PostgreSQL reject wrong registered resource and actor without an admitted write
+    ok 15 - JS and PostgreSQL reject wrong registered resource and actor without an admitted write
+      ---
+      duration_ms: 260.217542
+      type: 'test'
+      ...
+    1..15
+ok 3 - R2 durable ingress: real canonical mutation, atomic outcomes, recovery and fencing
+  ---
+  duration_ms: 15713.156333
+  type: 'test'
+  ...
+# {"environment":"OWNED_LOCAL_POSTGRESQL17","forwardMigrations":["supabase/production_migrations/202609300131_canonical_resource_control_v1.sql","supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql","supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql","supabase/production_migrations/202609300134_certification_annual_administration_v1.sql","supabase/production_migrations/202609300135_certification_read_contracts_v1.sql","supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql"],"leases":11,"googleCalls":0,"hostedAccess":false,"finalBaselineEmitted":false}
+1..3
+# tests 29
+# suites 0
+# pass 29
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 351689.873375

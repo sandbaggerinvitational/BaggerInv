@@ -1,0 +1,62 @@
+{
+  "recordedAt": "2026-10-03T00:27:19.693908+00:00",
+  "classification": "TEST_CONTRACT_AND_LOCAL_HARNESS_ENVIRONMENT_CORRECTIONS",
+  "originalFailure": "BENCHMARK_SAMPLE_REJECTED; payload withheld",
+  "originalLogSha256": "751a27c31a363919b78527ce6441be03e627dd3b529850f5a6c9a93123f9016c",
+  "safeSemanticDiagnostic": [
+    {
+      "event": "BENCHMARK_SEMANTIC_REJECTION",
+      "scale": 1,
+      "operation": "currentRead",
+      "rpc": "read_certification_projection_v1",
+      "keys": [
+        "ok",
+        "data",
+        "shadow_only",
+        "authoritative",
+        "fallback_used",
+        "resource_class",
+        "deployment_commit",
+        "activation_revision",
+        "google_foreground_requests"
+      ],
+      "ok": true,
+      "code": null,
+      "state": null,
+      "dataKeys": [
+        "teams",
+        "rounds",
+        "matches",
+        "players",
+        "query_ms",
+        "tournament",
+        "source_revision",
+        "tournament_presentation"
+      ],
+      "tournamentKeys": [
+        "name",
+        "created_at",
+        "updated_at",
+        "imported_at",
+        "tournament_id",
+        "tournament_year",
+        "scoring_authority",
+        "source_workbook_id"
+      ]
+    }
+  ],
+  "oldAssertion": "data.tournament.id === \"2026\"",
+  "correctedAssertion": "data.tournament.tournament_id === \"2026\" and data.tournament.tournament_year === 2026",
+  "sourceAuthority": [
+    "202609300135_certification_read_contracts_v1.sql:271 delegates LEADERBOARDS to read_leaderboards_core_view",
+    "202608230002_production_final_domain_schema.sql:4217 selects to_jsonb(t) with canonical tournament_id"
+  ],
+  "startupFailure": "postmaster became multithreaded during startup; PostgreSQL requested valid LC_ALL",
+  "startupLogSha256": "29bcc4dac17f35ba9bdb0345e91d36a32d00f58945b81c746c39acaeb5a340b1",
+  "startupCorrection": "Process-only LC_ALL=C LANG=C in clean environment. No host setting,IPC,permission or runtime change.",
+  "runtimeChanged": false,
+  "fixtureAuthorityChanged": false,
+  "testAssertionWeakened": false,
+  "payloadValuesEmitted": false,
+  "allOwnedFailedAndCompletedClustersCleaned": true
+}

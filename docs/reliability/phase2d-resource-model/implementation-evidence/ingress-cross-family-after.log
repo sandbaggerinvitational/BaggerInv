@@ -1,0 +1,225 @@
+TAP version 13
+# Subtest: Certification canonical domain corrections preserve truthful resource, receipts and recovery
+    # Subtest: shipping Director adapter commits canonical setup with exact registered transport
+    ok 1 - shipping Director adapter commits canonical setup with exact registered transport
+      ---
+      duration_ms: 684.273083
+      type: 'test'
+      ...
+    # Subtest: Prepare reaches current Certification pointer with complete context and immutable handicap
+    ok 2 - Prepare reaches current Certification pointer with complete context and immutable handicap
+      ---
+      duration_ms: 466.527792
+      type: 'test'
+      ...
+    # Subtest: canonical lifecycle still separates Mark Live from scoring access and binds real control receipts
+    ok 3 - canonical lifecycle still separates Mark Live from scoring access and binds real control receipts
+      ---
+      duration_ms: 237.916417
+      type: 'test'
+      ...
+    # Subtest: first and subsequent canonical scores commit with real executable ingress and atomic receipt/audit
+    ok 4 - first and subsequent canonical scores commit with real executable ingress and atomic receipt/audit
+      ---
+      duration_ms: 290.30025
+      type: 'test'
+      ...
+    # Subtest: direct receipt insertion cannot borrow a context without entry-transaction lease
+    ok 5 - direct receipt insertion cannot borrow a context without entry-transaction lease
+      ---
+      duration_ms: 35.448125
+      type: 'test'
+      ...
+    # Subtest: score recovery survives permission revocation and masks other actor existence
+    ok 6 - score recovery survives permission revocation and masks other actor existence
+      ---
+      duration_ms: 317.450167
+      type: 'test'
+      ...
+    # Subtest: eighteen canonical holes finalize; Reopen preserves text mutation identity
+    ok 7 - eighteen canonical holes finalize; Reopen preserves text mutation identity
+      ---
+      duration_ms: 2026.494583
+      type: 'test'
+      ...
+    # Subtest: after admission closes all three receipt read cases remain origin-bound and read-only
+    ok 8 - after admission closes all three receipt read cases remain origin-bound and read-only
+      ---
+      duration_ms: 154.583958
+      type: 'test'
+      ...
+    # Subtest: shipping Director client recovers exact original committed setup after admission closes
+    ok 9 - shipping Director client recovers exact original committed setup after admission closes
+      ---
+      duration_ms: 110.714375
+      type: 'test'
+      ...
+    # Subtest: shipping score recovery adapter returns public COMMITTED DTO after admission closes
+    ok 10 - shipping score recovery adapter returns public COMMITTED DTO after admission closes
+      ---
+      duration_ms: 20.331625
+      type: 'test'
+      ...
+    # Subtest: shipping finalize retry recovers commit before fresh capability gate
+    ok 11 - shipping finalize retry recovers commit before fresh capability gate
+      ---
+      duration_ms: 37.404167
+      type: 'test'
+      ...
+    # Subtest: shipping reopen retry recovers commit before fresh capability gate
+    ok 12 - shipping reopen retry recovers commit before fresh capability gate
+      ---
+      duration_ms: 37.967459
+      type: 'test'
+      ...
+    # Subtest: private helpers and Production wrappers remain unavailable to uncertified authority
+    ok 13 - private helpers and Production wrappers remain unavailable to uncertified authority
+      ---
+      duration_ms: 130.080708
+      type: 'test'
+      ...
+    1..13
+ok 1 - Certification canonical domain corrections preserve truthful resource, receipts and recovery
+  ---
+  duration_ms: 16148.17425
+  type: 'test'
+  ...
+# {"environment":"OWNED_LOCAL_POSTGRESQL17","forwardMigrations":["supabase/production_migrations/202609300131_canonical_resource_control_v1.sql","supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql","supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql","supabase/production_migrations/202609300134_certification_annual_administration_v1.sql","supabase/production_migrations/202609300135_certification_read_contracts_v1.sql","supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql","supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql"],"holes":18,"finalizedReceipts":1,"reopenedReceipts":1,"googleCalls":0,"googleJobs":0,"hostedAccess":false,"productionAccess":false,"fullTournament":"NOT_RUN_HERE"}
+# Subtest: R2 ingress forward upgrade fences old executions, preserves public OID and rejects unexpected ACLs
+    # Subtest: upgrade waits for a genuinely executing predecessor mutation before creating the ingress generation
+    ok 1 - upgrade waits for a genuinely executing predecessor mutation before creating the ingress generation
+      ---
+      duration_ms: 568.401
+      type: 'test'
+      ...
+    # Subtest: already-invoked cached predecessor execution cannot resume with its old context after upgrade
+    ok 2 - already-invoked cached predecessor execution cannot resume with its old context after upgrade
+      ---
+      duration_ms: 360.99025
+      type: 'test'
+      ...
+    # Subtest: unknown default EXECUTE grantee aborts entire migration; prepared public entry retains OID and denies no-lease call
+    ok 3 - unknown default EXECUTE grantee aborts entire migration; prepared public entry retains OID and denies no-lease call
+      ---
+      duration_ms: 582.917334
+      type: 'test'
+      ...
+    1..3
+ok 2 - R2 ingress forward upgrade fences old executions, preserves public OID and rejects unexpected ACLs
+  ---
+  duration_ms: 23261.301125
+  type: 'test'
+  ...
+# Subtest: R2 durable ingress: real canonical mutation, atomic outcomes, recovery and fencing
+    # Subtest: durable admission precedes execution and retry allocates one lease
+    ok 1 - durable admission precedes execution and retry allocates one lease
+      ---
+      duration_ms: 262.527208
+      type: 'test'
+      ...
+    # Subtest: canonical mutation receipt audit and COMMITTED outcome commit atomically
+    ok 2 - canonical mutation receipt audit and COMMITTED outcome commit atomically
+      ---
+      duration_ms: 180.102833
+      type: 'test'
+      ...
+    # Subtest: authorization and target failures allocate no lease
+    ok 3 - authorization and target failures allocate no lease
+      ---
+      duration_ms: 328.954708
+      type: 'test'
+      ...
+    # Subtest: pre-execution crash remains unresolved; explicit resolution fences delayed execution
+    ok 4 - pre-execution crash remains unresolved; explicit resolution fences delayed execution
+      ---
+      duration_ms: 246.304458
+      type: 'test'
+      ...
+    # Subtest: domain failure rollback leaves durable unresolved admission for explicit recovery
+    ok 5 - domain failure rollback leaves durable unresolved admission for explicit recovery
+      ---
+      duration_ms: 313.222292
+      type: 'test'
+      ...
+    # Subtest: statement timeout after durable admission cannot report non-commit without explicit fencing
+    ok 6 - statement timeout after durable admission cannot report non-commit without explicit fencing
+      ---
+      duration_ms: 344.852667
+      type: 'test'
+      ...
+    # Subtest: concurrent same-ID admission returns one durable lease
+    ok 7 - concurrent same-ID admission returns one durable lease
+      ---
+      duration_ms: 203.704375
+      type: 'test'
+      ...
+    # Subtest: cross-family match mutation IDs share one admission namespace
+    ok 8 - cross-family match mutation IDs share one admission namespace
+      ---
+      duration_ms: 439.280041
+      type: 'test'
+      ...
+    # Subtest: resolve waits for in-flight execution and observes the committed canonical outcome
+    ok 9 - resolve waits for in-flight execution and observes the committed canonical outcome
+      ---
+      duration_ms: 332.944792
+      type: 'test'
+      ...
+    # Subtest: participant recovery survives score-permission revocation and hides other-origin operation existence
+    ok 10 - participant recovery survives score-permission revocation and hides other-origin operation existence
+      ---
+      duration_ms: 148.983167
+      type: 'test'
+      ...
+    # Subtest: close captures nonempty generation, unresolved blocks drain, resolve then close is immutable
+    ok 11 - close captures nonempty generation, unresolved blocks drain, resolve then close is immutable
+      ---
+      duration_ms: 699.47125
+      type: 'test'
+      ...
+    # Subtest: ACLs, RLS, owners, search_path, private cores and terminal immutability
+    ok 12 - ACLs, RLS, owners, search_path, private cores and terminal immutability
+      ---
+      duration_ms: 66.139083
+      type: 'test'
+      ...
+    # Subtest: JS transport uses the exact initially registered resource and real canonical update
+    ok 13 - JS transport uses the exact initially registered resource and real canonical update
+      ---
+      duration_ms: 328.282541
+      type: 'test'
+      ...
+    # Subtest: JS lost admission acknowledgement never executes; exact recovery and fencing persist
+    ok 14 - JS lost admission acknowledgement never executes; exact recovery and fencing persist
+      ---
+      duration_ms: 260.460042
+      type: 'test'
+      ...
+    # Subtest: JS lost execution acknowledgement resolves the committed canonical result without resubmission
+    ok 15 - JS lost execution acknowledgement resolves the committed canonical result without resubmission
+      ---
+      duration_ms: 371.839917
+      type: 'test'
+      ...
+    # Subtest: JS and PostgreSQL reject wrong registered resource and actor without an admitted write
+    ok 16 - JS and PostgreSQL reject wrong registered resource and actor without an admitted write
+      ---
+      duration_ms: 246.401625
+      type: 'test'
+      ...
+    1..16
+ok 3 - R2 durable ingress: real canonical mutation, atomic outcomes, recovery and fencing
+  ---
+  duration_ms: 16426.8765
+  type: 'test'
+  ...
+# {"environment":"OWNED_LOCAL_POSTGRESQL17","forwardMigrations":["supabase/production_migrations/202609300131_canonical_resource_control_v1.sql","supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql","supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql","supabase/production_migrations/202609300134_certification_annual_administration_v1.sql","supabase/production_migrations/202609300135_certification_read_contracts_v1.sql","supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql"],"leases":12,"googleCalls":0,"hostedAccess":false,"finalBaselineEmitted":false}
+1..3
+# tests 35
+# suites 0
+# pass 35
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 56206.634208

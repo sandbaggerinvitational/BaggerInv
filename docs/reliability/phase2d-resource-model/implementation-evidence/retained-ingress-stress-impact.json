@@ -1,0 +1,56 @@
+{
+  "recordedAt": "2026-10-03T02:35:02.767979+00:00",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "claim": "RETAINED_CORE_INGRESS_STRESS_ONLY",
+  "artifact": "ingress-stress-final-profile.json",
+  "artifactSha256": "873cf151b678d1972fbf7ab1f09ca979a90d1159e9ea6f1d6aae95704cde9b2d",
+  "counts": {
+    "nodes": 9,
+    "cases": 8
+  },
+  "criticalSourcesUnchanged": [
+    {
+      "file": "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+      "recordedSha256": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+      "currentSha256": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2"
+    },
+    {
+      "file": "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql",
+      "recordedSha256": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+      "currentSha256": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298"
+    },
+    {
+      "file": "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql",
+      "recordedSha256": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+      "currentSha256": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245"
+    },
+    {
+      "file": "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql",
+      "recordedSha256": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+      "currentSha256": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8"
+    },
+    {
+      "file": "test/reliability-phase2dr2-ingress-stress.integration.test.mjs",
+      "recordedSha256": "9d6dbca83675b09527141ad690b920b53f2e409d664a5fffb287b424e0bb5a89",
+      "currentSha256": "9d6dbca83675b09527141ad690b920b53f2e409d664a5fffb287b424e0bb5a89"
+    }
+  ],
+  "retentionReason": "Exact136/137 ingress and132 setup dispatch remain byte-identical.144/148-152 add release/Odds/annual/closed-enable behavior; fresh release, annual, timeout and bootstrap tests cover those separately.141 changed future-worker binding and the shared fixture evolved; neither is inferred to have stress coverage.",
+  "covered": [
+    "20 identical concurrent admissions/executions",
+    "20 conflicting duplicates",
+    "typed domain rejection",
+    "backend connection death",
+    "terminal audit rollback",
+    "owned PostgreSQL process restart",
+    "actual300-second lease expiry",
+    "execute/core-close race"
+  ],
+  "notCovered": [
+    "final-profile stress combination",
+    "annual ABORT/REOPEN (separate annual22 proof)",
+    "physical power loss",
+    "hosted or Production behavior"
+  ],
+  "rerunRequiredIf": "Any critical listed source, ingress storage/receipt/CAS/lease/fence semantics or the exercised132 setup mutation changes."
+}

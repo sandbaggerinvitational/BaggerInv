@@ -1,0 +1,88 @@
+{
+  "recordedAt": "2026-10-03T02:56:32.547249+00:00",
+  "environment": "LOCAL_SOURCE_ONLY",
+  "baseHead": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "branch": "codex/reliability-phase2d-staging-admission",
+  "changedTracked": 28,
+  "untrackedCandidateFiles": 370,
+  "sourceCounts": {
+    "app": 3,
+    "lib": 28,
+    "migrations": 22,
+    "test": 57,
+    "tools": 6,
+    "docs": 277
+  },
+  "javascriptSyntax": {
+    "files": 93,
+    "failures": []
+  },
+  "json": {
+    "files": 167,
+    "invalid": []
+  },
+  "diffCheckExit": 0,
+  "secretPatternScan": {
+    "textFiles": 398,
+    "matchesWithoutValues": [],
+    "limitation": "Bounded pattern scan, not proof of every secret format."
+  },
+  "historicalMigrationsChanged": [],
+  "nativeShippingChanged": [],
+  "packagesChanged": [],
+  "repositoryDatabaseKeyEnvFiles": [],
+  "canonicalOddsAlgorithmsAndPublicMappersUnchanged": {
+    "lib/tournament-odds.js": true,
+    "lib/prediction-engine.js": true,
+    "lib/tournament-context.js": true,
+    "lib/championship-odds-resilience.js": true,
+    "lib/championship-odds-supabase.js": true,
+    "lib/published-odds-supabase.js": true,
+    "lib/mobile-v1-odds.js": true
+  },
+  "migrationSequence": [
+    131,
+    132,
+    133,
+    134,
+    135,
+    136,
+    137,
+    138,
+    139,
+    140,
+    141,
+    142,
+    143,
+    144,
+    145,
+    146,
+    147,
+    148,
+    149,
+    150,
+    151,
+    152
+  ],
+  "migrationSequenceContiguous": true,
+  "registrationDisabled": true,
+  "finalInstallerNotEmitted": true,
+  "remainingOwnedFixturePrefixDirectories": [
+    "bagger-reliability-pg17-NLvAYV",
+    "bagger-reliability-pg17-Y6kkmU",
+    "bagger-reliability-pg17-xTGzGr"
+  ],
+  "allCurrentProofOwnedClustersAwaitedCleanup": true,
+  "productionAccess": false,
+  "hostedChanges": false,
+  "googleAccountAccess": false,
+  "realMessaging": false,
+  "committed": false,
+  "pushed": false,
+  "remainingFixtureDirectoriesDisposition": {
+    "classification": "PREEXISTING_OUTSIDE_REPOSITORY",
+    "created": "All three were created2026-09-28, before current continuation.",
+    "postmasterPidPresent": false,
+    "action": "Preserved; not treated as owned by this run. No processes terminated or unknown directories removed."
+  }
+}

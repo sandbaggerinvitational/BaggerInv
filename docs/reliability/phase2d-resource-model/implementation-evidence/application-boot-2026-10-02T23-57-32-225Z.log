@@ -1,0 +1,79 @@
+   ▲ Next.js 15.5.18
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/historical.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/draft/draft.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/live/live.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/history/historical-match-row.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/draft/draft.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/historical.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/live/live.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/odds-center/odds.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/war-room/war-room.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 2 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/admin/admin-center.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/admin/director/ProductionFutureYearAdministrationPanel.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/admin/player-passport-admin.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/admin/cms-manager.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-bZPcIa/app/admin/director/net-skins-entries.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+Failed to compile.
+
+./lib/production-google-credential-confinement.js
+Module not found: Can't resolve '../docs/evidence/step11-6-production-google-credential-confinement-v4.json'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./lib/production-google-writer-fence-quiesce.js
+./lib/production-google-writer-fence-rehearsal.js
+./lib/production-google-writer-fence-rehearsal-server.js
+./app/admin/step12-production-google-writer-provider-fence/page.js
+
+./lib/production-google-historical-safe-method-writer.js
+Module not found: Can't resolve '../docs/evidence/step11-6-historical-safe-method-google-writer-v2.json'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./lib/production-google-writer-fence-quiesce.js
+./lib/production-google-writer-fence-rehearsal.js
+./lib/production-google-writer-fence-rehearsal-server.js
+./app/admin/step12-production-google-writer-provider-fence/page.js
+
+./lib/production-google-historical-writer-scope.js
+Module not found: Can't resolve '../docs/evidence/step11-6-historical-production-google-writer-scope-v1.json'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./lib/production-google-writer-fence-quiesce.js
+./lib/production-google-writer-fence-rehearsal.js
+./lib/production-google-writer-fence-rehearsal-server.js
+./app/admin/step12-production-google-writer-provider-fence/page.js
+
+./lib/production-google-writer-fence-quiesce.js
+Module not found: Can't resolve '../docs/evidence/step11-6-production-origin-inventory-v4.json'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./lib/production-google-writer-fence-rehearsal.js
+./lib/production-google-writer-fence-rehearsal-server.js
+./app/admin/step12-production-google-writer-provider-fence/page.js
+
+
+> Build failed because of webpack errors
+

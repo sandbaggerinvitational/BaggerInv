@@ -1,0 +1,41 @@
+{
+  "checkedAt": "2026-10-03T02:58:27.924166+00:00",
+  "artifactHashChecks": 22,
+  "currentDocumentLinkChecks": "PASS",
+  "errors": [],
+  "head": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "branch": "codex/reliability-phase2d-staging-admission",
+  "remote": "git@github.com:sandbaggerinvitational/BaggerInv.git",
+  "evidenceCounts": {
+    "focusedUnit": 282,
+    "annualNodes": 13,
+    "canonicalHoles": 864,
+    "finals": 48,
+    "oddsNodes": 49,
+    "directorNodes": 14,
+    "releaseNodes": 18,
+    "timeoutNodes": 11,
+    "actual57014Cases": 10,
+    "netSkinsNodes": 7,
+    "resourceIsolationNodes": 7,
+    "configuredCalcuttaNodes": 6,
+    "bootNodes": 8,
+    "freshInstallNodes": 12,
+    "broadPass": 4077,
+    "broadBaselineFail": 20,
+    "broadNewFailureIdentities": 0,
+    "benchmarkSamples": 6800
+  },
+  "p0": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PARTIAL",
+    "D": "PASS",
+    "E": "PASS",
+    "F": "PASS"
+  },
+  "allSixClosed": false,
+  "noCommitPushBecauseRequiredGatesIncomplete": true,
+  "noHostedProductionGoogleAccess": true,
+  "scope": "Current docs and receipts; historical counterevidence preserved"
+}

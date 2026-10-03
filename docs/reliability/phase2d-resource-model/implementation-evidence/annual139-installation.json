@@ -1,0 +1,55 @@
+{
+  "strength": "PROVEN",
+  "proofLayer": "POSTGRESQL",
+  "scope": "PROVISIONAL_SCHEMA_INSTALL_AND_SYNTHETIC_INITIALIZATION_ONLY",
+  "result": "PASS",
+  "baseSha": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "environment": "OWNED_LOCAL_POSTGRESQL17_UNIX_SOCKET",
+  "forwardThrough": 139,
+  "sourceFiles": [
+    {
+      "path": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+      "sha256": "c1ff73d79523bfa4d2bac5c52b6a5fe6109cf3a63092e2bde9932b58da3e13b0"
+    },
+    {
+      "path": "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql",
+      "sha256": "f11945f0d8962653624fef41eb711cfc27e4aed2f4a5de79e4bbf1941528a46a"
+    }
+  ],
+  "observed": {
+    "environment": "OWNED_SOCKET_POSTGRESQL17",
+    "stage": "139_INSTALL_AND_INITIALIZATION_ONLY",
+    "origin": {
+      "resource_id": "CERTIFICATION:6cd800b4-656c-4d7e-9231-51f3678f3d48",
+      "resource_class": "CERTIFICATION",
+      "origin_kind": "CERTIFICATION_INITIALIZATION",
+      "installation_id": "6cd800b4-656c-4d7e-9231-51f3678f3d48",
+      "database_name": "r2_certification_0",
+      "project_ref": "aaaaaaaaaaaaaaaaaaaa",
+      "project_url": "https://aaaaaaaaaaaaaaaaaaaa.supabase.co",
+      "registration_revision": 1,
+      "installation_contract": "bagger-canonical-bootstrap-v1",
+      "registration_manifest_digest": "d00db24b915d253e917e941d0fca9b3de13c2cb4aaa2d1f0b108972fcd07ec4c",
+      "installation_manifest_digest": "d00db24b915d253e917e941d0fca9b3de13c2cb4aaa2d1f0b108972fcd07ec4c",
+      "schema_digest": "2e02ae4027fad691b7cc62862c3f538ae371fa5a1501517da2d677e29c58712c",
+      "static_data_digest": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d",
+      "authority_epoch_id": "3559a563-d185-4bf1-a847-d2b6a554d1ea",
+      "admission_generation_id": "5b55c685-e50e-4b1c-9221-2821c357688a",
+      "initial_tournament_id": "2026",
+      "initial_pointer_revision": 1,
+      "initial_lifecycle_revision": 1,
+      "binding_id": "3671bb1f-8af6-43ef-843c-f887079579b4",
+      "initialization_fingerprint": "8a45c9c0267f2cb654e563f84ddd3094b25fd98116c8fe94afca8ec131101032",
+      "created_by": "postgres",
+      "created_at": "2026-09-30T14:45:21.602461-05:00"
+    },
+    "functions": 1061
+  },
+  "limitations": [
+    "No first/later annual transition exercised",
+    "No final bootstrap baseline emitted",
+    "No hosted/Supabase provider proof",
+    "Compiler reference uses synthetic historical Production-shaped prerequisite rows; fresh target copies canonical schema/static rows only",
+    "Owned cluster destroyed after successful probe"
+  ]
+}

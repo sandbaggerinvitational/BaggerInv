@@ -1,0 +1,154 @@
+TAP version 13
+# {"fixture":"phase2c1-zero-google-release-v1","environment":"OWNED_SOCKET_ONLY_POSTGRESQL17","schema":137,"result":"PASS","runtimeGuardsSubstituted":false,"GoogleWriterRows":0,"GoogleCalls":0,"GoogleCredentialsRequired":false,"frozen2026Release":"PASS","frozen2026Replay":"PASS","annual2099Release":"PASS","annualReplay":"PASS","secondAnnualRelease":"PASS","staleAuthorityDenied":true,"conflictingReplayDenied":true,"canonicalActiveWorkerDenied":true,"orphanCanonicalLeaseDenied":true,"activeAnnualTransitionDenied":true,"GoogleFlagsRejected":5,"retiredMirrorHistoryIgnored":true,"annualRowsUnchanged":true,"canonicalSideGameCertification":"cd1bb2a635e97f8e0caf8ab42a26b21fc19f8ca2158e07bc5e1e2339a15826ec","limitations":["Synthetic annual authority fixture; not a full CREATE/PREPARE/ACTIVATE annual initialization","Historical platform bootstrap models prior Google cutover locally; candidate normal release phase requires no Google","No hosted, Production, real Google or physical proof"],"timestamp":"2026-09-30T19:46:15.916Z","r2ForwardMigrations":["202609300131_canonical_resource_control_v1.sql","202609300132_certification_domain_gateways_v1.sql","202609300133_certification_derived_gateways_v1.sql","202609300134_certification_annual_administration_v1.sql","202609300135_certification_read_contracts_v1.sql","202609300136_certification_durable_ingress_v1.sql","202609300137_certification_domain_resource_recovery_v1.sql"]}
+# {"result":"ANNUAL_RELEASE_REVIEW_OK","migrations":25,"annualSnapshot":"aa3c1287e68d4930e4fc56d720d80177bba6acfcb162a27ab8755ac2c2e3eb83","authorization":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_AUTHORIZED","status":"PENDING","idempotent":false,"release_sequence":2,"release_intent_id":"e13d7f81-0d7f-4c24-b903-1ba273f70eb8","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","target_deployment_commit":"56ded61379e3308ab5c465ce186140550f3827a7","authorization_fingerprint":"736966b9e37e4bf96386249e3b177318f469571f039d6c2fae49eb8c14acc3ae"},"rebind":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_REBOUND","ingress":"OPEN","authority":"SUPABASE","idempotent":false,"boundary_mode":"MAINTENANCE_WINDOW_V1","cutover_phase":"OBSERVATION","deployment_id":"dpl_PostcutoverNormalRelease054","workers_enabled":true,"release_sequence":2,"deployment_commit":"56ded61379e3308ab5c465ce186140550f3827a7","maintenance_state":"NORMAL","release_rebind_id":"501dd977-e8da-4198-a894-a4ed643542f8","admission_revision":12,"capability_ceiling":"OBSERVATION","activation_revision":23,"capability_contract":"production-maintenance-single-deployment-capability-v1","runtime_fingerprint":"f59ab308572942e7d36cee5499685f4827b144068e9a05d1f0c48040aa85d5d4","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","admission_generation_id":"48505cad-e272-4058-8f98-7585428a7524","authority_generation_id":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb","predecessor_deployment_id":"dpl_PostcutoverApplication053","predecessor_release_sequence":1,"participant_identity_authority":"SUPABASE"},"secondRebind":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_REBOUND","ingress":"OPEN","authority":"SUPABASE","idempotent":false,"boundary_mode":"MAINTENANCE_WINDOW_V1","cutover_phase":"OBSERVATION","deployment_id":"dpl_PostcutoverNormalRelease055","workers_enabled":true,"release_sequence":3,"deployment_commit":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","maintenance_state":"NORMAL","release_rebind_id":"8c97a0db-f1db-41c1-8c06-794544a988ca","admission_revision":13,"capability_ceiling":"OBSERVATION","activation_revision":24,"capability_contract":"production-maintenance-single-deployment-capability-v1","runtime_fingerprint":"6f9f63a81d2b134685cda0574547642c177250e5e989a1e1139595ed8f1e3a55","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","admission_generation_id":"48505cad-e272-4058-8f98-7585428a7524","authority_generation_id":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb","predecessor_deployment_id":"dpl_PostcutoverNormalRelease054","predecessor_release_sequence":2,"participant_identity_authority":"SUPABASE"}}
+# Subtest: migration 078 rebinds future annual normal releases without mutating annual state
+    # Subtest: future annual authorization, replay, stale and invariance
+    ok 1 - future annual authorization, replay, stale and invariance
+      ---
+      duration_ms: 6820.815291
+      type: 'test'
+      ...
+    1..1
+ok 1 - migration 078 rebinds future annual normal releases without mutating annual state
+  ---
+  duration_ms: 10187.254208
+  type: 'test'
+  ...
+# Subtest: R2 two-database resource, receipt, ingress, read and worker isolation
+    # Subtest: same operation ID in distinct registered databases has independent canonical outcome
+    ok 1 - same operation ID in distinct registered databases has independent canonical outcome
+      ---
+      duration_ms: 581.580209
+      type: 'test'
+      ...
+    # Subtest: foreign resource, deployment and lease never rebind to local authority
+    not ok 2 - foreign resource, deployment and lease never rebind to local authority
+      ---
+      duration_ms: 44.877666
+      type: 'test'
+      location: '/private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-resource-isolation.integration.test.mjs:33:11'
+      failureType: 'testCodeFailure'
+      error: |-
+        The input did not match the regular expression /RESOURCE_BINDING_DENIED|RESOURCE_CONTEXT/. Input:
+        
+        'Error: /opt/homebrew/opt/postgresql@17/bin/psql\n' +
+          'ERROR:  CERTIFICATION_INGRESS_RESOURCE_DENIED\n' +
+          'CONTEXT:  PL/pgSQL function production_control.certification_ingress_recovery_resource_v1(jsonb) line 25 at RAISE\n' +
+          'PL/pgSQL function public.admit_certification_operation_v1(jsonb) line 6 at assignment\n'
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+      actual:
+      error: |-
+        /opt/homebrew/opt/postgresql@17/bin/psql
+        ERROR:  CERTIFICATION_INGRESS_RESOURCE_DENIED
+        CONTEXT:  PL/pgSQL function production_control.certification_ingress_recovery_resource_v1(jsonb) line 25 at RAISE
+        PL/pgSQL function public.admit_certification_operation_v1(jsonb) line 6 at assignment
+        
+      stack: |-
+        run (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/postgres17.mjs:54:19)
+        sql (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/postgres17.mjs:196:10)
+        q (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/phase2d-certification-fixture.mjs:49:31)
+        Object.rpc (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/phase2d-certification-fixture.mjs:58:57)
+        file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-resource-isolation.integration.test.mjs:37:30
+        getActual (node:assert:580:5)
+        strict.throws (node:assert:728:24)
+        TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-resource-isolation.integration.test.mjs:37:13)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+      operator: 'throws'
+      stack: |-
+        TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-resource-isolation.integration.test.mjs:37:13)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+        TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-resource-isolation.integration.test.mjs:33:11)
+        async Test.run (node:internal/test_runner/test:1404:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+      ...
+    # Subtest: same-ID recovery returns only locally bound receipt and full hash conflict
+    ok 3 - same-ID recovery returns only locally bound receipt and full hash conflict
+      ---
+      duration_ms: 80.477334
+      type: 'test'
+      ...
+    # Subtest: canonical current reads and financial projections reject the other resource
+    not ok 4 - canonical current reads and financial projections reject the other resource
+      ---
+      duration_ms: 27.627875
+      type: 'test'
+      location: '/private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-resource-isolation.integration.test.mjs:52:11'
+      failureType: 'testCodeFailure'
+      error: |-
+        The input did not match the regular expression /RESOURCE_BINDING_DENIED|RESOURCE_CONTEXT/. Input:
+        
+        'Error: /opt/homebrew/opt/postgresql@17/bin/psql\n' +
+          'ERROR:  CERTIFICATION_OPERATION_NOT_ADMITTED\n' +
+          'CONTEXT:  PL/pgSQL function production_control.certification_operation_phase_v1(text,boolean) line 10 at RAISE\n' +
+          'PL/pgSQL function public.read_certification_operation_v1(jsonb) line 7 at assignment\n'
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+      actual:
+      error: |-
+        /opt/homebrew/opt/postgresql@17/bin/psql
+        ERROR:  CERTIFICATION_OPERATION_NOT_ADMITTED
+        CONTEXT:  PL/pgSQL function production_control.certification_operation_phase_v1(text,boolean) line 10 at RAISE
+        PL/pgSQL function public.read_certification_operation_v1(jsonb) line 7 at assignment
+        
+      stack: |-
+        run (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/postgres17.mjs:54:19)
+        sql (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/postgres17.mjs:196:10)
+        q (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/phase2d-certification-fixture.mjs:49:31)
+        Object.rpc (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/phase2d-certification-fixture.mjs:58:57)
+        file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-resource-isolation.integration.test.mjs:54:29
+        getActual (node:assert:580:5)
+        strict.throws (node:assert:728:24)
+        TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-resource-isolation.integration.test.mjs:54:12)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+      operator: 'throws'
+      stack: |-
+        TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-resource-isolation.integration.test.mjs:54:12)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+        TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-resource-isolation.integration.test.mjs:52:11)
+        async Test.run (node:internal/test_runner/test:1404:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+      ...
+    # Subtest: worker command cannot claim or materialize against a different registered database
+    ok 5 - worker command cannot claim or materialize against a different registered database
+      ---
+      duration_ms: 198.620083
+      type: 'test'
+      ...
+    # Subtest: private relations remain unavailable and neither database acquires Production or Google authority
+    ok 6 - private relations remain unavailable and neither database acquires Production or Google authority
+      ---
+      duration_ms: 143.067125
+      type: 'test'
+      ...
+    1..6
+not ok 2 - R2 two-database resource, receipt, ingress, read and worker isolation
+  ---
+  duration_ms: 17803.7575
+  type: 'test'
+  location: '/private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-resource-isolation.integration.test.mjs:14:1'
+  failureType: 'subtestsFailed'
+  error: '2 subtests failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..2
+# tests 9
+# suites 0
+# pass 6
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 28266.903

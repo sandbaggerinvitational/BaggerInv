@@ -1,0 +1,352 @@
+{
+  "schemaVersion": 2,
+  "recordedAt": "2026-10-03T02:53:12.357900+00:00",
+  "environment": "OWNED_LOCAL_NON_PRODUCTION",
+  "baseSha": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "branch": "codex/reliability-phase2d-staging-admission",
+  "newCandidateSha": null,
+  "completeCandidateCertified": false,
+  "migrationProfile": [
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql",
+    "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql",
+    "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql",
+    "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql",
+    "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql",
+    "supabase/production_migrations/202609300151_certification_annual_reopen_lineage_v1.sql",
+    "supabase/production_migrations/202609300152_certification_closed_release_admission_v1.sql"
+  ],
+  "allSixP0Closed": false,
+  "p0": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PARTIAL",
+    "D": "PASS",
+    "E": "PASS",
+    "F": "PASS"
+  },
+  "pendingOwnerApprovalsFor144And148": [],
+  "entries": [
+    {
+      "claim": "FRESH_INSTALL_131_152",
+      "artifact": "evidence/bootstrap.json",
+      "artifactSha256": "214ee622306908140e6e07bc7b4a77b22bca3f36a2213451b7ae0dce112191f0",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 12
+      },
+      "proofLayer": "POSTGRESQL/FAILURE_INJECTION",
+      "limitation": "Two clean local databases and three install rollback faults; provisional in-memory full profile only. Final installer not released."
+    },
+    {
+      "claim": "PRIVATE_CORES_131_152",
+      "artifact": "implementation-evidence/bootstrap-private-core-security.json",
+      "artifactSha256": "b563cc045e7de52efcbb880190b29239375a97e9087fda96a316dae8d0cc0ea6",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "newPrivateFunctions": 168,
+        "retainedPrivateGuardsAsserted": 1,
+        "newPublicWrappers": 16,
+        "touchedPublicWrappers": 77,
+        "actualDeniedCalls": 507
+      },
+      "proofLayer": "POSTGRESQL/SECURITY",
+      "limitation": "Owners/ACL/search_path/security/OIDs/stored dependencies and actual denials; textual nested behavior additionally requires domain tests."
+    },
+    {
+      "claim": "DIRECTOR",
+      "artifact": "implementation-evidence/director-financial-2026-10-03T02-28-02.225Z.json",
+      "artifactSha256": "ba194feb4b6a5bd5757b2a36ded410ed9484870950c7e9bf40528eb91f934343",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 14,
+        "capabilities": 7
+      },
+      "proofLayer": "CLIENT/API/POSTGRESQL/SECURITY",
+      "limitation": "Synthetic local Auth/transport; initial-generation financial capabilities, not hosted authentication."
+    },
+    {
+      "claim": "RELEASE",
+      "artifact": "implementation-evidence/release-transition-2026-10-03T02-24-05.900Z.json",
+      "artifactSha256": "1389fd8e0bfb9a3a27d872cbbd80cee1283629ff69ab8a3f4742faafe6511dc0",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 18
+      },
+      "proofLayer": "POSTGRESQL/FAILURE_INJECTION",
+      "limitation": "Full131\u2013152 negative/replay/drain proof. Genuine OPEN/CLOSED positive chronology also in annual22."
+    },
+    {
+      "claim": "ANNUAL_FIRST_AND_LATER",
+      "artifact": "implementation-evidence/annual-transition-2026-10-03T02-08-24-102Z.json",
+      "artifactSha256": "c796e88b3999b61dbda6b0c0aa3379671ed65ef3c60e085a65ac3b224754450b",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 13,
+        "canonicalHoles": 864,
+        "finals": 48,
+        "canonicalOperations": 1056
+      },
+      "proofLayer": "API/POSTGRESQL/INTEGRATION/CONCURRENCY",
+      "limitation": "2026\u21922097\u21922098; publication/recap both years. One reopened ancestry edge/year, successor financial families unconfigured. Calcutta later claim DTO correction affects an unexecuted branch only; see retained-proof-impact.json."
+    },
+    {
+      "claim": "APPLICATION_BOOT",
+      "artifact": "implementation-evidence/application-boot-2026-10-03T02-21-52-716Z.json",
+      "artifactSha256": "1494aae66b7b079b8fc67a63203e08b1c269ca44da5bfe21613811cd1e6e4aec",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 8,
+        "rpcCalls": 147
+      },
+      "proofLayer": "BUILD/API/INTEGRATION",
+      "limitation": "Real local Next routes, ES256/local JWKS and local PostgreSQL transport. Configured Calcutta claim branch absent here; separate real-work proof below. No hosted Auth/PostgREST."
+    },
+    {
+      "claim": "CALCUTTA_CONFIGURED_HOOK",
+      "artifact": "implementation-evidence/calcutta-postcommit-2026-10-03T02-43-10-137Z.json",
+      "artifactSha256": "229633e9ddbd41cd552d437e73e2e2db9119e568166acfc7b35dfa0d3379f06c",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 6,
+        "cases": 5
+      },
+      "proofLayer": "INTEGRATION/POSTGRESQL/SECURITY",
+      "limitation": "Actual initial2026 PROVISIONAL calculation with one synthetic auction purchase, unchanged ownership/prices/publication, replay/stale/role/disabled checks. No completed-round payout/publication proof; future claim binding modeled only."
+    },
+    {
+      "claim": "ODDS_EXPANDED",
+      "artifact": "implementation-evidence/odds-expanded-runtime.json",
+      "artifactSha256": "eeeae2ea774d9eae73f18fb372f99a6c6808480810167b3c6574be613d4eb8b6",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 27
+      },
+      "proofLayer": "API/POSTGRESQL/CONCURRENCY",
+      "limitation": "Actual canonical10000-iteration engine/reference equality; explicit owner publication; no algorithm or Production policy change."
+    },
+    {
+      "claim": "ODDS_FRESHNESS",
+      "artifact": "implementation-evidence/odds-two-part-freshness.json",
+      "artifactSha256": "366c326c308092fc7a02c684b851c6d8821d207bfdd16be7281160fff6964625",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 9
+      },
+      "proofLayer": "POSTGRESQL/CONCURRENCY",
+      "limitation": "Independent structural and live revisions, stale request/work/publication rejection and actual score/publication ordering."
+    },
+    {
+      "claim": "ODDS_PUBLICATION_IDENTITY",
+      "artifact": "implementation-evidence/odds-publication-identity-2026-10-03T02-45-04-937Z.json",
+      "artifactSha256": "bf550725326effb0c1039f997b7de15cbce4445dafbe68e256b01a1f026b1475",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 11
+      },
+      "proofLayer": "API/POSTGRESQL/FAILURE_INJECTION",
+      "limitation": "Same-result/new-live-source explicit publication, immutable predecessor, atomic receipt and public DTO compatibility."
+    },
+    {
+      "claim": "ODDS_COMBINED_FINAL_PROFILE",
+      "artifact": "implementation-evidence/odds152-run-source-receipt.json",
+      "artifactSha256": "fa5785312d23c336ba3960fcf7217bc123a67d0afc14b9f945a3ea7002d52f09",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 49
+      },
+      "proofLayer": "SOURCE/RUNTIME_RECEIPT",
+      "limitation": "27+9+11 Certification nodes and2 protected calculation/rejection nodes; not49 independent scenarios. Protected positive adoption remains unproven."
+    },
+    {
+      "claim": "FINITE_TIMEOUT",
+      "artifact": "implementation-evidence/finite-timeout-matrix-2026-10-03T02-26-09.590Z.json",
+      "artifactSha256": "d5a74a49f0c49afa78cab32965a11128b6fb627dd10443c9ce3c8ed2918d19db",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 11,
+        "actual57014Cases": 10
+      },
+      "proofLayer": "FAILURE_INJECTION/POSTGRESQL",
+      "limitation": "150ms statement timeout across actual mutation/worker/Odds/pub boundaries; rollback and same-identity recovery. No JavaScript CPU or hosted request timeout claim."
+    },
+    {
+      "claim": "NET_SKINS",
+      "artifact": "implementation-evidence/net-skins-concurrency-2026-10-03T02-28-17.784Z.json",
+      "artifactSha256": "aca659fc6a2c2da34359c5e3406b56602f3fc245b458fe031a10c6be1d340f07",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 7
+      },
+      "proofLayer": "CONCURRENCY/FAILURE_INJECTION",
+      "limitation": "Known mixed-round contention, PROVISIONAL results, stale/superseded completion and injected40P01 with actual backoff. No final financial publication or universal deadlock freedom claimed."
+    },
+    {
+      "claim": "TWO_DATABASE_ISOLATION",
+      "artifact": "implementation-evidence/resource-isolation-profile152.json",
+      "artifactSha256": "60d25bcc5deb59c4eeb46f4e566e14972a1eeff29f54221a80f35919cf48509c",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 7
+      },
+      "proofLayer": "POSTGRESQL/SECURITY",
+      "limitation": "Two separate owned local databases; foreign resource/context/receipt/job authority denied."
+    },
+    {
+      "claim": "INGRESS_STRESS_RETAINED",
+      "artifact": "implementation-evidence/retained-ingress-stress-impact.json",
+      "artifactSha256": "bc248f703631aee6cbdbfd5760be33177d21bdfe63ecc6a8a879dae57e7aacee",
+      "status": "PASS_RETAINED_SCOPED",
+      "counts": {
+        "nodes": 9,
+        "cases": 8
+      },
+      "proofLayer": "CONCURRENCY/FAILURE_INJECTION",
+      "limitation": "Five critical sources unchanged; actual database process restart and300sec lease. No final-profile combined stress or physical power-loss claim."
+    },
+    {
+      "claim": "PROTECTED_CALCULATION",
+      "artifact": "implementation-evidence/production-odds-equivalence.json",
+      "artifactSha256": "860e21e37b2ddfc208a5cac1da71ecb29283d133d91830a69663846f23cdb267",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "nodes": 2
+      },
+      "proofLayer": "POSTGRESQL/RPC",
+      "limitation": "Actual local Production-shaped calculator/replay and missing-adoption rejection. Positive frozen2026 publication NOT PROVEN."
+    },
+    {
+      "claim": "PROTECTED_ANNUAL_SETUP",
+      "artifact": "implementation-evidence/production-annual-golden.json",
+      "artifactSha256": "4c2ad0405682ffd172068e293d473f7a4988d877ca1450ae956ff3e354d454a7",
+      "status": "PARTIAL",
+      "counts": {
+        "scopedNodes": 2
+      },
+      "proofLayer": "POSTGRESQL",
+      "limitation": "Distinct-course future setup only. Complete predecessor publication/FinalRecap/close/activation not executed."
+    },
+    {
+      "claim": "PROVIDER_FORWARD",
+      "artifact": "implementation-evidence/provider-history-2026-10-02-partial.json",
+      "artifactSha256": "0c15ed5dccd5ff7d371709d4003129f8a414611076a89493cbccb906f398ff8a",
+      "status": "PARTIAL",
+      "counts": {},
+      "proofLayer": "POSTGRESQL/INTEGRATION",
+      "limitation": "Actual38m48s elapsed provider chronology stops at069; no fabricated binding/timestamps/closure or relaxed gates."
+    },
+    {
+      "claim": "UNIT",
+      "artifact": "evidence/unit.json",
+      "artifactSha256": "e40e8d0cdd2bbaeb8c2f60a31c05232493d183110f585abb7fa52b2111ce86b3",
+      "status": "PASS",
+      "counts": {
+        "tests": 282,
+        "pass": 282,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "proofLayer": "UNIT",
+      "limitation": "Focused contracts and negatives; cannot substitute for runtime proof."
+    },
+    {
+      "claim": "BROAD",
+      "artifact": "evidence/broad-accounting.json",
+      "artifactSha256": "87034771de3dbada28c22ed6742bc55c6b4ff5cec34e2b50f54c5379d38304a3",
+      "status": "PASS_NO_NEW_REGRESSION",
+      "counts": {
+        "tests": 4097,
+        "pass": 4077,
+        "fail": 20,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "proofLayer": "REGRESSION",
+      "limitation": "Raw suite retains20 established failures;493-file selection preserved; exact normalized diagnostics unchanged."
+    },
+    {
+      "claim": "BUILD",
+      "artifact": "evidence/build.json",
+      "artifactSha256": "e461b31c9144f048cb7db635dc85bbfc90664264256bd9d23575fc5f1031cc50",
+      "status": "PASS",
+      "counts": {},
+      "proofLayer": "BUILD",
+      "limitation": "Local production-mode compilation only; no deployment."
+    },
+    {
+      "claim": "PERFORMANCE",
+      "artifact": "implementation-evidence/ingress-performance-summary.json",
+      "artifactSha256": "bcb5108def0f7623ea20e79c36c5806a8a56d285a185710e9ea6f6a28fbb74b6",
+      "status": "PASS_SCOPED",
+      "counts": {
+        "samples": 6800
+      },
+      "proofLayer": "PERFORMANCE",
+      "limitation": "Local rollback-contained statements and16plans; p99, fullcommit/HTTP latency, internal querycount and lockduration unproven."
+    }
+  ],
+  "limitations": [
+    "048/057 exact-history positive adoption/publication and dependent FinalRecap/full annual proof remain NOT PROVEN; owner accepted irreproducibility as a limitation. Original payloads are not reconstructed and048/057 remain unchanged.",
+    "Same-course/tee reuse across three rounds exposes an unchanged066/139 duplicate-hole promotion defect; distinct-course setup is proven. This is separate baseline counterevidence, not an added mandatory special fixture.",
+    "Successor Net Skins/Calcutta configured calculation is not exercised in the annual fixture; those families are deliberately unconfigured there. Initial configured paths have separate proof.",
+    "Hosted identity/Auth/PostgREST, resource/credential isolation, capacity, restore, physical clients and2027 readiness remain unproven."
+  ],
+  "historicalIndex": "evidence-index-before-approved-144-148.json",
+  "retentionPolicy": "Each artifact retains its own source manifest. Later source differences require explicit impact analysis or rerun; no blanket latest-source PASS.",
+  "supportingAudits": [
+    {
+      "artifact": "implementation-evidence/final-checkpoint-hygiene.json",
+      "sha256": "fffc579ba0caea5b86cb22517aa925bc5f8a142a5fab49b3c42378309aaf121a"
+    },
+    {
+      "artifact": "implementation-evidence/retained-proof-impact.json",
+      "sha256": "b413be298507452150d15f932cba1c8cb67f57880b5eaff2dd353d03a361142a"
+    },
+    {
+      "artifact": "implementation-evidence/source-safety-audit.json",
+      "sha256": "ffe9a2112c086e32e48d09cf12e54f5accbbab2220cb43cbaa2a44d11a47dad6"
+    }
+  ],
+  "ownerDecisionUpdate": {
+    "recordedAt": "2026-10-03T03:49:43.319760+00:00",
+    "approved069": "IMPLEMENTED_RUNTIME_PROOF_PENDING",
+    "acceptedHistoricalLimitations": [
+      "048/057 exact-history positive adoption/publication and dependent FinalRecap/full annual proof remain NOT PROVEN; owner accepted irreproducibility as a limitation. Original payloads are not reconstructed and048/057 remain unchanged."
+    ],
+    "sourceReview": "../069-COMPATIBILITY-REVIEW.md",
+    "reviewed069Sha256": "f65608135c4667bf041adbf98041c40aaf6d291993198a76ef0ecfba747202f4",
+    "annual864Retention": "PENDING_FOCUSED_CERTIFICATION_READINESS_AND_069_138_CATALOG_IMPACT_PROOF",
+    "historicalArtifactsRelabeled": false,
+    "dependent138Change": {
+      "classification": "ORDINARY_PREDECESSOR_HASH_AND_PRODUCTION_ONLY_READINESS_EXTRACTION_PRESERVATION",
+      "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+      "annualRecordedSha256": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+      "reviewedCurrentSha256": "d4bf918963490416e74e6c2049af306d52fc51d4f740de9f494363c9c54df838",
+      "runtimeProof": "PENDING"
+    }
+  },
+  "candidateCommitResolution": {
+    "status": "PENDING_REQUIRED_PROOF_AND_COMMIT",
+    "baseShaMeaning": "Historical base/execution HEAD, not uncommitted candidate identity",
+    "method": "Resolve Git commit containing final source, installer and evidence after required gates pass; report exact SHA in final handoff. Do not embed a self-referential commit hash."
+  },
+  "remainingLocalGates": [
+    "Approved069 provider compatibility is implemented in the worktree; actual runtime/security/maintenance-equivalence proof remains pending.",
+    "Final deterministic installer emission, non-provisional catalog/rollback proof and affected source-freshness/regression/build/hygiene accounting remain pending."
+  ]
+}

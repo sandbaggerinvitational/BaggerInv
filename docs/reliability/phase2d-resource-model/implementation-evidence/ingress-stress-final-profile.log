@@ -1,0 +1,29 @@
+▶ R2 ingress full lifecycle stress:20 callers, connection death, restart, actual expiry and close race
+  ✔ twenty concurrent admission and execution attempts create one canonical receipt (306.467458ms)
+  ✔ twenty conflicting payloads cannot share admitted identity (168.939375ms)
+  ✔ deterministic canonical rejection records NOT_COMMITTED with the established domain result (118.693584ms)
+  ✔ actual connection death before commit rolls back canonical work but retains admission (186.5105ms)
+  ✔ terminal-audit failure atomically rolls back domain receipt and terminal outcome (194.675959ms)
+  ✔ physical PostgreSQL process restart retains admitted and committed evidence (400.390208ms)
+  ✔ real lease expiry remains unresolved and blocks drain until authoritative resolution (298900.264667ms)
+  ✔ close waits for active canonical execution; no old-generation write can land afterward (304.503958ms)
+✔ R2 ingress full lifecycle stress:20 callers, connection death, restart, actual expiry and close race (306863.066416ms)
+ℹ Waiting 299 seconds for the actual five-minute lease lifetime; no clock or lease mutation.
+ℹ Actual lease expiry wait: 269seconds remaining
+ℹ Actual lease expiry wait: 239seconds remaining
+ℹ Actual lease expiry wait: 209seconds remaining
+ℹ Actual lease expiry wait: 179seconds remaining
+ℹ Actual lease expiry wait: 149seconds remaining
+ℹ Actual lease expiry wait: 119seconds remaining
+ℹ Actual lease expiry wait: 89seconds remaining
+ℹ Actual lease expiry wait: 59seconds remaining
+ℹ Actual lease expiry wait: 29seconds remaining
+ℹ Actual lease expiry wait: 0seconds remaining
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 306971.706208

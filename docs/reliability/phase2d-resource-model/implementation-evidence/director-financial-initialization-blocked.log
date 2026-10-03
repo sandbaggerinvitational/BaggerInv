@@ -1,0 +1,47 @@
+✖ Certification seven Director capabilities and reduced financial operations preserve authority (685.60075ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 833.782125
+
+✖ failing tests:
+
+test at test/reliability-phase2dr2-director.integration.test.mjs:30:1
+✖ Certification seven Director capabilities and reduced financial operations preserve authority (685.60075ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/initdb
+  The files belonging to this database system will be owned by user "claybeltran".
+  This user must also own the server process.
+  
+  The database cluster will be initialized with locale "C".
+  The default text search configuration will be set to "english".
+  
+  Data page checksums are disabled.
+  
+  creating directory /var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-OENdgA/data ... ok
+  creating subdirectories ... ok
+  selecting dynamic shared memory implementation ... posix
+  selecting default "max_connections" ... 25
+  selecting default "shared_buffers" ... 400kB
+  selecting default time zone ... America/Chicago
+  creating configuration files ... ok
+  running bootstrap script ... 
+  2026-09-30 15:26:12.549 CDT [72944] FATAL:  could not create shared memory segment: No space left on device
+  2026-09-30 15:26:12.549 CDT [72944] DETAIL:  Failed system call was shmget(key=43864766, size=56, 03600).
+  2026-09-30 15:26:12.549 CDT [72944] HINT:  This error does *not* mean that you have run out of disk space.  It occurs either if all available shared memory IDs have been taken, in which case you need to raise the SHMMNI parameter in your kernel, or because the system's overall limit for shared memory has been reached.
+  	The PostgreSQL documentation contains more information about shared memory configuration.
+  child process exited with exit code 1
+  initdb: removing data directory "/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-OENdgA/data"
+  
+      at run (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/postgres17.mjs:54:19)
+      at createIsolatedCluster (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/postgres17.mjs:128:5)
+      at async createCanonicalCompilerFixture (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/phase2d-resource-bootstrap.mjs:58:16)
+      at async createCertificationFixture (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/phase2d-certification-fixture.mjs:18:17)
+      at async TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-director.integration.test.mjs:39:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    result: { status: 1, signal: null, output: [ null, 'The files belonging to this database system will be owned by user "claybeltran".\nThis user must also own the server process.\n\nThe database cluster will be initialized with locale "C".\nThe default text search configuration will be set to "english".\n\nData page checksums are disabled.\n\ncreating directory /var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-OENdgA/data ... ok\ncreating subdirectories ... ok\nselecting dynamic shared memory implementation ... posix\nselecting default "max_connections" ... 25\nselecting default "shared_buffers" ... 400kB\nselecting default time zone ... America/Chicago\ncreating configuration files ... ok\nrunning bootstrap script ... ', `2026-09-30 15:26:12.549 CDT [72944] FATAL:  could not create shared memory segment: No space left on device\n2026-09-30 15:26:12.549 CDT [72944] DETAIL:  Failed system call was shmget(key=43864766, size=56, 03600).\n2026-09-30 15:26:12.549 CDT [72944] HINT:  This error does *not* mean that you have run out of disk space.  It occurs either if all available shared memory IDs have been taken, in which case you need to raise the SHMMNI parameter in your kernel, or because the system's overall limit for shared memory has been reached.\n\tThe PostgreSQL documentation contains more information about shared memory configuration.\nchild process exited with exit code 1\ninitdb: removing data directory "/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-OENdgA/data"\n` ], pid: 72886, stdout: 'The files belonging to this database system will be owned by user "claybeltran".\nThis user must also own the server process.\n\nThe database cluster will be initialized with locale "C".\nThe default text search configuration will be set to "english".\n\nData page checksums are disabled.\n\ncreating directory /var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-OENdgA/data ... ok\ncreating subdirectories ... ok\nselecting dynamic shared memory implementation ... posix\nselecting default "max_connections" ... 25\nselecting default "shared_buffers" ... 400kB\nselecting default time zone ... America/Chicago\ncreating configuration files ... ok\nrunning bootstrap script ... ', stderr: `2026-09-30 15:26:12.549 CDT [72944] FATAL:  could not create shared memory segment: No space left on device\n2026-09-30 15:26:12.549 CDT [72944] DETAIL:  Failed system call was shmget(key=43864766, size=56, 03600).\n2026-09-30 15:26:12.549 CDT [72944] HINT:  This error does *not* mean that you have run out of disk space.  It occurs either if all available shared memory IDs have been taken, in which case you need to raise the SHMMNI parameter in your kernel, or because the system's overall limit for shared memory has been reached.\n\tThe PostgreSQL documentation contains more information about shared memory configuration.\nchild process exited with exit code 1\ninitdb: removing data directory "/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-reliability-pg17-OENdgA/data"\n` }
+  }

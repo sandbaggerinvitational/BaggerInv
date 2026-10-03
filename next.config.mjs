@@ -1,3 +1,9 @@
+import { certificationRequested, requireCertificationResourceEnvironment } from "./lib/canonical-resource-registration.js";
+
+// Validate the registered public/server pair before public Auth configuration
+// is emitted into a browser bundle. This performs no remote request.
+if (certificationRequested(process.env)) requireCertificationResourceEnvironment(process.env);
+
 /** @type {import('next').NextConfig} */
 const nextConfig={
   reactStrictMode:true,

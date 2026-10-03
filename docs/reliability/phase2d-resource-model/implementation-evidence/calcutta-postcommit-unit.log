@@ -1,0 +1,34 @@
+✔ registered 2026 postcommit uses only bound canonical worker with no Google or legacy authority (21.697542ms)
+✔ registered 2097 postcommit uses only bound canonical worker with no Google or legacy authority (0.640333ms)
+✔ wrong or absent postcommit tournament fails before worker side effects (missing) (0.372375ms)
+✔ wrong or absent postcommit tournament fails before worker side effects (2097) (0.219583ms)
+✔ denied worker admission never falls through to legacy Preview or Production (0.453125ms)
+✔ stale context conflicts at first tick instead of resolving a fresh target (0.479375ms)
+✔ invalid registered resource is denied before transport and fallback (0.083584ms)
+✔ existing Production and ordinary Preview selection/logic remain byte-identical (14.903958ms)
+✔ Production Calcutta server exposes only the exact fixed-resource V1 RPCs (0.683709ms)
+✔ Director operations are revision-bound, explicit, and never caller-select publication policy (0.163083ms)
+✔ admin route forwards both exact revision fingerprints (0.13075ms)
+✔ bounded worker reuses the existing Calcutta engine and binds both current revisions (0.383ms)
+✔ worker inspects service-only revision tokens without using the participant market read (0.112084ms)
+✔ admin route is Production-only, Director-bound, same-origin, and has no GET (0.141958ms)
+✔ mobile route is a read-only Bearer wrapper around the bounded DTO (0.064542ms)
+✔ post-commit selector drains Production V1 and never invokes Preview mutation RPCs (0.406375ms)
+✔ post-commit selector preserves the existing Preview calculator (0.097333ms)
+✔ canonical scoring routes use the environment-selected Calcutta worker (4.931542ms)
+✔ migration 075 registers exact OBSERVATION Calcutta operations as dispatcher-only targets (2.173875ms)
+✔ future Calcutta state, jobs, and results are exact tournament and runtime-generation scoped (0.842792ms)
+✔ legacy 2026 and scoring invalidation remain pointer fenced (0.310917ms)
+✔ server sends future Calcutta calls only through the certified annual dispatcher (0.245208ms)
+✔ participant and native reads retain the current identity-selected tournament (0.120792ms)
+✔ participant DTO distinguishes frozen 2026 and future unconfigured revisions without cross-year acceptance (0.370084ms)
+✔ Production postcommit derives exact tournament from canonical Match and rejects a caller mismatch (0.35975ms)
+✔ every canonical scoring/lifecycle postcommit call supplies the affected Match (4.644959ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 100.261125

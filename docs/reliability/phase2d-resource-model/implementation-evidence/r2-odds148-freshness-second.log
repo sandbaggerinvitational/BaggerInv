@@ -1,0 +1,39 @@
+▶ Certification two-part Odds freshness preserves actual live-source authority
+  ✔ all three new helpers deny direct runtime roles and retain safe owner attributes (63.543083ms)
+  ✔ actual score makes an old request fail while same committed operation remains recoverable (195.575459ms)
+  ✔ claim supersedes actual stale live input without publishing or losing receipt history (38.23425ms)
+  ✔ checkpoint rejects a source advance during real calculation execution (861.060042ms)
+  ✔ completed real result is superseded after live source advancement; calculation data stays immutable (6143.516667ms)
+  ✔ explicit publication rejects source advancement and commits no publication/audit receipt (6235.594125ms)
+  ✔ source writer first: publication waits then rejects the newly committed source (6311.30825ms)
+  ✖ publication first: actual score cannot commit between source validation and publication commit (6426.205791ms)
+✖ Certification two-part Odds freshness preserves actual live-source authority (32625.933083ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 7
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 32816.982792
+
+✖ failing tests:
+
+test at test/reliability-phase2dr2-odds-freshness.integration.test.mjs:49:33
+✖ publication first: actual score cannot commit between source validation and publication commit (6426.205791ms)
+  Error: /opt/homebrew/opt/postgresql@17/bin/psql
+  ERROR:  column "snapshot_id" does not exist
+  LINE 1: select jsonb_agg(to_jsonb(s)order by snapshot_id)from scorin...
+                                               ^
+  
+      at run (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/postgres17.mjs:54:19)
+      at sql (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/postgres17.mjs:196:10)
+      at Object.q (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/phase2d-certification-fixture.mjs:50:31)
+      at file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-odds-freshness.integration.test.mjs:148:48
+      at async TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-odds-freshness.integration.test.mjs:49:53)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async TestContext.<anonymous> (file:///private/tmp/bagger-phase2d-staging-admission/test/reliability-phase2dr2-odds-freshness.integration.test.mjs:120:3)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    result: { status: 3, signal: null, output: [ null, '', 'ERROR:  column "snapshot_id" does not exist\nLINE 1: select jsonb_agg(to_jsonb(s)order by snapshot_id)from scorin...\n                                             ^\n' ], pid: 42197, stdout: '', stderr: 'ERROR:  column "snapshot_id" does not exist\nLINE 1: select jsonb_agg(to_jsonb(s)order by snapshot_id)from scorin...\n                                             ^\n' }
+  }

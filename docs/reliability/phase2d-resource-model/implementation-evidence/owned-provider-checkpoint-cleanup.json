@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-10-03T05:01:41.591574+00:00",
+  "environment": "OWNED_LOCAL_ONLY",
+  "removed": "Owned synthetic cold PostgreSQL17 provider checkpoint data directory after all focused replay checks completed",
+  "fileCount": 2446,
+  "captureMetadataAndHashesPreserved": "provider-069-checkpoint-capture.json",
+  "finalProofPreserved": "provider-069-final-source-revalidation.json",
+  "coldDataRemoved": true,
+  "activeDatabaseStoppedByThisAction": false,
+  "unknownClustersOrSystemVObjectsTouched": false,
+  "productionOrHostedAccess": false
+}

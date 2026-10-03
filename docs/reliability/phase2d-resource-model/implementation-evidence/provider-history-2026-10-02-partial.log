@@ -1,0 +1,110 @@
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":301,"elapsedSeconds":0}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":271,"elapsedSeconds":30}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":241,"elapsedSeconds":60}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":211,"elapsedSeconds":90}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":181,"elapsedSeconds":120}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":151,"elapsedSeconds":150}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":121,"elapsedSeconds":180}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":91,"elapsedSeconds":210}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":61,"elapsedSeconds":240}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":31,"elapsedSeconds":270}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-forward:quiesce-drain","remainingSeconds":1,"elapsedSeconds":300}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":301,"elapsedSeconds":0}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":271,"elapsedSeconds":30}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":241,"elapsedSeconds":60}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":211,"elapsedSeconds":90}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":181,"elapsedSeconds":120}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":151,"elapsedSeconds":150}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":121,"elapsedSeconds":180}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":91,"elapsedSeconds":210}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":61,"elapsedSeconds":240}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":31,"elapsedSeconds":270}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal-restore:quiesce-drain","remainingSeconds":1,"elapsedSeconds":300}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":202,"elapsedSeconds":0}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":172,"elapsedSeconds":30}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":142,"elapsedSeconds":60}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":112,"elapsedSeconds":90}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":82,"elapsedSeconds":120}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":52,"elapsedSeconds":150}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:acl-settlement","remainingSeconds":22,"elapsedSeconds":180}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:second-readback","remainingSeconds":11,"elapsedSeconds":0}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":995,"elapsedSeconds":0}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":965,"elapsedSeconds":30}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":935,"elapsedSeconds":60}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":905,"elapsedSeconds":90}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":875,"elapsedSeconds":120}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":845,"elapsedSeconds":150}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":815,"elapsedSeconds":180}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":785,"elapsedSeconds":210}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":755,"elapsedSeconds":240}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":725,"elapsedSeconds":270}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":695,"elapsedSeconds":300}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":665,"elapsedSeconds":330}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":635,"elapsedSeconds":360}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":605,"elapsedSeconds":390}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":574,"elapsedSeconds":420}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":544,"elapsedSeconds":450}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":514,"elapsedSeconds":480}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":484,"elapsedSeconds":510}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":454,"elapsedSeconds":540}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":424,"elapsedSeconds":570}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":394,"elapsedSeconds":600}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":364,"elapsedSeconds":630}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":334,"elapsedSeconds":660}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":304,"elapsedSeconds":690}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":274,"elapsedSeconds":720}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":244,"elapsedSeconds":750}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":214,"elapsedSeconds":780}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":184,"elapsedSeconds":810}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":154,"elapsedSeconds":840}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":124,"elapsedSeconds":870}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":94,"elapsedSeconds":900}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":64,"elapsedSeconds":931}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":34,"elapsedSeconds":961}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-rehearsal:provider-wide-horizon","remainingSeconds":4,"elapsedSeconds":991}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":301,"elapsedSeconds":0}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":271,"elapsedSeconds":30}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":241,"elapsedSeconds":60}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":211,"elapsedSeconds":90}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":181,"elapsedSeconds":120}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":151,"elapsedSeconds":150}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":121,"elapsedSeconds":180}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":91,"elapsedSeconds":210}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":61,"elapsedSeconds":240}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":31,"elapsedSeconds":270}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover-forward:quiesce-drain","remainingSeconds":1,"elapsedSeconds":300}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":202,"elapsedSeconds":0}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":172,"elapsedSeconds":30}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":142,"elapsedSeconds":60}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":112,"elapsedSeconds":90}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":82,"elapsedSeconds":120}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":52,"elapsedSeconds":150}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:acl-settlement","remainingSeconds":22,"elapsedSeconds":180}
+{"phase":"ACTUAL_PROTOCOL_WAIT","label":"r2-v4-historical-cutover:second-readback","remainingSeconds":11,"elapsedSeconds":0}
+✖ R2 preserves actual V4 provider-bound closure through historical forward install (2328261.874334ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2328354.319625
+
+✖ failing tests:
+
+test at [generated-module stack omitted; exact source hash in JSON]:4021:1
+✖ R2 preserves actual V4 provider-bound closure through historical forward install (2328261.874334ms)
+  CommandFailure: Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -q -v ON_ERROR_STOP=1 -d r2_provider_history -f /private/tmp/bagger-phase2d-staging-admission/supabase/production_migrations/202608300069_production_annual_scoring_authority_v1.sql
+  psql:/private/tmp/bagger-phase2d-staging-admission/supabase/production_migrations/202608300069_production_annual_scoring_authority_v1.sql:254: ERROR:  query returned no rows
+  CONTEXT:  PL/pgSQL function inline_code_block line 55 at SQL statement
+      at runCommand ([generated-module stack omitted; exact source hash in JSON]:936:11)
+      at psqlFile ([generated-module stack omitted; exact source hash in JSON]:965:10)
+      at TestContext.<anonymous> ([generated-module stack omitted; exact source hash in JSON]:4054:4)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    status: 3,
+    stdout: '',
+    stderr: 'psql:/private/tmp/bagger-phase2d-staging-admission/supabase/production_migrations/202608300069_production_annual_scoring_authority_v1.sql:254: ERROR:  query returned no rows\nCONTEXT:  PL/pgSQL function inline_code_block line 55 at SQL statement\n',
+    cause: undefined
+  }

@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-09-30T20:24:21.120532+00:00",
+  "environment": "LOCAL_NODE",
+  "proofLayers": [
+    "UNIT",
+    "API_HANDLER_WITH_INJECTED_SERVER",
+    "COMPONENT_MODEL"
+  ],
+  "result": "PASS",
+  "command": "node --conditions=react-server --test test/certification-future-context.test.mjs test/certification-recovery-adapters.test.mjs test/reliability-p0f-operations-api.test.mjs test/reliability-p0f-director-workspace.test.mjs",
+  "summary": {
+    "pass": 84,
+    "fail": 0,
+    "skip": 0
+  },
+  "files": {
+    "test/certification-future-context.test.mjs": "40f85bf8cd0215240979773880b645ec23ada7ba2670e4e0f5f8cbfda85b3f5d",
+    "test/certification-recovery-adapters.test.mjs": "02718148c6e5bbbb3cd72d970ef750fc0dc0a300beb961d4ddf3a95a14c5e119",
+    "test/reliability-p0f-operations-api.test.mjs": "c66f3bbec3ef1cac31fd4c775751c1dc55bf9778ced8b21caffeecb397039fd5",
+    "test/reliability-p0f-director-workspace.test.mjs": "f67985334d472f8f7bbc66d9f31c34fa779e4f5601e163e0c6643d4d812bf365",
+    "lib/canonical-director-operations-client.js": "8f2ae30067d0844d44500a4306e151b94bf15f5e916653a946ac424decf381c4",
+    "lib/isolated-director-operations.js": "9d2b2e3f54ef710a2ec7eb375d8b78b3e6d2746ffe0cc6d560084082daf53f7a",
+    "lib/certification-runtime-server.js": "7d83a755e7c93af8eae2a5938fc634c2f2ddfa27a9944a76207a53709299775e",
+    "app/api/director/canonical-operations/route.js": "cbc0446b5fd60f7f867531fa64126a65891e6df66a153379897765c91760078c",
+    "lib/canonical-director-overview.js": "5b6b79368c144df9cffd921a123a709dd7ec9c0068f7335004980dc32a8e53dd"
+  },
+  "logSha256": "124ebe2c7c0c016fd6f2ee0a478cbbed958ec00b285c0721cf781ff946393280",
+  "productionAccess": false,
+  "hostedAccess": false,
+  "googleCalls": 0,
+  "shippingNativeChanged": false,
+  "limitations": [
+    "Not PostgreSQL runtime proof",
+    "Component model execution is not rendered browser proof",
+    "Overlaps prior test aggregates; do not add84 to177/185 totals",
+    "Current and governance identifiers are parsed independently; actor/target/token remain server validated"
+  ]
+}

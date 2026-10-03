@@ -1,0 +1,114 @@
+▶ Certification Odds real calculation, durable owner publication and isolation
+  ✔ fresh state has no historical publication; real canonical read works (47.222083ms)
+  ✔ client and database deny absent, participant, spectator, wrong target and impersonated Director authority (79.53075ms)
+  ✔ two independently installed resources reject cross read, target and wrong release (32.180916ms)
+  ✔ Director calculation request creates truthful durable job and no publication (69.509792ms)
+  ✔ unfinished calculation cannot be published and absent operation remains UNKNOWN (37.897292ms)
+  ✔ job request and required audit roll back together at receipt failure (84.563209ms)
+  ✔ forged provenance, stale context, worker owner-operation and cross-resource write fail closed (134.983667ms)
+  ✔ same logical calculation retry ignores timing telemetry; conflict remains denied (97.030292ms)
+  ✔ claim race admits one lease; expired lease recovers and old token is rejected (109.542959ms)
+  ✔ calculator interruption preserves real checkpoint and resumes without publication (652.013333ms)
+  ✔ existing canonical calculator checkpoints and completes; never publishes (5583.148042ms)
+  ✔ completed calculator duplicate delivery does not recalculate or publish (35.76175ms)
+  ✔ durable calculator exactly matches unchanged canonical domain engine and exposes no private provenance (5890.105334ms)
+  ✔ concurrent duplicate committed calculation operations resolve one durable outcome (35.74725ms)
+  ✔ first publication validates result/source/milestone/generation and never adopts historical provider data (136.520334ms)
+  ✔ snapshot, pointer, job publication and audit roll back together at receipt fault (92.672917ms)
+  ✔ explicit Director first publication commits genuine result and immutable provenance (49.987875ms)
+  ✔ actual public published snapshots and unchanged mobile DTOs omit private Certification provenance (23.197583ms)
+  ✔ lost publication acknowledgement recovers same receipt; stale first CAS conflicts (118.828917ms)
+  ✔ owned PostgreSQL restart retains publication and exact operation recovery (322.346916ms)
+  ✔ committed replay and status reject explicit impersonation without widening recovery authority (22.825042ms)
+  ✔ worker cannot publish, historical publication is immutable and audit provenance is truthful (34.089542ms)
+  ✔ private cores inaccessible and Production legacy publication remains denied (77.140959ms)
+  ✔ real request supersedes stale unpublished work after preserved synthetic canonical input advances (21184.648458ms)
+  ✔ exact current job, publication and recovery reads retain bounded indexed authority (43.753458ms)
+✔ Certification Odds real calculation, durable owner publication and isolation (43847.90075ms)
+ℹ {"domainEquivalence":{"source":[{"file":"lib/tournament-odds.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"c45c557f03eb630b3998e7a61ea03638ace591ae3df15cb55d0028c2efb8fcc1","unchanged":true},{"file":"lib/prediction-engine.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"9260def65c1eb4b6fc9f520c4e5158768ad309ad59206b5e3ab1fc9fe408ace3","unchanged":true},{"file":"lib/tournament-context.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"0423715b1d4e93c6decc39cfcb27cb0fbc6fffb5c6a9a936c306c4eab4686db4","unchanged":true},{"file":"lib/championship-odds-resilience.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"2a9b9776279ba849bbab128d1d56920b99a7fb38257cbb28a8bb164e26aa6c28","unchanged":true},{"file":"lib/championship-odds-supabase.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"26b143371df2359e0bbdf571e544afdd232fccd29f58ac316bd40747e7aec1be","unchanged":true},{"file":"lib/published-odds-supabase.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"081d157585e0795e999b4071ce36a2e7f3ff52f599574df571b332a56c984e9b","unchanged":true},{"file":"lib/mobile-v1-odds.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"608858f8b1fd2900469c259e767cf14ac2d553e8e6dc231946524a61aa269fcd","unchanged":true}],"reference":{"ok":true,"jobId":"9cdf93c3988d060eb394735fdc868c3418b4ba8a1d4776aa6c6994e8a1958521","iterations":10000,"referenceFingerprint":"2bc241d0afebf456ff36c6617a3d34854cae40484e1eb55668f9520f889e1e9c","resilientFingerprint":"2bc241d0afebf456ff36c6617a3d34854cae40484e1eb55668f9520f889e1e9c","exactEquality":true,"storedFingerprintValid":true,"referenceMetrics":{"durationMs":5771.009999999998,"cpuMs":5789.595,"rssBeforeBytes":219037696,"rssAfterBytes":218333184,"heapBeforeBytes":32209176,"heapAfterBytes":41854664}}}}
+ℹ {"layer":"LOCAL_POSTGRESQL_RPC_ACTUAL_CALCULATOR","rpcCalls":97,"actualDirectorApi":true,"independentResources":2,"concurrentReplay":8,"googleCalls":0,"googleJobs":0,"autoPublication":0}
+▶ migration 078 rebinds future annual normal releases without mutating annual state
+  ✖ future annual authorization, replay, stale and invariance (3745.376584ms)
+✖ migration 078 rebinds future annual normal releases without mutating annual state (5509.691417ms)
+▶ migration 078 rebinds future annual normal releases without mutating annual state
+  ✖ future annual authorization, replay, stale and invariance (3161.685625ms)
+✖ migration 078 rebinds future annual normal releases without mutating annual state (4897.471541ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 26
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 54516.523833
+
+✖ failing tests:
+
+test at annual-normal-release-rebind-generated.mjs:26:13
+✖ future annual authorization, replay, stale and invariance (3745.376584ms)
+  CommandFailure: Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -qAt -v ON_ERROR_STOP=1 -d annual_normal_release_frozen_2026
+  ERROR:  duplicate key value violates unique constraint "tournament_setup_course_holes_v1_pkey"
+  DETAIL:  Key (tournament_id, course_id, tee_id, hole_number)=(2027, CRS000001, Synthetic, 1) already exists.
+  CONTEXT:  SQL statement "insert into scoring_authority.tournament_setup_course_holes_v1 (
+        tournament_id, course_id, tee_id, hole_number, par,
+        stroke_index, yardage, setup_revision
+      ) select target_id, source.course_id, source.tee_id,
+        source.hole_number, source.par, source.stroke_index, source.yardage,
+        catalog.setup_revision
+      from (
+        select reference.tournament_id, existing.course_id, existing.tee_id,
+          existing.hole_number, existing.par, existing.stroke_index,
+          existing.yardage
+        from production_control.future_tournament_course_references_v1 reference
+        join scoring_authority.tournament_setup_course_holes_v1 existing
+          on existing.tournament_id = reference.source_tournament_id
+         and existing.course_id = reference.course_id
+         and existing.tee_id = reference.tee_id
+        where reference.reference_status = 'EXISTING_REFERENCE'
+        union all
+        select reference.tournament_id, context.course_id, context.tee_id,
+          context.hole_number, context.par, context.stroke_index,
+          context.yardage
+        from production_control.future_tournament_course_references_v1 reference
+        join scoring_authority.global_course_hole_contexts_v1 context
+          on context.course_id = reference.course_id
+         and context.tee_id = reference.tee_id
+         and context.context_revision = reference.source_setup_revision
+        where reference.reference_status = 'GLOBAL_COURSE_CONTEXT'
+      ) source
+      where source.tournament_id = target_id"
+  PL/pgSQL function production_control.canonical_mutate_future_runtime_resource_v2(jsonb,jsonb) line 1736 at SQL statement
+  PL/pgSQL function public.mutate_production_future_runtime_v2(jsonb) line 11 at RETURN
+      at runCommand (annual-normal-release-rebind-generated.mjs:135:11)
+      at psql (annual-normal-release-rebind-generated.mjs:151:10)
+      at q (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-annual-golden.mjs:17:21)
+      at row (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-annual-golden.mjs:17:80)
+      at rpc (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-annual-golden.mjs:18:26)
+      at call (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-annual-golden.mjs:69:17)
+      at run (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/certification-future-authoring-proof.mjs:58:30)
+      at preparePromotedFutureScoring (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/certification-future-authoring-proof.mjs:59:23)
+      at runProductionAnnualGolden (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-annual-golden.mjs:94:9)
+      at async TestContext.<anonymous> (annual-normal-release-rebind-generated.mjs:2190:32) {
+    status: 3,
+    cause: undefined
+  }
+
+test at annual-normal-release-rebind-generated.mjs:26:13
+✖ future annual authorization, replay, stale and invariance (3161.685625ms)
+  CommandFailure: Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -qAt -v ON_ERROR_STOP=1 -d annual_normal_release_frozen_2026
+  ERROR:  PRODUCTION_PREDICTION_SETTINGS_NOT_CURRENT
+  CONTEXT:  PL/pgSQL function current_production_odds_inputs(jsonb) line 22 at RAISE
+  PL/pgSQL function public.request_production_odds_calculation_job(jsonb) line 16 at assignment
+      at runCommand (annual-normal-release-rebind-generated.mjs:135:11)
+      at psql (annual-normal-release-rebind-generated.mjs:151:10)
+      at q ([generated module]:18:21)
+      at row ([generated module]:18:80)
+      at rpc ([generated module]:19:26)
+      at transport (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-odds-equivalence.mjs:42:18)
+      at requestJob (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-odds-equivalence.mjs:48:22)
+      at requestProductionOddsCalculation (file:///private/tmp/bagger-phase2d-staging-admission/lib/production-odds-calculation-server.js:745:27)
+      at async measure (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-odds-equivalence.mjs:16:87)
+      at async runAdmittedProductionOdds (file:///private/tmp/bagger-phase2d-staging-admission/test/support/reliability/production-odds-equivalence.mjs:50:18) {
+    status: 3,
+    cause: undefined
+  }

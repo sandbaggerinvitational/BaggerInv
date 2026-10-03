@@ -1,0 +1,6377 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "googleCalls": 0,
+  "hostedAccess": false,
+  "scoresSeeded": 0,
+  "finalsSeeded": 0,
+  "certificatesSeeded": 0,
+  "readinessSeeded": 0,
+  "completedGates": [
+    "synthetic initial identities preserve existing verified contact and owner authority predicates",
+    "published-only current Odds read is empty without publication and rejects foreign target or private core access",
+    "future CREATE, roster, courses, promotion, handicap, pairings, contexts and content use supported operations",
+    "predecessor has 432 canonical holes and 24 actual Finals plus explicit rejected and unresolved ingress histories"
+  ],
+  "initialAuthority": {
+    "players": 24,
+    "emailsSent": 0,
+    "source": "urn:bagger:synthetic:5bf927ba-7706-4329-9d6c-06edb4ca2ee3",
+    "configurationFingerprint": "6795d9eb49996540638a6610b4231d53f07e5b636a7bc0db45dac01f44498cd9"
+  },
+  "futurePreparation": {
+    "ok": true,
+    "ready": false,
+    "blockers": [
+      {
+        "code": "FUTURE_PREDECESSOR_SCORING_CLOSE_FENCE_NOT_CERTIFIED",
+        "details": [
+          "PREDECESSOR_SCORING_ADMISSION_NOT_CLOSED"
+        ],
+        "message": "The current tournament scoring close and drain boundary is not certified.",
+        "section": "Activation"
+      }
+    ],
+    "fingerprint": "e273fe029105d6e49f5300545c606ae9ae6feacc40adbb9460805ea588663565",
+    "contractVersion": "production-annual-scoring-transition-readiness-v1",
+    "targetTournamentId": "2097",
+    "predecessorCertificate": {
+      "blockers": [
+        "PREDECESSOR_SCORING_ADMISSION_NOT_CLOSED"
+      ],
+      "certified": false,
+      "fingerprint": "2a224a6d94861c4237b333015a0a5221c69467c6e52e678d3a266d9f82efd4c4",
+      "tournamentId": "2026",
+      "sideGameDrain": {
+        "oddsMirrorRows": 0,
+        "oddsUnresolved": 0,
+        "calcuttaUnresolved": 0,
+        "generationMismatch": 0,
+        "netSkinsUnresolved": 0,
+        "runtimeGenerationId": null
+      },
+      "derivedWorkerDrain": {
+        "runtimeGenerationId": null,
+        "competitionUnresolved": 0,
+        "intelligenceUnresolved": 0,
+        "competitionGenerationMismatch": 0,
+        "intelligenceGenerationMismatch": 0
+      }
+    },
+    "expectedPointerRevision": 1,
+    "predecessorTournamentId": "2026"
+  },
+  "predecessorSequence": {
+    "rounds": {
+      "1": 108,
+      "2": 108,
+      "3": 216
+    },
+    "holes": 432,
+    "finals": 24
+  },
+  "predecessorWorkers": {
+    "environment": "OWNED_LOCAL_POSTGRESQL17",
+    "cycles": 21,
+    "events": [
+      {
+        "observedAt": 1790799290150,
+        "type": "started",
+        "workerId": "certification-proof-2a6f42aa-f5db-4692-8dab-d3bf0a37e098"
+      },
+      {
+        "observedAt": 1790799290280,
+        "type": "tick",
+        "cycle": 0,
+        "tickStartedAt": 1790799290150,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799290496,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799290777,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799290897,
+        "type": "tick",
+        "cycle": 1,
+        "tickStartedAt": 1790799290787,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799291097,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799291408,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799291531,
+        "type": "tick",
+        "cycle": 2,
+        "tickStartedAt": 1790799291419,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799291819,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799292017,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799292137,
+        "type": "tick",
+        "cycle": 3,
+        "tickStartedAt": 1790799292028,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799292335,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799292619,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799292740,
+        "type": "tick",
+        "cycle": 4,
+        "tickStartedAt": 1790799292632,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799292945,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799293264,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799293392,
+        "type": "tick",
+        "cycle": 5,
+        "tickStartedAt": 1790799293274,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799293687,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799293889,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799294027,
+        "type": "tick",
+        "cycle": 6,
+        "tickStartedAt": 1790799293902,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799294243,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799294628,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799294766,
+        "type": "tick",
+        "cycle": 7,
+        "tickStartedAt": 1790799294638,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799294965,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799295248,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799295440,
+        "type": "tick",
+        "cycle": 8,
+        "tickStartedAt": 1790799295260,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799295892,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799296095,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799296219,
+        "type": "tick",
+        "cycle": 9,
+        "tickStartedAt": 1790799296106,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799296423,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799296714,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799296842,
+        "type": "tick",
+        "cycle": 10,
+        "tickStartedAt": 1790799296727,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799297070,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799297348,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799297471,
+        "type": "tick",
+        "cycle": 11,
+        "tickStartedAt": 1790799297359,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799297753,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799297958,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799298081,
+        "type": "tick",
+        "cycle": 12,
+        "tickStartedAt": 1790799297969,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799298280,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799298564,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799298689,
+        "type": "tick",
+        "cycle": 13,
+        "tickStartedAt": 1790799298577,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 101,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799298885,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799299172,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799299301,
+        "type": "tick",
+        "cycle": 14,
+        "tickStartedAt": 1790799299183,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 92,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799299583,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799299788,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799299912,
+        "type": "tick",
+        "cycle": 15,
+        "tickStartedAt": 1790799299799,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 68,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799300272,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799300578,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799300699,
+        "type": "tick",
+        "cycle": 16,
+        "tickStartedAt": 1790799300590,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 44,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799300899,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799301187,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799301310,
+        "type": "tick",
+        "cycle": 17,
+        "tickStartedAt": 1790799301200,
+        "materialized": 8,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 20,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": true,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799301583,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799301778,
+        "type": "processed",
+        "family": "COMPETITION",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799301891,
+        "type": "tick",
+        "cycle": 18,
+        "tickStartedAt": 1790799301791,
+        "materialized": 0,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 2,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": false,
+          "INTELLIGENCE": true
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799302164,
+        "type": "processed",
+        "family": "INTELLIGENCE",
+        "empty": false
+      },
+      {
+        "observedAt": 1790799302280,
+        "type": "tick",
+        "cycle": 19,
+        "tickStartedAt": 1790799302174,
+        "materialized": 0,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 0,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": false,
+          "INTELLIGENCE": false
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799302396,
+        "type": "tick",
+        "cycle": 20,
+        "tickStartedAt": 1790799302292,
+        "materialized": 0,
+        "terminal": 0,
+        "cancelled": false,
+        "statusIncomplete": false,
+        "blockedAutomatic": 0,
+        "pendingAutomatic": 0,
+        "activeLeases": 0,
+        "ready": {
+          "CALCUTTA": false,
+          "COMPETITION": false,
+          "INTELLIGENCE": false
+        },
+        "waitingOwner": 0,
+        "waitingPublication": 1
+      },
+      {
+        "observedAt": 1790799302396,
+        "type": "stopped",
+        "cycles": 21
+      }
+    ],
+    "calls": [
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.COMPETITION_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_CLAIM",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "read_certification_projection_v1",
+        "phase": "READS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.INTELLIGENCE_WRITE",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "read_certification_runtime_context_v1",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      },
+      {
+        "name": "execute_certification_operation_v1",
+        "operation": "WORKERS.DELIVERY_TICK",
+        "phase": "WORKERS"
+      }
+    ],
+    "automaticFamilies": [
+      "CALCUTTA",
+      "COMPETITION",
+      "INTELLIGENCE"
+    ],
+    "googleCalls": 0,
+    "externalNetworkCalls": 0,
+    "requiredAutomaticWork": 0,
+    "calculators": "SHIPPING_IMPLEMENTATION",
+    "projections": "ACTUAL_CANONICAL_RPC"
+  },
+  "preparedReadiness": {
+    "ok": true,
+    "ready": false,
+    "blockers": [
+      {
+        "code": "FUTURE_PREDECESSOR_SCORING_CLOSE_FENCE_NOT_CERTIFIED",
+        "details": [
+          "PREDECESSOR_SCORING_ADMISSION_NOT_CLOSED",
+          "PREDECESSOR_DERIVED_WORK_DRAIN_INCOMPLETE"
+        ],
+        "message": "The current tournament scoring close and drain boundary is not certified.",
+        "section": "Activation"
+      }
+    ],
+    "fingerprint": "782aba57703f54027179317cf68818e4f8518362f06947b8600addef0e089fb7",
+    "contractVersion": "production-annual-scoring-transition-readiness-v1",
+    "targetTournamentId": "2097",
+    "predecessorCertificate": {
+      "blockers": [
+        "PREDECESSOR_SCORING_ADMISSION_NOT_CLOSED",
+        "PREDECESSOR_DERIVED_WORK_DRAIN_INCOMPLETE"
+      ],
+      "certified": false,
+      "fingerprint": "1061a31c99fd8b4781f3aea4df872c6b1b58b5088ce5f412df341233540d08e0",
+      "tournamentId": "2026",
+      "sideGameDrain": {
+        "oddsMirrorRows": 0,
+        "oddsUnresolved": 0,
+        "calcuttaUnresolved": 0,
+        "generationMismatch": 0,
+        "netSkinsUnresolved": 0,
+        "runtimeGenerationId": null
+      },
+      "derivedWorkerDrain": {
+        "runtimeGenerationId": null,
+        "competitionUnresolved": 0,
+        "intelligenceUnresolved": 1,
+        "competitionGenerationMismatch": 0,
+        "intelligenceGenerationMismatch": 0
+      }
+    },
+    "expectedPointerRevision": 1,
+    "predecessorTournamentId": "2026"
+  },
+  "prepare": {
+    "ok": true,
+    "code": "PRODUCTION_ANNUAL_SCORING_TRANSITION_PREPARED",
+    "idempotent": false,
+    "transitionId": "8fa3c8ee-e615-47ac-a65b-026cc746056f",
+    "pointerChanged": false,
+    "predecessorClosed": false,
+    "successorActivated": false,
+    "runtimeGenerationId": "f0dd169b-601d-4a31-af2f-7758b838450d",
+    "readinessFingerprint": "782aba57703f54027179317cf68818e4f8518362f06947b8600addef0e089fb7",
+    "admissionGenerationId": "f629addb-5dea-46f2-b12b-662296a5a72e",
+    "authorityGenerationId": "0c5d8dca-606c-4001-ae58-ff78403e62d6",
+    "successorTournamentId": "2097",
+    "expectedPointerRevision": 1,
+    "predecessorTournamentId": "2026",
+    "predecessorAdmissionStopped": false
+  },
+  "firstFailure": {
+    "name": "Error",
+    "code": null,
+    "message": "/opt/homebrew/opt/postgresql@17/bin/psql\nERROR:  PRODUCTION_ANNUAL_PREDECESSOR_DERIVED_WORK_PENDING\nCONTEXT:  PL/pgSQL function production_control.close_annual_scoring_predecessor_v1(jsonb,text) line 28 at RAISE\nPL/pgSQL function production_control.canonical_close_annual_scoring_transition_v2(jsonb,jsonb) line 59 at assignment\nPL/pgSQL function public.mutate_certification_annual_transition_v1(jsonb) line 12 at assignment\n"
+  },
+  "startedAt": "2026-09-30T20:13:27.891Z",
+  "finishedAt": "2026-09-30T20:15:02.718Z",
+  "startSource": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "c92685bdbb9d6f0537ab897985d472d27aad4947e3cf648208241865653ce27f",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "test/reliability-phase2dr2-annual-transition.integration.test.mjs": "c7aa52e1f85597ec5b2786bd76cb7f1b2e57966a6c4c092ae6f77f775974dd3d",
+    "test/support/reliability/phase2d-certification-fixture.mjs": "8dbeccb14fd6531657e81051aa4c0016a262dbea0345f1f0137a2bda2364ba78",
+    "test/support/reliability/certification-annual-transition-fixture.mjs": "b1e40f7b02278fbc92fc5d1edd29e711b0fec7c43d3b2de276a3f17063fedefc",
+    "test/support/reliability/certification-future-authoring-proof.mjs": "72e53ef2d3107cc59a4b04566dd554a5a48ab6c15db9fdd873b754e2539665a0",
+    "test/support/reliability/certification-worker-proof.mjs": "a4bcfc2656e9c6b22cf057c75db292d18a930696e697db69ddeda194bdeb5315"
+  },
+  "endSource": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "c92685bdbb9d6f0537ab897985d472d27aad4947e3cf648208241865653ce27f",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "test/reliability-phase2dr2-annual-transition.integration.test.mjs": "c7aa52e1f85597ec5b2786bd76cb7f1b2e57966a6c4c092ae6f77f775974dd3d",
+    "test/support/reliability/phase2d-certification-fixture.mjs": "8dbeccb14fd6531657e81051aa4c0016a262dbea0345f1f0137a2bda2364ba78",
+    "test/support/reliability/certification-annual-transition-fixture.mjs": "b1e40f7b02278fbc92fc5d1edd29e711b0fec7c43d3b2de276a3f17063fedefc",
+    "test/support/reliability/certification-future-authoring-proof.mjs": "72e53ef2d3107cc59a4b04566dd554a5a48ab6c15db9fdd873b754e2539665a0",
+    "test/support/reliability/certification-worker-proof.mjs": "a4bcfc2656e9c6b22cf057c75db292d18a930696e697db69ddeda194bdeb5315"
+  },
+  "sourceStable": true,
+  "timings": [
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 25.94145800000115,
+      "executeMs": 57.331624999998894,
+      "totalMs": 83.27308300000004
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 24.969208000002254,
+      "executeMs": 42.6494169999969,
+      "totalMs": 67.61862499999916
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 26.290124999999534,
+      "executeMs": 43.76970799999981,
+      "totalMs": 70.05983299999934
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.563249999999243,
+      "executeMs": 40.311125000000175,
+      "totalMs": 66.87437499999942
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.52483299999949,
+      "executeMs": 39.968667000001005,
+      "totalMs": 66.4935000000005
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.259375000001455,
+      "executeMs": 37.27024999999776,
+      "totalMs": 61.529624999999214
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.727833000000828,
+      "executeMs": 39.81399999999849,
+      "totalMs": 65.54183299999931
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.559417000000394,
+      "executeMs": 44.595666000001074,
+      "totalMs": 70.15508300000147
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 35.924707999998645,
+      "executeMs": 46.58250000000044,
+      "totalMs": 82.50720799999908
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.828125,
+      "executeMs": 46.55633400000079,
+      "totalMs": 72.38445900000079
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 42.966292000000976,
+      "executeMs": 67.77945800000089,
+      "totalMs": 110.74575000000186
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 48.88300000000163,
+      "executeMs": 59.34158299999763,
+      "totalMs": 108.22458299999926
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 37.27729199999885,
+      "executeMs": 55.66425000000163,
+      "totalMs": 92.94154200000048
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 33.676582999996754,
+      "executeMs": 45.01537500000268,
+      "totalMs": 78.69195799999943
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.021583999998256,
+      "executeMs": 37.17512500000157,
+      "totalMs": 62.19670899999983
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.116791999997076,
+      "executeMs": 36.44500000000335,
+      "totalMs": 61.56179200000042
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.024915999998484,
+      "executeMs": 37.94508400000268,
+      "totalMs": 62.970000000001164
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.18829100000221,
+      "executeMs": 36.70812499999738,
+      "totalMs": 60.89641599999959
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.756750000000466,
+      "executeMs": 37.52504100000078,
+      "totalMs": 63.28179100000125
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.54529199999888,
+      "executeMs": 37.45912500000122,
+      "totalMs": 62.0044170000001
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.00279099999898,
+      "executeMs": 37.76058399999965,
+      "totalMs": 62.76337499999863
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 24.70929099999921,
+      "executeMs": 39.82366700000057,
+      "totalMs": 64.53295799999978
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 26.06866599999921,
+      "executeMs": 55.257166999999754,
+      "totalMs": 81.32583299999897
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 25.022875000002387,
+      "executeMs": 41.852374999998574,
+      "totalMs": 66.87525000000096
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 26.573040999999648,
+      "executeMs": 46.812167000000045,
+      "totalMs": 73.3852079999997
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.323749999999563,
+      "executeMs": 38.58037499999773,
+      "totalMs": 66.9041249999973
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.88875000000189,
+      "executeMs": 37.82395799999722,
+      "totalMs": 62.71270799999911
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.429041999999754,
+      "executeMs": 37.59220800000185,
+      "totalMs": 63.0212500000016
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.661292000000685,
+      "executeMs": 40.19154100000014,
+      "totalMs": 64.85283300000083
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.47741600000154,
+      "executeMs": 38.43104200000016,
+      "totalMs": 63.9084580000017
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.522667000001093,
+      "executeMs": 39.68129200000112,
+      "totalMs": 65.20395900000221
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.28204199999891,
+      "executeMs": 37.87750000000233,
+      "totalMs": 63.15954200000124
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.147334000001138,
+      "executeMs": 39.50762499999837,
+      "totalMs": 65.65495899999951
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.00104199999987,
+      "executeMs": 39.084124999997584,
+      "totalMs": 65.08516699999745
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.52087500000198,
+      "executeMs": 38.882958999998664,
+      "totalMs": 65.40383400000064
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.31354199999987,
+      "executeMs": 40.507792000000336,
+      "totalMs": 67.8213340000002
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.131083000000217,
+      "executeMs": 40.33679199999824,
+      "totalMs": 67.46787499999846
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.486042000000452,
+      "executeMs": 39.78125,
+      "totalMs": 68.26729200000045
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.165790999999444,
+      "executeMs": 40.574250000001484,
+      "totalMs": 66.74004100000093
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.59479199999987,
+      "executeMs": 39.44366600000285,
+      "totalMs": 66.03845800000272
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.48949999999968,
+      "executeMs": 39.303250000000844,
+      "totalMs": 66.79275000000052
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.759249999999156,
+      "executeMs": 39.63324999999895,
+      "totalMs": 65.39249999999811
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.19495900000038,
+      "executeMs": 39.9955829999999,
+      "totalMs": 66.19054200000028
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 26.59049999999843,
+      "executeMs": 41.947125000002416,
+      "totalMs": 68.53762500000084
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 26.33808300000237,
+      "executeMs": 55.23862499999814,
+      "totalMs": 81.57670800000051
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 25.668916999999055,
+      "executeMs": 47.449625000001106,
+      "totalMs": 73.11854200000016
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 30.20837499999834,
+      "executeMs": 55.62908299999981,
+      "totalMs": 85.83745799999815
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.569500000001426,
+      "executeMs": 36.45816600000035,
+      "totalMs": 61.02766600000177
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.205125000000407,
+      "executeMs": 38.626374999999825,
+      "totalMs": 63.83150000000023
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.244332999998733,
+      "executeMs": 38.947542000001704,
+      "totalMs": 64.19187500000044
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.166832999999315,
+      "executeMs": 38.6984999999986,
+      "totalMs": 64.86533299999792
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.636624999999185,
+      "executeMs": 42.13862499999959,
+      "totalMs": 67.77524999999878
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 29.381207999998878,
+      "executeMs": 43.53870800000004,
+      "totalMs": 72.91991599999892
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.4027079999978,
+      "executeMs": 40.211834000001545,
+      "totalMs": 66.61454199999935
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.049082999998063,
+      "executeMs": 41.117291999999,
+      "totalMs": 69.16637499999706
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.89116600000125,
+      "executeMs": 39.583042000002024,
+      "totalMs": 65.47420800000327
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.26041599999735,
+      "executeMs": 38.590250000001106,
+      "totalMs": 64.85066599999845
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.72691599999962,
+      "executeMs": 37.10845899999913,
+      "totalMs": 62.83537499999875
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.560374999997293,
+      "executeMs": 42.46504199999981,
+      "totalMs": 70.0254169999971
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.60029200000281,
+      "executeMs": 39.86683300000004,
+      "totalMs": 66.46712500000285
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.62195900000006,
+      "executeMs": 38.4619160000002,
+      "totalMs": 64.08387500000026
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.850040999997873,
+      "executeMs": 38.93404200000077,
+      "totalMs": 63.784082999998645
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.087917000000743,
+      "executeMs": 37.826624999997875,
+      "totalMs": 62.91454199999862
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.96666600000026,
+      "executeMs": 38.783917000000656,
+      "totalMs": 64.75058300000092
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.60504199999923,
+      "executeMs": 38.37220800000068,
+      "totalMs": 63.97724999999991
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 28.73937500000102,
+      "executeMs": 203.85966599999665,
+      "totalMs": 232.59904099999767
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 24.87225000000035,
+      "executeMs": 55.8269169999985,
+      "totalMs": 80.69916699999885
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 27.821250000000873,
+      "executeMs": 45.29887499999677,
+      "totalMs": 73.12012499999764
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 27.297707999998238,
+      "executeMs": 47.583417000001646,
+      "totalMs": 74.88112499999988
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.32995799999844,
+      "executeMs": 58.6921250000014,
+      "totalMs": 86.02208299999984
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 62.17474999999831,
+      "executeMs": 40.658541000000696,
+      "totalMs": 102.83329099999901
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.361582999998063,
+      "executeMs": 39.27425000000221,
+      "totalMs": 66.63583300000028
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.037209000001894,
+      "executeMs": 43.09937499999796,
+      "totalMs": 70.13658399999986
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.78320800000074,
+      "executeMs": 40.40504200000214,
+      "totalMs": 68.18825000000288
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.657916000003752,
+      "executeMs": 37.77166699999361,
+      "totalMs": 63.429582999997365
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.051791999998386,
+      "executeMs": 37.630582999998296,
+      "totalMs": 62.68237499999668
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.29766699999891,
+      "executeMs": 38.34654099999898,
+      "totalMs": 63.64420799999789
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.26154200000019,
+      "executeMs": 38.399624999998196,
+      "totalMs": 64.66116699999839
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.556875000002037,
+      "executeMs": 38.61070800000016,
+      "totalMs": 64.1675830000022
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.37462499999674,
+      "executeMs": 39.906457999997656,
+      "totalMs": 65.2810829999944
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 32.85358300000371,
+      "executeMs": 46.02162500000122,
+      "totalMs": 78.87520800000493
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.845667000001413,
+      "executeMs": 40.6785830000008,
+      "totalMs": 69.52425000000221
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.292624999994587,
+      "executeMs": 42.863499999999476,
+      "totalMs": 70.15612499999406
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 29.58562499999971,
+      "executeMs": 42.45279199999641,
+      "totalMs": 72.03841699999612
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.504625000001397,
+      "executeMs": 40.12183399999776,
+      "totalMs": 66.62645899999916
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.290540999994846,
+      "executeMs": 36.69625000000087,
+      "totalMs": 62.98679099999572
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.341416999996,
+      "executeMs": 37.79766600000585,
+      "totalMs": 62.13908300000185
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 24.890833999997994,
+      "executeMs": 40.42779100000189,
+      "totalMs": 65.31862499999988
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 25.087915999996767,
+      "executeMs": 55.26162500000646,
+      "totalMs": 80.34954100000323
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 25.407375000002503,
+      "executeMs": 42.12204200000269,
+      "totalMs": 67.5294170000052
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 25.659459000002244,
+      "executeMs": 44.484375,
+      "totalMs": 70.14383400000224
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.48137499999575,
+      "executeMs": 38.05395800000406,
+      "totalMs": 63.53533299999981
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.64120799999364,
+      "executeMs": 38.40862500000367,
+      "totalMs": 63.04983299999731
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.52150000000256,
+      "executeMs": 37.702707999997074,
+      "totalMs": 63.224207999999635
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.76391699999658,
+      "executeMs": 40.840625000004366,
+      "totalMs": 67.60454200000095
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.481082999998762,
+      "executeMs": 41.059291999998095,
+      "totalMs": 67.54037499999686
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.538375000003725,
+      "executeMs": 39.89566699999705,
+      "totalMs": 66.43404200000077
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.54808399999456,
+      "executeMs": 39.891583000004175,
+      "totalMs": 66.43966699999874
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.034249999996973,
+      "executeMs": 39.928625000000466,
+      "totalMs": 66.96287499999744
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.000082999998995,
+      "executeMs": 38.004416999996465,
+      "totalMs": 63.00449999999546
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.069833999994444,
+      "executeMs": 38.886083000004874,
+      "totalMs": 65.95591699999932
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.948624999997264,
+      "executeMs": 39.29200000000128,
+      "totalMs": 65.24062499999854
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.558250000001863,
+      "executeMs": 38.44208300000173,
+      "totalMs": 63.00033300000359
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 40.99570899999526,
+      "executeMs": 63.7867499999993,
+      "totalMs": 104.78245899999456
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 45.17983299999469,
+      "executeMs": 58.30050000000483,
+      "totalMs": 103.48033299999952
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.93358299999818,
+      "executeMs": 51.534458000001905,
+      "totalMs": 80.46804100000008
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 34.94816699999501,
+      "executeMs": 44.97387500000332,
+      "totalMs": 79.92204199999833
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.51141600000119,
+      "executeMs": 38.76304199999868,
+      "totalMs": 66.27445799999987
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.05854199999885,
+      "executeMs": 39.44791699999769,
+      "totalMs": 64.50645899999654
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 25.3023749999993,
+      "executeMs": 40.198833000002196,
+      "totalMs": 65.5012080000015
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 24.84700000000157,
+      "executeMs": 55.23770799999329,
+      "totalMs": 80.08470799999486
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 23.992249999995693,
+      "executeMs": 41.30391700000473,
+      "totalMs": 65.29616700000042
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 24.092917000001762,
+      "executeMs": 41.963582999997016,
+      "totalMs": 66.05649999999878
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 23.653417000001355,
+      "executeMs": 35.98695800000132,
+      "totalMs": 59.64037500000268
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 23.915584000002127,
+      "executeMs": 36.16729099999793,
+      "totalMs": 60.08287500000006
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.11791699999594,
+      "executeMs": 37.21450000000186,
+      "totalMs": 61.332416999997804
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.029666999995243,
+      "executeMs": 37.46529200000077,
+      "totalMs": 62.494958999996015
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.594834000003175,
+      "executeMs": 39.849874999999884,
+      "totalMs": 64.44470900000306
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.752000000000407,
+      "executeMs": 42.222874999999476,
+      "totalMs": 67.97487499999988
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.64862500000163,
+      "executeMs": 42.959374999998545,
+      "totalMs": 69.60800000000017
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.834666999995534,
+      "executeMs": 38.14887499999895,
+      "totalMs": 62.983541999994486
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.511290999995254,
+      "executeMs": 36.54970900000626,
+      "totalMs": 61.06100000000151
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 23.728708999995433,
+      "executeMs": 37.21066600000631,
+      "totalMs": 60.939375000001746
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.43424999999843,
+      "executeMs": 36.31958399999712,
+      "totalMs": 60.75383399999555
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 23.931375000000116,
+      "executeMs": 37.0915410000016,
+      "totalMs": 61.022916000001715
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.34483299999556,
+      "executeMs": 37.60745800000586,
+      "totalMs": 61.95229100000142
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.416333000001032,
+      "executeMs": 38.054708999996365,
+      "totalMs": 62.4710419999974
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.703374999997322,
+      "executeMs": 36.92608399999881,
+      "totalMs": 63.62945899999613
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.043499999999767,
+      "executeMs": 36.63354199999594,
+      "totalMs": 60.67704199999571
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.28441600000224,
+      "executeMs": 36.88933399999951,
+      "totalMs": 61.173750000001746
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 23.70979200000147,
+      "executeMs": 37.21274999999878,
+      "totalMs": 60.92254200000025
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 23.699124999999185,
+      "executeMs": 38.67608399999881,
+      "totalMs": 62.375208999997994
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 24.997167000001355,
+      "executeMs": 54.23029200000019,
+      "totalMs": 79.22745900000155
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 25.514916000000085,
+      "executeMs": 42.43183399999543,
+      "totalMs": 67.94674999999552
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 24.708292000002984,
+      "executeMs": 43.82291699999769,
+      "totalMs": 68.53120900000067
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.250707999999577,
+      "executeMs": 36.63658299999952,
+      "totalMs": 60.887290999999095
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.434207999998762,
+      "executeMs": 39.26616700000159,
+      "totalMs": 64.70037500000035
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.28254200000083,
+      "executeMs": 41.37116699999751,
+      "totalMs": 65.65370899999834
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.210500000001048,
+      "executeMs": 38.56133299999783,
+      "totalMs": 63.77183299999888
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.64237499999581,
+      "executeMs": 48.71362500000396,
+      "totalMs": 74.35599999999977
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.532749999998487,
+      "executeMs": 39.867666000005556,
+      "totalMs": 67.40041600000404
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.642208000004757,
+      "executeMs": 38.83220799999981,
+      "totalMs": 65.47441600000457
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 32.55308299999888,
+      "executeMs": 63.059375000004366,
+      "totalMs": 95.61245800000324
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 30.45808300000499,
+      "executeMs": 47.8695000000007,
+      "totalMs": 78.32758300000569
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 40.226457999997365,
+      "executeMs": 51.676666999999725,
+      "totalMs": 91.90312499999709
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.940375000005588,
+      "executeMs": 38.471874999995634,
+      "totalMs": 65.41225000000122
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.341250000004948,
+      "executeMs": 39.52408399999695,
+      "totalMs": 67.8653340000019
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.987166999999317,
+      "executeMs": 39.86408300000039,
+      "totalMs": 65.85124999999971
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.111833999995724,
+      "executeMs": 39.638041000005614,
+      "totalMs": 64.74987500000134
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 30.470416999996814,
+      "executeMs": 40.091707999999926,
+      "totalMs": 70.56212499999674
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.415333000004466,
+      "executeMs": 39.012917000000016,
+      "totalMs": 64.42825000000448
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.42566700000316,
+      "executeMs": 41.920249999995576,
+      "totalMs": 66.34591699999874
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.95279099999607,
+      "executeMs": 40.998959000004106,
+      "totalMs": 69.95175000000017
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 25.13904200000252,
+      "executeMs": 43.59795799999847,
+      "totalMs": 68.73700000000099
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 24.635500000003958,
+      "executeMs": 56.02720899999986,
+      "totalMs": 80.66270900000382
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 26.350709000005736,
+      "executeMs": 46.58183299999655,
+      "totalMs": 72.93254200000229
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 24.832584000003408,
+      "executeMs": 43.56291600000259,
+      "totalMs": 68.395500000006
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.49616600000445,
+      "executeMs": 38.775000000001455,
+      "totalMs": 63.271166000005906
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.913124999999127,
+      "executeMs": 37.37141700000211,
+      "totalMs": 62.28454200000124
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.95012499999575,
+      "executeMs": 37.725334000002476,
+      "totalMs": 62.67545899999823
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.763083999998344,
+      "executeMs": 36.56479099999706,
+      "totalMs": 61.3278749999954
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.526459000000614,
+      "executeMs": 38.74979099999473,
+      "totalMs": 63.27624999999534
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.15545800000109,
+      "executeMs": 38.61191699999472,
+      "totalMs": 63.76737499999581
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.73879200000374,
+      "executeMs": 40.89074999999866,
+      "totalMs": 67.6295420000024
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.637000000002445,
+      "executeMs": 39.58333299999504,
+      "totalMs": 66.22033299999748
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.318999999995867,
+      "executeMs": 38.04975000000559,
+      "totalMs": 63.368750000001455
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.047834000004514,
+      "executeMs": 37.85870799999975,
+      "totalMs": 63.906542000004265
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.590457999998762,
+      "executeMs": 38.730250000000524,
+      "totalMs": 64.32070799999929
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.254917000005662,
+      "executeMs": 37.91741599999659,
+      "totalMs": 63.172333000002254
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.939582999999402,
+      "executeMs": 38.85925000000134,
+      "totalMs": 64.79883300000074
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.757833000003302,
+      "executeMs": 38.52524999999878,
+      "totalMs": 64.28308300000208
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.175832999993872,
+      "executeMs": 38.33979200000613,
+      "totalMs": 64.515625
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.93370899999718,
+      "executeMs": 38.05774999999994,
+      "totalMs": 62.99145899999712
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.457959000006667,
+      "executeMs": 37.80779099999927,
+      "totalMs": 63.26575000000594
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.256792000000132,
+      "executeMs": 42.776167000003625,
+      "totalMs": 71.03295900000376
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 25.84962500000256,
+      "executeMs": 40.94195800000307,
+      "totalMs": 66.79158300000563
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 28.08979199999885,
+      "executeMs": 58.89512499999546,
+      "totalMs": 86.98491699999431
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 34.506584000002476,
+      "executeMs": 61.093957999997656,
+      "totalMs": 95.60054200000013
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 32.66041699999914,
+      "executeMs": 49.35583300000144,
+      "totalMs": 82.01625000000058
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.003083000003244,
+      "executeMs": 39.18945800000074,
+      "totalMs": 65.19254100000398
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.992708999998285,
+      "executeMs": 39.45070800000394,
+      "totalMs": 65.44341700000223
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.482041000002937,
+      "executeMs": 38.95495900000242,
+      "totalMs": 64.43700000000536
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.080332999998063,
+      "executeMs": 38.26416700000118,
+      "totalMs": 63.34449999999924
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.10441699999501,
+      "executeMs": 39.306415999999444,
+      "totalMs": 65.41083299999445
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.053665999999794,
+      "executeMs": 42.41129200000432,
+      "totalMs": 69.46495800000412
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 29.682292000004963,
+      "executeMs": 40.33558300000004,
+      "totalMs": 70.017875000005
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.266458000005514,
+      "executeMs": 38.67254199999297,
+      "totalMs": 64.93899999999849
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.35187500000029,
+      "executeMs": 37.60920800000167,
+      "totalMs": 62.96108300000196
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.218124999999418,
+      "executeMs": 39.00237499999639,
+      "totalMs": 64.22049999999581
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.2465830000001,
+      "executeMs": 48.211167000001296,
+      "totalMs": 74.4577500000014
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.775375000004715,
+      "executeMs": 40.02379199999996,
+      "totalMs": 66.79916700000467
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.782666999999492,
+      "executeMs": 39.575417000000016,
+      "totalMs": 66.35808399999951
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.891916000000492,
+      "executeMs": 38.47662500000297,
+      "totalMs": 66.36854100000346
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.87779099999898,
+      "executeMs": 39.47475000000122,
+      "totalMs": 65.3525410000002
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.2490420000031,
+      "executeMs": 41.02766600000177,
+      "totalMs": 68.27670800000487
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.418417000000773,
+      "executeMs": 39.67775000000256,
+      "totalMs": 66.09616700000333
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.48491600000125,
+      "executeMs": 38.13091700000223,
+      "totalMs": 63.61583300000348
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 24.835165999997116,
+      "executeMs": 39.15045900000405,
+      "totalMs": 63.985625000001164
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 29.82062500000029,
+      "executeMs": 64.29391699999542,
+      "totalMs": 94.11454199999571
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 28.751875000001746,
+      "executeMs": 47.69574999999895,
+      "totalMs": 76.4476250000007
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 28.99854200000118,
+      "executeMs": 48.43824999999924,
+      "totalMs": 77.43679200000042
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.84745799999655,
+      "executeMs": 42.898667000001296,
+      "totalMs": 71.74612499999785
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.274334000001545,
+      "executeMs": 36.657249999996566,
+      "totalMs": 61.93158399999811
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.70233300000109,
+      "executeMs": 37.36649999999645,
+      "totalMs": 62.06883299999754
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.454499999999825,
+      "executeMs": 39.75154100000509,
+      "totalMs": 65.20604100000492
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.422334000002593,
+      "executeMs": 37.860458000002836,
+      "totalMs": 62.28279200000543
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.990375000001222,
+      "executeMs": 38.059792000000016,
+      "totalMs": 63.05016700000124
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.174250000003667,
+      "executeMs": 39.20929099999921,
+      "totalMs": 64.38354100000288
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.2362909999938,
+      "executeMs": 38.3730840000062,
+      "totalMs": 63.609375
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.928957999996783,
+      "executeMs": 39.435959000002185,
+      "totalMs": 65.36491699999897
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.455375000005006,
+      "executeMs": 37.890041999999085,
+      "totalMs": 63.34541700000409
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.78687500000524,
+      "executeMs": 38.107332999999926,
+      "totalMs": 64.89420800000516
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.10466699999961,
+      "executeMs": 38.05050000000483,
+      "totalMs": 63.15516700000444
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.67383400000108,
+      "executeMs": 38.57729100000142,
+      "totalMs": 64.2511250000025
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.26366699999926,
+      "executeMs": 42.21399999999994,
+      "totalMs": 69.4776669999992
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 29.025707999993756,
+      "executeMs": 52.10695800000394,
+      "totalMs": 81.1326659999977
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.272083000003477,
+      "executeMs": 39.628499999998894,
+      "totalMs": 66.90058300000237
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.853416999998444,
+      "executeMs": 40.00920800000313,
+      "totalMs": 67.86262500000157
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.889083000001847,
+      "executeMs": 39.44474999999511,
+      "totalMs": 66.33383299999696
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 26.435417000000598,
+      "executeMs": 41.99495800000295,
+      "totalMs": 68.43037500000355
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 27.412374999999884,
+      "executeMs": 60.15508299999783,
+      "totalMs": 87.56745799999771
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 27.29308299999684,
+      "executeMs": 42.81266699999833,
+      "totalMs": 70.10574999999517
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 27.141708000002836,
+      "executeMs": 45.185624999998254,
+      "totalMs": 72.32733300000109
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.748790999998164,
+      "executeMs": 39.1784589999952,
+      "totalMs": 65.92724999999336
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.4742499999993,
+      "executeMs": 38.779875000000175,
+      "totalMs": 65.25412499999948
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.85612499999843,
+      "executeMs": 40.41987499999959,
+      "totalMs": 66.27599999999802
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.69108299999789,
+      "executeMs": 38.07587500000227,
+      "totalMs": 63.76695800000016
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.191208000003826,
+      "executeMs": 39.765833999997994,
+      "totalMs": 66.95704200000182
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.3338750000039,
+      "executeMs": 39.45229200000176,
+      "totalMs": 66.78616700000566
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.355124999994587,
+      "executeMs": 39.2513340000005,
+      "totalMs": 65.60645899999508
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.520917000001646,
+      "executeMs": 39.21354099999735,
+      "totalMs": 64.734457999999
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.423374999998487,
+      "executeMs": 43.96045900000172,
+      "totalMs": 71.3838340000002
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.491666999994777,
+      "executeMs": 46.393958000000566,
+      "totalMs": 74.88562499999534
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.07416699999885,
+      "executeMs": 41.76224999999977,
+      "totalMs": 69.83641699999862
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.15587499999674,
+      "executeMs": 44.25050000000192,
+      "totalMs": 72.40637499999866
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.916082999996434,
+      "executeMs": 37.835166999997455,
+      "totalMs": 62.75124999999389
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.345000000001164,
+      "executeMs": 40.583082999997714,
+      "totalMs": 66.92808299999888
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.98795799999789,
+      "executeMs": 38.49129199999879,
+      "totalMs": 65.47924999999668
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.348416000000725,
+      "executeMs": 39.05016700000124,
+      "totalMs": 66.39858300000196
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.99699999999575,
+      "executeMs": 38.29654200000368,
+      "totalMs": 64.29354199999943
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.901208999996015,
+      "executeMs": 39.7477080000026,
+      "totalMs": 66.64891699999862
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 27.065834000000905,
+      "executeMs": 42.14408299999923,
+      "totalMs": 69.20991700000013
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 26.334999999999127,
+      "executeMs": 57.26629099999991,
+      "totalMs": 83.60129099999904
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 26.864709000001312,
+      "executeMs": 43.80645799999911,
+      "totalMs": 70.67116700000042
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 28.362042000000656,
+      "executeMs": 48.25737500000105,
+      "totalMs": 76.6194170000017
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.897791999996116,
+      "executeMs": 43.81858300000022,
+      "totalMs": 71.71637499999633
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 35.674707999998645,
+      "executeMs": 51.20466699999815,
+      "totalMs": 86.8793749999968
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 74.283666000003,
+      "executeMs": 42.321209000001545,
+      "totalMs": 116.60487500000454
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.54187500000262,
+      "executeMs": 37.36616700000013,
+      "totalMs": 61.90804200000275
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.30520900000556,
+      "executeMs": 41.170500000000175,
+      "totalMs": 66.47570900000574
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 37.17541599999822,
+      "executeMs": 45.09179199999926,
+      "totalMs": 82.26720799999748
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 89.51900000000023,
+      "executeMs": 125.10008299999754,
+      "totalMs": 214.61908299999777
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 46.40083299999969,
+      "executeMs": 67.24412499999744,
+      "totalMs": 113.64495799999713
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 30.09966699999495,
+      "executeMs": 39.538916000004974,
+      "totalMs": 69.63858299999993
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.63916600000084,
+      "executeMs": 37.65220899999986,
+      "totalMs": 64.2913750000007
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 29.051124999998137,
+      "executeMs": 48.21845800000301,
+      "totalMs": 77.26958300000115
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 32.37016600000061,
+      "executeMs": 50.46491699999751,
+      "totalMs": 82.83508299999812
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.088292000000365,
+      "executeMs": 38.02958299999591,
+      "totalMs": 63.117874999996275
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.418917000002693,
+      "executeMs": 38.07654199999524,
+      "totalMs": 64.49545899999794
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.83404199999495,
+      "executeMs": 38.97137500000099,
+      "totalMs": 64.80541699999594
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.54945900000166,
+      "executeMs": 36.99704099999508,
+      "totalMs": 61.54649999999674
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.084624999995867,
+      "executeMs": 37.45325000000594,
+      "totalMs": 62.537875000001804
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 31.316916999996465,
+      "executeMs": 38.54637499999808,
+      "totalMs": 69.86329199999454
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 25.942833000000974,
+      "executeMs": 41.599583000002895,
+      "totalMs": 67.54241600000387
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 24.930499999994936,
+      "executeMs": 105.84129200000461,
+      "totalMs": 130.77179199999955
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 25.76141700000153,
+      "executeMs": 41.523291000004974,
+      "totalMs": 67.2847080000065
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 25.4405409999963,
+      "executeMs": 44.589749999999185,
+      "totalMs": 70.03029099999549
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.906000000002678,
+      "executeMs": 40.53624999999738,
+      "totalMs": 66.44225000000006
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.326583000001847,
+      "executeMs": 41.63245900000038,
+      "totalMs": 67.95904200000223
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.953083000000333,
+      "executeMs": 45.529791999993904,
+      "totalMs": 73.48287499999424
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.640708999999333,
+      "executeMs": 43.896207999998296,
+      "totalMs": 72.53691699999763
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.390375000002678,
+      "executeMs": 37.90970799999923,
+      "totalMs": 62.300083000001905
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.659167000005255,
+      "executeMs": 38.062082999997074,
+      "totalMs": 62.72125000000233
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.543583000006038,
+      "executeMs": 37.98816699999588,
+      "totalMs": 62.53175000000192
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.291666999997688,
+      "executeMs": 36.31641700000182,
+      "totalMs": 62.60808399999951
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.715416999999434,
+      "executeMs": 41.651082999997016,
+      "totalMs": 66.36649999999645
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.66920800000662,
+      "executeMs": 37.36999999999534,
+      "totalMs": 62.03920800000196
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.99987500000134,
+      "executeMs": 37.66562499999418,
+      "totalMs": 62.66549999999552
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.749667000003683,
+      "executeMs": 39.51933299999655,
+      "totalMs": 64.26900000000023
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.20604199999798,
+      "executeMs": 37.89749999999913,
+      "totalMs": 62.103541999997105
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.319875000001048,
+      "executeMs": 37.29291699999885,
+      "totalMs": 64.6127919999999
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.52887500000361,
+      "executeMs": 37.31266699999833,
+      "totalMs": 61.84154200000194
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.288249999997788,
+      "executeMs": 40.70016700000269,
+      "totalMs": 65.98841700000048
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.44933299999684,
+      "executeMs": 39.21008299999812,
+      "totalMs": 64.65941599999496
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 30.689666999998735,
+      "executeMs": 43.50087500000518,
+      "totalMs": 74.19054200000392
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 31.747457999998005,
+      "executeMs": 65.5537089999998,
+      "totalMs": 97.3011669999978
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 29.71966699999757,
+      "executeMs": 68.09141700000328,
+      "totalMs": 97.81108400000085
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 30.16279100000247,
+      "executeMs": 52.15441699999792,
+      "totalMs": 82.31720800000039
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 52.23099999999977,
+      "executeMs": 83.56787500000064,
+      "totalMs": 135.7988750000004
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 64.0187089999963,
+      "executeMs": 70.38637500000186,
+      "totalMs": 134.40508399999817
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 55.88829099999566,
+      "executeMs": 69.9179590000058,
+      "totalMs": 125.80625000000146
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 29.26933399999689,
+      "executeMs": 41.8047080000033,
+      "totalMs": 71.07404200000019
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.16370900000038,
+      "executeMs": 37.260957999998936,
+      "totalMs": 61.42466699999932
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.680125000006228,
+      "executeMs": 44.74187499999971,
+      "totalMs": 71.42200000000594
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.37287500000093,
+      "executeMs": 37.639540999996825,
+      "totalMs": 62.012415999997756
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.645917000001646,
+      "executeMs": 38.71783299999515,
+      "totalMs": 63.3637499999968
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.746832999997423,
+      "executeMs": 37.77883400000428,
+      "totalMs": 62.525667000001704
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.76683399999456,
+      "executeMs": 38.06204100000468,
+      "totalMs": 63.82887499999924
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.120167000000947,
+      "executeMs": 37.0859580000033,
+      "totalMs": 62.20612500000425
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.186125000000175,
+      "executeMs": 37.41150000000198,
+      "totalMs": 61.597625000002154
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.627082999999402,
+      "executeMs": 40.228416999998444,
+      "totalMs": 65.85549999999785
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.144500000002154,
+      "executeMs": 42.68229199999769,
+      "totalMs": 69.82679199999984
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 31.907791999998153,
+      "executeMs": 47.704750000004424,
+      "totalMs": 79.61254200000258
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.858916999997746,
+      "executeMs": 39.61079199999949,
+      "totalMs": 67.46970899999724
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.526332999994338,
+      "executeMs": 41.197542000001704,
+      "totalMs": 67.72387499999604
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.709541999996873,
+      "executeMs": 40.29354100000637,
+      "totalMs": 67.00308300000324
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.714333000003535,
+      "executeMs": 41.11920899999677,
+      "totalMs": 66.8335420000003
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 26.635999999998603,
+      "executeMs": 41.92466699999932,
+      "totalMs": 68.56066699999792
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 25.56904200000281,
+      "executeMs": 60.24349999999686,
+      "totalMs": 85.81254199999967
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 26.827332999993814,
+      "executeMs": 43.71079200000531,
+      "totalMs": 70.53812499999913
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 25.238499999999476,
+      "executeMs": 47.39470799999981,
+      "totalMs": 72.63320799999929
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.588792000002286,
+      "executeMs": 41.04358299999876,
+      "totalMs": 68.63237500000105
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.672958000002836,
+      "executeMs": 40.98420900000201,
+      "totalMs": 67.65716700000485
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.192291999999725,
+      "executeMs": 38.17474999999831,
+      "totalMs": 64.36704199999804
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.081958000002487,
+      "executeMs": 39.218375000004016,
+      "totalMs": 64.3003330000065
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.68504199999734,
+      "executeMs": 42.438583000002836,
+      "totalMs": 69.12362500000017
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.106209000005038,
+      "executeMs": 39.788290999997116,
+      "totalMs": 65.89450000000215
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.919792000000598,
+      "executeMs": 45.375833000005514,
+      "totalMs": 71.29562500000611
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.539291000000958,
+      "executeMs": 39.07379200000287,
+      "totalMs": 64.61308300000383
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.57508300000336,
+      "executeMs": 38.36666699999478,
+      "totalMs": 62.94174999999814
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.63808300000528,
+      "executeMs": 41.6229170000006,
+      "totalMs": 69.26100000000588
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.868374999998196,
+      "executeMs": 39.958874999996624,
+      "totalMs": 65.82724999999482
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 29.171375000005355,
+      "executeMs": 44.01595799999632,
+      "totalMs": 73.18733300000167
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.817457999997714,
+      "executeMs": 40.87812500000291,
+      "totalMs": 66.69558300000062
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 33.59533299999748,
+      "executeMs": 43.84058299999742,
+      "totalMs": 77.4359159999949
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.81754099999671,
+      "executeMs": 38.324625000001106,
+      "totalMs": 65.14216599999781
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.88758300000336,
+      "executeMs": 38.99624999999651,
+      "totalMs": 63.88383299999987
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.582374999998137,
+      "executeMs": 39.58466600000247,
+      "totalMs": 66.16704100000061
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 29.244499999993423,
+      "executeMs": 39.3072500000053,
+      "totalMs": 68.55174999999872
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 25.307041000000027,
+      "executeMs": 41.20391699999891,
+      "totalMs": 66.51095799999894
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 26.81458399999974,
+      "executeMs": 56.61237500000425,
+      "totalMs": 83.42695900000399
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 26.28370800000266,
+      "executeMs": 43.69479199999478,
+      "totalMs": 69.97849999999744
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 27.64766700000473,
+      "executeMs": 44.576750000000175,
+      "totalMs": 72.2244170000049
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.160916000000725,
+      "executeMs": 38.97112499999639,
+      "totalMs": 65.13204099999712
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.575708000003942,
+      "executeMs": 40.26195899999584,
+      "totalMs": 66.83766699999978
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.78162500000326,
+      "executeMs": 40.79716699999699,
+      "totalMs": 67.57879200000025
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.17558399999689,
+      "executeMs": 38.885332999998354,
+      "totalMs": 67.06091699999524
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.733625000000757,
+      "executeMs": 38.538667000000714,
+      "totalMs": 64.27229200000147
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.375832999998238,
+      "executeMs": 38.25941700000112,
+      "totalMs": 63.63524999999936
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.370041000001947,
+      "executeMs": 37.5247920000038,
+      "totalMs": 61.89483300000575
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.80174999999872,
+      "executeMs": 38.19024999999965,
+      "totalMs": 62.99199999999837
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.455584000003,
+      "executeMs": 39.41033299999981,
+      "totalMs": 64.86591700000281
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.901707999997598,
+      "executeMs": 38.86104200000409,
+      "totalMs": 63.76275000000169
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.171041000001424,
+      "executeMs": 39.23266700000386,
+      "totalMs": 66.40370800000528
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.10399999999936,
+      "executeMs": 39.5682500000039,
+      "totalMs": 65.67225000000326
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.149875000002794,
+      "executeMs": 38.052624999996624,
+      "totalMs": 63.20249999999942
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.66783299999952,
+      "executeMs": 39.53587499999412,
+      "totalMs": 66.20370799999364
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.092500000006112,
+      "executeMs": 40.43874999999389,
+      "totalMs": 66.53125
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.475084000005154,
+      "executeMs": 38.815999999998894,
+      "totalMs": 65.29108400000405
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.130624999997963,
+      "executeMs": 37.51145800000086,
+      "totalMs": 63.64208299999882
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.68779199999699,
+      "executeMs": 38.51204200000211,
+      "totalMs": 63.1998339999991
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 25.1351250000007,
+      "executeMs": 41.18600000000151,
+      "totalMs": 66.32112500000221
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 24.92833399999654,
+      "executeMs": 56.89749999999913,
+      "totalMs": 81.82583399999567
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 25.156792000001587,
+      "executeMs": 42.951958000005106,
+      "totalMs": 68.1087500000067
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 25.33666600000288,
+      "executeMs": 44.227083999998285,
+      "totalMs": 69.56375000000116
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.606082999998762,
+      "executeMs": 40.08812499999476,
+      "totalMs": 66.69420799999352
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.274083999996947,
+      "executeMs": 39.29533300000185,
+      "totalMs": 65.5694169999988
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 30.583833000004233,
+      "executeMs": 41.04733399999532,
+      "totalMs": 71.63116699999955
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.309625000001688,
+      "executeMs": 40.05554200000188,
+      "totalMs": 66.36516700000357
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.546167000000423,
+      "executeMs": 47.02654099999927,
+      "totalMs": 74.5727079999997
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.41737500000454,
+      "executeMs": 42.798125000001164,
+      "totalMs": 70.2155000000057
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 31.997124999994412,
+      "executeMs": 63.859041000003344,
+      "totalMs": 95.85616599999776
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 33.02704100000119,
+      "executeMs": 39.80108399999881,
+      "totalMs": 72.828125
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.744041999998444,
+      "executeMs": 36.440167000000656,
+      "totalMs": 63.1842089999991
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.077125000003434,
+      "executeMs": 38.451082999999926,
+      "totalMs": 63.52820800000336
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.005458999999973,
+      "executeMs": 38.16933300000528,
+      "totalMs": 63.174792000005255
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.30054100000416,
+      "executeMs": 38.609749999995984,
+      "totalMs": 63.91029100000014
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.98570800000016,
+      "executeMs": 38.09362500000134,
+      "totalMs": 64.0793330000015
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.629582999994454,
+      "executeMs": 39.16504200000054,
+      "totalMs": 64.794624999995
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.565417000005255,
+      "executeMs": 38.696499999998196,
+      "totalMs": 64.26191700000345
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.289166000002297,
+      "executeMs": 39.35099999999511,
+      "totalMs": 65.64016599999741
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.122082999994745,
+      "executeMs": 39.319334000007075,
+      "totalMs": 65.44141700000182
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.240499999999884,
+      "executeMs": 39.28599999999278,
+      "totalMs": 65.52649999999267
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 26.09625000000233,
+      "executeMs": 42.59379199999967,
+      "totalMs": 68.690042000002
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 24.46287500001199,
+      "executeMs": 56.32391700000153,
+      "totalMs": 80.78679200001352
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 25.798832999993465,
+      "executeMs": 44.38404200000514,
+      "totalMs": 70.1828749999986
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 28.443499999993946,
+      "executeMs": 44.922082999997656,
+      "totalMs": 73.3655829999916
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.29158400000597,
+      "executeMs": 39.97874999999476,
+      "totalMs": 68.27033400000073
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.140874999997322,
+      "executeMs": 36.79208300000755,
+      "totalMs": 62.932958000004874
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.727333999995608,
+      "executeMs": 37.365499999999884,
+      "totalMs": 62.09283399999549
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.135874999992666,
+      "executeMs": 36.630833000002895,
+      "totalMs": 61.76670799999556
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 23.69275000000198,
+      "executeMs": 37.113666999997804,
+      "totalMs": 60.80641699999978
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.407041999991634,
+      "executeMs": 60.604458000001614,
+      "totalMs": 86.01149999999325
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.729666999992332,
+      "executeMs": 41.12929100000474,
+      "totalMs": 66.85895799999707
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.56462500001362,
+      "executeMs": 40.95024999999441,
+      "totalMs": 68.51487500000803
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.42112499999348,
+      "executeMs": 44.645000000004075,
+      "totalMs": 73.06612499999756
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.717166999995243,
+      "executeMs": 42.64758299999812,
+      "totalMs": 69.36474999999336
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.935874999995576,
+      "executeMs": 37.132334000008996,
+      "totalMs": 62.06820900000457
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.182041000007303,
+      "executeMs": 37.368416999990586,
+      "totalMs": 61.55045799999789
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.195416000002297,
+      "executeMs": 37.93725000000268,
+      "totalMs": 63.132666000004974
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.434666000001016,
+      "executeMs": 37.492333999995026,
+      "totalMs": 61.92699999999604
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.761999999987893,
+      "executeMs": 37.37345800000185,
+      "totalMs": 62.13545799998974
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.27766700000211,
+      "executeMs": 38.74224999999569,
+      "totalMs": 63.019916999997804
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.514832999993814,
+      "executeMs": 41.51675000000978,
+      "totalMs": 68.0315830000036
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.711999999999534,
+      "executeMs": 39.94495800000732,
+      "totalMs": 65.65695800000685
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 24.145333000007668,
+      "executeMs": 39.99124999999185,
+      "totalMs": 64.13658299999952
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 25.429917000001296,
+      "executeMs": 59.62608299999556,
+      "totalMs": 85.05599999999686
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 30.600333999987924,
+      "executeMs": 56.77300000000105,
+      "totalMs": 87.37333399998897
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 43.460917000003974,
+      "executeMs": 59.89154099998996,
+      "totalMs": 103.35245799999393
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.741167000000132,
+      "executeMs": 40.5487909999938,
+      "totalMs": 68.28995799999393
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.839749999999185,
+      "executeMs": 37.553249999997206,
+      "totalMs": 62.39299999999639
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.000249999997322,
+      "executeMs": 37.35879100000602,
+      "totalMs": 65.35904100000334
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.353457999997772,
+      "executeMs": 38.192207999993116,
+      "totalMs": 63.54566599999089
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 23.86241699999664,
+      "executeMs": 37.4699580000015,
+      "totalMs": 61.33237499999814
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.896666999993613,
+      "executeMs": 37.60845800000243,
+      "totalMs": 62.50512499999604
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.312209000010625,
+      "executeMs": 39.14279099999112,
+      "totalMs": 63.455000000001746
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.875249999997322,
+      "executeMs": 37.03650000000198,
+      "totalMs": 61.9117499999993
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.125749999991967,
+      "executeMs": 38.48237500000687,
+      "totalMs": 65.60812499999884
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.569292000000132,
+      "executeMs": 37.12254199999734,
+      "totalMs": 62.69183399999747
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.064832999996725,
+      "executeMs": 37.264291999992565,
+      "totalMs": 62.32912499998929
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.364042000001064,
+      "executeMs": 36.78812499999185,
+      "totalMs": 62.152166999992914
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.508832999999868,
+      "executeMs": 38.05799999998999,
+      "totalMs": 62.566832999989856
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.154458000004524,
+      "executeMs": 39.20158300000185,
+      "totalMs": 66.35604100000637
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.677792000002228,
+      "executeMs": 38.135957999998936,
+      "totalMs": 63.813750000001164
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.04008399999293,
+      "executeMs": 38.41120800000499,
+      "totalMs": 63.45129199999792
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.006792000000132,
+      "executeMs": 39.12741699999606,
+      "totalMs": 63.13420899999619
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.540750000000116,
+      "executeMs": 40.085917000003974,
+      "totalMs": 65.62666700000409
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 46.0190419999999,
+      "executeMs": 71.85749999999825,
+      "totalMs": 117.87654199999815
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 41.156374999991385,
+      "executeMs": 64.55537500001083,
+      "totalMs": 105.71175000000221
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 34.80545799998799,
+      "executeMs": 45.0671250000014,
+      "totalMs": 79.87258299998939
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 24.71183299999393,
+      "executeMs": 44.8092089999991,
+      "totalMs": 69.52104199999303
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.98812499998894,
+      "executeMs": 41.815207999999984,
+      "totalMs": 66.80333299998892
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.372707999995328,
+      "executeMs": 38.766958000007435,
+      "totalMs": 65.13966600000276
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.877332999996725,
+      "executeMs": 38.71700000000419,
+      "totalMs": 65.59433300000092
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.346583999998984,
+      "executeMs": 38.7934580000001,
+      "totalMs": 64.14004199999908
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.126499999998487,
+      "executeMs": 39.574583000008715,
+      "totalMs": 66.7010830000072
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.64162500000384,
+      "executeMs": 37.67687500000466,
+      "totalMs": 62.3185000000085
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.043625000005704,
+      "executeMs": 38.70529100000567,
+      "totalMs": 63.74891600001138
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.872291000006953,
+      "executeMs": 38.96733400000085,
+      "totalMs": 63.8396250000078
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.1935000000085,
+      "executeMs": 43.66083300000173,
+      "totalMs": 70.85433300001023
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.060958000001847,
+      "executeMs": 40.86849999999686,
+      "totalMs": 67.9294579999987
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.014083000001847,
+      "executeMs": 40.966042000000016,
+      "totalMs": 67.98012500000186
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.63095799999428,
+      "executeMs": 39.81500000000233,
+      "totalMs": 65.44595799999661
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.976125000001048,
+      "executeMs": 38.393874999994296,
+      "totalMs": 64.36999999999534
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.95054100001289,
+      "executeMs": 40.113666999997804,
+      "totalMs": 67.0642080000107
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.769957999989856,
+      "executeMs": 39.26670800001011,
+      "totalMs": 66.03666599999997
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 29.682874999998603,
+      "executeMs": 45.192875000007916,
+      "totalMs": 74.87575000000652
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 29.552624999996624,
+      "executeMs": 43.6672499999986,
+      "totalMs": 73.21987499999523
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.285249999986263,
+      "executeMs": 40.56875000000582,
+      "totalMs": 68.85399999999208
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 25.39108300000953,
+      "executeMs": 40.949791999999434,
+      "totalMs": 66.34087500000896
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 28.092250000001513,
+      "executeMs": 61.72070800000802,
+      "totalMs": 89.81295800000953
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 27.307750000007218,
+      "executeMs": 46.40654199999699,
+      "totalMs": 73.7142920000042
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 24.140500000008615,
+      "executeMs": 41.838374999992084,
+      "totalMs": 65.9788750000007
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.231583000000683,
+      "executeMs": 39.91662499999802,
+      "totalMs": 66.1482079999987
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.349333000005572,
+      "executeMs": 38.129082999992534,
+      "totalMs": 63.478415999998106
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.247959000000264,
+      "executeMs": 38.37758299999405,
+      "totalMs": 63.62554199999431
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.988708000004408,
+      "executeMs": 38.44016699999338,
+      "totalMs": 63.42887499999779
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.508665999994264,
+      "executeMs": 38.62904200000048,
+      "totalMs": 65.13770799999475
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.559500000003027,
+      "executeMs": 39.393041000002995,
+      "totalMs": 64.95254100000602
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.906667000002926,
+      "executeMs": 39.44091600000684,
+      "totalMs": 65.34758300000976
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.27516599999217,
+      "executeMs": 39.20045899999968,
+      "totalMs": 64.47562499999185
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.01241700000537,
+      "executeMs": 38.59304199999315,
+      "totalMs": 64.60545899999852
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.653082999997423,
+      "executeMs": 38.55762500000128,
+      "totalMs": 64.2107079999987
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.912750000003143,
+      "executeMs": 38.419167000000016,
+      "totalMs": 64.33191700000316
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.163625000001048,
+      "executeMs": 38.40262499998789,
+      "totalMs": 63.56624999998894
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.40587499999674,
+      "executeMs": 38.95979100000113,
+      "totalMs": 64.36566599999787
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.661999999996624,
+      "executeMs": 41.0184159999917,
+      "totalMs": 67.68041599998833
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.108124999998836,
+      "executeMs": 44.70937500000582,
+      "totalMs": 72.81750000000466
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.815792000008514,
+      "executeMs": 39.99354199999652,
+      "totalMs": 67.80933400000504
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.204791000011028,
+      "executeMs": 36.78816699999152,
+      "totalMs": 61.992958000002545
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.76662500000384,
+      "executeMs": 37.49741599999834,
+      "totalMs": 62.26404100000218
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 25.59008399999584,
+      "executeMs": 40.99445800000103,
+      "totalMs": 66.58454199999687
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 25.940290999991703,
+      "executeMs": 56.02329200001259,
+      "totalMs": 81.96358300000429
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 26.201249999998254,
+      "executeMs": 42.399583000005805,
+      "totalMs": 68.60083300000406
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 25.328916999991634,
+      "executeMs": 43.5583750000078,
+      "totalMs": 68.88729199999943
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.464374999995925,
+      "executeMs": 37.788000000000466,
+      "totalMs": 63.25237499999639
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.690417000005255,
+      "executeMs": 42.07849999998871,
+      "totalMs": 70.76891699999396
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 30.60129200000665,
+      "executeMs": 45.806540999998106,
+      "totalMs": 76.40783300000476
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.814707999990787,
+      "executeMs": 39.817250000007334,
+      "totalMs": 66.63195799999812
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.42579100000148,
+      "executeMs": 39.33541700000933,
+      "totalMs": 66.76120800001081
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.070833999998285,
+      "executeMs": 39.56695799999579,
+      "totalMs": 66.63779199999408
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.572958999997354,
+      "executeMs": 37.28466600000684,
+      "totalMs": 63.85762500000419
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.788541999994777,
+      "executeMs": 38.88666600000579,
+      "totalMs": 65.67520800000057
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.286332999996375,
+      "executeMs": 40.75358299999789,
+      "totalMs": 69.03991599999426
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.137083999987226,
+      "executeMs": 40.4256660000101,
+      "totalMs": 67.56274999999732
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.10845899999549,
+      "executeMs": 37.11437500000466,
+      "totalMs": 61.22283400000015
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.49000000000524,
+      "executeMs": 37.28833399999712,
+      "totalMs": 61.77833400000236
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.78041699998721,
+      "executeMs": 39.81625000000349,
+      "totalMs": 65.5966669999907
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.868875000000116,
+      "executeMs": 42.007041999997455,
+      "totalMs": 67.87591699999757
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.24291600000288,
+      "executeMs": 39.7710839999927,
+      "totalMs": 65.01399999999558
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.91287499999453,
+      "executeMs": 38.83950000000186,
+      "totalMs": 63.75237499999639
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.541041999997105,
+      "executeMs": 42.39795800000138,
+      "totalMs": 69.93899999999849
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.544083000000683,
+      "executeMs": 42.46012499999779,
+      "totalMs": 70.00420799999847
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 24.488042000011774,
+      "executeMs": 38.96316599998681,
+      "totalMs": 63.45120799999859
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 25.54579200000444,
+      "executeMs": 58.65595800000301,
+      "totalMs": 84.20175000000745
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 24.830916999999317,
+      "executeMs": 42.52116699999897,
+      "totalMs": 67.35208399999829
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 26.676416999995126,
+      "executeMs": 45.327416000000085,
+      "totalMs": 72.00383299999521
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.81895900001109,
+      "executeMs": 38.415290999997524,
+      "totalMs": 64.23425000000861
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.632583000013256,
+      "executeMs": 38.903083999990486,
+      "totalMs": 65.53566700000374
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.63008400000399,
+      "executeMs": 39.46304099999543,
+      "totalMs": 65.09312499999942
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.309875000006286,
+      "executeMs": 38.41008299999521,
+      "totalMs": 63.7199580000015
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 28.552166000008583,
+      "executeMs": 40.75866700000188,
+      "totalMs": 69.31083300001046
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.549666999999317,
+      "executeMs": 40.39829099999042,
+      "totalMs": 66.94795799998974
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.156166000000667,
+      "executeMs": 38.98291699998663,
+      "totalMs": 65.1390829999873
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.63475000001199,
+      "executeMs": 38.76008300000103,
+      "totalMs": 66.39483300001302
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.75833299999067,
+      "executeMs": 38.59945900000457,
+      "totalMs": 64.35779199999524
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.138042000005953,
+      "executeMs": 39.37012500000128,
+      "totalMs": 65.50816700000723
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.46312499999476,
+      "executeMs": 38.61091699999815,
+      "totalMs": 65.07404199999291
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.569083999987924,
+      "executeMs": 38.23929100000532,
+      "totalMs": 62.80837499999325
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.19062500000291,
+      "executeMs": 38.97895799999242,
+      "totalMs": 64.16958299999533
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.923374999998487,
+      "executeMs": 37.33170799999789,
+      "totalMs": 64.25508299999638
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.06524999999965,
+      "executeMs": 37.74170800000138,
+      "totalMs": 62.80695800000103
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.516708000010112,
+      "executeMs": 38.1004580000008,
+      "totalMs": 63.61716600001091
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.29899999999907,
+      "executeMs": 38.09766600000148,
+      "totalMs": 63.39666600000055
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.142874999990454,
+      "executeMs": 39.41275000000314,
+      "totalMs": 65.5556249999936
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 26.99391599999217,
+      "executeMs": 44.87862500001211,
+      "totalMs": 71.87254100000428
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 27.11212499999965,
+      "executeMs": 59.41279200000281,
+      "totalMs": 86.52491700000246
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 27.541207999995095,
+      "executeMs": 46.57995899999514,
+      "totalMs": 74.12116699999024
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 25.61379200000374,
+      "executeMs": 46.99479199999769,
+      "totalMs": 72.60858400000143
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.040042000007816,
+      "executeMs": 38.48620800000208,
+      "totalMs": 65.5262500000099
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.291207999995095,
+      "executeMs": 39.032042000006186,
+      "totalMs": 65.32325000000128
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.36525000000256,
+      "executeMs": 38.1229170000006,
+      "totalMs": 63.48816700000316
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.029541000010795,
+      "executeMs": 39.15337499999441,
+      "totalMs": 66.1829160000052
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.001624999989872,
+      "executeMs": 38.74116700000013,
+      "totalMs": 63.742791999990004
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.254000000000815,
+      "executeMs": 37.56508299999405,
+      "totalMs": 61.81908299999486
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.33812499999476,
+      "executeMs": 36.920249999995576,
+      "totalMs": 61.25837499999034
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.482084000002942,
+      "executeMs": 38.85308299999451,
+      "totalMs": 64.33516699999745
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.14566699998977,
+      "executeMs": 39.712833000012324,
+      "totalMs": 64.8585000000021
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.969625000012456,
+      "executeMs": 38.76616699999431,
+      "totalMs": 64.73579200000677
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.147332999986247,
+      "executeMs": 41.83025000001362,
+      "totalMs": 66.97758299999987
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 26.583958000002895,
+      "executeMs": 38.40133400000923,
+      "totalMs": 64.98529200001212
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.101917000007234,
+      "executeMs": 37.89145799999824,
+      "totalMs": 62.99337500000547
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.368625000002794,
+      "executeMs": 37.51404099998763,
+      "totalMs": 61.88266599999042
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.145541000005323,
+      "executeMs": 37.48862499999814,
+      "totalMs": 61.63416600000346
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.043000000005122,
+      "executeMs": 37.499291000000085,
+      "totalMs": 61.54229100000521
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.407374999995227,
+      "executeMs": 37.197667000000365,
+      "totalMs": 61.60504199999559
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 24.151333999994677,
+      "executeMs": 36.710332999995444,
+      "totalMs": 60.86166699999012
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 24.733708999992814,
+      "executeMs": 41.53341600000567,
+      "totalMs": 66.26712499999849
+    }
+  ],
+  "completedOperations": 528,
+  "ingressScenarios": {
+    "deterministicRejected": {
+      "operationId": "annual:2026:2026-R1-1:h1:rejected",
+      "leaseId": "9d08918f-3785-45f2-b0a0-e637e05c2936",
+      "code": "INVALID_GROSS_SCORES",
+      "state": "NOT_COMMITTED"
+    },
+    "unresolved": {
+      "input": {
+        "contract_version": "certification-runtime-v1",
+        "resource": {
+          "resource_id": "CERTIFICATION:5bf927ba-7706-4329-9d6c-06edb4ca2ee3",
+          "resource_class": "CERTIFICATION",
+          "installation_id": "5bf927ba-7706-4329-9d6c-06edb4ca2ee3",
+          "project_ref": "aaaaaaaaaaaaaaaaaaaa",
+          "project_url": "https://aaaaaaaaaaaaaaaaaaaa.supabase.co",
+          "vercel_team_id": "team_syntheticcertification",
+          "vercel_project_id": "prj_syntheticcertification",
+          "registration_revision": 1,
+          "manifest_digest": "750d7685bc8b3038bf45e78b38638858f94d481a9363ef1703ac4d47ff0e1d30",
+          "schema_contract": "canonical-resource-v1",
+          "schema_digest": "9756b80f4156288b247e184511cb0eae2d7cc99f96061af5563d4a3d9062fa6d"
+        },
+        "deployment": {
+          "vercel_team_id": "team_syntheticcertification",
+          "vercel_project_id": "prj_syntheticcertification",
+          "git_branch": "codex/synthetic-resource-proof",
+          "deployment_class": "preview",
+          "release_commit": "cccccccccccccccccccccccccccccccccccccccc",
+          "deployment_id": "dpl_synthetic_certification_0",
+          "deployment_origin": "https://synthetic-certification-0.vercel.app"
+        },
+        "phase": "SCORING",
+        "authorization": {
+          "tournament_id": "2026",
+          "role": "PLAYER",
+          "auth_user_id": "10000000-0000-4000-8000-000000000001",
+          "player_id": "P01",
+          "match_id": "2026-R1-1",
+          "permission_revision": 2
+        },
+        "operation_id": "SCORING.SUBMIT_HOLE",
+        "payload": {
+          "match_id": "2026-R1-1",
+          "mutation_key": "annual:2026:2026-R1-1:h1:unresolved",
+          "hole_number": 1,
+          "expected_match_revision": 3,
+          "expected_hole_revision": 0,
+          "team_1_gross_scores": [
+            4,
+            4
+          ],
+          "team_2_gross_scores": [
+            5,
+            5
+          ]
+        },
+        "operation_request_id": "annual:2026:2026-R1-1:h1:unresolved",
+        "expected_context_token": "70c28a789a7fa26c5f1716a437396b538251a31c61925bad6756e7a90a8f28b9"
+      },
+      "leaseId": "51586b8e-776a-4bab-95ce-ade748d3469f",
+      "state": "UNKNOWN"
+    },
+    "lostAcknowledgement": {
+      "operationId": "annual:2026:2026-R1-1:h1",
+      "leaseId": "f983ad13-2c5c-4a53-aa35-6a0f23c3c05b",
+      "state": "COMMITTED",
+      "method": "Discard committed RPC response before caller recovery"
+    }
+  }
+}

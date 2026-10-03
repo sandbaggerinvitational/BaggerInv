@@ -1,0 +1,46 @@
+{
+  "environment": "OWNED_UNIX_SOCKET_ONLY_POSTGRESQL17",
+  "productionAccess": false,
+  "hostedAccess": false,
+  "googleCalls": 0,
+  "sourceHashes": {
+    "test/reliability-phase2dr2-resource-isolation.integration.test.mjs": "976ac710494e50883c02bcf8ca68fa81a41f96bb1f1d6a889365167931e984e9",
+    "test/reliability-phase2dr2-production-equivalence.integration.test.mjs": "25ee876ba633ba543c4664deee4770820fffb0f8c2c9dd3ded8400a15249ed46",
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8"
+  },
+  "productionEquivalence": {
+    "result": "PASS",
+    "nodeCounts": {
+      "pass": 2,
+      "fail": 0,
+      "skip": 0
+    },
+    "evidence": "production-protected-equivalence.json",
+    "scope": "Real protected local platform fixture; read, setup, Lock, grant denial, financial effects/replay, normal release admission and rejection; not full annual transition"
+  },
+  "twoCertificationDatabases": {
+    "result": "PASS",
+    "nodeCounts": {
+      "pass": 7,
+      "fail": 0,
+      "skip": 0
+    },
+    "behaviorCases": 6,
+    "durationMs": 18778.449792,
+    "evidence": "resource-isolation-results.json",
+    "log": "resource-isolation-final.log"
+  },
+  "limitations": [
+    "Two fresh Certification physical databases, not Production-vs-Certification cross-database matrix",
+    "Protected Production-shaped proof uses a separate synthetic local fixture, never real Production",
+    "Worker boundary includes foreign-resource denial and positive idle tick; nonempty worker processing proved separately",
+    "Earlier resource-isolation failures were fixture contract assertions: resource error enum and raw financial projection response, corrected without source changes",
+    "138/139 annual transition and authoring excluded from this result"
+  ]
+}

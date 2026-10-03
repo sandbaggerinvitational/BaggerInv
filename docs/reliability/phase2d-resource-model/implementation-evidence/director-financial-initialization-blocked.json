@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-09-30T20:27:25.060402+00:00",
+  "result": "NOT_PROVEN_ENVIRONMENT_BLOCKED",
+  "environment": "OWNED_LOCAL_POSTGRESQL17_INITIALIZATION",
+  "runtimeCasesExecuted": 0,
+  "schemaInstalled": false,
+  "attempts": [
+    {
+      "sandboxed": true,
+      "failure": "shmget Operation not permitted",
+      "bootstrapPid": 72639,
+      "ownedDirectory": "bagger-reliability-pg17-EHY4cp"
+    },
+    {
+      "sandboxed": false,
+      "normalApprovalReview": "PERMITTED",
+      "failure": "shmget No space left on device",
+      "bootstrapPid": 72944,
+      "ownedDirectory": "bagger-reliability-pg17-OENdgA"
+    }
+  ],
+  "cleanup": {
+    "unknownIpcTouched": false,
+    "hostSettingsChanged": false,
+    "ownedDirectoriesRemain": []
+  },
+  "files": {
+    "test/reliability-phase2dr2-director.integration.test.mjs": "4d1ba2abbb98b1989e25f6d621b7d85790a61c67fff44226bbcb1fdb27d0920a",
+    "test/support/reliability/certification-director-proof.mjs": "b024e778e43fa20e354b0eecf4e67042af8f540862daae475c15e5067390f9ab",
+    "test/support/reliability/postgres17.mjs": "c2942a243fa0af4f56025f7f027aeba49c69710d561f36093542407c16b59bd6"
+  },
+  "log": "director-financial-initialization-blocked.log",
+  "logSha256": "b9b755141acb028394c2da23b73f5dc57a0c21ac437eebffc260edde0fec9dde",
+  "attemptArtifacts": [
+    {
+      "path": "docs/reliability/phase2d-resource-model/implementation-evidence/director-financial-2026-09-30T20-25-39.338Z.json",
+      "runtimeCasesExecuted": 0,
+      "meaning": "Initialization did not reach any runtime subtest; zero recorded failures is not PASS."
+    },
+    {
+      "path": "docs/reliability/phase2d-resource-model/implementation-evidence/director-financial-2026-09-30T20-26-12.564Z.json",
+      "runtimeCasesExecuted": 0,
+      "meaning": "Initialization did not reach any runtime subtest; zero recorded failures is not PASS."
+    }
+  ],
+  "productionAccess": false,
+  "hostedAccess": false,
+  "googleAccess": false,
+  "interpretation": "Source-prepared proof only. Local host initialization failed before installation or any candidate runtime assertion; not a candidate SQL failure and not a PASS."
+}

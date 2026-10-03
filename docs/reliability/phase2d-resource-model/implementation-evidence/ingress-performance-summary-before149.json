@@ -1,0 +1,686 @@
+{
+  "recordedAt": "2026-10-03T00:27:19.693908+00:00",
+  "status": "PASS_SCOPED_LOCAL_IRRELEVANT_INGRESS_HISTORY_MEASUREMENT",
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "profile": [
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql"
+  ],
+  "completeCandidateCertified": false,
+  "excludedMigration": 144,
+  "fixture": "CERTIFICATION_INGRESS_HISTORY_V1",
+  "sampleCount": 6800,
+  "samplesPerPrimaryOperationPerScale": 300,
+  "samplesPerFingerprintOrClosePerScale": 100,
+  "warmupSamplesExcluded": 100,
+  "sourceStable": true,
+  "googleJobs": 0,
+  "method": "psql timing of one real RPC inside a rollback-only sample; persistent socket within each batch",
+  "statementTimeoutMs": 5000,
+  "workerActivity": "NO_CONCURRENT_WORKERS",
+  "clusterCleanup": "Completed after awaited destroyIsolatedCluster; process exit0.",
+  "rows": [
+    {
+      "scale": 1,
+      "terminalHistory": 432,
+      "operations": {
+        "admission": {
+          "count": 300,
+          "p50": 0.437,
+          "p95": 0.953,
+          "p99": null,
+          "max": 6.812,
+          "mean": 0.5339800000000001,
+          "standardDeviation": 0.6391016765220799
+        },
+        "canonicalExecutionIncludingTerminal": {
+          "count": 300,
+          "p50": 1.939,
+          "p95": 2.691,
+          "p99": null,
+          "max": 13.378,
+          "mean": 2.115990000000002,
+          "standardDeviation": 1.147108708841495
+        },
+        "recovery": {
+          "count": 300,
+          "p50": 0.137,
+          "p95": 0.344,
+          "p99": null,
+          "max": 3.32,
+          "mean": 0.18089333333333343,
+          "standardDeviation": 0.3110176339409426
+        },
+        "contextHandshake": {
+          "count": 300,
+          "p50": 0.084,
+          "p95": 0.138,
+          "p99": null,
+          "max": 2.886,
+          "mean": 0.11490333333333337,
+          "standardDeviation": 0.26762143783503056
+        },
+        "currentRead": {
+          "count": 300,
+          "p50": 3.201,
+          "p95": 3.537,
+          "p99": null,
+          "max": 9.599,
+          "mean": 3.2981766666666696,
+          "standardDeviation": 0.6128469619643137
+        },
+        "fingerprint": {
+          "count": 100,
+          "p50": 0.074,
+          "p95": 0.12,
+          "p99": null,
+          "max": 1.89,
+          "mean": 0.09661999999999994,
+          "standardDeviation": 0.1807673521408109
+        },
+        "closeDrain": {
+          "count": 100,
+          "p50": 0.26,
+          "p95": 0.353,
+          "p99": null,
+          "max": 3.037,
+          "mean": 0.29824000000000017,
+          "standardDeviation": 0.2775925834744149
+        }
+      },
+      "executionBatches": [
+        {
+          "operation": "canonicalExecutionIncludingTerminal",
+          "batch": 1,
+          "count": 100,
+          "success": 100,
+          "failures": 0,
+          "p50": 1.927,
+          "p95": 2.639,
+          "p99": null,
+          "p99Status": "NOT_PROVEN",
+          "max": 13.378,
+          "mean": 2.09805,
+          "standardDeviation": 1.150330112402522
+        },
+        {
+          "operation": "canonicalExecutionIncludingTerminal",
+          "batch": 2,
+          "count": 100,
+          "success": 100,
+          "failures": 0,
+          "p50": 1.962,
+          "p95": 2.698,
+          "p99": null,
+          "p99Status": "NOT_PROVEN",
+          "max": 13.124,
+          "mean": 2.1523600000000007,
+          "standardDeviation": 1.1492887410916373
+        },
+        {
+          "operation": "canonicalExecutionIncludingTerminal",
+          "batch": 3,
+          "count": 100,
+          "success": 100,
+          "failures": 0,
+          "p50": 1.924,
+          "p95": 2.656,
+          "p99": null,
+          "p99Status": "NOT_PROVEN",
+          "max": 13.276,
+          "mean": 2.0975599999999996,
+          "standardDeviation": 1.1408185247444043
+        }
+      ]
+    },
+    {
+      "scale": 2,
+      "terminalHistory": 864,
+      "operations": {
+        "admission": {
+          "count": 300,
+          "p50": 0.439,
+          "p95": 0.941,
+          "p99": null,
+          "max": 6.744,
+          "mean": 0.535003333333334,
+          "standardDeviation": 0.6320980224529178
+        },
+        "canonicalExecutionIncludingTerminal": {
+          "count": 300,
+          "p50": 2.002,
+          "p95": 2.733,
+          "p99": null,
+          "max": 13.911,
+          "mean": 2.1809033333333336,
+          "standardDeviation": 1.1492627697741233
+        },
+        "recovery": {
+          "count": 300,
+          "p50": 0.138,
+          "p95": 0.344,
+          "p99": null,
+          "max": 3.388,
+          "mean": 0.18410666666666675,
+          "standardDeviation": 0.3236461472383418
+        },
+        "contextHandshake": {
+          "count": 300,
+          "p50": 0.081,
+          "p95": 0.137,
+          "p99": null,
+          "max": 2.904,
+          "mean": 0.11336666666666669,
+          "standardDeviation": 0.2789922559658042
+        },
+        "currentRead": {
+          "count": 300,
+          "p50": 3.304,
+          "p95": 5.864,
+          "p99": null,
+          "max": 9.478,
+          "mean": 3.657866666666665,
+          "standardDeviation": 0.9382237911192729
+        },
+        "fingerprint": {
+          "count": 100,
+          "p50": 0.072,
+          "p95": 0.115,
+          "p99": null,
+          "max": 2.579,
+          "mean": 0.10240999999999996,
+          "standardDeviation": 0.24958441838384063
+        },
+        "closeDrain": {
+          "count": 100,
+          "p50": 0.266,
+          "p95": 0.348,
+          "p99": null,
+          "max": 4.119,
+          "mean": 0.31775,
+          "standardDeviation": 0.3845088393002167
+        }
+      },
+      "executionBatches": [
+        {
+          "operation": "canonicalExecutionIncludingTerminal",
+          "batch": 1,
+          "count": 100,
+          "success": 100,
+          "failures": 0,
+          "p50": 2.051,
+          "p95": 2.653,
+          "p99": null,
+          "p99Status": "NOT_PROVEN",
+          "max": 12.864,
+          "mean": 2.202959999999999,
+          "standardDeviation": 1.0872261486921662
+        },
+        {
+          "operation": "canonicalExecutionIncludingTerminal",
+          "batch": 2,
+          "count": 100,
+          "success": 100,
+          "failures": 0,
+          "p50": 1.99,
+          "p95": 2.82,
+          "p99": null,
+          "p99Status": "NOT_PROVEN",
+          "max": 13.911,
+          "mean": 2.175429999999999,
+          "standardDeviation": 1.2011250164325105
+        },
+        {
+          "operation": "canonicalExecutionIncludingTerminal",
+          "batch": 3,
+          "count": 100,
+          "success": 100,
+          "failures": 0,
+          "p50": 1.996,
+          "p95": 2.733,
+          "p99": null,
+          "p99Status": "NOT_PROVEN",
+          "max": 13.482,
+          "mean": 2.16432,
+          "standardDeviation": 1.1562271738719858
+        }
+      ]
+    },
+    {
+      "scale": 5,
+      "terminalHistory": 2160,
+      "operations": {
+        "admission": {
+          "count": 300,
+          "p50": 0.444,
+          "p95": 0.924,
+          "p99": null,
+          "max": 7.252,
+          "mean": 0.5426966666666667,
+          "standardDeviation": 0.6590799683312756
+        },
+        "canonicalExecutionIncludingTerminal": {
+          "count": 300,
+          "p50": 1.948,
+          "p95": 2.764,
+          "p99": null,
+          "max": 13.577,
+          "mean": 2.14092,
+          "standardDeviation": 1.1641492116276746
+        },
+        "recovery": {
+          "count": 300,
+          "p50": 0.139,
+          "p95": 0.328,
+          "p99": null,
+          "max": 3.668,
+          "mean": 0.18588333333333357,
+          "standardDeviation": 0.3292142611161038
+        },
+        "contextHandshake": {
+          "count": 300,
+          "p50": 0.083,
+          "p95": 0.145,
+          "p99": null,
+          "max": 2.822,
+          "mean": 0.11447333333333326,
+          "standardDeviation": 0.26549781409437045
+        },
+        "currentRead": {
+          "count": 300,
+          "p50": 3.218,
+          "p95": 4.961,
+          "p99": null,
+          "max": 10.489,
+          "mean": 3.4471766666666683,
+          "standardDeviation": 0.8684127122450992
+        },
+        "fingerprint": {
+          "count": 100,
+          "p50": 0.076,
+          "p95": 0.111,
+          "p99": null,
+          "max": 2.041,
+          "mean": 0.10020999999999997,
+          "standardDeviation": 0.19560333816169898
+        },
+        "closeDrain": {
+          "count": 100,
+          "p50": 0.267,
+          "p95": 0.344,
+          "p99": null,
+          "max": 3.195,
+          "mean": 0.30601999999999996,
+          "standardDeviation": 0.2920294498847679
+        }
+      },
+      "executionBatches": [
+        {
+          "operation": "canonicalExecutionIncludingTerminal",
+          "batch": 1,
+          "count": 100,
+          "success": 100,
+          "failures": 0,
+          "p50": 1.963,
+          "p95": 2.766,
+          "p99": null,
+          "p99Status": "NOT_PROVEN",
+          "max": 13.378,
+          "mean": 2.1555399999999993,
+          "standardDeviation": 1.1536272224596642
+        },
+        {
+          "operation": "canonicalExecutionIncludingTerminal",
+          "batch": 2,
+          "count": 100,
+          "success": 100,
+          "failures": 0,
+          "p50": 1.938,
+          "p95": 2.698,
+          "p99": null,
+          "p99Status": "NOT_PROVEN",
+          "max": 13.366,
+          "mean": 2.1477599999999994,
+          "standardDeviation": 1.1678220593908986
+        },
+        {
+          "operation": "canonicalExecutionIncludingTerminal",
+          "batch": 3,
+          "count": 100,
+          "success": 100,
+          "failures": 0,
+          "p50": 1.942,
+          "p95": 2.653,
+          "p99": null,
+          "p99Status": "NOT_PROVEN",
+          "max": 13.577,
+          "mean": 2.1194600000000006,
+          "standardDeviation": 1.1706173449936574
+        }
+      ]
+    },
+    {
+      "scale": 10,
+      "terminalHistory": 4320,
+      "operations": {
+        "admission": {
+          "count": 300,
+          "p50": 0.446,
+          "p95": 1.017,
+          "p99": null,
+          "max": 7.62,
+          "mean": 0.5589566666666669,
+          "standardDeviation": 0.690373687304363
+        },
+        "canonicalExecutionIncludingTerminal": {
+          "count": 300,
+          "p50": 2.017,
+          "p95": 2.822,
+          "p99": null,
+          "max": 14.377,
+          "mean": 2.2187566666666667,
+          "standardDeviation": 1.2111029728263776
+        },
+        "recovery": {
+          "count": 300,
+          "p50": 0.139,
+          "p95": 0.369,
+          "p99": null,
+          "max": 3.975,
+          "mean": 0.19101000000000032,
+          "standardDeviation": 0.3502776278420684
+        },
+        "contextHandshake": {
+          "count": 300,
+          "p50": 0.085,
+          "p95": 0.151,
+          "p99": null,
+          "max": 2.759,
+          "mean": 0.11565999999999997,
+          "standardDeviation": 0.26374842381835506
+        },
+        "currentRead": {
+          "count": 300,
+          "p50": 3.252,
+          "p95": 3.686,
+          "p99": null,
+          "max": 9.811,
+          "mean": 3.377103333333332,
+          "standardDeviation": 0.6775973184634729
+        },
+        "fingerprint": {
+          "count": 100,
+          "p50": 0.078,
+          "p95": 0.115,
+          "p99": null,
+          "max": 1.983,
+          "mean": 0.10158000000000002,
+          "standardDeviation": 0.18956356084437734
+        },
+        "closeDrain": {
+          "count": 100,
+          "p50": 0.269,
+          "p95": 0.345,
+          "p99": null,
+          "max": 3.367,
+          "mean": 0.30949000000000004,
+          "standardDeviation": 0.3093366934264347
+        }
+      },
+      "executionBatches": [
+        {
+          "operation": "canonicalExecutionIncludingTerminal",
+          "batch": 1,
+          "count": 100,
+          "success": 100,
+          "failures": 0,
+          "p50": 1.987,
+          "p95": 2.943,
+          "p99": null,
+          "p99Status": "NOT_PROVEN",
+          "max": 13.933,
+          "mean": 2.2296300000000002,
+          "standardDeviation": 1.224479698933388
+        },
+        {
+          "operation": "canonicalExecutionIncludingTerminal",
+          "batch": 2,
+          "count": 100,
+          "success": 100,
+          "failures": 0,
+          "p50": 2.063,
+          "p95": 2.749,
+          "p99": null,
+          "p99Status": "NOT_PROVEN",
+          "max": 14.377,
+          "mean": 2.25106,
+          "standardDeviation": 1.2427788445254444
+        },
+        {
+          "operation": "canonicalExecutionIncludingTerminal",
+          "batch": 3,
+          "count": 100,
+          "success": 100,
+          "failures": 0,
+          "p50": 1.993,
+          "p95": 2.732,
+          "p99": null,
+          "p99Status": "NOT_PROVEN",
+          "max": 13.556,
+          "mean": 2.175579999999999,
+          "standardDeviation": 1.1633724612522
+        }
+      ]
+    }
+  ],
+  "queryPlans": [
+    {
+      "scale": 1,
+      "query": "exactActorOperation",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "certification_ingress_leases__resource_id_operation_id_targ_key",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 1,
+      "query": "currentGeneration",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "certification_ingress_generation_sequence_v1",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 1,
+      "query": "resourceSingleton",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "canonical_resource_v1_pkey",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 1,
+      "query": "currentPointer",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "current_tournament_pointer_v1_pkey",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 2,
+      "query": "exactActorOperation",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "certification_ingress_leases__resource_id_operation_id_targ_key",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 2,
+      "query": "currentGeneration",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "certification_ingress_generation_sequence_v1",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 2,
+      "query": "resourceSingleton",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "canonical_resource_v1_pkey",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 2,
+      "query": "currentPointer",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "current_tournament_pointer_v1_pkey",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 5,
+      "query": "exactActorOperation",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "certification_ingress_leases__resource_id_operation_id_targ_key",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 5,
+      "query": "currentGeneration",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "certification_ingress_generation_sequence_v1",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 5,
+      "query": "resourceSingleton",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "canonical_resource_v1_pkey",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 5,
+      "query": "currentPointer",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "current_tournament_pointer_v1_pkey",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 10,
+      "query": "exactActorOperation",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "certification_ingress_leases__resource_id_operation_id_targ_key",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 10,
+      "query": "currentGeneration",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "certification_ingress_generation_sequence_v1",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 10,
+      "query": "resourceSingleton",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "canonical_resource_v1_pkey",
+          "actualRows": 1
+        }
+      ]
+    },
+    {
+      "scale": 10,
+      "query": "currentPointer",
+      "nodes": [
+        {
+          "nodeType": "Index Scan",
+          "index": "current_tournament_pointer_v1_pkey",
+          "actualRows": 1
+        }
+      ]
+    }
+  ],
+  "maximumObservedStatementMs": 14.377,
+  "canonicalExecutionMedian10xTo1x": 1.040226921093347,
+  "interpretation": "No10x terminal-ingress-history latency explosion observed within this local current-generation fixture. No same-method candidate-versus-base regression study was performed.",
+  "limitations": [
+    "Local warm-cache query-path evidence, not hosted/Production capacity.",
+    "Sample execution rolls back; durable commit/restart semantics are proven by separate behavioral suites.",
+    "Terminal outcome/receipt/audit are atomic inside canonical execution; no independent terminal transaction exists.",
+    "p99 is NOT PROVEN with300 samples per operation/scale.",
+    "Internal statement count and separately instrumented lock-hold duration are not measured here.",
+    "The explicitly listed local profile excludes pending release migration144; this does not certify the final complete candidate.",
+    "Scale increases terminal ingress-lease history, not all score/side-game/multiyear histories.",
+    "Admission and canonical execution are separate measured RPCs; execution includes atomic terminal receipt/audit and is rolled back before each next sample. End-to-end commit duration is not measured.",
+    "Earlier Phase2C score-only medians are not a directly comparable baseline for this durable-ingress path.",
+    "No concurrent workers during the measurement; worker-contention correlation is not measured."
+  ],
+  "sourceArtifact": "ingress-performance.json",
+  "sourceArtifactSha256": "73b9b292da15711f5fa98196f6fcd13fdc33e73fd104442332cbe744d665cba2",
+  "logSha256": "7071a97ca9afe2c7730ebe7d2bcf290ed152e6c860f79480b8eb076501c07a7b"
+}

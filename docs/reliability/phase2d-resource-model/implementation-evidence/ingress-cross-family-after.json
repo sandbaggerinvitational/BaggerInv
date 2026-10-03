@@ -1,0 +1,53 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "attempts": [
+    "SCORING.SUBMIT_HOLE",
+    "DIRECTOR.MATCH_CONTROL"
+  ],
+  "accepted": [
+    {
+      "ok": true,
+      "state": "ADMITTED",
+      "context": {
+        "phase": "SCORING",
+        "binding_id": "6a85b842-2770-43a3-891f-13bb6863b563",
+        "git_branch": "codex/synthetic-resource-proof",
+        "project_ref": "aaaaaaaaaaaaaaaaaaaa",
+        "project_url": "https://aaaaaaaaaaaaaaaaaaaa.supabase.co",
+        "resource_id": "CERTIFICATION:48556c14-2362-40e8-be8e-3507d0736e0c",
+        "context_token": "3e9c349079f341dcbc38a11080ca9e583f36fb982ab466dade6de11885a1e889",
+        "deployment_id": "dpl_synthetic_certification_0",
+        "schema_digest": "1dd7649c4035dace038cc73dfb4bc57de2811c1cf27e3b1903c5e5bdffbf9415",
+        "tournament_id": "2026",
+        "release_commit": "cccccccccccccccccccccccccccccccccccccccc",
+        "resource_class": "CERTIFICATION",
+        "vercel_team_id": "team_syntheticcertification",
+        "installation_id": "48556c14-2362-40e8-be8e-3507d0736e0c",
+        "manifest_digest": "9324113b322e3ed01a953b684f4549d3c5521aead1e82d97bf3ef15343ee6e33",
+        "schema_contract": "canonical-resource-v1",
+        "deployment_class": "preview",
+        "pointer_revision": 1,
+        "deployment_origin": "https://synthetic-certification-0.vercel.app",
+        "vercel_project_id": "prj_syntheticcertification",
+        "admission_revision": 2,
+        "authority_epoch_id": "b0482ab4-65d0-483f-81b5-52cdfb8f5f41",
+        "activation_revision": 1,
+        "operation_request_id": "f9e3d34c-874e-42b0-929f-3284e28856eb",
+        "resource_fingerprint": "47a9f36f00d251636e561eb377ecb335a6131e5d55f30bf560dc8896476252eb",
+        "current_tournament_id": "2026",
+        "registration_revision": 1,
+        "current_tournament_year": 2026,
+        "governance_tournament_id": "2026"
+      },
+      "contract": "certification-ingress-v1",
+      "lease_id": "337246fe-64bd-4fb6-97f3-8de7a80a108a",
+      "request_hash": "5969476cf33d2ff16bfb25df7d85190ac83c088d610c2f39f6ccf5c942d33676",
+      "admission_sequence": 6,
+      "operation_request_id": "f9e3d34c-874e-42b0-929f-3284e28856eb",
+      "admission_generation_id": "08544d6e-cb6f-4241-b939-40940e8b7136"
+    }
+  ],
+  "denied": [
+    "Error: Owned SQL session closed (3): ERROR:  CERTIFICATION_INGRESS_IDEMPOTENCY_CONFLICT\nCONTEXT:  PL/pgSQL function public.admit_certification_operation_v1(jsonb) line 52 at RAISE\n"
+  ]
+}

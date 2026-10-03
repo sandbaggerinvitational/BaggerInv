@@ -1,0 +1,75 @@
+{
+  "recordedAt": "2026-10-03T02:50:01.293647+00:00",
+  "environment": "LOCAL_NON_PRODUCTION",
+  "entries": [
+    {
+      "artifact": "annual-transition-2026-10-03T02-08-24-102Z.json",
+      "sha256": "c796e88b3999b61dbda6b0c0aa3379671ed65ef3c60e085a65ac3b224754450b",
+      "filesCompared": 50,
+      "changed": [],
+      "retentionReason": "Recorded50 source hashes unchanged. Calcutta unconfigured, zero CALCUTTA jobs; claim processor branch never executed. Later Certification-only claim DTO validator therefore does not change the exercised annual path. No configured successor financial claim inferred.",
+      "retainedStatus": "PASS_SCOPED_TO_RECORDED_EXERCISED_PATHS"
+    },
+    {
+      "artifact": "application-boot-2026-10-03T02-21-52-716Z.json",
+      "sha256": "1494aae66b7b079b8fc67a63203e08b1c269ca44da5bfe21613811cd1e6e4aec",
+      "filesCompared": 995,
+      "changed": [
+        {
+          "file": "lib/production-calcutta-server.js",
+          "recordedSha256": "506224c1f3f668cf69fbd488fe5ee93fd1ad79d0237ac8cf24b8740ca06a9143",
+          "currentSha256": "a4e88cbe7bef7458b4b25f3ab4e9056b4ecb165d9448413242a053de1c269733"
+        }
+      ],
+      "retentionReason": "Only later changed file is production-calcutta-server.js. Actual boot records configured Calcutta hook context/ticks but CALCUTTA not ready; no claim. Retain8/8 only for those exact exercised paths. New real configured claim is separately proven6/6.",
+      "retainedStatus": "PASS_SCOPED_TO_RECORDED_EXERCISED_PATHS"
+    },
+    {
+      "artifact": "director-financial-2026-10-03T02-28-02.225Z.json",
+      "sha256": "ba194feb4b6a5bd5757b2a36ded410ed9484870950c7e9bf40528eb91f934343",
+      "filesCompared": 29,
+      "changed": [],
+      "retentionReason": "Recorded29 sources unchanged; seven Director identities do not execute the changed worker claim validator.",
+      "retainedStatus": "PASS_SCOPED_TO_RECORDED_EXERCISED_PATHS"
+    },
+    {
+      "artifact": "finite-timeout-matrix-2026-10-03T02-26-09.590Z.json",
+      "sha256": "d5a74a49f0c49afa78cab32965a11128b6fb627dd10443c9ce3c8ed2918d19db",
+      "filesCompared": 567,
+      "changed": [
+        {
+          "file": "lib/production-calcutta-server.js",
+          "recordedSha256": "506224c1f3f668cf69fbd488fe5ee93fd1ad79d0237ac8cf24b8740ca06a9143",
+          "currentSha256": "a4e88cbe7bef7458b4b25f3ab4e9056b4ecb165d9448413242a053de1c269733"
+        }
+      ],
+      "retentionReason": "Changed Calcutta claim validator is not exercised in this timeout matrix; required derived materialization fault is COMPETITION. All affected SQL/score/Odds/publication fault paths unchanged.",
+      "retainedStatus": "PASS_SCOPED_TO_RECORDED_EXERCISED_PATHS"
+    },
+    {
+      "artifact": "release-transition-2026-10-03T02-24-05.900Z.json",
+      "sha256": "1389fd8e0bfb9a3a27d872cbbd80cee1283629ff69ab8a3f4742faafe6511dc0",
+      "filesCompared": 568,
+      "changed": [
+        {
+          "file": "lib/production-calcutta-server.js",
+          "recordedSha256": "506224c1f3f668cf69fbd488fe5ee93fd1ad79d0237ac8cf24b8740ca06a9143",
+          "currentSha256": "a4e88cbe7bef7458b4b25f3ab4e9056b4ecb165d9448413242a053de1c269733"
+        }
+      ],
+      "retentionReason": "Recorded release SQL and tests unchanged; Calcutta claimed response validation not invoked.",
+      "retainedStatus": "PASS_SCOPED_TO_RECORDED_EXERCISED_PATHS"
+    },
+    {
+      "artifact": "net-skins-concurrency-2026-10-03T02-28-17.784Z.json",
+      "sha256": "aca659fc6a2c2da34359c5e3406b56602f3fc245b458fe031a10c6be1d340f07",
+      "filesCompared": 30,
+      "changed": [],
+      "retentionReason": "Recorded Net Skins SQL and tests unchanged; no Calcutta claim validator invoked.",
+      "retainedStatus": "PASS_SCOPED_TO_RECORDED_EXERCISED_PATHS"
+    }
+  ],
+  "newBranchProof": "calcutta-postcommit-final-receipt.json",
+  "newBranchLimit": "Initial actual configured provisional result only; future DTO binding modeled, no future configured worker calculation claimed.",
+  "blanketLatestSourceCertification": false
+}

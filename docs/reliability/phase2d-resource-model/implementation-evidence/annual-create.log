@@ -1,0 +1,19 @@
+▶ R2 annual CREATE/read shared core with truthful Certification authority
+  ✔ authorized owner creates future Draft with current/target distinction and truthful resource readback (274.193584ms)
+  ✔ same operation replay and conflict preserve one canonical receipt (92.081666ms)
+  ✔ canonical numeric target year contract remains strict (269.183958ms)
+  ✔ wrong actor/role/context/authority fields fail closed before any create (354.028583ms)
+  ✔ failure before future_tournament_resources_v1 rolls back and same request retries (156.312916ms)
+  ✔ failure before future_year_audit_events_v1 rolls back and same request retries (174.367333ms)
+  ✔ failure before future_year_operation_receipts_v1 rolls back and same request retries (231.601666ms)
+  ✔ audit records resource, actor, operation and release atomically; cores are private (37.567083ms)
+✔ R2 annual CREATE/read shared core with truthful Certification authority (12929.376334ms)
+ℹ {"environment":"OWNED_LOCAL_POSTGRESQL17","forwardMigrations":["supabase/production_migrations/202609300131_canonical_resource_control_v1.sql","supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql","supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql","supabase/production_migrations/202609300134_certification_annual_administration_v1.sql","supabase/production_migrations/202609300135_certification_read_contracts_v1.sql"],"convergentFunctions":994,"authorityRowsCopied":0,"googleCalls":0,"hostedAccess":false,"finalBaselineEmitted":false,"annualTransition":"NOT_IMPLEMENTED_OWNER_REVIEW_REQUIRED"}
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13063.479042

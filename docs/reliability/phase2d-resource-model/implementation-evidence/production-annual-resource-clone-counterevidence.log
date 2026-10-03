@@ -1,0 +1,53 @@
+TAP version 13
+# Subtest: migration 078 rebinds future annual normal releases without mutating annual state
+    # Subtest: future annual authorization, replay, stale and invariance
+    not ok 1 - future annual authorization, replay, stale and invariance
+      ---
+      duration_ms: 4766.307583
+      type: 'test'
+      location: 'annual-normal-release-rebind-generated.mjs:26:13'
+      failureType: 'testCodeFailure'
+      error: |-
+        Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -qAt -v ON_ERROR_STOP=1 -d annual_normal_release_frozen_2026
+        ERROR:  CANONICAL_RESOURCE_BINDING_DENIED
+        CONTEXT:  PL/pgSQL function production_control.guard_canonical_annual_row_v1() line 10 at RAISE
+        SQL statement "update production_control.scoring_admission_closures
+          set deployment_id = input->>'deployment_id',
+              closed_admission_revision = next_admission_revision
+          where closure_id = closure.closure_id"
+        PL/pgSQL function production_control.rebind_production_postcutover_normal_release_frozen_2026_v1(jsonb) line 529 at SQL statement
+        PL/pgSQL function production_control.rebind_production_postcutover_normal_release(jsonb) line 39 at RETURN
+        SQL function "rebind_production_postcutover_normal_release" statement 1
+      code: 'ERR_TEST_FAILURE'
+      name: 'CommandFailure'
+      stack: |-
+        runCommand (annual-normal-release-rebind-generated.mjs:135:11)
+        psql (annual-normal-release-rebind-generated.mjs:151:10)
+        rpc (annual-normal-release-rebind-generated.mjs:176:26)
+        TestContext.<anonymous> (annual-normal-release-rebind-generated.mjs:2167:30)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+        context.test (annual-normal-release-rebind-generated.mjs:26:13)
+        annual-normal-release-rebind-generated.mjs:1712:15
+      ...
+    1..1
+not ok 1 - migration 078 rebinds future annual normal releases without mutating annual state
+  ---
+  duration_ms: 7988.695875
+  type: 'test'
+  location: 'annual-normal-release-rebind-generated.mjs:19:10'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8300.468542

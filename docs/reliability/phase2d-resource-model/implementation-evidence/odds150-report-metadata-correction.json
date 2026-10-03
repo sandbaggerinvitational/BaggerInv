@@ -1,0 +1,10 @@
+{
+  "artifact": "odds-performance-query-plans.json",
+  "field": "excludedMigration144",
+  "correction": "Migration144 is installed, as proved by the actual migrations list; complete release behavior is certified separately.",
+  "testLabelOnlyCorrection": {
+    "executedTestSha256": "e3ff658247d4663fea812e675fd784d1ec3e963c11cf5a7f923d27948b182e11",
+    "correctedTestSha256": "7dfbcd7a6a6622382db984fa6c6f2915b3dc3591885b85f130ba5110d36a4f7e",
+    "effect": "Report-only stale excludedMigration144 label corrected after run; no behavior or measured values changed"
+  }
+}

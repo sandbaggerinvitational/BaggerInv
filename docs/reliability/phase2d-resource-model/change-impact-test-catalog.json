@@ -1,0 +1,360 @@
+{
+  "schemaVersion": 1,
+  "phase": "PHASE2D_R2",
+  "baseSha": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "candidateFrozen": false,
+  "policy": "Additive current change-impact overlay. Does not rewrite historical catalogs or convert scoped evidence to final-profile PASS. Matching any source path invalidates all listed tests and broad/build comparison. Hosted/Production/physical proof remains separate.",
+  "executionBoundary": "Owned local synthetic fixtures only; remote network denied; PostgreSQL fixture runs sequentially.",
+  "gates": [
+    {
+      "id": "NA-2026-CERTIFICATION-RESOURCE-ISOLATION",
+      "sourcePathsOrPrefixes": [
+        "lib/canonical-resource-registration.js",
+        "lib/canonical-runtime-source.js",
+        "config/certification-resource-registration.json",
+        "supabase/production_migrations/202609300131_"
+      ],
+      "requiredTests": [
+        "test/certification-resource-registration.test.mjs",
+        "test/reliability-phase2dr2-resource-isolation.integration.test.mjs",
+        "test/reliability-phase2dr2-production-certification-isolation.integration.test.mjs"
+      ],
+      "requirement": "An explicit exact registration is required; no URL-only, legacy Preview, Production or second-resource fallback.",
+      "currentStatus": "SCOPED_LOCAL_PASS_AT_RECORDED_FULL152_SOURCE",
+      "scopedEvidence": [
+        "implementation-evidence/resource-isolation-profile152.json"
+      ],
+      "futureTournamentReleaseBlocking": true,
+      "hosted": "NOT_PROVEN",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "latestExecutedProof": {
+        "profile": "131\u2013152",
+        "testPass": 7,
+        "testFail": 0,
+        "sourceStable": true,
+        "scope": "Two separately registered owned databases; independent same-ID outcomes, foreign resource/deployment/lease/read/worker denial and private authority. Local worker check is an idle tick, not configured financial convergence.",
+        "ownedFixtureCleanup": "COMPLETE"
+      },
+      "freshnessQualification": "Retained at recorded source hashes after final Calcutta claim-DTO impact review: the modified nonempty Certification Calcutta claim validator was not executed by these scoped paths. Director financial fact/control authorization, NetSkins, resource isolation, release and ingress/score/Odds timeout semantics are unchanged. Configured initial Calcutta is separately proved6/6; no configured future Calcutta integration claim."
+    },
+    {
+      "id": "NA-2026-CERTIFICATION-DURABLE-INGRESS",
+      "sourcePathsOrPrefixes": [
+        "lib/certification-runtime-server.js",
+        "supabase/production_migrations/202609300136_",
+        "supabase/production_migrations/202609300137_"
+      ],
+      "requiredTests": [
+        "test/reliability-phase2dr2-ingress.integration.test.mjs",
+        "test/reliability-phase2dr2-ingress-upgrade.integration.test.mjs",
+        "test/reliability-phase2dr2-ingress-stress.integration.test.mjs",
+        "tools/reliability/benchmark-certification-ingress.mjs"
+      ],
+      "requirement": "Durable exact actor/operation/hash/generation admission, atomic outcome, post-revocation recovery, failure/restart/concurrency and bounded lookup.",
+      "currentStatus": "FINAL_PROFILE_NOT_CERTIFIED",
+      "scopedEvidence": [],
+      "futureTournamentReleaseBlocking": true,
+      "hosted": "NOT_PROVEN",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "NA-2026-CERTIFICATION-DIRECTOR-CANONICAL",
+      "sourcePathsOrPrefixes": [
+        "lib/isolated-director-operations.js",
+        "lib/preview-director-authorization.js",
+        "lib/participant-identity-supabase.js",
+        "supabase/production_migrations/202609300132_"
+      ],
+      "requiredTests": [
+        "test/reliability-phase2dr2-director.integration.test.mjs",
+        "test/certification-future-context.test.mjs"
+      ],
+      "requirement": "All seven identities use actual canonical client/API/SQL authority; class-specific negatives, same-ID conflict/recovery and atomic accurate financial audit.",
+      "currentStatus": "SCOPED_LOCAL_PASS_AT_RECORDED_FULL152_SOURCE",
+      "scopedEvidence": [
+        "implementation-evidence/director-financial-2026-10-03T02-28-02.225Z.json",
+        "implementation-evidence/director-financial-2026-10-02T21-39-54.863Z.json"
+      ],
+      "futureTournamentReleaseBlocking": true,
+      "hosted": "NOT_PROVEN",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "latestExecutedProof": {
+        "profile": "131\u2013152",
+        "testPass": 14,
+        "testFail": 0,
+        "sourceStable": true,
+        "scope": "Seven Director capability identities through actual client/API/SQL, class-specific authorization, truthful financial audit, same-ID recovery/conflict and atomic failure. Synthetic sessions, no hosted Auth or broad Director certification.",
+        "ownedFixtureCleanup": "COMPLETE"
+      },
+      "freshnessQualification": "Retained at recorded source hashes after final Calcutta claim-DTO impact review: the modified nonempty Certification Calcutta claim validator was not executed by these scoped paths. Director financial fact/control authorization, NetSkins, resource isolation, release and ingress/score/Odds timeout semantics are unchanged. Configured initial Calcutta is separately proved6/6; no configured future Calcutta integration claim."
+    },
+    {
+      "id": "NA-2026-CERTIFICATION-ANNUAL-PUBLISHED-FINAL",
+      "sourcePathsOrPrefixes": [
+        "supabase/production_migrations/202609300134_",
+        "supabase/production_migrations/202609300138_",
+        "supabase/production_migrations/202609300139_",
+        "supabase/production_migrations/202609300140_",
+        "supabase/production_migrations/202609300141_",
+        "supabase/production_migrations/202609300142_",
+        "supabase/production_migrations/202609300148_",
+        "supabase/production_migrations/202609300151_",
+        "supabase/production_migrations/202609300152_"
+      ],
+      "requiredTests": [
+        "test/reliability-phase2dr2-annual.integration.test.mjs",
+        "test/reliability-phase2dr2-annual-transition.integration.test.mjs",
+        "test/reliability-phase2dr2-production-annual.integration.test.mjs"
+      ],
+      "requirement": "Actual432/24, publication wait, real calculation, explicit owner publication, FinalRecap, unknown resolution, CLOSE/certificate/ACTIVATE and later transition; never fabricate completion.",
+      "currentStatus": "CERTIFICATION_FIRST_AND_LATER_PASS_PROTECTED_HISTORICAL_PARTIAL",
+      "scopedEvidence": [
+        "implementation-evidence/annual-transition-2026-10-03T02-08-24-102Z.json"
+      ],
+      "futureTournamentReleaseBlocking": true,
+      "hosted": "NOT_PROVEN",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "remainingCounterevidence": "Certification chronology passes. Mandatory protected provider-forward069 and positive historical publication/full annual proof remain incomplete."
+    },
+    {
+      "id": "NA-2026-CERTIFICATION-OWNER-ODDS-PUBLICATION",
+      "sourcePathsOrPrefixes": [
+        "lib/certification-odds-server.js",
+        "lib/canonical-director-odds-client.js",
+        "app/admin/director/CanonicalDirectorOdds.js",
+        "app/api/director/canonical-odds/route.js",
+        "app/api/odds/publish/route.js",
+        "supabase/production_migrations/202609300143_",
+        "supabase/production_migrations/202609300148_",
+        "supabase/production_migrations/202609300149_",
+        "supabase/production_migrations/202609300150_"
+      ],
+      "requiredTests": [
+        "test/certification-odds-adapter.test.mjs",
+        "test/reliability-phase2dr2-odds.integration.test.mjs",
+        "test/reliability-phase2dr2-production-odds.integration.test.mjs",
+        "test/reliability-phase2dr2-odds-publication-identity.integration.test.mjs",
+        "test/reliability-phase2dr2-odds-freshness.integration.test.mjs"
+      ],
+      "requirement": "Real unchanged engine, truthful first CAS, separate authorized publication, exact receipt recovery, no auto-publication, private provenance or cross-resource claim.",
+      "currentStatus": "FINAL_PROFILE_NOT_CERTIFIED",
+      "scopedEvidence": [],
+      "futureTournamentReleaseBlocking": true,
+      "hosted": "NOT_PROVEN",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "NA-2026-CERTIFICATION-NET-SKINS-LOCK-ORDER",
+      "sourcePathsOrPrefixes": [
+        "lib/score-derived-delivery.js",
+        "lib/certification-worker-adapter.js",
+        "supabase/production_migrations/202609300133_",
+        "supabase/production_migrations/202609300141_",
+        "lib/calcutta-post-commit.js"
+      ],
+      "requiredTests": [
+        "test/reliability-phase2dr2-net-skins-concurrency.integration.test.mjs",
+        "test/reliability-phase2dr2-annual-transition.integration.test.mjs"
+      ],
+      "requirement": "Known mixed-round cycle prevention, stale worker containment, real retry/backoff, score isolation and truthful delivery provenance.",
+      "currentStatus": "SCOPED_LOCAL_PASS_AT_RECORDED_FULL152_SOURCE",
+      "scopedEvidence": [
+        "implementation-evidence/net-skins-concurrency-2026-10-03T02-28-17.784Z.json",
+        "implementation-evidence/net-skins-concurrency-2026-10-02T22-05-01.623Z.json"
+      ],
+      "futureTournamentReleaseBlocking": true,
+      "hosted": "NOT_PROVEN",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "latestExecutedProof": {
+        "profile": "131\u2013152",
+        "testPass": 7,
+        "testFail": 0,
+        "sourceStable": true,
+        "scope": "Real mixed-round wait, eight concurrency batches, stale/superseded result denial, actual40P01 retry/backoff and unchanged all-format owner calculator. No universal deadlock or capacity claim.",
+        "ownedFixtureCleanup": "COMPLETE"
+      },
+      "freshnessQualification": "Retained at recorded source hashes after final Calcutta claim-DTO impact review: the modified nonempty Certification Calcutta claim validator was not executed by these scoped paths. Director financial fact/control authorization, NetSkins, resource isolation, release and ingress/score/Odds timeout semantics are unchanged. Configured initial Calcutta is separately proved6/6; no configured future Calcutta integration claim."
+    },
+    {
+      "id": "NA-2026-CERTIFICATION-ANNUAL-READ-CONTINUITY",
+      "sourcePathsOrPrefixes": [
+        "lib/certification-read-adapters.js",
+        "lib/participant-identity-supabase.js",
+        "lib/preview-director-authorization.js",
+        "supabase/production_migrations/202609300135_",
+        "supabase/production_migrations/202609300145_",
+        "supabase/production_migrations/202609300146_",
+        "lib/history-2026-service.js",
+        "lib/history-2026-supabase.js",
+        "supabase/production_migrations/202609300147_"
+      ],
+      "requiredTests": [
+        "test/certification-adapter-routing.test.mjs",
+        "test/reliability-phase2dr2-annual-transition.integration.test.mjs",
+        "test/reliability-phase2dr2-application-boot.integration.test.mjs"
+      ],
+      "requirement": "Closed predecessor remains readable, successor reads use exact current authority, immutable governance entitlement remains distinct, old competitive writes denied.",
+      "currentStatus": "FINAL_PROFILE_NOT_CERTIFIED",
+      "scopedEvidence": [
+        "implementation-evidence/annual-transition-2026-10-03T00-08-59-014Z.json",
+        "implementation-evidence/application-boot-2026-10-03T00-11-52-656Z.json"
+      ],
+      "futureTournamentReleaseBlocking": true,
+      "hosted": "NOT_PROVEN",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "NA-2026-CERTIFICATION-RELEASE-REBIND",
+      "sourcePathsOrPrefixes": [
+        "supabase/production_migrations/202609300144_",
+        "supabase/production_migrations/202609300152_"
+      ],
+      "requiredTests": [
+        "test/reliability-phase2dr2-release.integration.test.mjs",
+        "test/reliability-phase2dr2-annual-transition.integration.test.mjs"
+      ],
+      "requirement": "Owner-only disabled-admission release CAS: actual gate-bound generation precedence, exact untouched-initial fallback, genuine CLOSED evidence, outgoing-release Odds drain, atomic audit and preserved receipt/job authority. Production unchanged.",
+      "currentStatus": "SCOPED_LOCAL_PASS_AT_RECORDED_FULL152_SOURCE",
+      "scopedEvidence": [
+        "implementation-evidence/release-transition-2026-10-03T02-24-05.900Z.json",
+        "implementation-evidence/annual-transition-2026-10-03T02-08-24-102Z.json"
+      ],
+      "futureTournamentReleaseBlocking": true,
+      "hosted": "NOT_PROVEN",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "latestExecutedProof": {
+        "profile": "131\u2013152",
+        "testPass": 18,
+        "testFail": 0,
+        "sourceStable": true,
+        "scope": "Owner-only CAS/ACL/fence/audit, unfinished outgoing Odds drain, original equal-result publication after source advance, prior outcome recovery and no-closure denial. Genuine initial/reopened/activated/future CLOSED chronology is separately annual22; hosted release identity and protected historical Production upgrade remain unproven.",
+        "ownedFixtureCleanup": "COMPLETE"
+      },
+      "freshnessQualification": "Retained at recorded source hashes after final Calcutta claim-DTO impact review: the modified nonempty Certification Calcutta claim validator was not executed by these scoped paths. Director financial fact/control authorization, NetSkins, resource isolation, release and ingress/score/Odds timeout semantics are unchanged. Configured initial Calcutta is separately proved6/6; no configured future Calcutta integration claim."
+    },
+    {
+      "id": "NA-2026-CERTIFICATION-FRESH-INSTALL",
+      "sourcePathsOrPrefixes": [
+        "supabase/canonical_bootstrap/",
+        "tools/reliability/canonical-bootstrap-artifacts.mjs",
+        "tools/reliability/generate-canonical-bootstrap.mjs",
+        "supabase/production_migrations/"
+      ],
+      "requiredTests": [
+        "tools/reliability/canonical-bootstrap.integration.test.mjs",
+        "test/reliability-phase2dr2-application-boot.integration.test.mjs",
+        "test/reliability-phase2dr2-provider-history.integration.test.mjs"
+      ],
+      "requirement": "Two clean convergent installs, no seeded business history, hash/replay/atomicity/RLS checks, actual app boot and preserved real historical provider protocol.",
+      "currentStatus": "FINAL_PROFILE_NOT_CERTIFIED",
+      "scopedEvidence": [
+        "implementation-evidence/bootstrap-provisional-profile147.json",
+        "implementation-evidence/bootstrap-private-core-security.json",
+        "implementation-evidence/application-boot-2026-10-03T00-11-52-656Z.json"
+      ],
+      "futureTournamentReleaseBlocking": true,
+      "hosted": "NOT_PROVEN",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "NA-2026-CERTIFICATION-ODDS-TWO-PART-FRESHNESS",
+      "sourcePathsOrPrefixes": [
+        "lib/certification-odds-server.js",
+        "supabase/production_migrations/202609300139_",
+        "supabase/production_migrations/202609300143_",
+        "supabase/production_migrations/202609300148_"
+      ],
+      "requiredTests": [
+        "test/reliability-phase2dr2-odds-freshness.integration.test.mjs",
+        "test/reliability-phase2dr2-odds.integration.test.mjs",
+        "test/reliability-phase2dr2-annual-transition.integration.test.mjs",
+        "test/reliability-phase2dr2-production-odds.integration.test.mjs"
+      ],
+      "requirement": "Future authoring captures versioned structural compatibility without backfill; live source independently checked at request, claim, checkpoint, completion and explicit publication. Actual score/publication races serialize; stale unpublished work cannot publish; published history and exact receipt recovery remain intact. Production fingerprints/branches unchanged.",
+      "currentStatus": "FINAL_PROFILE_NOT_CERTIFIED",
+      "scopedEvidence": [],
+      "futureTournamentReleaseBlocking": true,
+      "hosted": "NOT_PROVEN",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN"
+    },
+    {
+      "id": "NA-2026-CERTIFICATION-FINITE-TIMEOUT",
+      "sourcePathsOrPrefixes": [
+        "lib/certification-runtime-server.js",
+        "lib/certification-odds-server.js",
+        "supabase/production_migrations/202609300136_",
+        "supabase/production_migrations/202609300137_",
+        "supabase/production_migrations/202609300143_",
+        "supabase/production_migrations/202609300148_",
+        "supabase/production_migrations/202609300150_"
+      ],
+      "requiredTests": [
+        "test/reliability-phase2dr2-timeout-matrix.integration.test.mjs"
+      ],
+      "requirement": "Actual finite SQL57014 must leave atomic canonical authority, durable identity, safe same-operation recovery and no fabricated worker/publication completion.",
+      "currentStatus": "SCOPED_LOCAL_PASS_AT_RECORDED_FULL152_SOURCE",
+      "scopedEvidence": [
+        "implementation-evidence/finite-timeout-matrix-2026-10-03T02-26-09.590Z.json"
+      ],
+      "futureTournamentReleaseBlocking": true,
+      "hosted": "NOT_PROVEN",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "latestExecutedProof": {
+        "profile": "131\u2013152",
+        "testPass": 11,
+        "testFail": 0,
+        "sourceStable": true,
+        "scope": "Ten actualSQL57014 cases at150ms: admission, setup, terminal audit, explicit recovery, real score, derived worker, Odds claim/checkpoint/completion/publication. Same-identity recovery and rollback proved. No hosted HTTP or JavaScript CPU bound claim.",
+        "ownedFixtureCleanup": "COMPLETE"
+      },
+      "freshnessQualification": "Retained at recorded source hashes after final Calcutta claim-DTO impact review: the modified nonempty Certification Calcutta claim validator was not executed by these scoped paths. Director financial fact/control authorization, NetSkins, resource isolation, release and ingress/score/Odds timeout semantics are unchanged. Configured initial Calcutta is separately proved6/6; no configured future Calcutta integration claim."
+    },
+    {
+      "id": "NA-2026-CERTIFICATION-CALCUTTA-POSTCOMMIT",
+      "sourcePathsOrPrefixes": [
+        "lib/calcutta-post-commit.js",
+        "lib/score-derived-delivery.js",
+        "lib/certification-worker-adapter.js",
+        "lib/production-calcutta-server.js",
+        "supabase/production_migrations/202609300133_",
+        "supabase/production_migrations/202609300141_"
+      ],
+      "requiredTests": [
+        "test/certification-calcutta-post-commit.test.mjs",
+        "test/reliability-phase2dr2-calcutta-post-commit.integration.test.mjs",
+        "test/reliability-phase2dr2-application-boot.integration.test.mjs"
+      ],
+      "requirement": "Exact current Certification worker context before any tick, no legacy Preview or Production fallback, durable canonical queue and unchanged financial facts/publication.",
+      "currentStatus": "SCOPED_CONFIGURED_INITIAL_LOCAL_PASS",
+      "scopedEvidence": [
+        "implementation-evidence/calcutta-postcommit-2026-10-03T02-43-10-137Z.json",
+        "implementation-evidence/calcutta-postcommit-unit-receipt.json",
+        "implementation-evidence/application-boot-2026-10-03T02-21-52-716Z.json"
+      ],
+      "futureTournamentReleaseBlocking": true,
+      "hosted": "NOT_PROVEN",
+      "production": "NOT_PROVEN",
+      "physical": "NOT_PROVEN",
+      "latestExecutedProof": {
+        "profile": "131\u2013152",
+        "testPass": 6,
+        "testFail": 0,
+        "sourceStable": true,
+        "scope": "Configured initial2026 actual owner auction\u2192score\u2192postcommit hook\u2192claim\u2192unchanged calculator\u2192complete, repeat wakeup, exact target/context-revision and role/disabled admission denials, financial facts/publication preserved.",
+        "ownedFixtureCleanup": "COMPLETE"
+      },
+      "freshnessQualification": "Boot5 was unconfigured and executed no Calcutta claim; its empty canonical tick path remains unchanged. Final private JS validator aligns existing133 initial and141 future DTOs without SQL/Production branch change. Future claimed DTO checks are unit-tested; actual configured future financial authoring/runtime is not claimed."
+    }
+  ]
+}

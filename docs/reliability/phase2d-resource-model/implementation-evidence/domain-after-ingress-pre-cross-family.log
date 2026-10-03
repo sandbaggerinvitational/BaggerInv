@@ -1,0 +1,96 @@
+TAP version 13
+# Subtest: Certification canonical domain corrections preserve truthful resource, receipts and recovery
+    # Subtest: shipping Director adapter commits canonical setup with exact registered transport
+    ok 1 - shipping Director adapter commits canonical setup with exact registered transport
+      ---
+      duration_ms: 620.892375
+      type: 'test'
+      ...
+    # Subtest: Prepare reaches current Certification pointer with complete context and immutable handicap
+    ok 2 - Prepare reaches current Certification pointer with complete context and immutable handicap
+      ---
+      duration_ms: 481.995792
+      type: 'test'
+      ...
+    # Subtest: canonical lifecycle still separates Mark Live from scoring access and binds real control receipts
+    ok 3 - canonical lifecycle still separates Mark Live from scoring access and binds real control receipts
+      ---
+      duration_ms: 235.44225
+      type: 'test'
+      ...
+    # Subtest: first and subsequent canonical scores commit with real executable ingress and atomic receipt/audit
+    ok 4 - first and subsequent canonical scores commit with real executable ingress and atomic receipt/audit
+      ---
+      duration_ms: 313.855125
+      type: 'test'
+      ...
+    # Subtest: direct receipt insertion cannot borrow a context without entry-transaction lease
+    ok 5 - direct receipt insertion cannot borrow a context without entry-transaction lease
+      ---
+      duration_ms: 34.355375
+      type: 'test'
+      ...
+    # Subtest: score recovery survives permission revocation and masks other actor existence
+    ok 6 - score recovery survives permission revocation and masks other actor existence
+      ---
+      duration_ms: 299.1785
+      type: 'test'
+      ...
+    # Subtest: eighteen canonical holes finalize; Reopen preserves text mutation identity
+    ok 7 - eighteen canonical holes finalize; Reopen preserves text mutation identity
+      ---
+      duration_ms: 1995.132041
+      type: 'test'
+      ...
+    # Subtest: after admission closes all three receipt read cases remain origin-bound and read-only
+    ok 8 - after admission closes all three receipt read cases remain origin-bound and read-only
+      ---
+      duration_ms: 159.364125
+      type: 'test'
+      ...
+    # Subtest: shipping Director client recovers exact original committed setup after admission closes
+    ok 9 - shipping Director client recovers exact original committed setup after admission closes
+      ---
+      duration_ms: 113.755209
+      type: 'test'
+      ...
+    # Subtest: shipping score recovery adapter returns public COMMITTED DTO after admission closes
+    ok 10 - shipping score recovery adapter returns public COMMITTED DTO after admission closes
+      ---
+      duration_ms: 20.297708
+      type: 'test'
+      ...
+    # Subtest: shipping finalize retry recovers commit before fresh capability gate
+    ok 11 - shipping finalize retry recovers commit before fresh capability gate
+      ---
+      duration_ms: 35.927125
+      type: 'test'
+      ...
+    # Subtest: shipping reopen retry recovers commit before fresh capability gate
+    ok 12 - shipping reopen retry recovers commit before fresh capability gate
+      ---
+      duration_ms: 34.710667
+      type: 'test'
+      ...
+    # Subtest: private helpers and Production wrappers remain unavailable to uncertified authority
+    ok 13 - private helpers and Production wrappers remain unavailable to uncertified authority
+      ---
+      duration_ms: 115.225541
+      type: 'test'
+      ...
+    1..13
+ok 1 - Certification canonical domain corrections preserve truthful resource, receipts and recovery
+  ---
+  duration_ms: 15691.491958
+  type: 'test'
+  ...
+# {"environment":"OWNED_LOCAL_POSTGRESQL17","forwardMigrations":["supabase/production_migrations/202609300131_canonical_resource_control_v1.sql","supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql","supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql","supabase/production_migrations/202609300134_certification_annual_administration_v1.sql","supabase/production_migrations/202609300135_certification_read_contracts_v1.sql","supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql","supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql"],"holes":18,"finalizedReceipts":1,"reopenedReceipts":1,"googleCalls":0,"googleJobs":0,"hostedAccess":false,"productionAccess":false,"fullTournament":"NOT_RUN_HERE"}
+1..1
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 15831.191917

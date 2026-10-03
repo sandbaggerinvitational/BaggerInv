@@ -1,0 +1,20 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17_NON_PRODUCTION",
+  "migration143": "cdda46ff5eec5ae4b011828fccf1ddf153c404e08c3bbe959f7280aa9df03c80",
+  "apiBooleanImpersonationDenied": true,
+  "observed": [
+    {
+      "name": "dispatch_certification_odds_v1",
+      "denied": false,
+      "resultState": "COMMITTED",
+      "idempotent": true
+    },
+    {
+      "name": "read_certification_odds_operation_v1",
+      "denied": false,
+      "resultState": "COMMITTED",
+      "idempotent": false
+    }
+  ],
+  "canonicalSnapshots": 1
+}

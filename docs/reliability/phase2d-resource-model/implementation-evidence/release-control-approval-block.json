@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-10-02",
+  "action": "Run test/reliability-phase2dr2-release.integration.test.mjs in owned local PostgreSQL",
+  "status": "AUTO_REVIEW_REJECTED_NOT_EXECUTED",
+  "reason": "Executes newly introduced Certification release-rebind authority operation; available transcript shows scratch proposal under review rather than explicit approval for applying/exercising exact implementation. Must obtain approval; no workaround.",
+  "migration": "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql",
+  "databaseExecution": false,
+  "hostedAccess": false,
+  "productionAccess": false,
+  "followup": "Retain unexecuted draft for owner review; exclude from any compiler or test until approval boundary resolved.",
+  "quarantinedMigration": "/private/tmp/r2-release-rebind-unapproved.sql",
+  "quarantinedTest": "/private/tmp/r2-release-integration-unapproved.mjs",
+  "repositoryDiscovery": false
+}

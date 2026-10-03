@@ -1,0 +1,159 @@
+{
+  "recordedAt": "2026-10-03T02:45:52.865584+00:00",
+  "classification": "STRONGLY_SUPPORTED",
+  "proofLayer": "SOURCE",
+  "status": "SCOPED_REVIEW_COMPLETE_NOT_RUNTIME_CERTIFICATION",
+  "baseSha": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "branch": "codex/reliability-phase2d-staging-admission",
+  "networkUsed": false,
+  "postgresqlStarted": false,
+  "runtimeSourceChangedByAudit": false,
+  "sourceHashes": {
+    "app/admin/director/CanonicalDirectorOdds.js": "7d6674f13f58835c2e2440cbb62a2f4a670b719742c10028e69f7800fdcad562",
+    "app/api/director/canonical-odds/route.js": "ccf05dd9bd22098ff18f43cf1f649317c599f32dc96933007fd712cfc2036086",
+    "app/api/odds/publish/route.js": "95d35ac18052cf535cee5484d98d840ae0cd41e74e4ac555ea45e44dca2fb876",
+    "config/certification-resource-registration.json": "7ff467e11e3ae1e9e679b4c5630ddcea2116bf38eaf3d4429517d219532a5d5e",
+    "lib/calcutta-post-commit.js": "589210e3eee402d393c1279a89ad9f7dd48fcca034fa3711e498465fb3d95e7f",
+    "lib/canonical-director-odds-client.js": "14125cbf9f69f16d362f9e69563fd410c0467edebf19cf57ce29091e06f708b7",
+    "lib/canonical-director-odds.js": "3b897836d1d044fa8286e330c9be10a71e64435092fc5514bd4799cc24dabcaa",
+    "lib/canonical-director-operations-client.js": "8f2ae30067d0844d44500a4306e151b94bf15f5e916653a946ac424decf381c4",
+    "lib/canonical-director-overview.js": "5b6b79368c144df9cffd921a123a709dd7ec9c0068f7335004980dc32a8e53dd",
+    "lib/canonical-resource-registration.js": "0f2647d93c0f37c8d2ee92a77f6270408345f1e09e6ac5964ce88f7f83fe28f1",
+    "lib/canonical-runtime-source.js": "1907a9b4d5cccadce45bfb587f6da78fa0a16c5aadc004b2fac0f38a8c7591f0",
+    "lib/certification-odds-server.js": "3e1d0b8f21336463a67b3fdfcebd49b874e3496c3454df594782e863397bad39",
+    "lib/certification-read-adapters.js": "374e7f35a2f3e578f9705802e1284fb996e2bb5be44b98cd2d52c3edd80767b4",
+    "lib/certification-runtime-server.js": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779",
+    "lib/certification-worker-adapter.js": "33f6c84b25c6cf36a149038700892482f05baeaa9ed7cf4f86c54dfb08f6435e",
+    "lib/competition-derived-supabase.js": "79e209265c143ed2f97260a848a05a841a649ed98098bc4191a9b7dca5a5088c",
+    "lib/history-2026-read-source.js": "61cf48b692a1915f4791355201a1fd3ccb03cb6e8e60292e99817e5e09346271",
+    "lib/history-2026-service.js": "4a5c8ca644cddb88ae3afa87c3491b845880385acbafae8619d2c021ae8646af",
+    "lib/history-2026-supabase.js": "20151f6d60d223f3cf393f7eab21f31b33ebf1d8dcbd5c72a74bd55f6a6776b0",
+    "lib/intelligence-derived-supabase.js": "583ebeefccd8b835d8bc96a1a790c5246516e819e3858b59d86bc24a01f192bd",
+    "lib/isolated-director-operations.js": "de01168a85256452260c88456b26232c71bdda05c1f8b1764ed2a70ec98ed15d",
+    "lib/participant-identity-authority.js": "3d58f92dddd330db6705c52f7d4eb35dfb5425272462461703da614ada45043c",
+    "lib/participant-identity-supabase.js": "5b9e5d92b7ca1f471ded189eab22713c4d75b2491e2e235aa2929703eb32e9a0",
+    "lib/prediction-input-bundle-source.js": "44bd7fcc544872564d2c3fa9e719201247d5c74fb160eb1049ed6b3d38be2073",
+    "lib/preview-director-authorization.js": "a887205c98c841617f2ab6cdb9459847c91a6e64f1e9961058d96a0084d87b6d",
+    "lib/production-calcutta-server.js": "a4e88cbe7bef7458b4b25f3ab4e9056b4ecb165d9448413242a053de1c269733",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "lib/scoring-authority-supabase.js": "1591779c5e511a82457912c935e470ee7fd6dbc09f07977ab80a42ecb49254ec",
+    "lib/scoring-authority.js": "eb364b5cf3be383bf1b0f09ebf26c0d432781b4cfeb49114bf1f02739139e654",
+    "lib/scoring-shadow.js": "7df8341e7e39148f2bb5d99b7382fed5361ff81ca06b74afd5a28baadb8d7c33",
+    "lib/supabase-auth-admin.js": "64496f94a041788c22b4493ebfa289b6b17a5c43d10dd84b10b16412ed4ea67b",
+    "lib/supabase-auth-server.js": "4cfaaf576e6670047ceb570a953439ceae69a7f574bb9f52b385a7dfb28d8bf9",
+    "next.config.mjs": "8ef3fcd3665e6f09141d1bc385344566dc74d17239ea206a3029a425e2259c7c",
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+    "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql": "5ef34c3bd09feda3a4cacdac275764166ea82319d20a59235efed091016b0343",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql": "0d610b350d76b27f4f63942758cfd7e12bafeddac48f3c8c0ff8c94c74fb37ff",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql": "410f4b2681442ff99cee1ab7f291f0b006fed069262584540ddbfc2e2eb36ffb",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql": "080cdaf863a5f0bc70670f15e0aa658916cda439e0df10110de7d428675334f6",
+    "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql": "d2c7e20327392826882e3451daab8594fd1187ea2672cece7889cbeb4768d245",
+    "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql": "1f7ea4800f11204dd8016269f65291b213666e642fb65a899df883b32462044d",
+    "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql": "ff89ea6218d6692e7f669e1b057d0f5ac2d7bf35131bab972bec38e2a1b93510",
+    "supabase/production_migrations/202609300151_certification_annual_reopen_lineage_v1.sql": "049479ddd58887dedc374a685eae12a6939dc834619b573070a29b44c27e029a",
+    "supabase/production_migrations/202609300152_certification_closed_release_admission_v1.sql": "6e5ea854a7e7baa51f18af7bd8f9436fa2e4a487416cb61649c32ace60238e8b"
+  },
+  "secretScan": {
+    "textFilesScanned": 384,
+    "patterns": [
+      "private_key",
+      "supabase_secret_format",
+      "google_oauth_token",
+      "github_token",
+      "slack_token",
+      "jwt_shape"
+    ],
+    "matchesWithoutValues": [],
+    "limitation": "Pattern scan only; does not prove absence of every possible secret format."
+  },
+  "nativeFilesChanged": [],
+  "packageManifestOrLockChanges": [],
+  "repositoryDatabaseOrKeyFiles": [],
+  "repositoryLocalEnvFilesNamesOnly": [],
+  "preexistingCandidateControlTestSeamUnchanged": true,
+  "ownPriorClusterCleanup": "All owned fixtures from final152 release, finite-timeout, Director, NetSkins and two-database isolation proofs destroyed after awaited cleanup; parent/other agents may own the next coordinated cluster.",
+  "reviewedBoundaries": [
+    "Exact checked-in Certification registration and public/server URL/key hash binding; explicit request fails closed.",
+    "Server-owned actor/resource context, logical RPC allowlists, durable ingress and same-operation recovery.",
+    "Director verified Auth/account/entitlement/non-impersonation and SQL actor validation.",
+    "Participant identity reads only; Certification provider administration/OTP unavailable.",
+    "Scoring/current reads/workers select explicit Certification paths before legacy providers; no fallback authority found.",
+    "Odds read DTO privacy, exact job/resource/generation/release binding, explicit owner publication and canonical atomic receipts/audit.",
+    "141 binder sets canonical current generation only after resource-aware gate/future-current checks.",
+    "147 exact retained closed2026 History lineage and immutable published Guide authority; no fixture exception or hidden current fallback.",
+    "144 owner-only release CAS and current generation precedence; scoped Odds drain denies unfinished required outgoing work without job adoption.",
+    "148 Certification-only structural plus canonical live freshness, exact match locks, no Production fingerprint rewrite.",
+    "149 exact Certification snapshot guard resource dispatch; original Production branch, immutable fields and triggers preserved.",
+    "150 truthful composite configuration/live-source publication identity; existing index, Production and replay semantics preserved.",
+    "151 exact genuine closure ancestry through supported ABORT/reopen; immutable annual origin and guard retained.",
+    "152 owner-only CLOSED enable retains PAUSED with exact closure/drain evidence; READS/ANNUAL only under existing phase guard.",
+    "Calcutta postcommit explicit Certification path validates branded current worker context and target; no legacy Preview/Production fallback on error.",
+    "Final Calcutta validator aligns only explicit Certification claims to existing133/141 DTOs: all canonical input targets and activation exact; initial optional fields absent/null as specified, contradictory fields deny; future outer/job targets and generation UUID agree. Same branded context and all claim/configuration/auction/source checks remain, no SQL or Production branch change."
+  ],
+  "exclusions": [
+    "Source review does not substitute for installed owner/ACL/RLS/OID/pg_depend or runtime negative authorization.",
+    "No hosted,Production,physical-device,capacity,restore or complete protected historical-upgrade certification."
+  ],
+  "unresolvedProtectedHistoricalProofs": [
+    {
+      "id": "R2-PROVIDER-FORWARD-LINEAGE",
+      "status": "NOT_PROVEN",
+      "detail": "Actual V4 COMMITTED provider path stops at069 requiring maintenance binding for current epoch; no truthful supported synthetic continuation established."
+    },
+    {
+      "id": "R2-PRODUCTION-ODDS-ADOPTION",
+      "status": "NOT_PROVEN",
+      "detail": "Actual protected calculation succeeds; first publication correctly rejects missing frozen2026 historical adoption. Positive publication not proven."
+    },
+    {
+      "id": "R2-PRODUCTION-FULL-ANNUAL",
+      "status": "PARTIAL",
+      "detail": "Supported distinct-course future setup passes; complete predecessor publication/FinalRecap/close/activate dependent on missing adoption and not executed."
+    },
+    {
+      "id": "R2-ANNUAL-SAME-COURSE-PROMOTION",
+      "status": "PROVEN_BASE_DEFECT_UNRESOLVED",
+      "detail": "066 and139 retain byte-identical repeated-course hole-copy query; actual same-course multi-round promotion raises23505."
+    }
+  ],
+  "finalProfile": "131\u2013152",
+  "runtimeEvidenceReferences": [
+    "release-transition-2026-10-03T02-24-05.900Z.json",
+    "finite-timeout-matrix-2026-10-03T02-26-09.590Z.json",
+    "director-financial-2026-10-03T02-28-02.225Z.json",
+    "net-skins-concurrency-2026-10-03T02-28-17.784Z.json",
+    "resource-isolation-profile152.json",
+    "annual-transition-2026-10-03T02-08-24-102Z.json",
+    "calcutta-postcommit-2026-10-03T02-43-10-137Z.json"
+  ],
+  "previousRecordedAt": "2026-10-03T02:31:09.365625+00:00",
+  "differentialRuntimeReview": {
+    "changedFiles": [
+      "lib/production-calcutta-server.js"
+    ],
+    "secretPatternMatchesWithoutValues": [],
+    "fullTreeRescan": false,
+    "reason": "Only changed frozen runtime files rereviewed; no CPU test sweep or PostgreSQL started. Prior384-file scan retained at its recorded snapshot."
+  },
+  "retainedEvidenceImpact": {
+    "annual22": "Claimed/calculated Calcutta branch not executed; unconfigured families and unchanged annual/worker paths only. Actual configured initial calculation is separate6/6 proof.",
+    "boot5": "Hook selected canonical delivery tick but no configured Calcutta job; claim validator not executed. Actual HTTP score/recovery/Odds and empty hook paths unchanged.",
+    "Director14": "Financial fact/configuration/ownership operations and authorization do not execute worker claim validator; retained exercised domain proof.",
+    "timeout11": "Worker tick/drain had unconfigured Calcutta; all actual57014 score/ingress/recovery/Odds boundaries unchanged.",
+    "release18_NetSkins7_resource7": "Changed nonempty Calcutta claim validator not exercised; exact release, NetSkins and resource boundary paths unchanged.",
+    "configuredInitialCalcutta": "calcutta-postcommit-2026-10-03T02-43-10-137Z.json:6/6 tests, sourceStable, actual configured score\u2192claim\u2192unchanged calculator\u2192complete, financial facts/publication unchanged; context race/roles/disabled/missing/wrong target denied.",
+    "futureConfiguredCalcutta": "Matching141 response validation unit coverage only; no claim of configured future financial authoring/runtime integration."
+  }
+}

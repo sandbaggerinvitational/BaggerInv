@@ -1,0 +1,42 @@
+✔ registered 2026 postcommit uses only bound canonical worker with no Google or legacy authority (17.379958ms)
+✔ registered 2097 postcommit uses only bound canonical worker with no Google or legacy authority (0.630667ms)
+✔ wrong or absent postcommit tournament fails before worker side effects (missing) (0.351042ms)
+✔ wrong or absent postcommit tournament fails before worker side effects (2097) (0.209125ms)
+✔ denied worker admission never falls through to legacy Preview or Production (0.458ms)
+✔ stale context conflicts at first tick instead of resolving a fresh target (0.487084ms)
+✔ invalid registered resource is denied before transport and fallback (0.104458ms)
+✔ existing Production and ordinary Preview selection/logic remain byte-identical (16.652375ms)
+✔ canonical 2026 claim DTO passes exact target binding and reaches strict calculator validation (1.150542ms)
+✔ canonical 2097 claim DTO passes exact target binding and reaches strict calculator validation (0.429334ms)
+✔ initial canonical claim fails closed: missing input tournament (0.301125ms)
+✔ initial canonical claim fails closed: wrong input tournament (0.255959ms)
+✔ initial canonical claim fails closed: wrong configuration target (0.245458ms)
+✔ initial canonical claim fails closed: wrong core target (0.23525ms)
+✔ initial canonical claim fails closed: stale activation (0.3575ms)
+✔ initial canonical claim fails closed: contradictory optional job target (0.266667ms)
+✔ initial canonical claim fails closed: contradictory optional response target (0.40375ms)
+✔ initial canonical claim fails closed: unexpected initial generation (0.289ms)
+✔ future canonical claim fails closed: missing job target (0.262208ms)
+✔ future canonical claim fails closed: missing response target (0.253167ms)
+✔ future canonical claim fails closed: wrong configuration target (0.24975ms)
+✔ future canonical claim fails closed: wrong core target (0.595167ms)
+✔ future canonical claim fails closed: stale activation (0.251417ms)
+✔ future canonical claim fails closed: missing generation (0.271333ms)
+✔ future canonical claim fails closed: malformed generation (0.223792ms)
+✔ future canonical claim fails closed: contradictory generations (0.200083ms)
+✔ migration 075 registers exact OBSERVATION Calcutta operations as dispatcher-only targets (1.877667ms)
+✔ future Calcutta state, jobs, and results are exact tournament and runtime-generation scoped (0.802833ms)
+✔ legacy 2026 and scoring invalidation remain pointer fenced (0.280625ms)
+✔ server sends future Calcutta calls only through the certified annual dispatcher (0.229625ms)
+✔ participant and native reads retain the current identity-selected tournament (0.112542ms)
+✔ participant DTO distinguishes frozen 2026 and future unconfigured revisions without cross-year acceptance (0.45ms)
+✔ Production postcommit derives exact tournament from canonical Match and rejects a caller mismatch (0.561709ms)
+✔ every canonical scoring/lifecycle postcommit call supplies the affected Match (4.319875ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 114.155166

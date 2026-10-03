@@ -1,0 +1,68 @@
+{
+  "status": "PASS",
+  "profile": "131\u2013152",
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17_NON_PRODUCTION",
+  "startUtc": "2026-10-03T02:43:47.233575+00:00",
+  "endUtc": "2026-10-03T02:46:11.125620+00:00",
+  "counts": {
+    "total": 49,
+    "pass": 49,
+    "fail": 0,
+    "skip": 0
+  },
+  "groups": {
+    "expandedCertification": {
+      "total": 27,
+      "behavioral": 26,
+      "rpcCalls": 112,
+      "independentDatabases": 2,
+      "concurrentReplay": 8
+    },
+    "twoPartFreshness": {
+      "total": 9,
+      "behavioral": 8,
+      "evidence": "odds-two-part-freshness.json"
+    },
+    "sameResultPublication": {
+      "total": 11,
+      "behavioral": 10,
+      "evidence": "odds-publication-identity-2026-10-03T02-45-04-937Z.json"
+    },
+    "protectedProductionShaped": {
+      "total": 2,
+      "behavioral": 1,
+      "evidence": "production-odds-equivalence.json",
+      "scope": "Actual calculation/request/replay/worker/reference equality and unchanged no-adoption publication denial"
+    }
+  },
+  "sourceFreshness": {
+    "sourceStable": true,
+    "changed": [],
+    "manifest": "odds152-run-source-receipt.json",
+    "method": "Before/after hashes of all app,lib,supabase,test-support sources and exact executed tests"
+  },
+  "rawLog": {
+    "path": "odds152-final-expanded-freshness-identity-protected.log",
+    "originalPath": "/private/tmp/r2-odds152-final.log",
+    "sha256": "fc223f0ea50bc7e6f2a205052d6b37b94f409ce50c2b432bc3f108dc3a805126"
+  },
+  "artifacts": {
+    "odds-publication-identity-2026-10-03T02-45-04-937Z.json": "bf550725326effb0c1039f997b7de15cbce4445dafbe68e256b01a1f026b1475",
+    "odds-two-part-freshness.json": "366c326c308092fc7a02c684b851c6d8821d207bfdd16be7281160fff6964625",
+    "production-odds-equivalence.json": "860e21e37b2ddfc208a5cac1da71ecb29283d133d91830a69663846f23cdb267",
+    "odds-performance-query-plans.json": "ea76d7553d0dfa174124d40b46e746df3c46160b728b36f6cc2e79e8fa30b6b2",
+    "odds-pg-depend-graph.json": "258823f16077bc3ddd204125eef9447c7a276e40ce030c29a4f245a3b31ac6f0"
+  },
+  "googleCalls": 0,
+  "googleJobs": 0,
+  "automaticPublication": 0,
+  "hostedAccess": false,
+  "productionAccess": false,
+  "limitations": [
+    "Positive historical Production publication/adoption is NOT PROVEN; no synthetic authority was fabricated to bypass it",
+    "Protected wrapper parent retains historical annual-release label; its injected focused Odds golden actually executes and emits fresh PASS evidence",
+    "Local transport/calculator/PostgreSQL only; no hosted or Production certification",
+    "Small per-operation timing samples are observations, not p95/p99 estimates"
+  ],
+  "historicalEvidencePreserved": "odds-pre152-evidence-preservation.json; original14923505 and150 receipts unchanged"
+}

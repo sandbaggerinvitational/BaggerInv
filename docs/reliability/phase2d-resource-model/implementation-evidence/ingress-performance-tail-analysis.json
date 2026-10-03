@@ -1,0 +1,553 @@
+{
+  "method": "First-sample position in each100-sample batch; all observations retained.",
+  "batchCount": 68,
+  "maxAtFirstCount": 66,
+  "batches": [
+    {
+      "scale": 1,
+      "operation": "admission",
+      "batch": 1,
+      "max": 12.097,
+      "maxAtSample": 64,
+      "firstSample": 8.03
+    },
+    {
+      "scale": 1,
+      "operation": "admission",
+      "batch": 2,
+      "max": 12.159,
+      "maxAtSample": 1,
+      "firstSample": 12.159
+    },
+    {
+      "scale": 1,
+      "operation": "admission",
+      "batch": 3,
+      "max": 8.167,
+      "maxAtSample": 1,
+      "firstSample": 8.167
+    },
+    {
+      "scale": 1,
+      "operation": "canonicalExecutionIncludingTerminal",
+      "batch": 1,
+      "max": 15.585,
+      "maxAtSample": 1,
+      "firstSample": 15.585
+    },
+    {
+      "scale": 1,
+      "operation": "canonicalExecutionIncludingTerminal",
+      "batch": 2,
+      "max": 14.539,
+      "maxAtSample": 1,
+      "firstSample": 14.539
+    },
+    {
+      "scale": 1,
+      "operation": "canonicalExecutionIncludingTerminal",
+      "batch": 3,
+      "max": 14.404,
+      "maxAtSample": 1,
+      "firstSample": 14.404
+    },
+    {
+      "scale": 1,
+      "operation": "recovery",
+      "batch": 1,
+      "max": 3.224,
+      "maxAtSample": 1,
+      "firstSample": 3.224
+    },
+    {
+      "scale": 1,
+      "operation": "recovery",
+      "batch": 2,
+      "max": 3.248,
+      "maxAtSample": 1,
+      "firstSample": 3.248
+    },
+    {
+      "scale": 1,
+      "operation": "recovery",
+      "batch": 3,
+      "max": 3.317,
+      "maxAtSample": 1,
+      "firstSample": 3.317
+    },
+    {
+      "scale": 1,
+      "operation": "contextHandshake",
+      "batch": 1,
+      "max": 2.879,
+      "maxAtSample": 1,
+      "firstSample": 2.879
+    },
+    {
+      "scale": 1,
+      "operation": "contextHandshake",
+      "batch": 2,
+      "max": 3.364,
+      "maxAtSample": 1,
+      "firstSample": 3.364
+    },
+    {
+      "scale": 1,
+      "operation": "contextHandshake",
+      "batch": 3,
+      "max": 3.102,
+      "maxAtSample": 1,
+      "firstSample": 3.102
+    },
+    {
+      "scale": 1,
+      "operation": "currentRead",
+      "batch": 1,
+      "max": 9.099,
+      "maxAtSample": 1,
+      "firstSample": 9.099
+    },
+    {
+      "scale": 1,
+      "operation": "currentRead",
+      "batch": 2,
+      "max": 13.379,
+      "maxAtSample": 1,
+      "firstSample": 13.379
+    },
+    {
+      "scale": 1,
+      "operation": "currentRead",
+      "batch": 3,
+      "max": 9.308,
+      "maxAtSample": 1,
+      "firstSample": 9.308
+    },
+    {
+      "scale": 1,
+      "operation": "fingerprint",
+      "batch": 1,
+      "max": 1.824,
+      "maxAtSample": 1,
+      "firstSample": 1.824
+    },
+    {
+      "scale": 1,
+      "operation": "closeDrain",
+      "batch": 1,
+      "max": 3.115,
+      "maxAtSample": 1,
+      "firstSample": 3.115
+    },
+    {
+      "scale": 2,
+      "operation": "admission",
+      "batch": 1,
+      "max": 6.42,
+      "maxAtSample": 1,
+      "firstSample": 6.42
+    },
+    {
+      "scale": 2,
+      "operation": "admission",
+      "batch": 2,
+      "max": 6.646,
+      "maxAtSample": 1,
+      "firstSample": 6.646
+    },
+    {
+      "scale": 2,
+      "operation": "admission",
+      "batch": 3,
+      "max": 7.133,
+      "maxAtSample": 1,
+      "firstSample": 7.133
+    },
+    {
+      "scale": 2,
+      "operation": "canonicalExecutionIncludingTerminal",
+      "batch": 1,
+      "max": 12.955,
+      "maxAtSample": 1,
+      "firstSample": 12.955
+    },
+    {
+      "scale": 2,
+      "operation": "canonicalExecutionIncludingTerminal",
+      "batch": 2,
+      "max": 13.441,
+      "maxAtSample": 1,
+      "firstSample": 13.441
+    },
+    {
+      "scale": 2,
+      "operation": "canonicalExecutionIncludingTerminal",
+      "batch": 3,
+      "max": 14.04,
+      "maxAtSample": 1,
+      "firstSample": 14.04
+    },
+    {
+      "scale": 2,
+      "operation": "recovery",
+      "batch": 1,
+      "max": 3.263,
+      "maxAtSample": 1,
+      "firstSample": 3.263
+    },
+    {
+      "scale": 2,
+      "operation": "recovery",
+      "batch": 2,
+      "max": 3.525,
+      "maxAtSample": 1,
+      "firstSample": 3.525
+    },
+    {
+      "scale": 2,
+      "operation": "recovery",
+      "batch": 3,
+      "max": 3.321,
+      "maxAtSample": 1,
+      "firstSample": 3.321
+    },
+    {
+      "scale": 2,
+      "operation": "contextHandshake",
+      "batch": 1,
+      "max": 2.798,
+      "maxAtSample": 1,
+      "firstSample": 2.798
+    },
+    {
+      "scale": 2,
+      "operation": "contextHandshake",
+      "batch": 2,
+      "max": 3.003,
+      "maxAtSample": 1,
+      "firstSample": 3.003
+    },
+    {
+      "scale": 2,
+      "operation": "contextHandshake",
+      "batch": 3,
+      "max": 2.844,
+      "maxAtSample": 1,
+      "firstSample": 2.844
+    },
+    {
+      "scale": 2,
+      "operation": "currentRead",
+      "batch": 1,
+      "max": 8.996,
+      "maxAtSample": 1,
+      "firstSample": 8.996
+    },
+    {
+      "scale": 2,
+      "operation": "currentRead",
+      "batch": 2,
+      "max": 8.991,
+      "maxAtSample": 1,
+      "firstSample": 8.991
+    },
+    {
+      "scale": 2,
+      "operation": "currentRead",
+      "batch": 3,
+      "max": 9.135,
+      "maxAtSample": 1,
+      "firstSample": 9.135
+    },
+    {
+      "scale": 2,
+      "operation": "fingerprint",
+      "batch": 1,
+      "max": 1.872,
+      "maxAtSample": 1,
+      "firstSample": 1.872
+    },
+    {
+      "scale": 2,
+      "operation": "closeDrain",
+      "batch": 1,
+      "max": 3.021,
+      "maxAtSample": 1,
+      "firstSample": 3.021
+    },
+    {
+      "scale": 5,
+      "operation": "admission",
+      "batch": 1,
+      "max": 6.624,
+      "maxAtSample": 1,
+      "firstSample": 6.624
+    },
+    {
+      "scale": 5,
+      "operation": "admission",
+      "batch": 2,
+      "max": 7.094,
+      "maxAtSample": 1,
+      "firstSample": 7.094
+    },
+    {
+      "scale": 5,
+      "operation": "admission",
+      "batch": 3,
+      "max": 8.377,
+      "maxAtSample": 1,
+      "firstSample": 8.377
+    },
+    {
+      "scale": 5,
+      "operation": "canonicalExecutionIncludingTerminal",
+      "batch": 1,
+      "max": 13.266,
+      "maxAtSample": 1,
+      "firstSample": 13.266
+    },
+    {
+      "scale": 5,
+      "operation": "canonicalExecutionIncludingTerminal",
+      "batch": 2,
+      "max": 13.653,
+      "maxAtSample": 1,
+      "firstSample": 13.653
+    },
+    {
+      "scale": 5,
+      "operation": "canonicalExecutionIncludingTerminal",
+      "batch": 3,
+      "max": 14.664,
+      "maxAtSample": 1,
+      "firstSample": 14.664
+    },
+    {
+      "scale": 5,
+      "operation": "recovery",
+      "batch": 1,
+      "max": 3.992,
+      "maxAtSample": 1,
+      "firstSample": 3.992
+    },
+    {
+      "scale": 5,
+      "operation": "recovery",
+      "batch": 2,
+      "max": 3.86,
+      "maxAtSample": 1,
+      "firstSample": 3.86
+    },
+    {
+      "scale": 5,
+      "operation": "recovery",
+      "batch": 3,
+      "max": 3.828,
+      "maxAtSample": 1,
+      "firstSample": 3.828
+    },
+    {
+      "scale": 5,
+      "operation": "contextHandshake",
+      "batch": 1,
+      "max": 3.205,
+      "maxAtSample": 1,
+      "firstSample": 3.205
+    },
+    {
+      "scale": 5,
+      "operation": "contextHandshake",
+      "batch": 2,
+      "max": 3.543,
+      "maxAtSample": 1,
+      "firstSample": 3.543
+    },
+    {
+      "scale": 5,
+      "operation": "contextHandshake",
+      "batch": 3,
+      "max": 3.292,
+      "maxAtSample": 1,
+      "firstSample": 3.292
+    },
+    {
+      "scale": 5,
+      "operation": "currentRead",
+      "batch": 1,
+      "max": 14.513,
+      "maxAtSample": 1,
+      "firstSample": 14.513
+    },
+    {
+      "scale": 5,
+      "operation": "currentRead",
+      "batch": 2,
+      "max": 10.486,
+      "maxAtSample": 1,
+      "firstSample": 10.486
+    },
+    {
+      "scale": 5,
+      "operation": "currentRead",
+      "batch": 3,
+      "max": 10.305,
+      "maxAtSample": 1,
+      "firstSample": 10.305
+    },
+    {
+      "scale": 5,
+      "operation": "fingerprint",
+      "batch": 1,
+      "max": 2.21,
+      "maxAtSample": 1,
+      "firstSample": 2.21
+    },
+    {
+      "scale": 5,
+      "operation": "closeDrain",
+      "batch": 1,
+      "max": 3.242,
+      "maxAtSample": 1,
+      "firstSample": 3.242
+    },
+    {
+      "scale": 10,
+      "operation": "admission",
+      "batch": 1,
+      "max": 7.161,
+      "maxAtSample": 1,
+      "firstSample": 7.161
+    },
+    {
+      "scale": 10,
+      "operation": "admission",
+      "batch": 2,
+      "max": 7.224,
+      "maxAtSample": 1,
+      "firstSample": 7.224
+    },
+    {
+      "scale": 10,
+      "operation": "admission",
+      "batch": 3,
+      "max": 6.889,
+      "maxAtSample": 1,
+      "firstSample": 6.889
+    },
+    {
+      "scale": 10,
+      "operation": "canonicalExecutionIncludingTerminal",
+      "batch": 1,
+      "max": 13.21,
+      "maxAtSample": 1,
+      "firstSample": 13.21
+    },
+    {
+      "scale": 10,
+      "operation": "canonicalExecutionIncludingTerminal",
+      "batch": 2,
+      "max": 17.12,
+      "maxAtSample": 12,
+      "firstSample": 13.645
+    },
+    {
+      "scale": 10,
+      "operation": "canonicalExecutionIncludingTerminal",
+      "batch": 3,
+      "max": 13.55,
+      "maxAtSample": 1,
+      "firstSample": 13.55
+    },
+    {
+      "scale": 10,
+      "operation": "recovery",
+      "batch": 1,
+      "max": 3.197,
+      "maxAtSample": 1,
+      "firstSample": 3.197
+    },
+    {
+      "scale": 10,
+      "operation": "recovery",
+      "batch": 2,
+      "max": 3.264,
+      "maxAtSample": 1,
+      "firstSample": 3.264
+    },
+    {
+      "scale": 10,
+      "operation": "recovery",
+      "batch": 3,
+      "max": 3.303,
+      "maxAtSample": 1,
+      "firstSample": 3.303
+    },
+    {
+      "scale": 10,
+      "operation": "contextHandshake",
+      "batch": 1,
+      "max": 2.855,
+      "maxAtSample": 1,
+      "firstSample": 2.855
+    },
+    {
+      "scale": 10,
+      "operation": "contextHandshake",
+      "batch": 2,
+      "max": 2.785,
+      "maxAtSample": 1,
+      "firstSample": 2.785
+    },
+    {
+      "scale": 10,
+      "operation": "contextHandshake",
+      "batch": 3,
+      "max": 2.758,
+      "maxAtSample": 1,
+      "firstSample": 2.758
+    },
+    {
+      "scale": 10,
+      "operation": "currentRead",
+      "batch": 1,
+      "max": 9.059,
+      "maxAtSample": 1,
+      "firstSample": 9.059
+    },
+    {
+      "scale": 10,
+      "operation": "currentRead",
+      "batch": 2,
+      "max": 9.19,
+      "maxAtSample": 1,
+      "firstSample": 9.19
+    },
+    {
+      "scale": 10,
+      "operation": "currentRead",
+      "batch": 3,
+      "max": 9.109,
+      "maxAtSample": 1,
+      "firstSample": 9.109
+    },
+    {
+      "scale": 10,
+      "operation": "fingerprint",
+      "batch": 1,
+      "max": 1.955,
+      "maxAtSample": 1,
+      "firstSample": 1.955
+    },
+    {
+      "scale": 10,
+      "operation": "closeDrain",
+      "batch": 1,
+      "max": 3.14,
+      "maxAtSample": 1,
+      "firstSample": 3.14
+    }
+  ],
+  "allSamplesRetained": true,
+  "inference": "Session initialization is a possible contributor; no internal cache/CPU/IO attribution measured. No concurrent workers."
+}

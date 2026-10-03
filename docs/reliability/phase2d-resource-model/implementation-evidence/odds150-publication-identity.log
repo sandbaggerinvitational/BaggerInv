@@ -1,0 +1,20 @@
+▶ Certification publication identity distinguishes fresh source without changing equal canonical results
+  ✔ real first calculation and explicit publication record both canonical source components (11950.377125ms)
+  ✔ genuine scoring produces a fresh job with the identical numerical result and unchanged configuration (12222.610917ms)
+  ✔ required receipt failure rolls back second snapshot, current flags, job and audit (115.476125ms)
+  ✔ same-result fresh-source publication commits revision2 with immutable predecessor and accurate audit (168.770542ms)
+  ✔ same-operation replay and lost-response recovery do not duplicate publication; changed request conflicts (81.35175ms)
+  ✔ same source and result retains the existing job and never creates duplicate logical publication (182.305375ms)
+  ✔ actual public freshness and PWA/Build10 projections remain current without exposing private provenance (33.108292ms)
+  ✔ stale source, forged identity, wrong resource, wrong actor and worker publication remain denied (6386.401125ms)
+  ✔ concurrent owner CAS publishes a single revision for the same fresh equal-result job (6322.930417ms)
+  ✔ index definition, private privileges and immutable identity components remain protected (84.74775ms)
+✔ Certification publication identity distinguishes fresh source without changing equal canonical results (43824.292167ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 43902.448875

@@ -1,0 +1,64 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "cases": [
+    {
+      "id": "BROAD-NEW-007 course/tee and immutable approved handicap through actual client/API",
+      "result": "PASS"
+    },
+    {
+      "id": "BROAD-NEW-008 stable operation identity, actual receipt/readback and conflict",
+      "result": "PASS"
+    },
+    {
+      "id": "BROAD-NEW-009 atomic complete round pairings retain approved handicap reference",
+      "result": "PASS"
+    },
+    {
+      "id": "BROAD-NEW-010 all three formats use immutable Net Skins bindings and truthful financial audit",
+      "result": "FAIL",
+      "error": "The canonical operation is unconfirmed. Retry the same operation; do not create a replacement identity."
+    }
+  ],
+  "capabilities": [
+    "BROAD-NEW-007",
+    "BROAD-NEW-008",
+    "BROAD-NEW-009",
+    "BROAD-NEW-010",
+    "BROAD-NEW-011",
+    "BROAD-NEW-012",
+    "BROAD-NEW-174"
+  ],
+  "externalNetworkCalls": 0,
+  "googleCalls": 0,
+  "productionAccess": false,
+  "sessionProof": "SYNTHETIC_SESSION_ADAPTER_REAL_DATABASE_AUTHORIZATION",
+  "databaseErrors": [],
+  "sourceStable": true,
+  "sourceManifest": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "c837f915ba1f3a28919a8a7a3d836bb578f074ebb9a484ce97d3430f2c5c8916",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "lib/certification-runtime-server.js": "7d83a755e7c93af8eae2a5938fc634c2f2ddfa27a9944a76207a53709299775e",
+    "lib/isolated-director-operations.js": "9d2b2e3f54ef710a2ec7eb375d8b78b3e6d2746ffe0cc6d560084082daf53f7a",
+    "lib/canonical-director-operations-client.js": "8f2ae30067d0844d44500a4306e151b94bf15f5e916653a946ac424decf381c4",
+    "app/api/director/canonical-operations/route.js": "cbc0446b5fd60f7f867531fa64126a65891e6df66a153379897765c91760078c",
+    "test/reliability-phase2dr2-director.integration.test.mjs": "cfcff08999ea582e48946a4627284a0e1e0ed9e8fe5e53cdd58ddcb102b91357",
+    "test/support/reliability/certification-director-proof.mjs": "efc0ee1ef5c22cb09c62a4409b69382ae6620e06c626838d5aa4b0826fe30dbb"
+  },
+  "completed": 3,
+  "failures": 1,
+  "limitations": [
+    "Local HTTP/session adapter only; no hosted Auth proof",
+    "Synthetic initial Calcutta configuration is fixture provisioning, not a new configuration API",
+    "No native physical-device or hosted proof"
+  ]
+}

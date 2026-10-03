@@ -150,6 +150,104 @@ create table production_control.annual_scoring_platform_certifications_v1 (
   certified_at timestamptz not null default pg_catalog.clock_timestamp()
 );
 
+-- Forward-install compatibility for a genuinely committed provider-origin
+-- cutover. Such an epoch cannot acquire a maintenance-only capability binding.
+-- Verify its stored origin without refreshing or manufacturing provider facts.
+-- This grants no annual capability; request admission remains in the complete
+-- pre-069 runtime chain, including its supported rollback-worker drain path.
+create function production_control.assert_legacy_provider_origin_v1()
+returns void
+language plpgsql
+stable
+security definer
+set search_path = pg_catalog
+as $$
+begin
+  if not exists (
+    select 1
+    from production_control.resource_scope resource
+    join production_control.cutover_activation_state activation using (scope_key)
+    join production_control.current_tournament_pointer_v1 pointer using (scope_key)
+    join scoring_authority.ingress_gates gate
+      on gate.tournament_id = '2026'
+    join scoring_authority.authority_epochs epoch
+      on epoch.epoch_id = activation.authority_generation_id
+    join production_control.scoring_admission_closures closure
+      on closure.closure_id = epoch.admission_closure_id
+    join production_control.scoring_external_fence_evidence evidence
+      on evidence.evidence_id = epoch.external_fence_evidence_id
+    where resource.scope_key = 'BAGGER_INV_PRODUCTION'
+      and resource.project_ref = 'ymqhhtxaywtqllynrmxe'
+      and resource.project_url = 'https://ymqhhtxaywtqllynrmxe.supabase.co'
+      and resource.google_workbook_id = '1umqPxiQxN9_jwmsD7IcVTzqxPmMycYLlrY_gm31l5U4'
+      and resource.vercel_project = 'bagger-inv'
+      and resource.canonical_domain = 'https://baggerinv.com'
+      and resource.current_tournament_id = '2026'
+      and resource.current_tournament_year = 2026
+      and resource.scoring_authority = 'SUPABASE'
+      and resource.scoring_ingress_enabled
+      and pointer.tournament_id = '2026'
+      and activation.boundary_mode = 'PROVIDER_FENCE_V2'
+      and activation.state = 'SCORING_COMMITTED'
+      and activation.current_authority = 'SUPABASE'
+      and activation.scoring_ingress_enabled
+      and activation.active_transition_epoch_id is null
+      and gate.boundary_mode = 'PROVIDER_FENCE_V2'
+      and gate.authority = 'SUPABASE'
+      and gate.admission_state = 'CLOSED'
+      and gate.admission_protocol_enforced
+      and gate.active_epoch_id = epoch.epoch_id
+      and epoch.boundary_mode = 'PROVIDER_FENCE_V2'
+      and epoch.status = 'COMMITTED'
+      and epoch.epoch_type = 'CUTOVER'
+      and epoch.authority_before = 'GOOGLE'
+      and epoch.authority_after = 'SUPABASE'
+      and epoch.tournament_id = '2026'
+      and epoch.deployment_commit = activation.expected_deployment_commit
+      and closure.boundary_mode = 'PROVIDER_FENCE_V2'
+      and closure.closure_kind = 'LEGACY_ADMISSION'
+      and closure.authority = 'GOOGLE'
+      and closure.status = 'CONSUMED'
+      and closure.consumed_epoch_id = epoch.epoch_id
+      and closure.tournament_id = '2026'
+      and closure.deployment_id = gate.admission_deployment_id
+      and evidence.deployment_id = gate.admission_deployment_id
+      and evidence.deployment_commit = activation.expected_deployment_commit
+      and evidence.vercel_project_id = activation.expected_vercel_project_id
+      and evidence.source_workbook_id = resource.google_workbook_id
+      and evidence.legacy_deployments_fenced
+      and evidence.legacy_google_credentials_fenced
+      and evidence.non_owner_manual_google_scoring_fenced
+      and evidence.owner_override_operationally_frozen
+      and evidence.revoked_at is null
+      and epoch.admission_generation_id = closure.admission_generation_id
+      and epoch.closure_boundary_fingerprint = closure.lease_set_fingerprint
+      and closure.external_fence_evidence_id = evidence.evidence_id
+      and epoch.google_writer_provider_fence_id = evidence.provider_fence_id
+      and epoch.google_writer_provider_verification_id = evidence.provider_fence_verification_id
+      and closure.google_writer_provider_fence_id = evidence.provider_fence_id
+      and closure.google_writer_provider_verification_id = evidence.provider_fence_verification_id
+      and not exists (
+        select 1 from production_control.maintenance_deployment_capability_bindings binding
+        where binding.epoch_id = epoch.epoch_id
+      )
+      and not exists (
+        select 1 from production_control.postcutover_application_release_rebindings
+        where scope_key = resource.scope_key
+      )
+      and not exists (
+        select 1 from production_control.postcutover_normal_release_head
+        where scope_key = resource.scope_key
+      )
+  ) then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_LEGACY_PROVIDER_ORIGIN_REQUIRED';
+  end if;
+end;
+$$;
+revoke all on function production_control.assert_legacy_provider_origin_v1()
+  from public, anon, authenticated, service_role;
+
 do $annual_platform_certification$
 declare
   resource production_control.resource_scope%rowtype;
@@ -176,6 +274,27 @@ begin
   select value.* into strict gate
   from scoring_authority.ingress_gates value
   where value.tournament_id = '2026';
+  if activation.boundary_mode = 'PROVIDER_FENCE_V2' then
+    perform production_control.assert_legacy_provider_origin_v1();
+    if gate.state is distinct from 'OPEN'
+       or not exists (
+         select 1 from production_control.scoring_admission_closures value
+         where value.closure_id = gate.active_closure_id
+           and value.closure_kind = 'LEGACY_ADMISSION'
+           and value.consumed_epoch_id = activation.authority_generation_id
+           and value.admission_generation_id = gate.admission_generation_id
+           and value.external_fence_evidence_id = gate.external_fence_evidence_id
+           and value.google_writer_provider_fence_id = gate.google_writer_provider_fence_id
+           and value.google_writer_provider_verification_id = gate.google_writer_provider_verification_id
+           and value.google_writer_provider_fence_id = activation.active_google_writer_provider_fence_id
+           and value.google_writer_provider_verification_id = activation.active_google_writer_provider_verification_id
+       ) then
+      raise exception using errcode = '55000',
+        message = 'PRODUCTION_LEGACY_PROVIDER_INSTALL_ADMISSION_REQUIRED';
+    end if;
+    -- Installation is compatible; maintenance and annual authority are absent.
+    return;
+  end if;
   select value.* into normal_head
   from production_control.postcutover_normal_release_head value
   where value.scope_key = 'BAGGER_INV_PRODUCTION';
@@ -677,6 +796,7 @@ set search_path = pg_catalog
 as $$
 declare
   pointer production_control.current_tournament_pointer_v1%rowtype;
+  boundary_mode_value text;
 begin
   perform pg_catalog.pg_advisory_xact_lock_shared(
     production_control.scoring_admission_lock_key()
@@ -688,7 +808,14 @@ begin
     raise exception using errcode = '40001',
       message = 'PRODUCTION_LEGACY_SCORING_POINTER_CHANGED';
   end if;
-  perform production_control.annual_scoring_platform_certification_v1(input);
+  select boundary_mode into strict boundary_mode_value
+  from production_control.cutover_activation_state
+  where scope_key = 'BAGGER_INV_PRODUCTION';
+  if boundary_mode_value = 'PROVIDER_FENCE_V2' then
+    perform production_control.assert_legacy_provider_origin_v1();
+  else
+    perform production_control.annual_scoring_platform_certification_v1(input);
+  end if;
   perform production_control
     .assert_production_scoring_runtime_pre_annual_pointer_fence(
       input, required_worker
@@ -1103,6 +1230,13 @@ begin
     raise exception using errcode = '42501',
       message = 'PRODUCTION_FUTURE_RUNTIME_SERVICE_ROLE_REQUIRED';
   end;
+  if not exists (
+    select 1 from production_control.annual_scoring_platform_certifications_v1
+    where scope_key = 'BAGGER_INV_PRODUCTION'
+  ) then
+    raise exception using errcode = '55000',
+      message = 'PRODUCTION_ANNUAL_SCORING_PLATFORM_CERTIFICATION_REQUIRED';
+  end if;
   select value.* into strict scope
   from production_control.resource_scope value
   where value.scope_key = 'BAGGER_INV_PRODUCTION';
@@ -1371,6 +1505,18 @@ begin
   ) value
   where value->>'code' <>
     'FUTURE_PREDECESSOR_SCORING_CLOSE_FENCE_NOT_CERTIFIED';
+  if not exists (
+    select 1 from production_control.annual_scoring_platform_certifications_v1
+    where scope_key = 'BAGGER_INV_PRODUCTION'
+  ) then
+    blockers := blockers || pg_catalog.jsonb_build_array(
+      pg_catalog.jsonb_build_object(
+        'code', 'PRODUCTION_ANNUAL_SCORING_PLATFORM_CERTIFICATION_REQUIRED',
+        'section', 'Activation',
+        'message', 'Annual activation requires its lawful platform certification.'
+      )
+    );
+  end if;
   certificate :=
     production_control.annual_scoring_predecessor_certificate_v1(
       pointer.tournament_id
@@ -2948,6 +3094,7 @@ do $$
 declare signature text;
 begin
   foreach signature in array array[
+    'production_control.assert_legacy_provider_origin_v1()',
     'production_control.annual_scoring_unresolved_count_v1(text,uuid)',
     'production_control.annual_scoring_lease_fingerprint_v1(text,uuid)',
     'production_control.annual_scoring_platform_certification_v1(jsonb)',

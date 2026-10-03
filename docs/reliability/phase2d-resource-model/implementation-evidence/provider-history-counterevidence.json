@@ -1,0 +1,26 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "historicalProtocol": "PROVIDER_FENCE_V2",
+  "providerObservation": "SYNTHETIC_FIXTURE_INPUT",
+  "hostedAccess": false,
+  "realGoogleAccess": false,
+  "googleNetworkCalls": 0,
+  "status": "PARTIAL",
+  "steps": [
+    {
+      "id": "HISTORICAL_PUBLIC_PROTOCOL",
+      "status": "PASS",
+      "closure": {
+        "status": "CONSUMED",
+        "watermark": 1,
+        "fingerprint": "87792cb95a3c73e9c683ff4e59002cc14e85eae3eb0cf4abb41212aaf1ac5b1e",
+        "externalFenceId": "a2d7ccc9-9330-4173-b1c5-c695c1258d98",
+        "providerFenceId": "c104d64c-2b45-4c61-8adb-3685c83dbdcb",
+        "providerVerificationId": "35f52e61-ce19-4b49-babe-5dc105487c4f"
+      },
+      "nonemptyLeaseOutcome": "PROVEN_NO_WRITE",
+      "limitation": "Database protocol proof with synthetic provider observations, no real external writer"
+    }
+  ],
+  "error": "Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -q -v ON_ERROR_STOP=1 -d r2_provider_history -f /private/tmp/bagger-phase2d-staging-admission/supabase/production_migrations/202608260039_production_all_project_provider_inventory_v3.sql\npsql:/private/tmp/bagger-phase2d-staging-admission/supabase/production_migrations/202608260039_production_all_project_provider_inventory_v3.sql:87: ERROR:  PRODUCTION_PROVIDER_INVENTORY_V3_MIGRATION_STATE_INVALID\nCONTEXT:  PL/pgSQL function inline_code_block line 75 at RAISE"
+}

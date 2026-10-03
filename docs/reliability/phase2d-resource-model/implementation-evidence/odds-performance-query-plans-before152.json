@@ -1,0 +1,293 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17_NON_PRODUCTION",
+  "fixture": "Certification initial2026 normalized synthetic inputs; two independently installed resources; 10000-iteration canonical engine",
+  "migrations": [
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql",
+    "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql",
+    "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql",
+    "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql",
+    "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql"
+  ],
+  "excludedMigration144": "Separate release gate pending; not part of this Odds proof",
+  "source": {
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+    "lib/certification-odds-server.js": "3e1d0b8f21336463a67b3fdfcebd49b874e3496c3454df594782e863397bad39",
+    "lib/certification-runtime-server.js": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779",
+    "test/reliability-phase2dr2-odds.integration.test.mjs": "e3ff658247d4663fea812e675fd784d1ec3e963c11cf5a7f923d27948b182e11"
+  },
+  "measurement": "performance.now around actual in-process Director API and owned psql RPC transport; worker timing resumes after1000 retained iterations",
+  "limitations": [
+    "Samples characterize individual operations, not latency distributions",
+    "Includes local process scheduling and psql spawn overhead",
+    "Plan fixture has one tournament/current publication and low history; history-scale benchmark is separate",
+    "No hosted or Production proof"
+  ],
+  "measured": {
+    "calculationRequestApi": {
+      "sampleCount": 1,
+      "samplesMs": [
+        60.40037500000108
+      ],
+      "maxMs": 60.40037500000108,
+      "p95": "NOT_PROVEN",
+      "p99": "NOT_PROVEN"
+    },
+    "calculationResumeWorker": {
+      "sampleCount": 1,
+      "samplesMs": [
+        5694.138709000001
+      ],
+      "maxMs": 5694.138709000001,
+      "p95": "NOT_PROVEN",
+      "p99": "NOT_PROVEN"
+    },
+    "firstPublicationApi": {
+      "sampleCount": 1,
+      "samplesMs": [
+        48.422875000000204
+      ],
+      "maxMs": 48.422875000000204,
+      "p95": "NOT_PROVEN",
+      "p99": "NOT_PROVEN"
+    },
+    "committedRecoveryApi": {
+      "sampleCount": 1,
+      "samplesMs": [
+        9.083792000001267
+      ],
+      "maxMs": 9.083792000001267,
+      "p95": "NOT_PROVEN",
+      "p99": "NOT_PROVEN"
+    },
+    "calculationFreshWorker25000": {
+      "sampleCount": 1,
+      "samplesMs": [
+        15448.863417
+      ],
+      "maxMs": 15448.863417,
+      "p95": "NOT_PROVEN",
+      "p99": "NOT_PROVEN"
+    },
+    "calculationFreshWorker10000": {
+      "sampleCount": 1,
+      "samplesMs": [
+        6026.699249999998
+      ],
+      "maxMs": 6026.699249999998,
+      "p95": "NOT_PROVEN",
+      "p99": "NOT_PROVEN"
+    },
+    "secondPublicationApi": {
+      "sampleCount": 1,
+      "samplesMs": [
+        48.44100000000617
+      ],
+      "maxMs": 48.44100000000617,
+      "p95": "NOT_PROVEN",
+      "p99": "NOT_PROVEN"
+    }
+  },
+  "queries": {
+    "job": "select *from scoring_authority.odds_calculation_jobs where job_id='55b40cf6748ddc6d1e60921fdb25d4ef5cc5792e8ff88cf17b615d5367e1fe34'",
+    "publication": "select *from scoring_authority.odds_publication_current where tournament_id='2026'",
+    "receipt": "select *from production_control.certification_odds_receipts_v1 where resource_id='CERTIFICATION:d4ed6e7a-396e-43ec-aecb-e9d86ce2df29'and tournament_id='2026'and operation_request_id='3a39cb28-fca3-4ce0-b52d-5464c80addb3'"
+  },
+  "plans": {
+    "job": [
+      {
+        "Plan": {
+          "Node Type": "Index Scan",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Scan Direction": "Forward",
+          "Index Name": "odds_calculation_jobs_pkey",
+          "Relation Name": "odds_calculation_jobs",
+          "Alias": "odds_calculation_jobs",
+          "Startup Cost": 0.14,
+          "Total Cost": 8.16,
+          "Plan Rows": 1,
+          "Plan Width": 1084,
+          "Actual Startup Time": 0.003,
+          "Actual Total Time": 0.003,
+          "Actual Rows": 1,
+          "Actual Loops": 1,
+          "Index Cond": "(job_id = '55b40cf6748ddc6d1e60921fdb25d4ef5cc5792e8ff88cf17b615d5367e1fe34'::text)",
+          "Rows Removed by Index Recheck": 0,
+          "Shared Hit Blocks": 2,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        },
+        "Planning": {
+          "Shared Hit Blocks": 207,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        },
+        "Planning Time": 0.195,
+        "Triggers": [],
+        "Execution Time": 0.016
+      }
+    ],
+    "publication": [
+      {
+        "Plan": {
+          "Node Type": "Index Scan",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Scan Direction": "Forward",
+          "Index Name": "odds_publication_current_pkey",
+          "Relation Name": "odds_publication_current",
+          "Alias": "odds_publication_current",
+          "Startup Cost": 0.14,
+          "Total Cost": 8.16,
+          "Plan Rows": 1,
+          "Plan Width": 432,
+          "Actual Startup Time": 0.002,
+          "Actual Total Time": 0.002,
+          "Actual Rows": 1,
+          "Actual Loops": 1,
+          "Index Cond": "(tournament_id = '2026'::text)",
+          "Rows Removed by Index Recheck": 0,
+          "Shared Hit Blocks": 2,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        },
+        "Planning": {
+          "Shared Hit Blocks": 127,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        },
+        "Planning Time": 0.12,
+        "Triggers": [],
+        "Execution Time": 0.01
+      }
+    ],
+    "receipt": [
+      {
+        "Plan": {
+          "Node Type": "Index Scan",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Scan Direction": "Forward",
+          "Index Name": "certification_odds_receipts_v1_pkey",
+          "Relation Name": "certification_odds_receipts_v1",
+          "Alias": "certification_odds_receipts_v1",
+          "Startup Cost": 0.15,
+          "Total Cost": 8.17,
+          "Plan Rows": 1,
+          "Plan Width": 264,
+          "Actual Startup Time": 0.004,
+          "Actual Total Time": 0.004,
+          "Actual Rows": 1,
+          "Actual Loops": 1,
+          "Index Cond": "((resource_id = 'CERTIFICATION:d4ed6e7a-396e-43ec-aecb-e9d86ce2df29'::text) AND (tournament_id = '2026'::text) AND (operation_request_id = '3a39cb28-fca3-4ce0-b52d-5464c80addb3'::uuid))",
+          "Rows Removed by Index Recheck": 0,
+          "Shared Hit Blocks": 2,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        },
+        "Planning": {
+          "Shared Hit Blocks": 103,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        },
+        "Planning Time": 0.107,
+        "Triggers": [],
+        "Execution Time": 0.012
+      }
+    ]
+  },
+  "indexes": [
+    {
+      "name": "certification_odds_receipts_v1_pkey",
+      "table": "certification_odds_receipts_v1",
+      "definition": "CREATE UNIQUE INDEX certification_odds_receipts_v1_pkey ON production_control.certification_odds_receipts_v1 USING btree (resource_id, tournament_id, operation_request_id)"
+    },
+    {
+      "name": "odds_calculation_jobs_claim_idx",
+      "table": "odds_calculation_jobs",
+      "definition": "CREATE INDEX odds_calculation_jobs_claim_idx ON scoring_authority.odds_calculation_jobs USING btree (status, lease_expires_at, requested_at)"
+    },
+    {
+      "name": "odds_calculation_jobs_invocation_fingerprint_key",
+      "table": "odds_calculation_jobs",
+      "definition": "CREATE UNIQUE INDEX odds_calculation_jobs_invocation_fingerprint_key ON scoring_authority.odds_calculation_jobs USING btree (invocation_fingerprint)"
+    },
+    {
+      "name": "odds_calculation_jobs_pkey",
+      "table": "odds_calculation_jobs",
+      "definition": "CREATE UNIQUE INDEX odds_calculation_jobs_pkey ON scoring_authority.odds_calculation_jobs USING btree (job_id)"
+    },
+    {
+      "name": "odds_calculation_jobs_scope_idx",
+      "table": "odds_calculation_jobs",
+      "definition": "CREATE INDEX odds_calculation_jobs_scope_idx ON scoring_authority.odds_calculation_jobs USING btree (tournament_id, phase, requested_at DESC)"
+    },
+    {
+      "name": "odds_publication_current_current_snapshot_id_key",
+      "table": "odds_publication_current",
+      "definition": "CREATE UNIQUE INDEX odds_publication_current_current_snapshot_id_key ON scoring_authority.odds_publication_current USING btree (current_snapshot_id)"
+    },
+    {
+      "name": "odds_publication_current_pkey",
+      "table": "odds_publication_current",
+      "definition": "CREATE UNIQUE INDEX odds_publication_current_pkey ON scoring_authority.odds_publication_current USING btree (tournament_id)"
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "cases": [
+    {
+      "id": "known opposite-round lock cycle becomes one-way wait; concurrent score remains independent",
+      "result": "PASS",
+      "details": {
+        "graph": [
+          {
+            "pid": 59793,
+            "blockedBy": [
+              59794
+            ]
+          }
+        ],
+        "scoreMs": 47.37945800000034,
+        "deadlocks": 0
+      }
+    },
+    {
+      "id": "eight mixed-round batches retain exact current source and configuration",
+      "result": "PASS",
+      "details": [
+        {
+          "iteration": 0,
+          "workers": 3,
+          "processed": 4,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 1,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 2,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 3,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 4,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 5,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 6,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        },
+        {
+          "iteration": 7,
+          "workers": 3,
+          "processed": 3,
+          "deadlocks": 0
+        }
+      ]
+    },
+    {
+      "id": "stale and superseded owner completion races current materialization without replacing authority",
+      "result": "PASS",
+      "details": [
+        {
+          "scenario": "STALE_RUNNING",
+          "round": 1,
+          "denial": "PRODUCTION_NET_SKINS_SOURCE_REVISION_CONFLICT",
+          "sourcePreserved": true,
+          "deadlocks": 0
+        },
+        {
+          "scenario": "SUPERSEDED",
+          "round": 2,
+          "denial": "PRODUCTION_NET_SKINS_JOB_LEASE_REQUIRED",
+          "sourcePreserved": true,
+          "deadlocks": 0
+        }
+      ]
+    },
+    {
+      "id": "typed40P01 materialization failure retains durable retry and recovers after actual backoff",
+      "result": "PASS",
+      "details": {
+        "sqlstate": "40P01",
+        "retryState": "RETRYABLE",
+        "actualBackoffMs": 2007,
+        "recoveryState": "SUCCEEDED",
+        "attempts": 2,
+        "canonicalScoreCommitted": true
+      }
+    },
+    {
+      "id": "explicit owner claims and unchanged calculator complete all formats without publishing or changing financial facts",
+      "result": "PASS",
+      "details": [
+        {
+          "round": 1,
+          "state": "PROVISIONAL",
+          "fullNetEntrants": 24,
+          "resultId": "319faaac-beba-4790-9527-1389a779d6c7"
+        },
+        {
+          "round": 2,
+          "state": "PROVISIONAL",
+          "fullNetEntrants": 12,
+          "resultId": "f9b98049-a5f2-472d-8221-499c5ecf34ea"
+        },
+        {
+          "round": 3,
+          "state": "PROVISIONAL",
+          "fullNetEntrants": 24,
+          "resultId": "e8de590b-27e7-426e-9d04-1225f06ac4ba"
+        }
+      ]
+    },
+    {
+      "id": "wrong resource and participant cannot claim owner financial work",
+      "result": "PASS"
+    }
+  ],
+  "googleCalls": 0,
+  "googleJobs": 0,
+  "deadlocks": 0,
+  "externalNetwork": false,
+  "sourceManifest": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "c837f915ba1f3a28919a8a7a3d836bb578f074ebb9a484ce97d3430f2c5c8916",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "f6e6ffe41b25ce698eaa794d964992b99d28dc14fd709d2c4c50b79ef5c15e33",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "test/reliability-phase2dr2-net-skins-concurrency.integration.test.mjs": "9741ec4b226e7f3b2646b1eb823766aacdf4217d366bd2dc49b4354e1f864e4e",
+    "test/support/reliability/certification-net-skins-fixture.mjs": "7f43b53093a392bbf5cda1e3ea81cbb86c202ecf9c69cd8d887365693e4ab16f",
+    "test/support/reliability/certification-director-proof.mjs": "343e1b6c0d1ff7c1080a134b83f7d18c9eed42f19e4e9a7b83d1fc9dea6d7e73",
+    "test/support/reliability/phase2d-certification-fixture.mjs": "8dbeccb14fd6531657e81051aa4c0016a262dbea0345f1f0137a2bda2364ba78",
+    "lib/production-full-net.js": "fb854e2036d1082e12a885397f8648c74ab0e31a7126f05b31302b75c629780b",
+    "lib/net-skins.js": "99629f0e5e850cc2bf61751a6085709f31d87127f8bb401547d9f496e9c24cee",
+    "lib/isolated-director-operations.js": "de01168a85256452260c88456b26232c71bdda05c1f8b1764ed2a70ec98ed15d"
+  },
+  "sourceStable": true,
+  "limitations": [
+    "Known mixed-round ordered lock scenario only, not universal deadlock freedom",
+    "Initial synthetic configuration is declared fixture provisioning; entry saves and owner calculator are actual supported operations",
+    "No final financial publication or hosted capacity proof"
+  ]
+}

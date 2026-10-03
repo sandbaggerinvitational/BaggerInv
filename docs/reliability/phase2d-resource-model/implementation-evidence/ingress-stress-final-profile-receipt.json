@@ -1,0 +1,28 @@
+{
+  "capturedAt": "2026-10-02T23:43:23.430822+00:00",
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "profile": {
+    "through": 146,
+    "excluded": [
+      144
+    ]
+  },
+  "scope": "Durable ingress core close/reopen, not annual abort/reopen authority",
+  "result": "PASS",
+  "nodeTests": 9,
+  "behavioralCases": 8,
+  "fail": 0,
+  "skip": 0,
+  "durationMs": 306971.706208,
+  "sourceStable": true,
+  "runtimeArtifactSha256": "873cf151b678d1972fbf7ab1f09ca979a90d1159e9ea6f1d6aae95704cde9b2d",
+  "logSha256": "96ea187ef401ebc0d6dfccbef54f5c7d92a5e11573cd3b31bdcf9376589ad8fb",
+  "clusterCleanup": "COMPLETE; process exit0 after awaited destroyIsolatedCluster",
+  "limitations": [
+    "No hosted or Production target",
+    "No power-loss durability claim",
+    "Actual300-second admission expiry, not time-compressed",
+    "Core ingress close/reopen only; annual transition authority covered separately",
+    "Pending144 and future147 excluded"
+  ]
+}

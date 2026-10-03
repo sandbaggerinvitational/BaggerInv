@@ -1,0 +1,570 @@
+   ▲ Next.js 15.5.18
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/historical.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/draft/draft.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/live/live.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/history/historical-match-row.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/draft/draft.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/historical.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/live/live.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/odds-center/odds.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/war-room/war-room.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 2 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/admin/admin-center.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/admin/director/ProductionFutureYearAdministrationPanel.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/admin/player-passport-admin.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/admin/cms-manager.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/admin/director/net-skins-entries.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+ ⚠ Compiled with warnings in 8.9s
+
+./app/admin/admin-center.module.css
+Warning
+
+(1:1045) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/admin-center.module.css
+./app/admin/AdminCenter.js
+
+./app/admin/cms-manager.module.css
+Warning
+
+(1:674) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/cms-manager.module.css
+./app/admin/CmsManager.js
+./app/admin/AdminCenter.js
+
+./app/admin/director/ProductionFutureYearAdministrationPanel.module.css
+Warning
+
+(1:3693) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/director/ProductionFutureYearAdministrationPanel.module.css
+./app/admin/director/ProductionFutureYearAdministrationPanel.js
+./app/admin/director/ProductionDirectorConsole.js
+
+./app/admin/director/net-skins-entries.module.css
+Warning
+
+(24:53) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/director/net-skins-entries.module.css
+./app/admin/director/ProductionNetSkinsEntries.js
+./app/admin/director/CanonicalDirectorOperations.js
+./app/admin/director/CanonicalDirectorConsole.js
+
+./app/admin/player-passport-admin.module.css
+Warning
+
+(1:108) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/player-passport-admin.module.css
+./app/admin/PlayerPassportAdmin.js
+./app/admin/AdminCenter.js
+
+./app/draft/draft.module.css
+Warning
+
+(1:1661) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/draft/draft.module.css
+./app/draft/DraftExperience.js
+./app/draft/page.js
+
+./app/draft/draft.module.css
+Warning
+
+(1:1661) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/draft/draft.module.css
+./app/draft/DraftAnalysisSummary.js
+
+./app/historical.module.css
+Warning
+
+(2285:3) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/historical.module.css
+./app/champions/page.js
+
+./app/historical.module.css
+Warning
+
+(2285:3) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/historical.module.css
+./app/history/HistoryBackToTop.js
+
+./app/history/historical-match-row.module.css
+Warning
+
+(1:1188) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/history/historical-match-row.module.css
+./app/history/HistoricalMatchRow.js
+./app/history/[year]/round/[round]/page.js
+
+./app/live/live.module.css
+Warning
+
+(155:3) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/live/live.module.css
+./app/PublicMatchCard.js
+./app/history/[year]/team/[side]/page.js
+
+./app/live/live.module.css
+Warning
+
+(155:3) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/live/live.module.css
+./app/me/ParticipantProfile.js
+
+./app/odds-center/odds.module.css
+Warning
+
+(1:1051) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/odds-center/odds.module.css
+./app/odds-center/OddsCenter.js
+
+./app/war-room/war-room.module.css
+Warning
+
+(5:240) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/war-room/war-room.module.css
+./app/war-room/WarRoom.js
+
+./app/war-room/war-room.module.css
+Warning
+
+(19:50) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/war-room/war-room.module.css
+./app/war-room/WarRoom.js
+
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/historical.module.css': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/draft/draft.module.css': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/live/live.module.css': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/history/historical-match-row.module.css': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/odds-center/odds.module.css': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/war-room/war-room.module.css': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 2 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/admin/admin-center.module.css': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/admin/player-passport-admin.module.css': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/admin/cms-manager.module.css': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/admin/director/ProductionFutureYearAdministrationPanel.module.css': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!/private/var/folders/1l/c2bdsd7114l3tgslqq4np9qc0000gn/T/bagger-r2-application-aPaMrU/app/admin/director/net-skins-entries.module.css': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+ ⚠ Compiled with warnings in 3.4s
+
+./app/admin/admin-center.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/admin/admin-center.module.css
+Warning
+
+(1:1045) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/admin-center.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/admin/admin-center.module.css
+./app/admin/admin-center.module.css
+./app/admin/AdminCenter.js
+
+./app/admin/cms-manager.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/admin/cms-manager.module.css
+Warning
+
+(1:674) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/cms-manager.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/admin/cms-manager.module.css
+./app/admin/cms-manager.module.css
+./app/admin/CmsManager.js
+./app/admin/AdminCenter.js
+
+./app/admin/director/ProductionFutureYearAdministrationPanel.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/admin/director/ProductionFutureYearAdministrationPanel.module.css
+Warning
+
+(1:3693) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/director/ProductionFutureYearAdministrationPanel.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/admin/director/ProductionFutureYearAdministrationPanel.module.css
+./app/admin/director/ProductionFutureYearAdministrationPanel.module.css
+./app/admin/director/ProductionFutureYearAdministrationPanel.js
+./app/admin/director/ProductionDirectorConsole.js
+
+./app/admin/director/net-skins-entries.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/admin/director/net-skins-entries.module.css
+Warning
+
+(24:53) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/director/net-skins-entries.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/admin/director/net-skins-entries.module.css
+./app/admin/director/net-skins-entries.module.css
+./app/admin/director/ProductionNetSkinsEntries.js
+./app/admin/director/CanonicalDirectorOperations.js
+./app/admin/director/CanonicalDirectorConsole.js
+
+./app/admin/player-passport-admin.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/admin/player-passport-admin.module.css
+Warning
+
+(1:108) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/player-passport-admin.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/admin/player-passport-admin.module.css
+./app/admin/player-passport-admin.module.css
+./app/admin/PlayerPassportAdmin.js
+./app/admin/AdminCenter.js
+
+./app/draft/draft.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/draft/draft.module.css
+Warning
+
+(1:1661) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/draft/draft.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/draft/draft.module.css
+./app/draft/draft.module.css
+
+./app/historical.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/historical.module.css
+Warning
+
+(2285:3) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/historical.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/historical.module.css
+./app/historical.module.css
+
+./app/history/historical-match-row.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/history/historical-match-row.module.css
+Warning
+
+(1:1188) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/history/historical-match-row.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/history/historical-match-row.module.css
+./app/history/historical-match-row.module.css
+
+./app/live/live.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/live/live.module.css
+Warning
+
+(155:3) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/live/live.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/live/live.module.css
+./app/live/live.module.css
+
+./app/odds-center/odds.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/odds-center/odds.module.css
+Warning
+
+(1:1051) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/odds-center/odds.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/odds-center/odds.module.css
+./app/odds-center/odds.module.css
+./app/odds-center/OddsCenter.js
+
+./app/war-room/war-room.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/war-room/war-room.module.css
+Warning
+
+(5:240) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/war-room/war-room.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/war-room/war-room.module.css
+./app/war-room/war-room.module.css
+./app/war-room/WarRoom.js
+
+./app/war-room/war-room.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/war-room/war-room.module.css
+Warning
+
+(19:50) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/war-room/war-room.module.css.webpack[javascript/auto]!=!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!../../../../../../tmp/bagger-phase2d-staging-admission/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./app/war-room/war-room.module.css
+./app/war-room/war-room.module.css
+./app/war-room/WarRoom.js
+
+ ✓ Compiled successfully in 12.4s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/19) ...
+   Generating static pages (4/19) 
+   Generating static pages (9/19) 
+   Generating static pages (14/19) 
+ ✓ Generating static pages (19/19)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                                           Size  First Load JS
+┌ ƒ /                                                              4.42 kB         115 kB
+├ ○ /_not-found                                                    1.01 kB         104 kB
+├ ○ /activate                                                      1.93 kB         108 kB
+├ ƒ /admin                                                         24.6 kB         141 kB
+├ ○ /admin/data-health                                               472 B         103 kB
+├ ƒ /admin/director                                                 127 kB         278 kB
+├ ƒ /admin/director/completed-history                              2.06 kB         113 kB
+├ ƒ /admin/director/game-center-readiness                            416 B         151 kB
+├ ƒ /admin/live-matches                                              472 B         103 kB
+├ ○ /admin/publish-odds                                              472 B         103 kB
+├ ƒ /admin/source-audit                                               1 kB         104 kB
+├ ƒ /admin/step11-6-production-google-writer-fence                 6.51 kB         114 kB
+├ ƒ /admin/step12-production-google-writer-provider-fence          5.24 kB         112 kB
+├ ƒ /admin/tournament-guide                                          472 B         103 kB
+├ ƒ /api/admin/cms                                                   472 B         103 kB
+├ ƒ /api/admin/data-authority-certification                          472 B         103 kB
+├ ƒ /api/admin/draft-projection                                      472 B         103 kB
+├ ƒ /api/admin/production-calcutta-v1                                472 B         103 kB
+├ ƒ /api/admin/production-director-synchronization                   472 B         103 kB
+├ ƒ /api/admin/production-maintenance-precommit-deployment-rebind    472 B         103 kB
+├ ƒ /api/admin/production-net-skins-v1                               472 B         103 kB
+├ ƒ /api/admin/production-odds-calculations                          472 B         103 kB
+├ ƒ /api/admin/scorecard-calibration                                 472 B         103 kB
+├ ƒ /api/admin/session                                               472 B         103 kB
+├ ƒ /api/admin/step11-6-production-google-writer-fence               472 B         103 kB
+├ ƒ /api/admin/step11-production-google-certificate                  472 B         103 kB
+├ ƒ /api/admin/step11-production-google-metadata                     472 B         103 kB
+├ ƒ /api/admin/step11-scoring-rehearsal                              472 B         103 kB
+├ ƒ /api/admin/tournament                                            472 B         103 kB
+├ ƒ /api/admin/war-room-calculation-parity                           472 B         103 kB
+├ ƒ /api/admin/war-room-input-parity                                 472 B         103 kB
+├ ƒ /api/auth/hooks/send-sms                                         472 B         103 kB
+├ ƒ /api/captains-briefing                                           472 B         103 kB
+├ ƒ /api/cron/account-deletion                                       472 B         103 kB
+├ ƒ /api/cron/future-match-google-compatibility                      472 B         103 kB
+├ ƒ /api/cron/guide-sync                                             472 B         103 kB
+├ ƒ /api/cron/guide-sync/diagnostics                                 472 B         103 kB
+├ ƒ /api/cron/round-scorecards-archive                               472 B         103 kB
+├ ƒ /api/cron/scoring-google-outbox                                  472 B         103 kB
+├ ƒ /api/director                                                    472 B         103 kB
+├ ƒ /api/director/access                                             472 B         103 kB
+├ ƒ /api/director/canonical-odds                                     472 B         103 kB
+├ ƒ /api/director/canonical-operations                               472 B         103 kB
+├ ƒ /api/director/canonical-overview                                 472 B         103 kB
+├ ƒ /api/director/completed-history                                  472 B         103 kB
+├ ƒ /api/director/draft                                              472 B         103 kB
+├ ƒ /api/director/entitlement                                        472 B         103 kB
+├ ƒ /api/director/future-tournaments                                 472 B         103 kB
+├ ƒ /api/director/future-tournaments/google-writer                   472 B         103 kB
+├ ƒ /api/director/guide                                              472 B         103 kB
+├ ƒ /api/director/guide-content                                      472 B         103 kB
+├ ƒ /api/director/handicaps                                          472 B         103 kB
+├ ƒ /api/director/identity-shadow-diagnostics                        472 B         103 kB
+├ ƒ /api/director/impersonation                                      472 B         103 kB
+├ ƒ /api/director/net-skins-entries                                  472 B         103 kB
+├ ƒ /api/director/notifications/sandbox                              472 B         103 kB
+├ ƒ /api/director/odds-publication                                   472 B         103 kB
+├ ƒ /api/director/participant-identity                               472 B         103 kB
+├ ƒ /api/director/players-access                                     472 B         103 kB
+├ ƒ /api/director/prediction-settings                                472 B         103 kB
+├ ƒ /api/director/production-overview                                472 B         103 kB
+├ ƒ /api/director/reset-preview                                      472 B         103 kB
+├ ƒ /api/director/round-scoring                                      472 B         103 kB
+├ ƒ /api/director/scoring-authority                                  472 B         103 kB
+├ ƒ /api/director/scoring-shadow                                     472 B         103 kB
+├ ƒ /api/director/scoring-shadow/benchmark                           472 B         103 kB
+├ ƒ /api/director/scoring-shadow/phase2-dry-run                      472 B         103 kB
+├ ƒ /api/director/tournament-awards                                  472 B         103 kB
+├ ƒ /api/director/tournament-setup                                   472 B         103 kB
+├ ƒ /api/draft-analysis                                              472 B         103 kB
+├ ƒ /api/draft-analytics                                             472 B         103 kB
+├ ƒ /api/entry                                                       472 B         103 kB
+├ ƒ /api/game-center/[matchId]                                       472 B         103 kB
+├ ƒ /api/leaderboards/calcutta                                       472 B         103 kB
+├ ƒ /api/leaderboards/core                                           472 B         103 kB
+├ ƒ /api/leaderboards/insights                                       472 B         103 kB
+├ ƒ /api/leaderboards/net-skins                                      472 B         103 kB
+├ ƒ /api/live                                                        472 B         103 kB
+├ ƒ /api/live-matches                                                472 B         103 kB
+├ ƒ /api/mobile/v1/account/deletion                                  472 B         103 kB
+├ ƒ /api/mobile/v1/auth/captcha                                      472 B         103 kB
+├ ƒ /api/mobile/v1/auth/certification/renew                          472 B         103 kB
+├ ƒ /api/mobile/v1/auth/otp/certify                                  472 B         103 kB
+├ ƒ /api/mobile/v1/auth/otp/phone                                    472 B         103 kB
+├ ƒ /api/mobile/v1/auth/otp/request                                  472 B         103 kB
+├ ƒ /api/mobile/v1/calcutta                                          472 B         103 kB
+├ ƒ /api/mobile/v1/guide                                             472 B         103 kB
+├ ƒ /api/mobile/v1/health                                            472 B         103 kB
+├ ƒ /api/mobile/v1/history                                           472 B         103 kB
+├ ƒ /api/mobile/v1/history/[year]                                    472 B         103 kB
+├ ƒ /api/mobile/v1/leaders                                           472 B         103 kB
+├ ƒ /api/mobile/v1/matches                                           472 B         103 kB
+├ ƒ /api/mobile/v1/matches/[matchId]                                 472 B         103 kB
+├ ƒ /api/mobile/v1/net-skins                                         472 B         103 kB
+├ ƒ /api/mobile/v1/odds                                              472 B         103 kB
+├ ƒ /api/mobile/v1/passport                                          472 B         103 kB
+├ ƒ /api/mobile/v1/portrait-policy                                   472 B         103 kB
+├ ƒ /api/mobile/v1/records                                           472 B         103 kB
+├ ƒ /api/mobile/v1/schedule                                          472 B         103 kB
+├ ƒ /api/mobile/v1/scoring/current                                   472 B         103 kB
+├ ƒ /api/mobile/v1/scoring/finalize                                  472 B         103 kB
+├ ƒ /api/mobile/v1/scoring/hole                                      472 B         103 kB
+├ ƒ /api/mobile/v1/scoring/mutation-status                           472 B         103 kB
+├ ƒ /api/mobile/v1/session                                           472 B         103 kB
+├ ƒ /api/mobile/v1/today                                             472 B         103 kB
+├ ƒ /api/my-match                                                    472 B         103 kB
+├ ƒ /api/odds/calculations                                           472 B         103 kB
+├ ƒ /api/odds/inputs                                                 472 B         103 kB
+├ ƒ /api/odds/prediction-settings                                    472 B         103 kB
+├ ƒ /api/odds/publication-operations                                 472 B         103 kB
+├ ƒ /api/odds/publish                                                472 B         103 kB
+├ ƒ /api/odds/publish-preview                                        472 B         103 kB
+├ ƒ /api/participant/auth/diagnostics                                472 B         103 kB
+├ ƒ /api/participant/auth/otp/request                                472 B         103 kB
+├ ƒ /api/participant/auth/otp/verify                                 472 B         103 kB
+├ ƒ /api/participant/auth/phone                                      472 B         103 kB
+├ ƒ /api/participant/auth/phone-enrollment                           472 B         103 kB
+├ ƒ /api/participant/auth/phone-login-proof                          472 B         103 kB
+├ ƒ /api/participant/auth/session                                    472 B         103 kB
+├ ƒ /api/participant/context                                         472 B         103 kB
+├ ƒ /api/participant/home                                            472 B         103 kB
+├ ƒ /api/participant/tournament-guide                                472 B         103 kB
+├ ƒ /api/player-passport/activation                                  472 B         103 kB
+├ ƒ /api/player-passport/admin                                       472 B         103 kB
+├ ƒ /api/player-passport/initialize                                  472 B         103 kB
+├ ƒ /api/player-passport/matches                                     472 B         103 kB
+├ ƒ /api/player-passport/notifications                               472 B         103 kB
+├ ƒ /api/player-passport/readiness                                   472 B         103 kB
+├ ƒ /api/player-passport/session                                     472 B         103 kB
+├ ƒ /api/preview-environment                                         472 B         103 kB
+├ ƒ /api/preview-reliability                                         472 B         103 kB
+├ ƒ /api/scoring/access                                              472 B         103 kB
+├ ƒ /api/scoring/current                                             472 B         103 kB
+├ ƒ /api/scoring/diagnostics                                         472 B         103 kB
+├ ƒ /api/scoring/matches                                             472 B         103 kB
+├ ƒ /api/scoring/matches/[matchId]                                   472 B         103 kB
+├ ƒ /api/scoring/mutation-status                                     472 B         103 kB
+├ ƒ /api/scoring/session                                             472 B         103 kB
+├ ƒ /api/spectator/[resource]                                        472 B         103 kB
+├ ƒ /api/spectator/golf/[...path]                                    472 B         103 kB
+├ ƒ /api/tournament-guide                                            472 B         103 kB
+├ ƒ /api/tournament-guide/schema                                     472 B         103 kB
+├ ƒ /api/tournament/foundation                                       472 B         103 kB
+├ ƒ /api/tournament/live                                             472 B         103 kB
+├ ƒ /api/tournament/secondary                                        472 B         103 kB
+├ ○ /app                                                             472 B         103 kB
+├ ƒ /app/courses                                                     146 B         118 kB
+├ ƒ /app/courses/[courseId]                                        1.35 kB         118 kB
+├ ƒ /app/courses/[courseId]/holes/[holeNumber]                      4.4 kB         115 kB
+├ ƒ /app/guide                                                     4.17 kB         115 kB
+├ ƒ /app/guide/[section]                                             145 B         121 kB
+├ ƒ /app/history                                                     143 B         118 kB
+├ ƒ /app/history/[year]                                             2.7 kB         119 kB
+├ ƒ /app/history/[year]/round/[round]                                153 B         126 kB
+├ ƒ /app/history/[year]/team/[side]                                4.04 kB         125 kB
+├ ƒ /app/leaderboards                                                30 kB         146 kB
+├ ƒ /app/odds                                                        137 B         117 kB
+├ ƒ /app/players                                                     140 B         117 kB
+├ ƒ /app/players/[slug]                                              151 B         127 kB
+├ ƒ /app/tournament                                                  214 B         145 kB
+├ ○ /apple-icon.png                                                    0 B            0 B
+├ ƒ /board-of-governors                                              139 B         117 kB
+├ ƒ /champions                                                     6.57 kB         117 kB
+├ ƒ /champions/[year]                                              6.73 kB         118 kB
+├ ƒ /compare                                                       11.4 kB         122 kB
+├ ƒ /courses                                                         146 B         118 kB
+├ ƒ /courses/[courseId]                                            1.35 kB         118 kB
+├ ƒ /courses/[courseId]/holes/[holeNumber]                          4.4 kB         115 kB
+├ ƒ /data-health                                                     637 B         111 kB
+├ ƒ /draft                                                           912 B         118 kB
+├ ƒ /draft/[year]                                                    912 B         118 kB
+├ ƒ /draft/analytics                                               6.41 kB         123 kB
+├ ƒ /enter                                                         1.74 kB         105 kB
+├ ƒ /follow/[[...path]]                                            8.17 kB         117 kB
+├ ƒ /game-center/[matchId]                                         11.3 kB         118 kB
+├ ƒ /history                                                         142 B         118 kB
+├ ƒ /history/[year]                                                 2.7 kB         119 kB
+├ ƒ /history/[year]/round/[round]                                    153 B         126 kB
+├ ƒ /history/[year]/team/[side]                                    4.04 kB         125 kB
+├ ƒ /home                                                          18.2 kB         137 kB
+├ ○ /icon.png                                                          0 B            0 B
+├ ƒ /live                                                            232 B         149 kB
+├ ○ /manifest.webmanifest                                            472 B         103 kB
+├ ƒ /me                                                             8.8 kB         115 kB
+├ ƒ /me/verify-mobile                                              2.92 kB         109 kB
+├ ƒ /my-match                                                        147 B         141 kB
+├ ƒ /odds-center                                                     137 B         117 kB
+├ ○ /odds-center/admin                                               472 B         103 kB
+├ ƒ /participant-auth                                              13.1 kB         116 kB
+├ ƒ /players                                                         140 B         117 kB
+├ ƒ /players/[slug]                                                  151 B         127 kB
+├ ○ /privacy                                                         171 B         106 kB
+├ ƒ /ratings                                                       1.31 kB         112 kB
+├ ƒ /records                                                        4.4 kB         115 kB
+├ ƒ /records/[slug]                                                8.57 kB         119 kB
+├ ○ /robots.txt                                                      472 B         103 kB
+├ ○ /rules                                                           472 B         103 kB
+├ ƒ /score                                                           147 B         141 kB
+├ ƒ /score/access/[token]                                            472 B         103 kB
+├ ○ /sitemap.xml                                                     472 B         103 kB
+├ ƒ /statistics                                                    4.24 kB         115 kB
+├ ƒ /statistics/handicaps                                            140 B         117 kB
+├ ƒ /statistics/partnerships                                         140 B         117 kB
+├ ƒ /statistics/rivalries                                            139 B         117 kB
+├ ○ /support                                                         171 B         106 kB
+├ ƒ /tournament-guide                                              4.17 kB         115 kB
+├ ƒ /tournament-guide/[section]                                      145 B         121 kB
+├ ƒ /war-room                                                      18.6 kB         135 kB
+├ ƒ /war-room/lineup-optimizer                                     5.25 kB         122 kB
+├ ƒ /war-room/simulator                                              472 B         103 kB
+└ ƒ /war-room/team-intelligence                                    8.57 kB         125 kB
++ First Load JS shared by all                                       103 kB
+  ├ chunks/1547-c7ee97a2117cbca9.js                                  46 kB
+  ├ chunks/7a57e81c-045bb389ab8ee4ac.js                            54.2 kB
+  └ other shared chunks (total)                                    2.68 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+
+   ▲ Next.js 15.5.18
+   - Local:        http://127.0.0.1:58390
+   - Network:      http://127.0.0.1:58390
+
+ ✓ Starting...
+ ✓ Ready in 189ms
+(node:55949) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{"schema_version":1,"timestamp":"2026-10-03T00:01:40.595Z","event":"RPC","request_id":"e8e5f2b6-a521-4691-8252-6af0195e7024","correlation_id":"e8e5f2b6-a521-4691-8252-6af0195e7024","route":"/api/tournament/live","domain":"TOURNAMENT_READ","feature":"TOURNAMENT_READ","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":"cccccccccccccccccccccccccccccccccccccccc","operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":26.603,"http_status":400,"query_family":"read_certification_runtime_context_v1","phase":"rpc_transport","outcome":"NOT_APPLICABLE","error_class":"INTERNAL_ERROR","domain_error_code":null,"sqlstate":"42501","canonical_readback":"NOT_OBSERVED","dropped_events":0}
+{"schema_version":1,"timestamp":"2026-10-03T00:01:40.595Z","event":"RPC","request_id":"e8e5f2b6-a521-4691-8252-6af0195e7024","correlation_id":"e8e5f2b6-a521-4691-8252-6af0195e7024","route":"/api/tournament/live","domain":"TOURNAMENT_READ","feature":"TOURNAMENT_READ","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":"cccccccccccccccccccccccccccccccccccccccc","operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":9.991,"http_status":400,"query_family":"read_certification_runtime_context_v1","phase":"rpc_transport","outcome":"NOT_APPLICABLE","error_class":"INTERNAL_ERROR","domain_error_code":null,"sqlstate":"42501","canonical_readback":"NOT_OBSERVED","dropped_events":0}
+{"schema_version":1,"timestamp":"2026-10-03T00:01:40.596Z","event":"DOMAIN_ERROR","request_id":"e8e5f2b6-a521-4691-8252-6af0195e7024","correlation_id":"e8e5f2b6-a521-4691-8252-6af0195e7024","route":"/api/tournament/live","domain":"TOURNAMENT_READ","feature":"TOURNAMENT_READ","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":"cccccccccccccccccccccccccccccccccccccccc","operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":null,"http_status":409,"query_family":null,"phase":null,"outcome":"UNOBSERVED","error_class":"CONFLICT","domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}
+Tournament Supabase live read failed {
+  code: 'CERTIFICATION_DOMAIN_REJECTED',
+  message: 'Canonical Certification operation could not be confirmed.'
+}
+{"schema_version":1,"timestamp":"2026-10-03T00:01:40.596Z","event":"REQUEST","request_id":"e8e5f2b6-a521-4691-8252-6af0195e7024","correlation_id":"e8e5f2b6-a521-4691-8252-6af0195e7024","route":"/api/tournament/live","domain":"TOURNAMENT_READ","feature":"TOURNAMENT_READ","release":null,"release_source":"UNAVAILABLE","activation":null,"activation_source":"UNAVAILABLE","sha":"cccccccccccccccccccccccccccccccccccccccc","operation_id":null,"mutation_id":null,"job_id":null,"match_id":null,"round":null,"target_count":null,"authority_revision":null,"authority_fingerprint":null,"latency_ms":29.717,"http_status":503,"query_family":null,"phase":null,"outcome":"NOT_APPLICABLE","error_class":"FEATURE_UNAVAILABLE","domain_error_code":null,"sqlstate":null,"canonical_readback":"NOT_OBSERVED","dropped_events":0}

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readdir } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import {
   repositoryRoot,
@@ -10,6 +11,8 @@ import {
 export const release139Sha = "b2065c901f9f6cbdc3dc2f1f37f6b1b782309ec6";
 export const lastRelease139Migration =
   "202609270120_bounded_late_r3_result_compatibility_v1.sql";
+export const release139Original069Fixture = "test/fixtures/reliability/release139-069-original.sql";
+const release139Original069Sha256 = "697abe93c2f82002e95b01a2c4ef062507a6f56ac4785111f510e3d1b2fe6152";
 
 const migrationsDirectory = path.join(repositoryRoot, "supabase", "production_migrations");
 const incrementalDirectory = path.join(repositoryRoot, "supabase", "production_incremental");
@@ -78,7 +81,17 @@ export async function installRelease139Schema(cluster, database) {
   assert.equal(names.at(-1), lastRelease139Migration,
     "Release 139 migration boundary is missing");
   for (const name of names) {
-    sqlFile(cluster, database, path.join(migrationsDirectory, name), { role: "" });
+    if (name.startsWith("202608300069")) {
+      // This frozen schema-only scaffold must use Release139's actual source.
+      // It is not a truthful provider/maintenance adoption chronology. The
+      // current compiler applies the reviewed131 bridge after this old profile.
+      const source = await readFile(path.join(repositoryRoot, release139Original069Fixture), "utf8");
+      assert.equal(createHash("sha256").update(source).digest("hex"), release139Original069Sha256,
+        "Retained Release139 migration069 fixture changed");
+      sql(cluster, database, source, { role: "" });
+    } else {
+      sqlFile(cluster, database, path.join(migrationsDirectory, name), { role: "" });
+    }
     if (name.startsWith("202608260038")) {
       sql(cluster, database, `
         insert into scoring_authority.tournaments(

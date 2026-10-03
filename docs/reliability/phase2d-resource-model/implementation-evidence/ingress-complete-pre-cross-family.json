@@ -1,0 +1,19 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "source_sha256": "13883347238fed55eefb9846fa019a901f1cbbf56cb2d2a996f5f500e9fe16e9",
+  "ingress_tests": {
+    "pass": 29,
+    "fail": 0,
+    "skip": 0,
+    "behavioral": 26,
+    "parents": 3
+  },
+  "domain_tests": {
+    "pass": 14,
+    "fail": 0,
+    "skip": 0
+  },
+  "scope": "Before separately reviewed cross-family match mutation-key collision correction; not annual/full tournament/hosted proof",
+  "hosted_access": false,
+  "google_calls": 0
+}

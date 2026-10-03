@@ -1,0 +1,49 @@
+TAP version 13
+# Subtest: migration 078 rebinds future annual normal releases without mutating annual state
+    # Subtest: future annual authorization, replay, stale and invariance
+    not ok 1 - future annual authorization, replay, stale and invariance
+      ---
+      duration_ms: 5091.975375
+      type: 'test'
+      location: 'annual-normal-release-rebind-generated.mjs:26:13'
+      failureType: 'testCodeFailure'
+      error: |-
+        Command failed (3): /opt/homebrew/opt/postgresql@17/bin/psql -X -q -v ON_ERROR_STOP=1 -d maintenance_capability_1_phases -f /private/tmp/bagger-phase2d-staging-admission/supabase/production_migrations/202609300138_certification_annual_transition_v1.sql
+        pg_advisory_xact_lock 
+        -----------------------
+         
+        (1 row)
+        psql:/private/tmp/bagger-phase2d-staging-admission/supabase/production_migrations/202609300138_certification_annual_transition_v1.sql:174: ERROR:  check constraint "scoring_admission_closures_resource_provenance" of relation "scoring_admission_closures" is violated by some row
+      code: 'ERR_TEST_FAILURE'
+      name: 'CommandFailure'
+      stack: |-
+        runCommand (annual-normal-release-rebind-generated.mjs:135:11)
+        psqlFile (annual-normal-release-rebind-generated.mjs:159:10)
+        TestContext.<anonymous> (annual-normal-release-rebind-generated.mjs:2147:133)
+        Test.runInAsyncScope (node:async_hooks:226:14)
+        Test.run (node:internal/test_runner/test:1397:25)
+        Test.start (node:internal/test_runner/test:1257:17)
+        TestContext.test (node:internal/test_runner/test:399:20)
+        context.test (annual-normal-release-rebind-generated.mjs:26:13)
+        annual-normal-release-rebind-generated.mjs:1712:15
+        async Test.run (node:internal/test_runner/test:1404:7)
+      ...
+    1..1
+not ok 1 - migration 078 rebinds future annual normal releases without mutating annual state
+  ---
+  duration_ms: 9028.101041
+  type: 'test'
+  location: 'annual-normal-release-rebind-generated.mjs:19:10'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9247.758083

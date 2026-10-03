@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 2,
+  "status": "PASS",
+  "timestamp": "2026-10-03T04:58:13.907172+00:00",
+  "baseSha": "7cec5128409286f5b4a5f3524d4c5488124a7be7",
+  "branch": "codex/reliability-phase2d-staging-admission",
+  "newCandidateSha": null,
+  "workingTree": "CERTIFIED_SOURCE_FROZEN_FOR_COMMIT",
+  "environment": "OWNED_LOCAL_NON_PRODUCTION",
+  "migrationProfile": [
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql",
+    "supabase/production_migrations/202609300144_certification_release_rebind_v1.sql",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql",
+    "supabase/production_migrations/202609300148_certification_odds_two_part_freshness_v1.sql",
+    "supabase/production_migrations/202609300149_certification_odds_snapshot_guard_v1.sql",
+    "supabase/production_migrations/202609300150_certification_odds_publication_source_identity_v1.sql",
+    "supabase/production_migrations/202609300151_certification_annual_reopen_lineage_v1.sql",
+    "supabase/production_migrations/202609300152_certification_closed_release_admission_v1.sql"
+  ],
+  "allSixP0Closed": true,
+  "p0": {
+    "A": "PASS",
+    "B": "PASS",
+    "C": "PASS",
+    "D": "PASS",
+    "E": "PASS",
+    "F": "PASS"
+  },
+  "readyForPhase2DP": true,
+  "finalBootstrapEnabled": true,
+  "registrationEnabled": false,
+  "ownerPublicationImplemented": true,
+  "approved144And148": "IMPLEMENTED_AND_LOCALLY_PROVEN",
+  "pendingOwnerDecisions": [],
+  "remainingProtectedProof": [],
+  "separateBaselineIssue": "Same-course/tee reuse across three rounds exposes an unchanged066/139 duplicate-hole promotion defect; distinct-course setup is proven. This is separate baseline counterevidence, not an added mandatory special fixture.",
+  "scopeLimits": [
+    "Successor Net Skins/Calcutta configured calculation is not exercised in the annual fixture; those families are deliberately unconfigured there. Initial configured paths have separate proof.",
+    "Hosted identity/Auth/PostgREST, resource/credential isolation, capacity, restore, physical clients and2027 readiness remain unproven."
+  ],
+  "boundaries": {
+    "productionAccess": false,
+    "hostedChanges": false,
+    "oldSharedPreviewAccess": false,
+    "googleAccess": false,
+    "realMessaging": false,
+    "realCompetitiveDataChanged": false,
+    "nativeShippingChanged": false
+  },
+  "evidenceIndex": "evidence-index.json",
+  "commitPolicy": "Local required gates pass with owner-accepted048/057 NOT PROVEN limitations. Commit/push isolated branch only; no Phase2D-P or hosted action is authorized.",
+  "ownerDecisionUpdate": {
+    "recordedAt": "2026-10-03T04:58:13.907172+00:00",
+    "approved069": "IMPLEMENTED_AND_FOCUSED_LOCAL_PROOF_PASS",
+    "acceptedHistoricalLimitations": [
+      "048/057 exact-history positive adoption/publication and dependent FinalRecap/full annual proof remain NOT PROVEN; owner accepted irreproducibility as a limitation. Original payloads are not reconstructed and048/057 remain unchanged."
+    ],
+    "sourceReview": "../069-COMPATIBILITY-REVIEW.md",
+    "reviewed069Sha256": "4e072703787c19f4c8e62b2cc9d84c532c8a99e7fec8c5bce3a1d03b99d9ffe6",
+    "annual864Retention": "PASS_SCOPED_FINAL_CATALOG_AND_CERTIFICATION_READINESS_IMPACT_PROOF",
+    "historicalArtifactsRelabeled": false,
+    "dependent138Change": {
+      "classification": "ORDINARY_PREDECESSOR_HASH_AND_PRODUCTION_ONLY_READINESS_EXTRACTION_PRESERVATION",
+      "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+      "annualRecordedSha256": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+      "reviewedCurrentSha256": "d4bf918963490416e74e6c2049af306d52fc51d4f740de9f494363c9c54df838",
+      "runtimeProof": "PASS_069_CERTIFICATION_IMPACT_FINAL"
+    },
+    "forward131Bridge": {
+      "sha256": "636d107c84f28096717cab20cad14759cbbad1df4c87a05c38fe03f54b215640",
+      "old130Upgrade": "PASS",
+      "correctedNoop": "PASS",
+      "mixedUnknownPrivilegeDefaults": "FAIL_CLOSED",
+      "dataOrCertificateMinted": false
+    }
+  },
+  "candidateCommitResolution": {
+    "status": "CERTIFIED_SOURCE_FROZEN_FOR_COMMIT",
+    "baseShaMeaning": "Historical execution HEAD, not the final candidate identity",
+    "method": "The Git commit containing this final report and source is the candidate. Resolve with git rev-parse HEAD after commit; exact commit/push result is supplied in owner handoff. No self-referential commit hash is embedded."
+  },
+  "acceptedHistoricalLimitations": [
+    "048/057 exact-history positive adoption/publication and dependent FinalRecap/full annual proof remain NOT PROVEN; owner accepted irreproducibility as a limitation. Original payloads are not reconstructed and048/057 remain unchanged."
+  ],
+  "commitReadiness": "READY_FOR_AUTHORIZED_ISOLATED_BRANCH_COMMIT_AND_PUSH",
+  "finalSourceHygiene": "PASS_WITH_PRESERVED_RAW_LOG_WHITESPACE"
+}

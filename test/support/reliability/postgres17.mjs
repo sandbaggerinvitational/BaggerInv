@@ -169,6 +169,20 @@ export async function destroyIsolatedCluster(cluster) {
   await rm(cluster.directory, { recursive: true, force: true });
 }
 
+// Test-only physical process restart. Ownership is verified before pg_ctl; no
+// URL/host argument is accepted. This is not a power-loss durability claim.
+export function restartIsolatedCluster(cluster) {
+  assertOwnedCluster(cluster);
+  assert.equal(cluster.started, true, 'Only the owned running fixture may restart');
+  run(binaries.pg_ctl, ['-D', cluster.data, '-m', 'fast', '-w', 'stop']);
+  cluster.started = false;
+  run(binaries.pg_ctl, ['-D', cluster.data, '-l', cluster.log,
+    '-o', `-F -k ${cluster.socket} -h '' -p ${cluster.port} -c shared_buffers=32MB -c max_connections=20`,
+    '-w', 'start']);
+  cluster.started = true;
+  assert.match(sql(cluster, 'postgres', 'show server_version_num', {role: ''}), /^17\d{4}$/);
+}
+
 export function createDatabase(cluster, database, { template } = {}) {
   assertOwnedCluster(cluster);
   assert.match(database, databaseNamePattern);

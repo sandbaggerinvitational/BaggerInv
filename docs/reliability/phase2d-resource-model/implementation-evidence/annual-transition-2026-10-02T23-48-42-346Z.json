@@ -1,0 +1,4080 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "googleCalls": 0,
+  "hostedAccess": false,
+  "scoresSeeded": 0,
+  "finalsSeeded": 0,
+  "certificatesSeeded": 0,
+  "readinessSeeded": 0,
+  "completedGates": [
+    "synthetic initial identities preserve existing verified contact and owner authority predicates",
+    "published-only current Odds read is empty without publication and rejects foreign target or private core access",
+    "closed History read fails closed without completed same-resource annual lineage and private cores stay private",
+    "future CREATE, roster, courses, promotion, handicap, pairings, contexts and content use supported operations",
+    "predecessor has 432 canonical holes and 24 actual Finals plus explicit rejected and unresolved ingress histories"
+  ],
+  "initialAuthority": {
+    "players": 24,
+    "emailsSent": 0,
+    "source": "urn:bagger:synthetic:4a46d6b3-f4d8-4d35-bb12-fe56391ef21c",
+    "configurationFingerprint": "6795d9eb49996540638a6610b4231d53f07e5b636a7bc0db45dac01f44498cd9"
+  },
+  "initialGuideInput": {
+    "authorityKind": "DECLARED_INITIAL_SYNTHETIC_GUIDE_INPUT",
+    "actualShippingNormalizer": true,
+    "actualSqlValidation": true,
+    "publicationReceiptInvented": false,
+    "importReceiptInvented": false,
+    "googleAccess": false,
+    "projectionHash": "133b1aae82ae58a6c0275f03d6eedfc7b27661d7ee5e8f3b569eb9a5333173fe",
+    "initialPointer": {
+      "domain": "GUIDE",
+      "advanced_at": "2026-10-02T18:48:48.452259-05:00",
+      "advanced_by": "SYNTHETIC_INITIAL_GUIDE_FIXTURE",
+      "revision_id": "70fd6acf-4f43-468b-a610-940d51141183",
+      "tournament_id": "2026"
+    }
+  },
+  "futurePreparation": {
+    "ok": true,
+    "ready": false,
+    "blockers": [
+      {
+        "code": "FUTURE_PREDECESSOR_SCORING_CLOSE_FENCE_NOT_CERTIFIED",
+        "details": [
+          "PREDECESSOR_SCORING_ADMISSION_NOT_CLOSED"
+        ],
+        "message": "The current tournament scoring close and drain boundary is not certified.",
+        "section": "Activation"
+      }
+    ],
+    "fingerprint": "e273fe029105d6e49f5300545c606ae9ae6feacc40adbb9460805ea588663565",
+    "contractVersion": "production-annual-scoring-transition-readiness-v1",
+    "targetTournamentId": "2097",
+    "predecessorCertificate": {
+      "blockers": [
+        "PREDECESSOR_SCORING_ADMISSION_NOT_CLOSED"
+      ],
+      "certified": false,
+      "fingerprint": "2a224a6d94861c4237b333015a0a5221c69467c6e52e678d3a266d9f82efd4c4",
+      "tournamentId": "2026",
+      "sideGameDrain": {
+        "oddsMirrorRows": 0,
+        "oddsUnresolved": 0,
+        "calcuttaUnresolved": 0,
+        "generationMismatch": 0,
+        "netSkinsUnresolved": 0,
+        "runtimeGenerationId": null
+      },
+      "derivedWorkerDrain": {
+        "runtimeGenerationId": null,
+        "competitionUnresolved": 0,
+        "intelligenceUnresolved": 0,
+        "competitionGenerationMismatch": 0,
+        "intelligenceGenerationMismatch": 0
+      }
+    },
+    "expectedPointerRevision": 1,
+    "predecessorTournamentId": "2026"
+  },
+  "preActivationWorkerBindings": {
+    "expectedRuntimeGeneration": null,
+    "families": {
+      "COMPETITION": {
+        "rows": 0,
+        "unbound": 0,
+        "mismatched": 0
+      },
+      "NET_SKINS": {
+        "rows": 0,
+        "unbound": 0,
+        "mismatched": 0
+      },
+      "CALCUTTA": {
+        "rows": 0,
+        "unbound": 0,
+        "mismatched": 0
+      }
+    }
+  },
+  "predecessorSequence": {
+    "rounds": {
+      "1": 108,
+      "2": 108,
+      "3": 216
+    },
+    "holes": 432,
+    "finals": 24
+  },
+  "firstFailure": {
+    "name": "Error",
+    "code": null,
+    "message": "The finalized snapshot is missing required Round Scorecards identity/configuration fields."
+  },
+  "failureSnapshot": {
+    "competitionJobs": [
+      {
+        "status": "PENDING",
+        "attempts": 0,
+        "engine_key": "PROJECTION_EDITORIAL",
+        "round_number": 0,
+        "tournament_id": "2026",
+        "last_error_code": null,
+        "delivery_attempts": 0,
+        "runtime_generation_id": null,
+        "delivery_dead_letter_at": null
+      },
+      {
+        "status": "PENDING",
+        "attempts": 0,
+        "engine_key": "TEAM_MOMENTUM",
+        "round_number": 0,
+        "tournament_id": "2026",
+        "last_error_code": null,
+        "delivery_attempts": 0,
+        "runtime_generation_id": null,
+        "delivery_dead_letter_at": null
+      },
+      {
+        "status": "PENDING",
+        "attempts": 0,
+        "engine_key": "TOURNAMENT_FINAL_RECAP",
+        "round_number": 0,
+        "tournament_id": "2026",
+        "last_error_code": null,
+        "delivery_attempts": 0,
+        "runtime_generation_id": null,
+        "delivery_dead_letter_at": null
+      },
+      {
+        "status": "PENDING",
+        "attempts": 0,
+        "engine_key": "TOURNAMENT_INTELLIGENCE",
+        "round_number": 0,
+        "tournament_id": "2026",
+        "last_error_code": null,
+        "delivery_attempts": 0,
+        "runtime_generation_id": null,
+        "delivery_dead_letter_at": null
+      },
+      {
+        "status": "PENDING",
+        "attempts": 0,
+        "engine_key": "TOURNAMENT_STORYLINES",
+        "round_number": 0,
+        "tournament_id": "2026",
+        "last_error_code": null,
+        "delivery_attempts": 0,
+        "runtime_generation_id": null,
+        "delivery_dead_letter_at": null
+      }
+    ],
+    "derivedIntents": [
+      {
+        "count": 432,
+        "family": "COMPETITION",
+        "status": "PENDING",
+        "tournament_id": "2026"
+      }
+    ],
+    "ingress": [
+      {
+        "count": 528,
+        "state": "COMMITTED",
+        "tournament_id": "2026"
+      },
+      {
+        "count": 1,
+        "state": "NOT_COMMITTED",
+        "tournament_id": "2026"
+      },
+      {
+        "count": 1,
+        "state": "UNKNOWN",
+        "tournament_id": "2026"
+      }
+    ],
+    "generations": [
+      {
+        "state": "OPEN",
+        "revision": 1,
+        "generation_id": "82b7339a-a6c5-454b-bc23-6661ec8ad935",
+        "tournament_id": "2026"
+      }
+    ],
+    "pointer": {
+      "scope_key": "CERTIFICATION:4a46d6b3-f4d8-4d35-bb12-fe56391ef21c",
+      "updated_at": "2026-10-02T18:48:48.246371-05:00",
+      "tournament_id": "2026",
+      "tournament_year": 2026,
+      "contract_version": "certification-current-tournament-pointer-v1",
+      "pointer_revision": 1,
+      "lifecycle_revision": 1,
+      "updated_by_player_id": null,
+      "updated_by_auth_user_id": null
+    }
+  },
+  "startedAt": "2026-10-02T23:48:42.346Z",
+  "finishedAt": "2026-10-02T23:49:22.150Z",
+  "startSource": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql": "0d610b350d76b27f4f63942758cfd7e12bafeddac48f3c8c0ff8c94c74fb37ff",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql": "410f4b2681442ff99cee1ab7f291f0b006fed069262584540ddbfc2e2eb36ffb",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql": "080cdaf863a5f0bc70670f15e0aa658916cda439e0df10110de7d428675334f6",
+    "test/reliability-phase2dr2-annual-transition.integration.test.mjs": "8ba928429cee041bc9469c08b7cf6d546474f7d9a404e7d492ac8348ad96b037",
+    "test/support/reliability/phase2d-certification-fixture.mjs": "d3506fd608338cf174048ea865e028811b4f437c410500dbdb0468ea83dc3049",
+    "test/support/reliability/certification-annual-transition-fixture.mjs": "5fb7ef25980c3d700517b8f5bef16891e2ec55f6206f83d7c8b7a1c879871aab",
+    "test/support/reliability/certification-future-authoring-proof.mjs": "cb0c70d8bc7f458baa4b32c00e496a64c70f2baaf72879ead4b3e9e4fed3f1a6",
+    "test/support/reliability/certification-worker-proof.mjs": "57fb6e93f1dab12daef76a484535648940b65888399580c8309f2e8d63d50d96",
+    "test/support/reliability/certification-annual-observations.mjs": "e66870ca59f1044d7c445b664fdcebcde9004d40bce11a812c3ab5ffb927614b",
+    "test/support/reliability/certification-annual-chronology-proof.mjs": "ec14660778c7e15bb06ba56fb60d03fc96858338f4bc5fb27d10abd3294e9570",
+    "test/support/reliability/certification-final-recap-failure-proof.mjs": "93ef46377f1b310e3fe5850f81b334fb54ee31a07f13acc50b610bff98f9d201",
+    "test/support/reliability/certification-successor-read-proof.mjs": "571cbf7adaedb468ceb2c741c2bff60a5bfa2397b1667639fbfc8e418ec4a679",
+    "test/support/reliability/certification-history-service-proof.mjs": "a8af59522c79fdd938a5b221c896b2819e9e4dbb96305d59a0d21ba35b39585f",
+    "test/support/reliability/certification-odds-proof.mjs": "dca5c10506889546bbbecf3e9dae38e97f817d42c35d6adc2ec0634980ccb34d",
+    "lib/certification-runtime-server.js": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779",
+    "lib/certification-read-adapters.js": "374e7f35a2f3e578f9705802e1284fb996e2bb5be44b98cd2d52c3edd80767b4",
+    "lib/certification-worker-adapter.js": "33f6c84b25c6cf36a149038700892482f05baeaa9ed7cf4f86c54dfb08f6435e",
+    "lib/certification-odds-server.js": "0e626cdccc8296e6119858d43f27fc7506e661af9e15477f02bd400b9f8ef1d0",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "lib/intelligence-derived-supabase.js": "583ebeefccd8b835d8bc96a1a790c5246516e819e3858b59d86bc24a01f192bd",
+    "lib/competition-derived-supabase.js": "79e209265c143ed2f97260a848a05a841a649ed98098bc4191a9b7dca5a5088c",
+    "lib/canonical-director-odds.js": "3b897836d1d044fa8286e330c9be10a71e64435092fc5514bd4799cc24dabcaa",
+    "lib/canonical-director-odds-client.js": "14125cbf9f69f16d362f9e69563fd410c0467edebf19cf57ce29091e06f708b7",
+    "lib/preview-director-authorization.js": "a887205c98c841617f2ab6cdb9459847c91a6e64f1e9961058d96a0084d87b6d",
+    "lib/participant-identity-supabase.js": "5b9e5d92b7ca1f471ded189eab22713c4d75b2491e2e235aa2929703eb32e9a0",
+    "lib/history-2026-service.js": "4a5c8ca644cddb88ae3afa87c3491b845880385acbafae8619d2c021ae8646af",
+    "lib/history-2026-supabase.js": "20151f6d60d223f3cf393f7eab21f31b33ebf1d8dcbd5c72a74bd55f6a6776b0",
+    "lib/history-2026-adapter.js": "a3944f67a9d1647ab13727f5be0a97a3fb05db65376ece3da9a81ca52d007ff5",
+    "app/api/director/canonical-odds/route.js": "ccf05dd9bd22098ff18f43cf1f649317c599f32dc96933007fd712cfc2036086"
+  },
+  "endSource": {
+    "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql": "7e7c0f51945dd3a993858e2502152b447cfde65670f7a8a94dc4055778b01fc2",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "supabase/production_migrations/202609300134_certification_annual_administration_v1.sql": "80c8f16bc9bace929b89972dc12aabb36d55fd7bc2098cc953e3abc828e93bdc",
+    "supabase/production_migrations/202609300135_certification_read_contracts_v1.sql": "9d1be0e3b60cf18b48973bbe179b6842f3b52a9795b1ce0954fb50e4d295b6c7",
+    "supabase/production_migrations/202609300136_certification_durable_ingress_v1.sql": "814625bc5012a0db87ccb7d95c39fbed0cd5b0e75d4d8afb9707cc672daaa245",
+    "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql": "fe24a356e275f3a683450b2645658750073f723468c2ef597aa32721655358d8",
+    "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql": "cd7b2d1e66c26ae97bcaf4bbaf1ffe109d435e0298aff7820d6c2538e7edcfae",
+    "supabase/production_migrations/202609300139_certification_future_authoring_v1.sql": "4ccac06ae32c02381210b0c254b835a17cc3d57d91c5a5fe110b9000fbf4822b",
+    "supabase/production_migrations/202609300140_certification_future_scoring_v1.sql": "57212190dce4e414f0fd585cf4e848efac2cf1917e876232ec6f9b93a337f564",
+    "supabase/production_migrations/202609300141_certification_future_workers_v1.sql": "057a232ae041daf45af1776e08a725563e047533c14d877d0dbcb762da313b13",
+    "supabase/production_migrations/202609300142_certification_required_worker_reads_v1.sql": "5410db23933fe347d5cc9c213c691b78733e872607c8dcb247331b82562ef352",
+    "supabase/production_migrations/202609300143_certification_odds_owner_publication_v1.sql": "d01dad65c168666ef19e31d708cbcdf8bbaf3d8d7a63502d2085d55e32371295",
+    "supabase/production_migrations/202609300145_certification_closed_tournament_read_v1.sql": "0d610b350d76b27f4f63942758cfd7e12bafeddac48f3c8c0ff8c94c74fb37ff",
+    "supabase/production_migrations/202609300146_certification_successor_current_reads_v1.sql": "410f4b2681442ff99cee1ab7f291f0b006fed069262584540ddbfc2e2eb36ffb",
+    "supabase/production_migrations/202609300147_certification_closed_history_service_v1.sql": "080cdaf863a5f0bc70670f15e0aa658916cda439e0df10110de7d428675334f6",
+    "test/reliability-phase2dr2-annual-transition.integration.test.mjs": "8ba928429cee041bc9469c08b7cf6d546474f7d9a404e7d492ac8348ad96b037",
+    "test/support/reliability/phase2d-certification-fixture.mjs": "d3506fd608338cf174048ea865e028811b4f437c410500dbdb0468ea83dc3049",
+    "test/support/reliability/certification-annual-transition-fixture.mjs": "5fb7ef25980c3d700517b8f5bef16891e2ec55f6206f83d7c8b7a1c879871aab",
+    "test/support/reliability/certification-future-authoring-proof.mjs": "cb0c70d8bc7f458baa4b32c00e496a64c70f2baaf72879ead4b3e9e4fed3f1a6",
+    "test/support/reliability/certification-worker-proof.mjs": "57fb6e93f1dab12daef76a484535648940b65888399580c8309f2e8d63d50d96",
+    "test/support/reliability/certification-annual-observations.mjs": "e66870ca59f1044d7c445b664fdcebcde9004d40bce11a812c3ab5ffb927614b",
+    "test/support/reliability/certification-annual-chronology-proof.mjs": "ec14660778c7e15bb06ba56fb60d03fc96858338f4bc5fb27d10abd3294e9570",
+    "test/support/reliability/certification-final-recap-failure-proof.mjs": "93ef46377f1b310e3fe5850f81b334fb54ee31a07f13acc50b610bff98f9d201",
+    "test/support/reliability/certification-successor-read-proof.mjs": "571cbf7adaedb468ceb2c741c2bff60a5bfa2397b1667639fbfc8e418ec4a679",
+    "test/support/reliability/certification-history-service-proof.mjs": "a8af59522c79fdd938a5b221c896b2819e9e4dbb96305d59a0d21ba35b39585f",
+    "test/support/reliability/certification-odds-proof.mjs": "dca5c10506889546bbbecf3e9dae38e97f817d42c35d6adc2ec0634980ccb34d",
+    "lib/certification-runtime-server.js": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779",
+    "lib/certification-read-adapters.js": "374e7f35a2f3e578f9705802e1284fb996e2bb5be44b98cd2d52c3edd80767b4",
+    "lib/certification-worker-adapter.js": "33f6c84b25c6cf36a149038700892482f05baeaa9ed7cf4f86c54dfb08f6435e",
+    "lib/certification-odds-server.js": "0e626cdccc8296e6119858d43f27fc7506e661af9e15477f02bd400b9f8ef1d0",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "lib/intelligence-derived-supabase.js": "583ebeefccd8b835d8bc96a1a790c5246516e819e3858b59d86bc24a01f192bd",
+    "lib/competition-derived-supabase.js": "79e209265c143ed2f97260a848a05a841a649ed98098bc4191a9b7dca5a5088c",
+    "lib/canonical-director-odds.js": "3b897836d1d044fa8286e330c9be10a71e64435092fc5514bd4799cc24dabcaa",
+    "lib/canonical-director-odds-client.js": "14125cbf9f69f16d362f9e69563fd410c0467edebf19cf57ce29091e06f708b7",
+    "lib/preview-director-authorization.js": "a887205c98c841617f2ab6cdb9459847c91a6e64f1e9961058d96a0084d87b6d",
+    "lib/participant-identity-supabase.js": "5b9e5d92b7ca1f471ded189eab22713c4d75b2491e2e235aa2929703eb32e9a0",
+    "lib/history-2026-service.js": "4a5c8ca644cddb88ae3afa87c3491b845880385acbafae8619d2c021ae8646af",
+    "lib/history-2026-supabase.js": "20151f6d60d223f3cf393f7eab21f31b33ebf1d8dcbd5c72a74bd55f6a6776b0",
+    "lib/history-2026-adapter.js": "a3944f67a9d1647ab13727f5be0a97a3fb05db65376ece3da9a81ca52d007ff5",
+    "app/api/director/canonical-odds/route.js": "ccf05dd9bd22098ff18f43cf1f649317c599f32dc96933007fd712cfc2036086"
+  },
+  "sourceStable": true,
+  "timings": [
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 12.850749999999607,
+      "executeMs": 28.551000000001295,
+      "totalMs": 41.4017500000009
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.759957999998733,
+      "executeMs": 22.533708000000843,
+      "totalMs": 36.293665999999575
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.738083000000188,
+      "executeMs": 22.186874999999418,
+      "totalMs": 34.924957999999606
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.392209000001458,
+      "executeMs": 19.65387499999997,
+      "totalMs": 33.04608400000143
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 17.14154200000121,
+      "executeMs": 20.77258299999994,
+      "totalMs": 37.91412500000115
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.466082999999344,
+      "executeMs": 19.85466699999961,
+      "totalMs": 33.32074999999895
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.900832999999693,
+      "executeMs": 20.08691700000054,
+      "totalMs": 32.98775000000023
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.814041999999972,
+      "executeMs": 19.915250000000015,
+      "totalMs": 32.72929199999999
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.05908399999862,
+      "executeMs": 20.551166000001103,
+      "totalMs": 33.61024999999972
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.72650000000067,
+      "executeMs": 21.456834000000526,
+      "totalMs": 34.183334000001196
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.683457999999519,
+      "executeMs": 19.819917000000714,
+      "totalMs": 32.50337500000023
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.360208000000057,
+      "executeMs": 20.093708000000333,
+      "totalMs": 33.45391600000039
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.66912500000035,
+      "executeMs": 19.44708299999911,
+      "totalMs": 32.11620799999946
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.674458000001323,
+      "executeMs": 19.419874999999593,
+      "totalMs": 32.094333000000915
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.130957999999737,
+      "executeMs": 20.306624999999258,
+      "totalMs": 34.437582999998995
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.909874999999374,
+      "executeMs": 19.362209000000803,
+      "totalMs": 32.27208400000018
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.051292000000103,
+      "executeMs": 19.77375000000029,
+      "totalMs": 32.825042000000394
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.357582999999067,
+      "executeMs": 19.677874999999403,
+      "totalMs": 32.03545799999847
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.613291000001482,
+      "executeMs": 19.547083999999813,
+      "totalMs": 32.160375000001295
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.448458000000755,
+      "executeMs": 18.990207999999257,
+      "totalMs": 33.43866600000001
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.531958999999915,
+      "executeMs": 19.03412500000013,
+      "totalMs": 31.566084000000046
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.453583000000435,
+      "executeMs": 20.798542000000452,
+      "totalMs": 33.25212500000089
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 13.47716600000058,
+      "executeMs": 28.247416999998677,
+      "totalMs": 41.72458299999926
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.84479200000169,
+      "executeMs": 21.18304199999875,
+      "totalMs": 34.02783400000044
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 14.771083999999973,
+      "executeMs": 22.161458000000493,
+      "totalMs": 36.93254200000047
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.666542000000845,
+      "executeMs": 19.105916999998954,
+      "totalMs": 31.7724589999998
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.472625000000335,
+      "executeMs": 19.030290999999124,
+      "totalMs": 31.50291599999946
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.767166999999972,
+      "executeMs": 18.830708000001323,
+      "totalMs": 33.597875000001295
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.822833000000173,
+      "executeMs": 19.998332999999548,
+      "totalMs": 32.82116599999972
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.773583000000144,
+      "executeMs": 20.73637499999859,
+      "totalMs": 34.50995799999873
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.391041999999288,
+      "executeMs": 19.87420800000109,
+      "totalMs": 33.26525000000038
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.69287500000064,
+      "executeMs": 19.326124999999593,
+      "totalMs": 32.01900000000023
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.91150000000016,
+      "executeMs": 19.293958000000202,
+      "totalMs": 32.20545800000036
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.956459000000905,
+      "executeMs": 18.932707999998456,
+      "totalMs": 31.88916699999936
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.22258299999885,
+      "executeMs": 19.232167000000118,
+      "totalMs": 31.454749999998967
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.846166000001176,
+      "executeMs": 19.17304199999853,
+      "totalMs": 32.01920799999971
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.791790999999648,
+      "executeMs": 19.086459000000104,
+      "totalMs": 31.878249999999753
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.30462499999885,
+      "executeMs": 19.224084000001312,
+      "totalMs": 31.528709000000163
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.833708000000115,
+      "executeMs": 19.382166999999754,
+      "totalMs": 32.21587499999987
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.585666000000856,
+      "executeMs": 19.541708999999173,
+      "totalMs": 32.12737500000003
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.381666000001132,
+      "executeMs": 19.15083400000003,
+      "totalMs": 31.532500000001164
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.627000000000407,
+      "executeMs": 19.48766699999942,
+      "totalMs": 32.11466699999983
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.910874999999578,
+      "executeMs": 19.763208000000304,
+      "totalMs": 32.67408299999988
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.385874999999942,
+      "executeMs": 20.816749999999956,
+      "totalMs": 33.2026249999999
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 12.831166999998459,
+      "executeMs": 30.584000000000742,
+      "totalMs": 43.4151669999992
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.563833000000159,
+      "executeMs": 22.20391699999891,
+      "totalMs": 34.76774999999907
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.606832999999824,
+      "executeMs": 22.439041999999972,
+      "totalMs": 35.045874999999796
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.397999999999229,
+      "executeMs": 19.496917000000394,
+      "totalMs": 31.894916999999623
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.588540999999168,
+      "executeMs": 19.656334000001152,
+      "totalMs": 32.24487500000032
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.598458000000392,
+      "executeMs": 19.07758399999875,
+      "totalMs": 31.676041999999143
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.892625000000407,
+      "executeMs": 19.651041999999507,
+      "totalMs": 32.543666999999914
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.781082999999853,
+      "executeMs": 19.042209000001094,
+      "totalMs": 31.823292000000947
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.513707999998587,
+      "executeMs": 18.99987500000134,
+      "totalMs": 31.513582999999926
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.394459000001007,
+      "executeMs": 19.073624999999083,
+      "totalMs": 31.46808400000009
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.586874999999054,
+      "executeMs": 18.877958999999464,
+      "totalMs": 31.46483399999852
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.29858299999978,
+      "executeMs": 18.73475000000144,
+      "totalMs": 31.03333300000122
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.47270799999933,
+      "executeMs": 18.84479199999987,
+      "totalMs": 33.3174999999992
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.136917000001631,
+      "executeMs": 19.175207999998747,
+      "totalMs": 31.31212500000038
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.5362499999992,
+      "executeMs": 19.221958000000086,
+      "totalMs": 31.758207999999286
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.444000000001324,
+      "executeMs": 19.100791999999274,
+      "totalMs": 31.544792000000598
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.10570800000096,
+      "executeMs": 19.223916999999346,
+      "totalMs": 31.329625000000306
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.401750000000902,
+      "executeMs": 18.669749999999112,
+      "totalMs": 31.071500000000015
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.525958000000173,
+      "executeMs": 18.720417000000452,
+      "totalMs": 31.246375000000626
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.697541999999885,
+      "executeMs": 19.076790999999503,
+      "totalMs": 31.774332999999388
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.540082999999868,
+      "executeMs": 19.21429199999875,
+      "totalMs": 31.754374999998618
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.552416000000449,
+      "executeMs": 20.19866699999875,
+      "totalMs": 32.7510829999992
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 14.853833000001032,
+      "executeMs": 27.87379200000032,
+      "totalMs": 42.72762500000135
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 14.579749999998967,
+      "executeMs": 21.06879200000003,
+      "totalMs": 35.648541999999
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.119582999999693,
+      "executeMs": 24.554458000000523,
+      "totalMs": 37.674041000000216
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.364999999999782,
+      "executeMs": 19.388624999999593,
+      "totalMs": 32.753624999999374
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.115791000000172,
+      "executeMs": 19.13366700000006,
+      "totalMs": 32.24945800000023
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.256083999998737,
+      "executeMs": 19.03625000000102,
+      "totalMs": 31.292333999999755
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.360208000000057,
+      "executeMs": 19.0714169999992,
+      "totalMs": 31.431624999999258
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.47033300000112,
+      "executeMs": 19.422166999998808,
+      "totalMs": 31.892499999999927
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.352666999999201,
+      "executeMs": 19.225125000000844,
+      "totalMs": 31.577792000000045
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.983582999999271,
+      "executeMs": 20.1323339999999,
+      "totalMs": 35.11591699999917
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.228375000000597,
+      "executeMs": 19.67687500000102,
+      "totalMs": 32.905250000001615
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.80987499999901,
+      "executeMs": 19.9202920000007,
+      "totalMs": 32.73016699999971
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.137416999999914,
+      "executeMs": 19.194499999999607,
+      "totalMs": 32.33191699999952
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.802459000000454,
+      "executeMs": 19.50604100000055,
+      "totalMs": 32.308500000001004
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.2706249999992,
+      "executeMs": 19.26970800000163,
+      "totalMs": 31.540333000000828
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.974374999999782,
+      "executeMs": 19.356125000000247,
+      "totalMs": 32.33050000000003
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.750458000000435,
+      "executeMs": 19.105874999999287,
+      "totalMs": 31.856332999999722
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.63666700000067,
+      "executeMs": 18.987332999999126,
+      "totalMs": 31.623999999999796
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 15.003125000001091,
+      "executeMs": 19.737833999999566,
+      "totalMs": 34.74095900000066
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.0484579999993,
+      "executeMs": 19.775916999999026,
+      "totalMs": 32.82437499999833
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.977042000000438,
+      "executeMs": 19.970124999999825,
+      "totalMs": 32.94716700000026
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.825000000000728,
+      "executeMs": 21.06237499999952,
+      "totalMs": 33.88737500000025
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 15.259625000000597,
+      "executeMs": 28.89104199999929,
+      "totalMs": 44.150666999999885
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.2104589999999,
+      "executeMs": 22.009040999999343,
+      "totalMs": 35.21949999999924
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.135583999999653,
+      "executeMs": 92.01945800000067,
+      "totalMs": 105.15504200000032
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 16.00495900000169,
+      "executeMs": 21.547582999999577,
+      "totalMs": 37.55254200000127
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 22.80462499999885,
+      "executeMs": 26.61700000000019,
+      "totalMs": 49.42162499999904
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.454916999999114,
+      "executeMs": 38.690041000001656,
+      "totalMs": 64.14495800000077
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.417875000001004,
+      "executeMs": 19.580540999999357,
+      "totalMs": 32.99841600000036
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.506334000001516,
+      "executeMs": 19.393832999998267,
+      "totalMs": 31.900166999999783
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.610333000000537,
+      "executeMs": 19.080292000000554,
+      "totalMs": 31.69062500000109
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.489916999998968,
+      "executeMs": 20.43000000000029,
+      "totalMs": 34.91991699999926
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.415874999998778,
+      "executeMs": 20.208834000000934,
+      "totalMs": 33.62470899999971
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.28058300000157,
+      "executeMs": 20.29791699999987,
+      "totalMs": 33.57850000000144
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.901166999999987,
+      "executeMs": 19.280915999999706,
+      "totalMs": 32.18208299999969
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.582499999996799,
+      "executeMs": 19.164333000000624,
+      "totalMs": 31.746832999997423
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.967124999999214,
+      "executeMs": 19.46795900000143,
+      "totalMs": 32.43508400000064
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.948416999999608,
+      "executeMs": 19.70758299999943,
+      "totalMs": 32.65599999999904
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.616625000002387,
+      "executeMs": 19.07079099999828,
+      "totalMs": 31.687416000000667
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.671207999999751,
+      "executeMs": 19.22425000000294,
+      "totalMs": 31.89545800000269
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.53900000000067,
+      "executeMs": 19.107707999999548,
+      "totalMs": 31.646708000000217
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.777541999999812,
+      "executeMs": 19.3972079999985,
+      "totalMs": 32.17474999999831
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.6931250000016,
+      "executeMs": 19.664874999998574,
+      "totalMs": 32.358000000000175
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.960750000002008,
+      "executeMs": 20.737166999999317,
+      "totalMs": 33.697917000001326
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 15.035416999999143,
+      "executeMs": 28.70733300000211,
+      "totalMs": 43.74275000000125
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.774750000000495,
+      "executeMs": 21.591207999998005,
+      "totalMs": 34.3659579999985
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.667417000000569,
+      "executeMs": 23.48754100000224,
+      "totalMs": 37.15495800000281
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.444625000000087,
+      "executeMs": 19.62679200000275,
+      "totalMs": 32.07141700000284
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.543250000002445,
+      "executeMs": 19.13658299999952,
+      "totalMs": 31.679833000001963
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.760541999999987,
+      "executeMs": 19.130041000000347,
+      "totalMs": 31.890583000000333
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.859208999998373,
+      "executeMs": 19.217082999999548,
+      "totalMs": 32.07629199999792
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.850999999998749,
+      "executeMs": 18.96208299999853,
+      "totalMs": 31.813082999997278
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.772625000001426,
+      "executeMs": 19.433625000001484,
+      "totalMs": 32.20625000000291
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.44433299999946,
+      "executeMs": 18.745124999997643,
+      "totalMs": 31.189457999997103
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.773750000000291,
+      "executeMs": 18.993625000002794,
+      "totalMs": 31.767375000003085
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.796375000001717,
+      "executeMs": 19.506666999997833,
+      "totalMs": 32.30304199999955
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.289875000002212,
+      "executeMs": 19.135749999997643,
+      "totalMs": 31.425624999999854
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.711542000000918,
+      "executeMs": 19.60966600000029,
+      "totalMs": 32.32120800000121
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.677666999999929,
+      "executeMs": 18.965124999998807,
+      "totalMs": 31.642791999998735
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.196583000000828,
+      "executeMs": 23.341458000002604,
+      "totalMs": 36.53804100000343
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 27.267374999999447,
+      "executeMs": 81.874917000001,
+      "totalMs": 109.14229200000045
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.200708000000304,
+      "executeMs": 19.99737500000265,
+      "totalMs": 34.19808300000295
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.48725000000195,
+      "executeMs": 19.63762499999939,
+      "totalMs": 32.12487500000134
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.85554200000115,
+      "executeMs": 21.32999999999811,
+      "totalMs": 34.18554199999926
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.670541999999841,
+      "executeMs": 19.74762499999997,
+      "totalMs": 32.41816699999981
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.595625000001746,
+      "executeMs": 20.571791999998823,
+      "totalMs": 33.16741700000057
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 14.877166999998735,
+      "executeMs": 30.19683300000179,
+      "totalMs": 45.074000000000524
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.719333000000915,
+      "executeMs": 22.059124999999767,
+      "totalMs": 34.77845800000068
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.486583999998402,
+      "executeMs": 23.606291000000056,
+      "totalMs": 36.09287499999846
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.803625000000466,
+      "executeMs": 19.223291000002064,
+      "totalMs": 32.02691600000253
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.650458000000071,
+      "executeMs": 19.086999999999534,
+      "totalMs": 31.737457999999606
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.478332999999111,
+      "executeMs": 19.10229199999958,
+      "totalMs": 31.58062499999869
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.623041000002559,
+      "executeMs": 19.536292000000685,
+      "totalMs": 32.159333000003244
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.796084000001429,
+      "executeMs": 19.269625000000815,
+      "totalMs": 32.065709000002244
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.217208000001847,
+      "executeMs": 23.364541999999346,
+      "totalMs": 36.58175000000119
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.05541699999958,
+      "executeMs": 19.341958000000886,
+      "totalMs": 32.397375000000466
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.359082999999373,
+      "executeMs": 18.981166999998095,
+      "totalMs": 31.340249999997468
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.789625000001251,
+      "executeMs": 21.02191700000185,
+      "totalMs": 33.8115420000031
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 19.974417000001267,
+      "executeMs": 23.351166999997076,
+      "totalMs": 43.325583999998344
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.748124999998254,
+      "executeMs": 19.497792000001937,
+      "totalMs": 34.24591700000019
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.048750000001746,
+      "executeMs": 19.943833000001177,
+      "totalMs": 32.992583000002924
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.715790999998717,
+      "executeMs": 19.60595900000044,
+      "totalMs": 32.321749999999156
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.136916999999812,
+      "executeMs": 19.93120800000179,
+      "totalMs": 33.0681250000016
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.198333000000275,
+      "executeMs": 20.334916999996494,
+      "totalMs": 33.53324999999677
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.032749999998487,
+      "executeMs": 19.80004199999894,
+      "totalMs": 32.832791999997426
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.833624999999302,
+      "executeMs": 19.487457999999606,
+      "totalMs": 32.32108299999891
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.024375000000873,
+      "executeMs": 19.69433299999946,
+      "totalMs": 32.71870800000033
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.69679200000246,
+      "executeMs": 21.297082999997656,
+      "totalMs": 33.993875000000116
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 15.04554100000314,
+      "executeMs": 27.98149999999805,
+      "totalMs": 43.02704100000119
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.038415999999415,
+      "executeMs": 22.07600000000093,
+      "totalMs": 35.11441600000035
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.269416999999521,
+      "executeMs": 23.55737500000032,
+      "totalMs": 36.82679199999984
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.65337499999805,
+      "executeMs": 20.595792000000074,
+      "totalMs": 34.249166999998124
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.360916999998153,
+      "executeMs": 19.60204100000192,
+      "totalMs": 32.96295800000007
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.93250000000262,
+      "executeMs": 19.637332999998762,
+      "totalMs": 32.56983300000138
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.502208000001701,
+      "executeMs": 19.051041999999143,
+      "totalMs": 31.553250000000844
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.636416999997891,
+      "executeMs": 19.277750000001106,
+      "totalMs": 31.914166999998997
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.743458000000828,
+      "executeMs": 19.481332999999722,
+      "totalMs": 32.22479100000055
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.628000000000611,
+      "executeMs": 19.074415999999474,
+      "totalMs": 31.702416000000085
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.909958000000188,
+      "executeMs": 19.144749999999476,
+      "totalMs": 32.054707999999664
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.327541999999085,
+      "executeMs": 19.103041000002122,
+      "totalMs": 31.430583000001207
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.266041999999288,
+      "executeMs": 19.045500000000175,
+      "totalMs": 31.311541999999463
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.811832999999751,
+      "executeMs": 19.253375000000233,
+      "totalMs": 32.065207999999984
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.399457999999868,
+      "executeMs": 19.12220900000102,
+      "totalMs": 31.52166700000089
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.934541999999055,
+      "executeMs": 20.56383300000016,
+      "totalMs": 34.498374999999214
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.932333000000654,
+      "executeMs": 19.370624999999563,
+      "totalMs": 32.30295800000022
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.94537499999933,
+      "executeMs": 19.01062500000262,
+      "totalMs": 31.95600000000195
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.70116699999926,
+      "executeMs": 19.613915999998426,
+      "totalMs": 32.315082999997685
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.344624999997905,
+      "executeMs": 19.863540999998804,
+      "totalMs": 33.20816599999671
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.690000000002328,
+      "executeMs": 19.51799999999639,
+      "totalMs": 32.20799999999872
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.916583000001992,
+      "executeMs": 20.37904200000048,
+      "totalMs": 33.295625000002474
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 14.549957999999606,
+      "executeMs": 27.525042000001122,
+      "totalMs": 42.07500000000073
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.773874999998952,
+      "executeMs": 20.986250000001746,
+      "totalMs": 33.7601250000007
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.15558400000009,
+      "executeMs": 22.290624999997817,
+      "totalMs": 35.44620899999791
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.459584000000177,
+      "executeMs": 19.373332999999548,
+      "totalMs": 31.832916999999725
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.683124999999563,
+      "executeMs": 19.049291000002995,
+      "totalMs": 31.73241600000256
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 15.236832999999024,
+      "executeMs": 19.879667000001064,
+      "totalMs": 35.11650000000009
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.69866600000023,
+      "executeMs": 18.767416999999114,
+      "totalMs": 31.466082999999344
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.628375000000233,
+      "executeMs": 18.811540999999124,
+      "totalMs": 31.439915999999357
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.665499999999156,
+      "executeMs": 19.619249999999738,
+      "totalMs": 32.284749999998894
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.651792000000569,
+      "executeMs": 19.077499999999418,
+      "totalMs": 31.729291999999987
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.585415999998077,
+      "executeMs": 19.736417000000074,
+      "totalMs": 32.32183299999815
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.71387500000128,
+      "executeMs": 19.10491700000057,
+      "totalMs": 31.81879200000185
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.886749999997846,
+      "executeMs": 18.835750000002008,
+      "totalMs": 31.722499999999854
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.696750000002794,
+      "executeMs": 19.068082999998296,
+      "totalMs": 31.76483300000109
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.477500000000873,
+      "executeMs": 18.658541999997396,
+      "totalMs": 31.13604199999827
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.501499999998487,
+      "executeMs": 19.460666999999376,
+      "totalMs": 31.962166999997862
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.868542000000161,
+      "executeMs": 19.16033299999981,
+      "totalMs": 34.02887499999997
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.701457999999548,
+      "executeMs": 19.516583000000537,
+      "totalMs": 32.218041000000085
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.948374999999942,
+      "executeMs": 19.406291999999667,
+      "totalMs": 32.35466699999961
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.708791000000929,
+      "executeMs": 18.950708999997005,
+      "totalMs": 31.659499999997934
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.64574999999968,
+      "executeMs": 19.4654580000024,
+      "totalMs": 32.11120800000208
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.570582999996986,
+      "executeMs": 20.27766700000211,
+      "totalMs": 32.8482499999991
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 14.817208999997092,
+      "executeMs": 28.19287500000064,
+      "totalMs": 43.01008399999773
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.76983399999881,
+      "executeMs": 21.535165999997844,
+      "totalMs": 34.30499999999665
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.751542000001791,
+      "executeMs": 22.509791000000405,
+      "totalMs": 35.261333000002196
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.664416999999958,
+      "executeMs": 19.053375000003143,
+      "totalMs": 31.7177920000031
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.3314169999976,
+      "executeMs": 19.38129200000185,
+      "totalMs": 33.71270899999945
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.651583000002574,
+      "executeMs": 19.172499999996944,
+      "totalMs": 31.82408299999952
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.32025000000067,
+      "executeMs": 19.18266699999731,
+      "totalMs": 31.50291699999798
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.63958300000013,
+      "executeMs": 19.024334000001545,
+      "totalMs": 31.663917000001675
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.586333999999624,
+      "executeMs": 19.445000000003347,
+      "totalMs": 32.03133400000297
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.603083000001789,
+      "executeMs": 18.929709000000003,
+      "totalMs": 31.53279200000179
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.877541000001656,
+      "executeMs": 19.09991699999955,
+      "totalMs": 31.977458000001207
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.621166999997513,
+      "executeMs": 19.995875000000524,
+      "totalMs": 33.61704199999804
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.304041999999754,
+      "executeMs": 19.6897080000017,
+      "totalMs": 32.993750000001455
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 17.545915999999124,
+      "executeMs": 19.99354200000016,
+      "totalMs": 37.539457999999286
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.764250000000175,
+      "executeMs": 19.111958999998024,
+      "totalMs": 31.876208999998198
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.593625000001339,
+      "executeMs": 19.216832999998587,
+      "totalMs": 31.810457999999926
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.489375000001019,
+      "executeMs": 19.411041999999725,
+      "totalMs": 33.90041700000074
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.288708000000042,
+      "executeMs": 19.076625000001513,
+      "totalMs": 31.365333000001556
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.65729199999987,
+      "executeMs": 19.146625000001222,
+      "totalMs": 31.803917000001093
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.960750000002008,
+      "executeMs": 19.101999999998952,
+      "totalMs": 32.06275000000096
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.23804200000086,
+      "executeMs": 19.373124999998254,
+      "totalMs": 31.611166999999114
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.646292000001267,
+      "executeMs": 20.520666999997047,
+      "totalMs": 33.166958999998315
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 12.781042000002344,
+      "executeMs": 28.88512499999706,
+      "totalMs": 41.666166999999405
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.07958299999882,
+      "executeMs": 22.326584000002185,
+      "totalMs": 35.406167000001005
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.220000000001164,
+      "executeMs": 23.716082999999344,
+      "totalMs": 36.93608300000051
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.06945800000176,
+      "executeMs": 19.005374999997002,
+      "totalMs": 32.07483299999876
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.520415999999386,
+      "executeMs": 19.546167000000423,
+      "totalMs": 32.06658299999981
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.879832999999053,
+      "executeMs": 19.624792000002344,
+      "totalMs": 32.5046250000014
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.791124999999738,
+      "executeMs": 19.272666999997455,
+      "totalMs": 32.06379199999719
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.76641699999891,
+      "executeMs": 19.497041000002355,
+      "totalMs": 32.263458000001265
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.937416000000667,
+      "executeMs": 19.766625000000204,
+      "totalMs": 32.70404100000087
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.954208000002836,
+      "executeMs": 19.48608299999978,
+      "totalMs": 32.44029100000262
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.869833000000654,
+      "executeMs": 18.708999999998923,
+      "totalMs": 33.57883299999958
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.006874999999127,
+      "executeMs": 19.400166999999783,
+      "totalMs": 32.40704199999891
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.695625000000291,
+      "executeMs": 19.175250000000233,
+      "totalMs": 31.870875000000524
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.845541999999114,
+      "executeMs": 19.252000000000407,
+      "totalMs": 34.09754199999952
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.56933299999946,
+      "executeMs": 19.133499999999913,
+      "totalMs": 31.702832999999373
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.862959000001865,
+      "executeMs": 19.35058299999946,
+      "totalMs": 32.213542000001326
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.990709000001516,
+      "executeMs": 19.675374999998894,
+      "totalMs": 32.66608400000041
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.544499999999971,
+      "executeMs": 19.1687090000014,
+      "totalMs": 31.71320900000137
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.561334000001807,
+      "executeMs": 19.22200000000157,
+      "totalMs": 31.78333400000338
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.510708000001614,
+      "executeMs": 19.561291999998502,
+      "totalMs": 33.072000000000116
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.451415999999881,
+      "executeMs": 20.602834000001167,
+      "totalMs": 34.05425000000105
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 13.156166000000667,
+      "executeMs": 20.522916999998415,
+      "totalMs": 33.67908299999908
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 14.903167000000394,
+      "executeMs": 27.99866699999984,
+      "totalMs": 42.901834000000235
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.165499999999156,
+      "executeMs": 21.380457999999635,
+      "totalMs": 34.54595799999879
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.920042000001558,
+      "executeMs": 22.61699999999837,
+      "totalMs": 35.53704199999993
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.841249999997672,
+      "executeMs": 19.315291999999317,
+      "totalMs": 32.15654199999699
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.422500000000582,
+      "executeMs": 19.033832999997685,
+      "totalMs": 33.45633299999827
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.594499999999243,
+      "executeMs": 19.574375000000146,
+      "totalMs": 32.16887499999939
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.052332999999635,
+      "executeMs": 19.108791999999085,
+      "totalMs": 32.16112499999872
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.759500000000116,
+      "executeMs": 19.29033299999719,
+      "totalMs": 32.04983299999731
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.48504199999661,
+      "executeMs": 19.295874999999796,
+      "totalMs": 31.780916999996407
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.559417000000394,
+      "executeMs": 18.938915999999153,
+      "totalMs": 31.498332999999548
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.923792000001413,
+      "executeMs": 20.62279099999796,
+      "totalMs": 34.54658299999937
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.038709000000381,
+      "executeMs": 19.708166000000347,
+      "totalMs": 33.74687500000073
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.66558299999815,
+      "executeMs": 19.317542000000685,
+      "totalMs": 31.983124999998836
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.900375000001077,
+      "executeMs": 21.412874999998166,
+      "totalMs": 36.31324999999924
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.408417000002373,
+      "executeMs": 19.683333000000857,
+      "totalMs": 32.09175000000323
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.718375000000378,
+      "executeMs": 19.457041999998182,
+      "totalMs": 32.17541699999856
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.446457999998529,
+      "executeMs": 19.301292000000103,
+      "totalMs": 31.747749999998632
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.923208000000159,
+      "executeMs": 18.970166999999492,
+      "totalMs": 31.89337499999965
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.700959000001603,
+      "executeMs": 19.26350000000093,
+      "totalMs": 31.964459000002535
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.815500000000611,
+      "executeMs": 19.452832999999373,
+      "totalMs": 32.268332999999984
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.411292000000685,
+      "executeMs": 18.950417000000016,
+      "totalMs": 31.3617090000007
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.923417000001791,
+      "executeMs": 20.60441599999831,
+      "totalMs": 33.5278330000001
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 13.18212499999936,
+      "executeMs": 51.300208000000566,
+      "totalMs": 64.48233299999993
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.865042000001267,
+      "executeMs": 21.379375000000437,
+      "totalMs": 34.244417000001704
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.496999999999389,
+      "executeMs": 22.59741600000052,
+      "totalMs": 35.09441599999991
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.744542000000365,
+      "executeMs": 19.300583000000188,
+      "totalMs": 32.04512500000055
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.975374999998166,
+      "executeMs": 19.405917000000045,
+      "totalMs": 32.38129199999821
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.753166999998939,
+      "executeMs": 18.810249999998632,
+      "totalMs": 31.56341699999757
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.400916000002326,
+      "executeMs": 19.687083999997412,
+      "totalMs": 32.08799999999974
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.584374999998545,
+      "executeMs": 19.60358300000007,
+      "totalMs": 32.187957999998616
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.601209000000381,
+      "executeMs": 18.891082999998616,
+      "totalMs": 31.492291999998997
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.301500000001397,
+      "executeMs": 19.33062499999869,
+      "totalMs": 31.632125000000087
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.444250000000466,
+      "executeMs": 19.160124999998516,
+      "totalMs": 31.60437499999898
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.596166999999696,
+      "executeMs": 19.138332999998966,
+      "totalMs": 31.73449999999866
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.827915999998368,
+      "executeMs": 18.92145900000105,
+      "totalMs": 31.749374999999418
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.270375000000058,
+      "executeMs": 20.42804099999921,
+      "totalMs": 33.69841599999927
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 65.29041700000016,
+      "executeMs": 28.9462910000002,
+      "totalMs": 94.23670800000036
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 21.313874999999825,
+      "executeMs": 25.89274999999907,
+      "totalMs": 47.206624999998894
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 25.021749999999884,
+      "executeMs": 33.11358399999881,
+      "totalMs": 58.13533399999869
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 19.56116600000314,
+      "executeMs": 20.757291999998415,
+      "totalMs": 40.318458000001556
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.391625000000204,
+      "executeMs": 19.964082999998936,
+      "totalMs": 33.35570799999914
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.971540999998979,
+      "executeMs": 19.35529200000019,
+      "totalMs": 32.32683299999917
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.425208000000566,
+      "executeMs": 19.48883299999943,
+      "totalMs": 31.914040999999997
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 13.179624999997031,
+      "executeMs": 20.479957999999897,
+      "totalMs": 33.65958299999693
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 13.088208000001032,
+      "executeMs": 28.45799999999872,
+      "totalMs": 41.54620799999975
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.85541700000249,
+      "executeMs": 21.499958000000333,
+      "totalMs": 34.35537500000282
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.57708300000013,
+      "executeMs": 27.732833999998547,
+      "totalMs": 41.30991699999868
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.667875000002823,
+      "executeMs": 21.138957999999548,
+      "totalMs": 35.80683300000237
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.467625000001135,
+      "executeMs": 21.797999999998865,
+      "totalMs": 35.265625
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.0256249999984,
+      "executeMs": 19.3840420000015,
+      "totalMs": 32.4096669999999
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.186916999999085,
+      "executeMs": 20.57404200000019,
+      "totalMs": 33.760958999999275
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.28950000000259,
+      "executeMs": 21.078333999997994,
+      "totalMs": 34.367834000000585
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.787584000001516,
+      "executeMs": 20.451124999999593,
+      "totalMs": 34.23870900000111
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.00854099999924,
+      "executeMs": 20.808334000001196,
+      "totalMs": 34.81687500000044
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.061250000002474,
+      "executeMs": 20.143457999998645,
+      "totalMs": 33.20470800000112
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.006583000002138,
+      "executeMs": 19.973707999997714,
+      "totalMs": 32.98029099999985
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.512084000001778,
+      "executeMs": 19.107124999998632,
+      "totalMs": 31.61920900000041
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.728666999999405,
+      "executeMs": 21.29925000000003,
+      "totalMs": 35.027916999999434
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.049917000000278,
+      "executeMs": 20.802749999998923,
+      "totalMs": 34.8526669999992
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.37408399999913,
+      "executeMs": 20.392250000000786,
+      "totalMs": 34.766333999999915
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.302040999999008,
+      "executeMs": 20.084209000000556,
+      "totalMs": 33.38624999999956
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.21704200000022,
+      "executeMs": 19.68670800000109,
+      "totalMs": 32.90375000000131
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.018958000000566,
+      "executeMs": 19.604999999999563,
+      "totalMs": 32.62395800000013
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.793624999998428,
+      "executeMs": 20.04462500000227,
+      "totalMs": 32.8382500000007
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.905166000000463,
+      "executeMs": 19.423666999999114,
+      "totalMs": 32.32883299999958
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 13.04975000000195,
+      "executeMs": 21.16520799999853,
+      "totalMs": 34.21495800000048
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 12.779708999998547,
+      "executeMs": 28.8726659999993,
+      "totalMs": 41.652374999997846
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.896375000000262,
+      "executeMs": 21.25054100000125,
+      "totalMs": 34.14691600000151
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.682541999998648,
+      "executeMs": 23.937167000000045,
+      "totalMs": 36.61970899999869
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 16.34875000000102,
+      "executeMs": 29.790165999998862,
+      "totalMs": 46.13891599999988
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 18.038375000000087,
+      "executeMs": 20.643041999999696,
+      "totalMs": 38.68141699999978
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.690041000001656,
+      "executeMs": 19.554917000001296,
+      "totalMs": 32.24495800000295
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.6037499999984,
+      "executeMs": 18.859541999998328,
+      "totalMs": 31.463291999996727
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.346333000001323,
+      "executeMs": 19.219582999998238,
+      "totalMs": 31.56591599999956
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.494792000001326,
+      "executeMs": 18.969207999998616,
+      "totalMs": 31.463999999999942
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.404374999998254,
+      "executeMs": 18.771292000001267,
+      "totalMs": 31.17566699999952
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.494957999999315,
+      "executeMs": 18.97808399999849,
+      "totalMs": 31.473041999997804
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.140917000000627,
+      "executeMs": 18.702000000001135,
+      "totalMs": 31.842917000001762
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.253583999998227,
+      "executeMs": 19.484958000000915,
+      "totalMs": 31.738541999999143
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.488166999999521,
+      "executeMs": 19.425665999999183,
+      "totalMs": 31.913832999998704
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.467333000000508,
+      "executeMs": 19.09916699999667,
+      "totalMs": 31.566499999997177
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.322333000000071,
+      "executeMs": 19.10291700000016,
+      "totalMs": 31.425250000000233
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.619667000002664,
+      "executeMs": 18.567082999998092,
+      "totalMs": 31.186750000000757
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.128208000001905,
+      "executeMs": 18.649750000000495,
+      "totalMs": 30.7779580000024
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.458582999999635,
+      "executeMs": 19.086999999999534,
+      "totalMs": 31.54558299999917
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.354707999998936,
+      "executeMs": 19.23158400000102,
+      "totalMs": 31.586291999999958
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.819500000001426,
+      "executeMs": 19.286416999999346,
+      "totalMs": 32.10591700000077
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.248125000001892,
+      "executeMs": 19.984709000000294,
+      "totalMs": 32.232834000002185
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 12.797333999998955,
+      "executeMs": 29.49829099999988,
+      "totalMs": 42.295624999998836
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.437791999996989,
+      "executeMs": 21.92804100000285,
+      "totalMs": 35.36583299999984
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.99004099999729,
+      "executeMs": 22.169459000000643,
+      "totalMs": 35.159499999997934
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.538791999999376,
+      "executeMs": 19.242083000001003,
+      "totalMs": 31.78087500000038
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.564792000001034,
+      "executeMs": 19.143707999999606,
+      "totalMs": 31.70850000000064
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.410625000000437,
+      "executeMs": 19.194791999998415,
+      "totalMs": 31.60541699999885
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.544541999999637,
+      "executeMs": 19.304333000000042,
+      "totalMs": 31.84887499999968
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.585000000002765,
+      "executeMs": 19.33599999999933,
+      "totalMs": 31.921000000002095
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.365624999998545,
+      "executeMs": 19.07183399999849,
+      "totalMs": 31.437458999997034
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.502791999999317,
+      "executeMs": 19.13195800000176,
+      "totalMs": 31.634750000001077
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.501000000000204,
+      "executeMs": 19.235749999999825,
+      "totalMs": 31.73675000000003
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.74079200000051,
+      "executeMs": 19.50587500000256,
+      "totalMs": 32.24666700000307
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.686874999999418,
+      "executeMs": 19.57391600000119,
+      "totalMs": 32.26079100000061
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.035249999997177,
+      "executeMs": 19.4722920000022,
+      "totalMs": 33.507541999999376
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.228916000000027,
+      "executeMs": 19.036584000001312,
+      "totalMs": 31.26550000000134
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.29883400000108,
+      "executeMs": 18.963707999999315,
+      "totalMs": 31.262542000000394
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.198082999999315,
+      "executeMs": 19.22279200000048,
+      "totalMs": 31.420874999999796
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.539458000002924,
+      "executeMs": 19.116416999997455,
+      "totalMs": 31.65587500000038
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.42829200000051,
+      "executeMs": 19.051166000001103,
+      "totalMs": 31.479458000001614
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.280790999997407,
+      "executeMs": 18.77429200000188,
+      "totalMs": 31.055082999999286
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.385083000001032,
+      "executeMs": 18.917708000000857,
+      "totalMs": 31.30279100000189
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.280833000000712,
+      "executeMs": 20.0067080000008,
+      "totalMs": 32.28754100000151
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 12.734333000000333,
+      "executeMs": 28.51604199999929,
+      "totalMs": 41.25037499999962
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.291000000001077,
+      "executeMs": 20.903666999998677,
+      "totalMs": 33.194666999999754
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.642124999998487,
+      "executeMs": 21.93920900000012,
+      "totalMs": 34.581333999998606
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.531125000001339,
+      "executeMs": 19.271749999999884,
+      "totalMs": 31.802875000001222
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.623999999999796,
+      "executeMs": 18.88904199999888,
+      "totalMs": 31.513041999998677
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.39600000000064,
+      "executeMs": 19.357166000001598,
+      "totalMs": 31.75316600000224
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.75616699999955,
+      "executeMs": 19.188540999999532,
+      "totalMs": 31.944707999999082
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.214208999997936,
+      "executeMs": 19.29395800000202,
+      "totalMs": 31.508166999999958
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.032708999999159,
+      "executeMs": 19.18579099999988,
+      "totalMs": 32.21849999999904
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.37999999999738,
+      "executeMs": 19.544458000000304,
+      "totalMs": 31.924457999997685
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.696749999999156,
+      "executeMs": 18.858291000000463,
+      "totalMs": 31.55504099999962
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.691500000000815,
+      "executeMs": 19.193959000000177,
+      "totalMs": 31.885459000000992
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.479416999998648,
+      "executeMs": 19.40662499999962,
+      "totalMs": 31.88604199999827
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.61529100000189,
+      "executeMs": 19.17566699999952,
+      "totalMs": 31.79095800000141
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.628584000001865,
+      "executeMs": 20.851166000000376,
+      "totalMs": 33.47975000000224
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.744416000001365,
+      "executeMs": 19.31683399999747,
+      "totalMs": 32.061249999998836
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.392832999998063,
+      "executeMs": 18.91349999999875,
+      "totalMs": 31.306332999996812
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.970750000000407,
+      "executeMs": 19.75737499999741,
+      "totalMs": 32.72812499999782
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.664249999997992,
+      "executeMs": 19.359583000001294,
+      "totalMs": 32.023832999999286
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.70116699999926,
+      "executeMs": 19.5346669999999,
+      "totalMs": 32.23583399999916
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.848417000001064,
+      "executeMs": 19.82041599999866,
+      "totalMs": 32.66883299999972
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.710833000001003,
+      "executeMs": 20.486958999998024,
+      "totalMs": 33.197791999999026
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 12.98791699999856,
+      "executeMs": 29.319665999999415,
+      "totalMs": 42.307582999997976
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.861167000002752,
+      "executeMs": 21.4339579999978,
+      "totalMs": 34.29512500000055
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.091999999996915,
+      "executeMs": 22.456334000002244,
+      "totalMs": 35.54833399999916
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.794499999999971,
+      "executeMs": 19.666832999999315,
+      "totalMs": 32.461332999999286
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.977208000000246,
+      "executeMs": 19.86212499999965,
+      "totalMs": 32.8393329999999
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.947415999999066,
+      "executeMs": 19.55616700000246,
+      "totalMs": 32.50358300000153
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.588541999997688,
+      "executeMs": 19.468541000002006,
+      "totalMs": 32.05708299999969
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.728083000001789,
+      "executeMs": 19.4385829999992,
+      "totalMs": 32.16666600000099
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.915957999997772,
+      "executeMs": 19.53087500000038,
+      "totalMs": 32.44683299999815
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.72899999999936,
+      "executeMs": 19.270375000000058,
+      "totalMs": 31.999374999999418
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.342040999999881,
+      "executeMs": 18.890417000002344,
+      "totalMs": 31.232458000002225
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.55070799999885,
+      "executeMs": 19.318584000000556,
+      "totalMs": 32.869291999999405
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.65241700000115,
+      "executeMs": 23.172500000000582,
+      "totalMs": 37.82491700000173
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.666708000000654,
+      "executeMs": 23.060166999999637,
+      "totalMs": 37.72687500000029
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.629291000001103,
+      "executeMs": 20.36933399999907,
+      "totalMs": 33.998625000000175
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.337250000000495,
+      "executeMs": 20.505750000000262,
+      "totalMs": 33.84300000000076
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.370875000000524,
+      "executeMs": 20.27733399999852,
+      "totalMs": 33.64820899999904
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.205458999997063,
+      "executeMs": 20.365125000000262,
+      "totalMs": 33.570583999997325
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.476083000001381,
+      "executeMs": 20.080792000000656,
+      "totalMs": 33.55687500000204
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.585917000000336,
+      "executeMs": 20.39958299999853,
+      "totalMs": 33.985499999998865
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.109499999998661,
+      "executeMs": 42.71625000000131,
+      "totalMs": 55.82574999999997
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 26.80254199999763,
+      "executeMs": 21.839500000001863,
+      "totalMs": 48.64204199999949
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 13.303917000001093,
+      "executeMs": 29.762375000002066,
+      "totalMs": 43.06629200000316
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 14.270709000000352,
+      "executeMs": 25.725040999997873,
+      "totalMs": 39.995749999998225
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.807333000000654,
+      "executeMs": 23.94800000000032,
+      "totalMs": 37.755333000000974
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.011375000001863,
+      "executeMs": 19.948499999998603,
+      "totalMs": 33.959875000000466
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.20945799999754,
+      "executeMs": 20.535500000001775,
+      "totalMs": 33.744957999999315
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.185790999999881,
+      "executeMs": 20.738792000000103,
+      "totalMs": 33.924582999999984
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.11933300000237,
+      "executeMs": 21.28729200000089,
+      "totalMs": 34.40662500000326
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.635041999994428,
+      "executeMs": 20.65412500000093,
+      "totalMs": 34.28916699999536
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.030333999995491,
+      "executeMs": 20.70416600000317,
+      "totalMs": 34.73449999999866
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.523999999997613,
+      "executeMs": 20.36845899999753,
+      "totalMs": 33.89245899999514
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.28166699999565,
+      "executeMs": 20.68279099999927,
+      "totalMs": 33.96445799999492
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.302209000001312,
+      "executeMs": 20.484291000000667,
+      "totalMs": 33.78650000000198
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.270250000001397,
+      "executeMs": 20.611166999995476,
+      "totalMs": 33.88141699999687
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.325292000001355,
+      "executeMs": 20.393208000001323,
+      "totalMs": 33.71850000000268
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.017957999996725,
+      "executeMs": 19.905500000000757,
+      "totalMs": 32.92345799999748
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.218625000001339,
+      "executeMs": 20.87370799999917,
+      "totalMs": 34.09233300000051
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.067167000001064,
+      "executeMs": 20.598207999995793,
+      "totalMs": 33.66537499999686
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.298750000001746,
+      "executeMs": 21.032874999997148,
+      "totalMs": 35.331624999998894
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.036542000001646,
+      "executeMs": 22.390791999998328,
+      "totalMs": 36.42733399999997
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.288207999998122,
+      "executeMs": 19.806750000003376,
+      "totalMs": 33.0949580000015
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.232499999998254,
+      "executeMs": 20.688750000001164,
+      "totalMs": 33.92124999999942
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 13.943374999995285,
+      "executeMs": 21.207875000000058,
+      "totalMs": 35.15124999999534
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 13.278291999995417,
+      "executeMs": 30.675208000000566,
+      "totalMs": 43.953499999995984
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.164708000003884,
+      "executeMs": 22.5479589999959,
+      "totalMs": 35.71266699999978
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.071499999998196,
+      "executeMs": 22.81787500000064,
+      "totalMs": 35.889374999998836
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.069416999998793,
+      "executeMs": 19.761624999999185,
+      "totalMs": 32.83104199999798
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.637417000005371,
+      "executeMs": 20.337749999998778,
+      "totalMs": 32.97516700000415
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.452209000002767,
+      "executeMs": 20.0625,
+      "totalMs": 33.51470900000277
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.418334000001778,
+      "executeMs": 19.93516599999566,
+      "totalMs": 33.35349999999744
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.918084000004455,
+      "executeMs": 19.96404099999927,
+      "totalMs": 32.882125000003725
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.796708000001672,
+      "executeMs": 19.16883300000336,
+      "totalMs": 31.965541000005032
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.086000000002969,
+      "executeMs": 20.370499999997264,
+      "totalMs": 33.45650000000023
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.720666000001074,
+      "executeMs": 19.563125000000582,
+      "totalMs": 32.283791000001656
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.94616600000154,
+      "executeMs": 19.69854199999827,
+      "totalMs": 32.64470799999981
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.283709000003,
+      "executeMs": 20.136124999997264,
+      "totalMs": 33.419834000000264
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.043999999994412,
+      "executeMs": 19.718042000000423,
+      "totalMs": 32.762041999994835
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.763333000002604,
+      "executeMs": 19.169291999998677,
+      "totalMs": 31.93262500000128
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.486834000003,
+      "executeMs": 19.201915999998164,
+      "totalMs": 31.688750000001164
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.497083000002021,
+      "executeMs": 19.541125000003376,
+      "totalMs": 32.0382080000054
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.069959000000381,
+      "executeMs": 21.28966599999694,
+      "totalMs": 34.35962499999732
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.598458000000392,
+      "executeMs": 19.340582999997423,
+      "totalMs": 31.939040999997815
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.607790999994904,
+      "executeMs": 19.309166999999434,
+      "totalMs": 31.916957999994338
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.843165999998746,
+      "executeMs": 19.753334000000905,
+      "totalMs": 33.59649999999965
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.631624999994528,
+      "executeMs": 20.872000000003027,
+      "totalMs": 33.503624999997555
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 14.794874999999593,
+      "executeMs": 28.956749999997555,
+      "totalMs": 43.75162499999715
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.73124999999709,
+      "executeMs": 21.4610840000023,
+      "totalMs": 34.19233399999939
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.442416999998386,
+      "executeMs": 22.57329100000061,
+      "totalMs": 35.015707999998995
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.707416999997804,
+      "executeMs": 19.116333000005397,
+      "totalMs": 31.8237500000032
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.424291000002995,
+      "executeMs": 19.32912500000384,
+      "totalMs": 33.75341600000684
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.945250000004307,
+      "executeMs": 19.138415999994322,
+      "totalMs": 32.08366599999863
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.408957999999984,
+      "executeMs": 19.146625000001222,
+      "totalMs": 31.555583000001207
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.712124999998196,
+      "executeMs": 19.47229199999856,
+      "totalMs": 32.184416999996756
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.884457999993174,
+      "executeMs": 19.180709000000206,
+      "totalMs": 32.06516699999338
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.862832999999227,
+      "executeMs": 19.711624999996275,
+      "totalMs": 32.5744579999955
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.559624999994412,
+      "executeMs": 19.523209000006318,
+      "totalMs": 32.08283400000073
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.738291000001482,
+      "executeMs": 19.679792000002635,
+      "totalMs": 32.41808300000412
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.909333000003244,
+      "executeMs": 19.448999999993248,
+      "totalMs": 32.35833299999649
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.62929200000508,
+      "executeMs": 19.01408299999457,
+      "totalMs": 31.64337499999965
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.850040999997873,
+      "executeMs": 19.286874999997963,
+      "totalMs": 32.136915999995836
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.399958000001789,
+      "executeMs": 19.52945799999725,
+      "totalMs": 31.929415999999037
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.61424999999872,
+      "executeMs": 19.44312500000524,
+      "totalMs": 32.05737500000396
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.82708399999683,
+      "executeMs": 19.246500000001106,
+      "totalMs": 32.073583999997936
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.52020800000173,
+      "executeMs": 19.530375000002095,
+      "totalMs": 32.050583000003826
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.806832999995095,
+      "executeMs": 19.281209000000672,
+      "totalMs": 32.08804199999577
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.391457999998238,
+      "executeMs": 19.26925000000483,
+      "totalMs": 31.66070800000307
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.913833999999042,
+      "executeMs": 23.19520800000464,
+      "totalMs": 36.10904200000368
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 12.893457999998645,
+      "executeMs": 37.09233300000051,
+      "totalMs": 49.98579099999915
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 132.82800000000134,
+      "executeMs": 51.98791599999822,
+      "totalMs": 184.81591599999956
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 26.337666999999783,
+      "executeMs": 39.103250000000116,
+      "totalMs": 65.4409169999999
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 15.79412500000035,
+      "executeMs": 19.939166999996814,
+      "totalMs": 35.733291999997164
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.39520800000173,
+      "executeMs": 20.6060839999991,
+      "totalMs": 34.00129200000083
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.01433299999917,
+      "executeMs": 20.114500000003318,
+      "totalMs": 33.12883300000249
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.554041999996116,
+      "executeMs": 19.3247080000001,
+      "totalMs": 31.878749999996217
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.094334000001254,
+      "executeMs": 19.67770799999562,
+      "totalMs": 32.77204199999687
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.961250000000291,
+      "executeMs": 19.61016699999891,
+      "totalMs": 32.5714169999992
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.454875000003085,
+      "executeMs": 19.375624999993306,
+      "totalMs": 31.83049999999639
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.903916000002937,
+      "executeMs": 19.58400000000256,
+      "totalMs": 32.4879160000055
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.15887500000099,
+      "executeMs": 19.905790999997407,
+      "totalMs": 33.0646659999984
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.870208000000275,
+      "executeMs": 19.812708000004932,
+      "totalMs": 32.68291600000521
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.256750000000466,
+      "executeMs": 22.13312500000029,
+      "totalMs": 35.38987500000076
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.38379200000054,
+      "executeMs": 19.836332999999286,
+      "totalMs": 33.220124999999825
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.563249999999243,
+      "executeMs": 19.72099999999773,
+      "totalMs": 33.28424999999697
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.305666000000201,
+      "executeMs": 20.025500000003376,
+      "totalMs": 33.33116600000358
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.937541999999667,
+      "executeMs": 19.73112499999843,
+      "totalMs": 32.668666999998095
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.075208000002021,
+      "executeMs": 19.65458299999591,
+      "totalMs": 32.72979099999793
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.293875000003027,
+      "executeMs": 19.30079100000148,
+      "totalMs": 32.59466600000451
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.785916999993788,
+      "executeMs": 19.86475000000064,
+      "totalMs": 32.65066699999443
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 13.05616700000246,
+      "executeMs": 21.04045799999585,
+      "totalMs": 34.09662499999831
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 12.896499999995285,
+      "executeMs": 30.15716699999757,
+      "totalMs": 43.053666999992856
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.181584000005387,
+      "executeMs": 21.692082999994454,
+      "totalMs": 34.87366699999984
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 14.638249999996333,
+      "executeMs": 22.489250000005995,
+      "totalMs": 37.12750000000233
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.409625000000233,
+      "executeMs": 19.348290999994788,
+      "totalMs": 31.75791599999502
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.766834000001836,
+      "executeMs": 19.21495799999684,
+      "totalMs": 31.981791999998677
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.038000000000466,
+      "executeMs": 19.095000000001164,
+      "totalMs": 32.13300000000163
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.549666999999317,
+      "executeMs": 19.76141600000119,
+      "totalMs": 32.31108300000051
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.110666000000492,
+      "executeMs": 19.275583999995433,
+      "totalMs": 32.386249999995925
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.416833000002953,
+      "executeMs": 19.132666999998037,
+      "totalMs": 31.54950000000099
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.36408400000073,
+      "executeMs": 18.810874999995576,
+      "totalMs": 31.174958999996306
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.40849999999773,
+      "executeMs": 19.827292000001762,
+      "totalMs": 32.23579199999949
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.813874999999825,
+      "executeMs": 19.455667000001995,
+      "totalMs": 32.26954200000182
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.010624999995343,
+      "executeMs": 20.742791000004217,
+      "totalMs": 33.75341599999956
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 15.779750000001513,
+      "executeMs": 21.81212499999674,
+      "totalMs": 37.591874999998254
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 16.267958000004,
+      "executeMs": 23.8223749999961,
+      "totalMs": 40.0903330000001
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.684416999996756,
+      "executeMs": 19.074832999998762,
+      "totalMs": 31.759249999995518
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.772207999994862,
+      "executeMs": 20.510417000004963,
+      "totalMs": 35.282624999999825
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.865250000002561,
+      "executeMs": 19.115083999997296,
+      "totalMs": 31.980333999999857
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.727041999998619,
+      "executeMs": 19.82062500000029,
+      "totalMs": 32.54766699999891
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.845792000000074,
+      "executeMs": 19.238540999998804,
+      "totalMs": 32.08433299999888
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.675500000004831,
+      "executeMs": 19.338999999999942,
+      "totalMs": 32.01450000000477
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 12.995583999996597,
+      "executeMs": 20.844166000002588,
+      "totalMs": 33.839749999999185
+    },
+    {
+      "operation": "DIRECTOR.MUTATE_SETUP",
+      "tournament": "2026",
+      "admitMs": 14.793707999997423,
+      "executeMs": 28.75812500000029,
+      "totalMs": 43.551832999997714
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 13.064500000000407,
+      "executeMs": 23.23529199999757,
+      "totalMs": 36.29979199999798
+    },
+    {
+      "operation": "DIRECTOR.MATCH_CONTROL",
+      "tournament": "2026",
+      "admitMs": 12.727624999999534,
+      "executeMs": 22.848874999996042,
+      "totalMs": 35.576499999995576
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.981790999998339,
+      "executeMs": 19.844083999996656,
+      "totalMs": 32.825874999994994
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 15.300542000004498,
+      "executeMs": 24.29666599999473,
+      "totalMs": 39.59720799999923
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 17.206458000000566,
+      "executeMs": 21.948791999995592,
+      "totalMs": 39.15524999999616
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.165375000004133,
+      "executeMs": 19.33625000000029,
+      "totalMs": 32.501625000004424
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.356124999998428,
+      "executeMs": 19.359457999998995,
+      "totalMs": 31.715582999997423
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.827250000002095,
+      "executeMs": 19.78091599999607,
+      "totalMs": 32.608165999998164
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.330042000001413,
+      "executeMs": 20.080916999999317,
+      "totalMs": 33.41095900000073
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.83654199999728,
+      "executeMs": 19.499666000003344,
+      "totalMs": 32.336208000000624
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.58008300000074,
+      "executeMs": 18.990334000001894,
+      "totalMs": 31.570417000002635
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 12.542333000004874,
+      "executeMs": 19.412791999995534,
+      "totalMs": 31.955125000000407
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.186750000000757,
+      "executeMs": 23.14433299999655,
+      "totalMs": 37.33108299999731
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.060041000004276,
+      "executeMs": 21.524749999996857,
+      "totalMs": 35.58479100000113
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.325207999994745,
+      "executeMs": 21.607167000001937,
+      "totalMs": 34.93237499999668
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 15.567957999999635,
+      "executeMs": 20.561208999999508,
+      "totalMs": 36.12916699999914
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.416249999994761,
+      "executeMs": 21.910250000000815,
+      "totalMs": 35.326499999995576
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.51379199999792,
+      "executeMs": 22.72045800000342,
+      "totalMs": 37.23425000000134
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 14.128167000002577,
+      "executeMs": 21.873374999995576,
+      "totalMs": 36.00154199999815
+    },
+    {
+      "operation": "SCORING.SUBMIT_HOLE",
+      "tournament": "2026",
+      "admitMs": 13.893707999995968,
+      "executeMs": 20.61775000000489,
+      "totalMs": 34.51145800000086
+    },
+    {
+      "operation": "SCORING.FINALIZE_MATCH",
+      "tournament": "2026",
+      "admitMs": 13.041834000003291,
+      "executeMs": 21.04529100000218,
+      "totalMs": 34.08712500000547
+    }
+  ],
+  "completedOperations": 528,
+  "ingressScenarios": {
+    "deterministicRejected": {
+      "operationId": "annual:2026:2026-R1-1:h1:rejected",
+      "leaseId": "cde5f2cb-c9a4-4cf8-aaf8-6aed4333c057",
+      "code": "INVALID_GROSS_SCORES",
+      "state": "NOT_COMMITTED"
+    },
+    "unresolved": {
+      "input": {
+        "contract_version": "certification-runtime-v1",
+        "resource": {
+          "resource_id": "CERTIFICATION:4a46d6b3-f4d8-4d35-bb12-fe56391ef21c",
+          "resource_class": "CERTIFICATION",
+          "installation_id": "4a46d6b3-f4d8-4d35-bb12-fe56391ef21c",
+          "project_ref": "aaaaaaaaaaaaaaaaaaaa",
+          "project_url": "https://aaaaaaaaaaaaaaaaaaaa.supabase.co",
+          "vercel_team_id": "team_syntheticcertification",
+          "vercel_project_id": "prj_syntheticcertification",
+          "registration_revision": 1,
+          "manifest_digest": "79bbe0940f3268d3a02ebff3f122ed76f2f6bf1b2fa66539a3ed31af89f74672",
+          "schema_contract": "canonical-resource-v1",
+          "schema_digest": "67ed928144e2d8985a1ade1f522e9e9304c5b735a5cb32d8726c38bfe2ea8121"
+        },
+        "deployment": {
+          "vercel_team_id": "team_syntheticcertification",
+          "vercel_project_id": "prj_syntheticcertification",
+          "git_branch": "codex/synthetic-resource-proof",
+          "deployment_class": "preview",
+          "release_commit": "cccccccccccccccccccccccccccccccccccccccc",
+          "deployment_id": "dpl_SyntheticCertification0",
+          "deployment_origin": "https://synthetic-certification-0.vercel.app"
+        },
+        "phase": "SCORING",
+        "authorization": {
+          "tournament_id": "2026",
+          "role": "PLAYER",
+          "auth_user_id": "10000000-0000-4000-8000-000000000001",
+          "player_id": "P01",
+          "match_id": "2026-R1-1",
+          "permission_revision": 2
+        },
+        "operation_id": "SCORING.SUBMIT_HOLE",
+        "payload": {
+          "match_id": "2026-R1-1",
+          "mutation_key": "annual:2026:2026-R1-1:h1:unresolved",
+          "hole_number": 1,
+          "expected_match_revision": 3,
+          "expected_hole_revision": 0,
+          "team_1_gross_scores": [
+            4,
+            4
+          ],
+          "team_2_gross_scores": [
+            5,
+            5
+          ]
+        },
+        "operation_request_id": "annual:2026:2026-R1-1:h1:unresolved",
+        "expected_context_token": "28f18f12a437d1e436e0ae19cbcb2bf51cd039405f4e5c9ad5af94d95eda2f41"
+      },
+      "leaseId": "5296bc7c-ae11-413a-8c3e-2170779045f9",
+      "admissionGenerationId": "82b7339a-a6c5-454b-bc23-6661ec8ad935",
+      "state": "UNKNOWN"
+    },
+    "lostAcknowledgement": {
+      "operationId": "annual:2026:2026-R1-1:h1",
+      "leaseId": "a2aeaeeb-e213-4792-9f61-46c87a4b6145",
+      "state": "COMMITTED",
+      "method": "Discard committed RPC response before caller recovery"
+    }
+  }
+}

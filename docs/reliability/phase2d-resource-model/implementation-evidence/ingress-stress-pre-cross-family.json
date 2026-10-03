@@ -1,0 +1,45 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "records": [
+    {
+      "id": "20_IDENTICAL",
+      "admissionAttempts": 20,
+      "executionAttempts": 20,
+      "canonicalReceipts": 1
+    },
+    {
+      "id": "20_CONFLICTING",
+      "conflicts": 20
+    },
+    {
+      "id": "DOMAIN_REJECTION",
+      "code": "TOURNAMENT_SETUP_REVISION_STALE",
+      "state": "NOT_COMMITTED"
+    },
+    {
+      "id": "CONNECTION_DEATH",
+      "sameLeaseRetry": "COMMITTED"
+    },
+    {
+      "id": "ATOMIC_TERMINAL_AUDIT",
+      "retry": "COMMITTED"
+    },
+    {
+      "id": "PHYSICAL_PROCESS_RESTART",
+      "powerLossProof": false
+    },
+    {
+      "id": "REAL_EXPIRY",
+      "durationSeconds": 300,
+      "automaticNonCommit": false,
+      "drainBlockedUntilResolution": true
+    },
+    {
+      "id": "EXECUTE_CLOSE_RACE",
+      "closeWaited": true
+    }
+  ],
+  "hostedAccess": false,
+  "googleCalls": 0,
+  "powerLossDurability": "NOT_PROVEN"
+}

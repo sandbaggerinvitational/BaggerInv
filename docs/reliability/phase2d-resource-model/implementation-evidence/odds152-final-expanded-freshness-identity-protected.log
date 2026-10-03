@@ -1,0 +1,65 @@
+▶ Certification two-part Odds freshness preserves actual live-source authority
+  ✔ all three new helpers deny direct runtime roles and retain safe owner attributes (63.507625ms)
+  ✔ actual score makes an old request fail while same committed operation remains recoverable (191.387875ms)
+  ✔ claim supersedes actual stale live input without publishing or losing receipt history (39.389208ms)
+  ✔ checkpoint rejects a source advance during real calculation execution (855.084458ms)
+  ✔ completed real result is superseded after live source advancement; calculation data stays immutable (6307.09425ms)
+  ✔ explicit publication rejects source advancement and commits no publication/audit receipt (6563.602208ms)
+  ✔ source writer first: publication waits then rejects the newly committed source (6134.566ms)
+  ✔ publication first: actual score cannot commit between source validation and publication commit (6412.463ms)
+✔ Certification two-part Odds freshness preserves actual live-source authority (32597.245542ms)
+▶ Certification publication identity distinguishes fresh source without changing equal canonical results
+  ✔ real first calculation and explicit publication record both canonical source components (12194.452ms)
+  ✔ genuine scoring produces a fresh job with the identical numerical result and unchanged configuration (12796.11175ms)
+  ✔ required receipt failure rolls back second snapshot, current flags, job and audit (111.042ms)
+  ✔ same-result fresh-source publication commits revision2 with immutable predecessor and accurate audit (168.175417ms)
+  ✔ same-operation replay and lost-response recovery do not duplicate publication; changed request conflicts (79.746375ms)
+  ✔ same source and result retains the existing job and never creates duplicate logical publication (175.443917ms)
+  ✔ actual public freshness and PWA/Build10 projections remain current without exposing private provenance (30.683666ms)
+  ✔ stale source, forged identity, wrong resource, wrong actor and worker publication remain denied (6608.413083ms)
+  ✔ concurrent owner CAS publishes a single revision for the same fresh equal-result job (6273.918791ms)
+  ✔ index definition, private privileges and immutable identity components remain protected (81.230625ms)
+✔ Certification publication identity distinguishes fresh source without changing equal canonical results (44868.155875ms)
+▶ Certification Odds real calculation, durable owner publication and isolation
+  ✔ fresh state has no historical publication; real canonical read works (48.37125ms)
+  ✔ client and database deny absent, participant, spectator, wrong target and impersonated Director authority (83.161083ms)
+  ✔ two independently installed resources reject cross read, target and wrong release (32.409917ms)
+  ✔ Director calculation request creates truthful durable job and no publication (72.86475ms)
+  ✔ unfinished calculation cannot be published and absent operation remains UNKNOWN (40.171083ms)
+  ✔ job request and required audit roll back together at receipt failure (94.160333ms)
+  ✔ forged provenance, stale context, worker owner-operation and cross-resource write fail closed (147.858208ms)
+  ✔ same logical calculation retry ignores timing telemetry; conflict remains denied (99.659375ms)
+  ✔ claim race admits one lease; expired lease recovers and old token is rejected (162.834167ms)
+  ✔ calculator interruption preserves real checkpoint and resumes without publication (682.655625ms)
+  ✔ existing canonical calculator checkpoints and completes; never publishes (5968.013292ms)
+  ✔ completed calculator duplicate delivery does not recalculate or publish (39.37475ms)
+  ✔ durable calculator exactly matches unchanged canonical domain engine and exposes no private provenance (6867.669083ms)
+  ✔ concurrent duplicate committed calculation operations resolve one durable outcome (34.265875ms)
+  ✔ first publication validates result/source/milestone/generation and never adopts historical provider data (170.990083ms)
+  ✔ snapshot, pointer, job publication and audit roll back together at receipt fault (103.692041ms)
+  ✔ explicit Director first publication commits genuine result and immutable provenance (57.340792ms)
+  ✔ actual public published snapshots and unchanged mobile DTOs omit private Certification provenance (23.887417ms)
+  ✔ lost publication acknowledgement recovers same receipt; stale first CAS conflicts (118.836208ms)
+  ✔ owned PostgreSQL restart retains publication and exact operation recovery (435.469666ms)
+  ✔ committed replay and status reject explicit impersonation without widening recovery authority (23.270666ms)
+  ✔ worker cannot publish, historical publication is immutable and audit provenance is truthful (36.273042ms)
+  ✔ private cores inaccessible and Production legacy publication remains denied (87.368ms)
+  ✔ real request supersedes stale unpublished work after preserved synthetic canonical input advances (22963.106667ms)
+  ✔ second explicit owner publication preserves old snapshot facts and commits pointer changes atomically (504.546083ms)
+  ✔ exact current job, publication and recovery reads retain bounded indexed authority (28.891125ms)
+✔ Certification Odds real calculation, durable owner publication and isolation (47774.44925ms)
+ℹ {"domainEquivalence":{"source":[{"file":"lib/tournament-odds.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"c45c557f03eb630b3998e7a61ea03638ace591ae3df15cb55d0028c2efb8fcc1","unchanged":true},{"file":"lib/prediction-engine.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"9260def65c1eb4b6fc9f520c4e5158768ad309ad59206b5e3ab1fc9fe408ace3","unchanged":true},{"file":"lib/tournament-context.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"0423715b1d4e93c6decc39cfcb27cb0fbc6fffb5c6a9a936c306c4eab4686db4","unchanged":true},{"file":"lib/championship-odds-resilience.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"2a9b9776279ba849bbab128d1d56920b99a7fb38257cbb28a8bb164e26aa6c28","unchanged":true},{"file":"lib/championship-odds-supabase.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"26b143371df2359e0bbdf571e544afdd232fccd29f58ac316bd40747e7aec1be","unchanged":true},{"file":"lib/published-odds-supabase.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"081d157585e0795e999b4071ce36a2e7f3ff52f599574df571b332a56c984e9b","unchanged":true},{"file":"lib/mobile-v1-odds.js","base":"7cec5128409286f5b4a5f3524d4c5488124a7be7","sha256":"608858f8b1fd2900469c259e767cf14ac2d553e8e6dc231946524a61aa269fcd","unchanged":true}],"reference":{"ok":true,"jobId":"e12ce67f7504ef57e33bfccde0535874fbe7905b70edf5fcbe5b8ccbfe68ffe1","iterations":10000,"referenceFingerprint":"2bc241d0afebf456ff36c6617a3d34854cae40484e1eb55668f9520f889e1e9c","resilientFingerprint":"2bc241d0afebf456ff36c6617a3d34854cae40484e1eb55668f9520f889e1e9c","exactEquality":true,"storedFingerprintValid":true,"referenceMetrics":{"durationMs":6750.3022089999995,"cpuMs":6686.467,"rssBeforeBytes":188973056,"rssAfterBytes":124174336,"heapBeforeBytes":48390808,"heapAfterBytes":39560064}}}}
+ℹ {"layer":"LOCAL_POSTGRESQL_RPC_ACTUAL_CALCULATOR","rpcCalls":112,"actualDirectorApi":true,"independentResources":2,"concurrentReplay":8,"googleCalls":0,"googleJobs":0,"autoPublication":0}
+{"fixture":"phase2c1-zero-google-release-v1","environment":"OWNED_SOCKET_ONLY_POSTGRESQL17","schema":152,"result":"PASS","runtimeGuardsSubstituted":false,"GoogleWriterRows":0,"GoogleCalls":0,"GoogleCredentialsRequired":false,"frozen2026Release":"PASS","frozen2026Replay":"PASS","annual2099Release":"PASS","annualReplay":"PASS","secondAnnualRelease":"PASS","staleAuthorityDenied":true,"conflictingReplayDenied":true,"canonicalActiveWorkerDenied":true,"orphanCanonicalLeaseDenied":true,"activeAnnualTransitionDenied":true,"GoogleFlagsRejected":5,"retiredMirrorHistoryIgnored":true,"annualRowsUnchanged":true,"canonicalSideGameCertification":"18b828f9b73dc20d27ed56070c32e1792ad4c4aa9c29118c0beaeae093f9b16d","limitations":["Synthetic annual authority fixture; not a full CREATE/PREPARE/ACTIVATE annual initialization","Historical platform bootstrap models prior Google cutover locally; candidate normal release phase requires no Google","No hosted, Production, real Google or physical proof"],"timestamp":"2026-10-03T02:46:10.719Z","excludedMigrations":[],"r2ForwardMigrations":["202609300131_canonical_resource_control_v1.sql","202609300132_certification_domain_gateways_v1.sql","202609300133_certification_derived_gateways_v1.sql","202609300134_certification_annual_administration_v1.sql","202609300135_certification_read_contracts_v1.sql","202609300136_certification_durable_ingress_v1.sql","202609300137_certification_domain_resource_recovery_v1.sql","202609300138_certification_annual_transition_v1.sql","202609300139_certification_future_authoring_v1.sql","202609300140_certification_future_scoring_v1.sql","202609300141_certification_future_workers_v1.sql","202609300142_certification_required_worker_reads_v1.sql","202609300143_certification_odds_owner_publication_v1.sql","202609300144_certification_release_rebind_v1.sql","202609300145_certification_closed_tournament_read_v1.sql","202609300146_certification_successor_current_reads_v1.sql","202609300147_certification_closed_history_service_v1.sql","202609300148_certification_odds_two_part_freshness_v1.sql","202609300149_certification_odds_snapshot_guard_v1.sql","202609300150_certification_odds_publication_source_identity_v1.sql","202609300151_certification_annual_reopen_lineage_v1.sql","202609300152_certification_closed_release_admission_v1.sql"]}
+{"result":"ANNUAL_RELEASE_REVIEW_OK","migrations":25,"annualSnapshot":"1dd7761bb56aaa03ba79f6231bdc42d8dadfdabb86b52116e5b1b1a35924b35f","authorization":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_AUTHORIZED","status":"PENDING","idempotent":false,"release_sequence":2,"release_intent_id":"59f3c341-33b5-41c8-b516-624ed186704a","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","target_deployment_commit":"56ded61379e3308ab5c465ce186140550f3827a7","authorization_fingerprint":"d586398079b312cbbc53b28789551fc424cca197825f038d30022a227a6df2e2"},"rebind":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_REBOUND","ingress":"OPEN","authority":"SUPABASE","idempotent":false,"boundary_mode":"MAINTENANCE_WINDOW_V1","cutover_phase":"OBSERVATION","deployment_id":"dpl_PostcutoverNormalRelease054","workers_enabled":true,"release_sequence":2,"deployment_commit":"56ded61379e3308ab5c465ce186140550f3827a7","maintenance_state":"NORMAL","release_rebind_id":"186d0915-7a71-4c8a-ba79-c3c768d68f4e","admission_revision":12,"capability_ceiling":"OBSERVATION","activation_revision":23,"capability_contract":"production-maintenance-single-deployment-capability-v1","runtime_fingerprint":"f5bb1d09d6feb592c0fc1929ba45c7a65d3be010e9c5d50415ff675dec2167b4","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","admission_generation_id":"7aa06beb-7775-4c73-a4b7-42e714482de5","authority_generation_id":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb","predecessor_deployment_id":"dpl_PostcutoverApplication053","predecessor_release_sequence":1,"participant_identity_authority":"SUPABASE"},"secondRebind":{"ok":true,"code":"PRODUCTION_POSTCUTOVER_NORMAL_RELEASE_REBOUND","ingress":"OPEN","authority":"SUPABASE","idempotent":false,"boundary_mode":"MAINTENANCE_WINDOW_V1","cutover_phase":"OBSERVATION","deployment_id":"dpl_PostcutoverNormalRelease055","workers_enabled":true,"release_sequence":3,"deployment_commit":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","maintenance_state":"NORMAL","release_rebind_id":"be7704ee-c02e-4b41-8efc-74a764cf687a","admission_revision":13,"capability_ceiling":"OBSERVATION","activation_revision":24,"capability_contract":"production-maintenance-single-deployment-capability-v1","runtime_fingerprint":"5ce38a9820e58a4f96f5537a2b41d5e6f482ed8e16b65986de532320b7c9a458","current_tournament_id":"2099","runtime_generation_id":"10000000-0000-4000-8000-000000000091","admission_generation_id":"7aa06beb-7775-4c73-a4b7-42e714482de5","authority_generation_id":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb","predecessor_deployment_id":"dpl_PostcutoverNormalRelease054","predecessor_release_sequence":2,"participant_identity_authority":"SUPABASE"}}
+▶ migration 078 rebinds future annual normal releases without mutating annual state
+  ✔ future annual authorization, replay, stale and invariance (16338.779708ms)
+✔ migration 078 rebinds future annual normal releases without mutating annual state (18109.939083ms)
+ℹ tests 49
+ℹ suites 0
+ℹ pass 49
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 143736.627666
