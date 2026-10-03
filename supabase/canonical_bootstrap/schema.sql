@@ -21,10 +21,10 @@ SET row_security = off;
 -- Name: extensions; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA extensions;
+CREATE SCHEMA IF NOT EXISTS extensions;
 
 
-ALTER SCHEMA extensions OWNER TO postgres;
+-- Existing extensions namespace ownership is preserved.
 
 --
 -- Name: participant_identity; Type: SCHEMA; Schema: -; Owner: postgres
@@ -67,6 +67,17 @@ ALTER SCHEMA scoring_authority OWNER TO postgres;
 --
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
+-- IF NOT EXISTS must not silently accept a different extension contract.
+DO $bootstrap_extension$
+BEGIN
+ IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_extension e
+  JOIN pg_catalog.pg_namespace n ON n.oid=e.extnamespace
+  WHERE e.extname='pgcrypto' AND e.extversion='1.3' AND n.nspname='extensions'
+  AND pg_catalog.pg_get_userbyid(e.extowner) IN ('postgres','supabase_admin')) THEN
+  RAISE EXCEPTION 'BOOTSTRAP_PGCRYPTO_PLATFORM_CONTRACT_MISMATCH';
+ END IF;
+END
+$bootstrap_extension$;
 
 
 --

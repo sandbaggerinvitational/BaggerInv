@@ -1,0 +1,53 @@
+{
+  "status": "PROVEN_SOURCE_IMPACT_BOUNDED",
+  "baseSha": "9f09f6f15afe1f1a0b326edd078cd54ab4001f71",
+  "candidateMeaning": "Containing commit; execution HEAD records the base while testing approved worktree bytes.",
+  "bootstrapContract": "bagger-canonical-bootstrap-v1",
+  "bootstrapProfile": "phase2-p0f-portrait-v1",
+  "receiptHashes": {
+    "manifest.json": "a96889846994f10a2d0e38e77d3cc6fa2b28a48cca86ce2c8cada90b3d8a3eec",
+    "schema.sql": "4e67e3084e341c543a192cc0e665a0a776bd7badc22d9bf9b821ebf21aa0ef04",
+    "static-contracts.sql": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d",
+    "catalog-manifest.json": "b764e284667b8117764aa11500414cdb3f800b3b4cda20d08297538fcf882a74"
+  },
+  "oldSchemaSha256": "9640535f1116dd7b009f0101a1d4cdfb447a582a38706c0383163844646c10a9",
+  "sourceFilesUnchanged": 149,
+  "forwardMigrationCount": 22,
+  "unchangedStaticContracts": true,
+  "unchangedApplicationCatalog": true,
+  "inventory": {
+    "functions": 1117,
+    "relations": 269,
+    "rlsTables": 260,
+    "triggers": 218,
+    "indexes": 691,
+    "dependencies": 12994
+  },
+  "productionMigrationsUnchanged": true,
+  "googleRuntimeUnchanged": true,
+  "authorityRowsCopied": 0,
+  "resourceRegistered": false,
+  "retainedR2Evidence": {
+    "p0A": "PASS_UNCHANGED_SOURCE",
+    "p0B": "PASS_UNCHANGED_SOURCE",
+    "p0C": "PASS_AFFECTED_BOOTSTRAP_RECERTIFIED",
+    "p0D": "PASS_UNCHANGED_SOURCE",
+    "p0E": "PASS_UNCHANGED_SOURCE",
+    "p0F": "PASS_UNCHANGED_SOURCE",
+    "chronology864": "RETAINED_NOT_RERUN_APPLICATION_CATALOG_AND_STATIC_DATA_BYTE_IDENTICAL",
+    "historical048": "NOT_REPRODUCIBLE_FROM_RETAINED_EVIDENCE_NOT_PROVEN_UNCHANGED",
+    "historical057": "NOT_REPRODUCIBLE_FROM_RETAINED_EVIDENCE_NOT_PROVEN_UNCHANGED",
+    "correction069": "PRESERVED_SOURCE_HASH_IDENTICAL"
+  },
+  "limits": [
+    "No managed hosted installation performed; real provider ownership/ACL/Auth/Supautils must be read back in Part1A.",
+    "Only pgcrypto platform owner may differ in catalog convergence (postgres or supabase_admin); raw target ownership retained. All application fields remain exact."
+  ],
+  "boundary": {
+    "production": false,
+    "hosted": false,
+    "oldPreview": false,
+    "google": false,
+    "native": false
+  }
+}

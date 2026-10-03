@@ -6,7 +6,7 @@
     },
     "schema": {
       "path": "supabase/canonical_bootstrap/schema.sql",
-      "sha256": "9640535f1116dd7b009f0101a1d4cdfb447a582a38706c0383163844646c10a9"
+      "sha256": "4e67e3084e341c543a192cc0e665a0a776bd7badc22d9bf9b821ebf21aa0ef04"
     },
     "staticData": {
       "path": "supabase/canonical_bootstrap/static-contracts.sql",
@@ -732,7 +732,7 @@
   "toolSources": [
     {
       "path": "tools/reliability/canonical-bootstrap-artifacts.mjs",
-      "sha256": "cec60a553218498a9cc5481eef45c0fbc8a6eccb851d766f8c2d7e62fc275208"
+      "sha256": "6e7f9106796964bcd1b73a81664b0d03d5ffe374e476258fe16860b73abd3285"
     },
     {
       "path": "tools/reliability/generate-canonical-bootstrap.mjs",

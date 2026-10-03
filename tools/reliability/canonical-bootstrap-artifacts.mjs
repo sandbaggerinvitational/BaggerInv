@@ -19,10 +19,17 @@ export function stableJson(value){
 }
 export const serialize=value=>JSON.stringify(stableJson(value),null,2)+'\n';
 export function assertCatalogConvergence(actual,expected){
+ // pgcrypto is a platform prerequisite on managed Supabase. Preserve its
+ // existing provider owner; every application owner/ACL remains exact. Keep
+ // raw catalog ownership truthful rather than normalizing the evidence away.
+ assert.equal(actual.extensions?.length,1,'Exactly the required pgcrypto inventory');
+ const extension=actual.extensions[0];
+ assert.ok(['postgres','supabase_admin'].includes(extension.owner),'Unsupported pgcrypto platform owner');
+ const comparison={...actual,extensions:actual.extensions.map(row=>({...row,owner:expected.extensions[0].owner}))};
  const differences=[];
- for(const section of new Set([...Object.keys(actual),...Object.keys(expected)])){
-  if(serialize(actual[section])===serialize(expected[section]))continue;
-  const a=actual[section],e=expected[section];
+ for(const section of new Set([...Object.keys(comparison),...Object.keys(expected)])){
+  if(serialize(comparison[section])===serialize(expected[section]))continue;
+  const a=comparison[section],e=expected[section];
   const first=Array.isArray(a)&&Array.isArray(e)?a.findIndex((row,index)=>serialize(row)!==serialize(e[index])):null;
   differences.push({section,actualCount:a?.length,expectedCount:e?.length,firstDifference:first,
    actual:first===null?a:a[first],expected:first===null?e:e[first]});
@@ -63,6 +70,26 @@ export async function dumpCanonicalSchema(cluster,database){
   let schema=ownedTool(cluster,database,'pg_restore',['--schema-only','--no-comments','--use-list',tocFile,'--file','-',archive]);
   schema=schema.replace(/^\\(?:un)?restrict .+\n/gm,'')
    .replace(/^-- Dumped (?:from|by).+\n/gm,'').replace(/^-- Started on .+\n/gm,'').replace(/^-- Completed on .+\n/gm,'');
+  // The compiler owns this namespace, but managed Supabase may already own it.
+  // Only establish it when absent; never change an existing owner or ACL.
+  assert.equal(schema.split('CREATE SCHEMA extensions;').length,2,'One extensions namespace definition');
+  assert.equal(schema.split('ALTER SCHEMA extensions OWNER TO postgres;').length,2,'One compiler namespace owner');
+  schema=schema.replace('CREATE SCHEMA extensions;','CREATE SCHEMA IF NOT EXISTS extensions;')
+   .replace('ALTER SCHEMA extensions OWNER TO postgres;','-- Existing extensions namespace ownership is preserved.');
+  const pgcrypto='CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;';
+  assert.equal(schema.split(pgcrypto).length,2,'One required extension establishment');
+  schema=schema.replace(pgcrypto,pgcrypto+`
+-- IF NOT EXISTS must not silently accept a different extension contract.
+DO $bootstrap_extension$
+BEGIN
+ IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_extension e
+  JOIN pg_catalog.pg_namespace n ON n.oid=e.extnamespace
+  WHERE e.extname='pgcrypto' AND e.extversion='1.3' AND n.nspname='extensions'
+  AND pg_catalog.pg_get_userbyid(e.extowner) IN ('postgres','supabase_admin')) THEN
+  RAISE EXCEPTION 'BOOTSTRAP_PGCRYPTO_PLATFORM_CONTRACT_MISMATCH';
+ END IF;
+END
+$bootstrap_extension$;`);
   assert.ok(!schema.includes('CREATE FUNCTION public.rls_auto_enable('),'Platform shim leaked into baseline');
   assert.ok(!/^\\connect\b/m.test(schema),'No target-changing psql command');
   // Auth is platform-owned and excluded from dump. Only application-owned

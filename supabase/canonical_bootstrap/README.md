@@ -22,6 +22,15 @@ The baseline preserves application function owners, effective ACLs, security mod
 
 The `public` and `auth` schemas are platform-owned prerequisites. The baseline preserves the target's `public` schema and platform `rls_auto_enable` implementation. It creates application public functions and app-owned Auth triggers, and includes the existing pgcrypto dependency. The test platform shim is not exported and is not hosted Supabase Auth certification.
 
+The owner-approved hosted portability correction establishes `extensions` with
+`CREATE SCHEMA IF NOT EXISTS` and preserves any existing namespace owner/ACL.
+It reuses installed pgcrypto without replacing or relocating it. A transactional
+check requires pgcrypto1.3 in `extensions`, owned by `postgres` or the provider's
+`supabase_admin`. Catalog convergence permits only that platform extension-owner
+difference; application owners, effective privileges, security modes, search paths,
+RLS and dependencies remain exact. Raw target ownership must remain in readback
+evidence. See the [local portability certification](../../docs/reliability/phase2d-bootstrap-compatibility/README.md).
+
 ## Limits
 
 Generated artifacts are not authority registration, hosted installation approval, staging certification, or Production deployment permission. Local migration replay and catalog convergence do not prove managed Auth configuration, hosted role membership, Storage, cron, provider messaging, or database recovery. No tool in this directory accepts a hosted URL or credential.

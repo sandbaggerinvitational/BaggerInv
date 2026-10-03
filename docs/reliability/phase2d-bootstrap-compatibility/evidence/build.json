@@ -1,0 +1,56 @@
+{
+  "suite": "build",
+  "baseSha": "9f09f6f15afe1f1a0b326edd078cd54ab4001f71",
+  "executionHead": "9f09f6f15afe1f1a0b326edd078cd54ab4001f71",
+  "startedAt": "2026-10-03T06:06:42.994Z",
+  "completedAt": "2026-10-03T06:06:56.000Z",
+  "environment": "OWNED_LOCAL_POSTGRESQL17_NON_PRODUCTION",
+  "network": "OUTBOUND_NET_TLS_SOCKET_DENIED",
+  "credentials": "REMOVED_FROM_CHILD_ENV",
+  "sourceManifest": [
+    {
+      "file": "supabase/canonical_bootstrap/catalog-manifest.json",
+      "sha256": "b764e284667b8117764aa11500414cdb3f800b3b4cda20d08297538fcf882a74"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/manifest.json",
+      "sha256": "a96889846994f10a2d0e38e77d3cc6fa2b28a48cca86ce2c8cada90b3d8a3eec"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/schema.sql",
+      "sha256": "4e67e3084e341c543a192cc0e665a0a776bd7badc22d9bf9b821ebf21aa0ef04"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/static-contracts.sql",
+      "sha256": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d"
+    },
+    {
+      "file": "tools/reliability/bootstrap-compatibility-isolation.cjs",
+      "sha256": "6e208ad0ee15624ceb91721215038643f94b9ebd321be1562b3ecd5ee4f19c11"
+    },
+    {
+      "file": "tools/reliability/canonical-bootstrap-artifacts.mjs",
+      "sha256": "6e7f9106796964bcd1b73a81664b0d03d5ffe374e476258fe16860b73abd3285"
+    },
+    {
+      "file": "tools/reliability/run-bootstrap-compatibility.mjs",
+      "sha256": "0286adb67855f388f2726a97ca76ea09cee687b7e44df7133db3144e39428a04"
+    }
+  ],
+  "sourcesStable": true,
+  "counts": null,
+  "failures": [],
+  "exitCode": 0,
+  "error": null,
+  "result": "PASS",
+  "rawArtifact": "build.log.gz",
+  "rawSha256": "2d23c9aa2695c992825c17b549ed22efe14fa8672fd062a891e435d44a9ca488",
+  "hosted": false,
+  "production": false,
+  "limitations": [
+    "Supabase-shaped local fixture is not hosted provider certification.",
+    "Broad raw failures require exact identity/diagnostic accounting; no baseline exclusion."
+  ],
+  "rawEncoding": "GZIP_LOSSLESS_ORIGINAL_BYTES",
+  "archiveSha256": "a5ee6a279b66d0df85dfe7297da20dabc8844e842f37e1338aab51d65a61e9c5"
+}

@@ -1,0 +1,2115 @@
+{
+  "suite": "application",
+  "baseSha": "9f09f6f15afe1f1a0b326edd078cd54ab4001f71",
+  "executionHead": "9f09f6f15afe1f1a0b326edd078cd54ab4001f71",
+  "startedAt": "2026-10-03T06:06:43.498Z",
+  "completedAt": "2026-10-03T06:09:22.369Z",
+  "environment": "OWNED_LOCAL_POSTGRESQL17_NON_PRODUCTION",
+  "network": "OUTBOUND_NET_TLS_SOCKET_DENIED",
+  "credentials": "REMOVED_FROM_CHILD_ENV",
+  "sourceManifest": [
+    {
+      "file": "supabase/canonical_bootstrap/catalog-manifest.json",
+      "sha256": "b764e284667b8117764aa11500414cdb3f800b3b4cda20d08297538fcf882a74"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/manifest.json",
+      "sha256": "a96889846994f10a2d0e38e77d3cc6fa2b28a48cca86ce2c8cada90b3d8a3eec"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/schema.sql",
+      "sha256": "4e67e3084e341c543a192cc0e665a0a776bd7badc22d9bf9b821ebf21aa0ef04"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/static-contracts.sql",
+      "sha256": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d"
+    },
+    {
+      "file": "test/account-deletion-completion-worker.test.mjs",
+      "sha256": "7fa6acdeee2fde3721bd659ea851249ab86aef4a79ecbde94d34b5fd2525bc5e"
+    },
+    {
+      "file": "test/account-deletion-policy.test.mjs",
+      "sha256": "ce8e3613fe362cb34da76af2a9f32820f2e778deeed3e19be170bcbd5960f5a1"
+    },
+    {
+      "file": "test/account-deletion-scheduled-worker.test.mjs",
+      "sha256": "4b3b990af012d830e397ff1a090fc03f8589e37125e1e38c5e35d2e55d00c016"
+    },
+    {
+      "file": "test/admin-cms-config.test.mjs",
+      "sha256": "04828d55ed9981095de50fca777acdd8ba7d6a0d3f4d8d6f8cbc7cfb9f09d7f1"
+    },
+    {
+      "file": "test/advisory-prediction-symmetry.test.mjs",
+      "sha256": "389191eae74a3175ce70d865365e5abf79e05d232fa1522127344c0243b3be9d"
+    },
+    {
+      "file": "test/app-store-information-pages.test.mjs",
+      "sha256": "62b53be267caf52d1ac8f90d14d6862086449d820389691d5a8d358838fcb522"
+    },
+    {
+      "file": "test/approved-mobile-enrollment-client.test.mjs",
+      "sha256": "c8f0090e3d0e48a7068545cc7d97a01dd9eabe69bc87f4228af8b904de4fcb02"
+    },
+    {
+      "file": "test/asset-paths.test.mjs",
+      "sha256": "0b88530b21b95718300e1c4e428218bfa725428b8e157fdb83c045b05e57ac4e"
+    },
+    {
+      "file": "test/atomic-round-scoring-contract.test.mjs",
+      "sha256": "6222600cf7e088804842a0cc06e27898fecdd7620e5c7b4cdb0f16567a51141f"
+    },
+    {
+      "file": "test/best-ball-decimal-handicap-display.test.mjs",
+      "sha256": "532829534502b6c754a7babec030cf3407ff091fab8711cc32286a53a8efd67d"
+    },
+    {
+      "file": "test/calcutta-candidate-integrity.test.mjs",
+      "sha256": "ea6140ed4ce2b3bf5ad007939da2658983c65409065fb6ff909ba236181a7d07"
+    },
+    {
+      "file": "test/calcutta-clear-server.test.mjs",
+      "sha256": "5f2ad7b749b07592c4d4a7125b7fad909a1901a999dbadd7caffa052971d797c"
+    },
+    {
+      "file": "test/calcutta-clear-ui.test.mjs",
+      "sha256": "44233c3276080c0d172af17076f8f0a8ad515e0b2c6989d142d8f5590e9391ba"
+    },
+    {
+      "file": "test/calcutta-full-course-handicap-v2.test.mjs",
+      "sha256": "d406b2079731d68060d82d26e99a0917d89f165135a0e981a8b87f0298b3d726"
+    },
+    {
+      "file": "test/calcutta-leaderboards-regression.test.mjs",
+      "sha256": "02363f7269ffd882c20ce29d39212c3d4e0fef202e6f48988d272ed6ba40ec38"
+    },
+    {
+      "file": "test/calcutta-leaderboards.test.mjs",
+      "sha256": "994e34ade90f12b374a083c271f892dde31447d55bb6d80eff863b7845ea33f5"
+    },
+    {
+      "file": "test/calcutta-management-server.test.mjs",
+      "sha256": "17048fb160e649e6c8d84c73d1f6057931500cc9094be2338ba6673990fb43ab"
+    },
+    {
+      "file": "test/calcutta-management.test.mjs",
+      "sha256": "e89d2b18c0d08d0d0215fc0d3b93d3d35a331ea68574fbe03133b3842d1f08da"
+    },
+    {
+      "file": "test/calcutta-recovery-source-boundary.test.mjs",
+      "sha256": "e29ffb0965783a9123438255585edd1f2906fdbfbb8d9011ba27895a676e605d"
+    },
+    {
+      "file": "test/calcutta-scramble-team-placement.test.mjs",
+      "sha256": "e3480bd1de942a16266991bfab2ca3d70151648d7375e9bf817a128e1fc78f8c"
+    },
+    {
+      "file": "test/calcutta-supabase.test.mjs",
+      "sha256": "c692dc6a08a6f83a68dd8b1a3adaebd73e8d877a152142c2c80e9ac47b9bf356"
+    },
+    {
+      "file": "test/calcutta-tie-metadata.test.mjs",
+      "sha256": "873b9b7bb795a4868b3fa18b82c9a66d37cc7b0115036f89f8178b3d4dab00c0"
+    },
+    {
+      "file": "test/calcutta-ux-clarity.test.mjs",
+      "sha256": "c458410e9616fcf8df8e7f28e2961069014da8a58fc9f09aa8491e0310e834b1"
+    },
+    {
+      "file": "test/calcutta.test.mjs",
+      "sha256": "6e892d25f8505d54628b21f5c819dfaff6a5f97b506769501efa71540eb7e13e"
+    },
+    {
+      "file": "test/canonical-projection-audit.test.mjs",
+      "sha256": "57507b5c9343f4cbcb7b45e709b80eefc865a7350a89bfa6e22f5dd477514842"
+    },
+    {
+      "file": "test/championship-odds-format.test.mjs",
+      "sha256": "b5213765c43f6175e1a9b3fcf785a2eb875104dbd6b36545ac920dbf7a129ed2"
+    },
+    {
+      "file": "test/championship-odds-insights.test.mjs",
+      "sha256": "004244d043af1c7b75bfd49ab3ed282c960977554537602e1386e595c6cb4ad9"
+    },
+    {
+      "file": "test/championship-odds-resilience.test.mjs",
+      "sha256": "dedf43ce6ede79b5edcd7d4e93a737708a26ddaeddf5b5278b4a48236d62886d"
+    },
+    {
+      "file": "test/championship-odds-supabase-inputs.test.mjs",
+      "sha256": "02511a23f2f6e0f1b054319588696a40f75c6b768117be635e239eaf13d03b05"
+    },
+    {
+      "file": "test/championship-projection-lifecycle.test.mjs",
+      "sha256": "27e23e9c0852044c0413a93f14788aa054076b8df522c09b5f1b5a21183eb4c9"
+    },
+    {
+      "file": "test/client-cache-hydration-safety.test.mjs",
+      "sha256": "c97bddb4ee4f51d248628705777c999b4cb3a414df8edf8ed95aebaedfc087e1"
+    },
+    {
+      "file": "test/client-mutation-operation-identity.test.mjs",
+      "sha256": "04d73ad7cf90dab2ea4b6739131b6f7474c8ad89e4f3a8fd21b5a1b88b57eaa8"
+    },
+    {
+      "file": "test/cms-save-transaction.test.mjs",
+      "sha256": "0cc0c5ee0a620d254e4e3c3028797c1bf554fd99ac6983f6d83825530e27b3e8"
+    },
+    {
+      "file": "test/competition-derived-supabase.test.mjs",
+      "sha256": "4c7e0c718eba4823b9825e738a5647bcbcee54c75da13c6d7872fadf62284851"
+    },
+    {
+      "file": "test/context-navigation.test.mjs",
+      "sha256": "7e42b947a2830c721096156ab65fdd7cacbb0265393a2b90e5e90a8d24fd554a"
+    },
+    {
+      "file": "test/course-archive-organization.test.mjs",
+      "sha256": "73976a9b42f0905d776f452aa1562ebb423ac12b7d985746f54a704b589b57c9"
+    },
+    {
+      "file": "test/course-detail-app.test.mjs",
+      "sha256": "998dde109ea245a1c88aa09c26dca62a1e49f995cc345aca09abd24f21b64810"
+    },
+    {
+      "file": "test/course-holes-schema.test.mjs",
+      "sha256": "489238a34545ddfb8688c4c6bd6ee8b9bffa7abc1bab848f6cb5d0299ff8402e"
+    },
+    {
+      "file": "test/director-capability-cookie.test.mjs",
+      "sha256": "d5799f98c4b6c1f8e5730b973c99e17e10a9438bcfc2cf3f6e1651ea67ff70a3"
+    },
+    {
+      "file": "test/director-course-tees.test.mjs",
+      "sha256": "f79722b1cf592ed311ddf7df8aa77e35852b460ab01bb14578a3b9365722648e"
+    },
+    {
+      "file": "test/director-guide-refresh.test.mjs",
+      "sha256": "6f82e34a80969e95fa8350fd6bcaf79529c113bf80774b4658d2d9bb27bcf1ff"
+    },
+    {
+      "file": "test/director-odds-history-v1-1.test.mjs",
+      "sha256": "63dbbdfa89071c8b6d90ac29e8421f848adb1930fa36266d78d8d62709f74d71"
+    },
+    {
+      "file": "test/director-operations-console.test.mjs",
+      "sha256": "56725710ad4ff1ff4f9e9a849f2cfd5134733174419fdbb92d15b6d9c60d59ad"
+    },
+    {
+      "file": "test/director-readback-verification.test.mjs",
+      "sha256": "a5f4634cd8c98c5f993f8480761e7fee2cf734dec9b58729a66b79dc53f31351"
+    },
+    {
+      "file": "test/director-transaction-pipeline.test.mjs",
+      "sha256": "b9a803b67b97e1825d5e290adbd91c65417d0b18917c9324e4d53a2b0955fce2"
+    },
+    {
+      "file": "test/draft-analytics.test.mjs",
+      "sha256": "059f6b82cf79f401deaffc490a60f2dc86917639904b6f2f4b1cdbf495b7097d"
+    },
+    {
+      "file": "test/draft-state.test.mjs",
+      "sha256": "4763eafcc5d21eea307dcc3a0fb6f2f1552375bdaa709ae972f80fef8824788f"
+    },
+    {
+      "file": "test/draft-supabase-projection.test.mjs",
+      "sha256": "8937311911748ec33654a66d4852bb606eb657cc1cc4958fe6c89270a3446a9d"
+    },
+    {
+      "file": "test/draft-value.test.mjs",
+      "sha256": "3a7fa83097c98a6cf717bcdb91c96c00a34591a54a88ee92c4f614e465a2cfdc"
+    },
+    {
+      "file": "test/expanded-spectator.test.mjs",
+      "sha256": "bfd01e3dbe65f881f2ef8bcb6ad846783e60159d0e5f80216fbe1aa81b80badf"
+    },
+    {
+      "file": "test/expired-identity-recovery.test.mjs",
+      "sha256": "b51831b8e6364681c38a658b7ec5cc3c6a57b8a7236d6ad3d73ec25810763dd9"
+    },
+    {
+      "file": "test/finalized-match-archive.test.mjs",
+      "sha256": "e6dfed339fd993450afbbfaa3b47c32735b613eb26076df04c7feebdfa426f36"
+    },
+    {
+      "file": "test/first-write-audit-revision.test.mjs",
+      "sha256": "706cfad7f4e83db86165e753a55e3079aa68076dc41fd3c00ad92af19a342946"
+    },
+    {
+      "file": "test/format-handicap.test.mjs",
+      "sha256": "9f92a8beb68adf7298bc77665125c01811e7e9ba85106d21d2ba3d96c44a3868"
+    },
+    {
+      "file": "test/game-center-final-lineup-freeze.test.mjs",
+      "sha256": "9e0a0bf5b8dd16e586b8da719a17747f1399927385506e0db54b532baacfea88"
+    },
+    {
+      "file": "test/game-center-readiness-page.test.mjs",
+      "sha256": "79041d323a5d0ea7c04f9564ba646dc8490265cb19edbbc09bb722b1820cbd79"
+    },
+    {
+      "file": "test/game-center-supabase.test.mjs",
+      "sha256": "f7cf49feced12df2763182aec61f362fe193d7b784d215a9a336e4a661e997e0"
+    },
+    {
+      "file": "test/game-center.test.mjs",
+      "sha256": "8a6120ad9337a842fefbd72ce9be1f8d0db8258a58c047c2419fb40fa5f48882"
+    },
+    {
+      "file": "test/ghin-hybrid-phase-2a.test.mjs",
+      "sha256": "da43f5eb50308fa89c5bc675038970eadd9c8b7e48a92dc02d030dae07de0540"
+    },
+    {
+      "file": "test/ghost-match.test.mjs",
+      "sha256": "32c4ed458d9f5dfd1c9eadaf5eafa8171dd952388e96e48cfdf91db431472c95"
+    },
+    {
+      "file": "test/google-sheet-field-types.test.mjs",
+      "sha256": "617f40f7439fda7cc420dd37bd993d850f45634813d90af0a98860eb770e6270"
+    },
+    {
+      "file": "test/guide-api-security.test.mjs",
+      "sha256": "5bf22d3185c1aeca4aba5191653f6907e56feb43ce03808ea80f9a2e366611c6"
+    },
+    {
+      "file": "test/guide-history-mobile-polish.test.mjs",
+      "sha256": "c90548bc5725979572e0e7eef370de2bda7b59e5249afe73e28f06fd22650a03"
+    },
+    {
+      "file": "test/guide-participant-adapter.test.mjs",
+      "sha256": "710d967588cc4de29b5eda747dccb51f417c114a24e4961258bb57b02760a126"
+    },
+    {
+      "file": "test/guide-service-layer.test.mjs",
+      "sha256": "0ff8394eaf74aeb3512a1191be0662390764da58b27343a1732b619bbc425646"
+    },
+    {
+      "file": "test/historical-captains.test.mjs",
+      "sha256": "8b092c01ee6cd98647d32a8655c834ee09f3fe3e1e4f019ac1ae00f9f946be5d"
+    },
+    {
+      "file": "test/history-2026-supabase.test.mjs",
+      "sha256": "c9c9b4357e46702ea0311c831320d1f8cbbb527ee3f0747391429696d8b62dd7"
+    },
+    {
+      "file": "test/history-analytics-reuse.test.mjs",
+      "sha256": "f69658204ab38790e585f16616fb928dc98cf67bcff1dfb60489a0c97a029edf"
+    },
+    {
+      "file": "test/history-champions-player-avatar-resolution.test.mjs",
+      "sha256": "3fb576994459ec9104668721c3c7859f8584e269b0aa3544f2f279ac093c510f"
+    },
+    {
+      "file": "test/history-final-2024-2025-round-statistics.test.mjs",
+      "sha256": "cf117f90e3e75c3891c914ff4f672071951ffe724d836ca84f5487d39f84230a"
+    },
+    {
+      "file": "test/history-final-2024-2025-tournament-record-presentation.test.mjs",
+      "sha256": "d1b1edeab8f09f403718376730534a609b0bd282225d248073ee0fe039c3a622"
+    },
+    {
+      "file": "test/history-final-content-ia.test.mjs",
+      "sha256": "37beab4a91cd3936faaab245d636a77bbf312b9e9a4449815ec51485d2071cc1"
+    },
+    {
+      "file": "test/history-handicaps-captains.test.mjs",
+      "sha256": "2ddff3175eb6a2e03eabd837dd8ba3f8d62107871ce563654bdba0f8cd6832b3"
+    },
+    {
+      "file": "test/history-hole-winner-summary-cleanup.test.mjs",
+      "sha256": "6601148a1078e95183c071f82d2941a832e902f6fdee9db9aa5da68c869e58cb"
+    },
+    {
+      "file": "test/history-physical-correction.test.mjs",
+      "sha256": "03f506e57b0c4f047d8657487cc6f9ecb0fce73468d6494e544bae7b43bc7897"
+    },
+    {
+      "file": "test/history-scorecard-derived-row-labels.test.mjs",
+      "sha256": "03d874502a36cfb0dc3d9adc39b3f5258a2afc8eba9c676397d396870fca41ef"
+    },
+    {
+      "file": "test/history-step1c-captain-import.test.mjs",
+      "sha256": "a69900ddb9adaacafefb3e3f95ac9a2a88a52cc7d9adf4bb8826d6397b1dc9e3"
+    },
+    {
+      "file": "test/history-step2a-legacy-player-identity.test.mjs",
+      "sha256": "d79540e60be3b5e9d1a8ba7d52cfb5551d4dd735fa4e4d6a63eecf7076677a3e"
+    },
+    {
+      "file": "test/history-step2b-scorecard-coverage.test.mjs",
+      "sha256": "78f58bc5c79c52e93e52d582398b94568e39445cf6594f63874a18d2acb49242"
+    },
+    {
+      "file": "test/history-step2c-honors-duplication.test.mjs",
+      "sha256": "9911735fa0d9244a51a096e1fa5ec2cade57121c38da808b3ef2e9b963c53e13"
+    },
+    {
+      "file": "test/history-step3a-completed-year-2025.test.mjs",
+      "sha256": "539bd36cc27b02519d3814d7a4f47232c7650a854809fb7be4bc4b362e624386"
+    },
+    {
+      "file": "test/history-step3a10-2025-master.test.mjs",
+      "sha256": "46d9cc543000082f6edfc2bc3c1dc9d62a523706eaa8484c0e0e38880b8bbcc9"
+    },
+    {
+      "file": "test/history-step3a2-tournament-records.test.mjs",
+      "sha256": "8fb944bdc437463c6a2f31a8826e342d410e34bcbe15b199c49ba7fd8cfdbd10"
+    },
+    {
+      "file": "test/history-step3a3-final-ux-cleanup.test.mjs",
+      "sha256": "d03db6508499ebc29c8820f17ab838c66e3b538e6dbe611e68550882998ad23b"
+    },
+    {
+      "file": "test/history-step3a4-navigation-scramble.test.mjs",
+      "sha256": "4f23d148fdd44c33bebfb884fe70a7e7cc9bd4ecfad4002c2a7e0513f08eee21"
+    },
+    {
+      "file": "test/history-step3a5-final-round-polish.test.mjs",
+      "sha256": "2bd43ef534f1365fa195a782e0e3b0c3d556ca3b77f38eed69ad4b2a5acea614"
+    },
+    {
+      "file": "test/history-step3a6-completed-navigation.test.mjs",
+      "sha256": "8fcdd05dbf0022a5df8df8c842c0d33f6d1c4464bab49041d6fe5d68564574d8"
+    },
+    {
+      "file": "test/history-step3a7-2026-parity.test.mjs",
+      "sha256": "de2ae80f519733e41c2fc16d07c5140996329fafa48004a9ec70025a6519681c"
+    },
+    {
+      "file": "test/history-step3a8-round-correctness.test.mjs",
+      "sha256": "e76b03405ea7c056fc34c6cdf4c4e143f11483e33c2974cf510ab86beb277843"
+    },
+    {
+      "file": "test/history-step3a8a-visual-cleanup.test.mjs",
+      "sha256": "5e63e971b76242e1f60007950e9dbd245926f0aa6293755edcbbbfe239100f03"
+    },
+    {
+      "file": "test/history-step3a9-scorecard-parity.test.mjs",
+      "sha256": "7153fabfdeb536928b75fbcb92a7555d2ed6478224eb42c6f1c6c43db7689f5b"
+    },
+    {
+      "file": "test/history-step3b1-2024-migration.test.mjs",
+      "sha256": "06ea1bc1f553286e9bbcae1ca234b047d5b436809e1b74a3f365af4aa956ced6"
+    },
+    {
+      "file": "test/history-step3b1a-2024-net-semantics.test.mjs",
+      "sha256": "a46a7c2e48d2ccff8b078cd38c9094ef9ce872ae2a49055b3f04cc8fa5d8e1f6"
+    },
+    {
+      "file": "test/history-step3b2-2023-migration.test.mjs",
+      "sha256": "48e6c1ea8b54aabe195fe3d638598b1927d40bbc19db556e54e1e06b15eefbd8"
+    },
+    {
+      "file": "test/history-step3b2a-2023-reconciliation.test.mjs",
+      "sha256": "afd1cb05d9be1171b4b35cd7087864e2adc6117adbe65a8f662e8d619b862efb"
+    },
+    {
+      "file": "test/history-step4a-player-context.test.mjs",
+      "sha256": "bc803c1e199b25e5a6ef0b781edc9da4346d2a58ff1cf1101fde1cea96224737"
+    },
+    {
+      "file": "test/history-step4a1-career-pwa.test.mjs",
+      "sha256": "8ab850c9fd3ea7762cb238b9ce93fa8d6a292d2cf02314e6b924dab93a062f52"
+    },
+    {
+      "file": "test/history-step4b-archive-integration.test.mjs",
+      "sha256": "75291a42d00255487743a8e23da2a3b0803680508641c318d37605b985580a7a"
+    },
+    {
+      "file": "test/history-step5-read-cutover.test.mjs",
+      "sha256": "40b7b15283c9773188a77f94fe3b98127cdc852b7dfa7f20b17a27e2b9781422"
+    },
+    {
+      "file": "test/history-step5c-delivery.test.mjs",
+      "sha256": "47a91639549309e8de2a1e598f480dcf1ad9ec0607fc0066e3e5c563d896c378"
+    },
+    {
+      "file": "test/history-step5c1-shell-scorecard.test.mjs",
+      "sha256": "1cb3a4596ac34dfb84b76b3869578ccd29c18639cfd853e9f29773ad78d738c3"
+    },
+    {
+      "file": "test/history-step6a-completed-foundation.test.mjs",
+      "sha256": "3a7513772c257adebff2a80651f1ab9ca257cba33f3e8401b7685dd74f6afaf5"
+    },
+    {
+      "file": "test/history-step6b-read-cutover.test.mjs",
+      "sha256": "828422ede398ce164ee726dd91dc707abcbc4ff3805db4195e6c410f6cad6f5e"
+    },
+    {
+      "file": "test/history-step6c1-secondary-consumers.test.mjs",
+      "sha256": "1d270c169c9a7338fa9238fd3b963e8c48ea776d4dbd109b68b0d0ca5862ccb5"
+    },
+    {
+      "file": "test/history-step6c2-secondary-consumers.test.mjs",
+      "sha256": "87eae55dd8040380351a5a9b33d450b29ab7ffa8c5285a56917a489d74e1688d"
+    },
+    {
+      "file": "test/history-step6d-historical-courses.test.mjs",
+      "sha256": "ee3bd1a1dc034a310fc03a856a93b62fb1358dabf841a8c82f75a0942b3d861f"
+    },
+    {
+      "file": "test/hole-by-hole-analytics.test.mjs",
+      "sha256": "3d7d5a581725184f7f748702d1a48bc8fc5cb049945a231481c8c9fc49764c81"
+    },
+    {
+      "file": "test/home-command-center-polish.test.mjs",
+      "sha256": "e362e730037253e1f52b8fa06744ece3bc5f0b9fca1094f06ff0a835fd61da45"
+    },
+    {
+      "file": "test/home-dashboard.test.mjs",
+      "sha256": "86f43f9a90bc0709d9f89796ca8e7220e061c408aa37c296a97d69fc9aa73430"
+    },
+    {
+      "file": "test/home-final-visual-finish.test.mjs",
+      "sha256": "96afe319d1bb0caeded330030abacb21a73e0e90a902d3d5a9d89acf26e9c460"
+    },
+    {
+      "file": "test/home-personality-assets.test.mjs",
+      "sha256": "4783ea689d1590e5246b53e687a977772dbd621db5d3efd47bab9a0b2c9b5832"
+    },
+    {
+      "file": "test/home-progressive-rendering.test.mjs",
+      "sha256": "a4995e1382013ce7a48d2aee06ae3fa9a8cbce52b09fe50e075724da0cfaf871"
+    },
+    {
+      "file": "test/home-supabase-read.test.mjs",
+      "sha256": "6ca9e0057223f77a0cf315e9d4f87bbe95e971c5d9628aa9bf2a0b7e457a62d7"
+    },
+    {
+      "file": "test/home-visual-consistency.test.mjs",
+      "sha256": "00af360ee7e7916471522e0bf7c9b8e52791501bc9adfddd6a5b0765880c9743"
+    },
+    {
+      "file": "test/homepage-current-supabase.test.mjs",
+      "sha256": "715a9f2aebe54f85a4f2cf20c173b92a2c582c5d51e8dd6b88973a7c678c49a8"
+    },
+    {
+      "file": "test/icons.test.mjs",
+      "sha256": "affd7c5f1cbe6ab867665f9b9d090343d1014e65ea214889626c0db26498745c"
+    },
+    {
+      "file": "test/identical-legacy-course-adoption.test.mjs",
+      "sha256": "7e3919a9419c90a3aacd63eca245bf62b96015add36483bb144859a3d4aecff0"
+    },
+    {
+      "file": "test/intelligence-derived-supabase.test.mjs",
+      "sha256": "9f96f7d5f92aae17bcafa4bcb6ef845fb7ff9c0166fc2a4b829ffe86ab69ff11"
+    },
+    {
+      "file": "test/leaderboard-detail-consistency.test.mjs",
+      "sha256": "49dc10d59062ea7bfa1d8d3bf0d8751c6a27a7677bb0aed914e38765a120d46c"
+    },
+    {
+      "file": "test/leaderboard-navigation-performance.test.mjs",
+      "sha256": "1737b0916b0a61fa8fcf31d58f3a0d0f7d889a5352a2fadb3916c2e36b00263c"
+    },
+    {
+      "file": "test/leaderboard-round-breakdown.test.mjs",
+      "sha256": "d81abe661ed79f52b9eb166566cd5d259ae844f5cc257f94d20b898441145ac2"
+    },
+    {
+      "file": "test/leaderboard-visual-standardization.test.mjs",
+      "sha256": "b5e1ae7c4e34311e69334d319fcf805ca8c133a14077a4816ad56fc370d6c526"
+    },
+    {
+      "file": "test/leaderboards-core-supabase.test.mjs",
+      "sha256": "47ee02ddaa2f3ca64589aa5fab4d1ccbcdbcdb31f0d8008679dca22098ccee28"
+    },
+    {
+      "file": "test/leaderboards-mobile-polish.test.mjs",
+      "sha256": "4e8ce4d593fc13ef1e8bc2fd3ec44c3042eba23bb38d643d08e408649dbbbce5"
+    },
+    {
+      "file": "test/legacy-participant-access-cleanup.test.mjs",
+      "sha256": "782eb371821fd420e81666a13e830d82a21b286d0532eeee02b6f728f9fb62d9"
+    },
+    {
+      "file": "test/lineup-optimizer.test.mjs",
+      "sha256": "ea370f38b239255968cf6991129cbc0be7b1941d1e67c313918e5b9be2f58d41"
+    },
+    {
+      "file": "test/live-command-center.test.mjs",
+      "sha256": "a256eae492f7c35a74b42f421498853439349ccc27c1df29ad5f9dd1120305c4"
+    },
+    {
+      "file": "test/live-hole-scoring.test.mjs",
+      "sha256": "82bb5ab84db254258221388ba41262cd847539a318b298d3514216375b26c38a"
+    },
+    {
+      "file": "test/live-match-pairing.test.mjs",
+      "sha256": "b2f930a3d30d193f756a0a128c099eb391277d89387d85e6795a862bedf70fc9"
+    },
+    {
+      "file": "test/live-match-schema.test.mjs",
+      "sha256": "26b4bd48055982d9f19a79c5b660065053c36a5abb851ba396b7544e4925e263"
+    },
+    {
+      "file": "test/live-scoring-native-types.test.mjs",
+      "sha256": "dccf904e7445cca13554557f5449036ed738660cee83af20ee8689f7a11453c5"
+    },
+    {
+      "file": "test/live-scoring-ui.test.mjs",
+      "sha256": "5f965ef2d7d9d37e118da613b1a087be83d61ca785e7b574c43d797ae2950c0d"
+    },
+    {
+      "file": "test/live-tournament.test.mjs",
+      "sha256": "38a4c0d12c60ccea04f133b22c991ffbfe7178dbd95b26a853ccc2306980bb40"
+    },
+    {
+      "file": "test/live-ux-foundation.test.mjs",
+      "sha256": "813c6a52c9e48ec2c7de688e1cd74de2a93b283944e9930cf65181a49f99802a"
+    },
+    {
+      "file": "test/match-authorization-supabase.test.mjs",
+      "sha256": "0c20715df0a84caa3c7f066e4ef2465134e0f535b64c5c063949b0f8a9f5acfb"
+    },
+    {
+      "file": "test/match-center-handicap-presentation.test.mjs",
+      "sha256": "34df880bb44c9c9d798a877db4dbafadccf4931c874792613d21948b68685375"
+    },
+    {
+      "file": "test/match-intelligence.test.mjs",
+      "sha256": "b45921852a672339d039c185cb40e00e32cea04e4f1d1dbd93be2898a4d852b3"
+    },
+    {
+      "file": "test/match-progression.test.mjs",
+      "sha256": "955aac4b9a4f4e949588fda7af9b570b238890102d310e143072ebc0977cccd3"
+    },
+    {
+      "file": "test/match-simulator.test.mjs",
+      "sha256": "4fbfd4ba3c70d5f5a96acce4947ad513e22fc1b67424e8a0ac58ebb9e8281bb6"
+    },
+    {
+      "file": "test/me-player-identity.test.mjs",
+      "sha256": "65b44d3d428a263e4e9834b143beea5c0f669291f36df1c2aa00a4eed3268a96"
+    },
+    {
+      "file": "test/mobile-account-deletion.test.mjs",
+      "sha256": "ca0b632543438bb240684d30f9af7b2d57b8f149f8f9078c4acadcde7d980f39"
+    },
+    {
+      "file": "test/mobile-api-v1-routes.test.mjs",
+      "sha256": "29484c6077dcfde8ae3daa33141a2b7bdf4ab0ba6d3d4db1332a7152ab51f2a7"
+    },
+    {
+      "file": "test/mobile-api-v1.test.mjs",
+      "sha256": "861c3c8c2d8a3f0015eae07d7724dc665c6a273d5eb1dcfa67103414107e7e22"
+    },
+    {
+      "file": "test/mobile-completed-result-parity.test.mjs",
+      "sha256": "bd931df395f0a12675d12380feb121b20a38e86606e6998d7fc71edf74642d39"
+    },
+    {
+      "file": "test/mobile-course-handicap.test.mjs",
+      "sha256": "5fe65d8cacbe00864ccf9003027f54376408f0e594bafe3da6fe3e72a0192356"
+    },
+    {
+      "file": "test/mobile-leaderboards.test.mjs",
+      "sha256": "fd5c6b87da9911c3b4eb1c397808d41aea8d8aaa1f82673e597139b7ff6db1c1"
+    },
+    {
+      "file": "test/mobile-native-certification.test.mjs",
+      "sha256": "4e08d1d76621b01eb1eeaa777c7547a86d33fbffd0b9dd4621bfb9098d85fa1a"
+    },
+    {
+      "file": "test/mobile-native-development-host-boundary.test.mjs",
+      "sha256": "82c589639e94c4b83b1ba0dd267771389a53efc0eccabe8a13d9193175d85533"
+    },
+    {
+      "file": "test/mobile-opaque-match-id-route.test.mjs",
+      "sha256": "17dcffff2cca4db6c74c33c411847cb5829ce3fac9d81933e2bac2ffd0e90697"
+    },
+    {
+      "file": "test/mobile-opaque-match-id.test.mjs",
+      "sha256": "76ab5fa9a714048bc817e741f05b438e215da3b55c54486f126a19ae1c5a48d6"
+    },
+    {
+      "file": "test/mobile-portrait-policy.test.mjs",
+      "sha256": "02808fd806c8546604da943e32a157fa338f51b394202062bab8ba7ab4fc3a2e"
+    },
+    {
+      "file": "test/mobile-production-cross-match-read.test.mjs",
+      "sha256": "461bf04fa8069a00b71f7ad35b86f68699b7547e35bd70f84a14ae39306381fb"
+    },
+    {
+      "file": "test/mobile-reviewer-history.test.mjs",
+      "sha256": "eddf278db889423b22dd5032114e9b2b910018f7d5d50678da593ea2efaff324"
+    },
+    {
+      "file": "test/mobile-reviewer-security.test.mjs",
+      "sha256": "153e3260588b8d66815cafc631a18a508477ad595a105780526c5562fe505994"
+    },
+    {
+      "file": "test/mobile-scoring-authority-recovery.test.mjs",
+      "sha256": "5f537b03d7cf1f93ec6cf421af96c886472698e1184188ade34644e7066833ed"
+    },
+    {
+      "file": "test/mobile-v1-calcutta-presentation.test.mjs",
+      "sha256": "a9a2c88f21b3c9991a2792699388c364203c91b07dd9108682e9815c32860e70"
+    },
+    {
+      "file": "test/mobile-v1-calcutta.test.mjs",
+      "sha256": "451aa8ce544cddaac3cd019e5651aa6cdf872d708665b822a3304f00d5175e14"
+    },
+    {
+      "file": "test/mobile-v1-guide-route.test.mjs",
+      "sha256": "83cccf1199988e4d909183e59c2ed27553e7ac4f80fca464349d47c15887a6af"
+    },
+    {
+      "file": "test/mobile-v1-guide.test.mjs",
+      "sha256": "2ddd8573b25e86d389106a946d354e68985c42681601a3b40e7797ab1cfcbeb2"
+    },
+    {
+      "file": "test/mobile-v1-match-detail-contract.test.mjs",
+      "sha256": "47e667238de9013f6869257c63ef3e034a5829a9ca763820fdc5ffcfaf7198d1"
+    },
+    {
+      "file": "test/mobile-v1-match-detail-pwa-parity.test.mjs",
+      "sha256": "b73beece48bc613de386554781aa8812ce381645fbe0c50d936ae0e891b6622a"
+    },
+    {
+      "file": "test/mobile-v1-match-detail.test.mjs",
+      "sha256": "1cb33925dc95b59167cea39091b3d7e7872d64437f6972f064801733b3972026"
+    },
+    {
+      "file": "test/mobile-v1-matches-contract.test.mjs",
+      "sha256": "8dbcc0efe0c10cb731e135cb7b348f3c157785d6e95a8891f2ede9a16450ce61"
+    },
+    {
+      "file": "test/mobile-v1-native-auth.test.mjs",
+      "sha256": "1e6d69bf5aa97b0122ffe7a9b54dcf82950372051fb5acae8568361d74602c71"
+    },
+    {
+      "file": "test/mobile-v1-net-skins-presentation.test.mjs",
+      "sha256": "5b02157a48717e97e33b2205e74123b3926484e7decc359085fb898488199981"
+    },
+    {
+      "file": "test/mobile-v1-net-skins.test.mjs",
+      "sha256": "0fe887a3b5ae75e5f4efaf48b4781951528d27c4177e2266b3bc63871fd9eb43"
+    },
+    {
+      "file": "test/mobile-v1-odds-team-identity.test.mjs",
+      "sha256": "ae674346847f90b290ac67d199f6577b6a47c3f4ee9c9defe5035a3313458807"
+    },
+    {
+      "file": "test/mobile-v1-participant-content-fixtures.test.mjs",
+      "sha256": "8d79a6fc38cb6a2329af931991a966745c87a398dbbd23fe0d4b662d32b91146"
+    },
+    {
+      "file": "test/mobile-v1-participant-content-routes.test.mjs",
+      "sha256": "06d696dc356d1ebe9bf930931899e7aacf25eff64988ab4a129be8b4723d0f56"
+    },
+    {
+      "file": "test/mobile-v1-participant-content.test.mjs",
+      "sha256": "a1c4a478099cd45b71dc4c359936175c702ab01bf25df72bc0f9f23054a5445b"
+    },
+    {
+      "file": "test/mobile-v1-passport.test.mjs",
+      "sha256": "ad335f86cc0b42181af875362e1f9c130be36c85f5f0ea893acdd3defd207380"
+    },
+    {
+      "file": "test/mobile-v1-preview-leaders-products.test.mjs",
+      "sha256": "518e93a9d621b9c9c49d3cb69c73c801cb0132d67402fada01db76489b5fdd14"
+    },
+    {
+      "file": "test/mobile-v1-production-player-leaders.test.mjs",
+      "sha256": "7585e846a18efcf60a5d8a73843ff91b109e46cb2da61c799d088a979a535f3c"
+    },
+    {
+      "file": "test/mobile-v1-scoring-contracts.test.mjs",
+      "sha256": "1c766e8ed3006fafa64f84d9445897e5db6b9b2794b1e7be5523f79730f107cb"
+    },
+    {
+      "file": "test/mobile-v1-scoring-routes.test.mjs",
+      "sha256": "3ed900b17b8facdf825d1076449da575917a4d791213fb7574bc5ef747dd9ab1"
+    },
+    {
+      "file": "test/mobile-v1-scoring.test.mjs",
+      "sha256": "7eb48c8cb68319d65aa56adf12043db4a09cd90fd03735b301a247d27545ed30"
+    },
+    {
+      "file": "test/mobile-v1-tournament-reads.test.mjs",
+      "sha256": "2003204ae665923dd0af0d382a4a5867c43d7ed616d0c52cddc4e2a37cbe8c4e"
+    },
+    {
+      "file": "test/mobile-v1-tournament-routes.test.mjs",
+      "sha256": "72c315eaf02c720496cc61a78d5c0446d4e7beb274a27a43d4b445b8c5e690a7"
+    },
+    {
+      "file": "test/mock-navigation-passport.test.mjs",
+      "sha256": "29e02a34d91de8c05b5a00d5684baf9db03c36c7b5bb654eca541ec5412f4010"
+    },
+    {
+      "file": "test/mock-tournament-integration.test.mjs",
+      "sha256": "9fe805f756c3c59660039f99e42327219c92654b2176d90071b68db25f0a5e5f"
+    },
+    {
+      "file": "test/my-match-dashboard.test.mjs",
+      "sha256": "27b48e691f6e391409749516300afc1470ba06883289da84d1a13858ea60b564"
+    },
+    {
+      "file": "test/my-match-game-center-final-micro-polish.test.mjs",
+      "sha256": "f5a96697450296b9b2e95971c0136d69e8573605645c3eee942f670121ab18f0"
+    },
+    {
+      "file": "test/my-match-game-center-role-polish.test.mjs",
+      "sha256": "3aa7a66a6c5e3202eaf473214f9c876a5b5b13b9435a456b4489a2ad6b3f04c2"
+    },
+    {
+      "file": "test/my-match-supabase.test.mjs",
+      "sha256": "771361ee71277d585677da7ca0d61813fb15ddfd7ffa6291b977e898b560f659"
+    },
+    {
+      "file": "test/native-session14.test.mjs",
+      "sha256": "970d59e9f2f48335315666ceb892fc9f26b66768f475fd1bfe934b693ee2d612"
+    },
+    {
+      "file": "test/native-spectator-companion.test.mjs",
+      "sha256": "1c965535663a0d0427c43d18ba9b6869b3d35fe391924f583901b23e4824119a"
+    },
+    {
+      "file": "test/native-text-handoff.test.mjs",
+      "sha256": "ea38b35dc87c47a3083b9b9e9b4df9d1cc31f993682430b6e9a0ad55f5807520"
+    },
+    {
+      "file": "test/navigation-ia-polish.test.mjs",
+      "sha256": "bf8eaa2f1acf325a2b32545af7385be113d7b82d2775257edf98d37f2350af7f"
+    },
+    {
+      "file": "test/net-skins-configuration-readiness.test.mjs",
+      "sha256": "d92c05192fa5a727c61c21e61f729d1b6633d3973978dd5247f499d5ed9e5bfd"
+    },
+    {
+      "file": "test/net-skins-entries-server.test.mjs",
+      "sha256": "ba4b4ac5aeb66b0b62134d6baff987fc14d1b3e15ea5a2421d04a9bdf066d970"
+    },
+    {
+      "file": "test/net-skins-entry-clarity.test.mjs",
+      "sha256": "37916be4735abab071ce2a8cc52a206ae110dcaa93f18f720e0bd43ef933c6e0"
+    },
+    {
+      "file": "test/net-skins-production-v1-app.test.mjs",
+      "sha256": "c641d626e61d5822e7f6ef7a74581179bd869490d23ff8d1f58818052f1c780b"
+    },
+    {
+      "file": "test/net-skins-ranking-polish.test.mjs",
+      "sha256": "d7723276252062e3e1a07dd33e58e194132d5b72054535ec71d4fa6e31424100"
+    },
+    {
+      "file": "test/net-skins-sql-source-boundary.test.mjs",
+      "sha256": "7c755f720c42425ea7155523eb388134870e0da8ca2f5badf2a1df3a02d853a7"
+    },
+    {
+      "file": "test/net-skins-supabase.test.mjs",
+      "sha256": "91a7ce72317167f9b9083519fb736c036a0e47104886189943c3cd0bce7b43d4"
+    },
+    {
+      "file": "test/net-skins.test.mjs",
+      "sha256": "b4fb6bf507bc99fdd845eb62195f03a369582aad864a3406e1bd18fac3265a5a"
+    },
+    {
+      "file": "test/notification-infrastructure.test.mjs",
+      "sha256": "f39cc313326d28a206c15f98fc28b7b25c7104e20328da56b255b5161a7715a9"
+    },
+    {
+      "file": "test/odds-center-freshness.test.mjs",
+      "sha256": "41ff573e1b91b952f02ff59eda6fabc3e79cedb9d232e75510cd5c31e547eb2f"
+    },
+    {
+      "file": "test/odds-official-pairing-source.test.mjs",
+      "sha256": "06514eba8c2c926a72f3266ba5e7ff1138a79d8ca8d6ce6d5c8ede0418be51e6"
+    },
+    {
+      "file": "test/odds-publication-rehearsal.test.mjs",
+      "sha256": "77f7d15a386bfffbc2a625a977e9874eabd5b5e6ab765c867cac4be6d41cbfa9"
+    },
+    {
+      "file": "test/odds-publication-transaction.test.mjs",
+      "sha256": "a0bc3ced0eaae14b625df04fdd18410ee3d57a79742b89b71fc04d716db77cbf"
+    },
+    {
+      "file": "test/odds-publication-withdrawal-v1-1.test.mjs",
+      "sha256": "e4f2599b0703a55cb21f1937d6f5e7bb73b8ba213285fc57597ff846c5dfef0e"
+    },
+    {
+      "file": "test/odds-publication-withdrawal-v1.test.mjs",
+      "sha256": "0e6181fb237abcb046811b598d7a259843b75ff6e60fbf4388795f6644ca4fae"
+    },
+    {
+      "file": "test/odds-snapshot-review.test.mjs",
+      "sha256": "38b15c417058c30598d9bc68b1aaf4be9661a0fad02c2d987357d1b997f601a5"
+    },
+    {
+      "file": "test/odds-workbook-persistence.test.mjs",
+      "sha256": "cca0cc70bcb513c21b4d1c5f21fca64ef060aa0aca5f85b58bfb71e477ccbde8"
+    },
+    {
+      "file": "test/option2-production-maintenance-control-plane.test.mjs",
+      "sha256": "ee276146da79e9566d1eb420fefb7099389ceba0bdd0e0a39fa1c8b0dcf46b09"
+    },
+    {
+      "file": "test/option2-production-maintenance-precommit-deployment-rebind.test.mjs",
+      "sha256": "a36947efab9c61b052468cd696172edcc8ff3ce65afcd8fab0873a68b63e4864"
+    },
+    {
+      "file": "test/option2-production-maintenance-preprepare-abort.test.mjs",
+      "sha256": "b2987d46495b36af6ff56ecbb5a6091e49366ac6f042d802c26c3055c6e7aa4a"
+    },
+    {
+      "file": "test/option2-production-maintenance-staging-provenance.test.mjs",
+      "sha256": "ae798560307a2033b6a15fa71e6b9e21cec01ee6170e5505d4700c48d6ecae5a"
+    },
+    {
+      "file": "test/option2-production-postcutover-application-release-rebind.test.mjs",
+      "sha256": "c48020dd81d84d8b89b7bf06cc1705aa4da83ded3e8b459290ca77f0e9ddd409"
+    },
+    {
+      "file": "test/option2-production-postcutover-normal-release-rebind.test.mjs",
+      "sha256": "1ab2b87d109c6bd8bec6ea376d2f7558edbd5986a6c3417e680b35cdeb351c4c"
+    },
+    {
+      "file": "test/option2-production-scoring-maintenance-ux.test.mjs",
+      "sha256": "e3ca9381def8ee04aec6c59082ce698596325bbd0cea79f1fbdc0ac8d080814a"
+    },
+    {
+      "file": "test/participant-auth-product.test.mjs",
+      "sha256": "47ebd0bcdb1d916964023840f427c8412b8393446733d767f49f2621c1f703a6"
+    },
+    {
+      "file": "test/participant-auth-rehearsal.test.mjs",
+      "sha256": "fd9224b1a963bd04841c095e75b0c2ee3d862a319ad83256198aa10f9afaed4f"
+    },
+    {
+      "file": "test/participant-identity-cutover.test.mjs",
+      "sha256": "21711b3f72e9e6db9708ade56f60d091135b26d4e724c63e427173f4a24fc354"
+    },
+    {
+      "file": "test/participant-identity-foundation.test.mjs",
+      "sha256": "0978a06c3bb6f20dff51572ab15216f83a99127ec35bbc2a6a63f570e72447b2"
+    },
+    {
+      "file": "test/participant-initialization-cache.test.mjs",
+      "sha256": "0a9c14bdf1a56721d590f557adc3e070a117711b8385b563ecfade73e1e8ddd0"
+    },
+    {
+      "file": "test/participant-initialization.test.mjs",
+      "sha256": "bc58be859562315141df70486d6569ecf3b6d170b34bf520e204183db71deef3"
+    },
+    {
+      "file": "test/participant-phone-auth-link-consistency.test.mjs",
+      "sha256": "a73959dc747f4563695f8e0cb5c243c799caae656fc86c40503ff4e9f7dcf4a0"
+    },
+    {
+      "file": "test/participant-phone-otp-controlled-preview.test.mjs",
+      "sha256": "ec4fcac85fa95fcd6be714d33a53474c494469a8ec7e67faab46553011cde663"
+    },
+    {
+      "file": "test/participant-phone-ownership-foundation.test.mjs",
+      "sha256": "bf13f99f0fb34fe6440e8b039706b6ab8fa6759b46223de4c2946990745c5aeb"
+    },
+    {
+      "file": "test/participant-scorekeeper-access.test.mjs",
+      "sha256": "548063fbffe9c9777b48dc4d822ad338042518f1eaf99add40866ff7661c97db"
+    },
+    {
+      "file": "test/participant-session-client.test.mjs",
+      "sha256": "6b73bd0515a1987d9ea23bf5808fd118bcbcf50155b5efab352f70957c8229c4"
+    },
+    {
+      "file": "test/participant-shell-fallback-regression.test.mjs",
+      "sha256": "53544a67aba8f0daa3a7e37b4db840651b94711d51b41fb64402db1c9171340b"
+    },
+    {
+      "file": "test/phase-8-environment.test.mjs",
+      "sha256": "2fe7c66fcce732092e5ee98d17b8429f4d61e6cd2532d3466b4dae34aecf8a5b"
+    },
+    {
+      "file": "test/phase-b1-production-starting-hole-retirement.test.mjs",
+      "sha256": "d3265ceae55bc1c001136aadd08fbda0a32b27d7477acb4d2a09797307b426df"
+    },
+    {
+      "file": "test/player-avatar.test.mjs",
+      "sha256": "b75109f62630ef612b2400c5658082e739d91d0fec9d1dab5d65d68cfdf47395"
+    },
+    {
+      "file": "test/player-career.test.mjs",
+      "sha256": "f81a937c2b06ca903be2db0bbb1675710537023fccb0deb30e0758c656d3953f"
+    },
+    {
+      "file": "test/player-comparison.test.mjs",
+      "sha256": "a8aabe2172b1a6086e8ba50ae27b2d19bf0e05dd2fab78631c21d07ceddcce55"
+    },
+    {
+      "file": "test/player-format-match-history.test.mjs",
+      "sha256": "18b0510bc2406ce48efa3eb597830a5a1d7212445c416234fbbfeab2ad9afc93"
+    },
+    {
+      "file": "test/player-home.test.mjs",
+      "sha256": "2f6609dab3632817050105ab002c00536674d9c0e6c598041b0055db8d00b080"
+    },
+    {
+      "file": "test/player-intelligence.test.mjs",
+      "sha256": "144fb1ff3fde25172fd8017b9f8c9d6e3a339f24943bdec191e80d096b4741aa"
+    },
+    {
+      "file": "test/player-leaderboards-competition.test.mjs",
+      "sha256": "7256bc685695058910e8b06e2a6f0f9a2c7287ee9b41e4be817eb09547a93687"
+    },
+    {
+      "file": "test/player-leaderboards-freeze.test.mjs",
+      "sha256": "ba729a6edf83a35fc13093f93587dd72524bae83b0cfe13e84ba157cebc8ea67"
+    },
+    {
+      "file": "test/player-passport.test.mjs",
+      "sha256": "b997137ee68c6ae13dd5b90417b2a91a8892f1e8d6d3806752620cb11e7e9d98"
+    },
+    {
+      "file": "test/pn1-production-mobile-boundary.test.mjs",
+      "sha256": "c129061396478028bf091ddcf871f78d9beb349aec4675123c8864e9b710c66f"
+    },
+    {
+      "file": "test/pn1-production-mobile-reads.test.mjs",
+      "sha256": "eaa93fc99ac51904227858b2eb9a442fa10f51f487dffc01409a1363cc1e9685"
+    },
+    {
+      "file": "test/pn2-native-admission.test.mjs",
+      "sha256": "32990271b32c30c2c978cd81be651e3cf698b3cef286841142130d245d2186e9"
+    },
+    {
+      "file": "test/pn6b-guide-reconciliation.test.mjs",
+      "sha256": "2a3a7bc1a4087c22abaec8cfe2b3cb1d34c3d2d31910a67f58a145222630928f"
+    },
+    {
+      "file": "test/pn7a-today-cache.test.mjs",
+      "sha256": "f2766b6374332435c767da7a92ead5a7afb84d885232cfe9dd8f8145bc002a0e"
+    },
+    {
+      "file": "test/pn8a-auth-integration.test.mjs",
+      "sha256": "1be63efcdfa1fd0eb065dda221ba5c9985e51f9279486439563504aef7cf7742"
+    },
+    {
+      "file": "test/post-reset-stability.test.mjs",
+      "sha256": "df745abe96bdf2daa8e1668adc1bc4b9a546b8d1c6fba07594234cbf840e06b6"
+    },
+    {
+      "file": "test/post-step14-director-odds-side-games.test.mjs",
+      "sha256": "f3c1046385f11eeba2fcd2c611d042dc7e7bf5171d7f99ac34f3cdbbbd4efbc2"
+    },
+    {
+      "file": "test/post-step14-draft-team-intelligence.test.mjs",
+      "sha256": "4df61a908e554b56b541712ecd91f7dafef7c445f7010688a97071eb975cfccd"
+    },
+    {
+      "file": "test/post-step14-production-empty-pairings-sql-contract.test.mjs",
+      "sha256": "7f694d0effee9eda7624ccc52fac45e82caaef5cc48f071e8e579317ecd994d7"
+    },
+    {
+      "file": "test/prediction-engine.test.mjs",
+      "sha256": "118eaec394079cf3d256426fed07d25d9a3c68cb2a11ab07c6dc8953974d67cd"
+    },
+    {
+      "file": "test/prediction-input-bundle.test.mjs",
+      "sha256": "188d2db9beb97bf1f94969334d9b04e405dae4f3523c78c0a969e4063336d1b9"
+    },
+    {
+      "file": "test/prediction-settings-projection.test.mjs",
+      "sha256": "f1613a4493a469e5fcf809ff9cbc24a6f63a354db11180b3d30aa4e4b4030724"
+    },
+    {
+      "file": "test/prediction-workbook-portability.test.mjs",
+      "sha256": "4ad41b6e5e7d3fb652b9411d1a66c318213b7b804eb16371499e695972b136e3"
+    },
+    {
+      "file": "test/prelaunch-corrections.test.mjs",
+      "sha256": "a65e72392297d8a2e017c024f2e36a7dba3a730a58827667bec5e958517152f3"
+    },
+    {
+      "file": "test/preview-director-entitlement.test.mjs",
+      "sha256": "78946af2e442d0b97bb33060d190f649ffb646c794c86d14c9141a4bf197fc0f"
+    },
+    {
+      "file": "test/preview-impersonation-lease-security.test.mjs",
+      "sha256": "b945a98854573e0f93c6303782f41661e78c1a96101f895661bca5e691cf0fee"
+    },
+    {
+      "file": "test/preview-mobile-secondary-leaderboards-v1-sql-contract.test.mjs",
+      "sha256": "15c0aa02d1622ba660cc1682010fb817cbbcb5dfc71d939ef4c3820ed4a69ec4"
+    },
+    {
+      "file": "test/preview-player-impersonation.test.mjs",
+      "sha256": "940278352627face070bff884b62918e680b947965605e998640fc4bdcf11207"
+    },
+    {
+      "file": "test/preview-projection-runtime.test.mjs",
+      "sha256": "c0ca485b9c456aa746acae431a9b95626cefa0da66f56af5bb4cced2e648fad1"
+    },
+    {
+      "file": "test/preview-reliability.test.mjs",
+      "sha256": "bf0ad0f68c2ae75f611d9682cb4aa53694eb79725a95d8c9301609678d048dc8"
+    },
+    {
+      "file": "test/preview-tournament-reset.test.mjs",
+      "sha256": "518e9b3fa5f9bbe86d2d778efe9a01e2b107622af9461e4c1c65da2db1476049"
+    },
+    {
+      "file": "test/production-approved-sms-hook-route.test.mjs",
+      "sha256": "7e119d24ab36ab55f6b14a2d223fb463da4a52ab12c9ec402fa68706a36fdffa"
+    },
+    {
+      "file": "test/production-approved-sms-hook.test.mjs",
+      "sha256": "439ea9cf074690ee029716900ede0e86d12a38f0215e60550dc773348d97f4fb"
+    },
+    {
+      "file": "test/production-calcutta-v1-app.test.mjs",
+      "sha256": "a3c409ca673762bad477e84d9ee92b50c83e291294149fa3242d69308fcb558a"
+    },
+    {
+      "file": "test/production-calcutta-v1-server.test.mjs",
+      "sha256": "b2196380a867a978459de71ff289b713e72a07df9afa41dffe128561cea74cf3"
+    },
+    {
+      "file": "test/production-completed-history-homepage-read.test.mjs",
+      "sha256": "b5b9d485728af8c14113680c1024b1f29f18663c520f7fc15646e1d56689968d"
+    },
+    {
+      "file": "test/production-current-shadow-semantic-parity.test.mjs",
+      "sha256": "3d831a99ddbbed3cb911aded7def8e673b380152d3141f2cb134c647d63aab4e"
+    },
+    {
+      "file": "test/production-net-skins-v1-server.test.mjs",
+      "sha256": "ba59a6b28dc978032117ab755c78d23f7c10574366eb39d35c3793ad4911d950"
+    },
+    {
+      "file": "test/production-phone-enrollment-route.test.mjs",
+      "sha256": "889c57288aa4a9732fda180154e5c1f50baac827205b929911b35cc850600b81"
+    },
+    {
+      "file": "test/production-phone-enrollment.test.mjs",
+      "sha256": "f1a5e79553448a95aac3c542b97b9f9b70cadee49af0c314b4635c3975f62cbd"
+    },
+    {
+      "file": "test/projection-editorial.test.mjs",
+      "sha256": "d6911f1715f859457c6ed16d0b1f4a2bfc17120e190537590ec2061a3921ffb3"
+    },
+    {
+      "file": "test/projection-mission-control.test.mjs",
+      "sha256": "14fb71538daba08faf870cd86c1868ac09e139761404ea1e2d8615579ae088b1"
+    },
+    {
+      "file": "test/projection-publication-client-contract.test.mjs",
+      "sha256": "73713cb0bf8a94f198ea975411756de2a498ccbd2b65dc68e2b6ff26ec43ce53"
+    },
+    {
+      "file": "test/projection-publication-diagnostics.test.mjs",
+      "sha256": "29a694f880d76a53c715b3d8ee3fe6518617a57716536d62b7ee5fe7fa7aee4f"
+    },
+    {
+      "file": "test/projection-sheet-scroll.test.mjs",
+      "sha256": "eb72cf95999c502efdcd3572c9c99b71d0ac49d1b880f08fb4952b30f971d20e"
+    },
+    {
+      "file": "test/public-courses-guide-restoration.test.mjs",
+      "sha256": "6a506028f6c599ccc30a02651d408f083ddd20f65282388fbdc43ca01ef4a31e"
+    },
+    {
+      "file": "test/public-history-restoration.test.mjs",
+      "sha256": "8cdf1723ac2a356b1281f4a0a98755f67c0ba1576023ea485c81c2aac9ffed26"
+    },
+    {
+      "file": "test/public-homepage-history-cards.test.mjs",
+      "sha256": "7c7887ee49d283a56cf9cfccfb30a5f8e499eb9ab27ac315b6817c015093f099"
+    },
+    {
+      "file": "test/public-player-profile-restoration.test.mjs",
+      "sha256": "0af9cbd20acb470a52191fd68674e8b16046de616729b4230c66ec670751a0a2"
+    },
+    {
+      "file": "test/public-website-shell-restoration.test.mjs",
+      "sha256": "3f821fd0b41015b879ea80065d256618e0438257b748f3055154ef63bdf69509"
+    },
+    {
+      "file": "test/published-odds-supabase.test.mjs",
+      "sha256": "8870751860cb31fd9fbd3c1ce8924a37e32d9985b81da5d66959ed14fdec3f5c"
+    },
+    {
+      "file": "test/pwa-email-text-contract.test.mjs",
+      "sha256": "c374e875195a1222291163b9a0f9d73ad16d7ffe96b6517fc3477200724fdb70"
+    },
+    {
+      "file": "test/pwa-installability.test.mjs",
+      "sha256": "288468d49c62b83a670af4a82d4722c3fdcc542fa68709f0188a68ebf4c252de"
+    },
+    {
+      "file": "test/pwa-launch-splash.test.mjs",
+      "sha256": "1ca2377ce2aad4fe7333cba0af861044b4858ad41f8dbc3a996e063d65bb5851"
+    },
+    {
+      "file": "test/pwa-native-shell.test.mjs",
+      "sha256": "96a434297809766884686110891570030cf5a9f17039aae6053bc698b8c98080"
+    },
+    {
+      "file": "test/pwa-phase4-polish.test.mjs",
+      "sha256": "c5e80493e64d3a879d864471311dfe1699daf89da6761ebe477a113cfe7cd116"
+    },
+    {
+      "file": "test/pwa-phone-route.test.mjs",
+      "sha256": "d71721a757c81c3c27af7db98eefb2fabd387fb14d448ce18e955a7090f2ad7d"
+    },
+    {
+      "file": "test/pwa-session-regression.test.mjs",
+      "sha256": "f8568a5a12a23be47cacb89eec605d3c251486e30d0d43de470a81b8af5ffbc7"
+    },
+    {
+      "file": "test/pwa-side-games.test.mjs",
+      "sha256": "6d75915cbf0d26e03b68c72183cd415faf4f27d217cdc4da8a37039f3d5eb49a"
+    },
+    {
+      "file": "test/pwa-standalone-contract.test.mjs",
+      "sha256": "e8e5cbf3ea1def27623c3ce7e53a1d08b529f15d7e909c4113abda33c7f48200"
+    },
+    {
+      "file": "test/pwa-visible-presentation-boundary.test.mjs",
+      "sha256": "18d5eb44ffedffd84a863c0cc3b29aec2e4e64076def472e1504efd5932fefda"
+    },
+    {
+      "file": "test/r3-existing-preparation-contract.test.mjs",
+      "sha256": "58265af37a4531cf75003e0bfb17e18570a977bc961260952fa2d7e90bb8f92e"
+    },
+    {
+      "file": "test/r3-score-timeout-boundary.test.mjs",
+      "sha256": "414c3872a45a732bf46655e887dc398367386eeda613418032f3693db8cb0653"
+    },
+    {
+      "file": "test/rate-limit.test.mjs",
+      "sha256": "41e94a20a5c0daa86fc5ecfadf4c5771ec6b39c486ab65f1d1ce8a32490758c5"
+    },
+    {
+      "file": "test/record-holder-authority.test.mjs",
+      "sha256": "20a1ad82562b39830c58efad1642f8bd91fc450e6c962c6ef29e53bd0ff68a9c"
+    },
+    {
+      "file": "test/release-b-full-net.test.mjs",
+      "sha256": "392c704bd050a2a9f9f754b7a4b5feb5afda0e828684c863f62cd55e8bf68005"
+    },
+    {
+      "file": "test/responsive-player-badge.test.mjs",
+      "sha256": "f4c320a5b287eba764115a867ef59a644db7da4b286a5e3600e949fa0fe06583"
+    },
+    {
+      "file": "test/roster-team-handicap-presentation.test.mjs",
+      "sha256": "911b9004275986f0a39cff074fa14380112674ed503c787a2d4e3d3685edf975"
+    },
+    {
+      "file": "test/round-pairing-read-envelope.test.mjs",
+      "sha256": "ad3a8b056580e869a40b0fb0c188f814a26d0feb902a524d4e76792937d5dc7c"
+    },
+    {
+      "file": "test/round-pairing-workspace.test.mjs",
+      "sha256": "e4c4ab0753eab054cc69eb4ecee896331d3e07c8a7cb9c50ea1ae46c857a847b"
+    },
+    {
+      "file": "test/round-pairings.test.mjs",
+      "sha256": "28ee40e55f7de47f96770af2ee724912adee8ee40b73dbd3507cc9ae01328d90"
+    },
+    {
+      "file": "test/round-scorecards-archive.test.mjs",
+      "sha256": "d386f8e1160bfd5274bd88799c0d17989836e2e0ab21bf1e11e73ff0c8719914"
+    },
+    {
+      "file": "test/rules-format-summary.test.mjs",
+      "sha256": "da418756dfcdf1d78dded013cce0b1c31e4ff123b8bcd63e5b172df9e0df7913"
+    },
+    {
+      "file": "test/runtime-performance.test.mjs",
+      "sha256": "916ff8a94c6b75313255fb9d1102b09b82db30157ff60a81c75af174cd6c64bd"
+    },
+    {
+      "file": "test/score-typography.test.mjs",
+      "sha256": "f559418aff51f958bf01141635fe619888ed0b73913b559c8c04de65f301c1b9"
+    },
+    {
+      "file": "test/scorecard-analytics.test.mjs",
+      "sha256": "3bfb1173bf53cf1eea05aa88d47d0b986919d9e631f59a7b25512e76deff676c"
+    },
+    {
+      "file": "test/scorecard-calibration.test.mjs",
+      "sha256": "59095a16260c1c9e6490056d4c912ec10a405d10b858b60a4c2329987f2010cb"
+    },
+    {
+      "file": "test/scorecard-intelligence.test.mjs",
+      "sha256": "c82e742c36caa68d7e34b35fdde2f660979994b325311a8a0bb498e75cbcbb8d"
+    },
+    {
+      "file": "test/scorecard-net.test.mjs",
+      "sha256": "046e8289072ec6c33f65c38a59d559dc039fa5d17767b0d6a2287e72f05b284a"
+    },
+    {
+      "file": "test/scorecard-public-integration.test.mjs",
+      "sha256": "64c709d4db9478291a4b7788c354de8d026bf109f6dc7a09d848c83d832a7a69"
+    },
+    {
+      "file": "test/scorecard-record-leaderboards.test.mjs",
+      "sha256": "8d1845877930bd931f00cefb01af5c6818136d99e04b1c407cd392430079169f"
+    },
+    {
+      "file": "test/scored-match-resume-contract.test.mjs",
+      "sha256": "ca4940016c8001a2f7b7d2536215ba7535048539a20d53e3c312228173119372"
+    },
+    {
+      "file": "test/scoring-access.test.mjs",
+      "sha256": "cd770d96bfe0c397ef4120b088f89f73623c701d814d0a031cb675bb0eb22853"
+    },
+    {
+      "file": "test/scoring-authority-dry-run.test.mjs",
+      "sha256": "9065a94a247cfcd8999fa35da675b3e702bbb5eb44b8683507680e2dac9498d3"
+    },
+    {
+      "file": "test/scoring-authority-no-change.test.mjs",
+      "sha256": "c9a4531efe1f26c260c4564a50bc2506a13edffa300f1c7c41c3a3b172bc3fac"
+    },
+    {
+      "file": "test/scoring-authority-phase2.test.mjs",
+      "sha256": "5cb27eb505639a92f2f6532ad7a3cdd644bc9aafdeaf9da8109df266f4aad7be"
+    },
+    {
+      "file": "test/scoring-authority-specific-provider.test.mjs",
+      "sha256": "c4c53deab3fab9c26ace63204d795602a70f96459bfb885719db622034a0100a"
+    },
+    {
+      "file": "test/scoring-client-diagnostics.test.mjs",
+      "sha256": "fc280a64aa708d8158004ae444723030da5c314728dde9cf6b577dece0f71454"
+    },
+    {
+      "file": "test/scoring-experience.test.mjs",
+      "sha256": "96498ae369254f967cea345d00c5d3e56c19b753fedb27145d55a3d903ebf88b"
+    },
+    {
+      "file": "test/scoring-identity-row-refinement.test.mjs",
+      "sha256": "9dffd3be4d38801e87954bb127753a46cd4ddfd5458af58c90c3ca4635acb9f0"
+    },
+    {
+      "file": "test/scoring-keypad-ux.test.mjs",
+      "sha256": "2c1c7c5575ba877d9a3a587a974131765ed4fd1ba99974056e192958134eb82e"
+    },
+    {
+      "file": "test/scoring-lifecycle.test.mjs",
+      "sha256": "6dc566abd9c70b79008841093d292da8fb0bcc35a99779d3d87439f53652d802"
+    },
+    {
+      "file": "test/scoring-mobile-layout-refinement.test.mjs",
+      "sha256": "ed88281620cf7d20d1e97b592cbf712cd389df1384850b387d0ea984c993f23c"
+    },
+    {
+      "file": "test/scoring-read-supabase.test.mjs",
+      "sha256": "f4c37ed44efda9269bcc9088df7275ffb721e0df098ba8682c9087e84b6b0d5f"
+    },
+    {
+      "file": "test/scoring-reopen-lifecycle-hardening.test.mjs",
+      "sha256": "89d6832942dbb7140e6020e94efb48fce03f93d1c20a72a14c614fe24b9a50bc"
+    },
+    {
+      "file": "test/scoring-revision-handoff.test.mjs",
+      "sha256": "7896cdab412a86ebb5fd25873588416bc6588f78f6db41aa875e4bcaf7b6a75b"
+    },
+    {
+      "file": "test/scoring-shadow-phase-1.test.mjs",
+      "sha256": "009f2708734833fd6558261f52ecf5a82abb5e1c93690abd7c40839a24a8f60c"
+    },
+    {
+      "file": "test/scoring-sync-queue.test.mjs",
+      "sha256": "e1d2ab4f938d1cc33c73d5a2846cb8af3dc1e48bf0c29d25f676a468325ca85e"
+    },
+    {
+      "file": "test/scramble-leaderboard-experience.test.mjs",
+      "sha256": "7e39ab41ba6589381297bf2f37b03d348cfcc9281ef26774494a3d699944b960"
+    },
+    {
+      "file": "test/seo.test.mjs",
+      "sha256": "d1322ce2393f31a09aae7b0a8d713cec81f8c80be1e32aad0332c4b9c931fc64"
+    },
+    {
+      "file": "test/session-isolation.test.mjs",
+      "sha256": "2c9ee6acccc93cd86a07fb602c1784e9f40110ad9456fb7828d916fd9b78406a"
+    },
+    {
+      "file": "test/sitemap-safety.test.mjs",
+      "sha256": "511122f85c64997bfc73b06d11662149b938e660b3a3de0444520c7f5ba13eca"
+    },
+    {
+      "file": "test/sms-hook-acceptance.test.mjs",
+      "sha256": "14dc3726284772c1abb5599bec44e4de8866bc4419ae701e101c47ec366d7212"
+    },
+    {
+      "file": "test/spectator-match-navigation.test.mjs",
+      "sha256": "d41120c11407c846f9133b7ff72278f2ea6d19c6b40a46773267c7e4b18bf598"
+    },
+    {
+      "file": "test/spectator-routes.test.mjs",
+      "sha256": "0d62026f8fcdb72e7803c7690bbc3fe1c65820095a2fba91ac9e39fd01175b58"
+    },
+    {
+      "file": "test/spectator-service.test.mjs",
+      "sha256": "1f6c584b8ff213cd10fa9884e5003bae2673eb19040b4b584c1abdbfbe3f44b4"
+    },
+    {
+      "file": "test/spectator.test.mjs",
+      "sha256": "efdcf1b462c6a6cde3c3d4d36c11ca331274b0eff3270b21a72022d101b6c0db"
+    },
+    {
+      "file": "test/status-badge.test.mjs",
+      "sha256": "5f7419314c347cef7e99137407c31e4b7d243725d1dc3321e6b7fad46e519034"
+    },
+    {
+      "file": "test/step10a-production-dormant-workers.test.mjs",
+      "sha256": "bd7a1ab8e433aa38d58ef914e43b87809759fc9ed16006957003cd4a8058a2a7"
+    },
+    {
+      "file": "test/step10a-production-foundation-resources.test.mjs",
+      "sha256": "645243baccd5aff0b4a37e813c3ec5d18552aec16b39df7abb1a1fd2a6849f89"
+    },
+    {
+      "file": "test/step10a-production-import-evidence-hardening.test.mjs",
+      "sha256": "423ff6daf90e2f59728a8e65885142b94e51a76747d4982cf82fe97b5bd25d20"
+    },
+    {
+      "file": "test/step10a-production-projection-imports.test.mjs",
+      "sha256": "5fca1969cd2d184e89dbc3abf0bd9e71972fa9866ea24322e1628b9e95b9c303"
+    },
+    {
+      "file": "test/step10a-production-projection-preparation.test.mjs",
+      "sha256": "5cbe63abd04a1c9824e6c7fa65f6fda376971146d680e74489bc7b7e757e5697"
+    },
+    {
+      "file": "test/step10a-production-schema-baseline.test.mjs",
+      "sha256": "72d92c120ec591f515f34e970ed04f6807e0fceb1a144b28fcd2ff6a76d0184a"
+    },
+    {
+      "file": "test/step10a-production-shadow-imports.test.mjs",
+      "sha256": "99c133bfe0a19d3fc20e74492ec7678781e8af297e968fc45f48e78f5fdc4a44"
+    },
+    {
+      "file": "test/step10a-production-shadow-payload-preparation.test.mjs",
+      "sha256": "0853693641a319e46572028cb6a915743b97676493121b6e6e26168cfafebeb3"
+    },
+    {
+      "file": "test/step10b-production-auth-otp-request-fix.test.mjs",
+      "sha256": "883c67bd3daa144f8033e9f48e2e83e4287fc82f2520fe6eed1fc3ead5209dba"
+    },
+    {
+      "file": "test/step10b-production-auth-otp-verification-type.test.mjs",
+      "sha256": "09a34c67a14bbd07a96444a642bc3e9e47ddd8d5fdf7541bb07299e0536d8229"
+    },
+    {
+      "file": "test/step10b-production-auth-provider-observability.test.mjs",
+      "sha256": "e712869830ec5783c5a370a844d6ae4b7b239daba3608b7e7f55b75e2a8cff1a"
+    },
+    {
+      "file": "test/step10b-production-current-shadow-v2.test.mjs",
+      "sha256": "2aa2930838c7850285c20b96a5d75ad42b6619d711661105998f5cb1c11a5840"
+    },
+    {
+      "file": "test/step10b-production-director-identity-bootstrap.test.mjs",
+      "sha256": "69ea6ae9667f3b79f04aabd2038a3e11945739d53afecf886439743cb41dc33b"
+    },
+    {
+      "file": "test/step10b-production-odds-input-bootstrap.test.mjs",
+      "sha256": "1b5592b2ad6772d089c401d6902a750096ba412fd5d86a1755a38017a4253cc7"
+    },
+    {
+      "file": "test/step10b-production-presentation-shadow.test.mjs",
+      "sha256": "fa294bb588e69693762167d381726aa021bcc346d2d4ef57a9cb20176881d8bf"
+    },
+    {
+      "file": "test/step10b-production-published-odds-import.test.mjs",
+      "sha256": "48cedaf7fd870c716476320a451b478f0fc8d2197e390e477b951107c9b5686e"
+    },
+    {
+      "file": "test/step10b-production-shadow-auth-boundary.test.mjs",
+      "sha256": "dcbae6c1cbf4324f7469697f814ed5fe990763d6f1548b6d969150fbade8b9cf"
+    },
+    {
+      "file": "test/step10b-production-shadow-candidate-adapters.test.mjs",
+      "sha256": "a602c554237b03af91c7295a682e26138276d2a5079c26790296d93348c322bc"
+    },
+    {
+      "file": "test/step10b-production-shadow-read-routing.test.mjs",
+      "sha256": "e982516aa4c377cc5c451f48f93b3fbba31f5c5b36a99151b66290adcbc063d0"
+    },
+    {
+      "file": "test/step10b-production-shadow-scoring-read-only.test.mjs",
+      "sha256": "c288e1f161c8d9bf07f38f9f769359cc06a237a87169817006ce80464eee2b8e"
+    },
+    {
+      "file": "test/step11-6-acl-v2-acceptance-generator.test.mjs",
+      "sha256": "9210ab15d2a47a72560d4c0eb685d968f11fe680a133aa231991c15980d2ac3e"
+    },
+    {
+      "file": "test/step11-6-candidate-control-authorization.test.mjs",
+      "sha256": "00bd0562d07de3d9659f817275f59ebef4bb478805ac0ca7caa6aec5d2034fec"
+    },
+    {
+      "file": "test/step11-6-dormant-scoring-admission-inspection.test.mjs",
+      "sha256": "449c5c7d7802b966558f604e87e1d2c71f7f327c9a522e8d4958f13b7efdc237"
+    },
+    {
+      "file": "test/step11-6-drive-acl-rehearsal-surface.test.mjs",
+      "sha256": "da0f8ea6a63130bc7441f7cb4dd8eb52f98e2eb62671237dc4d8d6c21759c2a6"
+    },
+    {
+      "file": "test/step11-6-historical-production-google-writer-scope.test.mjs",
+      "sha256": "77e0b90f759db297372abd852aae6393614176f0eff4335d8ea2b4e781448d24"
+    },
+    {
+      "file": "test/step11-6-historical-safe-method-google-writer-evidence.test.mjs",
+      "sha256": "1d15e32889131dddd69b57e01ca30d8c2fb9f75206fd0e8ef1239094e596b59c"
+    },
+    {
+      "file": "test/step11-6-legacy-google-mutation-inventory.test.mjs",
+      "sha256": "1188abdae08b44825b84b71033a34d202f538482c8a05ab9c641f48f9d268b66"
+    },
+    {
+      "file": "test/step11-6-production-google-credential-confinement.test.mjs",
+      "sha256": "3960f5d8774a57b28ff86b949547f11880f492af0c79f84ef16d585335d45e4a"
+    },
+    {
+      "file": "test/step11-6-production-google-writer-boundary.test.mjs",
+      "sha256": "adda81a467f4a86d6398c7eb7ab3b7337d2c3c61f7e04be12e9ca932edf52f4f"
+    },
+    {
+      "file": "test/step11-6-production-google-writer-critical-window-waf.test.mjs",
+      "sha256": "18dfb72c3459a0d86973d95eb9bb704a5ddbe58cec0fea6d365e66127657fbb7"
+    },
+    {
+      "file": "test/step11-6-production-google-writer-fence-rehearsal.test.mjs",
+      "sha256": "857770553c253fb44fe05e30a0b105d7d7a64955dc8daf26d80b1a6d2bf5a10a"
+    },
+    {
+      "file": "test/step11-6-production-google-writer-quiesce.test.mjs",
+      "sha256": "170e13ecbd1da6448c5fd36a115c2be72a79dd90a71def60ac30fad7eba32eda"
+    },
+    {
+      "file": "test/step11-6-production-origin-inventory-v3.test.mjs",
+      "sha256": "71c29aed9b0558b2503afaa3990b652d55d3a78f7a2e89fbbcae88fcf4883820"
+    },
+    {
+      "file": "test/step11-6-production-origin-inventory-v4.test.mjs",
+      "sha256": "fbd582bd76ed575cff68a368d270d110ca08918b9b3485ec2a0e9d76592d226e"
+    },
+    {
+      "file": "test/step11-6-provider-attestation-client.test.mjs",
+      "sha256": "028412d92a4505e235cd023f51c9b13783f9477c464aebe2f64aa8055051814d"
+    },
+    {
+      "file": "test/step11-6-rejected-waf-recovery-inspection.test.mjs",
+      "sha256": "16fb16e57febdcffb3044581f08d90f031a93e354ccf51931f2e0dfcdecab82a"
+    },
+    {
+      "file": "test/step11-6-vercel-environment-resource-review.test.mjs",
+      "sha256": "1af50b49644b07c8a2a456d8647f92ec10765bfd6ba2578e3cc00cf0b026555a"
+    },
+    {
+      "file": "test/step11-6-vercel-provider-attestation.test.mjs",
+      "sha256": "1e83d9bf5febf4a6ac56356ef2c5ae66884063a34caa1dcfce0e6080b2751247"
+    },
+    {
+      "file": "test/step11-6-vercel-waf-provider-executor.test.mjs",
+      "sha256": "47b083d98016a4ce6e6d56ac57d71f37f204ec49852c69b666cfa29130b16c5b"
+    },
+    {
+      "file": "test/step11-6-waf-critical-epoch-receipt-server.test.mjs",
+      "sha256": "a55ce3310f1e8ebf772deae0cc32fd12604ca4af724864cdba341216e3ee96d7"
+    },
+    {
+      "file": "test/step11-direct-vercel-hostname.test.mjs",
+      "sha256": "827f2b03c1a168307f67f0cc5b240acdeca944a1fa959bcbedb13a982336e5e6"
+    },
+    {
+      "file": "test/step11-production-activation-safety.test.mjs",
+      "sha256": "f80227b5941287e72837bff2cf25963a834fd7ec38fee541465b10d3b52377f8"
+    },
+    {
+      "file": "test/step11-production-cutover-activation-migration.test.mjs",
+      "sha256": "bc56231655e01bae0755cc288f219d44a5dd5ac1bc94a8b29ff9d3832b73914e"
+    },
+    {
+      "file": "test/step11-production-cutover-read-sources.test.mjs",
+      "sha256": "b86102e5015063580988ca3dae498be6dc9a5fc511893b4587f3597d366eb9b5"
+    },
+    {
+      "file": "test/step11-production-director-projection-synchronization.test.mjs",
+      "sha256": "7c9af2ae8142cbb55568f7ebc8671d5d2635e5e223cd30520ae2d84eec9840d9"
+    },
+    {
+      "file": "test/step11-production-google-credentials.test.mjs",
+      "sha256": "717b6dcaddc0d1e35d992914478716e10fdf81e5ab12f1cc5358acaf7bd5c530"
+    },
+    {
+      "file": "test/step11-production-odds-calculation.test.mjs",
+      "sha256": "2e92d5f3f48080c6348c3c323e1ca23ab09ae99a4f73e32a1c8c4d9cf171a976"
+    },
+    {
+      "file": "test/step11-production-odds-observation-phase.test.mjs",
+      "sha256": "b03d286b32ca80169f69c69310baa97664b8033007f8ccb8c87417f5bc998971"
+    },
+    {
+      "file": "test/step11-production-odds-rehearsal-fixture.test.mjs",
+      "sha256": "161d91647d950ef0e8d42aa8e690e84b305c4aa9df501b2deca2806ff6ebd630"
+    },
+    {
+      "file": "test/step11-production-odds-runtime-input-read.test.mjs",
+      "sha256": "c072d49c9e320ceaa5cca4f5c32a913126735aaa970e862b8bdef52c819932cc"
+    },
+    {
+      "file": "test/step11-production-odds-runtime-transition-nonce.test.mjs",
+      "sha256": "1315ebbea6fecdffd8f89da52672ba87bdae365b3f0988dfceb2b5d3683e0d14"
+    },
+    {
+      "file": "test/step11-production-odds-service-authorization.test.mjs",
+      "sha256": "a0fce60e2f9a0dfa3186bd0aef7aa9dc06e1ea517fec4c67a14551f0752384eb"
+    },
+    {
+      "file": "test/step11-production-participant-auth-cutover.test.mjs",
+      "sha256": "ac0f22b85a7feb256306c9636f667c64e1a633a992db4c55257de1d8ede949c5"
+    },
+    {
+      "file": "test/step11-production-precommit-release-abort.test.mjs",
+      "sha256": "e646344f4a8c3770c62b9f5a605d7f64e21ddb238fc03a2e14cbb8c2051296ab"
+    },
+    {
+      "file": "test/step11-production-reviewed-post-capture-preview-deployments.test.mjs",
+      "sha256": "7c5f984cfa66a7e3d8a616152d15c245def539b120d529f826f0c3cf9fea5bcc"
+    },
+    {
+      "file": "test/step11-production-scoring-admission-fence-v2.test.mjs",
+      "sha256": "5bac1477603121b3de5c308cb8f5946a6211f543d9535f298884fc9038b9b63d"
+    },
+    {
+      "file": "test/step11-production-scoring-completed-history-fixture.test.mjs",
+      "sha256": "4718b07d9f2a931bbdbe1042d687485b46be3deec6c1126224a1977910610514"
+    },
+    {
+      "file": "test/step11-production-scoring-operations.test.mjs",
+      "sha256": "2ef389c3dfeb5ffa90ed44bfd88d385205be7403fc3f5cee473eabeb5ecbaf0b"
+    },
+    {
+      "file": "test/step11-production-scoring-rehearsal-route.test.mjs",
+      "sha256": "8fa44c7e18dd711fbeec1b1007faa3fac454f9da7bef0810409adc032cbb7e41"
+    },
+    {
+      "file": "test/step11-production-scoring-rehearsal.test.mjs",
+      "sha256": "cdaf89942c382347616e3f0267d91a3337725f1503c33aa911167e3c6afeeb5f"
+    },
+    {
+      "file": "test/step11-production-security-preflight-hardening.test.mjs",
+      "sha256": "39db41c3da9eb75b69f199ecde8bce88b5b708af28f17578028056200ca57c16"
+    },
+    {
+      "file": "test/step11-production-staged-release-abort.test.mjs",
+      "sha256": "fbb62a39d8b19e0e2d57a553371fd21ebc36edc90da87b3bdce4063df0c4290b"
+    },
+    {
+      "file": "test/step11-pwa-network-boundaries.test.mjs",
+      "sha256": "c0de5480dbe7379ca149b04a4980ddce9bea4a505cd808abcaad0f52f614607e"
+    },
+    {
+      "file": "test/step12-production-google-drive-acl-fence.test.mjs",
+      "sha256": "b8ef6b0315b81010304118b10e86c74492dd392f43239739f9b3088dbc2a4117"
+    },
+    {
+      "file": "test/step12-production-participant-identity-partial-roster.test.mjs",
+      "sha256": "54db9774ae1a87ee5db37aa9e0750935612512855a21b3185c61f5f3f6aa3f0a"
+    },
+    {
+      "file": "test/step13a-production-net-skins-v1.test.mjs",
+      "sha256": "a6d90b7c7b7c1abe354a61344c42e71d71d0f4c1208d3da160d5f3ce862feabb"
+    },
+    {
+      "file": "test/step13b-production-calcutta-v1.test.mjs",
+      "sha256": "1913e02482019d830136242fc55700766ede589df5cb8987907c02e7c93b4811"
+    },
+    {
+      "file": "test/step13c-odds-publication-migration.test.mjs",
+      "sha256": "4de6e73f73120bf7a080368cf8f0dd454b0c22cbb0771beef11f842213435f06"
+    },
+    {
+      "file": "test/step13c-odds-publication-runtime.test.mjs",
+      "sha256": "dec8474430570fd9fdd492dea32c5b1fa952788503a20966053a68e2be779291"
+    },
+    {
+      "file": "test/step13e1-production-director-console-foundation.test.mjs",
+      "sha256": "382a372934986e6a3e2de10a62bf32d0feab3d3fd2008c5f800f74566e1a6951"
+    },
+    {
+      "file": "test/step13e1-production-handicap-management.test.mjs",
+      "sha256": "9798bd4f1d1cf1bb1ce17ab17cec7822a891eeab37885430f445f907a0f7fb90"
+    },
+    {
+      "file": "test/step13e1-production-handicap-migration.test.mjs",
+      "sha256": "c956235a007a60a1167c640468de8dc707ac2233dc00686f8f3e977d246690d9"
+    },
+    {
+      "file": "test/step13e1-weekly-handicap-ui.test.mjs",
+      "sha256": "1d770a9572e83fc1bb0ba26db9eea15efd31c7879e6322207712cc2eadc0b277"
+    },
+    {
+      "file": "test/step13e2-production-director-operations.test.mjs",
+      "sha256": "5378eb2d00912b85a4451f76428e4332154a75244015c6f14e20d95165ab596b"
+    },
+    {
+      "file": "test/step13e3-production-director-private-operations.test.mjs",
+      "sha256": "4af6e352aee5a384652d02c3382c2ab55a808777642b198aa2d0409163249020"
+    },
+    {
+      "file": "test/step13e4-production-director-players-access-ui.test.mjs",
+      "sha256": "67268226ff2a49204c4a95dd78ae2fa71d0c364aacd5c826d97f6430e6aeb663"
+    },
+    {
+      "file": "test/step13e4-production-player-access-contract.test.mjs",
+      "sha256": "b08e1248e865bc0eb559434ae17b7490d828b1dbe8a6f503d018699f73cd7302"
+    },
+    {
+      "file": "test/step13e4-production-player-access-security.test.mjs",
+      "sha256": "fa231aa7116bf8b3ffc9dedb9d785e552d56936f4d7885140940d627a31b6fea"
+    },
+    {
+      "file": "test/step13e5-production-access-governance-contract.test.mjs",
+      "sha256": "da5fc5b5cff976cbe1da319204d14c709e6cde417ce4cddefe8437a59060ab95"
+    },
+    {
+      "file": "test/step13e5-production-access-governance.test.mjs",
+      "sha256": "2d9f83edb7450361f1d5301185d867a64278f2bac9cc1c5f405436a5ee277558"
+    },
+    {
+      "file": "test/step13e5a1-initial-owner-adoption-guard.test.mjs",
+      "sha256": "78e2b421313d3dbe33517f0dbe8847d46165475bf164650d48c6bfbb55c9e658"
+    },
+    {
+      "file": "test/step13e6-production-tournament-setup-application.test.mjs",
+      "sha256": "1cda10177cfd8a20ff9729d09195fc8150f536967941e3905a64419175a16dfc"
+    },
+    {
+      "file": "test/step13e6-production-tournament-setup-sql-contract.test.mjs",
+      "sha256": "1c928bb8d862525787ddc382cd56a28e787c4b0e3b20f6da29ead96f08bd6717"
+    },
+    {
+      "file": "test/step13e7-production-future-year-administration-application.test.mjs",
+      "sha256": "f169415176efa63ccf2a552b7aa78f6e00404435df60386e87d55552f32d3a14"
+    },
+    {
+      "file": "test/step13e7-production-future-year-administration-sql-contract.test.mjs",
+      "sha256": "a284699b37d0214f805eb180b81a847d247fa9f5ae9763504e180c09b0a92030"
+    },
+    {
+      "file": "test/step13e7-production-future-year-administration-ui.test.mjs",
+      "sha256": "aa50dd724df9c2e66f1cb7ed64e5dc9af528716c9f96db8416f658aff949a5c1"
+    },
+    {
+      "file": "test/step13e7a-future-match-google-compatibility-worker.test.mjs",
+      "sha256": "ffb19348504199ffae21b69d0658d3dce8380df9b8aeb4ecbbdd0cae0f928835"
+    },
+    {
+      "file": "test/step13e7a-production-annual-projection-sync.test.mjs",
+      "sha256": "36acf3185b435fbc5f4c0243c785dc9faaa756e70d2e3100bbe1ff324fd94773"
+    },
+    {
+      "file": "test/step13e7a-production-current-scoring-runtime-sql-contract.test.mjs",
+      "sha256": "69c51a63d038481cfab433d32f8d29854196ac45d4f3697f41fe8f7ca903ec50"
+    },
+    {
+      "file": "test/step13e7a-production-current-tournament-runtime.test.mjs",
+      "sha256": "8b3fff1a799dbce31d29edebc98931df98226c4597aefed4a9f2b9c1b9c1928e"
+    },
+    {
+      "file": "test/step13e7a-production-future-identity-runtime.test.mjs",
+      "sha256": "1cb408632edf46e9e46788d78412c5dce1ccdcef989fa7770668bd86acb4d074"
+    },
+    {
+      "file": "test/step13e7a-production-future-runtime-application.test.mjs",
+      "sha256": "4fe52ec5f056b1af76fdfe9c04c945b9353a4bc85b2e7f9c78b8b520af7f6ec7"
+    },
+    {
+      "file": "test/step13e7b-production-annual-google-writer-certification.test.mjs",
+      "sha256": "6cb1b302e0065a9e6cfd7bcc6d29888b40c143150a49be153fc0bfadd0bca3a9"
+    },
+    {
+      "file": "test/step13e7b-production-annual-reads-workers.test.mjs",
+      "sha256": "787bf57e34ee562780198a57aefcc7ddf25425e2b1b233811179fa63d2d0a47a"
+    },
+    {
+      "file": "test/step13e7b-production-annual-scoring-dispatch.test.mjs",
+      "sha256": "9a384d2f280f6c4fcd802793e1f7c5381731e9739ede227b19acabf8503ac524"
+    },
+    {
+      "file": "test/step13e7b-production-current-match-authorization.test.mjs",
+      "sha256": "796ff840ee3bda7e969767fb9257aaf8e4f5804f54c68b59aa6f0e8f3070932e"
+    },
+    {
+      "file": "test/step13e7b-production-future-identity-mobile.test.mjs",
+      "sha256": "d0e618dbaf20f59337bc099ea0a8bd5ef22e871f185b8a2c3bbe1bf89a22d49b"
+    },
+    {
+      "file": "test/step13e7b1-production-annual-calcutta.test.mjs",
+      "sha256": "a9c5d4e4ca94e28e82dee32edf2f1ff71a039614d40e6b6c9d710d0b4ec9f31c"
+    },
+    {
+      "file": "test/step13e7b1-production-annual-net-skins.test.mjs",
+      "sha256": "92ff6d9055136585730f1b424b70f2f7e5bfd33f0f2318781db851641691c681"
+    },
+    {
+      "file": "test/step13e7b1-production-annual-odds.test.mjs",
+      "sha256": "d2f43bd9c335911f54c0143dca591e3fae5566548c06f2e224cf805e61e1383e"
+    },
+    {
+      "file": "test/step13e7b1-production-annual-side-game-activation.test.mjs",
+      "sha256": "672bf74f9a4498abb287b4799f02ec3ad4acbd2b38e8a355459a5b4c13921845"
+    },
+    {
+      "file": "test/step13e8a-production-prediction-settings-boundaries.test.mjs",
+      "sha256": "800c0208de824f199a284a3fefad09a0d07d4c6e031f301e6a6555053bad75d1"
+    },
+    {
+      "file": "test/step13e8a-production-prediction-settings.test.mjs",
+      "sha256": "fe7630ae48a70c63d82f5b9116119497367e9d7ae8f504273dbd677a5f1b4a0b"
+    },
+    {
+      "file": "test/step13e8b-production-draft-boundaries.test.mjs",
+      "sha256": "53c7115481747d6a46f6e9a9e0707cec3454d26e669f4660dbd92e00ae2b3dee"
+    },
+    {
+      "file": "test/step13e8b-production-draft-ui.test.mjs",
+      "sha256": "873c2d2a9bbe5121bd9dca19b22711f99d8b5043524cc8e11b1ee0d49a777687"
+    },
+    {
+      "file": "test/step13e8b-runtime-draft-authoring.test.mjs",
+      "sha256": "395ce84374f9350bef08295e898296a32ccc1e9226305419eace286e6c678c8b"
+    },
+    {
+      "file": "test/step13e8c-production-guide-retirement.test.mjs",
+      "sha256": "388bb5ed8f8a289c5cc523fcff77afe41a10afa93e2fb7743457a1c3d79a8227"
+    },
+    {
+      "file": "test/step13e8c-production-guide-ui.test.mjs",
+      "sha256": "9644fe8aa901caf6ddbc851cd24e7e9e4a08459917343743cf4db5ff53f182d9"
+    },
+    {
+      "file": "test/step13e8c-runtime-guide-authoring.test.mjs",
+      "sha256": "c92dc9d0f57ed4727570ee1e3d6a6549be7780b82afe153ba2bdc7a6ffeb8786"
+    },
+    {
+      "file": "test/step14a-participant-route-availability.test.mjs",
+      "sha256": "8962d67ef5c1a9f023afa93f3a442adbe09bf219d04bc432d436e28a6493c05b"
+    },
+    {
+      "file": "test/step14b-public-navigation.test.mjs",
+      "sha256": "36ff63f408f18e1d45f314b6fb6d3907b9ee0a27f1cb6dc44506849423b970ba"
+    },
+    {
+      "file": "test/step14c-advanced-analytics-tables.test.mjs",
+      "sha256": "1b9a74813476d1d7fd13b9d7e6cc441ad225f1815d11cf6d3c1a910fa626f20c"
+    },
+    {
+      "file": "test/step14d-read-path-performance.test.mjs",
+      "sha256": "ba440509a623524fb8da3331875c26ef0544e92b3d86d2cecbd30b043c0840da"
+    },
+    {
+      "file": "test/step14e-live-draft-guide-polish.test.mjs",
+      "sha256": "e51639babb8b89f7d6c6c5ec92792fade4ad3b65eb46005069a334d85dc11f8a"
+    },
+    {
+      "file": "test/step14f-seo-metadata-accessibility.test.mjs",
+      "sha256": "077c388055a8b20ac0b8c0f98b6ed5c911d5fe14d2047dff4178fff0c6222606"
+    },
+    {
+      "file": "test/step14g-legacy-human-ui-cleanup.test.mjs",
+      "sha256": "26b033505da4bc81900408565d55658d334f73581a635bae72e7b284c592af4d"
+    },
+    {
+      "file": "test/step14h-pwa-installability-retirement.test.mjs",
+      "sha256": "cccc6d425d530834b40f8e14b550db9fd76e6e7ef7464e9d84db0ddf9ef1bc0a"
+    },
+    {
+      "file": "test/step9-1-authority-selectors.test.mjs",
+      "sha256": "15813d4bbb5921c3a3ab0377bb8cf7d908e245bc0833a6951bf344ef83477572"
+    },
+    {
+      "file": "test/step9-1-data-authority-request.test.mjs",
+      "sha256": "399edcb9a1c4b37d87d371cb4155a05d4657276a4eb4b2eb6caab97912510c44"
+    },
+    {
+      "file": "test/step9-1-director-mutation-authority.test.mjs",
+      "sha256": "a026f3923c441d654f78537d13aee1a2c9562a0f6fb88ccca39fd2fcef54a1f4"
+    },
+    {
+      "file": "test/step9-1-network-certification-route.test.mjs",
+      "sha256": "d6812371329dc5923e4d34a909cf90e703a0c028bc903b6246635c17f132dd94"
+    },
+    {
+      "file": "test/step9-data-authority-cleanup.test.mjs",
+      "sha256": "8b213257397ba44c684b9e8e82b23fc426064190d5fd4348c511b106b8a673f9"
+    },
+    {
+      "file": "test/team-intelligence-lineup-runtime.test.mjs",
+      "sha256": "2bbec8d158aa811dfd11888c970fb1f245576514495224e002341a7aef3b906a"
+    },
+    {
+      "file": "test/team-intelligence-ui.test.mjs",
+      "sha256": "087c5936947b7e143ce0f18f1d408b4ee928e52a851ffb546f206b78a4c0c9f3"
+    },
+    {
+      "file": "test/team-intelligence.test.mjs",
+      "sha256": "5efe0c0e44dc89aeb043647ba2699bbdaa1bd068ea8a970aa66fed673883c392"
+    },
+    {
+      "file": "test/team-round-recap.test.mjs",
+      "sha256": "99a8074330447cfaee7fe516d6ebe718cf39d4bba26aea325594d610340f76be"
+    },
+    {
+      "file": "test/tournament-branding.test.mjs",
+      "sha256": "d5e770f4365a792211015843a3917190de89e04fa92d00d991997c91912df52a"
+    },
+    {
+      "file": "test/tournament-countdown.test.mjs",
+      "sha256": "dca9fb98b592098e1791fd012efdd47b44ac6793ce2c11e34b0d99b687952802"
+    },
+    {
+      "file": "test/tournament-dashboard.test.mjs",
+      "sha256": "a3f59da0de91ae845453dafbb65c370d3521b48c49fdd5141e22f25dd86f4e57"
+    },
+    {
+      "file": "test/tournament-director.test.mjs",
+      "sha256": "330b52f96cc85f5ee63234e24add5bf5dfcb014749bdf4217f22cb1e7d614891"
+    },
+    {
+      "file": "test/tournament-foundation-supabase.test.mjs",
+      "sha256": "1dcc8b9f220282d86dca304fe54bbf343864b595c2fb41da224a42a41f1e2b20"
+    },
+    {
+      "file": "test/tournament-guide-annual-template.test.mjs",
+      "sha256": "4c93eda4b0a7e0297b2610bba68cf15fc01f6fe980575d73c947f5aef8c0469a"
+    },
+    {
+      "file": "test/tournament-guide-app.test.mjs",
+      "sha256": "25a71b02ddf1b470993211428be830efc7a449273725346ad0486beb1ae978f1"
+    },
+    {
+      "file": "test/tournament-guide-contacts.test.mjs",
+      "sha256": "c3a79c5fb5cb00d45ea86c938c4ee524de4af29339189518d52dbc489d19e58d"
+    },
+    {
+      "file": "test/tournament-guide-dining.test.mjs",
+      "sha256": "c3d47bdde5e2bc21072b63b204385bee59b7856c233858c258597a099b6f73f0"
+    },
+    {
+      "file": "test/tournament-guide-local.test.mjs",
+      "sha256": "b13a1b8ff33e1022b0856861af3d3948aa0b02fe83f0011032a78f782068f19c"
+    },
+    {
+      "file": "test/tournament-guide-projection.test.mjs",
+      "sha256": "48727d2ff3b9a6194a8da28ac96b9c43af5d006aa4370c14626b832df0e907d1"
+    },
+    {
+      "file": "test/tournament-guide-schedule.test.mjs",
+      "sha256": "f1ade649ff2bfaca38f7204e861307aa3ded1541fbb5e738c1fdf06c77cb7d25"
+    },
+    {
+      "file": "test/tournament-guide.test.mjs",
+      "sha256": "223f1b1c828320515d7b734cc79bf48583cf821f97c6040b6db68c228249cfd0"
+    },
+    {
+      "file": "test/tournament-hub.test.mjs",
+      "sha256": "3c4c9ace0e10712a97f859d460afb54b725278444ef51579e6f5c56996f0bf93"
+    },
+    {
+      "file": "test/tournament-identifiers.test.mjs",
+      "sha256": "fb283a5b8cbca1f4f6cb5693da9f056b66bab987853daa3c7e19899643005802"
+    },
+    {
+      "file": "test/tournament-intelligence-storylines.test.mjs",
+      "sha256": "27ef6cf25a4132c3130b98b59dd2506fa914819b82deb7cfb35809c8f4931bc7"
+    },
+    {
+      "file": "test/tournament-odds.test.mjs",
+      "sha256": "a6447256551615a9e7857fc0f7901736ca4d12be60897da782ae62330bb1e8c0"
+    },
+    {
+      "file": "test/tournament-readiness.test.mjs",
+      "sha256": "78c7ed8b8d81fbd1dbded73a25b6439c00f5e908c4f9d0e6611eb3dbcebd79f9"
+    },
+    {
+      "file": "test/tournament-recap-intelligence.test.mjs",
+      "sha256": "86f5468af352e91579093221a64a9fc1c0ebc92414637fd92b2325277d455eed"
+    },
+    {
+      "file": "test/tournament-storylines.test.mjs",
+      "sha256": "0af2dfc775f5b74a3e8333eebef46baee4e4e4e3c9d5efc45b8b670c3bbf6339"
+    },
+    {
+      "file": "test/tournament-supabase-read.test.mjs",
+      "sha256": "3f719815c6119aa9b8a9f3092a6c2d5550d65ecc3535c401de00e66778ddca45"
+    },
+    {
+      "file": "test/tournament-time-freeze.test.mjs",
+      "sha256": "1346de37383161a3efda35e8ae4526518fed15d8179636341a5f7df7d0cca15e"
+    },
+    {
+      "file": "test/tournament-timeline.test.mjs",
+      "sha256": "379bc2dce6790e87d40f5ad312f4a7514758bd150fbaee44adcb3b5a4587fb0b"
+    },
+    {
+      "file": "test/tournament-workbook-initialization.test.mjs",
+      "sha256": "48de0d1514b096561d44a80f65631d0ebda527cc3575e18f9a4c4d1ef07012d5"
+    },
+    {
+      "file": "test/unified-player-leaderboards.test.mjs",
+      "sha256": "de3f9f3fb589bbc5b94ce7a1dad4a2af180c138f196d988b4a4bfe4b96884e3d"
+    },
+    {
+      "file": "test/verify-customcode.test.mjs",
+      "sha256": "f2ee37e8b19a41346276e57d4fb965c71c81f451e9513cd9811378c0d602005c"
+    },
+    {
+      "file": "test/war-room-calculation-parity.test.mjs",
+      "sha256": "5848ee93aa8fb63889f3416d0047bd86c1f20c0ddcfdf0a54c33c99111af9d2f"
+    },
+    {
+      "file": "test/war-room-input-dual-path.test.mjs",
+      "sha256": "c12689570cd47186f3283f10f929b15e7bfe839989c2973bb3afccb05506cf3a"
+    },
+    {
+      "file": "test/website-guide-supabase-transition.test.mjs",
+      "sha256": "4c87f0b15340e5a460b57802b52a1f3e91269cec2a638d873e5b2d1d45497eb1"
+    },
+    {
+      "file": "test/website-pwa-route-boundary.test.mjs",
+      "sha256": "7bd806cb7b3c0289f6797298421b913c183e0bd7172ec72debb949b00f8dfe77"
+    },
+    {
+      "file": "test/website-time-team-logo-polish.test.mjs",
+      "sha256": "53a9497fd0421b3594cf775a998727e2a58b88d48c5b92fe96262e22e3729f05"
+    },
+    {
+      "file": "test/workbook-protection.test.mjs",
+      "sha256": "b03fcf2f2acd620bc4d17adea491ed0cc18f0c7a7bab6ceda1fc8218a9d9b09c"
+    },
+    {
+      "file": "test/workbook-write-fidelity.test.mjs",
+      "sha256": "ad6defec9afa927af1a2bec256d97c2e40cd3886cd08f0c15c0448dbaa74a8a7"
+    },
+    {
+      "file": "tools/reliability/bootstrap-compatibility-isolation.cjs",
+      "sha256": "6e208ad0ee15624ceb91721215038643f94b9ebd321be1562b3ecd5ee4f19c11"
+    },
+    {
+      "file": "tools/reliability/canonical-bootstrap-artifacts.mjs",
+      "sha256": "6e7f9106796964bcd1b73a81664b0d03d5ffe374e476258fe16860b73abd3285"
+    },
+    {
+      "file": "tools/reliability/run-bootstrap-compatibility.mjs",
+      "sha256": "0286adb67855f388f2726a97ca76ea09cee687b7e44df7133db3144e39428a04"
+    }
+  ],
+  "sourcesStable": true,
+  "counts": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "failures": [
+    {
+      "name": "analytics implementation digest requires an explicit version update",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/history-analytics-reuse.test.mjs:319:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    + actual - expected\n    \n    + 'scorecard-domain-v1-456440687845e6d6'\n    - 'scorecard-domain-v1-c92d17cf30307685'\n                           ^\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 'scorecard-domain-v1-c92d17cf30307685'\n  actual: 'scorecard-domain-v1-456440687845e6d6'\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (file://<CHECKOUT>/test/history-analytics-reuse.test.mjs:331:10)\n    async Test.run (node:internal/test_runner/test:1404:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:969:7)\n  ...\n"
+    },
+    {
+      "name": "Google-backed secondary failures are isolated from the core route",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/leaderboards-core-supabase.test.mjs:465:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    The input did not match the regular expression /secondaryState === \"error\"/. Input:\n    \n    '\"use client\";\\n' +\n      '\\n' +\n      'import ParticipantSideGames from \"./ParticipantSideGames\";\\n' +\n      '\\n' +\n      'import { useCallback, useEffect, useMemo, useRef, useState } from \"react\";\\n' +\n      'import { usePathname, useSearchParams } from \"next/navigation\";\\n' +\n      'import AssetImage from \"../AssetImage\";\\n' +\n      'import PlayerAvatar from \"../PlayerAvatar\";\\n' +\n      'import StatusBadge from \"../StatusBadge\";\\n' +\n      'import TournamentIdentityHeader from \"../TournamentIdentityHeader\";\\n' +\n      'import TournamentIntelligenceStorylines from \"./TournamentIntelligenceStorylines\";\\n' +\n      'import ScrambleLeaderboard from \"./ScrambleLeaderboard\";\\n' +\n      'import ScrambleTeamIdentity from \"./ScrambleTeamIdentity\";\\n' +\n      'import { LeaderboardColumnHeader, LeaderboardDetailSheet, LeaderboardEntry, LeaderboardMetrics, PlayerLeaderboardIdentity, RoundLeaderboardSheet } from \"./LeaderboardRow\";\\n' +\n      'import { teamLogo, tournamentLogo } from \"../../lib/asset-paths\";\\n' +\n      'import { formatMeaningfulNumber, formatPlayerPoints, formatTeamPoints } from \"../../lib/formatters\";\\n' +\n      'import { publishedOddsInsights } from \"../../lib/championship-odds-insights\";\\n' +\n      'import { formatChampionshipOdds } from \"../../lib/championship-odds-format\";\\n' +\n      'import { playerProjectionSummary, projectionHistoryHighlights, publishedPlayerHistory, tournamentProjectionStory } from \"../../lib/projection-editorial\";\\n' +\n      'import { tournamentIntelligenceStorylines } from \"../../lib/tournament-intelligence-storylines\";\\n' +\n      'import { fetchWithTransientRetry } from \"../../lib/transient-fetch\";\\n' +\n      'import { isTournamentRecapPhase, projectionPresentationLabel } from \"../../lib/projection-phases\";\\n' +\n      'import { buildTournamentRecapIntelligence, finishLabel } from \"../../lib/tournament-recap-intelligence\";\\n' +\n      'import { participantRoundBreakdown, playerRoundBreakdown } from \"../../lib/leaderboard-round-breakdown\";\\n' +\n      'import { netSkinsCountLabel, netSkinsRankAccessibleLabel, netSkinsResultPresentation } from \"../../lib/net-skins-presentation\";\\n' +\n      'import { flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from \"../../lib/participant-auth-client-diagnostics\";\\n' +\n      'import { teamRoundRecap } from \"../../lib/team-round-recap\";\\n' +\n      'import { leaderboardModulesForNetSkinsState, normalizeLeaderboardModule } from \"../../lib/leaderboards-navigation\";\\n' +\n      'import {\\n' +\n      '  PLAYER_METRICS,\\n' +\n      '  playerPerformanceRows,\\n' +\n      '  rankPlayerRows,\\n' +\n      '  roundCompetitionRows,\\n' +\n      '  searchPlayerRows,\\n' +\n      '  teamStandings,\\n' +\n      '} from \"../../lib/mobile-leaderboards\";\\n' +\n      'import styles from \"./leaderboards-dashboard.module.css\";\\n' +\n      'import insightStyles from \"./leaderboards-insights.module.css\";\\n' +\n      'import skinsStyles from \"./net-skins.module.css\";\\n' +\n      'import leaderboardStyles from \"./scramble-leaderboard.module.css\";\\n' +\n      'import teamStyles from \"./teams-leaderboard.module.css\";\\n' +\n      '\\n' +\n      'const clean = (value) => String(value ?? \"\").trim();\\n' +\n      'const initials = (name) => clean(name || \"SBI\").split(/\\\\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join(\"\").toUpperCase();\\n' +\n      'const toPar = (value) => Number(value) === 0 ? \"E\" : Number(value) > 0 ? `+${value}` : String(value);\\n' +\n      'const average = (value) => Number.isFinite(Number(value)) ? Number(value).toFixed(1) : \"\u2014\";\\n' +\n      'const currency = (value) => new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\", maximumFractionDigits: Number(value) % 1 ? 2 : 0 }).format(Number(value) || 0);\\n' +\n      'const metricValue = (row, metric) => {\\n' +\n      '  if (metric === \"points\") return `${formatPlayerPoints(row.points)} pts`;\\n' +\n      '  if (metric === \"wins\") return String(row.wins ?? \"\u2014\");\\n' +\n      '  if (metric === \"winPct\") return row.winPct === null ? \"\u2014\" : `${row.winPct.toFixed(0)}%`;\\n' +\n      '  return average(row[metric]);\\n' +\n      '};\\n' +\n      '\\n' +\n      'function TeamMark({ filename, name, size = \"small\" }) {\\n' +\n      '  return <span className={`${styles.teamMark} ${size === \"sheet\" ? teamStyles.sheetTeamMark : \"\"}`.trim()} data-size={size}>\\n' +\n      '    <AssetImage src={teamLogo(filename)} alt={`${name} logo`} className={styles.teamLogo} fallbackClassName={styles.teamFallback} fallback={initials(name)} inferFallback={false} />\\n' +\n      '  </span>;\\n' +\n      '}\\n' +\n      '\\n' +\n      'function TeamNameWithBadge({ name, current = false }) {\\n' +\n      '  return <span className={teamStyles.teamNameLine}>\\n' +\n      '    <strong>{name}</strong>\\n' +\n      '    {current ? <em>YOUR TEAM</em> : null}\\n' +\n      '  </span>;\\n' +\n      '}\\n' +\n      '\\n' +\n      'function TeamSheetName({ name, current = false }) {\\n' +\n      '  return <span className={teamStyles.teamSheetName}>\\n' +\n      '    <strong>{name}</strong>\\n' +\n      '    {current ? <em>YOUR TEAM</em> : null}\\n' +\n      '  </span>;\\n' +\n      '}\\n' +\n      '\\n' +\n      'function TeamLeaderboardIdentity({ team, current = false, large = false }) {\\n' +\n      '  return <span className={teamStyles.teamSheetIdentity} data-large={large || undefined}>\\n' +\n      '    <TeamMark filename={team.logo} name={team.name} size=\"sheet\" />\\n' +\n      '    <TeamSheetName name={team.name} current={current} />\\n' +\n      '  </span>;\\n' +\n      '}\\n' +\n      '\\n' +\n      'function Controls({ rounds, selectedRound, onRound, metric = \"\", onMetric }) {\\n' +\n      '  return <section className={styles.rankingControls} aria-label=\"Leaderboard filters\">\\n' +\n      '    <label>\\n' +\n      '   "
+    },
+    {
+      "name": "Players uses one compact accessible Round and Rank By control surface",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/leaderboards-mobile-polish.test.mjs:22:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    The input did not match the regular expression /!\\[\"insights\", \"skins\"\\]\\.includes\\(tab\\)/. Input:\n    \n    '\"use client\";\\n' +\n      '\\n' +\n      'import ParticipantSideGames from \"./ParticipantSideGames\";\\n' +\n      '\\n' +\n      'import { useCallback, useEffect, useMemo, useRef, useState } from \"react\";\\n' +\n      'import { usePathname, useSearchParams } from \"next/navigation\";\\n' +\n      'import AssetImage from \"../AssetImage\";\\n' +\n      'import PlayerAvatar from \"../PlayerAvatar\";\\n' +\n      'import StatusBadge from \"../StatusBadge\";\\n' +\n      'import TournamentIdentityHeader from \"../TournamentIdentityHeader\";\\n' +\n      'import TournamentIntelligenceStorylines from \"./TournamentIntelligenceStorylines\";\\n' +\n      'import ScrambleLeaderboard from \"./ScrambleLeaderboard\";\\n' +\n      'import ScrambleTeamIdentity from \"./ScrambleTeamIdentity\";\\n' +\n      'import { LeaderboardColumnHeader, LeaderboardDetailSheet, LeaderboardEntry, LeaderboardMetrics, PlayerLeaderboardIdentity, RoundLeaderboardSheet } from \"./LeaderboardRow\";\\n' +\n      'import { teamLogo, tournamentLogo } from \"../../lib/asset-paths\";\\n' +\n      'import { formatMeaningfulNumber, formatPlayerPoints, formatTeamPoints } from \"../../lib/formatters\";\\n' +\n      'import { publishedOddsInsights } from \"../../lib/championship-odds-insights\";\\n' +\n      'import { formatChampionshipOdds } from \"../../lib/championship-odds-format\";\\n' +\n      'import { playerProjectionSummary, projectionHistoryHighlights, publishedPlayerHistory, tournamentProjectionStory } from \"../../lib/projection-editorial\";\\n' +\n      'import { tournamentIntelligenceStorylines } from \"../../lib/tournament-intelligence-storylines\";\\n' +\n      'import { fetchWithTransientRetry } from \"../../lib/transient-fetch\";\\n' +\n      'import { isTournamentRecapPhase, projectionPresentationLabel } from \"../../lib/projection-phases\";\\n' +\n      'import { buildTournamentRecapIntelligence, finishLabel } from \"../../lib/tournament-recap-intelligence\";\\n' +\n      'import { participantRoundBreakdown, playerRoundBreakdown } from \"../../lib/leaderboard-round-breakdown\";\\n' +\n      'import { netSkinsCountLabel, netSkinsRankAccessibleLabel, netSkinsResultPresentation } from \"../../lib/net-skins-presentation\";\\n' +\n      'import { flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from \"../../lib/participant-auth-client-diagnostics\";\\n' +\n      'import { teamRoundRecap } from \"../../lib/team-round-recap\";\\n' +\n      'import { leaderboardModulesForNetSkinsState, normalizeLeaderboardModule } from \"../../lib/leaderboards-navigation\";\\n' +\n      'import {\\n' +\n      '  PLAYER_METRICS,\\n' +\n      '  playerPerformanceRows,\\n' +\n      '  rankPlayerRows,\\n' +\n      '  roundCompetitionRows,\\n' +\n      '  searchPlayerRows,\\n' +\n      '  teamStandings,\\n' +\n      '} from \"../../lib/mobile-leaderboards\";\\n' +\n      'import styles from \"./leaderboards-dashboard.module.css\";\\n' +\n      'import insightStyles from \"./leaderboards-insights.module.css\";\\n' +\n      'import skinsStyles from \"./net-skins.module.css\";\\n' +\n      'import leaderboardStyles from \"./scramble-leaderboard.module.css\";\\n' +\n      'import teamStyles from \"./teams-leaderboard.module.css\";\\n' +\n      '\\n' +\n      'const clean = (value) => String(value ?? \"\").trim();\\n' +\n      'const initials = (name) => clean(name || \"SBI\").split(/\\\\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join(\"\").toUpperCase();\\n' +\n      'const toPar = (value) => Number(value) === 0 ? \"E\" : Number(value) > 0 ? `+${value}` : String(value);\\n' +\n      'const average = (value) => Number.isFinite(Number(value)) ? Number(value).toFixed(1) : \"\u2014\";\\n' +\n      'const currency = (value) => new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\", maximumFractionDigits: Number(value) % 1 ? 2 : 0 }).format(Number(value) || 0);\\n' +\n      'const metricValue = (row, metric) => {\\n' +\n      '  if (metric === \"points\") return `${formatPlayerPoints(row.points)} pts`;\\n' +\n      '  if (metric === \"wins\") return String(row.wins ?? \"\u2014\");\\n' +\n      '  if (metric === \"winPct\") return row.winPct === null ? \"\u2014\" : `${row.winPct.toFixed(0)}%`;\\n' +\n      '  return average(row[metric]);\\n' +\n      '};\\n' +\n      '\\n' +\n      'function TeamMark({ filename, name, size = \"small\" }) {\\n' +\n      '  return <span className={`${styles.teamMark} ${size === \"sheet\" ? teamStyles.sheetTeamMark : \"\"}`.trim()} data-size={size}>\\n' +\n      '    <AssetImage src={teamLogo(filename)} alt={`${name} logo`} className={styles.teamLogo} fallbackClassName={styles.teamFallback} fallback={initials(name)} inferFallback={false} />\\n' +\n      '  </span>;\\n' +\n      '}\\n' +\n      '\\n' +\n      'function TeamNameWithBadge({ name, current = false }) {\\n' +\n      '  return <span className={teamStyles.teamNameLine}>\\n' +\n      '    <strong>{name}</strong>\\n' +\n      '    {current ? <em>YOUR TEAM</em> : null}\\n' +\n      '  </span>;\\n' +\n      '}\\n' +\n      '\\n' +\n      'function TeamSheetName({ name, current = false }) {\\n' +\n      '  return <span className={teamStyles.teamSheetName}>\\n' +\n      '    <strong>{name}</strong>\\n' +\n      '    {current ? <em>YOUR TEAM</em> : null}\\n' +\n      '  </span>;\\n' +\n      '}\\n' +\n      '\\n' +\n      'function TeamLeaderboardIdentity({ team, current = false, large = false }) {\\n' +\n      '  return <span className={teamStyles.teamSheetIdentity} data-large={large || undefined}>\\n' +\n      '    <TeamMark filename={team.logo} name={team.name} size=\"sheet\" />\\n' +\n      '    <TeamSheetName name={team.name} current={current} />\\n' +\n      '  </span>;\\n' +\n      '}\\n' +\n      '\\n' +\n      'function Controls({ rounds, selectedRound, onRound, metric = \"\", onMetric }) {\\n' +\n      '  return <section className={styles.rankingControls} aria-label=\"Leaderboard filters\">\\n' +\n      '    <label>\\n"
+    },
+    {
+      "name": "polish is presentation-only and does not add a leaderboard request path",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/leaderboards-mobile-polish.test.mjs:89:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    The input was expected to not match the regular expression /calcutta/i. Input:\n    \n    '\"use client\";\\n' +\n      '\\n' +\n      'import ParticipantSideGames from \"./ParticipantSideGames\";\\n' +\n      '\\n' +\n      'import { useCallback, useEffect, useMemo, useRef, useState } from \"react\";\\n' +\n      'import { usePathname, useSearchParams } from \"next/navigation\";\\n' +\n      'import AssetImage from \"../AssetImage\";\\n' +\n      'import PlayerAvatar from \"../PlayerAvatar\";\\n' +\n      'import StatusBadge from \"../StatusBadge\";\\n' +\n      'import TournamentIdentityHeader from \"../TournamentIdentityHeader\";\\n' +\n      'import TournamentIntelligenceStorylines from \"./TournamentIntelligenceStorylines\";\\n' +\n      'import ScrambleLeaderboard from \"./ScrambleLeaderboard\";\\n' +\n      'import ScrambleTeamIdentity from \"./ScrambleTeamIdentity\";\\n' +\n      'import { LeaderboardColumnHeader, LeaderboardDetailSheet, LeaderboardEntry, LeaderboardMetrics, PlayerLeaderboardIdentity, RoundLeaderboardSheet } from \"./LeaderboardRow\";\\n' +\n      'import { teamLogo, tournamentLogo } from \"../../lib/asset-paths\";\\n' +\n      'import { formatMeaningfulNumber, formatPlayerPoints, formatTeamPoints } from \"../../lib/formatters\";\\n' +\n      'import { publishedOddsInsights } from \"../../lib/championship-odds-insights\";\\n' +\n      'import { formatChampionshipOdds } from \"../../lib/championship-odds-format\";\\n' +\n      'import { playerProjectionSummary, projectionHistoryHighlights, publishedPlayerHistory, tournamentProjectionStory } from \"../../lib/projection-editorial\";\\n' +\n      'import { tournamentIntelligenceStorylines } from \"../../lib/tournament-intelligence-storylines\";\\n' +\n      'import { fetchWithTransientRetry } from \"../../lib/transient-fetch\";\\n' +\n      'import { isTournamentRecapPhase, projectionPresentationLabel } from \"../../lib/projection-phases\";\\n' +\n      'import { buildTournamentRecapIntelligence, finishLabel } from \"../../lib/tournament-recap-intelligence\";\\n' +\n      'import { participantRoundBreakdown, playerRoundBreakdown } from \"../../lib/leaderboard-round-breakdown\";\\n' +\n      'import { netSkinsCountLabel, netSkinsRankAccessibleLabel, netSkinsResultPresentation } from \"../../lib/net-skins-presentation\";\\n' +\n      'import { flushParticipantAuthDiagnostics, recordParticipantAuthDiagnostic } from \"../../lib/participant-auth-client-diagnostics\";\\n' +\n      'import { teamRoundRecap } from \"../../lib/team-round-recap\";\\n' +\n      'import { leaderboardModulesForNetSkinsState, normalizeLeaderboardModule } from \"../../lib/leaderboards-navigation\";\\n' +\n      'import {\\n' +\n      '  PLAYER_METRICS,\\n' +\n      '  playerPerformanceRows,\\n' +\n      '  rankPlayerRows,\\n' +\n      '  roundCompetitionRows,\\n' +\n      '  searchPlayerRows,\\n' +\n      '  teamStandings,\\n' +\n      '} from \"../../lib/mobile-leaderboards\";\\n' +\n      'import styles from \"./leaderboards-dashboard.module.css\";\\n' +\n      'import insightStyles from \"./leaderboards-insights.module.css\";\\n' +\n      'import skinsStyles from \"./net-skins.module.css\";\\n' +\n      'import leaderboardStyles from \"./scramble-leaderboard.module.css\";\\n' +\n      'import teamStyles from \"./teams-leaderboard.module.css\";\\n' +\n      '\\n' +\n      'const clean = (value) => String(value ?? \"\").trim();\\n' +\n      'const initials = (name) => clean(name || \"SBI\").split(/\\\\s+/).filter(Boolean).map((part) => part[0]).slice(0, 3).join(\"\").toUpperCase();\\n' +\n      'const toPar = (value) => Number(value) === 0 ? \"E\" : Number(value) > 0 ? `+${value}` : String(value);\\n' +\n      'const average = (value) => Number.isFinite(Number(value)) ? Number(value).toFixed(1) : \"\u2014\";\\n' +\n      'const currency = (value) => new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\", maximumFractionDigits: Number(value) % 1 ? 2 : 0 }).format(Number(value) || 0);\\n' +\n      'const metricValue = (row, metric) => {\\n' +\n      '  if (metric === \"points\") return `${formatPlayerPoints(row.points)} pts`;\\n' +\n      '  if (metric === \"wins\") return String(row.wins ?? \"\u2014\");\\n' +\n      '  if (metric === \"winPct\") return row.winPct === null ? \"\u2014\" : `${row.winPct.toFixed(0)}%`;\\n' +\n      '  return average(row[metric]);\\n' +\n      '};\\n' +\n      '\\n' +\n      'function TeamMark({ filename, name, size = \"small\" }) {\\n' +\n      '  return <span className={`${styles.teamMark} ${size === \"sheet\" ? teamStyles.sheetTeamMark : \"\"}`.trim()} data-size={size}>\\n' +\n      '    <AssetImage src={teamLogo(filename)} alt={`${name} logo`} className={styles.teamLogo} fallbackClassName={styles.teamFallback} fallback={initials(name)} inferFallback={false} />\\n' +\n      '  </span>;\\n' +\n      '}\\n' +\n      '\\n' +\n      'function TeamNameWithBadge({ name, current = false }) {\\n' +\n      '  return <span className={teamStyles.teamNameLine}>\\n' +\n      '    <strong>{name}</strong>\\n' +\n      '    {current ? <em>YOUR TEAM</em> : null}\\n' +\n      '  </span>;\\n' +\n      '}\\n' +\n      '\\n' +\n      'function TeamSheetName({ name, current = false }) {\\n' +\n      '  return <span className={teamStyles.teamSheetName}>\\n' +\n      '    <strong>{name}</strong>\\n' +\n      '    {current ? <em>YOUR TEAM</em> : null}\\n' +\n      '  </span>;\\n' +\n      '}\\n' +\n      '\\n' +\n      'function TeamLeaderboardIdentity({ team, current = false, large = false }) {\\n' +\n      '  return <span className={teamStyles.teamSheetIdentity} data-large={large || undefined}>\\n' +\n      '    <TeamMark filename={team.logo} name={team.name} size=\"sheet\" />\\n' +\n      '    <TeamSheetName name={team.name} current={current} />\\n' +\n      '  </span>;\\n' +\n      '}\\n' +\n      '\\n' +\n      'function Controls({ rounds, selectedRound, onRound, metric = \"\", onMetric }) {\\n' +\n      '  return <section className={styles.rankingControls} aria-label=\"Leaderboard filters\">\\n' +\n      '    <label>\\n' +\n      '      <sp"
+    },
+    {
+      "name": "Supabase verification distinguishes rejected tokens from provider outages",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/mobile-api-v1.test.mjs:204:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly deep-equal:\n    + actual - expected\n    \n      {\n        authUserId: null,\n    +   email: '',\n    +   emailVerified: false,\n        status: 'invalid'\n      }\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected:\n    status: 'invalid'\n    authUserId: ~\n  actual:\n    status: 'invalid'\n    authUserId: ~\n    email: ''\n    emailVerified: false\n  operator: 'deepStrictEqual'\n  stack: |-\n    TestContext.<anonymous> (file://<CHECKOUT>/test/mobile-api-v1.test.mjs:206:10)\n    async Test.run (node:internal/test_runner/test:1404:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:969:7)\n  ...\n"
+    },
+    {
+      "name": "native certification receives only a server-verified Auth UUID and confirmed email",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/mobile-api-v1.test.mjs:222:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly deep-equal:\n    + actual - expected\n    \n      {\n        authUserId: '11111111-1111-4111-8111-111111111111',\n        email: 'approved@example.com',\n        emailVerified: true,\n    +   security: {\n    +     email: 'approved@example.com',\n    +     emailConfirmedAt: '2026-08-28T12:00:00.000Z',\n    +     identities: [],\n    +     phone: null,\n    +     phoneConfirmedAt: null\n    +   },\n        status: 'active'\n      }\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected:\n    status: 'active'\n    authUserId: '11111111-1111-4111-8111-111111111111'\n    email: 'approved@example.com'\n    emailVerified: true\n  actual:\n    status: 'active'\n    authUserId: '11111111-1111-4111-8111-111111111111'\n    email: 'approved@example.com'\n    emailVerified: true\n    security:\n      email: 'approved@example.com'\n      emailConfirmedAt: '2026-08-28T12:00:00.000Z'\n      phone: ~\n      phoneConfirmedAt: ~\n      identities:\n  operator: 'deepStrictEqual'\n  stack: |-\n    TestContext.<anonymous> (file://<CHECKOUT>/test/mobile-api-v1.test.mjs:233:10)\n    async Test.run (node:internal/test_runner/test:1404:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:969:7)\n  ...\n"
+    },
+    {
+      "name": "OTP route is no-signup, six-digit, scoped, durably audited, and returns generic unapproved behavior",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/participant-auth-rehearsal.test.mjs:202:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    The input was expected to not match the regular expression /console\\.(?:log|error).*token|refresh_token|access_token/i. Input:\n    \n    'import { createClient } from \"@supabase/supabase-js\";\\n' +\n      'import { randomUUID } from \"node:crypto\";\\n' +\n      'import { NextResponse } from \"next/server\";\\n' +\n      'import { participantIdentityAuthorityEnvironment } from \"../../../../../../lib/participant-identity-authority.js\";\\n' +\n      'import { classifyParticipantEmailOtpAuthError, participantAuthClientRequestHash, participantAuthGenericMessage, participantAuthRateLimitSecret } from \"../../../../../../lib/participant-auth-rehearsal.js\";\\n' +\n      'import { authorizeParticipantEmailOtpEligibility } from \"../../../../../../lib/participant-email-otp-authorization.js\";\\n' +\n      'import { requestParticipantEmailOtp, resolveParticipantEmailOtpVerificationType } from \"../../../../../../lib/participant-email-otp-mode.js\";\\n' +\n      'import { recordSingleParticipantOtpDelivery } from \"../../../../../../lib/participant-identity-supabase.js\";\\n' +\n      'import { participantAuthServerConfiguration } from \"../../../../../../lib/supabase-auth-server.js\";\\n' +\n      'import { normalizeParticipantAuthCaptchaToken } from \"../../../../../../lib/participant-phone-otp.js\";\\n' +\n      'import { participantAuthExperienceConfiguration } from \"../../../../../../lib/participant-sms-auth-feature.js\";\\n' +\n      'import { dataAuthorityFetch } from \"../../../../../../lib/data-authority-request.js\";\\n' +\n      'import { assertProductionShadowCandidateRequest } from \"../../../../../../lib/production-shadow-candidate.js\";\\n' +\n      'import { assertProductionCutoverRequest } from \"../../../../../../lib/production-cutover-activation-contract.js\";\\n' +\n      '\\n' +\n      'export const dynamic = \"force-dynamic\";\\n' +\n      'const responseHeaders = { \"Cache-Control\": \"private, no-store\", Vary: \"Cookie\" };\\n' +\n      'const json = (payload, status = 200) => NextResponse.json(payload, { status, headers: responseHeaders });\\n' +\n      'const publicRequestMinimumDurationMs = 750;\\n' +\n      '\\n' +\n      'async function enumerationSafeRequestResponse(startedAt, requestId) {\\n' +\n      '  const remaining = publicRequestMinimumDurationMs - Math.round(performance.now() - startedAt);\\n' +\n      '  if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));\\n' +\n      '  return json({ message: participantAuthGenericMessage(), step: \"code\", requestId: requestId || randomUUID() });\\n' +\n      '}\\n' +\n      '\\n' +\n      'function sameOriginMutation(request) {\\n' +\n      '  const origin = String(request.headers.get(\"origin\") || \"\").trim();\\n' +\n      '  const fetchSite = String(request.headers.get(\"sec-fetch-site\") || \"\").trim().toLowerCase();\\n' +\n      '  let expectedOrigin = \"\";\\n' +\n      '  try { expectedOrigin = new URL(request.url).origin; }\\n' +\n      '  catch { return false; }\\n' +\n      '  return origin === expectedOrigin && (!fetchSite || fetchSite === \"same-origin\");\\n' +\n      '}\\n' +\n      '\\n' +\n      'export async function POST(request) {\\n' +\n      '  const authority = participantIdentityAuthorityEnvironment();\\n' +\n      '  if (!authority.participantAuthEnabled) return json({ error: \"Not found.\" }, 404);\\n' +\n      '  if (authority.productionShadowCandidate) {\\n' +\n      '    try { assertProductionShadowCandidateRequest(request, process.env, { requireOrigin: true }); }\\n' +\n      '    catch { return json({ error: \"Not found.\" }, 404); }\\n' +\n      '  }\\n' +\n      '  if (authority.productionCutoverIdentity) {\\n' +\n      '    try { assertProductionCutoverRequest(request, process.env, { requireOrigin: true }); }\\n' +\n      '    catch { return json({ error: \"Not found.\" }, 404); }\\n' +\n      '  }\\n' +\n      `  if (!sameOriginMutation(request)) return json({ error: \"We couldn't verify this request. Try again.\", category: \"REQUEST_CHECK_FAILED\" }, 403);\\n` +\n      '  const input = await request.json().catch(() => ({}));\\n' +\n      '  const email = String(input.email || \"\").trim().toLowerCase();\\n' +\n      '  const experience = participantAuthExperienceConfiguration();\\n' +\n      '  let captchaToken = \"\";\\n' +\n      '  try { captchaToken = normalizeParticipantAuthCaptchaToken(input.captchaToken, { required: experience.captchaRequired }); }\\n' +\n      `  catch { return json({ error: \"We couldn't verify this request. Try again.\", category: \"REQUEST_CHECK_FAILED\" }, 400); }\\n` +\n      '  const publicRequestStartedAt = performance.now();\\n' +\n      '  const clientIdentity = `${request.headers.get(\"x-forwarded-for\") || \"\"}|${request.headers.get(\"user-agent\") || \"\"}`;\\n' +\n      '  let clientRequestHash = \"\";\\n' +\n      '  try {\\n' +\n      '    clientRequestHash = participantAuthClientRequestHash(clientIdentity, { secret: participantAuthRateLimitSecret() });\\n' +\n      '  } catch (error) {\\n' +\n      '    console.error(\"Participant email Auth configuration unavailable\", { code: error?.code || \"AUTH_CONFIGURATION_FAILURE\" });\\n' +\n      '    return json({ message: \"Email sign-in is temporarily unavailable. Try again shortly.\", category: \"EMAIL_UNAVAILABLE\" }, 503);\\n' +\n      '  }\\n' +\n      '  const eligibility = authority.productionCutoverIdentity\\n' +\n      '    ? await import(\"../../../../../../lib/production-participant-auth-enrollment.js\")\\n' +\n      '      .then(({ authorizeProductionParticipantEmailOtpEligibility }) =>\\n' +\n      '        authorizeProductionParticipantEmailOtpEligibility({ email, client_request_hash: clientRequestHash }))\\n' +\n      '    : await authorizeParticipantEmailOtpEligibility({ email, client_request_hash: clientRequestHash });\\n' +\n      '  if (!eligibility.ok) {\\n' +\n      '    console.error(\"Participant email authorization unavailable\", eligibility.diagnostics);\\n' +\n      '    return json({\\n' +\n      '    "
+    },
+    {
+      "name": "SSR session, logout, shadow comparison, and participant context stay Passport-authoritative",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/participant-auth-rehearsal.test.mjs:218:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    The input did not match the regular expression /signOut\\(\\{ scope: \"global\" \\}\\)/. Input:\n    \n    'import { cookies } from \"next/headers\";\\n' +\n      'import { NextResponse } from \"next/server\";\\n' +\n      'import { participantIdentityAuthorityEnvironment } from \"../../../../../lib/participant-identity-authority.js\";\\n' +\n      'import {\\n' +\n      '  readParticipantIdentityContextForAuth,\\n' +\n      '  recordSingleParticipantAuthLogout,\\n' +\n      '} from \"../../../../../lib/participant-identity-supabase.js\";\\n' +\n      'import { createParticipantAuthServerClient, verifyParticipantAuthClaims } from \"../../../../../lib/supabase-auth-server.js\";\\n' +\n      'import { playerPassportEffectivePlayerId, playerPassportTokenFromRequest, verifyPlayerPassportSession } from \"../../../../../lib/player-passport.js\";\\n' +\n      'import { observeParticipantIdentityShadow } from \"../../../../../lib/participant-identity-shadow.js\";\\n' +\n      'import { SCORING_SESSION_COOKIE, scoringSessionCookie } from \"../../../../../lib/scoring-access.js\";\\n' +\n      'import { assertProductionShadowCandidateRequest } from \"../../../../../lib/production-shadow-candidate.js\";\\n' +\n      'import { assertProductionCutoverRequest } from \"../../../../../lib/production-cutover-activation-contract.js\";\\n' +\n      '\\n' +\n      'export const dynamic = \"force-dynamic\";\\n' +\n      'const headers = { \"Cache-Control\": \"private, no-store\" };\\n' +\n      'export async function GET(request) {\\n' +\n      '  const authority = participantIdentityAuthorityEnvironment();\\n' +\n      '  if (!authority.participantAuthEnabled) return NextResponse.json({ error: \"Not found.\" }, { status: 404 });\\n' +\n      '  if (authority.productionShadowCandidate) {\\n' +\n      '    try { assertProductionShadowCandidateRequest(request, process.env, { requireOrigin: false }); }\\n' +\n      '    catch { return NextResponse.json({ error: \"Not found.\" }, { status: 404 }); }\\n' +\n      '  }\\n' +\n      '  if (authority.productionCutoverIdentity) {\\n' +\n      '    try { assertProductionCutoverRequest(request, process.env, { requireOrigin: false }); }\\n' +\n      '    catch { return NextResponse.json({ error: \"Not found.\" }, { status: 404 }); }\\n' +\n      '  }\\n' +\n      '  const started = performance.now();\\n' +\n      '  const verified = await verifyParticipantAuthClaims(await cookies());\\n' +\n      '  if (verified.status !== \"active\") return NextResponse.json({ session: \"inactive\", identityAuthority: authority.resolved }, { headers });\\n' +\n      '  const context = await readParticipantIdentityContextForAuth({ authUserId: verified.claims.sub });\\n' +\n      '  if (!context.payload?.ok) return NextResponse.json({ session: \"inactive\", identityAuthority: authority.resolved,\\n' +\n      '    code: context.payload?.code || \"PARTICIPANT_CONTEXT_UNAVAILABLE\" }, { headers });\\n' +\n      '  if (authority.resolved === \"supabase\") {\\n' +\n      '    return NextResponse.json({ session: \"active\", identityAuthority: \"supabase\", linkedPlayerId: context.payload.data.playerId,\\n' +\n      '      displayName: context.payload.data.displayName, shadowComparison: { status: \"NOT_APPLICABLE\", recorded: false },\\n' +\n      '      verificationMs: Math.round(performance.now() - started) }, { headers });\\n' +\n      '  }\\n' +\n      '  let shadow = { status: \"UNAVAILABLE\", recorded: false };\\n' +\n      '  try {\\n' +\n      '    const passport = verifyPlayerPassportSession(playerPassportTokenFromRequest(request));\\n' +\n      '    shadow = await observeParticipantIdentityShadow({\\n' +\n      '      authUserId: verified.claims.sub,\\n' +\n      '      tournamentId: context.payload.data.tournament.id,\\n' +\n      '      passportPlayerId: playerPassportEffectivePlayerId(passport),\\n' +\n      '    });\\n' +\n      '  } catch (error) {\\n' +\n      '    console.error(\"Single-participant Auth shadow observation unavailable\", { message: error?.message || String(error) });\\n' +\n      '  }\\n' +\n      '  return NextResponse.json({ session: \"active\", identityAuthority: \"passport\", linkedPlayerId: context.payload.data.playerId,\\n' +\n      '    displayName: context.payload.data.displayName, shadowComparison: { status: shadow.status, recorded: shadow.recorded },\\n' +\n      '    verificationMs: Math.round(performance.now() - started) }, { headers });\\n' +\n      '}\\n' +\n      'export async function DELETE(request) {\\n' +\n      '  const authority = participantIdentityAuthorityEnvironment();\\n' +\n      '  if (!authority.participantAuthEnabled) return NextResponse.json({ error: \"Not found.\" }, { status: 404 });\\n' +\n      '  if (authority.productionShadowCandidate) {\\n' +\n      '    try { assertProductionShadowCandidateRequest(request, process.env, { requireOrigin: true }); }\\n' +\n      '    catch { return NextResponse.json({ error: \"Not found.\" }, { status: 404 }); }\\n' +\n      '  }\\n' +\n      '  if (authority.productionCutoverIdentity) {\\n' +\n      '    try { assertProductionCutoverRequest(request, process.env, { requireOrigin: true }); }\\n' +\n      '    catch { return NextResponse.json({ error: \"Not found.\" }, { status: 404 }); }\\n' +\n      '  }\\n' +\n      '  const cookieStore = await cookies();\\n' +\n      '  const verified = await verifyParticipantAuthClaims(cookieStore);\\n' +\n      '  const client = createParticipantAuthServerClient(cookieStore);\\n' +\n      '  const signout = await client.auth.signOut({ scope: \"local\" });\\n' +\n      '    if (signout?.error) return NextResponse.json({ error: \"Sign out could not be completed. Try again.\" }, { status: 503, headers: { \"Cache-Control\": \"private, no-store\" } });\\n' +\n      '  if (verified.status === \"active\") {\\n' +\n      '    const context = await readParticipantIdentityContextForAuth({ authUserId: verified.claims.sub }).catch(() => null);\\n' +\n      '    if (context?.payload?.ok) await recordSingleParticipantAuthLogout"
+    },
+    {
+      "name": "participant navigation uses one fixed safe-area-aware native shell",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/player-passport.test.mjs:167:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    The input did not match the regular expression /--participant-nav-height: 68px/. Input:\n    \n    ':root {\\n' +\n      '  --navy: #24386f;\\n' +\n      '  --red: #c9232d;\\n' +\n      '  --green: #0b3529;\\n' +\n      '  --green-dark: #061f18;\\n' +\n      '  --green-soft: #174b3b;\\n' +\n      '  --gold: #d4b15f;\\n' +\n      '  --gold-soft: #e6cf98;\\n' +\n      '  --cream: #f5f0e6;\\n' +\n      '  --paper: #fffdf8;\\n' +\n      '  --ink: #172019;\\n' +\n      '  --muted: #6d746f;\\n' +\n      '  --line: #ddd6c8;\\n' +\n      '  --shadow: 0 22px 60px rgba(15, 35, 25, 0.10);\\n' +\n      '  --safe-top: env(safe-area-inset-top, 0px);\\n' +\n      '  --safe-right: env(safe-area-inset-right, 0px);\\n' +\n      '  --safe-bottom: env(safe-area-inset-bottom, 0px);\\n' +\n      '  --safe-left: env(safe-area-inset-left, 0px);\\n' +\n      '  --app-height: 100vh;\\n' +\n      '  --participant-header-height: 58px;\\n' +\n      '  --participant-nav-height: max(68px, 4.25rem);\\n' +\n      '  --participant-nav-total: calc(var(--participant-nav-height) + var(--safe-bottom));\\n' +\n      '  --public-site-header-height: max(84px, calc(82px + var(--safe-top)));\\n' +\n      '}\\n' +\n      '\\n' +\n      '@supports (height: 100svh) { :root { --app-height: 100svh; } }\\n' +\n      '@supports (height: 100dvh) { :root { --app-height: 100dvh; } }\\n' +\n      '\\n' +\n      '.liveControlEmbedded {\\n' +\n      '  min-height: 0 !important;\\n' +\n      '  padding: 0 0 30px !important;\\n' +\n      '  background: transparent !important;\\n' +\n      '}\\n' +\n      '\\n' +\n      '* { box-sizing: border-box; }\\n' +\n      '\\n' +\n      'html {\\n' +\n      '  min-height: 100%;\\n' +\n      '  scroll-behavior: smooth;\\n' +\n      '  -webkit-text-size-adjust: 100%;\\n' +\n      '  text-size-adjust: 100%;\\n' +\n      '}\\n' +\n      '\\n' +\n      'body {\\n' +\n      '  margin: 0;\\n' +\n      '  min-height: 100vh;\\n' +\n      '  min-height: 100svh;\\n' +\n      '  overflow-x: clip;\\n' +\n      '  background: var(--paper);\\n' +\n      '  color: var(--ink);\\n' +\n      '  font-family: Arial, Helvetica, sans-serif;\\n' +\n      '  -webkit-font-smoothing: antialiased;\\n' +\n      '  text-rendering: optimizeLegibility;\\n' +\n      '  overscroll-behavior-x: none;\\n' +\n      '}\\n' +\n      '\\n' +\n      'body.participant-app-shell-active { background: var(--green-dark); }\\n' +\n      'body.participant-overlay-open { overscroll-behavior: none; }\\n' +\n      'body.participant-scoring-focus-active [data-participant-navigation] {\\n' +\n      '  pointer-events: none;\\n' +\n      '  opacity: 0;\\n' +\n      '  transform: translateY(100%);\\n' +\n      '}\\n' +\n      '\\n' +\n      'body.participant-scoring-focus-active .participantAppContent,\\n' +\n      'body.participant-scoring-focus-active .participantRouteScene {\\n' +\n      '  min-height: calc(var(--app-height) - var(--participant-header-height));\\n' +\n      '}\\n' +\n      '\\n' +\n      '.participantAppShell {\\n' +\n      '  min-height: var(--app-height);\\n' +\n      '  background: var(--green-dark);\\n' +\n      '}\\n' +\n      '\\n' +\n      '.participantAppContent {\\n' +\n      '  min-height: calc(var(--app-height) - var(--participant-header-height) - var(--participant-nav-total));\\n' +\n      '  background: var(--paper);\\n' +\n      '}\\n' +\n      '\\n' +\n      '.participantAppShell .siteHeader,\\n' +\n      '.participantAppShell > .participantAppContent footer:not([data-app-footer=\"true\"]) { display: none; }\\n' +\n      '\\n' +\n      '.participantRouteScene {\\n' +\n      '  min-height: calc(var(--app-height) - var(--participant-header-height) - var(--participant-nav-total));\\n' +\n      '  animation: participantRouteEnter .14s ease-out both;\\n' +\n      '}\\n' +\n      '\\n' +\n      '@keyframes participantRouteEnter {\\n' +\n      '  from { opacity: .78; transform: translateY(2px); }\\n' +\n      '  to { opacity: 1; transform: none; }\\n' +\n      '}\\n' +\n      '\\n' +\n      '.mobileHomeMain {\\n' +\n      '  overflow-x: clip;\\n' +\n      '}\\n' +\n      '\\n' +\n      '.mobileHomeLoadError {\\n' +\n      '  width: min(520px, calc(100% - 32px));\\n' +\n      '  margin: 28px auto;\\n' +\n      '  padding: 28px 24px;\\n' +\n      '  border: 1px solid rgba(166, 125, 45, 0.24);\\n' +\n      '  border-radius: 18px;\\n' +\n      '  background: #fffdf8;\\n' +\n      '  color: var(--ink);\\n' +\n      '  text-align: center;\\n' +\n      '}\\n' +\n      '\\n' +\n      '.mobileHomeLoadError h1 {\\n' +\n      '  margin: 0 0 8px;\\n' +\n      '  color: #0b4435;\\n' +\n      '  font-family: Georgia, \"Times New Roman\", serif;\\n' +\n      '  font-size: clamp(1.45rem, 6vw, 2rem);\\n' +\n      '}\\n' +\n      '\\n' +\n      '.mobileHomeLoadError p {\\n' +\n      '  margin: 0;\\n' +\n      '  color: #68756f;\\n' +\n      '  line-height: 1.5;\\n' +\n      '}\\n' +\n      '\\n' +\n      '.mobileHomeLoadError button {\\n' +\n      '  min-height: 44px;\\n' +\n      '  margin-top: 18px;\\n' +\n      '  padding: 9px 20px;\\n' +\n      '  border: 1px solid #0b4435;\\n' +\n      '  border-radius: 999px;\\n' +\n      '  background: #0b4435;\\n' +\n      '  color: #fff;\\n' +\n      '  font-weight: 800;\\n' +\n      '}\\n' +\n      '\\n' +\n      'a { color: inherit; text-decoration: none; }\\n' +\n      'img { display: block; max-width: 100%; }\\n' +\n      'button, a, input, select, textarea {\\n' +\n      '  -webkit-tap-highlight-color: transparent;\\n' +\n      '  touch-action: manipulation;\\n' +\n      '}\\n' +\n      'button, [role=\"button\"], summary { -webkit-user-select: none; user-select: none; }\\n' +\n      'button:disabled { cursor: not-allowed; }\\n' +\n      '\\n' +\n      '@media (hover: none) and (pointer: coarse) {\\n' +\n      '  button:active, a:active, summary:active { opacity: .9; transform: scale(.985); }\\n' +\n      '  input, select, textarea { font-size: max(16px, 1em); }\\n' +\n      '}\\n' +\n      '\\n' +\n      '.siteHeader {\\n' +\n      '  position: sticky;\\n' +\n      '  top: 0;\\n' +\n      '  z-index: 50;\\n' +\n      '  min-height: 84px;\\n' +\n      '  "
+    },
+    {
+      "name": "every compiled mobile route denies Production before Auth, database, provider or worker transport",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/pn1-production-mobile-boundary.test.mjs:18:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    POST auth/otp/phone\n    \n    400 !== 503\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 503\n  actual: 400\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (file://<CHECKOUT>/test/pn1-production-mobile-boundary.test.mjs:45:16)\n    async Test.run (node:internal/test_runner/test:1404:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...\n"
+    },
+    {
+      "name": "Email provider flow remains byte-identical apart from optional enrollment proof issuance",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/pwa-email-text-contract.test.mjs:40:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    + actual - expected\n    \n    + 'e02561aa6ada635345b2a3f730cd25e535012661e0290aa8ebac44f54aa60e7b'\n    - 'b0e7d123b741d6a22554c5ce8e647815d0ae121608013d9ef7e98af19ac38aa8'\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 'b0e7d123b741d6a22554c5ce8e647815d0ae121608013d9ef7e98af19ac38aa8'\n  actual: 'e02561aa6ada635345b2a3f730cd25e535012661e0290aa8ebac44f54aa60e7b'\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (file://<CHECKOUT>/test/pwa-email-text-contract.test.mjs:44:9)\n    async Test.run (node:internal/test_runner/test:1404:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:969:7)\n  ...\n"
+    },
+    {
+      "name": "Phase 2 public pages consume the shared scorecard analytics service",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/scorecard-public-integration.test.mjs:18:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    The input was expected to not match the regular expression /ScorecardTable/. Input:\n    \n    '\"use client\";\\n' +\n      '\\n' +\n      'import Link from \"next/link\";\\n' +\n      'import { useId, useState } from \"react\";\\n' +\n      'import styles from \"../../historical.module.css\";\\n' +\n      'import { withPlayerOriginContext } from \"../../../lib/context-navigation\";\\n' +\n      'import ScorecardTable from \"../../ScorecardTable\";\\n' +\n      '\\n' +\n      'const FORMAT_LABELS = {\\n' +\n      '  BB: \"Best Ball\",\\n' +\n      '  SC: \"Scramble\",\\n' +\n      '  SI: \"Singles\",\\n' +\n      '};\\n' +\n      '\\n' +\n      'function resultLabel(outcome) {\\n' +\n      '  if (outcome === \"win\") return \"WIN\";\\n' +\n      '  if (outcome === \"loss\") return \"LOSS\";\\n' +\n      '  if (outcome === \"half\") return \"HALVE\";\\n' +\n      '  return \"PENDING\";\\n' +\n      '}\\n' +\n      '\\n' +\n      'function winnerColor(match, side) {\\n' +\n      '  if (side === 1) {\\n' +\n      '    return match.team.side === \"Team 1\"\\n' +\n      '      ? match.team.color\\n' +\n      '      : match.opposingTeam.color;\\n' +\n      '  }\\n' +\n      '  if (side === 2) {\\n' +\n      '    return match.team.side === \"Team 2\"\\n' +\n      '      ? match.team.color\\n' +\n      '      : match.opposingTeam.color;\\n' +\n      '  }\\n' +\n      '  return \"#777d79\";\\n' +\n      '}\\n' +\n      '\\n' +\n      'function MatchRow({ match, playerName, playerSlug, participantPresentation = false, scorecards = [] }) {\\n' +\n      '  const opponents = match.opponents.map((player) => player.name).join(\" + \");\\n' +\n      '  const partner = match.partner.map((player) => player.name).join(\" + \");\\n' +\n      '  const publicMatchHref = match.href\\n' +\n      '    ? withPlayerOriginContext(match.href, playerSlug)\\n' +\n      '    : null;\\n' +\n      '  const matchHref = participantPresentation && publicMatchHref\\n' +\n      '    ? publicMatchHref.replace(/^\\\\/history(?=\\\\/|\\\\?|$)/, \"/app/history\")\\n' +\n      '    : publicMatchHref;\\n' +\n      '\\n' +\n      '  return (\\n' +\n      '    <article className={styles.profileMatchRow} id={`profile-match-${match.id}`}>\\n' +\n      '      <div className={styles.profileMatchWhen}>\\n' +\n      '        <strong>Round {match.round}</strong>\\n' +\n      '        {match.course?.name ? <span>{match.course.name}</span> : null}\\n' +\n      '      </div>\\n' +\n      '\\n' +\n      '      <div className={styles.profileMatchPairing}>\\n' +\n      '        {partner ? <span>With <strong>{partner}</strong></span> : null}\\n' +\n      '        <span>vs <strong>{opponents || \"Opponent not recorded\"}</strong></span>\\n' +\n      '        <small>Represented {match.team.name}</small>\\n' +\n      '      </div>\\n' +\n      '\\n' +\n      '      <div className={styles.profileMatchResults}>\\n' +\n      '        <span className={styles.profileMatchOutcome} data-outcome={match.outcome}>\\n' +\n      '          {resultLabel(match.outcome)}\\n' +\n      '        </span>\\n' +\n      '        <div className={styles.profileMatchSegments}>\\n' +\n      '          {match.segments.map((segment) => (\\n' +\n      '            <span key={segment.label}>\\n' +\n      '              {segment.label}:{\" \"}\\n' +\n      '              <b\\n' +\n      '                style={{\\n' +\n      '                  \"--historical-result-color\": winnerColor(match, segment.side),\\n' +\n      '                }}\\n' +\n      '              >\\n' +\n      '                {segment.winner}\\n' +\n      '              </b>\\n' +\n      '            </span>\\n' +\n      '          ))}\\n' +\n      '          {!match.segments.length ? <span>Match Winner: {match.winner}</span> : null}\\n' +\n      '        </div>\\n' +\n      '      </div>\\n' +\n      '\\n' +\n      '      {matchHref ? (\\n' +\n      '        <Link\\n' +\n      \"          aria-label={`View ${playerName}'s ${match.year} Round ${match.round} ${FORMAT_LABELS[match.format] || match.format} match`}\\n\" +\n      '          className={styles.profileMatchLink}\\n' +\n      '          href={matchHref}\\n' +\n      '          prefetch={false}\\n' +\n      '        >\\n' +\n      '          View Match \u2192\\n' +\n      '        </Link>\\n' +\n      '      ) : null}\\n' +\n      '      {participantPresentation ? null : (\\n' +\n      '        <div className={styles.profileMatchScorecard}>\\n' +\n      '          <ScorecardTable\\n' +\n      '            scorecards={scorecards}\\n' +\n      '            compact\\n' +\n      '            title={`${match.year} \u00b7 Round ${match.round} Scorecard`}\\n' +\n      '          />\\n' +\n      '        </div>\\n' +\n      '      )}\\n' +\n      '    </article>\\n' +\n      '  );\\n' +\n      '}\\n' +\n      '\\n' +\n      'export default function PlayerFormatMatchHistory({\\n' +\n      '  history,\\n' +\n      '  playerName,\\n' +\n      '  playerSlug,\\n' +\n      '  participantPresentation = false,\\n' +\n      '  scorecardsByMatch = {},\\n' +\n      '}) {\\n' +\n      '  const accordionId = useId();\\n' +\n      '  const [open, setOpen] = useState(false);\\n' +\n      '  const [hasRenderedContent, setHasRenderedContent] = useState(false);\\n' +\n      '  const [openYears, setOpenYears] = useState(() =>\\n' +\n      '    history.latestYear ? new Set([history.latestYear]) : new Set()\\n' +\n      '  );\\n' +\n      '  const formatLabel = FORMAT_LABELS[history.format] || history.format;\\n' +\n      '\\n' +\n      '  if (!history.matches.length) {\\n' +\n      '    return (\\n' +\n      '      <p className={styles.profileMatchEmpty}>\\n' +\n      '        No recorded {formatLabel} matches\\n' +\n      '      </p>\\n' +\n      '    );\\n' +\n      '  }\\n' +\n      '\\n' +\n      '  function toggleYear(year) {\\n' +\n      '    setOpenYears((current) => {\\n' +\n      '      const next = new Set(current);\\n' +\n      '      if (next.has(year)) next.delete(year);\\n' +\n      '      else next.add(year);\\n' +\n      '      return next;\\n' +\n      '    });\\n' +\n      '  }\\n' +\n      '\\n' +\n      '  return (\\n' +\n      '"
+    },
+    {
+      "name": "CLI writes one immutable local artifact and never calls a provider",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/step11-6-acl-v2-acceptance-generator.test.mjs:161:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    <CHECKOUT>/node_modules/server-only/index.js:1\n    throw new Error(\n          ^\n    \n    Error: This module cannot be imported from a Client Component module. It should only be used from a Server Component.\n        at Object.<anonymous> (<CHECKOUT>/node_modules/server-only/index.js:1:7)\n        at Module._compile (node:internal/modules/cjs/loader:1934:14)\n        at Object..js (node:internal/modules/cjs/loader:2074:10)\n        at Module.load (node:internal/modules/cjs/loader:1656:32)\n        at Module._load (node:internal/modules/cjs/loader:1448:12)\n        at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n        at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:373:15)\n        at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:245:9)\n        at ModuleJob.run (node:internal/modules/esm/module_job:569:25)\n        at async node:internal/modules/esm/loader:650:26\n    \n    Node.js v26.7.0\n    \n    \n    1 !== 0\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 0\n  actual: 1\n  operator: 'strictEqual'\n  stack: |-\n    Object.<anonymous> (<CHECKOUT>/node_modules/server-only/index.js:1:7)\n    Module._compile (node:internal/modules/cjs/loader:1934:14)\n    Object..js (node:internal/modules/cjs/loader:2074:10)\n    Module.load (node:internal/modules/cjs/loader:1656:32)\n    Module._load (node:internal/modules/cjs/loader:1448:12)\n    wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n    loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:373:15)\n    ModuleWrap.<anonymous> (node:internal/modules/esm/translators:245:9)\n    ModuleJob.run (node:internal/modules/esm/module_job:569:25)\n    async node:internal/modules/esm/loader:650:26\n    TestContext.<anonymous> (file://<CHECKOUT>/test/step11-6-acl-v2-acceptance-generator.test.mjs:170:12)\n    Test.runInAsyncScope (node:async_hooks:226:14)\n    Test.run (node:internal/test_runner/test:1397:25)\n    Test.processPendingSubtests (node:internal/test_runner/test:969:18)\n    Test.postRun (node:internal/test_runner/test:1537:19)\n    Test.run (node:internal/test_runner/test:1462:12)\n    async Test.processPendingSubtests (node:internal/test_runner/test:969:7)\n  ...\n"
+    },
+    {
+      "name": "historical writer-scope evidence is generated from exact retained inputs",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/step11-6-historical-production-google-writer-scope.test.mjs:43:1'\n  failureType: 'testCodeFailure'\n  error: 'The source-unresolved SHA inventory drifted from its reviewed set.'\n  code: 'ERR_TEST_FAILURE'\n  stack: |-\n    exactReviewedArray (file://<CHECKOUT>/tools/step11-6-operator/generate-historical-production-google-writer-scope-evidence.mjs:266:43)\n    deriveHistoricalSource (file://<CHECKOUT>/tools/step11-6-operator/generate-historical-production-google-writer-scope-evidence.mjs:310:3)\n    buildHistoricalProductionGoogleWriterScopeEvidence (file://<CHECKOUT>/tools/step11-6-operator/generate-historical-production-google-writer-scope-evidence.mjs:470:18)\n    verifyHistoricalProductionGoogleWriterScopeEvidence (file://<CHECKOUT>/tools/step11-6-operator/generate-historical-production-google-writer-scope-evidence.mjs:771:20)\n    TestContext.<anonymous> (file://<CHECKOUT>/test/step11-6-historical-production-google-writer-scope.test.mjs:44:20)\n    Test.runInAsyncScope (node:async_hooks:226:14)\n    Test.run (node:internal/test_runner/test:1397:25)\n    Test.start (node:internal/test_runner/test:1257:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)\n  ...\n"
+    },
+    {
+      "name": "historical READY deployments with the safe-method Google writer are exact",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/step11-6-historical-safe-method-google-writer-evidence.test.mjs:24:1'\n  failureType: 'testCodeFailure'\n  error: 'The historical safe-method writer evidence drifted.'\n  code: 'ERR_TEST_FAILURE'\n  stack: |-\n    buildHistoricalSafeMethodGoogleWriterEvidence (file://<CHECKOUT>/tools/step11-6-operator/generate-historical-safe-method-google-writer-evidence.mjs:717:11)\n    verifyHistoricalSafeMethodGoogleWriterEvidence (file://<CHECKOUT>/tools/step11-6-operator/generate-historical-safe-method-google-writer-evidence.mjs:726:20)\n    TestContext.<anonymous> (file://<CHECKOUT>/test/step11-6-historical-safe-method-google-writer-evidence.test.mjs:25:20)\n    Test.runInAsyncScope (node:async_hooks:226:14)\n    Test.run (node:internal/test_runner/test:1397:25)\n    Test.start (node:internal/test_runner/test:1257:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)\n  ...\n"
+    },
+    {
+      "name": "the provider contract uses one exact all-method path OR group",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/step11-6-historical-safe-method-google-writer-evidence.test.mjs:111:1'\n  failureType: 'testCodeFailure'\n  error: 'The historical safe-method writer evidence drifted.'\n  code: 'ERR_TEST_FAILURE'\n  stack: |-\n    buildHistoricalSafeMethodGoogleWriterEvidence (file://<CHECKOUT>/tools/step11-6-operator/generate-historical-safe-method-google-writer-evidence.mjs:717:11)\n    verifyHistoricalSafeMethodGoogleWriterEvidence (file://<CHECKOUT>/tools/step11-6-operator/generate-historical-safe-method-google-writer-evidence.mjs:726:20)\n    TestContext.<anonymous> (file://<CHECKOUT>/test/step11-6-historical-safe-method-google-writer-evidence.test.mjs:112:20)\n    Test.runInAsyncScope (node:async_hooks:226:14)\n    Test.run (node:internal/test_runner/test:1397:25)\n    Test.processPendingSubtests (node:internal/test_runner/test:969:18)\n    Test.postRun (node:internal/test_runner/test:1537:19)\n    Test.run (node:internal/test_runner/test:1462:12)\n    async Test.processPendingSubtests (node:internal/test_runner/test:969:7)\n  ...\n"
+    },
+    {
+      "name": "v4 credential confinement classifies the complete provider and environment inventories",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/step11-6-production-google-credential-confinement.test.mjs:148:1'\n  failureType: 'testCodeFailure'\n  error: 'The committed credential-confinement evidence is stale or invalid.'\n  code: 'ERR_TEST_FAILURE'\n  stack: |-\n    verifyCredentialConfinementEvidence (file://<CHECKOUT>/tools/step11-6-operator/generate-credential-confinement-evidence.mjs:851:11)\n    TestContext.<anonymous> (file://<CHECKOUT>/test/step11-6-production-google-credential-confinement.test.mjs:149:20)\n    Test.runInAsyncScope (node:async_hooks:226:14)\n    Test.run (node:internal/test_runner/test:1397:25)\n    Test.processPendingSubtests (node:internal/test_runner/test:969:18)\n    Test.postRun (node:internal/test_runner/test:1537:19)\n    Test.run (node:internal/test_runner/test:1462:12)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...\n"
+    },
+    {
+      "name": "phone lifecycle dispatch is individually enumerated for frozen and future Production, with no Director namespace",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/step13e7b-production-future-identity-mobile.test.mjs:385:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    \n    14 !== 10\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 10\n  actual: 14\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (file://<CHECKOUT>/test/step13e7b-production-future-identity-mobile.test.mjs:388:9)\n    async Test.run (node:internal/test_runner/test:1404:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:969:7)\n  ...\n"
+    },
+    {
+      "name": "phone candidate introduces no identity tables or Director mutation and keeps service-only grants",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/step13e7b-production-future-identity-mobile.test.mjs:401:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    The expression evaluated to a falsy value:\n    \n      assert.ok(sql.includes(`revoke all on function public.${target}(jsonb) from public,anon,authenticated;`))\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: true\n  actual: false\n  operator: '=='\n  stack: |-\n    TestContext.<anonymous> (file://<CHECKOUT>/test/step13e7b-production-future-identity-mobile.test.mjs:406:10)\n    async Test.run (node:internal/test_runner/test:1404:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:969:7)\n  ...\n"
+    },
+    {
+      "name": "routes report feedback only after canonical completion; no client-selected receipt",
+      "diagnostic": "  ---\n  duration_ms: <TIME>\n  type: 'test'\n  location: '<CHECKOUT>/test/verify-customcode.test.mjs:27:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    The expression evaluated to a falsy value:\n    \n      assert.ok(l.indexOf('await reportCanonicalPhoneVerification')>l.indexOf('completion.ok !== true'))\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: true\n  actual: false\n  operator: '=='\n  stack: |-\n    TestContext.<anonymous> (file://<CHECKOUT>/test/verify-customcode.test.mjs:27:414)\n    Test.runInAsyncScope (node:async_hooks:226:14)\n    Test.run (node:internal/test_runner/test:1397:25)\n    Test.processPendingSubtests (node:internal/test_runner/test:969:18)\n    Test.postRun (node:internal/test_runner/test:1537:19)\n    Test.run (node:internal/test_runner/test:1462:12)\n    async Test.processPendingSubtests (node:internal/test_runner/test:969:7)\n  ...\n"
+    }
+  ],
+  "exitCode": 1,
+  "error": null,
+  "result": "FAIL",
+  "rawArtifact": "application.log.gz",
+  "rawSha256": "82ce9b7e7be9a2ac04fb05a2b9f429dedaf8050cb91711905a41ee289d275582",
+  "hosted": false,
+  "production": false,
+  "limitations": [
+    "Supabase-shaped local fixture is not hosted provider certification.",
+    "Broad raw failures require exact identity/diagnostic accounting; no baseline exclusion."
+  ],
+  "rawEncoding": "GZIP_LOSSLESS_ORIGINAL_BYTES",
+  "archiveSha256": "2299dc9ce9349ec08883598468022692252a0f21f2cec888474d03e78e9ac329"
+}
