@@ -1,5 +1,20 @@
 {
   "contract": "canonical-certification-registration-v1",
-  "enabled": false,
-  "registration": null
+  "enabled": true,
+  "registration": {
+    "deployment_class": "preview",
+    "git_branch": "codex/reliability-phase2d-staging-admission",
+    "installation_id": "2857f707-065a-405d-b5fc-b5b6fa1b0f51",
+    "project_ref": "trmcwrljjxwhgtikfdgu",
+    "project_url": "https://trmcwrljjxwhgtikfdgu.supabase.co",
+    "public_key_sha256": "0c927d2e3019c4233859b69e9ae0880acaab6743866c16f3f6a5887b6c5c6fd9",
+    "registration_revision": 1,
+    "resource_class": "CERTIFICATION",
+    "resource_id": "CERTIFICATION:2857f707-065a-405d-b5fc-b5b6fa1b0f51",
+    "schema_contract": "canonical-resource-v1",
+    "schema_digest": "7c371dc677c6b5ff244dcce68a71674482c6f500d814371517fd6f0fa2dabf42",
+    "server_key_sha256": "dba73f971920b09f53210c05c51e1c7849db9b2f21f9bcc2a07c3bc6714dcc58",
+    "vercel_project_id": "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+    "vercel_team_id": "team_kPw5zaib8uaQJALAwj4fWI6R"
+  }
 }

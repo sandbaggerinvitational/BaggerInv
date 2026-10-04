@@ -1,5 +1,5 @@
-// UNIT / no network. Every enabled registration below is an injected synthetic
-// test fixture. The checked-in shipping registration is disabled.
+// UNIT / no network. Injected fixtures stay synthetic. The shipping manifest
+// binds the owner-approved, physically registered Certification resource.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
@@ -22,12 +22,15 @@ function fixture() {
 }
 const resolve=({env,registrationManifest})=>certificationResourceEnvironment(env,{registrationManifest});
 
-test('shipping registry is disabled and cannot be enabled by environment or arbitrary ref',async()=>{
+test('shipping registry binds the approved physical resource and cannot be replaced by client/environment JSON',async()=>{
   const m=JSON.parse(await readFile(new URL('../config/certification-resource-registration.json',import.meta.url),'utf8'));
-  assert.deepEqual(m,{contract:'canonical-certification-registration-v1',enabled:false,registration:null});
+  assert.equal(m.contract,'canonical-certification-registration-v1');assert.equal(m.enabled,true);
+  assert.equal(m.registration.resource_id,'CERTIFICATION:2857f707-065a-405d-b5fc-b5b6fa1b0f51');
+  assert.equal(m.registration.project_ref,'trmcwrljjxwhgtikfdgu');assert.equal(m.registration.registration_revision,1);
+  assert.equal(certificationManifestDigest(m),'88e852b98dacc9502ef331c68cbe23202ab3b33de07c4b489047801839f982ff');
   const {env,registrationManifest}=fixture();
   const state=certificationResourceEnvironment({...env,BAGGER_CERTIFICATION_ENABLED:'true',BAGGER_CERTIFICATION_REGISTRATION_JSON:JSON.stringify(registrationManifest)});
-  assert.equal(state.requested,true);assert.equal(state.eligible,false);assert.equal(state.reason,'certification-registration-disabled');
+  assert.equal(state.requested,true);assert.equal(state.eligible,false);assert.equal(state.reason,'certification-resource-mismatch');
   assert.throws(()=>requireCertificationResourceEnvironment(env),{code:'CANONICAL_RESOURCE_UNAVAILABLE',status:503});
 });
 test('no explicit selector does not request Certification',()=>{
