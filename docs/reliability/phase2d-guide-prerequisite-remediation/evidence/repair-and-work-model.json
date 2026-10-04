@@ -1,0 +1,229 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17_ONLY",
+  "hostedMutated": false,
+  "remoteNetwork": false,
+  "modeledAuthOnly": true,
+  "cases": [
+    {
+      "name": "unchanged Tournament foundation fails closed without Guide",
+      "result": "PASS"
+    },
+    {
+      "name": "canonical Director course and prepare operations reproduce four automatic jobs plus ineligible FinalRecap",
+      "result": "PASS"
+    },
+    {
+      "name": "fixed renderer denies resource ymqhhtxaywtqllynrmxe",
+      "result": "PASS"
+    },
+    {
+      "name": "fixed renderer denies resource idgigvjjqkfbqjeredpb",
+      "result": "PASS"
+    },
+    {
+      "name": "fixed renderer denies resource zzzzzzzzzzzzzzzzzzzz",
+      "result": "PASS"
+    },
+    {
+      "name": "anon cannot invoke Guide repair",
+      "result": "PASS"
+    },
+    {
+      "name": "authenticated cannot invoke Guide repair",
+      "result": "PASS"
+    },
+    {
+      "name": "service_role cannot invoke Guide repair",
+      "result": "PASS"
+    },
+    {
+      "name": "runtime JWT cannot impersonate owner provisioning",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong release refused atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong deployment refused atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong receipt refused atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "stale admission refused atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong preserved snapshot refused atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "enabled admission rejected without changes",
+      "result": "PASS"
+    },
+    {
+      "name": "open ingress rejected without changes",
+      "result": "PASS"
+    },
+    {
+      "name": "changed course rejected without changes",
+      "result": "PASS"
+    },
+    {
+      "name": "mandatory repair audit failure rolls back both revision publications",
+      "result": "PASS"
+    },
+    {
+      "name": "managed owner creates only truthful Guide publication with preserved current fixture/control state",
+      "result": "PASS"
+    },
+    {
+      "name": "repair replay is idempotent; changed publication is denied",
+      "result": "PASS"
+    },
+    {
+      "name": "same publication already present cannot be adopted by a different repair request",
+      "result": "PASS"
+    },
+    {
+      "name": "unchanged Tournament foundation succeeds with validated synthetic Guide",
+      "result": "PASS"
+    },
+    {
+      "name": "pending classification: exactly four required now; FinalRecap is a truthful publication wait",
+      "result": "PASS"
+    },
+    {
+      "name": "bounded model uses two unchanged shipping processors and current Certification wrappers, not an autonomous runner",
+      "result": "PASS"
+    },
+    {
+      "name": "catalog/security exact; final admission disabled, ingress paused, scores/leases/FinalRecap absent",
+      "result": "PASS"
+    }
+  ],
+  "publication": {
+    "revision": 1,
+    "provenance": "urn:bagger:synthetic:2857f707-065a-405d-b5fc-b5b6fa1b0f51",
+    "payloadFingerprint": "184009963ef09c451ce74eece20e622ba6590d10f00b64e295d8c577e9e94957"
+  },
+  "foundation": {
+    "withoutGuide": "GUIDE_PROJECTION_UNAVAILABLE",
+    "withGuide": "PASS",
+    "googleRequests": 0
+  },
+  "beforeDrain": {
+    "ok": true,
+    "work": [
+      {
+        "key": "TEAM_MOMENTUM",
+        "cycle": 1,
+        "family": "COMPETITION",
+        "attempt": 0
+      },
+      {
+        "key": "TOURNAMENT_STORYLINES",
+        "cycle": 1,
+        "family": "COMPETITION",
+        "attempt": 0
+      },
+      {
+        "key": "TOURNAMENT_INTELLIGENCE",
+        "cycle": 1,
+        "family": "INTELLIGENCE",
+        "attempt": 0
+      },
+      {
+        "key": "PROJECTION_EDITORIAL",
+        "cycle": 1,
+        "family": "INTELLIGENCE",
+        "attempt": 0
+      }
+    ],
+    "ready": {
+      "CALCUTTA": false,
+      "COMPETITION": true,
+      "INTELLIGENCE": true
+    },
+    "scope": {
+      "tournamentId": "2026",
+      "runtimeGenerationId": null
+    },
+    "calcutta": {
+      "auctionRevision": 0,
+      "auctionFingerprint": null,
+      "configurationRevision": 1,
+      "configurationFingerprint": "84e74cd801c04d0b168bcd1c87503d45a05c95e54893d7d2f616b56071aa5fe4"
+    },
+    "terminal": 0,
+    "cancelled": false,
+    "activeLeases": 0,
+    "materialized": 0,
+    "waitingOwner": {
+      "NET_SKINS": 0
+    },
+    "blockedAutomatic": 0,
+    "pendingAutomatic": 4,
+    "statusIncomplete": false,
+    "terminalTruncated": false,
+    "waitingPublication": {
+      "FINAL_RECAP": 1
+    },
+    "blockedAutomaticLimit": 101,
+    "pendingAutomaticLimit": 101
+  },
+  "afterDrain": {
+    "ok": true,
+    "work": [],
+    "ready": {
+      "CALCUTTA": false,
+      "COMPETITION": false,
+      "INTELLIGENCE": false
+    },
+    "scope": {
+      "tournamentId": "2026",
+      "runtimeGenerationId": null
+    },
+    "calcutta": {
+      "auctionRevision": 0,
+      "auctionFingerprint": null,
+      "configurationRevision": 1,
+      "configurationFingerprint": "84e74cd801c04d0b168bcd1c87503d45a05c95e54893d7d2f616b56071aa5fe4"
+    },
+    "terminal": 0,
+    "cancelled": false,
+    "activeLeases": 0,
+    "materialized": 0,
+    "waitingOwner": {
+      "NET_SKINS": 0
+    },
+    "blockedAutomatic": 0,
+    "pendingAutomatic": 0,
+    "statusIncomplete": false,
+    "terminalTruncated": false,
+    "waitingPublication": {
+      "FINAL_RECAP": 1
+    },
+    "blockedAutomaticLimit": 101,
+    "pendingAutomaticLimit": 101
+  },
+  "processors": {
+    "competitionWrites": 2,
+    "intelligenceWrites": 2,
+    "autonomousRunner": false,
+    "transport": "OWNED_LOCAL_CERTIFICATION_GATEWAY",
+    "calculators": "UNCHANGED SHIPPING"
+  },
+  "catalogUnchanged": true,
+  "finalState": {
+    "admission": "DISABLED",
+    "ingress": "PAUSED",
+    "scores": 0,
+    "activeLeases": 0,
+    "requiredAutomatic": 0,
+    "finalRecap": "PENDING_INELIGIBLE"
+  }
+}

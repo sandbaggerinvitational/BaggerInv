@@ -1,0 +1,1591 @@
+TAP version 13
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.SUBMIT_HOLE
+ok 1 - score adapter preserves existing non-UUID mutation identity: SCORING.SUBMIT_HOLE
+  ---
+  duration_ms: 25.639875
+  type: 'test'
+  ...
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.FINALIZE_MATCH
+ok 2 - score adapter preserves existing non-UUID mutation identity: SCORING.FINALIZE_MATCH
+  ---
+  duration_ms: 1.24625
+  type: 'test'
+  ...
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.REOPEN_MATCH
+ok 3 - score adapter preserves existing non-UUID mutation identity: SCORING.REOPEN_MATCH
+  ---
+  duration_ms: 0.941875
+  type: 'test'
+  ...
+# Subtest: participant context adapter separates server-bound actor fields without changing caller DTO
+ok 4 - participant context adapter separates server-bound actor fields without changing caller DTO
+  ---
+  duration_ms: 0.910625
+  type: 'test'
+  ...
+# Subtest: receipt recovery remains an exact read and retains mutation identity after revocation
+ok 5 - receipt recovery remains an exact read and retains mutation identity after revocation
+  ---
+  duration_ms: 0.655833
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_tournament_live_view
+ok 6 - read alias uses admitted projection gateway: read_tournament_live_view
+  ---
+  duration_ms: 1.059292
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_leaderboards_core_view
+ok 7 - read alias uses admitted projection gateway: read_leaderboards_core_view
+  ---
+  duration_ms: 0.827459
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_canonical_2026_historical_view
+ok 8 - read alias uses admitted projection gateway: read_canonical_2026_historical_view
+  ---
+  duration_ms: 0.517
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_completed_history
+ok 9 - read alias uses admitted projection gateway: read_preview_completed_history
+  ---
+  duration_ms: 0.436666
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_current_guide_projection
+ok 10 - read alias uses admitted projection gateway: read_current_guide_projection
+  ---
+  duration_ms: 4.97075
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_draft_view
+ok 11 - read alias uses admitted projection gateway: read_preview_draft_view
+  ---
+  duration_ms: 0.62775
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_championship_odds_inputs
+ok 12 - read alias uses admitted projection gateway: read_championship_odds_inputs
+  ---
+  duration_ms: 0.375083
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_secondary_history_players
+ok 13 - read alias uses admitted projection gateway: read_preview_secondary_history_players
+  ---
+  duration_ms: 0.358542
+  type: 'test'
+  ...
+# Subtest: unlisted legacy mutation, publication, Google and import aliases never dispatch
+ok 14 - unlisted legacy mutation, publication, Google and import aliases never dispatch
+  ---
+  duration_ms: 0.613917
+  type: 'test'
+  ...
+# Subtest: read aliases reject supplied resource or historical workbook authority before transport
+ok 15 - read aliases reject supplied resource or historical workbook authority before transport
+  ---
+  duration_ms: 0.203167
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: TOURNAMENT_SETUP
+ok 16 - Director family read uses canonical context and separate actor: TOURNAMENT_SETUP
+  ---
+  duration_ms: 2.014458
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: ROUND_PAIRINGS
+ok 17 - Director family read uses canonical context and separate actor: ROUND_PAIRINGS
+  ---
+  duration_ms: 1.60125
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: MATCH_CONTROL
+ok 18 - Director family read uses canonical context and separate actor: MATCH_CONTROL
+  ---
+  duration_ms: 0.628083
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: NET_SKINS_ENTRIES
+ok 19 - Director family read uses canonical context and separate actor: NET_SKINS_ENTRIES
+  ---
+  duration_ms: 0.477584
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: CALCUTTA_MANAGEMENT
+ok 20 - Director family read uses canonical context and separate actor: CALCUTTA_MANAGEMENT
+  ---
+  duration_ms: 0.392375
+  type: 'test'
+  ...
+# Subtest: Director setup mutation confirms existing receipt and canonical readback; contract stays provider-neutral
+ok 21 - Director setup mutation confirms existing receipt and canonical readback; contract stays provider-neutral
+  ---
+  duration_ms: 2.838875
+  type: 'test'
+  ...
+# Subtest: Director admits the canonical direct NET_SKINS_ENTRIES projection but never a denial or wrong target
+ok 22 - Director admits the canonical direct NET_SKINS_ENTRIES projection but never a denial or wrong target
+  ---
+  duration_ms: 2.609834
+  type: 'test'
+  ...
+# Subtest: Director admits the canonical direct CALCUTTA_MANAGEMENT projection but never a denial or wrong target
+ok 23 - Director admits the canonical direct CALCUTTA_MANAGEMENT projection but never a denial or wrong target
+  ---
+  duration_ms: 1.442792
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects PLAYER without mutation
+ok 24 - Director authorization rejects PLAYER without mutation
+  ---
+  duration_ms: 0.174791
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects SPECTATOR without mutation
+ok 25 - Director authorization rejects SPECTATOR without mutation
+  ---
+  duration_ms: 0.092334
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects signed-out without mutation
+ok 26 - Director authorization rejects signed-out without mutation
+  ---
+  duration_ms: 0.086792
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects impersonated without mutation
+ok 27 - Director authorization rejects impersonated without mutation
+  ---
+  duration_ms: 0.0785
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects wrong-target without mutation
+ok 28 - Director authorization rejects wrong-target without mutation
+  ---
+  duration_ms: 0.212542
+  type: 'test'
+  ...
+# Subtest: Director stale token fails conflict without rebinding or dispatching mutation
+ok 29 - Director stale token fails conflict without rebinding or dispatching mutation
+  ---
+  duration_ms: 0.385208
+  type: 'test'
+  ...
+# Subtest: Director recovery verifies original admitted context and full request without current admission
+ok 30 - Director recovery verifies original admitted context and full request without current admission
+  ---
+  duration_ms: 1.042
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: score_derived_delivery_tick_v1
+ok 31 - worker preserves lease and exact authority: score_derived_delivery_tick_v1
+  ---
+  duration_ms: 0.4235
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_competition_derived_jobs
+ok 32 - worker preserves lease and exact authority: claim_competition_derived_jobs
+  ---
+  duration_ms: 0.271708
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_intelligence_derived_bundle
+ok 33 - worker preserves lease and exact authority: claim_intelligence_derived_bundle
+  ---
+  duration_ms: 0.265542
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_production_calcutta_v1_recalculation
+ok 34 - worker preserves lease and exact authority: claim_production_calcutta_v1_recalculation
+  ---
+  duration_ms: 0.230875
+  type: 'test'
+  ...
+# Subtest: worker rejects unknown functions, Production-tagged payload and forged supplied context
+ok 35 - worker rejects unknown functions, Production-tagged payload and forged supplied context
+  ---
+  duration_ms: 0.167
+  type: 'test'
+  ...
+# Subtest: current worker factory selects Certification without importing a Production runtime or requiring Google
+ok 36 - current worker factory selects Certification without importing a Production runtime or requiring Google
+  ---
+  duration_ms: 2.217834
+  type: 'test'
+  ...
+# Subtest: identity reads use admitted gateway; provider administration and participant messaging are unavailable
+ok 37 - identity reads use admitted gateway; provider administration and participant messaging are unavailable
+  ---
+  duration_ms: 0.998459
+  type: 'test'
+  ...
+# Subtest: admission response completes before canonical execution; only DB lease identity is forwarded
+ok 38 - admission response completes before canonical execution; only DB lease identity is forwarded
+  ---
+  duration_ms: 21.300958
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family SCORING.SUBMIT_HOLE
+ok 39 - durable admission applies to required canonical family SCORING.SUBMIT_HOLE
+  ---
+  duration_ms: 1.231
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family SCORING.FINALIZE_MATCH
+ok 40 - durable admission applies to required canonical family SCORING.FINALIZE_MATCH
+  ---
+  duration_ms: 0.8285
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family SCORING.REOPEN_MATCH
+ok 41 - durable admission applies to required canonical family SCORING.REOPEN_MATCH
+  ---
+  duration_ms: 1.027041
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.MUTATE_SETUP
+ok 42 - durable admission applies to required canonical family DIRECTOR.MUTATE_SETUP
+  ---
+  duration_ms: 0.86
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.MUTATE_PAIRINGS
+ok 43 - durable admission applies to required canonical family DIRECTOR.MUTATE_PAIRINGS
+  ---
+  duration_ms: 0.58375
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.MATCH_CONTROL
+ok 44 - durable admission applies to required canonical family DIRECTOR.MATCH_CONTROL
+  ---
+  duration_ms: 1.111791
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.SAVE_NET_SKINS_ENTRIES
+ok 45 - durable admission applies to required canonical family DIRECTOR.SAVE_NET_SKINS_ENTRIES
+  ---
+  duration_ms: 0.482625
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.REPLACE_CALCUTTA_AUCTION
+ok 46 - durable admission applies to required canonical family DIRECTOR.REPLACE_CALCUTTA_AUCTION
+  ---
+  duration_ms: 0.449916
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.CLEAR_CALCUTTA_AUCTION
+ok 47 - durable admission applies to required canonical family DIRECTOR.CLEAR_CALCUTTA_AUCTION
+  ---
+  duration_ms: 0.452167
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: WORKERS.COMPETITION_CLAIM
+ok 48 - existing job protocol stays separate: WORKERS.COMPETITION_CLAIM
+  ---
+  duration_ms: 0.345917
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: WORKERS.INTELLIGENCE_WRITE
+ok 49 - existing job protocol stays separate: WORKERS.INTELLIGENCE_WRITE
+  ---
+  duration_ms: 0.516791
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: WORKERS.CALCUTTA_COMPLETE
+ok 50 - existing job protocol stays separate: WORKERS.CALCUTTA_COMPLETE
+  ---
+  duration_ms: 0.488583
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: DIRECTOR.NET_SKINS_CLAIM
+ok 51 - existing job protocol stays separate: DIRECTOR.NET_SKINS_CLAIM
+  ---
+  duration_ms: 0.352625
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: DIRECTOR.REQUEUE_DERIVED
+ok 52 - existing job protocol stays separate: DIRECTOR.REQUEUE_DERIVED
+  ---
+  duration_ms: 0.261291
+  type: 'test'
+  ...
+# Subtest: failed admission never executes or fabricates non-commit: connection
+ok 53 - failed admission never executes or fabricates non-commit: connection
+  ---
+  duration_ms: 1.010541
+  type: 'test'
+  ...
+# Subtest: failed admission never executes or fabricates non-commit: 57014
+ok 54 - failed admission never executes or fabricates non-commit: 57014
+  ---
+  duration_ms: 0.877625
+  type: 'test'
+  ...
+# Subtest: failed admission never executes or fabricates non-commit: missing-schema
+ok 55 - failed admission never executes or fabricates non-commit: missing-schema
+  ---
+  duration_ms: 0.704042
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: contract=wrong
+ok 56 - invalid admission readback fails before execution: contract=wrong
+  ---
+  duration_ms: 0.568833
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: operation_request_id=other
+ok 57 - invalid admission readback fails before execution: operation_request_id=other
+  ---
+  duration_ms: 0.351959
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: lease_id=null
+ok 58 - invalid admission readback fails before execution: lease_id=null
+  ---
+  duration_ms: 0.358666
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: lease_id=bad
+ok 59 - invalid admission readback fails before execution: lease_id=bad
+  ---
+  duration_ms: 0.37375
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: admission_generation_id=bad
+ok 60 - invalid admission readback fails before execution: admission_generation_id=bad
+  ---
+  duration_ms: 0.322333
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: admission_sequence=0
+ok 61 - invalid admission readback fails before execution: admission_sequence=0
+  ---
+  duration_ms: 0.359792
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: admission_sequence=9007199254740992
+ok 62 - invalid admission readback fails before execution: admission_sequence=9007199254740992
+  ---
+  duration_ms: 0.371625
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: request_hash=bad
+ok 63 - invalid admission readback fails before execution: request_hash=bad
+  ---
+  duration_ms: 0.361292
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: state=EXPIRED
+ok 64 - invalid admission readback fails before execution: state=EXPIRED
+  ---
+  duration_ms: 0.408583
+  type: 'test'
+  ...
+# Subtest: terminal same-operation admission replays established result without executing: COMMITTED
+ok 65 - terminal same-operation admission replays established result without executing: COMMITTED
+  ---
+  duration_ms: 0.756583
+  type: 'test'
+  ...
+# Subtest: terminal same-operation admission replays established result without executing: NOT_COMMITTED
+ok 66 - terminal same-operation admission replays established result without executing: NOT_COMMITTED
+  ---
+  duration_ms: 0.501
+  type: 'test'
+  ...
+# Subtest: contradictory lease outcome cannot become a client receipt: COMMITTED
+ok 67 - contradictory lease outcome cannot become a client receipt: COMMITTED
+  ---
+  duration_ms: 0.437542
+  type: 'test'
+  ...
+# Subtest: contradictory lease outcome cannot become a client receipt: NOT_COMMITTED
+ok 68 - contradictory lease outcome cannot become a client receipt: NOT_COMMITTED
+  ---
+  duration_ms: 0.3905
+  type: 'test'
+  ...
+# Subtest: contradictory lease outcome cannot become a client receipt: ADMITTED
+ok 69 - contradictory lease outcome cannot become a client receipt: ADMITTED
+  ---
+  duration_ms: 0.341625
+  type: 'test'
+  ...
+# Subtest: lost execution response attempts durable UNKNOWN with same identity and no sensitive payload
+ok 70 - lost execution response attempts durable UNKNOWN with same identity and no sensitive payload
+  ---
+  duration_ms: 0.725584
+  type: 'test'
+  ...
+# Subtest: lost acknowledgement can be recovered from terminal outcome returned by UNKNOWN marker
+ok 71 - lost acknowledgement can be recovered from terminal outcome returned by UNKNOWN marker
+  ---
+  duration_ms: 0.509416
+  type: 'test'
+  ...
+# Subtest: failed UNKNOWN marker does not replace original typed error or imply non-commit
+ok 72 - failed UNKNOWN marker does not replace original typed error or imply non-commit
+  ---
+  duration_ms: 0.595125
+  type: 'test'
+  ...
+# Subtest: marker cannot substitute another lease result even with matching operation identity
+ok 73 - marker cannot substitute another lease result even with matching operation identity
+  ---
+  duration_ms: 0.617416
+  type: 'test'
+  ...
+# Subtest: exact recovery needs no open-write context and preserves original actor: read_certification_ingress_status_v1
+ok 74 - exact recovery needs no open-write context and preserves original actor: read_certification_ingress_status_v1
+  ---
+  duration_ms: 0.278583
+  type: 'test'
+  ...
+# Subtest: exact recovery needs no open-write context and preserves original actor: resolve_certification_ingress_v1
+ok 75 - exact recovery needs no open-write context and preserves original actor: resolve_certification_ingress_v1
+  ---
+  duration_ms: 0.17375
+  type: 'test'
+  ...
+# Subtest: an absent operation status is UNKNOWN, with no implicit resolution or new admission
+ok 76 - an absent operation status is UNKNOWN, with no implicit resolution or new admission
+  ---
+  duration_ms: 1.011667
+  type: 'test'
+  ...
+# Subtest: replay-only recovery verifies full request while never obtaining write context
+ok 77 - replay-only recovery verifies full request while never obtaining write context
+  ---
+  duration_ms: 0.289458
+  type: 'test'
+  ...
+# Subtest: server hash conflict is preserved without recovery, execution or fallback
+ok 78 - server hash conflict is preserved without recovery, execution or fallback
+  ---
+  duration_ms: 0.235333
+  type: 'test'
+  ...
+# Subtest: recovery rejects authority selectors, unlisted operation families and blank identity before network
+ok 79 - recovery rejects authority selectors, unlisted operation families and blank identity before network
+  ---
+  duration_ms: 0.850834
+  type: 'test'
+  ...
+# Subtest: closed-origin recovery cannot bypass registration or use a Production endpoint
+ok 80 - closed-origin recovery cannot bypass registration or use a Production endpoint
+  ---
+  duration_ms: 0.189291
+  type: 'test'
+  ...
+# Subtest: preserved Certification fixture exact atomic contact repair
+    # Subtest: original omitted-contact package reproduces canonical identity denial without invented hosted facts
+    ok 1 - original omitted-contact package reproduces canonical identity denial without invented hosted facts
+      ---
+      duration_ms: 113.067917
+      type: 'test'
+      ...
+    # Subtest: repair follows supported release rebind without rewriting the original fixture receipt
+    ok 2 - repair follows supported release rebind without rewriting the original fixture receipt
+      ---
+      duration_ms: 64.410041
+      type: 'test'
+      ...
+    # Subtest: repair rejects resource ymqhhtxaywtqllynrmxe before rendering
+    ok 3 - repair rejects resource ymqhhtxaywtqllynrmxe before rendering
+      ---
+      duration_ms: 1.933208
+      type: 'test'
+      ...
+    # Subtest: repair rejects resource idgigvjjqkfbqjeredpb before rendering
+    ok 4 - repair rejects resource idgigvjjqkfbqjeredpb before rendering
+      ---
+      duration_ms: 0.296875
+      type: 'test'
+      ...
+    # Subtest: repair rejects resource zzzzzzzzzzzzzzzzzzzz before rendering
+    ok 5 - repair rejects resource zzzzzzzzzzzzzzzzzzzz before rendering
+      ---
+      duration_ms: 0.230291
+      type: 'test'
+      ...
+    # Subtest: repair rejects client-selected identities and unapproved original package
+    ok 6 - repair rejects client-selected identities and unapproved original package
+      ---
+      duration_ms: 0.496583
+      type: 'test'
+      ...
+    # Subtest: anon cannot invoke repair
+    ok 7 - anon cannot invoke repair
+      ---
+      duration_ms: 4731.712958
+      type: 'test'
+      ...
+    # Subtest: authenticated cannot invoke repair
+    ok 8 - authenticated cannot invoke repair
+      ---
+      duration_ms: 3499.794458
+      type: 'test'
+      ...
+    # Subtest: service_role cannot invoke repair
+    ok 9 - service_role cannot invoke repair
+      ---
+      duration_ms: 2979.869417
+      type: 'test'
+      ...
+    # Subtest: owner may not impersonate a runtime participant
+    ok 10 - owner may not impersonate a runtime participant
+      ---
+      duration_ms: 3203.484459
+      type: 'test'
+      ...
+    # Subtest: wrong deployment denied atomically
+    ok 11 - wrong deployment denied atomically
+      ---
+      duration_ms: 2982.237291
+      type: 'test'
+      ...
+    # Subtest: wrong release denied atomically
+    ok 12 - wrong release denied atomically
+      ---
+      duration_ms: 2956.294708
+      type: 'test'
+      ...
+    # Subtest: wrong origin denied atomically
+    ok 13 - wrong origin denied atomically
+      ---
+      duration_ms: 3491.768625
+      type: 'test'
+      ...
+    # Subtest: stale admission denied atomically
+    ok 14 - stale admission denied atomically
+      ---
+      duration_ms: 2988.072334
+      type: 'test'
+      ...
+    # Subtest: wrong binding denied atomically
+    ok 15 - wrong binding denied atomically
+      ---
+      duration_ms: 3036.743125
+      type: 'test'
+      ...
+    # Subtest: wrong epoch denied atomically
+    ok 16 - wrong epoch denied atomically
+      ---
+      duration_ms: 3524.268667
+      type: 'test'
+      ...
+    # Subtest: wrong generation denied atomically
+    ok 17 - wrong generation denied atomically
+      ---
+      duration_ms: 3093.7625
+      type: 'test'
+      ...
+    # Subtest: wrong original receipt denied atomically
+    ok 18 - wrong original receipt denied atomically
+      ---
+      duration_ms: 2894.106709
+      type: 'test'
+      ...
+    # Subtest: wrong original fingerprint denied atomically
+    ok 19 - wrong original fingerprint denied atomically
+      ---
+      duration_ms: 2993.01
+      type: 'test'
+      ...
+    # Subtest: enabled admission is not silently repaired
+    ok 20 - enabled admission is not silently repaired
+      ---
+      duration_ms: 3077.680083
+      type: 'test'
+      ...
+    # Subtest: open ingress is not silently repaired
+    ok 21 - open ingress is not silently repaired
+      ---
+      duration_ms: 2962.271583
+      type: 'test'
+      ...
+    # Subtest: changed existing link is not silently repaired
+    ok 22 - changed existing link is not silently repaired
+      ---
+      duration_ms: 3112.115917
+      type: 'test'
+      ...
+    # Subtest: changed fixture is not silently repaired
+    ok 23 - changed fixture is not silently repaired
+      ---
+      duration_ms: 3389.417292
+      type: 'test'
+      ...
+    # Subtest: unexpected context is not silently repaired
+    ok 24 - unexpected context is not silently repaired
+      ---
+      duration_ms: 2986.627041
+      type: 'test'
+      ...
+    # Subtest: preexisting contact is not silently repaired
+    ok 25 - preexisting contact is not silently repaired
+      ---
+      duration_ms: 3038.995166
+      type: 'test'
+      ...
+    # Subtest: CERTIFICATION_PART2A_SYNTHETIC_CONTACTS_PROVISIONED audit failure rolls back all new rows
+    ok 26 - CERTIFICATION_PART2A_SYNTHETIC_CONTACTS_PROVISIONED audit failure rolls back all new rows
+      ---
+      duration_ms: 3641.50075
+      type: 'test'
+      ...
+    # Subtest: CERTIFICATION_PART2A_IDENTITY_CONTACTS_REPAIRED audit failure rolls back all new rows
+    ok 27 - CERTIFICATION_PART2A_IDENTITY_CONTACTS_REPAIRED audit failure rolls back all new rows
+      ---
+      duration_ms: 3140.339417
+      type: 'test'
+      ...
+    # Subtest: managed owner repair creates only three contacts and required provenance; controls and fixture immutable
+    ok 28 - managed owner repair creates only three contacts and required provenance; controls and fixture immutable
+      ---
+      duration_ms: 133.28
+      type: 'test'
+      ...
+    # Subtest: exact replay creates no duplicate contacts/audits/revisions
+    ok 29 - exact replay creates no duplicate contacts/audits/revisions
+      ---
+      duration_ms: 3359.787959
+      type: 'test'
+      ...
+    # Subtest: conflicting replay and changed contacts are denied without overwriting
+    ok 30 - conflicting replay and changed contacts are denied without overwriting
+      ---
+      duration_ms: 6113.398542
+      type: 'test'
+      ...
+    # Subtest: original audit receipt and full catalog/security are unchanged
+    ok 31 - original audit receipt and full catalog/security are unchanged
+      ---
+      duration_ms: 414.836333
+      type: 'test'
+      ...
+    # Subtest: repaired fixture resolves all exact identities through canonical projection and resolver
+    ok 32 - repaired fixture resolves all exact identities through canonical projection and resolver
+      ---
+      duration_ms: 318.090458
+      type: 'test'
+      ...
+    1..32
+ok 81 - preserved Certification fixture exact atomic contact repair
+  ---
+  duration_ms: 99893.795875
+  type: 'test'
+  ...
+# Subtest: owner Certification Part2A provisioning package
+    # Subtest: renderer rejects Production, old Preview, arbitrary and client-selected resource/identities
+    ok 1 - renderer rejects Production, old Preview, arbitrary and client-selected resource/identities
+      ---
+      duration_ms: 2.748417
+      type: 'test'
+      ...
+    # Subtest: anon cannot invoke owner provisioning
+    ok 2 - anon cannot invoke owner provisioning
+      ---
+      duration_ms: 3210.502208
+      type: 'test'
+      ...
+    # Subtest: authenticated cannot invoke owner provisioning
+    ok 3 - authenticated cannot invoke owner provisioning
+      ---
+      duration_ms: 3185.877083
+      type: 'test'
+      ...
+    # Subtest: service_role cannot invoke owner provisioning
+    ok 4 - service_role cannot invoke owner provisioning
+      ---
+      duration_ms: 2994.993125
+      type: 'test'
+      ...
+    # Subtest: owner cannot impersonate a service-role runtime request
+    ok 5 - owner cannot impersonate a service-role runtime request
+      ---
+      duration_ms: 3380.830125
+      type: 'test'
+      ...
+    # Subtest: wrong release denied atomically
+    ok 6 - wrong release denied atomically
+      ---
+      duration_ms: 2999.088459
+      type: 'test'
+      ...
+    # Subtest: wrong deployment denied atomically
+    ok 7 - wrong deployment denied atomically
+      ---
+      duration_ms: 2945.667083
+      type: 'test'
+      ...
+    # Subtest: wrong origin denied atomically
+    ok 8 - wrong origin denied atomically
+      ---
+      duration_ms: 3371.780291
+      type: 'test'
+      ...
+    # Subtest: wrong binding denied atomically
+    ok 9 - wrong binding denied atomically
+      ---
+      duration_ms: 2987.938125
+      type: 'test'
+      ...
+    # Subtest: wrong epoch denied atomically
+    ok 10 - wrong epoch denied atomically
+      ---
+      duration_ms: 3099.696667
+      type: 'test'
+      ...
+    # Subtest: stale activation denied atomically
+    ok 11 - stale activation denied atomically
+      ---
+      duration_ms: 3250.6795
+      type: 'test'
+      ...
+    # Subtest: stale admission denied atomically
+    ok 12 - stale admission denied atomically
+      ---
+      duration_ms: 3148.334166
+      type: 'test'
+      ...
+    # Subtest: stale pointer denied atomically
+    ok 13 - stale pointer denied atomically
+      ---
+      duration_ms: 2971.587333
+      type: 'test'
+      ...
+    # Subtest: stale generation denied atomically
+    ok 14 - stale generation denied atomically
+      ---
+      duration_ms: 2920.286291
+      type: 'test'
+      ...
+    # Subtest: admission enabled refused without fixture changes
+    ok 15 - admission enabled refused without fixture changes
+      ---
+      duration_ms: 3292.149292
+      type: 'test'
+      ...
+    # Subtest: ingress open refused without fixture changes
+    ok 16 - ingress open refused without fixture changes
+      ---
+      duration_ms: 3001.436375
+      type: 'test'
+      ...
+    # Subtest: wrong registered database refused without fixture changes
+    ok 17 - wrong registered database refused without fixture changes
+      ---
+      duration_ms: 3256.028333
+      type: 'test'
+      ...
+    # Subtest: wrong installed receipt refused without fixture changes
+    ok 18 - wrong installed receipt refused without fixture changes
+      ---
+      duration_ms: 3718.730042
+      type: 'test'
+      ...
+    # Subtest: wrong existing player refused without fixture changes
+    ok 19 - wrong existing player refused without fixture changes
+      ---
+      duration_ms: 3291.978667
+      type: 'test'
+      ...
+    # Subtest: unconfirmed Auth refuses linkage
+    ok 20 - unconfirmed Auth refuses linkage
+      ---
+      duration_ms: 2982.020167
+      type: 'test'
+      ...
+    # Subtest: non-synthetic Auth refuses linkage
+    ok 21 - non-synthetic Auth refuses linkage
+      ---
+      duration_ms: 3387.03625
+      type: 'test'
+      ...
+    # Subtest: required audit failure rolls back every fixture row
+    ok 22 - required audit failure rolls back every fixture row
+      ---
+      duration_ms: 3093.716333
+      type: 'test'
+      ...
+    # Subtest: managed non-superuser owner creates exact minimum fixture without enabling admission
+    ok 23 - managed non-superuser owner creates exact minimum fixture without enabling admission
+      ---
+      duration_ms: 296.224125
+      type: 'test'
+      ...
+    # Subtest: fresh Guide is one validated synthetic revision/publication in each canonical store
+    ok 24 - fresh Guide is one validated synthetic revision/publication in each canonical store
+      ---
+      duration_ms: 53.839083
+      type: 'test'
+      ...
+    # Subtest: exact same request replay is a no-op with one audited receipt
+    ok 25 - exact same request replay is a no-op with one audited receipt
+      ---
+      duration_ms: 3229.975667
+      type: 'test'
+      ...
+    # Subtest: changed package/request receipt conflicts; changed persisted fixture is not silently repaired
+    ok 26 - changed package/request receipt conflicts; changed persisted fixture is not silently repaired
+      ---
+      duration_ms: 12484.294333
+      type: 'test'
+      ...
+    # Subtest: all catalog functions, ACLs, triggers, RLS, owners and private cores remain exact
+    ok 27 - all catalog functions, ACLs, triggers, RLS, owners and private cores remain exact
+      ---
+      duration_ms: 913.052875
+      type: 'test'
+      ...
+    # Subtest: fixture supports existing canonical Director setup, full-roster pairing and financial contracts after separate local activation
+    ok 28 - fixture supports existing canonical Director setup, full-roster pairing and financial contracts after separate local activation
+      ---
+      duration_ms: 788.58025
+      type: 'test'
+      ...
+    1..28
+ok 82 - owner Certification Part2A provisioning package
+  ---
+  duration_ms: 100137.600292
+  type: 'test'
+  ...
+# Subtest: preserved Certification synthetic Guide repair and bounded pending-work model
+    # Subtest: unchanged Tournament foundation fails closed without Guide
+    ok 1 - unchanged Tournament foundation fails closed without Guide
+      ---
+      duration_ms: 74.853541
+      type: 'test'
+      ...
+    # Subtest: canonical Director course and prepare operations reproduce four automatic jobs plus ineligible FinalRecap
+    ok 2 - canonical Director course and prepare operations reproduce four automatic jobs plus ineligible FinalRecap
+      ---
+      duration_ms: 230.161708
+      type: 'test'
+      ...
+    # Subtest: fixed renderer denies resource ymqhhtxaywtqllynrmxe
+    ok 3 - fixed renderer denies resource ymqhhtxaywtqllynrmxe
+      ---
+      duration_ms: 1.399208
+      type: 'test'
+      ...
+    # Subtest: fixed renderer denies resource idgigvjjqkfbqjeredpb
+    ok 4 - fixed renderer denies resource idgigvjjqkfbqjeredpb
+      ---
+      duration_ms: 0.310542
+      type: 'test'
+      ...
+    # Subtest: fixed renderer denies resource zzzzzzzzzzzzzzzzzzzz
+    ok 5 - fixed renderer denies resource zzzzzzzzzzzzzzzzzzzz
+      ---
+      duration_ms: 0.357167
+      type: 'test'
+      ...
+    # Subtest: anon cannot invoke Guide repair
+    ok 6 - anon cannot invoke Guide repair
+      ---
+      duration_ms: 96.713666
+      type: 'test'
+      ...
+    # Subtest: authenticated cannot invoke Guide repair
+    ok 7 - authenticated cannot invoke Guide repair
+      ---
+      duration_ms: 89.526542
+      type: 'test'
+      ...
+    # Subtest: service_role cannot invoke Guide repair
+    ok 8 - service_role cannot invoke Guide repair
+      ---
+      duration_ms: 92.149583
+      type: 'test'
+      ...
+    # Subtest: runtime JWT cannot impersonate owner provisioning
+    ok 9 - runtime JWT cannot impersonate owner provisioning
+      ---
+      duration_ms: 91.764042
+      type: 'test'
+      ...
+    # Subtest: wrong release refused atomically
+    ok 10 - wrong release refused atomically
+      ---
+      duration_ms: 100.469584
+      type: 'test'
+      ...
+    # Subtest: wrong deployment refused atomically
+    ok 11 - wrong deployment refused atomically
+      ---
+      duration_ms: 104.520291
+      type: 'test'
+      ...
+    # Subtest: wrong receipt refused atomically
+    ok 12 - wrong receipt refused atomically
+      ---
+      duration_ms: 103.875417
+      type: 'test'
+      ...
+    # Subtest: stale admission refused atomically
+    ok 13 - stale admission refused atomically
+      ---
+      duration_ms: 97.876541
+      type: 'test'
+      ...
+    # Subtest: wrong preserved snapshot refused atomically
+    ok 14 - wrong preserved snapshot refused atomically
+      ---
+      duration_ms: 112.329209
+      type: 'test'
+      ...
+    # Subtest: enabled admission rejected without changes
+    ok 15 - enabled admission rejected without changes
+      ---
+      duration_ms: 93.627083
+      type: 'test'
+      ...
+    # Subtest: open ingress rejected without changes
+    ok 16 - open ingress rejected without changes
+      ---
+      duration_ms: 94.365
+      type: 'test'
+      ...
+    # Subtest: changed course rejected without changes
+    ok 17 - changed course rejected without changes
+      ---
+      duration_ms: 109.25575
+      type: 'test'
+      ...
+    # Subtest: mandatory repair audit failure rolls back both revision publications
+    ok 18 - mandatory repair audit failure rolls back both revision publications
+      ---
+      duration_ms: 221.290959
+      type: 'test'
+      ...
+    # Subtest: managed owner creates only truthful Guide publication with preserved current fixture/control state
+    ok 19 - managed owner creates only truthful Guide publication with preserved current fixture/control state
+      ---
+      duration_ms: 175.501208
+      type: 'test'
+      ...
+    # Subtest: repair replay is idempotent; changed publication is denied
+    ok 20 - repair replay is idempotent; changed publication is denied
+      ---
+      duration_ms: 6558.413958
+      type: 'test'
+      ...
+    # Subtest: same publication already present cannot be adopted by a different repair request
+    ok 21 - same publication already present cannot be adopted by a different repair request
+      ---
+      duration_ms: 34.222084
+      type: 'test'
+      ...
+    # Subtest: unchanged Tournament foundation succeeds with validated synthetic Guide
+    ok 22 - unchanged Tournament foundation succeeds with validated synthetic Guide
+      ---
+      duration_ms: 78.797334
+      type: 'test'
+      ...
+    # Subtest: pending classification: exactly four required now; FinalRecap is a truthful publication wait
+    ok 23 - pending classification: exactly four required now; FinalRecap is a truthful publication wait
+      ---
+      duration_ms: 46.818458
+      type: 'test'
+      ...
+    # Subtest: bounded model uses two unchanged shipping processors and current Certification wrappers, not an autonomous runner
+    ok 24 - bounded model uses two unchanged shipping processors and current Certification wrappers, not an autonomous runner
+      ---
+      duration_ms: 439.957791
+      type: 'test'
+      ...
+    # Subtest: catalog/security exact; final admission disabled, ingress paused, scores/leases/FinalRecap absent
+    ok 25 - catalog/security exact; final admission disabled, ingress paused, scores/leases/FinalRecap absent
+      ---
+      duration_ms: 576.428291
+      type: 'test'
+      ...
+    1..25
+ok 83 - preserved Certification synthetic Guide repair and bounded pending-work model
+  ---
+  duration_ms: 20259.650458
+  type: 'test'
+  ...
+# Subtest: shipping registry binds the approved physical resource and cannot be replaced by client/environment JSON
+ok 84 - shipping registry binds the approved physical resource and cannot be replaced by client/environment JSON
+  ---
+  duration_ms: 5.425208
+  type: 'test'
+  ...
+# Subtest: no explicit selector does not request Certification
+ok 85 - no explicit selector does not request Certification
+  ---
+  duration_ms: 0.178083
+  type: 'test'
+  ...
+# Subtest: exact injected registration validates configuration and creates only redacted bound envelope
+ok 86 - exact injected registration validates configuration and creates only redacted bound envelope
+  ---
+  duration_ms: 0.505917
+  type: 'test'
+  ...
+# Subtest: manifest digest is stable over object key order and changes on provenance revision
+ok 87 - manifest digest is stable over object key order and changes on provenance revision
+  ---
+  duration_ms: 0.166333
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong resource
+ok 88 - exact registration fails closed: wrong resource
+  ---
+  duration_ms: 0.117709
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong team
+ok 89 - exact registration fails closed: wrong team
+  ---
+  duration_ms: 0.09525
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: conflicting team alias
+ok 90 - exact registration fails closed: conflicting team alias
+  ---
+  duration_ms: 0.11625
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong project
+ok 91 - exact registration fails closed: wrong project
+  ---
+  duration_ms: 0.093
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong branch
+ok 92 - exact registration fails closed: wrong branch
+  ---
+  duration_ms: 0.223333
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong deployment class
+ok 93 - exact registration fails closed: wrong deployment class
+  ---
+  duration_ms: 0.1995
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: missing SHA
+ok 94 - exact registration fails closed: missing SHA
+  ---
+  duration_ms: 0.167084
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: malformed SHA
+ok 95 - exact registration fails closed: malformed SHA
+  ---
+  duration_ms: 0.088625
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: missing deployment ID
+ok 96 - exact registration fails closed: missing deployment ID
+  ---
+  duration_ms: 0.101416
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong deployment origin
+ok 97 - exact registration fails closed: wrong deployment origin
+  ---
+  duration_ms: 0.11125
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: origin suffix spoof
+ok 98 - exact registration fails closed: origin suffix spoof
+  ---
+  duration_ms: 0.079625
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong server project
+ok 99 - exact registration fails closed: wrong server project
+  ---
+  duration_ms: 0.084375
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong Auth project
+ok 100 - exact registration fails closed: wrong Auth project
+  ---
+  duration_ms: 0.058
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong server credential
+ok 101 - exact registration fails closed: wrong server credential
+  ---
+  duration_ms: 0.055208
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: wrong public credential
+ok 102 - exact registration fails closed: wrong public credential
+  ---
+  duration_ms: 0.064958
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: missing server credential
+ok 103 - exact registration fails closed: missing server credential
+  ---
+  duration_ms: 0.06375
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: missing public credential
+ok 104 - exact registration fails closed: missing public credential
+  ---
+  duration_ms: 0.0505
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: Production overlay
+ok 105 - exact registration fails closed: Production overlay
+  ---
+  duration_ms: 0.094792
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: Production key inheritance
+ok 106 - exact registration fails closed: Production key inheritance
+  ---
+  duration_ms: 0.071542
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: Google key inheritance
+ok 107 - exact registration fails closed: Google key inheritance
+  ---
+  duration_ms: 0.049584
+  type: 'test'
+  ...
+# Subtest: exact registration fails closed: Google mirror overlay
+ok 108 - exact registration fails closed: Google mirror overlay
+  ---
+  duration_ms: 0.056875
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: class impersonation
+ok 109 - malformed owner registration rejected: class impersonation
+  ---
+  duration_ms: 0.05375
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: invalid installation
+ok 110 - malformed owner registration rejected: invalid installation
+  ---
+  duration_ms: 0.036208
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: different installation identity
+ok 111 - malformed owner registration rejected: different installation identity
+  ---
+  duration_ms: 0.038334
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: Production resource
+ok 112 - malformed owner registration rejected: Production resource
+  ---
+  duration_ms: 0.040292
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: legacy Preview resource
+ok 113 - malformed owner registration rejected: legacy Preview resource
+  ---
+  duration_ms: 0.03775
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: URL userinfo
+ok 114 - malformed owner registration rejected: URL userinfo
+  ---
+  duration_ms: 0.049959
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: URL suffix
+ok 115 - malformed owner registration rejected: URL suffix
+  ---
+  duration_ms: 0.039917
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: URL query
+ok 116 - malformed owner registration rejected: URL query
+  ---
+  duration_ms: 0.039917
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: URL path
+ok 117 - malformed owner registration rejected: URL path
+  ---
+  duration_ms: 0.041333
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: URL fragment
+ok 118 - malformed owner registration rejected: URL fragment
+  ---
+  duration_ms: 0.052958
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: URL port
+ok 119 - malformed owner registration rejected: URL port
+  ---
+  duration_ms: 0.048583
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: invalid revision
+ok 120 - malformed owner registration rejected: invalid revision
+  ---
+  duration_ms: 0.618792
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: schema digest missing
+ok 121 - malformed owner registration rejected: schema digest missing
+  ---
+  duration_ms: 0.039209
+  type: 'test'
+  ...
+# Subtest: malformed owner registration rejected: unknown privileged registration field
+ok 122 - malformed owner registration rejected: unknown privileged registration field
+  ---
+  duration_ms: 0.034875
+  type: 'test'
+  ...
+# Subtest: disabled optional flags confer no authority and do not interfere with exact registration
+ok 123 - disabled optional flags confer no authority and do not interfere with exact registration
+  ---
+  duration_ms: 0.120042
+  type: 'test'
+  ...
+# Subtest: state is a snapshot; changing injected manifest after validation cannot rewrite bound resource
+ok 124 - state is a snapshot; changing injected manifest after validation cannot rewrite bound resource
+  ---
+  duration_ms: 0.080584
+  type: 'test'
+  ...
+# Subtest: unregistered shipping runtime never performs network even with copied configuration
+ok 125 - unregistered shipping runtime never performs network even with copied configuration
+  ---
+  duration_ms: 2.135917
+  type: 'test'
+  ...
+# Subtest: registration handshake is exact, bounded and redacted; caller cannot forge context
+ok 126 - registration handshake is exact, bounded and redacted; caller cannot forge context
+  ---
+  duration_ms: 14.898584
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: resource_id
+ok 127 - wrong database/deployment readback denied: resource_id
+  ---
+  duration_ms: 0.436333
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: installation_id
+ok 128 - wrong database/deployment readback denied: installation_id
+  ---
+  duration_ms: 0.344583
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: project_ref
+ok 129 - wrong database/deployment readback denied: project_ref
+  ---
+  duration_ms: 0.350083
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: project_url
+ok 130 - wrong database/deployment readback denied: project_url
+  ---
+  duration_ms: 0.33925
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: manifest_digest
+ok 131 - wrong database/deployment readback denied: manifest_digest
+  ---
+  duration_ms: 0.285375
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: registration_revision
+ok 132 - wrong database/deployment readback denied: registration_revision
+  ---
+  duration_ms: 0.417875
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: schema_contract
+ok 133 - wrong database/deployment readback denied: schema_contract
+  ---
+  duration_ms: 0.956792
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: schema_digest
+ok 134 - wrong database/deployment readback denied: schema_digest
+  ---
+  duration_ms: 0.506625
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: release_commit
+ok 135 - wrong database/deployment readback denied: release_commit
+  ---
+  duration_ms: 0.365417
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: deployment_id
+ok 136 - wrong database/deployment readback denied: deployment_id
+  ---
+  duration_ms: 0.231916
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: deployment_origin
+ok 137 - wrong database/deployment readback denied: deployment_origin
+  ---
+  duration_ms: 0.205167
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: git_branch
+ok 138 - wrong database/deployment readback denied: git_branch
+  ---
+  duration_ms: 0.184708
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: vercel_project_id
+ok 139 - wrong database/deployment readback denied: vercel_project_id
+  ---
+  duration_ms: 0.213416
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: vercel_team_id
+ok 140 - wrong database/deployment readback denied: vercel_team_id
+  ---
+  duration_ms: 0.201584
+  type: 'test'
+  ...
+# Subtest: missing schema returns unavailable without fallback or registration attempts
+ok 141 - missing schema returns unavailable without fallback or registration attempts
+  ---
+  duration_ms: 0.835959
+  type: 'test'
+  ...
+# Subtest: known score operation reaches execute gateway with original operation identity and server context
+ok 142 - known score operation reaches execute gateway with original operation identity and server context
+  ---
+  duration_ms: 1.2375
+  type: 'test'
+  ...
+# Subtest: unknown operation, missing operation ID and payload authority are denied before any request
+ok 143 - unknown operation, missing operation ID and payload authority are denied before any request
+  ---
+  duration_ms: 0.252542
+  type: 'test'
+  ...
+# Subtest: stale token conflicts before execute and is not silently rebound
+ok 144 - stale token conflicts before execute and is not silently rebound
+  ---
+  duration_ms: 0.243458
+  type: 'test'
+  ...
+# Subtest: read context cannot confer write phase; wrong request environment cannot reuse branded context
+ok 145 - read context cannot confer write phase; wrong request environment cannot reuse branded context
+  ---
+  duration_ms: 0.3185
+  type: 'test'
+  ...
+# Subtest: lost mutation response preserves same operation ID as unknown; transport has no fallback
+ok 146 - lost mutation response preserves same operation ID as unknown; transport has no fallback
+  ---
+  duration_ms: 0.662708
+  type: 'test'
+  ...
+# Subtest: SQL statement timeout remains typed and mutation outcome retains identity
+ok 147 - SQL statement timeout remains typed and mutation outcome retains identity
+  ---
+  duration_ms: 0.646125
+  type: 'test'
+  ...
+# Subtest: worker classification retains database XX000 ahead of its HTTP envelope
+ok 148 - worker classification retains database XX000 ahead of its HTTP envelope
+  ---
+  duration_ms: 0.512166
+  type: 'test'
+  ...
+# Subtest: worker classification retains database 23514 ahead of its HTTP envelope
+ok 149 - worker classification retains database 23514 ahead of its HTTP envelope
+  ---
+  duration_ms: 0.303333
+  type: 'test'
+  ...
+# Subtest: worker classification retains database 40P01 ahead of its HTTP envelope
+ok 150 - worker classification retains database 40P01 ahead of its HTTP envelope
+  ---
+  duration_ms: 0.258917
+  type: 'test'
+  ...
+# Subtest: worker classification retains database 57014 ahead of its HTTP envelope
+ok 151 - worker classification retains database 57014 ahead of its HTTP envelope
+  ---
+  duration_ms: 0.232667
+  type: 'test'
+  ...
+# Subtest: established domain rejection preserves meaning without returning raw database details
+ok 152 - established domain rejection preserves meaning without returning raw database details
+  ---
+  duration_ms: 0.506875
+  type: 'test'
+  ...
+# Subtest: explicit invalid Certification cannot borrow legacy Preview, diagnostic, Production or Google transport
+ok 153 - explicit invalid Certification cannot borrow legacy Preview, diagnostic, Production or Google transport
+  ---
+  duration_ms: 1.083167
+  type: 'test'
+  ...
+# Subtest: signed-out participant context returns 401 AUTH_SESSION_REQUIRED before any canonical read
+ok 154 - signed-out participant context returns 401 AUTH_SESSION_REQUIRED before any canonical read
+  ---
+  duration_ms: 22.755625
+  type: 'test'
+  ...
+# Subtest: authenticated but unlinked participant context returns 403 without participant data
+ok 155 - authenticated but unlinked participant context returns 403 without participant data
+  ---
+  duration_ms: 1.231833
+  type: 'test'
+  ...
+# Subtest: typed AUTH_SESSION_EXPIRED without authority metadata preserves its 401 contract
+ok 156 - typed AUTH_SESSION_EXPIRED without authority metadata preserves its 401 contract
+  ---
+  duration_ms: 0.938917
+  type: 'test'
+  ...
+# Subtest: typed USER_PLAYER_LINK_SUSPENDED without authority metadata preserves its 403 contract
+ok 157 - typed USER_PLAYER_LINK_SUSPENDED without authority metadata preserves its 403 contract
+  ---
+  duration_ms: 0.898375
+  type: 'test'
+  ...
+# Subtest: typed USER_PLAYER_LINK_REVOKED without authority metadata preserves its 403 contract
+ok 158 - typed USER_PLAYER_LINK_REVOKED without authority metadata preserves its 403 contract
+  ---
+  duration_ms: 0.761625
+  type: 'test'
+  ...
+# Subtest: typed TOURNAMENT_MEMBERSHIP_INACTIVE without authority metadata preserves its 403 contract
+ok 159 - typed TOURNAMENT_MEMBERSHIP_INACTIVE without authority metadata preserves its 403 contract
+  ---
+  duration_ms: 0.794791
+  type: 'test'
+  ...
+# Subtest: typed APPROVED_TOURNAMENT_CONTEXT_REQUIRED without authority metadata preserves its 403 contract
+ok 160 - typed APPROVED_TOURNAMENT_CONTEXT_REQUIRED without authority metadata preserves its 403 contract
+  ---
+  duration_ms: 0.721583
+  type: 'test'
+  ...
+# Subtest: typed WRONG_TOURNAMENT without authority metadata preserves its 403 contract
+ok 161 - typed WRONG_TOURNAMENT without authority metadata preserves its 403 contract
+  ---
+  duration_ms: 1.56
+  type: 'test'
+  ...
+# Subtest: typed IMPERSONATION_LEASE_NOT_FOUND without authority metadata preserves its 403 contract
+ok 162 - typed IMPERSONATION_LEASE_NOT_FOUND without authority metadata preserves its 403 contract
+  ---
+  duration_ms: 0.770458
+  type: 'test'
+  ...
+# Subtest: typed IMPERSONATION_LEASE_REVOKED without authority metadata preserves its 403 contract
+ok 163 - typed IMPERSONATION_LEASE_REVOKED without authority metadata preserves its 403 contract
+  ---
+  duration_ms: 0.894166
+  type: 'test'
+  ...
+# Subtest: typed IMPERSONATION_LEASE_EXPIRED without authority metadata preserves its 403 contract
+ok 164 - typed IMPERSONATION_LEASE_EXPIRED without authority metadata preserves its 403 contract
+  ---
+  duration_ms: 0.580708
+  type: 'test'
+  ...
+# Subtest: typed IMPERSONATION_LEASE_MISMATCH without authority metadata preserves its 403 contract
+ok 165 - typed IMPERSONATION_LEASE_MISMATCH without authority metadata preserves its 403 contract
+  ---
+  duration_ms: 0.573292
+  type: 'test'
+  ...
+# Subtest: typed IMPERSONATION_TARGET_INACTIVE without authority metadata preserves its 403 contract
+ok 166 - typed IMPERSONATION_TARGET_INACTIVE without authority metadata preserves its 403 contract
+  ---
+  duration_ms: 0.532333
+  type: 'test'
+  ...
+# Subtest: typed PRODUCTION_AUTH_CERTIFICATION_REQUIRED without authority metadata preserves its 403 contract
+ok 167 - typed PRODUCTION_AUTH_CERTIFICATION_REQUIRED without authority metadata preserves its 403 contract
+  ---
+  duration_ms: 0.436209
+  type: 'test'
+  ...
+# Subtest: typed IDENTITY_AUTHORITY_UNAVAILABLE without authority metadata preserves its 503 contract
+ok 168 - typed IDENTITY_AUTHORITY_UNAVAILABLE without authority metadata preserves its 503 contract
+  ---
+  duration_ms: 0.470583
+  type: 'test'
+  ...
+# Subtest: typed PARTICIPANT_CONTEXT_UNAVAILABLE without authority metadata preserves its 503 contract
+ok 169 - typed PARTICIPANT_CONTEXT_UNAVAILABLE without authority metadata preserves its 503 contract
+  ---
+  duration_ms: 0.4925
+  type: 'test'
+  ...
+# Subtest: typed PRODUCTION_CURRENT_TOURNAMENT_IDENTITY_NOT_POINTER_AWARE without authority metadata preserves its 503 contract
+ok 170 - typed PRODUCTION_CURRENT_TOURNAMENT_IDENTITY_NOT_POINTER_AWARE without authority metadata preserves its 503 contract
+  ---
+  duration_ms: 0.468667
+  type: 'test'
+  ...
+# Subtest: linked participant success preserves the exact context and ignores client-selected identity/resource
+ok 171 - linked participant success preserves the exact context and ignores client-selected identity/resource
+  ---
+  duration_ms: 1.010959
+  type: 'test'
+  ...
+# Subtest: generic internal failure remains generic 503 rather than becoming an authorization denial
+ok 172 - generic internal failure remains generic 503 rather than becoming an authorization denial
+  ---
+  duration_ms: 0.506541
+  type: 'test'
+  ...
+# Subtest: untyped authorization-shaped error remains generic 503 rather than becoming an authorization denial
+ok 173 - untyped authorization-shaped error remains generic 503 rather than becoming an authorization denial
+  ---
+  duration_ms: 0.430292
+  type: 'test'
+  ...
+# Subtest: untyped named impostor remains generic 503 rather than becoming an authorization denial
+ok 174 - untyped named impostor remains generic 503 rather than becoming an authorization denial
+  ---
+  duration_ms: 0.441792
+  type: 'test'
+  ...
+# Subtest: service/database unavailable remains generic 503 rather than becoming an authorization denial
+ok 175 - service/database unavailable remains generic 503 rather than becoming an authorization denial
+  ---
+  duration_ms: 0.424875
+  type: 'test'
+  ...
+# Subtest: an actual canonical read outage remains 503 without returning partial/private context
+ok 176 - an actual canonical read outage remains 503 without returning partial/private context
+  ---
+  duration_ms: 0.503
+  type: 'test'
+  ...
+# Subtest: invalid physical resource selection remains unavailable before Auth or canonical context
+ok 177 - invalid physical resource selection remains unavailable before Auth or canonical context
+  ---
+  duration_ms: 0.497292
+  type: 'test'
+  ...
+# Subtest: participant-context diagnostic route stays unavailable outside Preview
+ok 178 - participant-context diagnostic route stays unavailable outside Preview
+  ---
+  duration_ms: 0.502833
+  type: 'test'
+  ...
+1..178
+# tests 263
+# suites 0
+# pass 263
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 221528.926625

@@ -1,0 +1,21 @@
+{
+  "baselinePath": "docs/reliability/phase2d-identity-contact-remediation/evidence/application.json",
+  "baselineSha256": "cafed05570d55ab78885eda071b375d42c8378d110d6bb7a8145811860bce946",
+  "currentCounts": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "exactFailureIdentityMatch": true,
+  "newUnexplainedFailureIdentities": [],
+  "focusedCounts": {
+    "tests": 263,
+    "pass": 263,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "buildExitCode": 0
+}

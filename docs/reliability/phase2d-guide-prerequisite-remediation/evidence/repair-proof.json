@@ -1,0 +1,172 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17_ONLY",
+  "hostedMutated": false,
+  "remoteNetwork": false,
+  "modeledAuthOnly": true,
+  "cases": [
+    {
+      "name": "original omitted-contact package reproduces canonical identity denial without invented hosted facts",
+      "result": "PASS"
+    },
+    {
+      "name": "repair follows supported release rebind without rewriting the original fixture receipt",
+      "result": "PASS"
+    },
+    {
+      "name": "repair rejects resource ymqhhtxaywtqllynrmxe before rendering",
+      "result": "PASS"
+    },
+    {
+      "name": "repair rejects resource idgigvjjqkfbqjeredpb before rendering",
+      "result": "PASS"
+    },
+    {
+      "name": "repair rejects resource zzzzzzzzzzzzzzzzzzzz before rendering",
+      "result": "PASS"
+    },
+    {
+      "name": "repair rejects client-selected identities and unapproved original package",
+      "result": "PASS"
+    },
+    {
+      "name": "anon cannot invoke repair",
+      "result": "PASS"
+    },
+    {
+      "name": "authenticated cannot invoke repair",
+      "result": "PASS"
+    },
+    {
+      "name": "service_role cannot invoke repair",
+      "result": "PASS"
+    },
+    {
+      "name": "owner may not impersonate a runtime participant",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong deployment denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong release denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong origin denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "stale admission denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong binding denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong epoch denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong generation denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong original receipt denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong original fingerprint denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "enabled admission is not silently repaired",
+      "result": "PASS"
+    },
+    {
+      "name": "open ingress is not silently repaired",
+      "result": "PASS"
+    },
+    {
+      "name": "changed existing link is not silently repaired",
+      "result": "PASS"
+    },
+    {
+      "name": "changed fixture is not silently repaired",
+      "result": "PASS"
+    },
+    {
+      "name": "unexpected context is not silently repaired",
+      "result": "PASS"
+    },
+    {
+      "name": "preexisting contact is not silently repaired",
+      "result": "PASS"
+    },
+    {
+      "name": "CERTIFICATION_PART2A_SYNTHETIC_CONTACTS_PROVISIONED audit failure rolls back all new rows",
+      "result": "PASS"
+    },
+    {
+      "name": "CERTIFICATION_PART2A_IDENTITY_CONTACTS_REPAIRED audit failure rolls back all new rows",
+      "result": "PASS"
+    },
+    {
+      "name": "managed owner repair creates only three contacts and required provenance; controls and fixture immutable",
+      "result": "PASS"
+    },
+    {
+      "name": "exact replay creates no duplicate contacts/audits/revisions",
+      "result": "PASS"
+    },
+    {
+      "name": "conflicting replay and changed contacts are denied without overwriting",
+      "result": "PASS"
+    },
+    {
+      "name": "original audit receipt and full catalog/security are unchanged",
+      "result": "PASS"
+    },
+    {
+      "name": "repaired fixture resolves all exact identities through canonical projection and resolver",
+      "result": "PASS"
+    }
+  ],
+  "supportedReleaseRebind": true,
+  "catalogUnchanged": true,
+  "originalReceiptUnchanged": true,
+  "canonicalIdentity": {
+    "mappings": [
+      {
+        "authUserId": "3003e93a-f0ec-422b-835e-5081fefb2e8e",
+        "playerId": "P01"
+      },
+      {
+        "authUserId": "3dcda7ec-1a08-4c93-93ec-3ec934a775bf",
+        "playerId": "P12"
+      },
+      {
+        "authUserId": "8172c31f-99fc-4798-9fd2-ecdfd3bda21a",
+        "playerId": "P11"
+      }
+    ],
+    "signedOut": "AUTH_SESSION_REQUIRED",
+    "unlinked": "ACTIVE_USER_PLAYER_LINK_REQUIRED",
+    "inactiveOrMismatchedIdentity": "DENIED",
+    "clientCrossSelection": "CANNOT SELECT OTHER PLAYER",
+    "authProof": "MODELED_LOCAL_VERIFIED_SUBJECT; actual unchanged SQL projection and resolver executed; no hosted Auth claim"
+  },
+  "repairPackageSha256": "d5b8a5a8a46e515705b27fb4d947df0f7b4d05e3f6e00271ab5fc3e2328f8925",
+  "legacyPackageSha256": "fd4dcf5aef0bc06e3977340d894d751834ae82a785c63681e73e09ec093296e2",
+  "newRows": {
+    "contacts": 3,
+    "contextRevisions": 1,
+    "importProvenance": 1,
+    "identityAudit": 1,
+    "repairAudit": 1
+  },
+  "preservedRowsModified": 0,
+  "admissionDisabled": true,
+  "ingressPaused": true
+}

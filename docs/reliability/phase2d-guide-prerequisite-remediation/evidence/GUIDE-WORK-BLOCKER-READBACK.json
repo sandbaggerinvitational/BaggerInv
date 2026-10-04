@@ -1,0 +1,10 @@
+{
+  "automatic_job_count": 4,
+  "final_recap_eligible": false,
+  "guide_content_revision_count": 0,
+  "guide_current_pointer_count": 0,
+  "guide_projection_revision_count": 0,
+  "waiting_final_recap": 1,
+  "worker_active_leases": 0,
+  "worker_dead_letters": 0
+}

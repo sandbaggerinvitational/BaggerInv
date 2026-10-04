@@ -1,0 +1,12 @@
+[
+  {
+    "originalArtifact": "/private/tmp/bagger-phase2d-p-preflight/docs/reliability/phase2d-p/part2a-resume-16661f2b/activation-after-contact-repair/DIRECTOR-DERIVED-JOB-READBACK.json",
+    "sha256": "ea60e6a7eaef4591977137907b8d98087d7e0d9875af5d3bb4ef9007d3d33f9b",
+    "kind": "RETAINED_HOSTED_READBACK_NOT_REEXECUTED"
+  },
+  {
+    "originalArtifact": "/private/tmp/bagger-phase2d-p-preflight/docs/reliability/phase2d-p/part2a-resume-16661f2b/activation-after-contact-repair/GUIDE-WORK-BLOCKER-READBACK.json",
+    "sha256": "b6599882d9e0c803768a169a32b1c1b6d9d92e58d8c8b3239c9beb8c6a777ce8",
+    "kind": "RETAINED_HOSTED_READBACK_NOT_REEXECUTED"
+  }
+]

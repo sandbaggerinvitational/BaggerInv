@@ -29,6 +29,12 @@ declare
  participant jsonb;
  cfg jsonb;
  cfg_manifest jsonb;
+ guide_validation jsonb;
+ guide_source jsonb;
+ guide_source_text text;
+ guide_source_hash text;
+ guide_projection_id uuid;
+ guide_content_id uuid;
  handicap_id constant uuid:='10000000-0000-4000-8000-000000000001';
 begin
  /*PROVISIONING_GUARDS*/
@@ -130,6 +136,7 @@ begin
   values('2026',(identity_row->>'auth_user_id')::uuid,identity_row->>'role',current_user);
  end loop;
  /*IDENTITY_CONTACTS*/
+ /*SYNTHETIC_GUIDE*/
  insert into production_control.director_entitlements(auth_user_id,tournament_id,player_id,role,granted_by)
  values('3003e93a-f0ec-422b-835e-5081fefb2e8e','2026','P01','DIRECTOR',current_user);
  cfg:=jsonb_build_object('contract_version','production-calcutta-v1',

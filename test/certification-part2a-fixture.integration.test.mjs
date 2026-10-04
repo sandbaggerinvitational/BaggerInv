@@ -146,6 +146,15 @@ test('owner Certification Part2A provisioning package',async t=>{
     assert.equal(q(`select count(*) from scoring_authority.${table}`),'0',table);
   });
   const after=counts();
+  await check('fresh Guide is one validated synthetic revision/publication in each canonical store',async()=>{
+   for(const table of ['production_control.projection_revisions','production_control.projection_current',
+    'scoring_authority.guide_content_revisions','scoring_authority.guide_projection_current'])assert.equal(q(`select count(*) from ${table}`),'1');
+   const row=JSON.parse(q('select to_jsonb(v) from production_control.projection_revisions v'));
+   assert.equal(row.source_payload.source.authoringAuthority,'SYNTHETIC_FIXTURE');
+   assert.equal(row.source_workbook_id,'urn:bagger:synthetic:'+resource.installation_id);
+   assert.equal(row.validation_status,'VALID');assert.equal(row.revision_number,1);
+   evidence.guide={revision:1,publicationSequence:1,provenance:'SYNTHETIC_FIXTURE',payloadFingerprint:row.payload_fingerprint};
+  });
   await check('exact same request replay is a no-op with one audited receipt',async()=>{
    q(rendered);assert.deepEqual(counts(),after);assert.equal(control(),beforeControl);
    assert.equal(q("select count(*) from production_control.operation_audit_events where event_type='CERTIFICATION_PART2A_FIXTURE_BOOTSTRAPPED'"),'1');
@@ -158,7 +167,8 @@ test('owner Certification Part2A provisioning package',async t=>{
    for(const setup of [
     "update production_control.operation_audit_events set request_fingerprint=repeat('d',64) where event_type='CERTIFICATION_PART2A_FIXTURE_BOOTSTRAPPED'",
    "update scoring_authority.players set display_name='Changed' where player_id='P24'",
-    "update participant_identity.participant_identity_contacts set identity_active=false where player_id='P12'",
+   "update participant_identity.participant_identity_contacts set identity_active=false where player_id='P12'",
+   "update production_control.projection_current set advanced_by='Changed' where domain='GUIDE'",
    ]){
     const result=sqlResult(cluster,database,`begin;${setup};\n${scriptBody(rendered).replace(/^begin;\n/,'').replace(/commit;\s*$/,'')}\nrollback;`,{role:''});
     assert.notEqual(result.status,0);assert.match(result.stderr,/CERTIFICATION_FIXTURE_CONFLICT|CERTIFICATION_FIXTURE_DRIFT/);

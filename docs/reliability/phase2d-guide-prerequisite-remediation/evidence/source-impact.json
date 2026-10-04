@@ -1,0 +1,18 @@
+{
+  "baseSha": "16661f2b6c36fc84a9b71448709137b20cec0e88",
+  "deployableAndBootstrapTrackedFilesCompared": 1432,
+  "changedDeployableOrBootstrapFiles": [],
+  "schemaChanged": false,
+  "migrationsChanged": false,
+  "rlsGrantsFunctionsChanged": false,
+  "workersAndCalculatorsChanged": false,
+  "installationReceiptAndBootstrapManifestChanged": false,
+  "fixtureProvisioningToolingChanged": true,
+  "864HoleRerunRequired": false,
+  "reason": "Only fixed Certification owner fixture/repair tooling, local tests and evidence change; canonical application/schema/worker sources byte-identical.",
+  "retainedEvidence": "R2 domain/scoring/annual/authorization/worker retry and lease contracts; prior hosted positive gates; 048/057 NOT REPRODUCIBLE / NOT PROVEN unchanged; 069 unchanged",
+  "hostedActions": 0,
+  "credentialsRead": 0,
+  "vercelGitAutoDeploymentForBranch": false,
+  "resolvedTestSetupIssue": "First model assertion used waitingPublication.finalRecap instead of the actual FINAL_RECAP count; corrected to 1 without source/contract weakening."
+}

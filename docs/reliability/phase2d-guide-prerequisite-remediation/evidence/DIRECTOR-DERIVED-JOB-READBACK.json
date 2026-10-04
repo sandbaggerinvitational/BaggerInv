@@ -1,0 +1,167 @@
+[
+  {
+    "attempts": 0,
+    "claim_token": null,
+    "claimed_by": null,
+    "completed_at": null,
+    "delivery_attempts": 0,
+    "delivery_available_at": "-infinity",
+    "delivery_cycle": 1,
+    "delivery_dead_letter_at": null,
+    "delivery_error_class": null,
+    "engine_key": "PROJECTION_EDITORIAL",
+    "last_error_code": null,
+    "last_error_safe": null,
+    "lease_expires_at": null,
+    "requested_at": "2026-10-04T20:59:12.069412+00:00",
+    "requested_source_revision": {
+      "reason": "CANONICAL_MATCH_CHANGED",
+      "revision": {
+        "matchId": "2026-R3-12",
+        "matchRevision": 1,
+        "resultWinner": "",
+        "scorecardComplete": false,
+        "status": "UPCOMING"
+      },
+      "transactional": true
+    },
+    "round_number": 0,
+    "runtime_generation_id": null,
+    "started_at": null,
+    "status": "PENDING",
+    "tournament_id": "2026",
+    "updated_at": "2026-10-04T20:59:12.069412+00:00"
+  },
+  {
+    "attempts": 0,
+    "claim_token": null,
+    "claimed_by": null,
+    "completed_at": null,
+    "delivery_attempts": 0,
+    "delivery_available_at": "-infinity",
+    "delivery_cycle": 1,
+    "delivery_dead_letter_at": null,
+    "delivery_error_class": null,
+    "engine_key": "TEAM_MOMENTUM",
+    "last_error_code": null,
+    "last_error_safe": null,
+    "lease_expires_at": null,
+    "requested_at": "2026-10-04T20:59:12.066595+00:00",
+    "requested_source_revision": {
+      "reason": "CANONICAL_MATCH_CHANGED",
+      "revision": {
+        "matchId": "2026-R3-12",
+        "matchRevision": 1,
+        "resultWinner": "",
+        "scorecardComplete": false,
+        "status": "UPCOMING"
+      },
+      "transactional": true
+    },
+    "round_number": 0,
+    "runtime_generation_id": null,
+    "started_at": null,
+    "status": "PENDING",
+    "tournament_id": "2026",
+    "updated_at": "2026-10-04T20:59:12.066595+00:00"
+  },
+  {
+    "attempts": 0,
+    "claim_token": null,
+    "claimed_by": null,
+    "completed_at": null,
+    "delivery_attempts": 0,
+    "delivery_available_at": "-infinity",
+    "delivery_cycle": 1,
+    "delivery_dead_letter_at": null,
+    "delivery_error_class": null,
+    "engine_key": "TOURNAMENT_FINAL_RECAP",
+    "last_error_code": null,
+    "last_error_safe": null,
+    "lease_expires_at": null,
+    "requested_at": "2026-10-04T20:59:12.069669+00:00",
+    "requested_source_revision": {
+      "reason": "CANONICAL_MATCH_CHANGED",
+      "revision": {
+        "matchId": "2026-R3-12",
+        "matchRevision": 1,
+        "resultWinner": "",
+        "scorecardComplete": false,
+        "status": "UPCOMING"
+      },
+      "transactional": true
+    },
+    "round_number": 0,
+    "runtime_generation_id": null,
+    "started_at": null,
+    "status": "PENDING",
+    "tournament_id": "2026",
+    "updated_at": "2026-10-04T20:59:12.069669+00:00"
+  },
+  {
+    "attempts": 0,
+    "claim_token": null,
+    "claimed_by": null,
+    "completed_at": null,
+    "delivery_attempts": 0,
+    "delivery_available_at": "-infinity",
+    "delivery_cycle": 1,
+    "delivery_dead_letter_at": null,
+    "delivery_error_class": null,
+    "engine_key": "TOURNAMENT_INTELLIGENCE",
+    "last_error_code": null,
+    "last_error_safe": null,
+    "lease_expires_at": null,
+    "requested_at": "2026-10-04T20:59:12.069114+00:00",
+    "requested_source_revision": {
+      "reason": "CANONICAL_MATCH_CHANGED",
+      "revision": {
+        "matchId": "2026-R3-12",
+        "matchRevision": 1,
+        "resultWinner": "",
+        "scorecardComplete": false,
+        "status": "UPCOMING"
+      },
+      "transactional": true
+    },
+    "round_number": 0,
+    "runtime_generation_id": null,
+    "started_at": null,
+    "status": "PENDING",
+    "tournament_id": "2026",
+    "updated_at": "2026-10-04T20:59:12.069114+00:00"
+  },
+  {
+    "attempts": 0,
+    "claim_token": null,
+    "claimed_by": null,
+    "completed_at": null,
+    "delivery_attempts": 0,
+    "delivery_available_at": "-infinity",
+    "delivery_cycle": 1,
+    "delivery_dead_letter_at": null,
+    "delivery_error_class": null,
+    "engine_key": "TOURNAMENT_STORYLINES",
+    "last_error_code": null,
+    "last_error_safe": null,
+    "lease_expires_at": null,
+    "requested_at": "2026-10-04T20:59:12.068812+00:00",
+    "requested_source_revision": {
+      "reason": "CANONICAL_MATCH_CHANGED",
+      "revision": {
+        "matchId": "2026-R3-12",
+        "matchRevision": 1,
+        "resultWinner": "",
+        "scorecardComplete": false,
+        "status": "UPCOMING"
+      },
+      "transactional": true
+    },
+    "round_number": 0,
+    "runtime_generation_id": null,
+    "started_at": null,
+    "status": "PENDING",
+    "tournament_id": "2026",
+    "updated_at": "2026-10-04T20:59:12.068812+00:00"
+  }
+]
