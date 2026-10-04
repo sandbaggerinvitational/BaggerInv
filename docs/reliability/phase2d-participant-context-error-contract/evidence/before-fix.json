@@ -1,0 +1,19 @@
+{
+  "result": "EXPECTED_REGRESSION_REPRODUCED",
+  "baseSha": "3f6793c0d79ec19cbb8a22f7c66cacd18edc2492",
+  "environment": "LOCAL_ONLY",
+  "hosted": false,
+  "remoteSocketsDenied": true,
+  "routeSha256": "09435da29dd6b74e56a46cd4259fdf71dd7128234ad34e8c90c4602cefb7fc37",
+  "testSha256": "93b2b062c8cda880eb461e45d6fc93dc2567156703c2ca77d48d8a1d91b643f6",
+  "counts": {
+    "tests": 25,
+    "pass": 7,
+    "fail": 18,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "rawPath": "/private/tmp/bagger-participant-context-retained-raw/before-fix.tap",
+  "rawSha256": "1f9e31757b81c18d3cc82e1ff58f9d834830d1c567e0d36e1b308b7293422fe0",
+  "interpretation": "Actual unchanged route/resolver with local Auth/canonical-read boundaries; the typed error cases returned generic 503 before correction."
+}

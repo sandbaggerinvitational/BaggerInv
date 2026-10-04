@@ -1,0 +1,29 @@
+{
+  "baseSha": "3f6793c0d79ec19cbb8a22f7c66cacd18edc2492",
+  "onlyTrackedSourceChanged": [
+    "app/api/participant/context/route.js"
+  ],
+  "unchangedTrackedFiles": 4047,
+  "protectedUnchangedFiles": 838,
+  "protectedPathPrefixes": [
+    "lib/",
+    "supabase/",
+    "config/",
+    "tools/",
+    "native/"
+  ],
+  "deploymentSuppression": true,
+  "sharedErrorHelperChanged": false,
+  "resolverChanged": false,
+  "authorityRlsAdmissionScoringDirectorResourcePrivateCoreSchemaFixtureChanged": false,
+  "reasonsForNo864HoleRerun": [
+    "Only the GET route error response mapping changed.",
+    "The resolver, admission, scoring transaction, domain and database contracts remain unchanged."
+  ],
+  "sha256": {
+    "app/api/participant/context/route.js": "bb203e6e8c6341ae8f933e1bf9ce967f71055fd20e520bd9e8e2aa2ee964cac6",
+    "lib/participant-identity-resolver.js": "1a1b805e02e3fe5980e7e55689b637a7485932a6c559ac6941dc744bcc22b921",
+    "lib/participant-identity-authority.js": "3d58f92dddd330db6705c52f7d4eb35dfb5425272462461703da614ada45043c",
+    "vercel.json": "97778a3fe7fafb0a71dbe06d3c687c9c19d2d95079567f7a2e1cfa94588ebd2c"
+  }
+}

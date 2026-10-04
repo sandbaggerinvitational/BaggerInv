@@ -6,7 +6,7 @@ import { inspectPlayerPassportToken } from "../../../../lib/player-passport-serv
 import { readParticipantIdentityContext } from "../../../../lib/participant-identity-supabase.js";
 import { observeParticipantIdentityShadow } from "../../../../lib/participant-identity-shadow.js";
 import { verifyParticipantAuthClaims } from "../../../../lib/supabase-auth-server.js";
-import { participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
+import { ParticipantIdentityResolutionError, participantIdentityPublicError, resolveSupabaseParticipantIdentity } from "../../../../lib/participant-identity-resolver.js";
 import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
 
 export const dynamic = "force-dynamic";
@@ -81,7 +81,9 @@ export async function GET(request) {
       supabaseAuth: shadow.supabaseAuth, shadowComparison: shadow.shadowComparison,
       identityTimings: { passportVerificationMs, passportContextMs, ...shadow.timings } });
   } catch (error) {
-    const authority = error?.authority || { resolved: "unavailable" };
+    const authority = error instanceof ParticipantIdentityResolutionError
+      ? { resolved: "supabase" }
+      : error?.authority || { resolved: "unavailable" };
     console.error("Participant context foundation failed", { authority: authority.resolved, message: error?.message || String(error) });
     const safe = authority.resolved === "supabase" ? participantIdentityPublicError(error) : null;
     return response({ identityAuthority: authority.resolved, session: { status: safe?.status === 401 ? "inactive" : "unavailable" },
