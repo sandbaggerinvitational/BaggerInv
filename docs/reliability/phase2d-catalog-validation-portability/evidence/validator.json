@@ -1,0 +1,78 @@
+{
+  "suite": "validator",
+  "baseSha": "b46ea9465a3a6d0ad89e8d447d08546b84bd262b",
+  "executionHead": "b46ea9465a3a6d0ad89e8d447d08546b84bd262b",
+  "startedAt": "2026-10-04T03:59:26.984Z",
+  "completedAt": "2026-10-04T03:59:29.343Z",
+  "environment": "OWNED_LOCAL_POSTGRESQL17_NON_PRODUCTION",
+  "network": "OUTBOUND_NET_TLS_SOCKET_DENIED",
+  "credentials": "REMOVED_FROM_CHILD_ENV",
+  "selectionFiles": 1,
+  "sourceManifest": [
+    {
+      "file": "supabase/canonical_bootstrap/catalog-manifest.json",
+      "sha256": "b764e284667b8117764aa11500414cdb3f800b3b4cda20d08297538fcf882a74"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/catalog.sql",
+      "sha256": "95b4994868868dc2d775bb438b2dce93d3ca608aac6a416d8d60550abf3f8db5"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/manifest.json",
+      "sha256": "1d0d576e21cc48160bcbe82a56d4bc3a81adbc13032145296f1c0d6baa9ae4b2"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/schema.sql",
+      "sha256": "7c371dc677c6b5ff244dcce68a71674482c6f500d814371517fd6f0fa2dabf42"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/static-contracts.sql",
+      "sha256": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d"
+    },
+    {
+      "file": "tools/reliability/canonical-bootstrap-artifacts.mjs",
+      "sha256": "d6bb329df66d24c6f3b65ae122c33022be1a89432a15a3940b5f1dbdc67a4542"
+    },
+    {
+      "file": "tools/reliability/canonical-catalog-portability.test.mjs",
+      "sha256": "e417e046c6a46e0230ea88a6a5236f4d7eb6302f9a399671045146e05604009e"
+    },
+    {
+      "file": "tools/reliability/catalog-portability-isolation.cjs",
+      "sha256": "d857eb2be9b49c89d2b384220783cb76695c4a212fcb4c66d396ea4fb6456219"
+    },
+    {
+      "file": "tools/reliability/portable-canonical-catalog.mjs",
+      "sha256": "d2118146010dcc5b77912dc556b3afa8ff60cecfd62f613facce309f7b8457e1"
+    },
+    {
+      "file": "tools/reliability/run-catalog-portability.mjs",
+      "sha256": "8949ce9f0a41851be230369b45bf01f9687a99ca82f85d79339897bd8537d767"
+    },
+    {
+      "file": "tools/reliability/validate-canonical-catalog.mjs",
+      "sha256": "d4a158ff79d55c022d570faa45fb4d4af0bfa3af8a2e5fe417cbc3d66e3602a2"
+    }
+  ],
+  "sourcesStable": true,
+  "counts": {
+    "tests": 19,
+    "pass": 19,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "failures": [],
+  "exitCode": 0,
+  "error": null,
+  "result": "PASS",
+  "rawArtifact": "validator.log.gz",
+  "rawSha256": "df058f58201b6db7a78c564b55c0839b5df9460a7e0fb769cefef8da30dc02f7",
+  "hostedAccess": false,
+  "productionAccess": false,
+  "installationPerformed": false,
+  "limitations": [
+    "Preserved hosted snapshot is not fresh hosted validation or resource registration.",
+    "Broad raw failures require unchanged identity/diagnostic accounting."
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "status": "PASS_TOOLING_ONLY",
+  "baseApplicationSha": "b46ea9465a3a6d0ad89e8d447d08546b84bd262b",
+  "toolingCommit": "Containing commit; derive with git log -1 -- docs/reliability/phase2d-catalog-validation-portability",
+  "trackedBaseFilesChecked": 4018,
+  "changedBaseFiles": [],
+  "deployableApplicationContentChanged": false,
+  "bootstrapContentChanged": false,
+  "compilerManifestSourcesChanged": false,
+  "bootstrapVersion": "bagger-canonical-bootstrap-v1",
+  "bootstrapHashes": {
+    "schema.sql": "7c371dc677c6b5ff244dcce68a71674482c6f500d814371517fd6f0fa2dabf42",
+    "static-contracts.sql": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d",
+    "catalog-manifest.json": "b764e284667b8117764aa11500414cdb3f800b3b4cda20d08297538fcf882a74",
+    "manifest.json": "1d0d576e21cc48160bcbe82a56d4bc3a81adbc13032145296f1c0d6baa9ae4b2",
+    "catalog.sql": "95b4994868868dc2d775bb438b2dce93d3ca608aac6a416d8d60550abf3f8db5"
+  },
+  "existingInstallationReceiptUnchanged": true,
+  "existingInstallationReceiptStillExact": true,
+  "newValidatorContract": "bagger-catalog-validation-portability-v1",
+  "newValidatorOutsideBootstrapToolSources": true,
+  "build": {
+    "rerun": false,
+    "reason": "No previously tracked file changed; new tooling is not imported by app/lib/config/build scripts. Prior certified build PASS retained.",
+    "retainedEvidence": "docs/reliability/phase2d-bootstrap-privilege-portability/evidence/build.json"
+  },
+  "chronology864": {
+    "rerun": false,
+    "reason": "No schema, function, dependency, application, authority, RLS, grant, scoring or domain artifact changed."
+  },
+  "hosted": {
+    "accessed": false,
+    "mutated": false,
+    "reinstalled": false,
+    "registered": false,
+    "initialized": false
+  },
+  "productionAccess": false,
+  "oldPreviewAccess": false,
+  "googleAccess": false,
+  "vercelChanged": false,
+  "deployment": false,
+  "gitDeploymentEnabledForBranch": false,
+  "branch": "codex/reliability-phase2d-staging-admission",
+  "historical048_057": "NOT_REPRODUCIBLE_FROM_RETAINED_EVIDENCE_NOT_PROVEN_UNCHANGED",
+  "069": "UNCHANGED"
+}

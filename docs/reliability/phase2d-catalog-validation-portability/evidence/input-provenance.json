@@ -1,0 +1,24 @@
+{
+  "sourceApplicationSha": "b46ea9465a3a6d0ad89e8d447d08546b84bd262b",
+  "projectRef": "trmcwrljjxwhgtikfdgu",
+  "provenance": "Actual prior Part1A post-commit catalog/receipt readback. Copied locally during this remediation; no hosted access.",
+  "rawCatalogSha256": "f981f0400d7d51f027e6a823bfd48121b60f646b5f479145ef7bf3dbf0a08c18",
+  "compressedCatalogSha256": "0cff2fa6666aa3d4876aef61039358b05952b389589a97bf61fc26e51acc3705",
+  "hostedCollation": {
+    "collation": "en_US.UTF-8",
+    "ctype": "en_US.UTF-8",
+    "locale": "en-US",
+    "provider": "i"
+  },
+  "retainedDependencyClassification": {
+    "exact_ordered_match": false,
+    "actual_count": 12994,
+    "expected_count": 12994,
+    "unordered_multiset_match": true,
+    "unexpected_count": 0,
+    "missing_count": 0
+  },
+  "receiptUnchanged": true,
+  "containsApplicationData": false,
+  "containsSecretValues": false
+}

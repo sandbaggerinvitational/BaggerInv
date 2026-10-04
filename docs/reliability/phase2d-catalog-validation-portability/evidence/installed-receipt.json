@@ -1,0 +1,9 @@
+[
+  {
+    "contract_version": "bagger-canonical-bootstrap-v1",
+    "installed_at": "2026-10-04T03:36:35.54824+00:00",
+    "manifest_sha256": "1d0d576e21cc48160bcbe82a56d4bc3a81adbc13032145296f1c0d6baa9ae4b2",
+    "schema_sha256": "7c371dc677c6b5ff244dcce68a71674482c6f500d814371517fd6f0fa2dabf42",
+    "static_data_sha256": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d"
+  }
+]

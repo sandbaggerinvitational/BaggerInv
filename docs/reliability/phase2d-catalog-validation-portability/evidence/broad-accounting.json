@@ -1,0 +1,27 @@
+{
+  "status": "PASS_NO_NEW_UNEXPLAINED_FAILURES",
+  "baselineCounts": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "candidateCounts": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "baselineSelectionFiles": 493,
+  "candidateSelectionFiles": 493,
+  "unchangedBaselineFailureIdentities": 20,
+  "newFailureIdentities": [],
+  "resolvedFailureIdentities": [],
+  "changedDiagnostics": [],
+  "comparison": "EXACT_IDENTITY_AND_NORMALIZED_DIAGNOSTIC",
+  "rawSuiteStatus": "FAIL_20_ESTABLISHED_BASELINE_FAILURES",
+  "newValidatorTests": 19,
+  "validatorTestsIncludedIn493FileSelection": false
+}
