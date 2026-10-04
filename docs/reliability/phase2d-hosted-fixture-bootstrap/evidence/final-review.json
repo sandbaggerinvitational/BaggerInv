@@ -1,0 +1,28 @@
+{
+  "baseSha": "1ae328f8fb4e303af4e6ad18cb9de1ee09bb209f",
+  "existingTrackedFilesChanged": 0,
+  "trackedBaseFileCount": 4034,
+  "installedApplicationBootstrapAndMigrationsUnchanged": true,
+  "secretScan": {
+    "newFilesScanned": 14,
+    "knownCredentialValuesComparedWithoutOutput": 5,
+    "leaks": 0,
+    "retainedBroadLogLeaks": 0,
+    "retainedBuildLogLeaks": 0
+  },
+  "broadRawLog": {
+    "localPath": "/private/tmp/bagger-fixture-retained-raw/application.tap",
+    "sha256": "b9330f41cd03d72bfd52105e702842268a1ba7b3e8790656d8e1c0e853d840af",
+    "committed": false
+  },
+  "gitAutomaticDeploymentDisabledForBranch": true,
+  "githubWorkflowsPresent": false,
+  "hostedRequestsMade": 0,
+  "hostedMutationsMade": 0,
+  "newDeployment": false,
+  "buildRawLog": {
+    "localPath": "/private/tmp/bagger-fixture-retained-raw/build.tap",
+    "sha256": "c2e8d8b7e2fb303d67156c82becde787b98d7c005cc190c913a988781ae94c1f",
+    "committed": false
+  }
+}

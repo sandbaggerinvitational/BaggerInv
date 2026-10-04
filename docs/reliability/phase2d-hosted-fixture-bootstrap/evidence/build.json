@@ -1,0 +1,29 @@
+{
+  "mode": "build",
+  "startedAt": "2026-10-04T07:57:28.866Z",
+  "completedAt": "2026-10-04T07:57:40.411Z",
+  "environment": "OWNED_LOCAL_ONLY",
+  "hosted": false,
+  "credentialsRemoved": true,
+  "remoteSocketsDenied": true,
+  "executionHead": "1ae328f8fb4e303af4e6ad18cb9de1ee09bb209f",
+  "counts": null,
+  "failures": [],
+  "exitCode": 0,
+  "error": null,
+  "sourcesStable": true,
+  "sourceManifest": {
+    "tools/reliability/certification-part2a-fixture.mjs": "e1913cca3d5412abdc0425e356aa22c09db5c30da832bd557c8474f2d3ee99f5",
+    "tools/reliability/certification-part2a-fixture.sql": "fd4dcf5aef0bc06e3977340d894d751834ae82a785c63681e73e09ec093296e2",
+    "tools/reliability/run-certification-fixture-tests.mjs": "ce2b497878697634380db185126666deaeb13032fe55dc4ae3b37c74afc49aa6",
+    "test/certification-part2a-fixture.integration.test.mjs": "8f00ce4330eb8a0749852a4da3c379d32ab99caf7fc40a2af0f159e52e7cf954",
+    "config/certification-resource-registration.json": "5aa847d4557e5048496eb6e75f2cf20cdeef10f73dbf1fb85b3f7fd5eaae3b0e",
+    "supabase/canonical_bootstrap/schema.sql": "7c371dc677c6b5ff244dcce68a71674482c6f500d814371517fd6f0fa2dabf42",
+    "supabase/canonical_bootstrap/static-contracts.sql": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d",
+    "supabase/canonical_bootstrap/manifest.json": "1d0d576e21cc48160bcbe82a56d4bc3a81adbc13032145296f1c0d6baa9ae4b2",
+    "supabase/canonical_bootstrap/catalog.sql": "95b4994868868dc2d775bb438b2dce93d3ca608aac6a416d8d60550abf3f8db5",
+    "supabase/canonical_bootstrap/catalog-manifest.json": "b764e284667b8117764aa11500414cdb3f800b3b4cda20d08297538fcf882a74"
+  },
+  "rawSha256": "c2e8d8b7e2fb303d67156c82becde787b98d7c005cc190c913a988781ae94c1f",
+  "result": "PASS"
+}

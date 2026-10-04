@@ -1,0 +1,136 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17_ONLY",
+  "hostedMutated": false,
+  "remoteNetwork": false,
+  "modeledAuthOnly": true,
+  "cases": [
+    {
+      "name": "renderer rejects Production, old Preview, arbitrary and client-selected resource/identities",
+      "result": "PASS"
+    },
+    {
+      "name": "anon cannot invoke owner provisioning",
+      "result": "PASS"
+    },
+    {
+      "name": "authenticated cannot invoke owner provisioning",
+      "result": "PASS"
+    },
+    {
+      "name": "service_role cannot invoke owner provisioning",
+      "result": "PASS"
+    },
+    {
+      "name": "owner cannot impersonate a service-role runtime request",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong release denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong deployment denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong origin denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong binding denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong epoch denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "stale activation denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "stale admission denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "stale pointer denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "stale generation denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "admission enabled refused without fixture changes",
+      "result": "PASS"
+    },
+    {
+      "name": "ingress open refused without fixture changes",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong registered database refused without fixture changes",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong installed receipt refused without fixture changes",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong existing player refused without fixture changes",
+      "result": "PASS"
+    },
+    {
+      "name": "unconfirmed Auth refuses linkage",
+      "result": "PASS"
+    },
+    {
+      "name": "non-synthetic Auth refuses linkage",
+      "result": "PASS"
+    },
+    {
+      "name": "required audit failure rolls back every fixture row",
+      "result": "PASS"
+    },
+    {
+      "name": "managed non-superuser owner creates exact minimum fixture without enabling admission",
+      "result": "PASS"
+    },
+    {
+      "name": "exact same request replay is a no-op with one audited receipt",
+      "result": "PASS"
+    },
+    {
+      "name": "changed package/request receipt conflicts; changed persisted fixture is not silently repaired",
+      "result": "PASS"
+    },
+    {
+      "name": "all catalog functions, ACLs, triggers, RLS, owners and private cores remain exact",
+      "result": "PASS"
+    },
+    {
+      "name": "fixture supports existing canonical Director setup, full-roster pairing and financial contracts after separate local activation",
+      "result": "PASS"
+    }
+  ],
+  "baseSha": "1ae328f8fb4e303af4e6ad18cb9de1ee09bb209f",
+  "receipt": {
+    "eventType": "CERTIFICATION_PART2A_FIXTURE_BOOTSTRAPPED",
+    "actor": "postgres",
+    "packageSha256": "fd4dcf5aef0bc06e3977340d894d751834ae82a785c63681e73e09ec093296e2",
+    "fixtureStateSha256": "617ab90ef5a19cfd2896e276a07bda27cf3b6f7adbb883abf05638969a98497b"
+  },
+  "catalogUnchanged": true,
+  "controlsUnchanged": true,
+  "fixtureCounts": {
+    "players": 4,
+    "teams": 2,
+    "rounds": 1,
+    "matches": 2,
+    "holes": 36,
+    "authLinks": 3,
+    "directorEntitlements": 1
+  },
+  "renderedPackageSha256": "feb8bdeb167b1ee7d13bfb769b0fbfe186eb55c082959aa66b56e7f83ced4211",
+  "installedBootstrapUnchanged": true
+}

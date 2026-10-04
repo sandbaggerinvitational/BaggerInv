@@ -1,0 +1,35 @@
+{
+  "mode": "focused",
+  "startedAt": "2026-10-04T08:04:21.329Z",
+  "completedAt": "2026-10-04T08:05:10.535Z",
+  "environment": "OWNED_LOCAL_ONLY",
+  "hosted": false,
+  "credentialsRemoved": true,
+  "remoteSocketsDenied": true,
+  "executionHead": "1ae328f8fb4e303af4e6ad18cb9de1ee09bb209f",
+  "counts": {
+    "tests": 178,
+    "pass": 178,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "failures": [],
+  "exitCode": 0,
+  "error": null,
+  "sourcesStable": true,
+  "sourceManifest": {
+    "tools/reliability/certification-part2a-fixture.mjs": "e1913cca3d5412abdc0425e356aa22c09db5c30da832bd557c8474f2d3ee99f5",
+    "tools/reliability/certification-part2a-fixture.sql": "fd4dcf5aef0bc06e3977340d894d751834ae82a785c63681e73e09ec093296e2",
+    "tools/reliability/run-certification-fixture-tests.mjs": "ce2b497878697634380db185126666deaeb13032fe55dc4ae3b37c74afc49aa6",
+    "test/certification-part2a-fixture.integration.test.mjs": "2ad686acafd9201c1ff290ec821cfd6459c684d69da2163e14de9f7916f5714d",
+    "config/certification-resource-registration.json": "5aa847d4557e5048496eb6e75f2cf20cdeef10f73dbf1fb85b3f7fd5eaae3b0e",
+    "supabase/canonical_bootstrap/schema.sql": "7c371dc677c6b5ff244dcce68a71674482c6f500d814371517fd6f0fa2dabf42",
+    "supabase/canonical_bootstrap/static-contracts.sql": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d",
+    "supabase/canonical_bootstrap/manifest.json": "1d0d576e21cc48160bcbe82a56d4bc3a81adbc13032145296f1c0d6baa9ae4b2",
+    "supabase/canonical_bootstrap/catalog.sql": "95b4994868868dc2d775bb438b2dce93d3ca608aac6a416d8d60550abf3f8db5",
+    "supabase/canonical_bootstrap/catalog-manifest.json": "b764e284667b8117764aa11500414cdb3f800b3b4cda20d08297538fcf882a74"
+  },
+  "rawSha256": "373a70415ab6224aad44cf74f046b9fdb4011eb1c848de626e5b2101afb26171",
+  "result": "PASS"
+}
