@@ -6,11 +6,15 @@ import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {repositoryRoot} from '../../test/support/reliability/postgres17.mjs';
 const mode=process.argv[2];assert.ok(['focused','application','build'].includes(mode)&&process.argv.length===3);
-const directory=path.join(repositoryRoot,'docs/reliability/phase2d-hosted-fixture-bootstrap/evidence');
+const directory=path.join(repositoryRoot,'docs/reliability/phase2d-identity-contact-remediation/evidence');
 await mkdir(directory,{recursive:true});
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const sourceFiles=['tools/reliability/certification-part2a-fixture.mjs','tools/reliability/certification-part2a-fixture.sql',
+ 'tools/reliability/certification-part2a-provisioning-guards.sql','tools/reliability/certification-part2a-identity-contacts.sql',
+ 'tools/reliability/certification-part2a-identity-contacts-repair.sql',
  'tools/reliability/run-certification-fixture-tests.mjs','test/certification-part2a-fixture.integration.test.mjs',
+ 'test/certification-part2a-contact-repair.integration.test.mjs','test/support/reliability/certification-contact-identity-proof.mjs',
+ 'test/support/reliability/fixtures/certification-part2a-omitted-contacts.sql',
  'config/certification-resource-registration.json',...['schema.sql','static-contracts.sql','manifest.json','catalog.sql','catalog-manifest.json']
  .map(name=>'supabase/canonical_bootstrap/'+name)];
 const snapshot=async()=>Object.fromEntries(await Promise.all(sourceFiles.map(async file=>[file,hash(await readFile(path.join(repositoryRoot,file)))])));
@@ -20,7 +24,8 @@ for(const key of Object.keys(env))if(/SUPABASE|VERCEL|GOOGLE|WORKBOOK|SERVICE_AC
 env.NODE_OPTIONS=`--require ${path.join(repositoryRoot,'tools/reliability/phase2-network-deny.cjs')}`;
 env.NEXT_TELEMETRY_DISABLED='1';env.BAGGER_PHASE2C1_CANDIDATE='1';env.BAGGER_PHASE2C1_CLOSURE='1';
 const files=mode==='application'?JSON.parse(await readFile(path.join(repositoryRoot,'docs/reliability/phase2/evidence/application-selection.json'),'utf8'))
- :['test/certification-part2a-fixture.integration.test.mjs','test/certification-resource-registration.test.mjs',
+ :['test/certification-part2a-fixture.integration.test.mjs','test/certification-part2a-contact-repair.integration.test.mjs',
+ 'test/participant-context-error-contract.test.mjs','test/certification-resource-registration.test.mjs',
  'test/certification-runtime-server.test.mjs','test/certification-ingress-transport.test.mjs','test/certification-adapter-routing.test.mjs'];
 if(mode==='application')assert.equal(files.length,493);
 const args=mode==='build'?['node_modules/next/dist/bin/next','build']

@@ -8,12 +8,14 @@ import registration from '../../config/certification-resource-registration.json'
 import {certificationManifestDigest} from '../../lib/canonical-resource-registration.js';
 
 export const fixtureContract='bootstrap-certification-part2a-fixture-v1';
+export const contactRepairContract='repair-certification-part2a-identity-contacts-v1';
+export const legacyFixturePackageSha256='fd4dcf5aef0bc06e3977340d894d751834ae82a785c63681e73e09ec093296e2';
 export const fixtureIdentities=Object.freeze([
  {auth_user_id:'3003e93a-f0ec-422b-835e-5081fefb2e8e',player_id:'P01',role:'DIRECTOR',email:'part2a-director@synthetic.bagger-certification.invalid'},
  {auth_user_id:'3dcda7ec-1a08-4c93-93ec-3ec934a775bf',player_id:'P12',role:'PARTICIPANT',email:'part2a-participant-a@synthetic.bagger-certification.invalid'},
  {auth_user_id:'8172c31f-99fc-4798-9fd2-ecdfd3bda21a',player_id:'P11',role:'PARTICIPANT',email:'part2a-participant-b@synthetic.bagger-certification.invalid'},
 ].map(Object.freeze));
-export const fixtureTables=Object.freeze([
+export const legacyFixtureTables=Object.freeze([
  'scoring_authority.players','scoring_authority.teams','scoring_authority.rounds',
  'scoring_authority.handicap_revisions','scoring_authority.tournament_players',
  'scoring_authority.handicap_revision_entries','scoring_authority.handicap_revision_current',
@@ -26,14 +28,19 @@ export const fixtureTables=Object.freeze([
  'participant_identity.tournament_roles','production_control.director_entitlements',
  'scoring_authority.calcutta_v1_configuration_revisions','scoring_authority.calcutta_v1_current',
 ]);
+export const contactTables=Object.freeze([
+ 'participant_identity.participant_identity_contacts','participant_identity.identity_context_revisions',
+ 'participant_identity.identity_config_import_runs','participant_identity.identity_audit_events',
+]);
+export const fixtureTables=Object.freeze([...legacyFixtureTables,...contactTables]);
 const digest=value=>createHash('sha256').update(value).digest('hex');
 const literal=value=>"'"+JSON.stringify(value).replaceAll("'","''")+"'::jsonb";
 const exactKeys=(value,keys)=>assert.ok(value&&typeof value==='object'&&!Array.isArray(value)&&
  Object.keys(value).length===keys.length&&keys.every(key=>Object.hasOwn(value,key)),'Exact owner request shape required');
-export function validateFixtureRequest(input){
- exactKeys(input,['contract','operation_id','resource','deployment','expected']);
- assert.equal(input.contract,fixtureContract);
- assert.equal(input.operation_id,'certification-part2a-initial-fixture');
+export function validateFixtureRequest(input,{repair=false}={}){
+ exactKeys(input,['contract','operation_id','resource','deployment','expected',...(repair?['fixture_receipt']:[])]);
+ assert.equal(input.contract,repair?contactRepairContract:fixtureContract);
+ assert.equal(input.operation_id,repair?'certification-part2a-identity-contacts-repair':'certification-part2a-initial-fixture');
  assert.deepEqual(input.resource,registration.registration,'Only the checked-in Certification registration is supported');
  exactKeys(input.deployment,['vercel_team_id','vercel_project_id','git_branch','deployment_class','release_commit','deployment_id','deployment_origin']);
  for(const key of ['vercel_team_id','vercel_project_id','git_branch','deployment_class'])
@@ -45,29 +52,50 @@ export function validateFixtureRequest(input){
  for(const key of ['binding_id','authority_epoch_id','generation_id'])assert.match(input.expected[key],/^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/);
  for(const key of ['activation_revision','admission_revision','pointer_revision','generation_revision'])
   assert.ok(Number.isSafeInteger(input.expected[key])&&input.expected[key]>0,'Positive exact revision required');
+ if(repair){
+  exactKeys(input.fixture_receipt,['event_id','request_fingerprint','package_sha256','fixture_state_sha256']);
+  assert.ok(Number.isSafeInteger(input.fixture_receipt.event_id)&&input.fixture_receipt.event_id>0);
+  assert.equal(input.fixture_receipt.package_sha256,legacyFixturePackageSha256,'Only the certified omitted-contact package is repairable');
+  for(const key of ['request_fingerprint','fixture_state_sha256'])assert.match(input.fixture_receipt[key],/^[a-f0-9]{64}$/);
+ }
  return input;
 }
-export async function renderCertificationFixture(input){
- validateFixtureRequest(input);
- const template=await readFile(new URL('./certification-part2a-fixture.sql',import.meta.url),'utf8');
+const tableSnapshot=tables=>`jsonb_build_object(${tables.map(table=>`'${table}',(select coalesce(jsonb_agg(to_jsonb(v) order by to_jsonb(v)::text collate "C"),'[]'::jsonb) from ${table} v)`).join(',')})`;
+async function renderPackage(input,repair){
+ validateFixtureRequest(input,{repair});
+ const file=repair?'certification-part2a-identity-contacts-repair.sql':'certification-part2a-fixture.sql';
+ const artifactNames=[file,'certification-part2a-provisioning-guards.sql','certification-part2a-identity-contacts.sql'];
+ const artifacts=await Promise.all(artifactNames.map(async name=>[name,await readFile(new URL('./'+name,import.meta.url),'utf8')]));
+ const [template,guards,contacts]=artifacts.map(([,text])=>text);
  const manifest=JSON.parse(await readFile(new URL('../../supabase/canonical_bootstrap/manifest.json',import.meta.url),'utf8'));
- const tableSnapshot=`jsonb_build_object(${fixtureTables.map(table=>`'${table}',(select coalesce(jsonb_agg(to_jsonb(v) order by to_jsonb(v)::text collate "C"),'[]'::jsonb) from ${table} v)`).join(',')})`;
  const request={...structuredClone(input),registration_manifest_digest:certificationManifestDigest(registration),
-  package_sha256:digest(template),identities:fixtureIdentities,
+  package_sha256:digest(JSON.stringify(artifacts.map(([name,text])=>({name,sha256:digest(text)})))),identities:fixtureIdentities,
   installed_manifest_sha256:digest(await readFile(new URL('../../supabase/canonical_bootstrap/manifest.json',import.meta.url))),
   installed_schema_sha256:manifest.artifacts.schema.sha256,installed_static_sha256:manifest.artifacts.staticData.sha256};
- return template.replace('/*OWNER_REQUEST*/',literal(request))
+ const rendered=template.replace('/*PROVISIONING_GUARDS*/',guards).replace('/*IDENTITY_CONTACTS*/',contacts)
+  .replace('/*OWNER_REQUEST*/',literal(request))
+  .replace('/*APPROVED_CONTRACT*/',"'"+(repair?contactRepairContract:fixtureContract)+"'")
+  .replace('/*APPROVED_OPERATION*/',"'"+(repair?'certification-part2a-identity-contacts-repair':'certification-part2a-initial-fixture')+"'")
   .replace('/*APPROVED_REGISTRATION*/',literal(registration.registration))
   .replace('/*APPROVED_IDENTITIES*/',literal(fixtureIdentities))
-  .replaceAll('/*FIXTURE_SNAPSHOT*/',tableSnapshot)
+  .replaceAll('/*FIXTURE_SNAPSHOT*/',tableSnapshot(fixtureTables))
+  .replaceAll('/*LEGACY_FIXTURE_SNAPSHOT*/',tableSnapshot(legacyFixtureTables))
+  .replaceAll('/*CONTACT_STATE_SNAPSHOT*/',tableSnapshot(contactTables))
+  .replace('/*LEGACY_PACKAGE_SHA256*/',"'"+legacyFixturePackageSha256+"'")
+  .replace('/*CONTACT_STATE_PRESENT*/',contactTables.map(table=>`exists(select 1 from ${table})`).join(' or '))
   .replace('/*LOCK_FIXTURE_TABLES*/',fixtureTables.join(','))
   .replace('/*EMPTY_FIXTURE*/',fixtureTables.map(table=>`exists(select 1 from ${table})`).join(' or '));
+ assert.ok(!/\/\*[A-Z_]+\*\//.test(rendered),'Unexpanded provisioning marker');
+ return rendered;
 }
+export const renderCertificationFixture=input=>renderPackage(input,false);
+export const renderCertificationIdentityContactRepair=input=>renderPackage(input,true);
 
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
- assert.equal(process.argv.length,4,'Usage: node tools/reliability/certification-part2a-fixture.mjs REQUEST.json OUTPUT.sql (renders only)');
- const input=JSON.parse(await readFile(process.argv[2],'utf8'));
- const output=await renderCertificationFixture(input);
- await writeFile(process.argv[3],output,{mode:0o600,flag:'wx'});
- console.log(JSON.stringify({rendered:true,executed:false,contract:fixtureContract,sha256:digest(output)}));
+ const repair=process.argv[2]==='--repair',offset=repair?1:0;
+ assert.equal(process.argv.length,4+offset,'Usage: node tools/reliability/certification-part2a-fixture.mjs [--repair] REQUEST.json OUTPUT.sql (renders only)');
+ const input=JSON.parse(await readFile(process.argv[2+offset],'utf8'));
+ const output=await renderPackage(input,repair);
+ await writeFile(process.argv[3+offset],output,{mode:0o600,flag:'wx'});
+ console.log(JSON.stringify({rendered:true,executed:false,contract:input.contract,sha256:digest(output)}));
 }

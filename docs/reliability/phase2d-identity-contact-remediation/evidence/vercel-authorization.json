@@ -1,0 +1,12 @@
+{
+  "observedFrom": "LOCAL_AUTH_METADATA_AND_RETAINED_READBACK_ONLY",
+  "retainedError": "HTTP 403 forbidden",
+  "accessTokenExpired": true,
+  "accessTokenExpiresAtUTC": "2026-10-04T13:41:32Z",
+  "refreshCredentialPresent": true,
+  "directReaderUsesRefreshFlow": false,
+  "normalCLIRefreshOrReauthRequiredBeforeHostedResume": true,
+  "providerRequestThisRun": false,
+  "configChangeRequired": false,
+  "rawTokenRecorded": false
+}

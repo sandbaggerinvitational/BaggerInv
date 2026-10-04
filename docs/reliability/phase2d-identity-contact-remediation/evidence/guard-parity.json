@@ -1,0 +1,5 @@
+{
+  "sharedOwnerResourceControlGuardsMatchCertifiedBase": true,
+  "changedPredicates": 0,
+  "onlyReplacements": "fixed package contract and operation markers"
+}

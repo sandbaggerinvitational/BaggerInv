@@ -1,0 +1,18 @@
+{
+  "baseSha": "5d053589fe29ea1db85219eaf5690749cfb3dca7",
+  "trackedBaseFiles": 4057,
+  "byteIdenticalFiles": 4053,
+  "changedBaseFiles": [
+    "test/certification-part2a-fixture.integration.test.mjs",
+    "tools/reliability/certification-part2a-fixture.mjs",
+    "tools/reliability/certification-part2a-fixture.sql",
+    "tools/reliability/run-certification-fixture-tests.mjs"
+  ],
+  "criticalApplicationBootstrapFiles": 1376,
+  "criticalApplicationBootstrapContentChanged": false,
+  "schemaMigrationsConfigChanged": false,
+  "hostedAction": false,
+  "domainScoringImpact": false,
+  "chronology864RerunRequired": false,
+  "gitAutoDeployDisabled": true
+}

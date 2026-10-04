@@ -1,0 +1,157 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17_ONLY",
+  "hostedMutated": false,
+  "remoteNetwork": false,
+  "modeledAuthOnly": true,
+  "cases": [
+    {
+      "name": "renderer rejects Production, old Preview, arbitrary and client-selected resource/identities",
+      "result": "PASS"
+    },
+    {
+      "name": "anon cannot invoke owner provisioning",
+      "result": "PASS"
+    },
+    {
+      "name": "authenticated cannot invoke owner provisioning",
+      "result": "PASS"
+    },
+    {
+      "name": "service_role cannot invoke owner provisioning",
+      "result": "PASS"
+    },
+    {
+      "name": "owner cannot impersonate a service-role runtime request",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong release denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong deployment denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong origin denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong binding denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong epoch denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "stale activation denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "stale admission denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "stale pointer denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "stale generation denied atomically",
+      "result": "PASS"
+    },
+    {
+      "name": "admission enabled refused without fixture changes",
+      "result": "PASS"
+    },
+    {
+      "name": "ingress open refused without fixture changes",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong registered database refused without fixture changes",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong installed receipt refused without fixture changes",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong existing player refused without fixture changes",
+      "result": "PASS"
+    },
+    {
+      "name": "unconfirmed Auth refuses linkage",
+      "result": "PASS"
+    },
+    {
+      "name": "non-synthetic Auth refuses linkage",
+      "result": "PASS"
+    },
+    {
+      "name": "required audit failure rolls back every fixture row",
+      "result": "PASS"
+    },
+    {
+      "name": "managed non-superuser owner creates exact minimum fixture without enabling admission",
+      "result": "PASS"
+    },
+    {
+      "name": "exact same request replay is a no-op with one audited receipt",
+      "result": "PASS"
+    },
+    {
+      "name": "changed package/request receipt conflicts; changed persisted fixture is not silently repaired",
+      "result": "PASS"
+    },
+    {
+      "name": "all catalog functions, ACLs, triggers, RLS, owners and private cores remain exact",
+      "result": "PASS"
+    },
+    {
+      "name": "fixture supports existing canonical Director setup, full-roster pairing and financial contracts after separate local activation",
+      "result": "PASS"
+    }
+  ],
+  "baseSha": "5d053589fe29ea1db85219eaf5690749cfb3dca7",
+  "receipt": {
+    "eventType": "CERTIFICATION_PART2A_FIXTURE_BOOTSTRAPPED",
+    "actor": "postgres",
+    "packageSha256": "4fe9eb3c8484448a06d713a5ab6d89873b039e4c938ab14b3f02e00f9574de7e",
+    "fixtureStateSha256": "317052031524ab46657f28bac5c5bd644e09326ce594fdb7e28b691987c0a29a"
+  },
+  "catalogUnchanged": true,
+  "controlsUnchanged": true,
+  "fixtureCounts": {
+    "players": 4,
+    "teams": 2,
+    "rounds": 1,
+    "matches": 2,
+    "holes": 36,
+    "authLinks": 3,
+    "directorEntitlements": 1
+  },
+  "canonicalIdentity": {
+    "mappings": [
+      {
+        "authUserId": "3003e93a-f0ec-422b-835e-5081fefb2e8e",
+        "playerId": "P01"
+      },
+      {
+        "authUserId": "3dcda7ec-1a08-4c93-93ec-3ec934a775bf",
+        "playerId": "P12"
+      },
+      {
+        "authUserId": "8172c31f-99fc-4798-9fd2-ecdfd3bda21a",
+        "playerId": "P11"
+      }
+    ],
+    "signedOut": "AUTH_SESSION_REQUIRED",
+    "unlinked": "ACTIVE_USER_PLAYER_LINK_REQUIRED",
+    "inactiveOrMismatchedIdentity": "DENIED",
+    "clientCrossSelection": "CANNOT SELECT OTHER PLAYER",
+    "authProof": "MODELED_LOCAL_VERIFIED_SUBJECT; actual unchanged SQL projection and resolver executed; no hosted Auth claim"
+  },
+  "renderedPackageSha256": "8eaab5ea16b30c0a946230f40e705402e235dac6427c509f7508db3fb3c3bb13",
+  "installedBootstrapUnchanged": true
+}

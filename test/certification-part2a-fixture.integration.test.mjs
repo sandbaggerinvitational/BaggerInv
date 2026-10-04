@@ -11,10 +11,11 @@ import {installLocalCanonicalPlatform} from './support/reliability/phase2d-resou
 import {readCanonicalArtifacts,installCanonicalBaseline,canonicalCatalog,canonicalTableCounts} from '../tools/reliability/canonical-bootstrap-artifacts.mjs';
 import {assertPortableCatalogConvergence} from '../tools/reliability/portable-canonical-catalog.mjs';
 import {buildTournamentSetupMutation,normalizeProductionTournamentSetupPayload} from '../lib/production-tournament-setup-contract.js';
+import {proveCanonicalContactIdentity} from './support/reliability/certification-contact-identity-proof.mjs';
 
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const evidence={environment:'OWNED_LOCAL_POSTGRESQL17_ONLY',hostedMutated:false,remoteNetwork:false,
- modeledAuthOnly:true,cases:[],baseSha:'1ae328f8fb4e303af4e6ad18cb9de1ee09bb209f'};
+ modeledAuthOnly:true,cases:[],baseSha:'5d053589fe29ea1db85219eaf5690749cfb3dca7'};
 const scriptBody=value=>value.replace(/^\\set ON_ERROR_STOP on\n/m,'');
 test('owner Certification Part2A provisioning package',async t=>{
  const cluster=await createIsolatedCluster();
@@ -135,6 +136,9 @@ test('owner Certification Part2A provisioning package',async t=>{
    assert.equal(q('select count(*) from scoring_authority.matches'),'2');
    assert.equal(q('select count(*) from scoring_authority.match_holes'),'36');
    assert.equal(q('select count(*) from participant_identity.user_player_links'),'3');
+   assert.equal(q('select count(*) from participant_identity.participant_identity_contacts'),'3');
+   assert.equal(q("select count(*) from participant_identity.identity_config_import_runs where status='APPROVED' and valid_count=3 and missing_count=1"),'1');
+   assert.equal(q("select context_revision from participant_identity.identity_context_revisions where tournament_id='2026'"),'1');
    assert.equal(q('select count(*) from production_control.director_entitlements'),'1');
    assert.equal(q('select count(*) from scoring_authority.scoring_permissions where can_score'),'0');
    for(const table of ['hole_scores','score_mutations','score_derived_intents_v1','odds_calculation_jobs','odds_published_snapshots',
@@ -153,7 +157,8 @@ test('owner Certification Part2A provisioning package',async t=>{
   await check('changed package/request receipt conflicts; changed persisted fixture is not silently repaired',async()=>{
    for(const setup of [
     "update production_control.operation_audit_events set request_fingerprint=repeat('d',64) where event_type='CERTIFICATION_PART2A_FIXTURE_BOOTSTRAPPED'",
-    "update scoring_authority.players set display_name='Changed' where player_id='P24'",
+   "update scoring_authority.players set display_name='Changed' where player_id='P24'",
+    "update participant_identity.participant_identity_contacts set identity_active=false where player_id='P12'",
    ]){
     const result=sqlResult(cluster,database,`begin;${setup};\n${scriptBody(rendered).replace(/^begin;\n/,'').replace(/commit;\s*$/,'')}\nrollback;`,{role:''});
     assert.notEqual(result.status,0);assert.match(result.stderr,/CERTIFICATION_FIXTURE_CONFLICT|CERTIFICATION_FIXTURE_DRIFT/);
@@ -171,6 +176,7 @@ test('owner Certification Part2A provisioning package',async t=>{
   });
   await check('fixture supports existing canonical Director setup, full-roster pairing and financial contracts after separate local activation',async()=>{
    owner('set_certification_admission_v1',{resource_id:resource.resource_id,expected_admission_revision:1,enabled:true,reason:'LOCAL ONLY fixture usability proof'});
+   evidence.canonicalIdentity=await proveCanonicalContactIdentity({q,resource,deployment});
    const envelope={contract_version:'certification-runtime-v1',resource, deployment,phase:'DIRECTOR',
     authorization:{tournament_id:'2026',role:'DIRECTOR',player_id:'P01',auth_user_id:fixtureIdentities[0].auth_user_id}};
    const rpc=(name,input)=>JSON.parse(q(`set request.jwt.claim.role='service_role';set role service_role;select public.${name}(${jsonLiteral(input)})`));
@@ -214,7 +220,7 @@ test('owner Certification Part2A provisioning package',async t=>{
   evidence.renderedPackageSha256=hash(rendered);evidence.installedBootstrapUnchanged=true;
  }finally{
   await destroyIsolatedCluster(cluster);
-  await mkdir('docs/reliability/phase2d-hosted-fixture-bootstrap/evidence',{recursive:true});
-  await writeFile('docs/reliability/phase2d-hosted-fixture-bootstrap/evidence/local-proof.json',JSON.stringify(evidence,null,2)+'\n');
+  await mkdir('docs/reliability/phase2d-identity-contact-remediation/evidence',{recursive:true});
+  await writeFile('docs/reliability/phase2d-identity-contact-remediation/evidence/fresh-proof.json',JSON.stringify(evidence,null,2)+'\n');
  }
 });
