@@ -1,0 +1,135 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "hosted": false,
+  "externalCalls": 0,
+  "fixture": "RETAINED_LOCAL_R2_ROSTER_ONLY_FOUR_MATCHES_EXERCISED",
+  "cases": [
+    {
+      "name": "no configuration permits Mark Live and creates no Calcutta demand",
+      "result": "PASS"
+    },
+    {
+      "name": "configured but no entered auction permits Mark Live without Calcutta demand",
+      "result": "PASS"
+    },
+    {
+      "name": "supported Director purchase followed by last-entry clear creates immutable valid empty revision",
+      "result": "PASS"
+    },
+    {
+      "name": "original Mark Live failure rolls back all match/permission/financial/job/receipt changes",
+      "result": "PASS"
+    },
+    {
+      "name": "UNKNOWN is authoritatively fenced NOT_COMMITTED; same recovery replay is safe",
+      "result": "PASS"
+    },
+    {
+      "name": "forward correction rejects runtime roles and rolls back a failed postflight",
+      "result": "PASS"
+    },
+    {
+      "name": "forward artifact changes exactly one function body and no rows/ACL/RLS/owners/security/search_path",
+      "result": "PASS"
+    },
+    {
+      "name": "fresh immutable baseline plus the forward artifact converges without receipt or authority fabrication",
+      "result": "PASS"
+    },
+    {
+      "name": "purchase/clear receipts, actor-bound audit and exact duplicate survive the correction",
+      "result": "PASS"
+    },
+    {
+      "name": "stale current auction revision denies lifecycle atomically rather than silently skipping",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong current auction fingerprint denies lifecycle atomically rather than silently skipping",
+      "result": "PASS"
+    },
+    {
+      "name": "malformed empty manifest with orphan ownership denies lifecycle atomically rather than silently skipping",
+      "result": "PASS"
+    },
+    {
+      "name": "stale configuration identity denies lifecycle atomically rather than silently skipping",
+      "result": "PASS"
+    },
+    {
+      "name": "explicit Publish and Recalculate remain denied for the valid empty auction",
+      "result": "PASS"
+    },
+    {
+      "name": "valid empty auction permits shipping Mark Live, exact replay and actor-bound receipt/audit",
+      "result": "PASS"
+    },
+    {
+      "name": "empty auction creates neither direct jobs nor score-derived intents across access/score/lock",
+      "result": "PASS"
+    },
+    {
+      "name": "participant, spectator and signed-out Director requests expose no financial data and create no lease",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong resource/context/revision and private cores remain denied",
+      "result": "PASS"
+    },
+    {
+      "name": "nonempty auction still creates required work and normal worker calculates an unpublished result",
+      "result": "PASS"
+    },
+    {
+      "name": "final local fixture has no unknown lease, Google/publication or authority broadening",
+      "result": "PASS"
+    }
+  ],
+  "empty": {
+    "auctionRevision": 2,
+    "publication": "UNPUBLISHED",
+    "purchaseCount": 0
+  },
+  "originalFailure": {
+    "sqlstate": "55000",
+    "message": "PRODUCTION_CALCUTTA_AUCTION_FACTS_REQUIRED",
+    "detail": "ERROR:  55000: PRODUCTION_CALCUTTA_AUCTION_FACTS_REQUIRED\nCONTEXT:  PL/pgSQL function production_control.assert_calcutta_nonempty_revision_v1() line 10 at RAISE\nSQL statement \"insert into scoring_authority.calcutta_v1_recalculation_jobs (\n    tournament_id, configuration_revision_id, configuration_revision,\n    configuration_fingerprint, auction_revision_id, auction_revision,\n    auction_fingerprint, activation_revision, source_revision,\n    source_fingerprint, status, reason, requested_by,\n    request_fingerprint, request_payload_hash\n  ) values (\n    '2026', current_value.configuration_revision_id,\n    current_value.configuration_revision,\n    current_value.configuration_fingerprint,\n    current_value.auction_revision_id, current_value.auction_revision,\n    current_value.auction_fingerprint, activation_revision_value,\n    source_revision_value, source_fingerprint_value, 'PENDING',\n    pg_catalog.left(coalesce(nullif(reason_value, ''),\n      'EXPLICIT_RECALCULATION'), 120),\n    pg_catalog.left(coalesce(nullif(requested_by_value, ''),\n      'production-calcutta-v1'), 160),\n    request_fingerprint_value, request_payload_hash_value\n  ) returning *\"\nPL/pgSQL function enqueue_production_calcutta_v1(text,text,boolean,text,text) line 89 at SQL statement\nSQL statement \"SELECT production_control.enqueue_production_calcutta_v1(\n      case\n        when tg_table_name = 'hole_scores' then 'CANONICAL_SCORE_CHANGED'\n        when tg_table_name = 'rounds'\n          then 'CANONICAL_ROUND_LIFECYCLE_CHANGED'\n        else 'CANONICAL_MATCH_LIFECYCLE_CHANGED'\n      end,\n      'production-calcutta-v1-trigger', false, null, null\n    )\"\nPL/pgSQL function scoring_authority.enqueue_production_calcutta_v1_change() line 82 at PERFORM\nSQL statement \"update scoring_authority.matches set\n    status = case when operation = 'MARK_LIVE' then 'LIVE' else status end,\n    scoring_locked = target_locked,\n    match_revision = next_match_revision,\n    permission_revision = next_permission_revision,\n    authority_updated_at = transition_at,\n    updated_at = transition_at\n  where match_id = target_match returning *\"\nPL/pgSQL function canonical_match_control_v1(jsonb,jsonb) line 292 at SQL statement\nPL/pgSQL function production_control.canonical_director_setup_operation_v2(jsonb,jsonb,boolean) line 67 at RETURN\nPL/pgSQL function production_control.dispatch_certification_operation_v1(jsonb,jsonb,boolean) line 86 at RETURN\nPL/pgSQL function production_control.execute_certification_operation_core_v1(jsonb) line 6 at assignment\nPL/pgSQL function public.execute_certification_operation_v1(jsonb) line 21 at assignment\nLOCATION:  exec_stmt_raise, pl_exec.c:3911\n"
+  },
+  "recovery": {
+    "operationId": "5f641fb9-1534-4aaf-817e-c56413989bcb",
+    "state": "NOT_COMMITTED"
+  },
+  "catalogDelta": {
+    "contract": "calcutta-empty-auction-demand-correction-v1",
+    "baseSha": "462a3e82e24ea65a7cd8bbf59ec3355be968139e",
+    "installationMode": "REVIEWED_FORWARD_CORRECTION_AFTER_IMMUTABLE_BASELINE",
+    "baselineContract": "bagger-canonical-bootstrap-v1",
+    "baselineManifestSha256": "1d0d576e21cc48160bcbe82a56d4bc3a81adbc13032145296f1c0d6baa9ae4b2",
+    "artifact": {
+      "path": "supabase/production_incremental/calcutta-empty-auction-demand-v1.sql",
+      "sha256": "3565bc80de4e8b9119518ff3050033e1798320c766c1e41caa6f5fcbb808aba0"
+    },
+    "changedFunction": "scoring_authority.enqueue_production_calcutta_v1_change()",
+    "predecessorProsrcSha256": "07a51a1f523c27c5410427e83f72e5dea581a5db8e9605e28eb7f02fb9a35aaa",
+    "successorProsrcSha256": "1450d4944fed0d68e5604c6cca06a347dddfdc05a0e9a9926d2c25bf780aab0c",
+    "baselineReceiptRewritten": false,
+    "registrationChanged": false,
+    "dataRepairRequired": false,
+    "predecessorDefinitionSha256": "ab83f0c20dfddf2b1427b8f9ab925df61ced302ed312626712816659a66a36a1",
+    "successorDefinitionSha256": "a9c9f327d0a77b3f98035cc7965ed093f6d351f5f4eeb5d43541a6b441d68f56",
+    "functionCount": 1117,
+    "onlyFunctionBodyChanged": true
+  },
+  "freshForwardConvergence": true,
+  "correctedMarkLive": {
+    "operationId": "39dc4258-c244-4c4d-95d4-ad18ed86d0a6",
+    "revision": 2,
+    "resource": "CERTIFICATION:673bcac1-6788-40c2-b38e-ad5d6fc07903"
+  },
+  "nonempty": {
+    "result": true,
+    "jobs": 1,
+    "results": 1
+  },
+  "result": "PASS"
+}

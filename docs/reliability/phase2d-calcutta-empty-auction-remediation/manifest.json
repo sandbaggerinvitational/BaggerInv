@@ -1,0 +1,17 @@
+{
+  "contract": "calcutta-empty-auction-demand-correction-v1",
+  "baseSha": "462a3e82e24ea65a7cd8bbf59ec3355be968139e",
+  "installationMode": "REVIEWED_FORWARD_CORRECTION_AFTER_IMMUTABLE_BASELINE",
+  "baselineContract": "bagger-canonical-bootstrap-v1",
+  "baselineManifestSha256": "1d0d576e21cc48160bcbe82a56d4bc3a81adbc13032145296f1c0d6baa9ae4b2",
+  "artifact": {
+    "path": "supabase/production_incremental/calcutta-empty-auction-demand-v1.sql",
+    "sha256": "3565bc80de4e8b9119518ff3050033e1798320c766c1e41caa6f5fcbb808aba0"
+  },
+  "changedFunction": "scoring_authority.enqueue_production_calcutta_v1_change()",
+  "predecessorProsrcSha256": "07a51a1f523c27c5410427e83f72e5dea581a5db8e9605e28eb7f02fb9a35aaa",
+  "successorProsrcSha256": "1450d4944fed0d68e5604c6cca06a347dddfdc05a0e9a9926d2c25bf780aab0c",
+  "baselineReceiptRewritten": false,
+  "registrationChanged": false,
+  "dataRepairRequired": false
+}

@@ -1,0 +1,17 @@
+{
+  "baseSha": "462a3e82e24ea65a7cd8bbf59ec3355be968139e",
+  "existingTrackedFilesChecked": 4105,
+  "changedBaseTrackedFiles": [],
+  "applicationJsChanged": false,
+  "historicalMigrationsChanged": false,
+  "canonicalBootstrapChanged": false,
+  "registrationChanged": false,
+  "onlyRuntimeCorrection": "scoring_authority.enqueue_production_calcutta_v1_change()",
+  "scoringMathChanged": false,
+  "financialInputsOrCalculatorChanged": false,
+  "authorityChanged": false,
+  "rerun864HolesRequired": false,
+  "reason": "Automatic Calcutta eligibility only. Focused canonical lifecycle/score-intent/nonempty processor proof replaces no scoring math or tournament chronology; retained R2 math/authority/annual evidence remains unaffected.",
+  "productionAccess": false,
+  "hostedAccess": false
+}

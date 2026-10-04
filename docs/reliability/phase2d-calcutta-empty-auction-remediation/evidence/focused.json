@@ -1,0 +1,44 @@
+{
+  "mode": "focused",
+  "startedAt": "2026-10-04T23:18:08.027Z",
+  "completedAt": "2026-10-04T23:19:51.227Z",
+  "environment": "OWNED_LOCAL_ONLY",
+  "hosted": false,
+  "credentialsRemoved": true,
+  "remoteSocketsDenied": true,
+  "executionHead": "462a3e82e24ea65a7cd8bbf59ec3355be968139e",
+  "counts": {
+    "tests": 207,
+    "pass": 205,
+    "fail": 2,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "failures": [
+    "migration 075 compiles inertly, preserves 2026 RPCs, and enforces PostgreSQL cross-year isolation",
+    "single-entry clear uses immutable revisions, real Director authority, guards and database locks"
+  ],
+  "exitCode": 1,
+  "error": null,
+  "sourcesStable": true,
+  "sourceManifest": {
+    "supabase/production_incremental/calcutta-empty-auction-demand-v1.sql": "3565bc80de4e8b9119518ff3050033e1798320c766c1e41caa6f5fcbb808aba0",
+    "docs/reliability/phase2d-calcutta-empty-auction-remediation/manifest.json": "01dc225708ca94fd783962e8d35fa53b96a9ac8b535651c2fbeeb6192078c1de",
+    "test/calcutta-empty-auction-demand.integration.test.mjs": "04c1566dc4ed3814355549c4cb1de3a3b135f8ca528bf43b08136a30820923cb",
+    "tools/reliability/run-calcutta-empty-auction-tests.mjs": "7364fa8aad7b058b754784edb54e40640f0635bf822b801bb16bd24c4527e395",
+    "supabase/production_incremental/director-calcutta-clear-entry-v1.sql": "47a930c4f292d422a771d621d00da12f6afe5bbe7f7f59258ed8c3999fa56dc3",
+    "supabase/production_migrations/202609300132_certification_domain_gateways_v1.sql": "5ea7c6f5d5e90ddaaf4747d2847b9bd85a83debe6b8f1ace1a3f8416657c8298",
+    "supabase/production_migrations/202609300133_certification_derived_gateways_v1.sql": "bb93f29f0eab7785523b77d926f32ec258291f3285317c826fe584c837562c1d",
+    "lib/isolated-director-operations.js": "de01168a85256452260c88456b26232c71bdda05c1f8b1764ed2a70ec98ed15d",
+    "lib/production-calcutta-server.js": "a4e88cbe7bef7458b4b25f3ab4e9056b4ecb165d9448413242a053de1c269733",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "config/certification-resource-registration.json": "5aa847d4557e5048496eb6e75f2cf20cdeef10f73dbf1fb85b3f7fd5eaae3b0e",
+    "supabase/canonical_bootstrap/schema.sql": "7c371dc677c6b5ff244dcce68a71674482c6f500d814371517fd6f0fa2dabf42",
+    "supabase/canonical_bootstrap/static-contracts.sql": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d",
+    "supabase/canonical_bootstrap/manifest.json": "1d0d576e21cc48160bcbe82a56d4bc3a81adbc13032145296f1c0d6baa9ae4b2",
+    "supabase/canonical_bootstrap/catalog.sql": "95b4994868868dc2d775bb438b2dce93d3ca608aac6a416d8d60550abf3f8db5",
+    "supabase/canonical_bootstrap/catalog-manifest.json": "b764e284667b8117764aa11500414cdb3f800b3b4cda20d08297538fcf882a74"
+  },
+  "rawSha256": "c798c46354351236522e06a1cae917ccc310dddcb9ce93deb75d57bf2e9f2c1d",
+  "result": "FAIL_REQUIRES_ACCOUNTING"
+}

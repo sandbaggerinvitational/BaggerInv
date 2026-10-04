@@ -1,0 +1,26 @@
+{
+  "baseSha": "462a3e82e24ea65a7cd8bbf59ec3355be968139e",
+  "control": "UNTOUCHED_GIT_ARCHIVE_NO_REMEDIATION_ARTIFACT",
+  "baselineHistoricalCounts": {
+    "tests": 13,
+    "pass": 11,
+    "fail": 2,
+    "skipped": 0
+  },
+  "historicalFailures": [
+    "migration 075 compiles inertly, preserves 2026 RPCs, and enforces PostgreSQL cross-year isolation",
+    "single-entry clear uses immutable revisions, real Director authority, guards and database locks"
+  ],
+  "bothFailBeforeNewArtifactAt": "069 PRODUCTION_LEGACY_PROVIDER_ORIGIN_REQUIRED",
+  "baselineRawSha256": "cb9d422d68e3bac26794ba4d649e0e5d30beba54464c93b56898bd48a71f0d7f",
+  "affectedFailuresIdenticalToUntouchedBase": true,
+  "broadCounts": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "broadFailureIdentitiesExact": true,
+  "newUnexplainedFailureIdentities": []
+}

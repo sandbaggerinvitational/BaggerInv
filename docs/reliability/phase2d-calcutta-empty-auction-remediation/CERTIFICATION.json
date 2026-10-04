@@ -1,0 +1,51 @@
+{
+  "status": "PASS_LOCAL_ONLY",
+  "baseSha": "462a3e82e24ea65a7cd8bbf59ec3355be968139e",
+  "newBehavioralCases": 20,
+  "newIntegrationTestNodes": 21,
+  "newIntegrationFailures": 0,
+  "affectedCounts": {
+    "tests": 207,
+    "pass": 205,
+    "fail": 2,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "affectedFailuresBaseReproduced": true,
+  "broadCounts": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "broadFailureIdentitiesExact": true,
+  "newUnexplainedFailures": 0,
+  "build": "PASS",
+  "runtimeDelta": "One private automatic-demand function body",
+  "functions": 1117,
+  "aclOwnersModesSearchPathsRlsTriggersDependencies": "UNCHANGED",
+  "publicGrants": 17,
+  "anonDeniedPublic": 444,
+  "authenticatedDeniedPublic": 444,
+  "serviceRoleDeniedPublic": 162,
+  "freshForwardConvergence": true,
+  "receiptRewritten": false,
+  "fixtureRepairRequired": false,
+  "financialMathChanged": false,
+  "scoringMathChanged": false,
+  "authorityChanged": false,
+  "roleExpansion": false,
+  "rerun864Required": false,
+  "hostedMutated": false,
+  "deployed": false,
+  "admission": "DISABLED",
+  "ingress": "PAUSED",
+  "nextAuthorizationMustInclude": "Exact reviewed forward SQL artifact plus isolated candidate deployment/rebind and remaining Part2A resume",
+  "part2BAuthorized": false,
+  "knownLimits": [
+    "Not hosted proof",
+    "Not autonomous worker certification",
+    "Historical migration069 fixture failures reproduced and retained"
+  ]
+}
