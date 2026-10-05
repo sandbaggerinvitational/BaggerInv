@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "baseSha": "45c2d4be7d0b21759827900da9fd6dafd964c24b",
+  "focused": {
+    "tests": 228,
+    "pass": 228,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "broad": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "newUnexplainedFailures": 0,
+  "build": "PASS",
+  "buildApplicationSourceHashesMatchFinalProof": true,
+  "buildTestHarnessNote": "Only the new non-build integration harness changed after build; deployable application content was identical across build/focused/broad manifests. No rebuild impact.",
+  "no864HoleRerun": "Only authority error representation and internal postcommit target propagation change; no scoring mathematics/domain transaction/financial semantics.",
+  "unchangedPaths": [
+    "supabase/production_migrations",
+    "supabase/canonical_bootstrap",
+    "config/certification-resource-registration.json",
+    "vercel.json",
+    "lib/certification-runtime-server.js",
+    "lib/calcutta-post-commit.js",
+    "lib/score-derived-worker.js",
+    "lib/scoring-authority-supabase.js"
+  ],
+  "hostedAccess": false,
+  "autoDeployment": {
+    "branch": "codex/reliability-phase2d-staging-admission",
+    "enabled": false,
+    "source": "vercel.json"
+  },
+  "applicationFiles": {
+    "lib/scoring-persistence-adapter.js": "ec4d682eeaa1362a5de1d532597b60e20a61395075d00bc827a8810ec44e794f",
+    "app/api/director/route.js": "aeee65648b81947dfc0f1213b612c7727493afa32fab10f5f2975d2b21ede10d",
+    "app/api/live-matches/route.js": "773b6698851c1739f0e94c87e1fdf6f49aaa2e7ebf8238751efcc3d3ad9d915b"
+  },
+  "forwardSqlSha256": "5b3189023341413bbbf3421d4947a574cf9ca6908bfa9db44e36e91d5c28545f",
+  "initialTestSetupFailures": [
+    "Sandbox shared memory denied: resolved using local-only elevated PostgreSQL runner",
+    "New harness interpreted canonicalCatalog object as JSON text: corrected without application changes",
+    "Initial broad evidence receipt rejected because new harness changed during execution: repeated final fixed selection; no shipping source changes"
+  ]
+}

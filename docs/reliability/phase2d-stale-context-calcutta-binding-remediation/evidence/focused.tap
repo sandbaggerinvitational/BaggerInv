@@ -1,0 +1,1381 @@
+TAP version 13
+# Subtest: empty Calcutta demand preserves the certified match/financial contracts
+    # Subtest: no configuration permits Mark Live and creates no Calcutta demand
+    ok 1 - no configuration permits Mark Live and creates no Calcutta demand
+      ---
+      duration_ms: 407.825458
+      type: 'test'
+      ...
+    # Subtest: configured but no entered auction permits Mark Live without Calcutta demand
+    ok 2 - configured but no entered auction permits Mark Live without Calcutta demand
+      ---
+      duration_ms: 460.511958
+      type: 'test'
+      ...
+    # Subtest: supported Director purchase followed by last-entry clear creates immutable valid empty revision
+    ok 3 - supported Director purchase followed by last-entry clear creates immutable valid empty revision
+      ---
+      duration_ms: 687.722125
+      type: 'test'
+      ...
+    # Subtest: original Mark Live failure rolls back all match/permission/financial/job/receipt changes
+    ok 4 - original Mark Live failure rolls back all match/permission/financial/job/receipt changes
+      ---
+      duration_ms: 463.081708
+      type: 'test'
+      ...
+    # Subtest: UNKNOWN is authoritatively fenced NOT_COMMITTED; same recovery replay is safe
+    ok 5 - UNKNOWN is authoritatively fenced NOT_COMMITTED; same recovery replay is safe
+      ---
+      duration_ms: 61.6725
+      type: 'test'
+      ...
+    # Subtest: forward correction rejects runtime roles and rolls back a failed postflight
+    ok 6 - forward correction rejects runtime roles and rolls back a failed postflight
+      ---
+      duration_ms: 974.279542
+      type: 'test'
+      ...
+    # Subtest: forward artifact changes exactly one function body and no rows/ACL/RLS/owners/security/search_path
+    ok 7 - forward artifact changes exactly one function body and no rows/ACL/RLS/owners/security/search_path
+      ---
+      duration_ms: 7998.966875
+      type: 'test'
+      ...
+    # Subtest: fresh immutable baseline plus the forward artifact converges without receipt or authority fabrication
+    ok 8 - fresh immutable baseline plus the forward artifact converges without receipt or authority fabrication
+      ---
+      duration_ms: 9772.08775
+      type: 'test'
+      ...
+    # Subtest: purchase/clear receipts, actor-bound audit and exact duplicate survive the correction
+    ok 9 - purchase/clear receipts, actor-bound audit and exact duplicate survive the correction
+      ---
+      duration_ms: 145.751167
+      type: 'test'
+      ...
+    # Subtest: stale current auction revision denies lifecycle atomically rather than silently skipping
+    ok 10 - stale current auction revision denies lifecycle atomically rather than silently skipping
+      ---
+      duration_ms: 119.018125
+      type: 'test'
+      ...
+    # Subtest: wrong current auction fingerprint denies lifecycle atomically rather than silently skipping
+    ok 11 - wrong current auction fingerprint denies lifecycle atomically rather than silently skipping
+      ---
+      duration_ms: 125.6665
+      type: 'test'
+      ...
+    # Subtest: malformed empty manifest with orphan ownership denies lifecycle atomically rather than silently skipping
+    ok 12 - malformed empty manifest with orphan ownership denies lifecycle atomically rather than silently skipping
+      ---
+      duration_ms: 129.0065
+      type: 'test'
+      ...
+    # Subtest: stale configuration identity denies lifecycle atomically rather than silently skipping
+    ok 13 - stale configuration identity denies lifecycle atomically rather than silently skipping
+      ---
+      duration_ms: 124.718042
+      type: 'test'
+      ...
+    # Subtest: explicit Publish and Recalculate remain denied for the valid empty auction
+    ok 14 - explicit Publish and Recalculate remain denied for the valid empty auction
+      ---
+      duration_ms: 73.132375
+      type: 'test'
+      ...
+    # Subtest: valid empty auction permits shipping Mark Live, exact replay and actor-bound receipt/audit
+    ok 15 - valid empty auction permits shipping Mark Live, exact replay and actor-bound receipt/audit
+      ---
+      duration_ms: 680.686334
+      type: 'test'
+      ...
+    # Subtest: empty auction creates neither direct jobs nor score-derived intents across access/score/lock
+    ok 16 - empty auction creates neither direct jobs nor score-derived intents across access/score/lock
+      ---
+      duration_ms: 894.075083
+      type: 'test'
+      ...
+    # Subtest: participant, spectator and signed-out Director requests expose no financial data and create no lease
+    ok 17 - participant, spectator and signed-out Director requests expose no financial data and create no lease
+      ---
+      duration_ms: 26.375417
+      type: 'test'
+      ...
+    # Subtest: wrong resource/context/revision and private cores remain denied
+    ok 18 - wrong resource/context/revision and private cores remain denied
+      ---
+      duration_ms: 560.305041
+      type: 'test'
+      ...
+    # Subtest: nonempty auction still creates required work and normal worker calculates an unpublished result
+    ok 19 - nonempty auction still creates required work and normal worker calculates an unpublished result
+      ---
+      duration_ms: 966.297375
+      type: 'test'
+      ...
+    # Subtest: final local fixture has no unknown lease, Google/publication or authority broadening
+    ok 20 - final local fixture has no unknown lease, Google/publication or authority broadening
+      ---
+      duration_ms: 328.822834
+      type: 'test'
+      ...
+    1..20
+ok 1 - empty Calcutta demand preserves the certified match/financial contracts
+  ---
+  duration_ms: 49455.473792
+  type: 'test'
+  ...
+# Subtest: registered 2026 postcommit uses only bound canonical worker with no Google or legacy authority
+ok 2 - registered 2026 postcommit uses only bound canonical worker with no Google or legacy authority
+  ---
+  duration_ms: 19.184916
+  type: 'test'
+  ...
+# Subtest: registered 2097 postcommit uses only bound canonical worker with no Google or legacy authority
+ok 3 - registered 2097 postcommit uses only bound canonical worker with no Google or legacy authority
+  ---
+  duration_ms: 1.208666
+  type: 'test'
+  ...
+# Subtest: wrong or absent postcommit tournament fails before worker side effects (missing)
+ok 4 - wrong or absent postcommit tournament fails before worker side effects (missing)
+  ---
+  duration_ms: 0.663791
+  type: 'test'
+  ...
+# Subtest: wrong or absent postcommit tournament fails before worker side effects (2097)
+ok 5 - wrong or absent postcommit tournament fails before worker side effects (2097)
+  ---
+  duration_ms: 0.38925
+  type: 'test'
+  ...
+# Subtest: denied worker admission never falls through to legacy Preview or Production
+ok 6 - denied worker admission never falls through to legacy Preview or Production
+  ---
+  duration_ms: 0.848375
+  type: 'test'
+  ...
+# Subtest: stale context conflicts at first tick instead of resolving a fresh target
+ok 7 - stale context conflicts at first tick instead of resolving a fresh target
+  ---
+  duration_ms: 0.978834
+  type: 'test'
+  ...
+# Subtest: invalid registered resource is denied before transport and fallback
+ok 8 - invalid registered resource is denied before transport and fallback
+  ---
+  duration_ms: 0.304541
+  type: 'test'
+  ...
+# Subtest: existing Production and ordinary Preview selection/logic remain byte-identical
+ok 9 - existing Production and ordinary Preview selection/logic remain byte-identical
+  ---
+  duration_ms: 31.776792
+  type: 'test'
+  ...
+# Subtest: canonical 2026 claim DTO passes exact target binding and reaches strict calculator validation
+ok 10 - canonical 2026 claim DTO passes exact target binding and reaches strict calculator validation
+  ---
+  duration_ms: 2.177416
+  type: 'test'
+  ...
+# Subtest: canonical 2097 claim DTO passes exact target binding and reaches strict calculator validation
+ok 11 - canonical 2097 claim DTO passes exact target binding and reaches strict calculator validation
+  ---
+  duration_ms: 0.821333
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: missing input tournament
+ok 12 - initial canonical claim fails closed: missing input tournament
+  ---
+  duration_ms: 0.576209
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: wrong input tournament
+ok 13 - initial canonical claim fails closed: wrong input tournament
+  ---
+  duration_ms: 0.496375
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: wrong configuration target
+ok 14 - initial canonical claim fails closed: wrong configuration target
+  ---
+  duration_ms: 0.478625
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: wrong core target
+ok 15 - initial canonical claim fails closed: wrong core target
+  ---
+  duration_ms: 0.444417
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: stale activation
+ok 16 - initial canonical claim fails closed: stale activation
+  ---
+  duration_ms: 0.441541
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: contradictory optional job target
+ok 17 - initial canonical claim fails closed: contradictory optional job target
+  ---
+  duration_ms: 0.423042
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: contradictory optional response target
+ok 18 - initial canonical claim fails closed: contradictory optional response target
+  ---
+  duration_ms: 0.428333
+  type: 'test'
+  ...
+# Subtest: initial canonical claim fails closed: unexpected initial generation
+ok 19 - initial canonical claim fails closed: unexpected initial generation
+  ---
+  duration_ms: 0.481458
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: missing job target
+ok 20 - future canonical claim fails closed: missing job target
+  ---
+  duration_ms: 0.476667
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: missing response target
+ok 21 - future canonical claim fails closed: missing response target
+  ---
+  duration_ms: 0.471292
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: wrong configuration target
+ok 22 - future canonical claim fails closed: wrong configuration target
+  ---
+  duration_ms: 0.452542
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: wrong core target
+ok 23 - future canonical claim fails closed: wrong core target
+  ---
+  duration_ms: 1.105958
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: stale activation
+ok 24 - future canonical claim fails closed: stale activation
+  ---
+  duration_ms: 0.523958
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: missing generation
+ok 25 - future canonical claim fails closed: missing generation
+  ---
+  duration_ms: 0.528166
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: malformed generation
+ok 26 - future canonical claim fails closed: malformed generation
+  ---
+  duration_ms: 0.440792
+  type: 'test'
+  ...
+# Subtest: future canonical claim fails closed: contradictory generations
+ok 27 - future canonical claim fails closed: contradictory generations
+  ---
+  duration_ms: 0.391833
+  type: 'test'
+  ...
+# Subtest: admission response completes before canonical execution; only DB lease identity is forwarded
+ok 28 - admission response completes before canonical execution; only DB lease identity is forwarded
+  ---
+  duration_ms: 18.33175
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family SCORING.SUBMIT_HOLE
+ok 29 - durable admission applies to required canonical family SCORING.SUBMIT_HOLE
+  ---
+  duration_ms: 0.977
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family SCORING.FINALIZE_MATCH
+ok 30 - durable admission applies to required canonical family SCORING.FINALIZE_MATCH
+  ---
+  duration_ms: 0.705708
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family SCORING.REOPEN_MATCH
+ok 31 - durable admission applies to required canonical family SCORING.REOPEN_MATCH
+  ---
+  duration_ms: 1.11975
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.MUTATE_SETUP
+ok 32 - durable admission applies to required canonical family DIRECTOR.MUTATE_SETUP
+  ---
+  duration_ms: 0.660292
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.MUTATE_PAIRINGS
+ok 33 - durable admission applies to required canonical family DIRECTOR.MUTATE_PAIRINGS
+  ---
+  duration_ms: 0.430916
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.MATCH_CONTROL
+ok 34 - durable admission applies to required canonical family DIRECTOR.MATCH_CONTROL
+  ---
+  duration_ms: 0.349209
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.SAVE_NET_SKINS_ENTRIES
+ok 35 - durable admission applies to required canonical family DIRECTOR.SAVE_NET_SKINS_ENTRIES
+  ---
+  duration_ms: 0.398583
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.REPLACE_CALCUTTA_AUCTION
+ok 36 - durable admission applies to required canonical family DIRECTOR.REPLACE_CALCUTTA_AUCTION
+  ---
+  duration_ms: 0.377042
+  type: 'test'
+  ...
+# Subtest: durable admission applies to required canonical family DIRECTOR.CLEAR_CALCUTTA_AUCTION
+ok 37 - durable admission applies to required canonical family DIRECTOR.CLEAR_CALCUTTA_AUCTION
+  ---
+  duration_ms: 0.404458
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: WORKERS.COMPETITION_CLAIM
+ok 38 - existing job protocol stays separate: WORKERS.COMPETITION_CLAIM
+  ---
+  duration_ms: 0.340625
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: WORKERS.INTELLIGENCE_WRITE
+ok 39 - existing job protocol stays separate: WORKERS.INTELLIGENCE_WRITE
+  ---
+  duration_ms: 0.244333
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: WORKERS.CALCUTTA_COMPLETE
+ok 40 - existing job protocol stays separate: WORKERS.CALCUTTA_COMPLETE
+  ---
+  duration_ms: 0.222125
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: DIRECTOR.NET_SKINS_CLAIM
+ok 41 - existing job protocol stays separate: DIRECTOR.NET_SKINS_CLAIM
+  ---
+  duration_ms: 0.222292
+  type: 'test'
+  ...
+# Subtest: existing job protocol stays separate: DIRECTOR.REQUEUE_DERIVED
+ok 42 - existing job protocol stays separate: DIRECTOR.REQUEUE_DERIVED
+  ---
+  duration_ms: 0.187166
+  type: 'test'
+  ...
+# Subtest: failed admission never executes or fabricates non-commit: connection
+ok 43 - failed admission never executes or fabricates non-commit: connection
+  ---
+  duration_ms: 0.88625
+  type: 'test'
+  ...
+# Subtest: failed admission never executes or fabricates non-commit: 57014
+ok 44 - failed admission never executes or fabricates non-commit: 57014
+  ---
+  duration_ms: 0.729833
+  type: 'test'
+  ...
+# Subtest: failed admission never executes or fabricates non-commit: missing-schema
+ok 45 - failed admission never executes or fabricates non-commit: missing-schema
+  ---
+  duration_ms: 0.580584
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: contract=wrong
+ok 46 - invalid admission readback fails before execution: contract=wrong
+  ---
+  duration_ms: 0.399
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: operation_request_id=other
+ok 47 - invalid admission readback fails before execution: operation_request_id=other
+  ---
+  duration_ms: 0.27125
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: lease_id=null
+ok 48 - invalid admission readback fails before execution: lease_id=null
+  ---
+  duration_ms: 0.316792
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: lease_id=bad
+ok 49 - invalid admission readback fails before execution: lease_id=bad
+  ---
+  duration_ms: 0.4845
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: admission_generation_id=bad
+ok 50 - invalid admission readback fails before execution: admission_generation_id=bad
+  ---
+  duration_ms: 0.305584
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: admission_sequence=0
+ok 51 - invalid admission readback fails before execution: admission_sequence=0
+  ---
+  duration_ms: 0.304458
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: admission_sequence=9007199254740992
+ok 52 - invalid admission readback fails before execution: admission_sequence=9007199254740992
+  ---
+  duration_ms: 0.301542
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: request_hash=bad
+ok 53 - invalid admission readback fails before execution: request_hash=bad
+  ---
+  duration_ms: 0.276708
+  type: 'test'
+  ...
+# Subtest: invalid admission readback fails before execution: state=EXPIRED
+ok 54 - invalid admission readback fails before execution: state=EXPIRED
+  ---
+  duration_ms: 0.312292
+  type: 'test'
+  ...
+# Subtest: terminal same-operation admission replays established result without executing: COMMITTED
+ok 55 - terminal same-operation admission replays established result without executing: COMMITTED
+  ---
+  duration_ms: 0.317084
+  type: 'test'
+  ...
+# Subtest: terminal same-operation admission replays established result without executing: NOT_COMMITTED
+ok 56 - terminal same-operation admission replays established result without executing: NOT_COMMITTED
+  ---
+  duration_ms: 0.323292
+  type: 'test'
+  ...
+# Subtest: contradictory lease outcome cannot become a client receipt: COMMITTED
+ok 57 - contradictory lease outcome cannot become a client receipt: COMMITTED
+  ---
+  duration_ms: 0.283833
+  type: 'test'
+  ...
+# Subtest: contradictory lease outcome cannot become a client receipt: NOT_COMMITTED
+ok 58 - contradictory lease outcome cannot become a client receipt: NOT_COMMITTED
+  ---
+  duration_ms: 0.302666
+  type: 'test'
+  ...
+# Subtest: contradictory lease outcome cannot become a client receipt: ADMITTED
+ok 59 - contradictory lease outcome cannot become a client receipt: ADMITTED
+  ---
+  duration_ms: 0.238625
+  type: 'test'
+  ...
+# Subtest: lost execution response attempts durable UNKNOWN with same identity and no sensitive payload
+ok 60 - lost execution response attempts durable UNKNOWN with same identity and no sensitive payload
+  ---
+  duration_ms: 0.534959
+  type: 'test'
+  ...
+# Subtest: lost acknowledgement can be recovered from terminal outcome returned by UNKNOWN marker
+ok 61 - lost acknowledgement can be recovered from terminal outcome returned by UNKNOWN marker
+  ---
+  duration_ms: 0.380042
+  type: 'test'
+  ...
+# Subtest: failed UNKNOWN marker does not replace original typed error or imply non-commit
+ok 62 - failed UNKNOWN marker does not replace original typed error or imply non-commit
+  ---
+  duration_ms: 0.437625
+  type: 'test'
+  ...
+# Subtest: marker cannot substitute another lease result even with matching operation identity
+ok 63 - marker cannot substitute another lease result even with matching operation identity
+  ---
+  duration_ms: 0.469375
+  type: 'test'
+  ...
+# Subtest: exact recovery needs no open-write context and preserves original actor: read_certification_ingress_status_v1
+ok 64 - exact recovery needs no open-write context and preserves original actor: read_certification_ingress_status_v1
+  ---
+  duration_ms: 0.199667
+  type: 'test'
+  ...
+# Subtest: exact recovery needs no open-write context and preserves original actor: resolve_certification_ingress_v1
+ok 65 - exact recovery needs no open-write context and preserves original actor: resolve_certification_ingress_v1
+  ---
+  duration_ms: 0.1245
+  type: 'test'
+  ...
+# Subtest: an absent operation status is UNKNOWN, with no implicit resolution or new admission
+ok 66 - an absent operation status is UNKNOWN, with no implicit resolution or new admission
+  ---
+  duration_ms: 0.753417
+  type: 'test'
+  ...
+# Subtest: replay-only recovery verifies full request while never obtaining write context
+ok 67 - replay-only recovery verifies full request while never obtaining write context
+  ---
+  duration_ms: 0.299584
+  type: 'test'
+  ...
+# Subtest: server hash conflict is preserved without recovery, execution or fallback
+ok 68 - server hash conflict is preserved without recovery, execution or fallback
+  ---
+  duration_ms: 0.2015
+  type: 'test'
+  ...
+# Subtest: recovery rejects authority selectors, unlisted operation families and blank identity before network
+ok 69 - recovery rejects authority selectors, unlisted operation families and blank identity before network
+  ---
+  duration_ms: 0.504166
+  type: 'test'
+  ...
+# Subtest: closed-origin recovery cannot bypass registration or use a Production endpoint
+ok 70 - closed-origin recovery cannot bypass registration or use a Production endpoint
+  ---
+  duration_ms: 0.095875
+  type: 'test'
+  ...
+# Subtest: Certification selects the exact native decision through its existing projection, never the legacy RPC
+ok 71 - Certification selects the exact native decision through its existing projection, never the legacy RPC
+  ---
+  duration_ms: 17.163166
+  type: 'test'
+  ...
+# Subtest: read-only final scorecard preserves READS and the database decision
+ok 72 - read-only final scorecard preserves READS and the database decision
+  ---
+  duration_ms: 0.787667
+  type: 'test'
+  ...
+# Subtest: native NOT_MATCH_PARTICIPANT denial is preserved without an allow reconstruction
+ok 73 - native NOT_MATCH_PARTICIPANT denial is preserved without an allow reconstruction
+  ---
+  duration_ms: 0.832541
+  type: 'test'
+  ...
+# Subtest: native TOURNAMENT_MEMBERSHIP_INACTIVE denial is preserved without an allow reconstruction
+ok 74 - native TOURNAMENT_MEMBERSHIP_INACTIVE denial is preserved without an allow reconstruction
+  ---
+  duration_ms: 0.872
+  type: 'test'
+  ...
+# Subtest: native MATCH_LOCKED denial is preserved without an allow reconstruction
+ok 75 - native MATCH_LOCKED denial is preserved without an allow reconstruction
+  ---
+  duration_ms: 0.606541
+  type: 'test'
+  ...
+# Subtest: native MATCH_FINAL denial is preserved without an allow reconstruction
+ok 76 - native MATCH_FINAL denial is preserved without an allow reconstruction
+  ---
+  duration_ms: 0.455084
+  type: 'test'
+  ...
+# Subtest: native SCORING_PERMISSION_STALE denial is preserved without an allow reconstruction
+ok 77 - native SCORING_PERMISSION_STALE denial is preserved without an allow reconstruction
+  ---
+  duration_ms: 0.422583
+  type: 'test'
+  ...
+# Subtest: native SCORING_PERMISSION_REVOKED denial is preserved without an allow reconstruction
+ok 78 - native SCORING_PERMISSION_REVOKED denial is preserved without an allow reconstruction
+  ---
+  duration_ms: 0.451417
+  type: 'test'
+  ...
+# Subtest: native MATCH_NOT_SCOREABLE denial is preserved without an allow reconstruction
+ok 79 - native MATCH_NOT_SCOREABLE denial is preserved without an allow reconstruction
+  ---
+  duration_ms: 1.144
+  type: 'test'
+  ...
+# Subtest: absent player/match/action tuple fails closed
+ok 80 - absent player/match/action tuple fails closed
+  ---
+  duration_ms: 0.560709
+  type: 'test'
+  ...
+# Subtest: another player only fails closed
+ok 81 - another player only fails closed
+  ---
+  duration_ms: 0.426083
+  type: 'test'
+  ...
+# Subtest: duplicate tuple fails closed
+ok 82 - duplicate tuple fails closed
+  ---
+  duration_ms: 0.341917
+  type: 'test'
+  ...
+# Subtest: wrong tournament fails closed
+ok 83 - wrong tournament fails closed
+  ---
+  duration_ms: 0.292666
+  type: 'test'
+  ...
+# Subtest: malformed response fails closed
+ok 84 - malformed response fails closed
+  ---
+  duration_ms: 0.284708
+  type: 'test'
+  ...
+# Subtest: malformed decision fails closed
+ok 85 - malformed decision fails closed
+  ---
+  duration_ms: 0.32525
+  type: 'test'
+  ...
+# Subtest: false success fails closed
+ok 86 - false success fails closed
+  ---
+  duration_ms: 0.340667
+  type: 'test'
+  ...
+# Subtest: canonical CANONICAL_RESOURCE_DEPLOYMENT_DENIED remains typed
+ok 87 - canonical CANONICAL_RESOURCE_DEPLOYMENT_DENIED remains typed
+  ---
+  duration_ms: 0.765958
+  type: 'test'
+  ...
+# Subtest: canonical CANONICAL_RESOURCE_INGRESS_CLOSED remains typed
+ok 88 - canonical CANONICAL_RESOURCE_INGRESS_CLOSED remains typed
+  ---
+  duration_ms: 0.439417
+  type: 'test'
+  ...
+# Subtest: canonical CANONICAL_RESOURCE_CONTEXT_STALE remains typed
+ok 89 - canonical CANONICAL_RESOURCE_CONTEXT_STALE remains typed
+  ---
+  duration_ms: 0.145458
+  type: 'test'
+  ...
+# Subtest: canonical CANONICAL_RESOURCE_REGISTRATION_STALE remains typed
+ok 90 - canonical CANONICAL_RESOURCE_REGISTRATION_STALE remains typed
+  ---
+  duration_ms: 0.154708
+  type: 'test'
+  ...
+# Subtest: canonical CERTIFICATION_READ_CONTEXT_DENIED remains typed
+ok 91 - canonical CERTIFICATION_READ_CONTEXT_DENIED remains typed
+  ---
+  duration_ms: 0.129958
+  type: 'test'
+  ...
+# Subtest: runtime revision drift between READS and SCORING is denied
+ok 92 - runtime revision drift between READS and SCORING is denied
+  ---
+  duration_ms: 0.544917
+  type: 'test'
+  ...
+# Subtest: legacy authorization and arbitrary legacy RPCs remain forbidden
+ok 93 - legacy authorization and arbitrary legacy RPCs remain forbidden
+  ---
+  duration_ms: 0.431541
+  type: 'test'
+  ...
+# Subtest: shipping POST returns its unchanged DTO and signed score session for valid Certification instead of 503
+ok 94 - shipping POST returns its unchanged DTO and signed score session for valid Certification instead of 503
+  ---
+  duration_ms: 8.576166
+  type: 'test'
+  ...
+# Subtest: shipping signed-out fails before match authorization without private data
+ok 95 - shipping signed-out fails before match authorization without private data
+  ---
+  duration_ms: 0.763084
+  type: 'test'
+  ...
+# Subtest: shipping unlinked fails before match authorization without private data
+ok 96 - shipping unlinked fails before match authorization without private data
+  ---
+  duration_ms: 0.608833
+  type: 'test'
+  ...
+# Subtest: shipping CANONICAL_RESOURCE_DEPLOYMENT_DENIED is a typed denial rather than generic 503
+ok 97 - shipping CANONICAL_RESOURCE_DEPLOYMENT_DENIED is a typed denial rather than generic 503
+  ---
+  duration_ms: 0.8905
+  type: 'test'
+  ...
+# Subtest: shipping CANONICAL_RESOURCE_CONTEXT_STALE is a typed denial rather than generic 503
+ok 98 - shipping CANONICAL_RESOURCE_CONTEXT_STALE is a typed denial rather than generic 503
+  ---
+  duration_ms: 0.6685
+  type: 'test'
+  ...
+# Subtest: shipping CANONICAL_RESOURCE_INGRESS_CLOSED is a typed denial rather than generic 503
+ok 99 - shipping CANONICAL_RESOURCE_INGRESS_CLOSED is a typed denial rather than generic 503
+  ---
+  duration_ms: 0.629833
+  type: 'test'
+  ...
+# Subtest: actual transport loss and unrelated internal errors retain generic unavailable without private details
+ok 100 - actual transport loss and unrelated internal errors retain generic unavailable without private details
+  ---
+  duration_ms: 1.020708
+  type: 'test'
+  ...
+# Subtest: score recovery preserves public COMMITTED DTO without open-context request
+ok 101 - score recovery preserves public COMMITTED DTO without open-context request
+  ---
+  duration_ms: 16.715042
+  type: 'test'
+  ...
+# Subtest: score recovery preserves public UNKNOWN DTO without open-context request
+ok 102 - score recovery preserves public UNKNOWN DTO without open-context request
+  ---
+  duration_ms: 0.721917
+  type: 'test'
+  ...
+# Subtest: Director client accepts an original committed receipt after annual advance without false current readback
+ok 103 - Director client accepts an original committed receipt after annual advance without false current readback
+  ---
+  duration_ms: 3.508167
+  type: 'test'
+  ...
+# Subtest: Director recovery contains internal ADMITTED as public UNKNOWN
+ok 104 - Director recovery contains internal ADMITTED as public UNKNOWN
+  ---
+  duration_ms: 0.620042
+  type: 'test'
+  ...
+# Subtest: Director recovery contains internal UNKNOWN as public UNKNOWN
+ok 105 - Director recovery contains internal UNKNOWN as public UNKNOWN
+  ---
+  duration_ms: 0.687083
+  type: 'test'
+  ...
+# Subtest: Director recovery contains internal NOT_COMMITTED as public UNKNOWN
+ok 106 - Director recovery contains internal NOT_COMMITTED as public UNKNOWN
+  ---
+  duration_ms: 0.66925
+  type: 'test'
+  ...
+# Subtest: missing original lease remains unconfirmed without fabricated historical context
+ok 107 - missing original lease remains unconfirmed without fabricated historical context
+  ---
+  duration_ms: 0.777583
+  type: 'test'
+  ...
+# Subtest: Director origin recovery rejects mismatched resource before replay
+ok 108 - Director origin recovery rejects mismatched resource before replay
+  ---
+  duration_ms: 0.347542
+  type: 'test'
+  ...
+# Subtest: Director origin recovery rejects mismatched context before replay
+ok 109 - Director origin recovery rejects mismatched context before replay
+  ---
+  duration_ms: 0.259875
+  type: 'test'
+  ...
+# Subtest: Director origin recovery rejects mismatched operation before replay
+ok 110 - Director origin recovery rejects mismatched operation before replay
+  ---
+  duration_ms: 0.313459
+  type: 'test'
+  ...
+# Subtest: Director changed original request conflicts and never executes or substitutes an ID
+ok 111 - Director changed original request conflicts and never executes or substitutes an ID
+  ---
+  duration_ms: 0.697042
+  type: 'test'
+  ...
+# Subtest: Director recovery denies participant before any transport
+ok 112 - Director recovery denies participant before any transport
+  ---
+  duration_ms: 0.152833
+  type: 'test'
+  ...
+# Subtest: Director recovery denies spectator before any transport
+ok 113 - Director recovery denies spectator before any transport
+  ---
+  duration_ms: 0.089417
+  type: 'test'
+  ...
+# Subtest: Director recovery denies signed-out before any transport
+ok 114 - Director recovery denies signed-out before any transport
+  ---
+  duration_ms: 0.084167
+  type: 'test'
+  ...
+# Subtest: Director recovery denies impersonated before any transport
+ok 115 - Director recovery denies impersonated before any transport
+  ---
+  duration_ms: 0.08725
+  type: 'test'
+  ...
+# Subtest: financial clear-entry recovery reconstructs only original admitted predecessor
+ok 116 - financial clear-entry recovery reconstructs only original admitted predecessor
+  ---
+  duration_ms: 0.768292
+  type: 'test'
+  ...
+# Subtest: financial replace-auction recovery reconstructs only original admitted predecessor
+ok 117 - financial replace-auction recovery reconstructs only original admitted predecessor
+  ---
+  duration_ms: 1.184791
+  type: 'test'
+  ...
+# Subtest: Director finalize lost acknowledgement recovery precedes open capability gates
+ok 118 - Director finalize lost acknowledgement recovery precedes open capability gates
+  ---
+  duration_ms: 0.539417
+  type: 'test'
+  ...
+# Subtest: Director reopen lost acknowledgement recovery precedes open capability gates
+ok 119 - Director reopen lost acknowledgement recovery precedes open capability gates
+  ---
+  duration_ms: 0.223375
+  type: 'test'
+  ...
+# Subtest: unregistered shipping runtime never performs network even with copied configuration
+ok 120 - unregistered shipping runtime never performs network even with copied configuration
+  ---
+  duration_ms: 2.10625
+  type: 'test'
+  ...
+# Subtest: registration handshake is exact, bounded and redacted; caller cannot forge context
+ok 121 - registration handshake is exact, bounded and redacted; caller cannot forge context
+  ---
+  duration_ms: 14.849667
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: resource_id
+ok 122 - wrong database/deployment readback denied: resource_id
+  ---
+  duration_ms: 0.423042
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: installation_id
+ok 123 - wrong database/deployment readback denied: installation_id
+  ---
+  duration_ms: 0.329709
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: project_ref
+ok 124 - wrong database/deployment readback denied: project_ref
+  ---
+  duration_ms: 0.36075
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: project_url
+ok 125 - wrong database/deployment readback denied: project_url
+  ---
+  duration_ms: 0.316083
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: manifest_digest
+ok 126 - wrong database/deployment readback denied: manifest_digest
+  ---
+  duration_ms: 0.276959
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: registration_revision
+ok 127 - wrong database/deployment readback denied: registration_revision
+  ---
+  duration_ms: 0.814375
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: schema_contract
+ok 128 - wrong database/deployment readback denied: schema_contract
+  ---
+  duration_ms: 0.43075
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: schema_digest
+ok 129 - wrong database/deployment readback denied: schema_digest
+  ---
+  duration_ms: 0.48275
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: release_commit
+ok 130 - wrong database/deployment readback denied: release_commit
+  ---
+  duration_ms: 0.459667
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: deployment_id
+ok 131 - wrong database/deployment readback denied: deployment_id
+  ---
+  duration_ms: 0.255458
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: deployment_origin
+ok 132 - wrong database/deployment readback denied: deployment_origin
+  ---
+  duration_ms: 0.215917
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: git_branch
+ok 133 - wrong database/deployment readback denied: git_branch
+  ---
+  duration_ms: 0.198
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: vercel_project_id
+ok 134 - wrong database/deployment readback denied: vercel_project_id
+  ---
+  duration_ms: 0.216667
+  type: 'test'
+  ...
+# Subtest: wrong database/deployment readback denied: vercel_team_id
+ok 135 - wrong database/deployment readback denied: vercel_team_id
+  ---
+  duration_ms: 0.173416
+  type: 'test'
+  ...
+# Subtest: missing schema returns unavailable without fallback or registration attempts
+ok 136 - missing schema returns unavailable without fallback or registration attempts
+  ---
+  duration_ms: 0.819791
+  type: 'test'
+  ...
+# Subtest: known score operation reaches execute gateway with original operation identity and server context
+ok 137 - known score operation reaches execute gateway with original operation identity and server context
+  ---
+  duration_ms: 1.235583
+  type: 'test'
+  ...
+# Subtest: unknown operation, missing operation ID and payload authority are denied before any request
+ok 138 - unknown operation, missing operation ID and payload authority are denied before any request
+  ---
+  duration_ms: 0.242958
+  type: 'test'
+  ...
+# Subtest: stale token conflicts before execute and is not silently rebound
+ok 139 - stale token conflicts before execute and is not silently rebound
+  ---
+  duration_ms: 0.235792
+  type: 'test'
+  ...
+# Subtest: read context cannot confer write phase; wrong request environment cannot reuse branded context
+ok 140 - read context cannot confer write phase; wrong request environment cannot reuse branded context
+  ---
+  duration_ms: 0.322667
+  type: 'test'
+  ...
+# Subtest: lost mutation response preserves same operation ID as unknown; transport has no fallback
+ok 141 - lost mutation response preserves same operation ID as unknown; transport has no fallback
+  ---
+  duration_ms: 0.650709
+  type: 'test'
+  ...
+# Subtest: SQL statement timeout remains typed and mutation outcome retains identity
+ok 142 - SQL statement timeout remains typed and mutation outcome retains identity
+  ---
+  duration_ms: 0.630541
+  type: 'test'
+  ...
+# Subtest: worker classification retains database XX000 ahead of its HTTP envelope
+ok 143 - worker classification retains database XX000 ahead of its HTTP envelope
+  ---
+  duration_ms: 0.493083
+  type: 'test'
+  ...
+# Subtest: worker classification retains database 23514 ahead of its HTTP envelope
+ok 144 - worker classification retains database 23514 ahead of its HTTP envelope
+  ---
+  duration_ms: 0.290625
+  type: 'test'
+  ...
+# Subtest: worker classification retains database 40P01 ahead of its HTTP envelope
+ok 145 - worker classification retains database 40P01 ahead of its HTTP envelope
+  ---
+  duration_ms: 0.258833
+  type: 'test'
+  ...
+# Subtest: worker classification retains database 57014 ahead of its HTTP envelope
+ok 146 - worker classification retains database 57014 ahead of its HTTP envelope
+  ---
+  duration_ms: 0.251625
+  type: 'test'
+  ...
+# Subtest: established domain rejection preserves meaning without returning raw database details
+ok 147 - established domain rejection preserves meaning without returning raw database details
+  ---
+  duration_ms: 0.481125
+  type: 'test'
+  ...
+# Subtest: explicit invalid Certification cannot borrow legacy Preview, diagnostic, Production or Google transport
+ok 148 - explicit invalid Certification cannot borrow legacy Preview, diagnostic, Production or Google transport
+  ---
+  duration_ms: 1.088625
+  type: 'test'
+  ...
+# Subtest: API: retired scoring-google-outbox rejects GET/POST before credentials, body, queue or adapter
+ok 149 - API: retired scoring-google-outbox rejects GET/POST before credentials, body, queue or adapter
+  ---
+  duration_ms: 18.86875
+  type: 'test'
+  ...
+# Subtest: API: retired round-scorecards-archive rejects GET/POST before credentials, body, queue or adapter
+ok 150 - API: retired round-scorecards-archive rejects GET/POST before credentials, body, queue or adapter
+  ---
+  duration_ms: 1.181459
+  type: 'test'
+  ...
+# Subtest: API: retired future-match-google-compatibility rejects GET/POST before credentials, body, queue or adapter
+ok 151 - API: retired future-match-google-compatibility rejects GET/POST before credentials, body, queue or adapter
+  ---
+  duration_ms: 1.089791
+  type: 'test'
+  ...
+# Subtest: UNIT: mobile post-commit ignores unavailable retired transports and retains three internal families
+ok 152 - UNIT: mobile post-commit ignores unavailable retired transports and retains three internal families
+  ---
+  duration_ms: 1.480416
+  type: 'test'
+  ...
+# Subtest: UNIT: managed post-commit failure remains settled and does not invoke a retired fallback
+ok 153 - UNIT: managed post-commit failure remains settled and does not invoke a retired fallback
+  ---
+  duration_ms: 0.763458
+  type: 'test'
+  ...
+# Subtest: API: app/api/scoring/current/route.js retains score acknowledgement and only internal post-commit families
+ok 154 - API: app/api/scoring/current/route.js retains score acknowledgement and only internal post-commit families
+  ---
+  duration_ms: 2.168167
+  type: 'test'
+  ...
+# Subtest: API: app/api/scoring/matches/[matchId]/route.js retains score acknowledgement and only internal post-commit families
+ok 155 - API: app/api/scoring/matches/[matchId]/route.js retains score acknowledgement and only internal post-commit families
+  ---
+  duration_ms: 1.402958
+  type: 'test'
+  ...
+# Subtest: API: app/api/director/route.js successful canonical lifecycle never awaits retired delivery
+ok 156 - API: app/api/director/route.js successful canonical lifecycle never awaits retired delivery
+  ---
+  duration_ms: 2.003
+  type: 'test'
+  ...
+# Subtest: API: app/api/director/route.js preserves rejected authorization
+ok 157 - API: app/api/director/route.js preserves rejected authorization
+  ---
+  duration_ms: 1.488167
+  type: 'test'
+  ...
+# Subtest: API: app/api/live-matches/route.js successful canonical lifecycle never awaits retired delivery
+ok 158 - API: app/api/live-matches/route.js successful canonical lifecycle never awaits retired delivery
+  ---
+  duration_ms: 1.591875
+  type: 'test'
+  ...
+# Subtest: API: app/api/live-matches/route.js preserves rejected authorization
+ok 159 - API: app/api/live-matches/route.js preserves rejected authorization
+  ---
+  duration_ms: 1.311917
+  type: 'test'
+  ...
+# Subtest: API: legacy Director workbook dashboard is explicitly retired without any transport
+ok 160 - API: legacy Director workbook dashboard is explicitly retired without any transport
+  ---
+  duration_ms: 1.5275
+  type: 'test'
+  ...
+# Subtest: API: canonical frozen-2026 live-match read preserves BB admin contract without Google
+ok 161 - API: canonical frozen-2026 live-match read preserves BB admin contract without Google
+  ---
+  duration_ms: 3.830083
+  type: 'test'
+  ...
+# Subtest: API: canonical frozen-2026 live-match read preserves SC admin contract without Google
+ok 162 - API: canonical frozen-2026 live-match read preserves SC admin contract without Google
+  ---
+  duration_ms: 1.323291
+  type: 'test'
+  ...
+# Subtest: API: canonical frozen-2026 live-match read preserves SI admin contract without Google
+ok 163 - API: canonical frozen-2026 live-match read preserves SI admin contract without Google
+  ---
+  duration_ms: 1.426875
+  type: 'test'
+  ...
+# Subtest: UNIT: disabled/failed historical Google consumers cannot degrade healthy internal workers
+ok 164 - UNIT: disabled/failed historical Google consumers cannot degrade healthy internal workers
+  ---
+  duration_ms: 1.263
+  type: 'test'
+  ...
+# Subtest: UNIT: absence of internal worker evidence remains NOT_OBSERVED, never fabricated healthy
+ok 165 - UNIT: absence of internal worker evidence remains NOT_OBSERVED, never fabricated healthy
+  ---
+  duration_ms: 0.127084
+  type: 'test'
+  ...
+# Subtest: UNIT: disabled or backlogged required internal family remains visible after retirement
+ok 166 - UNIT: disabled or backlogged required internal family remains visible after retirement
+  ---
+  duration_ms: 0.178792
+  type: 'test'
+  ...
+# Subtest: UNIT: enabled controls without internal queue measurement are not healthy evidence
+ok 167 - UNIT: enabled controls without internal queue measurement are not healthy evidence
+  ---
+  duration_ms: 0.109709
+  type: 'test'
+  ...
+# Subtest: API: canonical Final confirmation survives a failed readback without any Google fallback
+ok 168 - API: canonical Final confirmation survives a failed readback without any Google fallback
+  ---
+  duration_ms: 1.7075
+  type: 'test'
+  ...
+# Subtest: API: canonical match read failure fails closed without fallback
+ok 169 - API: canonical match read failure fails closed without fallback
+  ---
+  duration_ms: 1.170875
+  type: 'test'
+  ...
+# Subtest: API: canonical match read scope mismatch fails closed without fallback
+ok 170 - API: canonical match read scope mismatch fails closed without fallback
+  ---
+  duration_ms: 0.92375
+  type: 'test'
+  ...
+# Subtest: actual Certification Calcutta postcommit hook uses durable canonical workers
+    # Subtest: wrong target and missing target stop after canonical context read without worker writes
+    ok 1 - wrong target and missing target stop after canonical context read without worker writes
+      ---
+      duration_ms: 69.633
+      type: 'test'
+      ...
+    # Subtest: actual scored tournament completes Calcutta calculation through existing durable processor without publication
+    ok 2 - actual scored tournament completes Calcutta calculation through existing durable processor without publication
+      ---
+      duration_ms: 338.189333
+      type: 'test'
+      ...
+    # Subtest: repeat wakeup is idempotent and preserves canonical financial facts
+    ok 3 - repeat wakeup is idempotent and preserves canonical financial facts
+      ---
+      duration_ms: 150.676875
+      type: 'test'
+      ...
+    # Subtest: real admission revision change after context read conflicts before materialization
+    ok 4 - real admission revision change after context read conflicts before materialization
+      ---
+      duration_ms: 121.106583
+      type: 'test'
+      ...
+    # Subtest: disabled admission and unprivileged database roles cannot enter worker authority
+    ok 5 - disabled admission and unprivileged database roles cannot enter worker authority
+      ---
+      duration_ms: 115.140459
+      type: 'test'
+      ...
+    1..5
+ok 171 - actual Certification Calcutta postcommit hook uses durable canonical workers
+  ---
+  duration_ms: 16638.968958
+  type: 'test'
+  ...
+# Subtest: live scoring separates a clinched result from an 18-hole scorecard
+ok 172 - live scoring separates a clinched result from an 18-hole scorecard
+  ---
+  duration_ms: 3.882209
+  type: 'test'
+  ...
+# Subtest: only Final status locks hole writes and finalization requires all 18 holes
+ok 173 - only Final status locks hole writes and finalization requires all 18 holes
+  ---
+  duration_ms: 0.953959
+  type: 'test'
+  ...
+# Subtest: generic updates cannot bypass dedicated lifecycle transactions
+ok 174 - generic updates cannot bypass dedicated lifecycle transactions
+  ---
+  duration_ms: 1.815417
+  type: 'test'
+  ...
+# Subtest: forward stale-context correction preserves the complete local catalog and denial predicates
+    # Subtest: installation changes only four exact function bodies, preserves ACL/RLS/owner/security/data/receipt
+    ok 1 - installation changes only four exact function bodies, preserves ACL/RLS/owner/security/data/receipt
+      ---
+      duration_ms: 3643.066291
+      type: 'test'
+      ...
+    # Subtest: same artifact replay is idempotent and private execution remains denied
+    ok 2 - same artifact replay is idempotent and private execution remains denied
+      ---
+      duration_ms: 859.116875
+      type: 'test'
+      ...
+    # Subtest: unexpected predecessor denies atomically before any correction
+    ok 3 - unexpected predecessor denies atomically before any correction
+      ---
+      duration_ms: 820.04625
+      type: 'test'
+      ...
+    # Subtest: current context succeeds; stale token returns PT409 promptly through the public projection
+    ok 4 - current context succeeds; stale token returns PT409 promptly through the public projection
+      ---
+      duration_ms: 34.8355
+      type: 'test'
+      ...
+    # Subtest: cached generation/revision changes remain denied by the unchanged current-context guard
+    ok 5 - cached generation/revision changes remain denied by the unchanged current-context guard
+      ---
+      duration_ms: 58.458417
+      type: 'test'
+      ...
+    # Subtest: wrong resource/release/deployment remains denied without changing authority
+    ok 6 - wrong resource/release/deployment remains denied without changing authority
+      ---
+      duration_ms: 79.430125
+      type: 'test'
+      ...
+    # Subtest: actual SQL denial maps through the shipping authorization route to sanitized 409 with one attempt
+    ok 7 - actual SQL denial maps through the shipping authorization route to sanitized 409 with one attempt
+      ---
+      duration_ms: 120.08525
+      type: 'test'
+      ...
+    # Subtest: genuine PostgreSQL serializable concurrent update still emits 40001
+    ok 8 - genuine PostgreSQL serializable concurrent update still emits 40001
+      ---
+      duration_ms: 52.152417
+      type: 'test'
+      ...
+    1..8
+ok 175 - forward stale-context correction preserves the complete local catalog and denial predicates
+  ---
+  duration_ms: 24180.234708
+  type: 'test'
+  ...
+# Subtest: app/api/director/route.js: finalize uses committed canonical match target, ignoring client target
+ok 176 - app/api/director/route.js: finalize uses committed canonical match target, ignoring client target
+  ---
+  duration_ms: 25.438083
+  type: 'test'
+  ...
+# Subtest: app/api/director/route.js: reopen uses committed canonical match target, ignoring client target
+ok 177 - app/api/director/route.js: reopen uses committed canonical match target, ignoring client target
+  ---
+  duration_ms: 2.51175
+  type: 'test'
+  ...
+# Subtest: app/api/director/route.js: re-finalize uses committed canonical match target, ignoring client target
+ok 178 - app/api/director/route.js: re-finalize uses committed canonical match target, ignoring client target
+  ---
+  duration_ms: 1.891042
+  type: 'test'
+  ...
+# Subtest: app/api/director/route.js: postcommit failure reports pending work without changing committed receipt or resubmitting
+ok 179 - app/api/director/route.js: postcommit failure reports pending work without changing committed receipt or resubmitting
+  ---
+  duration_ms: 2.002041
+  type: 'test'
+  ...
+# Subtest: app/api/director/route.js: participant/anon denial cannot reach lifecycle or postcommit authority
+ok 180 - app/api/director/route.js: participant/anon denial cannot reach lifecycle or postcommit authority
+  ---
+  duration_ms: 1.005625
+  type: 'test'
+  ...
+# Subtest: app/api/director/route.js: precommit stale rejection is typed 409 and never schedules a Calcutta hook
+ok 181 - app/api/director/route.js: precommit stale rejection is typed 409 and never schedules a Calcutta hook
+  ---
+  duration_ms: 2.367417
+  type: 'test'
+  ...
+# Subtest: app/api/live-matches/route.js: finalize uses committed canonical match target, ignoring client target
+ok 182 - app/api/live-matches/route.js: finalize uses committed canonical match target, ignoring client target
+  ---
+  duration_ms: 2.169541
+  type: 'test'
+  ...
+# Subtest: app/api/live-matches/route.js: reopen uses committed canonical match target, ignoring client target
+ok 183 - app/api/live-matches/route.js: reopen uses committed canonical match target, ignoring client target
+  ---
+  duration_ms: 1.32075
+  type: 'test'
+  ...
+# Subtest: app/api/live-matches/route.js: re-finalize uses committed canonical match target, ignoring client target
+ok 184 - app/api/live-matches/route.js: re-finalize uses committed canonical match target, ignoring client target
+  ---
+  duration_ms: 1.339209
+  type: 'test'
+  ...
+# Subtest: app/api/live-matches/route.js: postcommit failure reports pending work without changing committed receipt or resubmitting
+ok 185 - app/api/live-matches/route.js: postcommit failure reports pending work without changing committed receipt or resubmitting
+  ---
+  duration_ms: 0.933625
+  type: 'test'
+  ...
+# Subtest: app/api/live-matches/route.js: participant/anon denial cannot reach lifecycle or postcommit authority
+ok 186 - app/api/live-matches/route.js: participant/anon denial cannot reach lifecycle or postcommit authority
+  ---
+  duration_ms: 0.661708
+  type: 'test'
+  ...
+# Subtest: app/api/live-matches/route.js: precommit stale rejection is typed 409 and never schedules a Calcutta hook
+ok 187 - app/api/live-matches/route.js: precommit stale rejection is typed 409 and never schedules a Calcutta hook
+  ---
+  duration_ms: 0.850375
+  type: 'test'
+  ...
+# Subtest: Calcutta target empty remains denied before any tick
+ok 188 - Calcutta target empty remains denied before any tick
+  ---
+  duration_ms: 0.570542
+  type: 'test'
+  ...
+# Subtest: Calcutta target WRONG remains denied before any tick
+ok 189 - Calcutta target WRONG remains denied before any tick
+  ---
+  duration_ms: 0.188208
+  type: 'test'
+  ...
+# Subtest: SCORING.READ_AUTHORITY: PT409 stays typed, makes one execution attempt and preserves recovery
+ok 190 - SCORING.READ_AUTHORITY: PT409 stays typed, makes one execution attempt and preserves recovery
+  ---
+  duration_ms: 1.124042
+  type: 'test'
+  ...
+# Subtest: SCORING.SUBMIT_HOLE: PT409 stays typed, makes one execution attempt and preserves recovery
+ok 191 - SCORING.SUBMIT_HOLE: PT409 stays typed, makes one execution attempt and preserves recovery
+  ---
+  duration_ms: 1.006333
+  type: 'test'
+  ...
+# Subtest: SCORING.FINALIZE_MATCH: PT409 stays typed, makes one execution attempt and preserves recovery
+ok 192 - SCORING.FINALIZE_MATCH: PT409 stays typed, makes one execution attempt and preserves recovery
+  ---
+  duration_ms: 0.4585
+  type: 'test'
+  ...
+# Subtest: SCORING.REOPEN_MATCH: PT409 stays typed, makes one execution attempt and preserves recovery
+ok 193 - SCORING.REOPEN_MATCH: PT409 stays typed, makes one execution attempt and preserves recovery
+  ---
+  duration_ms: 0.431459
+  type: 'test'
+  ...
+# Subtest: genuine serialization 40001 remains retryable and retains its existing unavailable envelope
+ok 194 - genuine serialization 40001 remains retryable and retains its existing unavailable envelope
+  ---
+  duration_ms: 0.3975
+  type: 'test'
+  ...
+# Subtest: Passport shipping authorization preserves PT409 and does not repeat the failed projection
+ok 195 - Passport shipping authorization preserves PT409 and does not repeat the failed projection
+  ---
+  duration_ms: 2.467
+  type: 'test'
+  ...
+1..195
+# tests 228
+# suites 0
+# pass 228
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 91781.536583

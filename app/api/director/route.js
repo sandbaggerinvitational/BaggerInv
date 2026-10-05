@@ -98,7 +98,7 @@ export async function POST(request) {
         try {
           await Promise.all([
             recalculateCompetitionDerivedTournament("", { calculatedBy: `Director lifecycle worker · ${updatedBy || "Director"}` }),
-            recalculateCalcuttaAfterCanonicalMutation("", {
+            recalculateCalcuttaAfterCanonicalMutation(lifecycle.tournamentId, {
               calculatedBy: `Director lifecycle Calcutta worker · ${updatedBy || "Director"}`,
               mutationKey: input.operationRequestId,
               matchId: input.matchId,

@@ -129,7 +129,7 @@ async function telemetryPOST(request) {
           recalculateIntelligenceDerivedTournament("", {
             calculatedBy: `Director lifecycle intelligence worker · ${authorization.identity?.actor?.name || updatedBy || "Director"}`,
           }),
-          recalculateCalcuttaAfterCanonicalMutation("", {
+          recalculateCalcuttaAfterCanonicalMutation(lifecycle.tournamentId, {
             calculatedBy: `Director lifecycle Calcutta worker · ${authorization.identity?.actor?.name || updatedBy || "Director"}`,
             mutationKey: operationRequestId,
             matchId,

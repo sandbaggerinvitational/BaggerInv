@@ -1,0 +1,125 @@
+{
+  "base_sha": "45c2d4be7d0b21759827900da9fd6dafd964c24b",
+  "active_producers": [
+    {
+      "signature": "production_control.assert_certification_annual_abort_drain_v1(uuid,jsonb)",
+      "old_body_sha256": "a8f20a3ce64f3a73ba75c53dcbbaefae46c1ba2e4afa66f995ebf09481ddfa58",
+      "new_body_sha256": "91ac1f4e36f19e267f09cdceb91d03c81dc04de06fb406ff1820a9f763f820b8"
+    },
+    {
+      "signature": "production_control.assert_certification_context_v1(jsonb,text,boolean)",
+      "old_body_sha256": "229bbb96bac054e72e1e762a95485f63ddb511322e84a82c44f6240b62e897ad",
+      "new_body_sha256": "36a266b5bf8e49f3c753807f0558c383c70a247fe4819cd9c65cb899d32f5f65"
+    },
+    {
+      "signature": "production_control.current_certification_context_v1()",
+      "old_body_sha256": "b04d83b624fff0fffef480631d152ebe0b2679304f16ce111ed132b1d09c3120",
+      "new_body_sha256": "0491bd73421f65da67d49dd9588061c4ba7b70d1a00f0968f4c4ce8bbba29250"
+    },
+    {
+      "signature": "production_control.install_certification_annual_reopened_generation_v1(uuid,uuid,jsonb)",
+      "old_body_sha256": "c3a4df1ea84fe592d3316756141061f4d858fc47feddb051279702f34a5df13b",
+      "new_body_sha256": "3f5cc0108c49441c2203e693881d2ecf1635723964e17afa9bad707f189d3fc6"
+    }
+  ],
+  "retained_source_locations": [
+    {
+      "file": "supabase/canonical_bootstrap/schema.sql",
+      "line": 7621,
+      "function": "production_control.assert_certification_annual_abort_drain_v1(target_closure uuid, ctx jsonb) RETURNS void",
+      "immutable_historical_or_bootstrap": true,
+      "sqlstate": "40001"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/schema.sql",
+      "line": 7771,
+      "function": "production_control.assert_certification_context_v1(input jsonb, required_phase text, mutation boolean) RETURNS jsonb",
+      "immutable_historical_or_bootstrap": true,
+      "sqlstate": "40001"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/schema.sql",
+      "line": 34717,
+      "function": "production_control.current_certification_context_v1() RETURNS jsonb",
+      "immutable_historical_or_bootstrap": true,
+      "sqlstate": "40001"
+    },
+    {
+      "file": "supabase/canonical_bootstrap/schema.sql",
+      "line": 45460,
+      "function": "production_control.install_certification_annual_reopened_generation_v1(target_closure uuid, nextgen uuid, ctx jsonb) RETURNS void",
+      "immutable_historical_or_bootstrap": true,
+      "sqlstate": "40001"
+    },
+    {
+      "file": "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+      "line": 756,
+      "function": "production_control.assert_certification_context_v1(input jsonb, required_phase text, mutation boolean)",
+      "immutable_historical_or_bootstrap": true,
+      "sqlstate": "40001"
+    },
+    {
+      "file": "supabase/production_migrations/202609300131_canonical_resource_control_v1.sql",
+      "line": 824,
+      "function": "production_control.current_certification_context_v1()",
+      "immutable_historical_or_bootstrap": true,
+      "sqlstate": "40001"
+    },
+    {
+      "file": "supabase/production_migrations/202609300137_certification_domain_resource_recovery_v1.sql",
+      "line": 895,
+      "function": "production_control.assert_certification_context_v1(input jsonb, required_phase text, mutation boolean)",
+      "immutable_historical_or_bootstrap": true,
+      "sqlstate": "40001"
+    },
+    {
+      "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+      "line": 762,
+      "function": "production_control.assert_certification_annual_abort_drain_v1(target_closure uuid,ctx jsonb)",
+      "immutable_historical_or_bootstrap": true,
+      "sqlstate": "40001"
+    },
+    {
+      "file": "supabase/production_migrations/202609300138_certification_annual_transition_v1.sql",
+      "line": 833,
+      "function": "production_control.install_certification_annual_reopened_generation_v1(target_closure uuid,nextgen uuid,ctx jsonb)",
+      "immutable_historical_or_bootstrap": true,
+      "sqlstate": "40001"
+    }
+  ],
+  "application_stale_mapping": "lib/certification-runtime-server.js: databaseFailure -> HTTP409 by typed STALE discriminator; five-character PT409 preserved in databaseSqlstate/diagnostics",
+  "retry_handler": "lib/score-derived-worker.js: classifyDerivedFailure retains genuine 40001/40P01/57014/55P03 and connection states; PT409 is terminal",
+  "calcutta_callers": {
+    "changed": [
+      "app/api/director/route.js",
+      "app/api/live-matches/route.js"
+    ],
+    "already_canonical": [
+      "app/api/scoring/current/route.js",
+      "app/api/scoring/matches/[matchId]/route.js",
+      "lib/mobile-v1-scoring-post-commit.js"
+    ]
+  },
+  "affected_stale_paths": [
+    "/api/player-passport/matches",
+    "/api/scoring/current",
+    "/api/scoring/matches/[matchId]",
+    "/api/director",
+    "/api/live-matches",
+    "all Certification read/mutation/worker gateways calling assert_certification_context_v1/current_certification_context_v1",
+    "Certification annual abort/reopened-generation helpers (only SQLSTATE literal affected)"
+  ],
+  "unchanged_other_business_states": [
+    "CANONICAL_RESOURCE_REGISTRATION_STALE",
+    "CERTIFICATION_ANNUAL_ABORT_NOT_SAFE",
+    "PRODUCTION_CALCUTTA_AUCTION_REVISION_CONFLICT"
+  ],
+  "production_and_legacy_transports": "UNCHANGED",
+  "hosted_access": false,
+  "sqlstate_dependencies": {
+    "JavaScript": "No exact stale-context code consumer requires40001; existing message discriminator selects409, diagnostics acceptsPT409.",
+    "worker": "40001 genuine/transient handling remains unchanged; PT409 is terminal as required.",
+    "durable_ingress": "Only domain rejectionP1360 is caught as NOT_COMMITTED inside execute; both old40001 and newPT409 propagate and preserve stable-ID UNKNOWN/status/resolve recovery.",
+    "Odds": "Migration143 retains two40001 catches around current_canonical_odds_inputs_v2 for source-advanced job supersession. Those source-conflict raises and all Odds SQL remain unchanged; authority/context validation precedes the source-input handling block."
+  }
+}

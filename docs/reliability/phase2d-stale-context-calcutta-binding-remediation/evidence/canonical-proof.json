@@ -1,0 +1,71 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "hosted": false,
+  "cases": [
+    {
+      "name": "installation changes only four exact function bodies, preserves ACL/RLS/owner/security/data/receipt",
+      "result": "PASS"
+    },
+    {
+      "name": "same artifact replay is idempotent and private execution remains denied",
+      "result": "PASS"
+    },
+    {
+      "name": "unexpected predecessor denies atomically before any correction",
+      "result": "PASS"
+    },
+    {
+      "name": "current context succeeds; stale token returns PT409 promptly through the public projection",
+      "result": "PASS"
+    },
+    {
+      "name": "cached generation/revision changes remain denied by the unchanged current-context guard",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong resource/release/deployment remains denied without changing authority",
+      "result": "PASS"
+    },
+    {
+      "name": "actual SQL denial maps through the shipping authorization route to sanitized 409 with one attempt",
+      "result": "PASS"
+    },
+    {
+      "name": "genuine PostgreSQL serializable concurrent update still emits 40001",
+      "result": "PASS"
+    }
+  ],
+  "changedFunctions": [
+    "production_control.assert_certification_annual_abort_drain_v1(target_closure uuid, ctx jsonb)",
+    "production_control.assert_certification_context_v1(input jsonb, required_phase text, mutation boolean)",
+    "production_control.current_certification_context_v1()",
+    "production_control.install_certification_annual_reopened_generation_v1(target_closure uuid, nextgen uuid, ctx jsonb)"
+  ],
+  "catalogSections": [
+    "columns",
+    "constraints",
+    "defaultPrivileges",
+    "dependencies",
+    "extensions",
+    "functions",
+    "indexes",
+    "policies",
+    "relations",
+    "schemas",
+    "triggers"
+  ],
+  "dataUnchanged": true,
+  "staleProjection": {
+    "sqlstate": "PT409",
+    "message": "CANONICAL_RESOURCE_CONTEXT_STALE",
+    "milliseconds": 17.112042000000656
+  },
+  "shipping": {
+    "status": 409,
+    "code": "CANONICAL_RESOURCE_CONTEXT_STALE",
+    "attempts": 1,
+    "milliseconds": 113.58879200000229
+  },
+  "genuineSerializationSqlstate": "40001",
+  "result": "PASS"
+}
