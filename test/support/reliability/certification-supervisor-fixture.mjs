@@ -60,7 +60,8 @@ export async function createSupervisorFixture() {
   const input=JSON.parse(init.body).input;calls.push({name,operation:input.operation_id||input.operation});
   const result=sqlResult(cluster,database,`\\set VERBOSITY verbose\nset role service_role;select public.${name}(${jsonLiteral(input)})`,{role:'service_role'});
   if(result.status!==0){const match=/ERROR:\s+([A-Z0-9]{5}):\s*([^\n]+)/.exec(result.stderr);if(!match)throw new Error(result.stderr);
-   return Response.json({code:match[1],message:match[2]},{status:400});}
+   const details=/DETAIL:\s+([^\n]+)/.exec(result.stderr)?.[1];
+   return Response.json({code:match[1],message:match[2],...(details?{details}:{})},{status:400});}
   return Response.json(JSON.parse(result.stdout.trim()));
  };
  const dependencies={registrationManifest,fetchImpl},bound={resource,deployment};

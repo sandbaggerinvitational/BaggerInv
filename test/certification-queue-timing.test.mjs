@@ -88,7 +88,7 @@ test('pinned SDK 0.7.0 performs real parser/renewal/ACK lifecycle against a synt
   assert.equal(new URL(url).hostname,'iad1.vercel-queue.com');
   if(init.method==='PATCH'){
    const seconds=JSON.parse(init.body).visibilityTimeoutSeconds;const deadline=Date.now()+seconds*1000;
-   assert.ok(deadline<clock+181_000,'provider expiration bounds every actual SDK renewal');events.push({kind:'renew',at:Date.now(),seconds,deadline});
+   assert.ok(deadline<clock+540_000,'provider expiration bounds every actual SDK renewal');events.push({kind:'renew',at:Date.now(),seconds,deadline});
   }else{assert.equal(init.method,'DELETE');events.push({kind:'ack',at:Date.now()});}
   return Response.json({success:true});
  };
@@ -96,12 +96,12 @@ test('pinned SDK 0.7.0 performs real parser/renewal/ACK lifecycle against a synt
   const client=new QueueClient({region:'iad1',deploymentId:'dpl_SyntheticTiming',token:'LOCAL_SYNTHETIC_NO_PROVIDER_AUTHORITY',telemetry:{isEnabled:false}});
   const callback=client.handleCallback(async(message,meta)=>{requireQueueAttemptLifetime(meta);entered();await hold;},
    {visibilityTimeoutSeconds:T.visibilitySeconds,retry:queueRetry});
-  const req=request(181);const parsed=await parseCallback(req.clone());
-  assert.equal(parsed.expiresAt,new Date(clock+181_000).toISOString());
+  const req=request(540,300);const parsed=await parseCallback(req.clone());
+  assert.equal(parsed.expiresAt,new Date(clock+540_000).toISOString());
   const response=handleBoundedQueueDelivery(req,callback);await reached;
-  for(let i=0;i<3;i++){t.mock.timers.tick(18_000);await yieldTurn();}
-  t.mock.timers.tick(5_000);release();assert.equal((await response).status,200);
-  assert.deepEqual(events.filter(x=>x.kind==='renew').map(x=>x.at-clock),[18_000,36_000,54_000]);
-  assert.equal(events.at(-1).kind,'ack');assert.equal(events.at(-1).at-clock,59_000);
+  t.mock.timers.tick(59_000);await yieldTurn();assert.equal(events.length,0);
+  t.mock.timers.tick(1_000);await yieldTurn();release();assert.equal((await response).status,200);
+  assert.deepEqual(events.filter(x=>x.kind==='renew').map(x=>x.at-clock),[60_000]);
+  assert.equal(events.at(-1).kind,'ack');assert.equal(events.at(-1).at-clock,60_000);
  }finally{globalThis.fetch=priorFetch;t.mock.timers.reset();release?.();}
 });

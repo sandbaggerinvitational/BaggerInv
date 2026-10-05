@@ -29,7 +29,7 @@ test('publisher lost acknowledgement never fabricates NOT_PUBLISHED or a complet
 test('queue retry is finite; security denials acknowledge without job work; errors preserve uncertainty',()=>{
  assert.deepEqual(queueRetry({code:'SUPERVISOR_MESSAGE_DENIED',status:403},{deliveryCount:1}),{acknowledge:true});assert.equal(queueRetry({}, {deliveryCount:5}),undefined);
  assert.notDeepEqual(queueRetry({status:403},{deliveryCount:1}),{acknowledge:true});
- assert.deepEqual(queueRetry({code:'SUPERVISOR_ACKNOWLEDGEMENT_UNKNOWN',status:503},{deliveryCount:1}),{afterSeconds:2});
+ assert.deepEqual(queueRetry({code:'SUPERVISOR_ACKNOWLEDGEMENT_UNKNOWN',status:503},{deliveryCount:1,expiresAt:new Date(Date.now()+540000)}),{afterSeconds:2});
  assert.equal(queueRetry({status:503},{deliveryCount:1}),undefined);
 });
 test('only Certification manifest registers one private consumer; base Production manifest unchanged; pinned SDK',async()=>{

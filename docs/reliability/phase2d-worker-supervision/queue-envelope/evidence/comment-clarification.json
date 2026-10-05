@@ -1,0 +1,8 @@
+{
+  "change": "provider-contract comment clarification only after functional certification",
+  "beforeSha256": "87d557afc00458b1eeed0b2f9f89670470ebc2bc5a012bd30f8c434f67bc4009",
+  "afterSha256": "581c7719f2eb65ff86a4e6816c5bdd125bfab23a7718e372f25bec29bcb49565",
+  "onlyExactCommentBlockChanged": true,
+  "executableStatementsChanged": false,
+  "providerConfigurationChanged": false
+}

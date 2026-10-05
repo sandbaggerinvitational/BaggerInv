@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "receipts": 59,
+  "proofs": [
+    {
+      "invocation_digest": "25bb49f4010fb8688b18cc55e1427976abc2185669b19e6c7317a56fe230a06b",
+      "status": "RETENTION_CONFIRMED",
+      "actualTtlSeconds": 547.973,
+      "postScheduleSeconds": 540.525,
+      "timestampToleranceSeconds": 2,
+      "clockSkewReviewSeconds": 30
+    },
+    {
+      "invocation_digest": "1e373c5c403cb0861f05505945390b5cbf923a115dc509f25af75a385414d741",
+      "status": "RETENTION_CONFIRMED",
+      "actualTtlSeconds": 607.832,
+      "postScheduleSeconds": 540.712,
+      "timestampToleranceSeconds": 2,
+      "clockSkewReviewSeconds": 30
+    },
+    {
+      "invocation_digest": "9c74290001d02e2d14072f97bb8941e6f2e7e94e5790c5651fe89b3fa031f577",
+      "status": "RETENTION_CONFIRMED",
+      "actualTtlSeconds": 547.119,
+      "postScheduleSeconds": 539.712,
+      "timestampToleranceSeconds": 2,
+      "clockSkewReviewSeconds": 30
+    },
+    {
+      "invocation_digest": "ea63a1ab1fa358bd024a686ffbdc74b17c1b6e9cb0e86c35095b2bf014fca36e",
+      "status": "RETENTION_CONFIRMED",
+      "actualTtlSeconds": 607.641,
+      "postScheduleSeconds": 540.197,
+      "timestampToleranceSeconds": 2,
+      "clockSkewReviewSeconds": 30
+    },
+    {
+      "invocation_digest": "f0414d9cef438963ec467fef59db0d08767cb4dbd30552751ea44224e91f4dc6",
+      "status": "RETENTION_CONFIRMED",
+      "actualTtlSeconds": 547.925,
+      "postScheduleSeconds": 540.197,
+      "timestampToleranceSeconds": 2,
+      "clockSkewReviewSeconds": 30
+    },
+    {
+      "invocation_digest": "d69d1649d820ab3c276ffc4b02cd853ce239540aec22e7af99a6901a1237d6e5",
+      "status": "RETENTION_CONFIRMED",
+      "actualTtlSeconds": 607.324,
+      "postScheduleSeconds": 540.411,
+      "timestampToleranceSeconds": 2,
+      "clockSkewReviewSeconds": 30
+    },
+    {
+      "invocation_digest": "0f51d6572c47c4667e99dd62cfc7c1a740d53b83bd15b21c44d4b2d79120f5ec",
+      "status": "RETENTION_CONFIRMED",
+      "actualTtlSeconds": 547.542,
+      "postScheduleSeconds": 540.411,
+      "timestampToleranceSeconds": 2,
+      "clockSkewReviewSeconds": 30
+    }
+  ],
+  "visibility": {
+    "status": "VISIBILITY_CONFIRMED",
+    "initialDeadlines": 7,
+    "requests": 3,
+    "acceptedRenewals": 1,
+    "acceptedRetryDirectives": 2,
+    "errors": [],
+    "fixedRenewalScheduleRequired": false
+  }
+}

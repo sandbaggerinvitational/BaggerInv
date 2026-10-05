@@ -40,7 +40,8 @@ test('worker engine, job-fault transport and retired HTTP route stay byte-identi
  for(const file of ['lib/score-derived-worker.js','app/api/internal/derived-worker/run/route.js'])
   assert.equal(await readFile(file,'utf8'),execFileSync('git',['show','71d6a393:'+file],{encoding:'utf8'}));
  const consumer=await readFile('app/api/internal/derived-worker/queue/route.js','utf8');
- assert.match(consumer,/handleBoundedQueueDelivery\(request,consume\)/);
+ assert.match(consumer,/handleQueueEnvelope\(request,consume,\{bound,evidence:timingEvidence\}\)/);
+ assert.match(consumer,/requireQueueEnvelopeMetadata\(metadata\)/);
  assert.match(consumer,/consumeCertificationQueueMessage\(message,metadata,\{timingEvidence\}\)/);
  assert.match(consumer,/observeQueueTransport/);
  const runtime=await readFile('lib/certification-worker-supervision.js','utf8');
@@ -49,8 +50,8 @@ test('worker engine, job-fault transport and retired HTTP route stay byte-identi
  assert.equal(jobTransport(runtime),jobTransport(original));
  const tool=await readFile('tools/reliability/certification-queue-control.mjs','utf8');assert.doesNotMatch(tool,/new QueueClient|from '@vercel\/queue'/);
  assert.match(tool,/x-vercel-trusted-oidc-idp-token/);
- // No additional package is needed: the existing pinned Queue SDK and lock
- // already install the official OIDC helper at this resolved module location.
+ // Reuse the same official OIDC helper already installed by the pinned SDK
+ // and used by the reviewed publisher; no new dependency is added.
  const lock=JSON.parse(await readFile('package-lock.json','utf8'));
  assert.equal(lock.packages['node_modules/@vercel/queue'].version,'0.7.0');
  assert.ok(lock.packages['node_modules/@vercel/queue'].dependencies['@vercel/oidc']);

@@ -1,0 +1,15 @@
+{
+  "runtime": "v24.21.0",
+  "hosted": false,
+  "remoteSocketsDenied": true,
+  "realCredentialsRemoved": true,
+  "counts": {
+    "tests": 63,
+    "pass": 63,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "exitCode": 0,
+  "rawSha256": "f0f86b5e58aa031c3890951283605adf5637731991d28a95410add24179a80ef"
+}

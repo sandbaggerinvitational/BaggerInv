@@ -7,7 +7,7 @@ import {createServer} from 'node:http';
 import {setImmediate as yieldTurn} from 'node:timers/promises';
 import {execFileSync} from 'node:child_process';
 import {QueueClient} from '@vercel/queue';
-import {createQueueTimingEvidence,observeQueueTransport,validateQueueTimingReceipt,verifyQueueRetentionEvidence,EVIDENCE_PROVENANCE} from '../lib/certification-queue-timing-evidence.js';
+import {createQueueTimingEvidence,observeQueueTransport,validateQueueTimingReceipt,verifyQueueRetentionEvidence,verifyQueueVisibilityEvidence,EVIDENCE_PROVENANCE} from '../lib/certification-queue-timing-evidence.js';
 import {queuePublicationTiming,requireQueueCallbackLifetime,QUEUE_TIMING as T} from '../lib/certification-queue-timing.js';
 import {publishOwnerQueueBatch} from '../lib/certification-queue-publication.js';
 import {QUEUE_TOPIC,QUEUE_CONTRACT} from '../lib/certification-queue-supervision.js';
@@ -23,7 +23,7 @@ function request(e,{created=clock,expires=clock+550_000,messageId='msg_synthetic
   'ce-type':'com.vercel.queue.v2beta','ce-vqsqueuename':QUEUE_TOPIC,'ce-vqsconsumergroup':'synthetic_consumer',
   'ce-vqsmessageid':messageId,'ce-vqsreceipthandle':'DO_NOT_LOG_RECEIPT_TOKEN','ce-vqsdeliverycount':'1','ce-vqsregion':'iad1',
   'ce-vqscreatedat':new Date(created).toISOString(),'ce-vqsexpiresat':new Date(expires).toISOString(),
-  'ce-vqsvisibilitydeadline':new Date(created+90_000).toISOString(),'content-type':'application/json','authorization':'DO_NOT_LOG_CREDENTIAL'},body:JSON.stringify(e.message)});
+  'ce-vqsvisibilitydeadline':new Date(created+300_000).toISOString(),'content-type':'application/json','authorization':'DO_NOT_LOG_CREDENTIAL'},body:JSON.stringify(e.message)});
 }
 function observed(f,e,expires=clock+550_000){f.e.publicationRequest(e,queuePublicationTiming(e,clock),clock);f.e.publicationResponse({messageId:'msg_synthetic_timing'});
  f.e.callback(request(e,{expires}));f.e.delivery(e.message,{messageId:'msg_synthetic_timing',createdAt:new Date(clock),expiresAt:new Date(expires)});
@@ -53,11 +53,11 @@ test('tick 1, tick 60 and tick 120 record the unchanged finite delay+540 formula
 });
 test('old retention necessarily fails a lawful 90-second renewal before 60-second termination; new survives it',()=>{
  // Exact 44784e8b formula: max(60, authorityExpiry-publication)=100.
- // S=publication+70, old expiry S+30 < renewal at S+18 plus90.
+ // S=publication+70, old expiry S+30 precedes the provider-driven first renewal near S+60.
  const old=fixture(),e=entry(70),oldTtl=Math.max(60,Math.ceil((Date.parse(e.expires_at)-clock)/1000)),oldExpiry=clock+oldTtl*1000;
  assert.equal(oldTtl,100);const oldProof=observed(old,e,oldExpiry);
  assert.equal(verifyQueueRetentionEvidence(...oldProof).status,'TTL_MISMATCH');
- assert.ok(clock+70_000+18_000+90_000>oldExpiry);
+ assert.ok(clock+70_000+60_000+90_000>oldExpiry);
  const fresh=fixture();const newProof=observed(fresh,e,clock+610_000);
  assert.equal(verifyQueueRetentionEvidence(...newProof).status,'RETENTION_CONFIRMED');
  assert.ok(clock+70_000+60_000+90_000<clock+610_000);
@@ -144,10 +144,13 @@ test('timelines bridge provider timestamps to retained natural lease/reclaim pro
  assert.equal(f.records.find(r=>r.event==='CANONICAL_FINISH_RESPONSE').elapsed_ms.value,90_000);
  assert.doesNotMatch(JSON.stringify(f.records),/DO_NOT_LOG/);
 });
-test('worker/claims/SQL/timing/security contracts remain byte-identical to the approved base',async()=>{
- for(const file of ['lib/score-derived-worker.js','lib/certification-worker-supervision.js','lib/certification-queue-timing.js',
- 'lib/certification-queue-errors.js','supabase/production_incremental/certification-queue-global-fault-v5.sql','vercel.certification-queue.json','package.json','package-lock.json'])
-  assert.equal(await readFile(file,'utf8'),execFileSync('git',['show','51d51930:'+file],{encoding:'utf8'}));
+test('worker/claims/historical SQL/provider configuration remain byte-identical; timing constants and SDK remain pinned',async()=>{
+ for(const file of ['lib/score-derived-worker.js','lib/score-derived-delivery.js','lib/certification-worker-supervision.js',
+ 'supabase/production_incremental/certification-queue-global-fault-v5.sql','vercel.certification-queue.json','vercel.json'])
+  assert.equal(await readFile(file,'utf8'),execFileSync('git',['show','720857e17a39f088b86583a22f6722812a695147:'+file],{encoding:'utf8'}));
+ assert.equal((await readFile('lib/certification-queue-timing.js','utf8')).split('const failure=')[0],
+  execFileSync('git',['show','720857e17a39f088b86583a22f6722812a695147:lib/certification-queue-timing.js'],{encoding:'utf8'}).split('const failure=')[0]);
+ assert.equal(JSON.parse(await readFile('package.json','utf8')).dependencies['@vercel/queue'],'0.7.0');
  const sdk=await readFile('node_modules/@vercel/queue/dist/index.d.ts','utf8');assert.match(sdk,/interface SendResult \{\s+messageId: string \| null;\s+\}/);
  assert.match(sdk,/interface MessageMetadata \{[^}]+createdAt: Date;[^}]+expiresAt: Date;/);
 });
@@ -194,11 +197,12 @@ test('installed Queue SDK parser, automatic renewals and ACK produce sanitized e
   const consume=client.handleCallback(async(message,metadata)=>{evidence.delivery(message,metadata);entered();await hold;},{visibilityTimeoutSeconds:90});
   const req=request(e);evidence.callback(req);
   const pending=observeQueueTransport(evidence,()=>consume(req));await reached;
-  await observeQueueTransport(evidence,async()=>{for(let n=0;n<3;n++){t.mock.timers.tick(18000);await yieldTurn();}release();});
+  await observeQueueTransport(evidence,async()=>{t.mock.timers.tick(59000);await yieldTurn();assert.equal(records.filter(r=>r.event==='VISIBILITY_RESPONSE').length,0);t.mock.timers.tick(1000);await yieldTurn();release();});
   const response=await pending;assert.equal(response.status,200);
-  const renewals=records.filter(r=>r.event==='VISIBILITY_RESPONSE');assert.equal(renewals.length,3);
-  assert.deepEqual(renewals.map(r=>r.requested_visibility_seconds.value),[90,90,90]);
+  const renewals=records.filter(r=>r.event==='VISIBILITY_RESPONSE');assert.equal(renewals.length,1);
+  assert.deepEqual(renewals.map(r=>r.requested_visibility_seconds.value),[90]);
   assert.ok(renewals.every(r=>r.provider_accepted.value&&r.expiry_margin_seconds.value>30));
+  assert.equal(verifyQueueVisibilityEvidence(records,{requireRenewal:true}).status,'VISIBILITY_CONFIRMED');
   assert.equal(records.filter(r=>r.event==='ACK_RESPONSE').length,1);assert.ok(records.at(-1).provider_accepted.value);
   records.forEach(validateQueueTimingReceipt);assert.doesNotMatch(JSON.stringify(records),/synthetic-only|DO_NOT_LOG/);
  }finally{release?.();globalThis.fetch=prior;t.mock.timers.reset();}

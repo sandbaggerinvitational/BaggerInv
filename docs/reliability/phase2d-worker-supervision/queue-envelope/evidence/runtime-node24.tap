@@ -1,0 +1,407 @@
+TAP version 13
+# Subtest: routing-only retry learns actual expiry through fixed provider zero-visibility peek before SDK entry
+ok 1 - routing-only retry learns actual expiry through fixed provider zero-visibility peek before SDK entry
+  ---
+  duration_ms: 17.209833
+  type: 'test'
+  ...
+# Subtest: bounded native envelope rejects arbitrary topic/region/group, malformed notification and Production context
+ok 2 - bounded native envelope rejects arbitrary topic/region/group, malformed notification and Production context
+  ---
+  duration_ms: 0.65025
+  type: 'test'
+  ...
+# Subtest: no actual expiry, exhausted horizon, wrong message or oversized provider response never start SDK timers/worker
+ok 3 - no actual expiry, exhausted horizon, wrong message or oversized provider response never start SDK timers/worker
+  ---
+  duration_ms: 1.308792
+  type: 'test'
+  ...
+# Subtest: locked/already processed notification is skipped without ACKing the underlying message or executing a worker
+ok 4 - locked/already processed notification is skipped without ACKing the underlying message or executing a worker
+  ---
+  duration_ms: 0.387916
+  type: 'test'
+  ...
+# Subtest: NOT_DUE and BUSY use explicit safe delays; transport-only probes do not imply execution/ACK
+ok 5 - NOT_DUE and BUSY use explicit safe delays; transport-only probes do not imply execution/ACK
+  ---
+  duration_ms: 0.61225
+  type: 'test'
+  ...
+# Subtest: authority/STOP/HALT/stale/replay deny with SDK ACK; infrastructure fails; UNKNOWN remains reconcilable
+ok 6 - authority/STOP/HALT/stale/replay deny with SDK ACK; infrastructure fails; UNKNOWN remains reconcilable
+  ---
+  duration_ms: 0.103125
+  type: 'test'
+  ...
+# Subtest: real SDK first early denial reschedules with HTTP 200; routing-only retry pulls real metadata and executes once
+ok 7 - real SDK first early denial reschedules with HTTP 200; routing-only retry pulls real metadata and executes once
+  ---
+  duration_ms: 3.56525
+  type: 'test'
+  ...
+# Queue callback error: Error: SUPERVISOR_CONTROL_UNAVAILABLE
+#     at queueDatabaseFailure (file:///private/tmp/bagger-worker-provider-portability/lib/certification-queue-errors.js:49:23)
+#     at failure (file:///private/tmp/bagger-worker-provider-portability/test/certification-queue-errors.test.mjs:5:46)
+#     at TestContext.<anonymous> (file:///private/tmp/bagger-worker-provider-portability/test/certification-queue-errors.test.mjs:60:18)
+#     at Test.runInAsyncScope (node:async_hooks:227:14)
+#     at Test.run (node:internal/test_runner/test:1402:25)
+#     at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+#     at Test.postRun (node:internal/test_runner/test:1542:19)
+#     at Test.run (node:internal/test_runner/test:1467:12)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+#   code: 'SUPERVISOR_CONTROL_UNAVAILABLE',
+#   status: 503,
+#   retryAfterSeconds: undefined,
+#   sqlstate: '21000',
+#   failureClass: 'DATABASE',
+#   queueDisposition: 'FAIL',
+#   operation: 'BEGIN'
+# }
+# Subtest: SUPERVISOR_ADMISSION_DENIED is an explicit deterministic denial, ACK without worker
+ok 8 - SUPERVISOR_ADMISSION_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.660333
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_RESERVATION_DENIED is an explicit deterministic denial, ACK without worker
+ok 9 - SUPERVISOR_RESERVATION_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.045375
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_DISABLED_OR_STALE is an explicit deterministic denial, ACK without worker
+ok 10 - SUPERVISOR_DISABLED_OR_STALE is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.039834
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_RESOURCE_DENIED is an explicit deterministic denial, ACK without worker
+ok 11 - SUPERVISOR_RESOURCE_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.034334
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_DEPLOYMENT_DENIED is an explicit deterministic denial, ACK without worker
+ok 12 - SUPERVISOR_DEPLOYMENT_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.035875
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_REQUEST_DENIED is an explicit deterministic denial, ACK without worker
+ok 13 - SUPERVISOR_REQUEST_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.029708
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_MESSAGE_DENIED is an explicit deterministic denial, ACK without worker
+ok 14 - SUPERVISOR_MESSAGE_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.031708
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_RUN_TOKEN_DENIED is an explicit deterministic denial, ACK without worker
+ok 15 - SUPERVISOR_RUN_TOKEN_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.027125
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_OWNER_PUBLICATION_REQUIRED is an explicit deterministic denial, ACK without worker
+ok 16 - SUPERVISOR_OWNER_PUBLICATION_REQUIRED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.050875
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_PUBLISHER_SESSION_DENIED is an explicit deterministic denial, ACK without worker
+ok 17 - SUPERVISOR_PUBLISHER_SESSION_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.067208
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_AUTHORITY_CONTEXT_STALE PT409 remains a typed nonretrying authority conflict
+ok 18 - SUPERVISOR_AUTHORITY_CONTEXT_STALE PT409 remains a typed nonretrying authority conflict
+  ---
+  duration_ms: 0.046125
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_REVISION_STALE PT409 remains a typed nonretrying authority conflict
+ok 19 - SUPERVISOR_REVISION_STALE PT409 remains a typed nonretrying authority conflict
+  ---
+  duration_ms: 0.03525
+  type: 'test'
+  ...
+# Subtest: CANONICAL_RESOURCE_CONTEXT_STALE PT409 remains a typed nonretrying authority conflict
+ok 20 - CANONICAL_RESOURCE_CONTEXT_STALE PT409 remains a typed nonretrying authority conflict
+  ---
+  duration_ms: 0.02775
+  type: 'test'
+  ...
+# Subtest: 21000 UPDATE requires a WHERE clause fails delivery without false authorization ACK
+ok 21 - 21000 UPDATE requires a WHERE clause fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.069209
+  type: 'test'
+  ...
+# Subtest: P0001 SUPERVISOR_SINGLETON_DRIFT fails delivery without false authorization ACK
+ok 22 - P0001 SUPERVISOR_SINGLETON_DRIFT fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.021708
+  type: 'test'
+  ...
+# Subtest: 42P01 missing relation fails delivery without false authorization ACK
+ok 23 - 42P01 missing relation fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.017708
+  type: 'test'
+  ...
+# Subtest: XX000 unexpected internal failure fails delivery without false authorization ACK
+ok 24 - XX000 unexpected internal failure fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.023125
+  type: 'test'
+  ...
+# Subtest: 42501 permission denied for private object fails delivery without false authorization ACK
+ok 25 - 42501 permission denied for private object fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.032083
+  type: 'test'
+  ...
+# Subtest: 21000 SUPERVISOR_ADMISSION_DENIED fails delivery without false authorization ACK
+ok 26 - 21000 SUPERVISOR_ADMISSION_DENIED fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.032958
+  type: 'test'
+  ...
+# Subtest: 42501 log: SUPERVISOR_ADMISSION_DENIED fails delivery without false authorization ACK
+ok 27 - 42501 log: SUPERVISOR_ADMISSION_DENIED fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.020459
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_NOT_DUE_OR_BUSY can become eligible and retries without ACK
+ok 28 - SUPERVISOR_NOT_DUE_OR_BUSY can become eligible and retries without ACK
+  ---
+  duration_ms: 0.054333
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_PUBLISHER_BUSY can become eligible and retries without ACK
+ok 29 - SUPERVISOR_PUBLISHER_BUSY can become eligible and retries without ACK
+  ---
+  duration_ms: 0.033125
+  type: 'test'
+  ...
+# Subtest: 40001 respects transaction retry/uncertainty without resetting attempts
+ok 30 - 40001 respects transaction retry/uncertainty without resetting attempts
+  ---
+  duration_ms: 0.032583
+  type: 'test'
+  ...
+# Subtest: 40P01 respects transaction retry/uncertainty without resetting attempts
+ok 31 - 40P01 respects transaction retry/uncertainty without resetting attempts
+  ---
+  duration_ms: 0.018208
+  type: 'test'
+  ...
+# Subtest: 57014 respects transaction retry/uncertainty without resetting attempts
+ok 32 - 57014 respects transaction retry/uncertainty without resetting attempts
+  ---
+  duration_ms: 0.017375
+  type: 'test'
+  ...
+# Subtest: 08006 respects transaction retry/uncertainty without resetting attempts
+ok 33 - 08006 respects transaction retry/uncertainty without resetting attempts
+  ---
+  duration_ms: 0.017792
+  type: 'test'
+  ...
+# Subtest: timeout/connection remain uncertain; generic status alone cannot authorize ACK
+ok 34 - timeout/connection remain uncertain; generic status alone cannot authorize ACK
+  ---
+  duration_ms: 0.08225
+  type: 'test'
+  ...
+# Subtest: installed native SDK: ACK deletes lease; retry changes visibility; programming fault fails HTTP callback without ACK
+    # Subtest: success
+    ok 1 - success
+      ---
+      duration_ms: 9.198958
+      type: 'test'
+      ...
+    # Subtest: authority
+    ok 2 - authority
+      ---
+      duration_ms: 0.314792
+      type: 'test'
+      ...
+    # Subtest: connection
+    ok 3 - connection
+      ---
+      duration_ms: 0.304084
+      type: 'test'
+      ...
+    # Subtest: busy
+    ok 4 - busy
+      ---
+      duration_ms: 0.230625
+      type: 'test'
+      ...
+    # Subtest: safeupdate
+    ok 5 - safeupdate
+      ---
+      duration_ms: 0.531625
+      type: 'test'
+      ...
+    1..5
+ok 35 - installed native SDK: ACK deletes lease; retry changes visibility; programming fault fails HTTP callback without ACK
+  ---
+  duration_ms: 10.922541
+  type: 'test'
+  ...
+# Subtest: provider expiration is actual delivery metadata; publication returns only an ID; every emitted field has explicit provenance
+ok 36 - provider expiration is actual delivery metadata; publication returns only an ID; every emitted field has explicit provenance
+  ---
+  duration_ms: 3.13475
+  type: 'test'
+  ...
+# Subtest: sanitizer never emits payload, headers, claim/run tokens, provider IDs or arbitrary error text; schema rejects extra fields
+ok 37 - sanitizer never emits payload, headers, claim/run tokens, provider IDs or arbitrary error text; schema rejects extra fields
+  ---
+  duration_ms: 0.905584
+  type: 'test'
+  ...
+# Subtest: tick 1, tick 60 and tick 120 record the unchanged finite delay+540 formula
+ok 38 - tick 1, tick 60 and tick 120 record the unchanged finite delay+540 formula
+  ---
+  duration_ms: 0.137458
+  type: 'test'
+  ...
+# Subtest: old retention necessarily fails a lawful 90-second renewal before 60-second termination; new survives it
+ok 39 - old retention necessarily fails a lawful 90-second renewal before 60-second termination; new survives it
+  ---
+  duration_ms: 0.30675
+  type: 'test'
+  ...
+# Subtest: absent provider expiry is unavailable; SDK 24h fallback never becomes provider evidence
+ok 40 - absent provider expiry is unavailable; SDK 24h fallback never becomes provider evidence
+  ---
+  duration_ms: 0.237042
+  type: 'test'
+  ...
+# Subtest: provider clock duration is skew-independent; schedule comparison does not silently excuse short horizons
+ok 41 - provider clock duration is skew-independent; schedule comparison does not silently excuse short horizons
+  ---
+  duration_ms: 0.395125
+  type: 'test'
+  ...
+# Subtest: missing acceptance, wrong invocation/deployment/message cannot certify retention
+ok 42 - missing acceptance, wrong invocation/deployment/message cannot certify retention
+  ---
+  duration_ms: 0.167958
+  type: 'test'
+  ...
+# Subtest: publication logging preserves partial/lost ACK uncertainty and cannot manufacture distributed atomicity
+ok 43 - publication logging preserves partial/lost ACK uncertainty and cannot manufacture distributed atomicity
+  ---
+  duration_ms: 0.534042
+  type: 'test'
+  ...
+# Subtest: fixed lease diagnostics record visibility request/response and ACK without logging URLs/handles/body/headers
+ok 44 - fixed lease diagnostics record visibility request/response and ACK without logging URLs/handles/body/headers
+  ---
+  duration_ms: 0.502625
+  type: 'test'
+  ...
+# Subtest: network failure/rejected renewal are never successful ACKs; unsupported body diagnostics remain explicitly absent
+ok 45 - network failure/rejected renewal are never successful ACKs; unsupported body diagnostics remain explicitly absent
+  ---
+  duration_ms: 0.133208
+  type: 'test'
+  ...
+# Subtest: diagnostics are context-isolated, fixed-destination only, and passive if logging fails
+ok 46 - diagnostics are context-isolated, fixed-destination only, and passive if logging fails
+  ---
+  duration_ms: 1.730583
+  type: 'test'
+  ...
+# Subtest: timelines bridge provider timestamps to retained natural lease/reclaim proof without exposing claims
+ok 47 - timelines bridge provider timestamps to retained natural lease/reclaim proof without exposing claims
+  ---
+  duration_ms: 0.704291
+  type: 'test'
+  ...
+# Subtest: worker/claims/historical SQL/provider configuration remain byte-identical; timing constants and SDK remain pinned
+ok 48 - worker/claims/historical SQL/provider configuration remain byte-identical; timing constants and SDK remain pinned
+  ---
+  duration_ms: 49.908292
+  type: 'test'
+  ...
+# Subtest: real Node fetch diagnostics expose the fixed SDK visibility JSON and completed HTTP ACK on loopback
+ok 49 - real Node fetch diagnostics expose the fixed SDK visibility JSON and completed HTTP ACK on loopback
+  ---
+  duration_ms: 17.946708
+  type: 'test'
+  ...
+# Subtest: installed Queue SDK parser, automatic renewals and ACK produce sanitized evidence through the unmodified lifecycle
+ok 50 - installed Queue SDK parser, automatic renewals and ACK produce sanitized evidence through the unmodified lifecycle
+  ---
+  duration_ms: 4.104667
+  type: 'test'
+  ...
+# Subtest: bounded recovery graph rounds 510 seconds to the minimum whole-cadence 540-second horizon
+ok 51 - bounded recovery graph rounds 510 seconds to the minimum whole-cadence 540-second horizon
+  ---
+  duration_ms: 0.352708
+  type: 'test'
+  ...
+# Subtest: 120 delayed ticks fit a two-hour batch; TTL starts at publication and includes the full delivery delay
+ok 52 - 120 delayed ticks fit a two-hour batch; TTL starts at publication and includes the full delivery delay
+  ---
+  duration_ms: 1.162584
+  type: 'test'
+  ...
+# Subtest: too-short retention, excessive delay, malformed dates and authority expansion fail before send
+ok 53 - too-short retention, excessive delay, malformed dates and authority expansion fail before send
+  ---
+  duration_ms: 0.249375
+  type: 'test'
+  ...
+# Subtest: publication derives timing without extending SQL authority or changing finite/lost-ACK accounting
+ok 54 - publication derives timing without extending SQL authority or changing finite/lost-ACK accounting
+  ---
+  duration_ms: 0.545375
+  type: 'test'
+  ...
+# Subtest: actual expiry is mandatory before SDK lease timers; near expiry admits no worker and no visibility request
+ok 55 - actual expiry is mandatory before SDK lease timers; near expiry admits no worker and no visibility request
+  ---
+  duration_ms: 8.06125
+  type: 'test'
+  ...
+# Subtest: every lawful renewal inside the 60-second ceiling is below actual expiry, including the minimum lifetime boundary
+ok 56 - every lawful renewal inside the 60-second ceiling is below actual expiry, including the minimum lifetime boundary
+  ---
+  duration_ms: 0.136667
+  type: 'test'
+  ...
+# Subtest: retry/backoff never requests visibility past actual expiry; deterministic denials remain ACKs
+ok 57 - retry/backoff never requests visibility past actual expiry; deterministic denials remain ACKs
+  ---
+  duration_ms: 0.104416
+  type: 'test'
+  ...
+# Subtest: pinned SDK 0.7.0 performs real parser/renewal/ACK lifecycle against a synthetic provider with no expiry violation
+ok 58 - pinned SDK 0.7.0 performs real parser/renewal/ACK lifecycle against a synthetic provider with no expiry violation
+  ---
+  duration_ms: 3.605416
+  type: 'test'
+  ...
+1..58
+# tests 63
+# suites 0
+# pass 63
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 392.126292

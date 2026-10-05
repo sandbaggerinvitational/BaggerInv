@@ -13,7 +13,7 @@ test('new canonical fixed-fault denial ACKs; SQL programming failures remain fai
 });
 test('lost outward acknowledgement retries finitely and never claims deterministic denial',()=>{
  const error={code:'SUPERVISOR_ACKNOWLEDGEMENT_UNKNOWN',queueDisposition:'RECONCILE'};
- assert.deepEqual(queueDeliveryRetry(error,{deliveryCount:1}),{afterSeconds:2});assert.equal(queueDeliveryRetry(error,{deliveryCount:5}),undefined);
+ assert.deepEqual(queueDeliveryRetry(error,{deliveryCount:1,expiresAt:new Date(Date.now()+540000)}),{afterSeconds:2});assert.equal(queueDeliveryRetry(error,{deliveryCount:5}),undefined);
 });
 test('fixed transient/global terminal use the established worker classifier',()=>{
  assert.equal(classifyDerivedFailure({code:'ECONNRESET'}).classification,'RETRYABLE');
