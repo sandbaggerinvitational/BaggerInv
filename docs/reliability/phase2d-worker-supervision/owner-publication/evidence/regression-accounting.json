@@ -1,0 +1,49 @@
+{
+  "result": "ACCEPTED_BASELINE_EXACT_MATCH",
+  "actual": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "baseline": "docs/reliability/phase2d-worker-supervision/queue-v2/evidence/application.json",
+  "baselineSha256": "45abd076f6c70f1b56aa3dbd5643084c4f23a2f0b0f6ea8192fde7ed96e81e89",
+  "establishedFailures": [
+    "analytics implementation digest requires an explicit version update",
+    "Google-backed secondary failures are isolated from the core route",
+    "Players uses one compact accessible Round and Rank By control surface",
+    "polish is presentation-only and does not add a leaderboard request path",
+    "Supabase verification distinguishes rejected tokens from provider outages",
+    "native certification receives only a server-verified Auth UUID and confirmed email",
+    "OTP route is no-signup, six-digit, scoped, durably audited, and returns generic unapproved behavior",
+    "SSR session, logout, shadow comparison, and participant context stay Passport-authoritative",
+    "participant navigation uses one fixed safe-area-aware native shell",
+    "every compiled mobile route denies Production before Auth, database, provider or worker transport",
+    "Email provider flow remains byte-identical apart from optional enrollment proof issuance",
+    "Phase 2 public pages consume the shared scorecard analytics service",
+    "CLI writes one immutable local artifact and never calls a provider",
+    "historical writer-scope evidence is generated from exact retained inputs",
+    "historical READY deployments with the safe-method Google writer are exact",
+    "the provider contract uses one exact all-method path OR group",
+    "v4 credential confinement classifies the complete provider and environment inventories",
+    "phone lifecycle dispatch is individually enumerated for frozen and future Production, with no Director namespace",
+    "phone candidate introduces no identity tables or Director mutation and keeps service-only grants",
+    "routes report feedback only after canonical completion; no client-selected receipt"
+  ],
+  "newUnexplainedFailures": [],
+  "newUnexplainedFailureCount": 0,
+  "hosted": false,
+  "resolvedInitialFailures": {
+    "sandbox": "local PostgreSQL shared memory required process permission",
+    "dependencySnapshots": "13 temporary direct-declaration snapshot failures; unnecessary declaration removed; dependency tree unchanged"
+  },
+  "buildExitCode": 0,
+  "focused": {
+    "tests": 38,
+    "pass": 38,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  }
+}

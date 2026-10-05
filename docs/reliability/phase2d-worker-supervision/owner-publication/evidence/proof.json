@@ -1,0 +1,36 @@
+{
+  "status": "LOCAL_PASS_HOSTED_GATES_PENDING",
+  "baseSha": "71d6a3932af7bef735a089cd1a63deb1b62e581d",
+  "hostedMutations": 0,
+  "queuePublications": 0,
+  "workerExecutions": 0,
+  "supervisor": "OFF",
+  "oidcEnvironmentPredicate": "preview",
+  "reusableSecretsAdded": 0,
+  "consumerChanged": false,
+  "existingRlsChanged": false,
+  "rolesAdded": 0,
+  "focused": {
+    "tests": 38,
+    "pass": 38,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "broad": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "newUnexplainedFailures": 0,
+  "build": "PASS",
+  "forwardSql": {
+    "artifact": "supabase/production_incremental/certification-queue-preview-publisher-v3.sql",
+    "sha256": "155de8fb07e7d6036988d0f18dd70cee8217fdc4bbf62470db4522fc4dabab02"
+  },
+  "providerAcceptance": "PENDING",
+  "offStateNativePublicationOrdering": "requires explicit owner approval for minimal no-work START window",
+  "no864HoleRerun": true
+}

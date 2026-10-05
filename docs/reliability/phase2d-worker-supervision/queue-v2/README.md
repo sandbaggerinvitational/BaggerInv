@@ -79,3 +79,9 @@ presentation and request assertions remain intact. No History/Awards source chan
 
 See [protocol/security](PROTOCOL.md), [hosted acceptance and installation](HOSTED-ACCEPTANCE.md)
 and the machine receipts under evidence/. Local PASS is not hosted Part 2B-1 PASS.
+# Owner publication follow-up
+
+The local/CLI SDK publication path documented for this original candidate is
+retired by the locally certified [owner-to-Preview correction](../owner-publication/README.md).
+The Queue v2 consumer/reservations remain unchanged. Original evidence below is
+retained truthfully; it does not establish current hosted provider acceptance.

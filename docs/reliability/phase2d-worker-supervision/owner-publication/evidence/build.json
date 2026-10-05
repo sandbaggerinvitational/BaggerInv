@@ -1,0 +1,26 @@
+{
+  "mode": "build",
+  "startedAt": "2026-10-05T15:48:06.163Z",
+  "completedAt": "2026-10-05T15:48:17.861Z",
+  "hosted": false,
+  "remoteSocketsDenied": true,
+  "realCredentialsRemoved": true,
+  "counts": null,
+  "failures": [],
+  "exitCode": 0,
+  "error": null,
+  "sourceStable": true,
+  "sourceManifest": {
+    "lib/certification-queue-publication.js": "25cbc9959596baa3c67e0090ea7b2b394239880c99b7504839e1f03f00ea9ae6",
+    "lib/certification-queue-publisher.js": "437dcea62bc81abc5fcabb3ea112425ff471d851eb46376469dfdd99fc960c56",
+    "tools/reliability/certification-queue-control.mjs": "54f6bc65e4c17f0b25a1055f7e39703eeb20288b841b3f06449753983f771112",
+    "app/api/internal/derived-worker/publication/route.js": "c0148b11e18ff5f6009dd67fa3b16a06066a90762a93483f6f9a6526693083f4",
+    "supabase/production_incremental/certification-queue-preview-publisher-v3.sql": "155de8fb07e7d6036988d0f18dd70cee8217fdc4bbf62470db4522fc4dabab02",
+    "lib/certification-queue-supervision.js": "316656032228e54f8aadf6bd8270367fd964dab70287375ea542ebb886b0d276",
+    "app/api/internal/derived-worker/queue/route.js": "442cc0011afb872fda767dbe7e0a63809476b7933ae369bf8b7cd63645233e7b",
+    "package.json": "02ca2154f932c5c5bacd6d52ddd4eec023c422b7e46e44d6ec0d35dc54b7826f",
+    "package-lock.json": "abf89699407983d173e997f62aa1083e8ae5cd34b81f33904ebba9744d318d43"
+  },
+  "rawSha256": "c540bc62143562246ccebdf1fc183d1d361b7b197082d7e55548b53a469b175d",
+  "head": "71d6a3932af7bef735a089cd1a63deb1b62e581d"
+}

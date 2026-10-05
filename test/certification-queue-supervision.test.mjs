@@ -12,14 +12,7 @@ const message=()=>({version:QUEUE_CONTRACT,invocation_id:randomUUID()});
 const batch=()=>({binding,epoch:randomUUID(),messages:[]});
 for(const [name,value]of Object.entries({missing:null,empty:{},resource:{...message(),resource:'PRODUCTION'},url:{...message(),url:'https://other.invalid'},worker:{...message(),worker:'CALCUTTA'},badVersion:{...message(),version:'other'},badId:{...message(),invocation_id:'id'}}))
  test('queue message denies '+name,()=>assert.throws(()=>parseQueueMessage(value),/SUPERVISOR_MESSAGE_DENIED/));
-test('SDK publisher uses explicit deployment pin and provider identity, never embeds authentication in message',async()=>{
- const b=batch(),claims={owner_id:binding.deployment.vercel_team_id,project_id:binding.deployment.vercel_project_id,environment:'preview',exp:Math.floor(Date.now()/1000)+60};
- const token=['synthetic',Buffer.from(JSON.stringify(claims)).toString('base64url'),'synthetic'].join('.');let options;
- const send=createOwnerQueuePublisher(b,token,{clientFactory:x=>{options=x;return{send:async(topic,msg,opts)=>{assert.equal(topic,'bagger-certification-derived-wake-v2');assert.equal(Object.keys(msg).length,2);assert.ok(!JSON.stringify(msg).includes(token));return{messageId:'msg_synthetic'};}};}});
- await send(message(),{});assert.equal(options.deploymentId,binding.deployment.deployment_id);assert.equal(options.region,'iad1');
- for(const bad of [{...claims,environment:'production'},{...claims,project_id:'foreign'},{...claims,owner_id:'foreign'},{...claims,exp:1}])
-  assert.throws(()=>createOwnerQueuePublisher(b,['s',Buffer.from(JSON.stringify(bad)).toString('base64url'),'s'].join('.'),{clientFactory:()=>assert.fail()}));
-});
+test('retired CLI publisher is incapable of hosted publication',()=>assert.throws(()=>createOwnerQueuePublisher(),/SUPERVISOR_LOCAL_PUBLICATION_RETIRED/));
 test('publisher denies arbitrary physical resource or unpinned destination before SDK creation',()=>{
  for(const field of ['resource_id','project_ref','registration_revision']){const b=structuredClone(batch());b.binding.resource[field]='foreign';assert.throws(()=>validateOwnerQueueBatch(b));}
  for(const field of ['deployment_id','git_branch','release_commit','deployment_class','deployment_origin']){const b=structuredClone(batch());b.binding.deployment[field]='foreign';assert.throws(()=>validateOwnerQueueBatch(b));}
