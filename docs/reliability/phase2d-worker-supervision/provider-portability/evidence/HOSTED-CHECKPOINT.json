@@ -1,0 +1,105 @@
+{
+  "evidence_class": "OBSERVED_HOSTED_READ_ONLY",
+  "resource": {
+    "id": "CERTIFICATION:2857f707-065a-405d-b5fc-b5b6fa1b0f51",
+    "class": "CERTIFICATION",
+    "project": "trmcwrljjxwhgtikfdgu",
+    "revision": 1
+  },
+  "authority": {
+    "sha": "a4bb57b1067fa7c50c8120c6fe5778378827a221",
+    "deployment": "dpl_E8TTtXeDoVjQ33SuEFubtsKdi4ET",
+    "enabled": false,
+    "admission_revision": 37
+  },
+  "ingress": [
+    "PAUSED"
+  ],
+  "supervisor": {
+    "state": "OFF",
+    "revision": 1,
+    "configured": false,
+    "dispatched": 0,
+    "installation_image_valid": true,
+    "counts": {
+      "dead_letters": 0,
+      "pending_work": 0,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 0
+    }
+  },
+  "vault_secret_count": 0,
+  "extensions": [
+    {
+      "name": "supabase_vault",
+      "version": "0.3.1",
+      "owner": "supabase_admin"
+    }
+  ],
+  "vault_authority": [
+    {
+      "role": "anon",
+      "schema_usage": false,
+      "decrypted_select": false,
+      "decrypted_select_grant": false
+    },
+    {
+      "role": "authenticated",
+      "schema_usage": false,
+      "decrypted_select": false,
+      "decrypted_select_grant": false
+    },
+    {
+      "role": "service_role",
+      "schema_usage": true,
+      "decrypted_select": true,
+      "decrypted_select_grant": false
+    },
+    {
+      "role": "postgres",
+      "schema_usage": true,
+      "decrypted_select": true,
+      "decrypted_select_grant": true
+    }
+  ],
+  "private_functions": {
+    "count": 15,
+    "owner": "postgres",
+    "search_path": "pg_catalog",
+    "anon_execute": false,
+    "authenticated_execute": false,
+    "service_role_execute": false
+  },
+  "roles": {
+    "postgres": {
+      "superuser": false,
+      "login": true
+    },
+    "supabase_admin": {
+      "superuser": true,
+      "login": true
+    },
+    "anon": {
+      "superuser": false,
+      "login": false
+    },
+    "authenticated": {
+      "superuser": false,
+      "login": false
+    },
+    "service_role": {
+      "superuser": false,
+      "login": false,
+      "bypass_rls": true
+    }
+  },
+  "graphql_available": false,
+  "public_direct_net_vault_cron_proxy_found": false,
+  "scope_limit": "catalog/direct-reference inventory, not a complete SQL injection or transitively reachable function audit",
+  "new_ext_install": false,
+  "hosted_mutations": 0,
+  "secrets_read": false,
+  "supervisor_started": false
+}

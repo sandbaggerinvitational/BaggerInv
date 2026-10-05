@@ -1,0 +1,29 @@
+{
+  "url": "https://supabase.com/changelog.md",
+  "sha256": "8a9b9cc29618b6988edcec0de74725028c031fce4f5638c93efd90a75ce88f0d",
+  "implementation_changed": false,
+  "relevant_findings": [
+    {
+      "url": "https://supabase.com/changelog/30606-removal-of-app-settings-jwt-secret-from-the-database",
+      "class": "breaking-security",
+      "review": "Database JWT GUC availability must not be assumed; the supervisor already uses a separate key, not this setting."
+    },
+    {
+      "url": "https://supabase.com/changelog/19298-directly-updating-rows-in-the-cron-job-table-is-no-longer-allowed",
+      "class": "breaking-database",
+      "review": "Use supported scheduling functions, not direct cron table writes; the repository schedule uses cron.schedule."
+    },
+    {
+      "url": "https://supabase.com/changelog/27988-dashboard-weekly-updates-08-07-24-15-07-24",
+      "review": "Data API exposure is configurable; inspect effective schemas independently of SQL grants."
+    },
+    {
+      "url": "https://supabase.com/changelog/20430-dashboard-weekly-updates-08-01-24-15-01-24",
+      "review": "Dashboard privilege UI does not establish provider-owner grant authority."
+    },
+    {
+      "url": "https://supabase.com/changelog/19702-platform-updates-may-2023",
+      "review": "Vault availability does not imply secret access isolation from service_role."
+    }
+  ]
+}

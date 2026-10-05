@@ -1,0 +1,71 @@
+{
+  "hosted": false,
+  "remoteEgress": false,
+  "credentialValuesRetained": false,
+  "cases": [
+    {
+      "name": "provider and managed installer are different roles; managed installer is not superuser",
+      "result": "PASS"
+    },
+    {
+      "name": "managed grant option cannot revoke provider-origin service_role SELECT",
+      "result": "PASS"
+    },
+    {
+      "name": "managed installer cannot remove provider PUBLIC queue privilege",
+      "result": "PASS"
+    },
+    {
+      "name": "Bagger private definer wrapper is denied for anon, participant/ordinary authenticated and service_role",
+      "result": "PASS"
+    },
+    {
+      "name": "generic provider SQL HTTP capability controls URL, body and headers without using Bagger authority",
+      "result": "PASS"
+    },
+    {
+      "name": "Vault direct SQL access differs from private-wrapper and Data API access",
+      "result": "PASS"
+    },
+    {
+      "name": "a queue reader can recover an issued header: no safe long-lived bypass secret may be enqueued",
+      "result": "PASS"
+    },
+    {
+      "name": "current provider ACL guard rejects PUBLIC queue access and rolls back both reservation and HTTP enqueue",
+      "result": "PASS"
+    },
+    {
+      "name": "current provider ACL guard independently rejects service_role decrypted-Vault read",
+      "result": "PASS"
+    },
+    {
+      "name": "unsigned generic HTTP and wrong signatures never reach BEGIN or the worker",
+      "result": "PASS"
+    },
+    {
+      "name": "a captured still-valid ticket is a bounded bearer permit, not a secret or permission to mint new requests",
+      "result": "PASS"
+    },
+    {
+      "name": "endpoint refuses arbitrary URL/path/method/resource and Production environment",
+      "result": "PASS"
+    },
+    {
+      "name": "expired scheduler ticket and valid HMAC without a real reservation are denied",
+      "result": "PASS"
+    },
+    {
+      "name": "single-use canonical reservation rejects second BEGIN even with identical valid HMAC",
+      "result": "PASS"
+    },
+    {
+      "name": "private dispatcher and secret getter remain inaccessible to application roles",
+      "result": "PASS"
+    },
+    {
+      "name": "local model finishes OFF, admission disabled and ingress paused without worker execution",
+      "result": "PASS"
+    }
+  ]
+}

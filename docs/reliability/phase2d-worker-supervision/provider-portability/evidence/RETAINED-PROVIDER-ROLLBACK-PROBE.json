@@ -1,0 +1,213 @@
+{
+  "functions": [
+    {
+      "acl": "{supabase_admin=X/supabase_admin}",
+      "anon": false,
+      "authenticated": false,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": false,
+      "signature": "vault._crypto_aead_det_encrypt(bytea,bytea,bigint,bytea,bytea)"
+    },
+    {
+      "acl": "{supabase_admin=X/supabase_admin}",
+      "anon": false,
+      "authenticated": false,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": false,
+      "signature": "vault._crypto_aead_det_noncegen()"
+    },
+    {
+      "acl": "{supabase_admin=X/supabase_admin,postgres=X*/supabase_admin,service_role=X/supabase_admin}",
+      "anon": false,
+      "authenticated": false,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": true,
+      "service": true,
+      "signature": "vault.create_secret(text,text,text,uuid)"
+    },
+    {
+      "acl": "{supabase_admin=X/supabase_admin,postgres=X*/supabase_admin,service_role=X/supabase_admin}",
+      "anon": false,
+      "authenticated": false,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": true,
+      "service": true,
+      "signature": "vault.update_secret(uuid,text,text,text,uuid)"
+    },
+    {
+      "acl": "{supabase_admin=X/supabase_admin,postgres=X*/supabase_admin,service_role=X/supabase_admin}",
+      "anon": false,
+      "authenticated": false,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": true,
+      "service": true,
+      "signature": "vault._crypto_aead_det_decrypt(bytea,bytea,bigint,bytea,bytea)"
+    },
+    {
+      "acl": null,
+      "anon": true,
+      "authenticated": true,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": true,
+      "signature": "net.check_worker_is_up()"
+    },
+    {
+      "acl": null,
+      "anon": true,
+      "authenticated": true,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": true,
+      "signature": "net._await_response(bigint)"
+    },
+    {
+      "acl": null,
+      "anon": true,
+      "authenticated": true,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": true,
+      "signature": "net._urlencode_string(character varying)"
+    },
+    {
+      "acl": null,
+      "anon": true,
+      "authenticated": true,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": true,
+      "signature": "net._encode_url_with_params_array(text,text[])"
+    },
+    {
+      "acl": null,
+      "anon": true,
+      "authenticated": true,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": true,
+      "signature": "net.worker_restart()"
+    },
+    {
+      "acl": null,
+      "anon": true,
+      "authenticated": true,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": true,
+      "signature": "net.wait_until_running()"
+    },
+    {
+      "acl": null,
+      "anon": true,
+      "authenticated": true,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": true,
+      "signature": "net.wake()"
+    },
+    {
+      "acl": null,
+      "anon": true,
+      "authenticated": true,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": true,
+      "signature": "net.http_get(text,jsonb,jsonb,integer)"
+    },
+    {
+      "acl": null,
+      "anon": true,
+      "authenticated": true,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": true,
+      "signature": "net.http_post(text,jsonb,jsonb,jsonb,integer)"
+    },
+    {
+      "acl": null,
+      "anon": true,
+      "authenticated": true,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": true,
+      "signature": "net.http_delete(text,jsonb,jsonb,integer,jsonb)"
+    },
+    {
+      "acl": null,
+      "anon": true,
+      "authenticated": true,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": true,
+      "signature": "net._http_collect_response(bigint,boolean)"
+    },
+    {
+      "acl": null,
+      "anon": true,
+      "authenticated": true,
+      "owner": "supabase_admin",
+      "postgres_grant_execute": false,
+      "service": true,
+      "signature": "net.http_collect_response(bigint,boolean)"
+    }
+  ],
+  "relations": [
+    {
+      "acl": "{supabase_admin=arwdDxtm/supabase_admin,postgres=r*d*D*x*/supabase_admin,service_role=rd/supabase_admin}",
+      "anon": false,
+      "authenticated": false,
+      "identity": "vault.secrets",
+      "owner": "supabase_admin",
+      "postgres_grant_select": true,
+      "service": true
+    },
+    {
+      "acl": "{supabase_admin=arwdDxtm/supabase_admin,postgres=r*d*D*x*/supabase_admin,service_role=rd/supabase_admin}",
+      "anon": false,
+      "authenticated": false,
+      "identity": "vault.decrypted_secrets",
+      "owner": "supabase_admin",
+      "postgres_grant_select": true,
+      "service": true
+    },
+    {
+      "acl": "{supabase_admin=arwdDxtm/supabase_admin,=arwdDxtm/supabase_admin}",
+      "anon": true,
+      "authenticated": true,
+      "identity": "net.http_request_queue",
+      "owner": "supabase_admin",
+      "postgres_grant_select": false,
+      "service": true
+    },
+    {
+      "acl": "{supabase_admin=arwdDxtm/supabase_admin,=arwdDxtm/supabase_admin}",
+      "anon": true,
+      "authenticated": true,
+      "identity": "net._http_response",
+      "owner": "supabase_admin",
+      "postgres_grant_select": false,
+      "service": true
+    }
+  ],
+  "roles": [
+    {
+      "name": "postgres",
+      "superuser": false
+    },
+    {
+      "name": "supabase_admin",
+      "superuser": true
+    }
+  ],
+  "sequences": [
+    {
+      "acl": "{supabase_admin=rwU/supabase_admin,=rwU/supabase_admin}",
+      "identity": "net.http_request_queue_id_seq",
+      "owner": "supabase_admin",
+      "postgres_grant": false
+    }
+  ]
+}

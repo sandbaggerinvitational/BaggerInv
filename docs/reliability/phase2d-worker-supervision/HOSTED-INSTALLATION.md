@@ -1,5 +1,7 @@
 # Next owner-authorized hosted Part 2B-1 plan
 
+**Portability hold:** this original local plan is not executable as written on the observed managed provider. Do not perform its blanket pg_net/Vault privilege normalization or provision keys. The subsequent [provider review](provider-portability/README.md) documents provider-origin grants, the service-role Vault boundary, plaintext queue-ticket visibility and the required [effective-authority acceptance plan](provider-portability/HOSTED-ACCEPTANCE.md). Supervisor remains OFF; a reviewed secret/dispatch correction and separate hosted authorization are required first. The original forward SQL and fail-closed ACL guard are unchanged.
+
 This is a reviewed execution plan, not permission to run it during local implementation. No provider credentials were read here. No hosted readback or mutation is claimed. The retained checkpoint is the owner-reported Part 2A PASS at deployment dpl_E8TTtXeDoVjQ33SuEFubtsKdi4ET / a4bb57b1067fa7c50c8120c6fe5778378827a221, admission disabled, ingress paused, all current required work/claims/leases/UNKNOWN/dead letters zero, primary 2026-R3-12 FINAL revision28 / 18 scores / snapshot3, second 2026-R3-11 UPCOMING unscored.
 
 ## Installation while disabled

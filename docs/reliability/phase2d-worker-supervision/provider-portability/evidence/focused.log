@@ -1,0 +1,32 @@
+▶ managed non-owner cannot close provider grants by issuing owner-style REVOKEs
+  ✔ provider and managed installer are different roles; managed installer is not superuser (14.986917ms)
+  ✔ managed grant option cannot revoke provider-origin service_role SELECT (13.511334ms)
+  ✔ managed installer cannot remove provider PUBLIC queue privilege (6.983583ms)
+  ✔ Bagger private definer wrapper is denied for anon, participant/ordinary authenticated and service_role (23.455041ms)
+  ✔ generic provider SQL HTTP capability controls URL, body and headers without using Bagger authority (37.728917ms)
+  ✔ Vault direct SQL access differs from private-wrapper and Data API access (24.319625ms)
+  ✔ a queue reader can recover an issued header: no safe long-lived bypass secret may be enqueued (14.414625ms)
+✔ managed non-owner cannot close provider grants by issuing owner-style REVOKEs (927.536708ms)
+▶ existing Bagger guard and endpoint stay fail-closed under provider-shaped privileges
+  ✔ current provider ACL guard rejects PUBLIC queue access and rolls back both reservation and HTTP enqueue (41.46975ms)
+  ✔ current provider ACL guard independently rejects service_role decrypted-Vault read (39.205958ms)
+  ✔ unsigned generic HTTP and wrong signatures never reach BEGIN or the worker (14.527458ms)
+  ✔ a captured still-valid ticket is a bounded bearer permit, not a secret or permission to mint new requests (0.342666ms)
+  ✔ endpoint refuses arbitrary URL/path/method/resource and Production environment (0.579042ms)
+  ✔ expired scheduler ticket and valid HMAC without a real reservation are denied (9.754958ms)
+  ✔ single-use canonical reservation rejects second BEGIN even with identical valid HMAC (29.597625ms)
+  ✔ private dispatcher and secret getter remain inaccessible to application roles (42.006208ms)
+  ✔ local model finishes OFF, admission disabled and ingress paused without worker execution (28.680416ms)
+✔ existing Bagger guard and endpoint stay fail-closed under provider-shaped privileges (5650.411208ms)
+✔ signed ticket binds immutable path/origin/expiry; neither forwarded host nor arbitrary resource grants authority (8.757792ms)
+✔ 45-second soft cutoff prevents a future tick/processor; existing runner exits after maximum one cycle (0.478333ms)
+✔ STOP that wins a processor reservation prevents processing and admits no future poll (0.239083ms)
+✔ deterministic adapter failure records global failure; unavailable accounting remains uncertain and sanitized (1.20125ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6760.07725

@@ -1,0 +1,71 @@
+{
+  "resource": "trmcwrljjxwhgtikfdgu",
+  "hosted_mutations": 0,
+  "requests": [
+    {
+      "actor": "anon",
+      "profile": "net",
+      "method": "GET",
+      "limit": 0,
+      "status": 406,
+      "code": "PGRST106",
+      "message": "Invalid schema: net",
+      "returned_rows": 0
+    },
+    {
+      "actor": "anon",
+      "profile": "vault",
+      "method": "GET",
+      "limit": 0,
+      "status": 406,
+      "code": "PGRST106",
+      "message": "Invalid schema: vault",
+      "returned_rows": 0
+    },
+    {
+      "actor": "anon",
+      "profile": "production_control",
+      "method": "GET",
+      "limit": 0,
+      "status": 406,
+      "code": "PGRST106",
+      "message": "Invalid schema: production_control",
+      "returned_rows": 0
+    },
+    {
+      "actor": "service_role",
+      "profile": "net",
+      "method": "GET",
+      "limit": 0,
+      "status": 406,
+      "code": "PGRST106",
+      "message": "Invalid schema: net",
+      "returned_rows": 0
+    },
+    {
+      "actor": "service_role",
+      "profile": "vault",
+      "method": "GET",
+      "limit": 0,
+      "status": 406,
+      "code": "PGRST106",
+      "message": "Invalid schema: vault",
+      "returned_rows": 0
+    },
+    {
+      "actor": "service_role",
+      "profile": "production_control",
+      "method": "GET",
+      "limit": 0,
+      "status": 406,
+      "code": "PGRST106",
+      "message": "Invalid schema: production_control",
+      "returned_rows": 0
+    }
+  ],
+  "management_config": {
+    "status": 403,
+    "exposed_schemas": null,
+    "extra_search_path": null
+  }
+}

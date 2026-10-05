@@ -1,0 +1,42 @@
+{
+  "base_sha": "fe3f780e14d0110816c3c6373505c7ffa3e97df6",
+  "completed_at": "2026-10-05T13:08:22.623244+00:00",
+  "review_status": "BLOCKED",
+  "local_tests_status": "PASS",
+  "command": "node --conditions=react-server --require ./tools/reliability/phase2-network-deny.cjs --test --test-concurrency=1 test/certification-supervisor-provider-portability.test.mjs test/certification-worker-supervision.test.mjs",
+  "counts": {
+    "tests": 22,
+    "pass": 22,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "exit_code": 0,
+  "owned_socket_only_postgresql": true,
+  "remote_sockets_denied": true,
+  "provider_credentials_used_in_tests": false,
+  "actual_extension_runtime_modeled": false,
+  "provider_sql_grants_modeled": true,
+  "log_sha256": "622b0e1eb4aec186a1e5538c0100d2ddb6f57e252edf53a2460866776116da16",
+  "application_and_forward_sql_unchanged": {
+    "lib/certification-worker-supervision.js": "081de110333e846e5618dcbf77b7a31ef97c78b466060126b3eb8d7f994dd041",
+    "app/api/internal/derived-worker/run/route.js": "ef3cdfabe277594f33cf33aeebe8fa724fe26e3c4a47320ab587a0c29dab54b5",
+    "supabase/production_incremental/certification-worker-supervision-v1.sql": "17a2b3af3663345df096ce6c97cc1a109a9c608857b38524179ac4a25707fa02",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "lib/certification-worker-adapter.js": "33f6c84b25c6cf36a149038700892482f05baeaa9ed7cf4f86c54dfb08f6435e",
+    "config/certification-resource-registration.json": "5aa847d4557e5048496eb6e75f2cf20cdeef10f73dbf1fb85b3f7fd5eaae3b0e",
+    "vercel.json": "97778a3fe7fafb0a71dbe06d3c687c9c19d2d95079567f7a2e1cfa94588ebd2c"
+  },
+  "broad_regression": "NOT_RERUN_NO_EXECUTABLE_APPLICATION_IMPACT",
+  "retained_broad_baseline": {
+    "pass": 4077,
+    "established_failures": 20,
+    "skip": 0
+  },
+  "build": "NOT_RERUN_RETAINED_PASS",
+  "holes_864": "NOT_RUN",
+  "no_runtime_remediation_implemented": true,
+  "hosted_mutations": 0,
+  "push": "NOT_PUSHED_REVIEW_BRANCH_NOT_IN_AUTO_DEPLOY_DENYLIST"
+}
