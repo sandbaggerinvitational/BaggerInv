@@ -1,0 +1,58 @@
+{
+  "base_sha": "917d6942350fa835c65b356951019d298a91a4f3",
+  "shipping_source_changed": false,
+  "sql_changed": false,
+  "sdk_config_changed": false,
+  "stage_a_rerun": false,
+  "broad_build_required": false,
+  "files": [
+    {
+      "path": "tools/reliability/certification-worker-demand.mjs",
+      "base_sha256": "6ad187cfdc11ec2427cae4689964e7cc40665bb25fd8ce87a77a899ea1937f08",
+      "candidate_sha256": "a88efa9a55a182660ba6f54ac2af55332d779c1db876d679eb1d0f1cd74d3602",
+      "changed": true
+    },
+    {
+      "path": "lib/certification-queue-supervision.js",
+      "base_sha256": "316656032228e54f8aadf6bd8270367fd964dab70287375ea542ebb886b0d276",
+      "candidate_sha256": "316656032228e54f8aadf6bd8270367fd964dab70287375ea542ebb886b0d276",
+      "changed": false
+    },
+    {
+      "path": "lib/certification-worker-supervision.js",
+      "base_sha256": "b03b6ba03b26425160be836a2bcbde7f9009e511d093b353b34bdfbc0e45fbc2",
+      "candidate_sha256": "b03b6ba03b26425160be836a2bcbde7f9009e511d093b353b34bdfbc0e45fbc2",
+      "changed": false
+    },
+    {
+      "path": "lib/certification-runtime-server.js",
+      "base_sha256": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779",
+      "candidate_sha256": "9e20015faa65c7c51b25904f39472f9b7a13c2c00106d60067d1bc7405c95779",
+      "changed": false
+    },
+    {
+      "path": "lib/score-derived-worker.js",
+      "base_sha256": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+      "candidate_sha256": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+      "changed": false
+    },
+    {
+      "path": "lib/score-derived-delivery.js",
+      "base_sha256": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+      "candidate_sha256": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+      "changed": false
+    },
+    {
+      "path": "supabase/canonical_bootstrap/schema.sql",
+      "base_sha256": "7c371dc677c6b5ff244dcce68a71674482c6f500d814371517fd6f0fa2dabf42",
+      "candidate_sha256": "7c371dc677c6b5ff244dcce68a71674482c6f500d814371517fd6f0fa2dabf42",
+      "changed": false
+    },
+    {
+      "path": "supabase/production_incremental/calcutta-empty-auction-demand-v1.sql",
+      "base_sha256": "3565bc80de4e8b9119518ff3050033e1798320c766c1e41caa6f5fcbb808aba0",
+      "candidate_sha256": "3565bc80de4e8b9119518ff3050033e1798320c766c1e41caa6f5fcbb808aba0",
+      "changed": false
+    }
+  ]
+}

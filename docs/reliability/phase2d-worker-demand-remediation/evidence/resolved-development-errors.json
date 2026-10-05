@@ -1,0 +1,26 @@
+{
+  "application_defects_found": 0,
+  "shipping_or_sql_correction": false,
+  "resolved_test_setup_issues": [
+    {
+      "class": "local execution setup",
+      "cause": "macOS initdb shared-memory bootstrap needed approved local sandbox escalation; no hosted connection involved",
+      "resolution": "Owned local PostgreSQL tests run with network-deny preload and sanitized environment"
+    },
+    {
+      "class": "test fixture input",
+      "cause": "Initial synthetic ownership input used share_fraction instead of the canonical ownership_fraction field",
+      "resolution": "Use the unchanged canonical Calcutta input contract"
+    },
+    {
+      "class": "test expectation",
+      "cause": "Tee-time-only demand refresh was incorrectly expected to advance canonical scoring source/delivery cycle",
+      "resolution": "Assert one committed setup mutation and preserved cycle; use a distinct lawful preparation operation only for the fresh-fixture source-supersession case"
+    },
+    {
+      "class": "test expectation",
+      "cause": "Post-refresh contention assumed delivery_attempts reset to 1 despite unchanged canonical source cycle",
+      "resolution": "Assert preserved prior attempts plus exactly one successful claim, and one current output per family"
+    }
+  ]
+}

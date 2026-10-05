@@ -1,0 +1,144 @@
+{
+  "evidence_layer": "RETAINED_HOSTED_CHECKPOINT_NOT_REFRESHED_BY_LOCAL_REMEDIATION",
+  "source_manifest_sha256": "cef7ba95f8727d562b466fa85a9582f9f3cd5fa6232b0e743953c696f4644bdf",
+  "resource": "CERTIFICATION:2857f707-065a-405d-b5fc-b5b6fa1b0f51",
+  "project_ref": "trmcwrljjxwhgtikfdgu",
+  "deployment": "dpl_5HLVAee2GwE3WkHbr3YNUWthJWc6",
+  "sha": "917d6942350fa835c65b356951019d298a91a4f3",
+  "admission_revision": 41,
+  "scoring_admission": "DISABLED",
+  "director_admission": "DISABLED",
+  "ingress": "PAUSED",
+  "supervisor_state": "OFF",
+  "supervisor_revision": 7,
+  "jobs": [
+    {
+      "delivery_attempts": 0,
+      "delivery_cycle": 29,
+      "engine_key": "PROJECTION_EDITORIAL",
+      "requested_source_revision": {
+        "reason": "CANONICAL_MATCH_CHANGED",
+        "revision": {
+          "matchId": "2026-R3-11",
+          "matchRevision": 0,
+          "resultWinner": "",
+          "scorecardComplete": false,
+          "status": "UPCOMING"
+        },
+        "transactional": true
+      },
+      "round_number": 0,
+      "status": "PENDING",
+      "tournament_id": "2026"
+    },
+    {
+      "delivery_attempts": 0,
+      "delivery_cycle": 29,
+      "engine_key": "TEAM_MOMENTUM",
+      "requested_source_revision": {
+        "reason": "CANONICAL_MATCH_CHANGED",
+        "revision": {
+          "matchId": "2026-R3-11",
+          "matchRevision": 0,
+          "resultWinner": "",
+          "scorecardComplete": false,
+          "status": "UPCOMING"
+        },
+        "transactional": true
+      },
+      "round_number": 0,
+      "status": "PENDING",
+      "tournament_id": "2026"
+    },
+    {
+      "delivery_attempts": 0,
+      "delivery_cycle": 29,
+      "engine_key": "TOURNAMENT_INTELLIGENCE",
+      "requested_source_revision": {
+        "reason": "CANONICAL_MATCH_CHANGED",
+        "revision": {
+          "matchId": "2026-R3-11",
+          "matchRevision": 0,
+          "resultWinner": "",
+          "scorecardComplete": false,
+          "status": "UPCOMING"
+        },
+        "transactional": true
+      },
+      "round_number": 0,
+      "status": "PENDING",
+      "tournament_id": "2026"
+    },
+    {
+      "delivery_attempts": 0,
+      "delivery_cycle": 29,
+      "engine_key": "TOURNAMENT_STORYLINES",
+      "requested_source_revision": {
+        "reason": "CANONICAL_MATCH_CHANGED",
+        "revision": {
+          "matchId": "2026-R3-11",
+          "matchRevision": 0,
+          "resultWinner": "",
+          "scorecardComplete": false,
+          "status": "UPCOMING"
+        },
+        "transactional": true
+      },
+      "round_number": 0,
+      "status": "PENDING",
+      "tournament_id": "2026"
+    }
+  ],
+  "active_claims": 0,
+  "active_leases": 0,
+  "unresolved_UNKNOWN": 0,
+  "dead_letters": 0,
+  "live_reservations": 0,
+  "live_handoffs": 0,
+  "setup": [
+    {
+      "match_id": "2026-R3-11",
+      "prepared_fingerprint_present": false,
+      "prepared_setup_revision": null,
+      "setup_revision": 5,
+      "tee_time": "08:01:00"
+    },
+    {
+      "match_id": "2026-R3-12",
+      "prepared_fingerprint_present": true,
+      "prepared_setup_revision": 2,
+      "setup_revision": 2,
+      "tee_time": null
+    }
+  ],
+  "calcutta": {
+    "auction_revision": 2,
+    "purchases": 0
+  },
+  "score_intents": {
+    "SUCCEEDED": 18
+  },
+  "final_recap": {
+    "attempts": 0,
+    "eligible": false,
+    "status": "PENDING"
+  },
+  "odds_publications": 0,
+  "operations": [
+    {
+      "operation_request_id": "d55e5098-59e0-41af-9fee-ee52e8f56da4",
+      "action": "upsert-match",
+      "state": "COMMITTED",
+      "code": "TOURNAMENT_SETUP_UPDATED",
+      "revision": 5
+    },
+    {
+      "operation_request_id": "362a92f1-6715-4224-bcf4-db48e3ac925e",
+      "action": "prepare-scoring-context",
+      "state": "NOT_COMMITTED",
+      "code": "TOURNAMENT_SETUP_DEPENDENCY_BLOCKED",
+      "revision": 5
+    }
+  ],
+  "future_readback_required_before_execution": true
+}

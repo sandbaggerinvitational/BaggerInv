@@ -3,11 +3,12 @@ import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {createQueueFixture} from './support/reliability/certification-queue-fixture.mjs';
 import {destroyIsolatedCluster} from './support/reliability/postgres17.mjs';
+import {demandCheckpointSink} from './support/reliability/certification-demand-checkpoint.mjs';
 import {createCertificationWorkerDemand} from '../tools/reliability/certification-worker-demand.mjs';
 import {certificationOperationRpc} from '../lib/certification-runtime-server.js';
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 test('native queue durable transient, terminal/recovery and cross-invocation halt',async t=>{
- let f;try{f=await createQueueFixture();const options={env:f.env,dependencies:f.dependencies};
+ let f;try{f=await createQueueFixture();const options={env:f.env,dependencies:f.dependencies,onCheckpoint:demandCheckpointSink(f.cluster)};
  const check=async(name,fn)=>{let e;await t.test(name,async()=>{try{await fn();}catch(x){e=x;throw x;}});if(e)throw e;};
  const demand=async()=>{f.toggle(true);await createCertificationWorkerDemand(options);f.toggle(false);};
  const entry=async()=>{const e=f.batch().messages[0];await f.due(e);return e;};

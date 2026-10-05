@@ -1,0 +1,164 @@
+{
+  "hostedMutated": false,
+  "network": "REMOTE_DENIED",
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "cases": [
+    {
+      "name": "no auction: clean one-step demand creates four truthful jobs, no scoring preparation/claim",
+      "result": "PASS"
+    },
+    {
+      "name": "same committed request replay/duplicate remains exact; no new cycle or execution",
+      "result": "PASS"
+    },
+    {
+      "name": "conflicting same-operation content is denied by canonical request hash without demand mutation",
+      "result": "PASS"
+    },
+    {
+      "name": "concurrent duplicate producer invocations share one canonical mutation/receipt and one demand refresh",
+      "result": "PASS"
+    },
+    {
+      "name": "required durable checkpoint write precedes dispatch; absent/failed storage cannot commit",
+      "result": "PASS"
+    },
+    {
+      "name": "configured without auction: unchanged preparation guard reports no Calcutta auction dependency",
+      "result": "PASS"
+    },
+    {
+      "name": "nonempty auction retains setup preparation dependency, immutable purchase and normal financial semantics",
+      "result": "PASS"
+    },
+    {
+      "name": "supported clear yields valid empty auction revision 2; preparation still fails closed",
+      "result": "PASS"
+    },
+    {
+      "name": "legacy partial commit: upsert COMMITTED, prepare NOT_COMMITTED; producer resumes original first receipt only",
+      "result": "PASS"
+    },
+    {
+      "name": "empty-auction clean producer needs no preparation and creates no financial demand/facts",
+      "result": "PASS"
+    },
+    {
+      "name": "lost commit acknowledgement plus unavailable recovery remains UNKNOWN; restart reads authoritative COMMITTED without reexecution",
+      "result": "PASS"
+    },
+    {
+      "name": "UNKNOWN missing origin is not absence proof and never automatically creates replacement demand",
+      "result": "PASS"
+    },
+    {
+      "name": "changed setup source between planning/dispatch is NOT_COMMITTED, never silently rebased; retry preserves rejection",
+      "result": "PASS"
+    },
+    {
+      "name": "later lawful demand refresh remains current when old successful operation is replayed; no lost work or extra cycle",
+      "result": "PASS"
+    },
+    {
+      "name": "checkpoint cannot select resource/project/release/deployment/match/queue/actor; no new authority surface",
+      "result": "PASS"
+    },
+    {
+      "name": "STOP/disabled admission preserves committed demand and replay; no new mutation while disabled",
+      "result": "PASS"
+    },
+    {
+      "name": "unchanged private queue consumer -> existing bounded worker discovers/claims/processes unprepared empty-auction work",
+      "result": "PASS"
+    },
+    {
+      "name": "final domain/control/catalog security remains unchanged; no financial/Google/Odds/FinalRecap side effect",
+      "result": "PASS"
+    }
+  ],
+  "outputs": [
+    {
+      "count": 1,
+      "engine": "PROJECTION_EDITORIAL"
+    },
+    {
+      "count": 1,
+      "engine": "TEAM_MOMENTUM"
+    },
+    {
+      "count": 1,
+      "engine": "TOURNAMENT_INTELLIGENCE"
+    },
+    {
+      "count": 1,
+      "engine": "TOURNAMENT_STORYLINES"
+    }
+  ],
+  "workerPath": "MODELED_PRIVATE_QUEUE -> UNCHANGED_BOUNDED_WORKER -> ACTUAL_CANONICAL_CLAIMS/PROCESSORS/OUTPUTS",
+  "jobs": [
+    {
+      "cycle": 1,
+      "engine": "PROJECTION_EDITORIAL",
+      "source": {
+        "reason": "CANONICAL_MATCH_CHANGED",
+        "revision": {
+          "status": "UPCOMING",
+          "matchId": "2026-R3-11",
+          "resultWinner": "",
+          "matchRevision": 0,
+          "scorecardComplete": false
+        },
+        "transactional": true
+      },
+      "status": "SUCCEEDED",
+      "claimed": false,
+      "attempts": 1,
+      "requestedAt": "2026-10-05T12:18:10.421554-05:00"
+    },
+    {
+      "cycle": 1,
+      "engine": "TEAM_MOMENTUM",
+      "source": {
+        "payloadHash": "f1cdd64739cf96d50baf50a42059e6fbeb2e7d75bd1883eb5600a321a6d2f6f1",
+        "sourceFingerprint": "7d2817f99ae9f792aad99fb233f7a283cd8232d2c2224543315a518e8f2b8045",
+        "configurationFingerprint": "7237d6616cb35cc3c2acc3eb584fda808382df45900e01910d82eaab091c7436"
+      },
+      "status": "SUCCEEDED",
+      "claimed": false,
+      "attempts": 1,
+      "requestedAt": "2026-10-05T12:17:59.085097-05:00"
+    },
+    {
+      "cycle": 1,
+      "engine": "TOURNAMENT_INTELLIGENCE",
+      "source": {
+        "reason": "CANONICAL_MATCH_CHANGED",
+        "revision": {
+          "status": "UPCOMING",
+          "matchId": "2026-R3-11",
+          "resultWinner": "",
+          "matchRevision": 0,
+          "scorecardComplete": false
+        },
+        "transactional": true
+      },
+      "status": "SUCCEEDED",
+      "claimed": false,
+      "attempts": 1,
+      "requestedAt": "2026-10-05T12:18:10.421554-05:00"
+    },
+    {
+      "cycle": 1,
+      "engine": "TOURNAMENT_STORYLINES",
+      "source": {
+        "payloadHash": "066f0df61c570db2b5651634972c9603d2dbfffe6ed6482c9c3fcf8b0efe7422",
+        "sourceFingerprint": "7a4d180292057a4839a8aa5618d6335064ee8906efdb260e634f972f9654f289",
+        "configurationFingerprint": "9becf4b144f553e35ee4450ce0a20fc5fc6f3b206289f749cf0ecf0878c3300f"
+      },
+      "status": "SUCCEEDED",
+      "claimed": false,
+      "attempts": 1,
+      "requestedAt": "2026-10-05T12:17:59.085604-05:00"
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import {mkdir,writeFile} from 'node:fs/promises';
 import {createSupervisorFixture} from './support/reliability/certification-supervisor-fixture.mjs';
 import {destroyIsolatedCluster,sqlFile,jsonLiteral,repositoryRoot,sqlResult} from './support/reliability/postgres17.mjs';
 import {supervisorEnvelope,handleSupervisorRequest,SUPERVISOR_PATH,createSupervisorTransport} from '../lib/certification-worker-supervision.js';
+import {demandCheckpointSink} from './support/reliability/certification-demand-checkpoint.mjs';
 import {createCertificationWorkerDemand} from '../tools/reliability/certification-worker-demand.mjs';
 import {certificationOperationRpc} from '../lib/certification-runtime-server.js';
 
@@ -13,7 +14,7 @@ test('private supervision durable fault/retry/recovery contracts',async t=>{
  const check=async(name,fn)=>{let error;await t.test(name,async()=>{try{await fn();evidence.cases.push({name,result:'PASS'});}catch(e){error=e;throw e;}});if(error)throw error;};
  try{
   f=await createSupervisorFixture();sqlFile(f.cluster,f.database,repositoryRoot+'/supabase/production_incremental/certification-worker-supervision-v1.sql',{role:''});
-  const options={env:f.env,dependencies:f.dependencies},bound=supervisorEnvelope(f.env,f.dependencies);
+  const options={env:f.env,dependencies:f.dependencies,onCheckpoint:demandCheckpointSink(f.cluster)},bound=supervisorEnvelope(f.env,f.dependencies);
   const owner=(fn,input={})=>fn==='reserve'?JSON.parse(f.q('select production_control.worker_supervisor_reserve_v1()')):f.owner('worker_supervisor_'+fn+'_v1',{...bound,...input});
   const status=()=>owner('status'),stop=()=>owner('control',{action:'STOP',request_id:randomUUID(),expected_revision:status().revision});
   owner('configure',{signing_secret_id:f.keyId});

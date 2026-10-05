@@ -6,6 +6,7 @@ import {destroyIsolatedCluster,jsonLiteral,sqlResult} from './support/reliabilit
 import {canonicalCatalog} from '../tools/reliability/canonical-bootstrap-artifacts.mjs';
 import {QUEUE_CONTRACT,parseQueueMessage,queueRuntimeIdentity} from '../lib/certification-queue-supervision.js';
 import {publishOwnerQueueBatch} from '../tools/reliability/certification-queue-control.mjs';
+import {demandCheckpointSink} from './support/reliability/certification-demand-checkpoint.mjs';
 import {createCertificationWorkerDemand} from '../tools/reliability/certification-worker-demand.mjs';
 import {POST as retiredHTTP} from '../app/api/internal/derived-worker/run/route.js';
 
@@ -80,9 +81,9 @@ test('private native queue protocol, real owned canonical claims and finite publ
   await assert.rejects(f.consume({message:{version:QUEUE_CONTRACT,invocation_id:randomUUID()}}),/SUPERVISOR_/);
   f.start();const e=f.batch().messages[0];await f.due(e);await assert.rejects(f.consume(e),/SUPERVISOR_ADMISSION_DENIED/);f.stop();
  });
- await check('supported synthetic preparation produces four real jobs; request path claims none',async()=>{
+ await check('supported synthetic tee-time update produces four real jobs; request path claims none',async()=>{
   f.toggle(true);const count=f.calls.filter(c=>c.operation?.startsWith('WORKERS.')).length;
-  await createCertificationWorkerDemand({env:f.env,dependencies:f.dependencies});assert.equal(f.status().counts.pending_work,4);
+  await createCertificationWorkerDemand({env:f.env,dependencies:f.dependencies,onCheckpoint:demandCheckpointSink(f.cluster)});assert.equal(f.status().counts.pending_work,4);
   assert.equal(f.calls.filter(c=>c.operation?.startsWith('WORKERS.')).length,count);
   assert.equal(f.q('select count(*)from scoring_authority.hole_scores'),'0');assert.equal(f.q("select status from scoring_authority.matches where match_id='2026-R3-11'"),'UPCOMING');
  });

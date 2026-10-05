@@ -7,6 +7,7 @@ import {mkdir,writeFile}from'node:fs/promises';
 import {createSupervisorFixture}from'./support/reliability/certification-supervisor-fixture.mjs';
 import {destroyIsolatedCluster,sqlFile,jsonLiteral,repositoryRoot}from'./support/reliability/postgres17.mjs';
 import {supervisorEnvelope,handleSupervisorRequest,SUPERVISOR_PATH}from'../lib/certification-worker-supervision.js';
+import {demandCheckpointSink} from './support/reliability/certification-demand-checkpoint.mjs';
 import {createCertificationWorkerDemand}from'../tools/reliability/certification-worker-demand.mjs';
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 test('real owned process disappearance, unchanged lease expiry/reclaim and source supersession',async t=>{
@@ -14,7 +15,7 @@ test('real owned process disappearance, unchanged lease expiry/reclaim and sourc
  const check=async(name,fn)=>{let error;await t.test(name,async()=>{try{await fn();evidence.cases.push({name,result:'PASS'});}catch(e){error=e;throw e;}});if(error)throw error;};
  try{
   f=await createSupervisorFixture();sqlFile(f.cluster,f.database,repositoryRoot+'/supabase/production_incremental/certification-worker-supervision-v1.sql',{role:''});
-  const options={env:f.env,dependencies:f.dependencies},bound=supervisorEnvelope(f.env,f.dependencies);
+  const options={env:f.env,dependencies:f.dependencies,onCheckpoint:demandCheckpointSink(f.cluster)},bound=supervisorEnvelope(f.env,f.dependencies);
   const owner=(fn,input={})=>fn==='reserve'?JSON.parse(f.q('select production_control.worker_supervisor_reserve_v1()')):f.owner('worker_supervisor_'+fn+'_v1',{...bound,...input});
   const status=()=>owner('status'),stop=()=>owner('control',{action:'STOP',request_id:randomUUID(),expected_revision:status().revision});
   owner('configure',{signing_secret_id:f.keyId});
@@ -58,7 +59,12 @@ test('real owned process disappearance, unchanged lease expiry/reclaim and sourc
   await check('source supersession denies held obsolete completion and leaves genuine current work for next autonomous tick',async()=>{
    f.toggle(true);await createCertificationWorkerDemand(options);f.toggle(false);const source=job('TEAM_MOMENTUM');plan=arm('SUPERSEDE');f.toggle(true);start();ticket=owner('reserve');
    child=runChild(ticket);const message=once(child,'message'),exited=once(child,'exit');await waitConsumed(plan.plan_id);
-   await createCertificationWorkerDemand(options);assert.ok(job('TEAM_MOMENTUM').delivery_cycle>source.delivery_cycle);
+   // A tee-time-only demand refresh does not change scoring source revision.
+   // This distinct supersession case lawfully prepares the fresh revision-0
+   // auction fixture; preparation is not part of the worker-demand producer.
+   assert.equal(f.q('select auction_revision from scoring_authority.calcutta_v1_current'),'0');
+   assert.equal((await f.mutation('prepare-scoring-context',{matchId:'2026-R3-11'})).payload.ok,true);
+   assert.ok(job('TEAM_MOMENTUM').delivery_cycle>source.delivery_cycle);
    owner('fault_control',{action:'RELEASE',plan_id:plan.plan_id});const[result]=await message;await exited;child=null;
    assert.equal(result.status,200);assert.equal(job('TEAM_MOMENTUM').status,'PENDING');
    assert.equal(f.q("select count(*)from scoring_authority.competition_derived_snapshots where is_current and engine_key='TEAM_MOMENTUM'"),'1');
@@ -68,11 +74,17 @@ test('real owned process disappearance, unchanged lease expiry/reclaim and sourc
    stop();f.toggle(false);
   });
   await check('two genuinely independent worker processes contend using canonical SQL CAS and complete drain',async()=>{
-   f.toggle(true);await createCertificationWorkerDemand(options);f.toggle(false);arm('CONTENTION');f.toggle(true);start(2);
+   f.toggle(true);await createCertificationWorkerDemand(options);f.toggle(false);
+   const engines=['TEAM_MOMENTUM','TOURNAMENT_STORYLINES','TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL'];
+   const priorAttempts=new Map(engines.map(engine=>[engine,job(engine).delivery_attempts]));
+   arm('CONTENTION');f.toggle(true);start(2);
    const a=runChild(owner('reserve')),b=runChild(owner('reserve'));const messages=await Promise.all([once(a,'message'),once(b,'message')]);
    assert.ok(messages.every(([r])=>r.status===200&&r.result.outcome==='SUCCEEDED'));
    assert.equal(status().counts.pending_work,0);assert.equal(status().counts.active_claims,0);
-   for(const engine of ['TEAM_MOMENTUM','TOURNAMENT_STORYLINES','TOURNAMENT_INTELLIGENCE','PROJECTION_EDITORIAL'])assert.equal(job(engine).delivery_attempts,1);
+   for(const engine of engines){
+    assert.equal(job(engine).delivery_attempts,priorAttempts.get(engine)+1);
+    assert.equal(f.q(`select count(*)from scoring_authority.competition_derived_snapshots where is_current and engine_key='${engine}'`),'1');
+   }
    stop();f.toggle(false);
   });
   assert.equal(status().state,'OFF');assert.equal(status().counts.active_leases,0);assert.equal(status().counts.dead_letters,0);

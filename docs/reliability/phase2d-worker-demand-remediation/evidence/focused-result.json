@@ -1,0 +1,42 @@
+{
+  "status": "PASS_LOCAL_REMEDIATION",
+  "case_count": 26,
+  "including_parent_tests": 29,
+  "suites": [
+    {
+      "file": "test/certification-worker-demand.integration.test.mjs",
+      "cases": 18,
+      "result": "PASS",
+      "evidence": "integration.json / producer-and-source-run.tap.gz",
+      "runner_note": "This suite passed in a combined command whose unrelated-to-this-suite crash assertion was subsequently corrected and independently rerun."
+    },
+    {
+      "file": "test/certification-queue-supervision-recovery.integration.test.mjs",
+      "cases": 3,
+      "result": "PASS",
+      "evidence": "initial-affected-run.tap.gz",
+      "runner_note": "This suite passed; the combined run also reported resolved producer/crash test expectation failures preserved in the raw log."
+    },
+    {
+      "file": "test/certification-queue-supervision-crash.integration.test.mjs",
+      "cases": 5,
+      "result": "PASS",
+      "evidence": "affected-crash-cases.json / crash-final.tap.gz",
+      "process_exit": 0
+    }
+  ],
+  "new_unexplained_failures": 0,
+  "broad_regression": "NOT_RUN_NO_SHIPPING_CHANGE",
+  "accepted_broad_baseline": "4077 pass / 20 established failures / 0 skip; retained, not rerun",
+  "build": "NOT_RUN_NO_SHIPPING_OR_PACKAGE_CHANGE",
+  "rerun_864_holes": false,
+  "stage_a_rerun": false,
+  "hosted_mutated": false,
+  "push": false,
+  "syntax_checks": "8 changed JavaScript modules PASS",
+  "test_source_sha256": {
+    "test/certification-worker-demand.integration.test.mjs": "7e076b7d5ad3834ef59f5faeaf37a768487954eb09b3024c0ddf55878e6703b2",
+    "test/certification-queue-supervision-recovery.integration.test.mjs": "a29aa72c540eebb0ecce1a4552ace71bdd98dc85c8c109c4abe4838b2fbc4240",
+    "test/certification-queue-supervision-crash.integration.test.mjs": "3a8f8bf082f4809ed9cc73adddfe083e411cb60d6c1686272334da06c2a27da9"
+  }
+}
