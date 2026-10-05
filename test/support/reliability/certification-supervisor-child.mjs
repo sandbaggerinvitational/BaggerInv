@@ -3,6 +3,7 @@
 import {spawnSync} from 'node:child_process';
 import {binaries,jsonLiteral} from './postgres17.mjs';
 import {consumeCertificationQueueMessage,QUEUE_TOPIC} from '../../../lib/certification-queue-supervision.js';
+import {QUEUE_TIMING} from '../../../lib/certification-queue-timing.js';
 import {handleSupervisorRequest,SUPERVISOR_PATH} from '../../../lib/certification-worker-supervision.js';
 process.once('message',async data=>{
  if(!data.socket.includes('/bagger-reliability-pg17-')||!data.socket.endsWith('/socket')||data.database!=='supervisor_certification')process.exit(2);
@@ -18,7 +19,8 @@ process.once('message',async data=>{
   return Response.json(JSON.parse(result.stdout.trim()));
  };
  if(data.queueEntry){
-  try{const result=await consumeCertificationQueueMessage(data.queueEntry.message,{topicName:QUEUE_TOPIC,messageId:'msg_local_child',deliveryCount:1},
+  try{const result=await consumeCertificationQueueMessage(data.queueEntry.message,{topicName:QUEUE_TOPIC,messageId:'msg_local_child',deliveryCount:1,
+   createdAt:new Date(Date.parse(data.queueEntry.scheduled_at)-10_000),expiresAt:new Date(Date.parse(data.queueEntry.scheduled_at)+QUEUE_TIMING.retentionHorizonSeconds*1000)},
    {env:data.env,dependencies:{registrationManifest:data.registrationManifest,fetchImpl}});process.send({status:200,result});}
   catch(error){process.send({status:error.status||503,result:{code:error.code||'LOCAL_CHILD_UNAVAILABLE',queueDisposition:error.queueDisposition||null}});}
   process.disconnect();return;

@@ -22,7 +22,7 @@ test('START remains truthful when credential acquisition fails after canonical c
  assert.deepEqual(calls,['control','publication']);
 });
 test('publisher lost acknowledgement never fabricates NOT_PUBLISHED or a complete schedule',async()=>{
- const b=batch();b.messages=[{message:message(),scheduled_at:new Date(Date.now()+1000).toISOString(),expires_at:new Date(Date.now()+31000).toISOString(),idempotency_key:'bagger-certification-'+b.epoch+'-1'}];
+ const b=batch(),created=Date.now();b.messages=[{message:message(),scheduled_at:new Date(created+1000).toISOString(),expires_at:new Date(created+31000).toISOString(),idempotency_key:'bagger-certification-'+b.epoch+'-1'}];
  const calls=[];const result=await publishOwnerQueueBatch({owner:async(op,input)=>{calls.push({op,input});return op==='publication'&&input.action==='BATCH'?b:{ok:true};},send:async()=>{throw new Error('accepted but ACK lost');}});
  assert.equal(result.results[0].outcome,'UNKNOWN');assert.equal(result.schedule_installed,false);assert.equal(calls.some(x=>x.input?.action==='ACK'),false);
 });

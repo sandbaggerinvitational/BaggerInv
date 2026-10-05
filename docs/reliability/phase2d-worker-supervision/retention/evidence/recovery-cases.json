@@ -1,0 +1,69 @@
+{
+  "hosted": false,
+  "postgres": 17,
+  "realChildren": true,
+  "remoteTransport": "MODELED_ONLY",
+  "manualLeaseWrites": 0,
+  "cases": [
+    {
+      "name": "actual maximum START creates 120 reservations; each delay has a full 540-second post-schedule lifetime",
+      "result": "PASS"
+    },
+    {
+      "name": "real child claims all required families through unchanged worker; original message stays live beyond reservation expiry",
+      "result": "PASS"
+    },
+    {
+      "name": "lease expires naturally; reconciliation and new reservations reclaim attempt two without duplicate current output",
+      "result": "PASS"
+    },
+    {
+      "name": "STOP and a new epoch cannot admit live physical old messages; no authority/domain/financial expansion",
+      "result": "PASS"
+    }
+  ],
+  "maximumBatch": {
+    "ticks": 120,
+    "duration": 7200,
+    "cadence": 60,
+    "safe": true
+  },
+  "claim": {
+    "at": "2026-10-05T15:48:12.297085-05:00",
+    "leaseDeadline": "2026-10-05T20:49:42.297Z",
+    "leaseSeconds": 90,
+    "attempt": 1,
+    "reservationExpiresAt": "2026-10-05T15:48:41.940555-05:00",
+    "messageExpiresAt": "2026-10-05T20:57:11.940Z"
+  },
+  "termination": {
+    "ceilingSeconds": 60,
+    "elapsedMs": 60015,
+    "signal": "SIGKILL",
+    "hostedProvider": false
+  },
+  "earlyReclaim": "DENIED",
+  "expiredReservationWithLiveMessage": "DENIED",
+  "reclaim": {
+    "naturalLeaseExpiry": true,
+    "recoveryTicks": 2,
+    "attempts": [
+      1,
+      2
+    ],
+    "currentOutputsPerFamily": 1,
+    "elapsedMs": 177667,
+    "sameReservationWorkerReruns": 0,
+    "visibilityError": null
+  },
+  "final": {
+    "pending": 0,
+    "claims": 0,
+    "leases": 0,
+    "unknown": 0,
+    "deadLetters": 0,
+    "auctionRevision": 2,
+    "odds": 0,
+    "finalRecap": false
+  }
+}

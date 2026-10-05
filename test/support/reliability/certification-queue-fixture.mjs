@@ -3,6 +3,7 @@ import {randomUUID} from 'node:crypto';
 import {createSupervisorFixture} from './certification-supervisor-fixture.mjs';
 import {sqlFile,jsonLiteral,repositoryRoot} from './postgres17.mjs';
 import {QUEUE_CONTRACT,QUEUE_TOPIC,consumeCertificationQueueMessage,queueControl} from '../../../lib/certification-queue-supervision.js';
+import {QUEUE_TIMING} from '../../../lib/certification-queue-timing.js';
 export async function createQueueFixture(){
  const f=await createSupervisorFixture();
  sqlFile(f.cluster,f.database,repositoryRoot+'/supabase/production_incremental/certification-worker-supervision-v1.sql',{role:''});
@@ -20,7 +21,8 @@ export async function createQueueFixture(){
  f.stop=()=>f.ownerQueue('control',{action:'STOP',request_id:randomUUID(),expected_revision:f.status().revision});
  f.batch=()=>f.ownerQueue('publication',{action:'BATCH'});
  f.due=async(entry)=>{const wait=Date.parse(entry.scheduled_at)-Date.now()+100;if(wait>0)await new Promise(r=>setTimeout(r,wait));};
- f.consume=async(entry,overrides={})=>consumeCertificationQueueMessage(entry.message,{topicName:QUEUE_TOPIC,messageId:'msg_local_'+entry.message.invocation_id,deliveryCount:1},
+ f.consume=async(entry,overrides={})=>consumeCertificationQueueMessage(entry.message,{topicName:QUEUE_TOPIC,messageId:'msg_local_'+entry.message.invocation_id,deliveryCount:1,
+  createdAt:new Date(Math.min(Date.now(),Date.parse(entry.scheduled_at)-10_000)),expiresAt:new Date(Date.parse(entry.scheduled_at)+QUEUE_TIMING.retentionHorizonSeconds*1000)},
   {env:f.env,dependencies:f.dependencies,...overrides});
  f.control=()=>queueControl({env:f.env,dependencies:f.dependencies});
  f.job=engine=>JSON.parse(f.q(`select to_jsonb(j)from scoring_authority.competition_recalculation_jobs j where engine_key='${engine}'`));

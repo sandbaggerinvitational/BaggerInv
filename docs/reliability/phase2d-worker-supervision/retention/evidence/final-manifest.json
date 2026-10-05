@@ -1,0 +1,88 @@
+{
+  "status": "PASS",
+  "baseSha": "44784e8b80f1777752ece93fe7cab2d1029f67f4",
+  "hosted": false,
+  "hostedMutations": 0,
+  "queuePublications": 0,
+  "newCredentials": 0,
+  "forwardSqlRequired": false,
+  "queueManifestChanged": false,
+  "unchanged": [
+    "lib/score-derived-worker.js",
+    "lib/certification-worker-supervision.js",
+    "lib/score-derived-delivery.js",
+    "vercel.json",
+    "vercel.certification-queue.json",
+    "package.json",
+    "package-lock.json"
+  ],
+  "certificates": {
+    "focused": {
+      "counts": {
+        "tests": 107,
+        "pass": 107,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "exitCode": 0,
+      "newFailures": [],
+      "rawSha256": "73e441e8ef550fd98a1e303cc4e7709851ff7949f838956fef91fe807ee10bab"
+    },
+    "recovery": {
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "exitCode": 0,
+      "newFailures": [],
+      "rawSha256": "a8132c2b22a6b260f1cc0685653f3c2f67d37781a2ff0fbd20ae6e87f5c03689"
+    },
+    "application": {
+      "counts": {
+        "tests": 4097,
+        "pass": 4077,
+        "fail": 20,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "exitCode": 1,
+      "newFailures": [],
+      "rawSha256": "2f2ab9e678694823e9bd5203203c19762473a9e0906101eff9c22397cc9026ee"
+    },
+    "build": {
+      "counts": null,
+      "exitCode": 0,
+      "newFailures": [],
+      "rawSha256": "1599b0e521517c2ce6682af2feef81106d1cdff9952c14096c54625b47f4e950"
+    }
+  },
+  "fileManifest": {
+    "app/api/internal/derived-worker/queue/route.js": "6e333344b362d09b6b79c553b06568ab6ab675c177eea9613e50af2cccef7ae5",
+    "docs/reliability/phase2d-worker-supervision/retention/CONTRACT.md": "d0024894c07d270402994754b413d7f96b1ba5c1ef112ca55179c15b95df4a75",
+    "docs/reliability/phase2d-worker-supervision/retention/REPORT.md": "da05e30fe5d30d68c03c2ae437ef0acb8e60ca8261ceadf9ac9103b7d9a29cac",
+    "docs/reliability/phase2d-worker-supervision/retention/evidence/application.json": "dc744b514a95fbd714b17181acc8883e866bba5b716fa124ff6a74b497663d3a",
+    "docs/reliability/phase2d-worker-supervision/retention/evidence/application.tap.gz": "68f904f80affa9dfdeefea34553c157b7cc1a5fdbacb781afb5a8ea65c2edfaf",
+    "docs/reliability/phase2d-worker-supervision/retention/evidence/build.json": "01df9ee15b6daf79b65bbde5e78264e3877c7ed8e27e470fa808ea51568a7e56",
+    "docs/reliability/phase2d-worker-supervision/retention/evidence/build.tap.gz": "d198677496db75b4e243ff558658fd136cd2867d571f31ad2f50de157019a36e",
+    "docs/reliability/phase2d-worker-supervision/retention/evidence/focused.json": "87e63b92d0b45a7e89d6810bc9cbc13fa1675e5845baac66814babba876506a4",
+    "docs/reliability/phase2d-worker-supervision/retention/evidence/focused.tap.gz": "946d6f163d94f812a8e411df0b70c28f93707397efee677f8b35db7575943395",
+    "docs/reliability/phase2d-worker-supervision/retention/evidence/recovery-cases.json": "b584fd74fbc9b8f5a6937caaa64f9f897bef7550736f984d8d3efa5590e8e787",
+    "docs/reliability/phase2d-worker-supervision/retention/evidence/recovery.json": "288499653c4ac4fa1a3b7d86009a694bc839859c5f0d4b349ec24b2f3c3d27d8",
+    "docs/reliability/phase2d-worker-supervision/retention/evidence/recovery.tap.gz": "b932eac88992634f7c631f7370ec945b857ceb926c8da5d49c12d20458a3a3bd",
+    "lib/certification-queue-errors.js": "e6593654d8e9ce8b4fff58ec630ccedff38bbeb62f7721c12525038bedc4a6be",
+    "lib/certification-queue-publication.js": "e588ddd39ce0454acb08dfa9459822f95d5691e635b93332adb31f563bc23530",
+    "lib/certification-queue-supervision.js": "07920e0f244675c0d789355692d99367212ee6ded6d16199667e66359e20b47c",
+    "lib/certification-queue-timing.js": "0238a5e0f6df547f5e780d03b255d186a4959a72355b309324b4bfcbdd98aa10",
+    "test/certification-queue-publisher.test.mjs": "7f63e406e721c26ff9255231afd8009a1e890b6930a8795cec495593b72a91b9",
+    "test/certification-queue-retention.integration.test.mjs": "623f0dbbd714e970355b113c1726fb6feb4ec5d051124811d71daf97344f2962",
+    "test/certification-queue-supervision.test.mjs": "ab88101548889ba94dfd7534b566f79e279a50ce41043403bce2f9dde27b104f",
+    "test/certification-queue-timing.test.mjs": "bd3864feab2e5c2ba769a82b739d1b6bbb589467d0b7931a59739f7e9ccb21ac",
+    "test/support/reliability/certification-queue-fixture.mjs": "de5f95f1d57ffd5dfefbd1065f81a6981cb0614ead842c046ab6b011990f2338",
+    "test/support/reliability/certification-supervisor-child.mjs": "fce5755e5e5e5f5b019d1b95bd929d51c0ea5db3335a974dc9ddeebb1f0222e2",
+    "tools/reliability/certify-queue-retention.mjs": "e23015d903b896d5ffc4a82a7f759b720aec5fb854da0b81ee8596d3cc85e5c9"
+  }
+}

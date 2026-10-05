@@ -1,0 +1,33 @@
+{
+  "mode": "build",
+  "startedAt": "2026-10-05T20:47:52.307Z",
+  "completedAt": "2026-10-05T20:48:07.462Z",
+  "hosted": false,
+  "remoteSocketsDenied": true,
+  "realCredentialsRemoved": true,
+  "counts": null,
+  "failures": [],
+  "newFailures": [],
+  "establishedFailures": [],
+  "exitCode": 0,
+  "error": null,
+  "sourceStable": true,
+  "sourceManifest": {
+    "lib/certification-queue-timing.js": "0238a5e0f6df547f5e780d03b255d186a4959a72355b309324b4bfcbdd98aa10",
+    "lib/certification-queue-publication.js": "e588ddd39ce0454acb08dfa9459822f95d5691e635b93332adb31f563bc23530",
+    "lib/certification-queue-errors.js": "e6593654d8e9ce8b4fff58ec630ccedff38bbeb62f7721c12525038bedc4a6be",
+    "lib/certification-queue-supervision.js": "07920e0f244675c0d789355692d99367212ee6ded6d16199667e66359e20b47c",
+    "lib/certification-queue-publisher.js": "09255de063631fb17b1d8a4076d563a7ae4682749e345be2c0bd24e1532e99c0",
+    "supabase/production_incremental/certification-queue-global-fault-v5.sql": "d1ea7b42d733a33b7b8ec5936ac9b5517497512d03e602061fed6ab0dab2366a",
+    "tools/reliability/certification-queue-control.mjs": "31f261e404f6a97ae18287d3b768d98742002d040d81f3bf612c6bea68c6986a",
+    "lib/certification-worker-supervision.js": "916cef646b1f141399c6784d96b16e08fac0f372b1b4a3770c36b439fccc34b0",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "app/api/internal/derived-worker/queue/route.js": "6e333344b362d09b6b79c553b06568ab6ab675c177eea9613e50af2cccef7ae5",
+    "test/support/reliability/pg-safeupdate/safeupdate.c": "1351fc18b9a1e2dcc72185d349c178244458b5d9eb30007609c3d599b38aeb38",
+    "package.json": "02ca2154f932c5c5bacd6d52ddd4eec023c422b7e46e44d6ec0d35dc54b7826f",
+    "package-lock.json": "abf89699407983d173e997f62aa1083e8ae5cd34b81f33904ebba9744d318d43"
+  },
+  "rawSha256": "1599b0e521517c2ce6682af2feef81106d1cdff9952c14096c54625b47f4e950",
+  "head": "44784e8b80f1777752ece93fe7cab2d1029f67f4"
+}
