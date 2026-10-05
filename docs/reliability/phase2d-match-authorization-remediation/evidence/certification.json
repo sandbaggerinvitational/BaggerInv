@@ -1,0 +1,52 @@
+{
+  "status": "PASS",
+  "baseSha": "6b1961aea632d5c5a29d6809b090b711d7c8e580",
+  "shippingFiles": {
+    "lib/match-authorization-supabase.js": "258b1bc52cd7ffe22b3c1c87b48aa9232974362c4966b82b68a319f64e01d763",
+    "app/api/player-passport/matches/route.js": "37bf7fbf345a1474aff85f33c48afcc46480e9dd883d7eac497150b053b0ad20"
+  },
+  "shippingContentIdenticalAcrossFocusedBroadBuild": true,
+  "forwardSQLRequired": false,
+  "rpcAdmissionChanged": false,
+  "authoritySemanticsChanged": false,
+  "schemaChanged": false,
+  "catalogAclRlsOwnershipSecuritySearchPathsChanged": false,
+  "focused": {
+    "tests": 220,
+    "pass": 220,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "broad": {
+    "pass": 4077,
+    "establishedFailures": 20,
+    "skip": 0,
+    "newUnexplainedFailureIdentities": 0
+  },
+  "build": "PASS",
+  "chronology864RerunRequired": false,
+  "reason": "Native SQL decision core, scoring math, lifecycle/identity/resource controls, schema and mutation protocols remain unchanged.",
+  "resolvedLocalHarnessIssues": [
+    "sandbox shared-memory restriction: owned local cluster run permitted",
+    "Director control DTO nesting and cleanup reference",
+    "multiple local setup result lines",
+    "unsupported local test action name corrected to existing scoring-unlock"
+  ],
+  "hostedMutated": false,
+  "hostedReadbackPerformed": false,
+  "hostedJobsProcessed": 0,
+  "hostedPendingJobsRetained": 4,
+  "authProof": "Modeled local verified subjects; actual shipping resolver/route/session/adapter and canonical SQL. No hosted Auth/scoring claim.",
+  "secrets": {
+    "providerSecretsRead": false,
+    "providerSecretPatternFindings": 0,
+    "credentialFilesChanged": false
+  },
+  "deploymentSafety": {
+    "certificationBranchAutoDeploymentEnabled": false,
+    "vercelConfigurationChanged": false,
+    "deploymentCreated": false
+  },
+  "readyForOwnerHostedResumeAuthorization": true
+}

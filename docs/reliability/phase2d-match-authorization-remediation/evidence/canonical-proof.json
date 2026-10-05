@@ -1,0 +1,411 @@
+{
+  "environment": "OWNED_LOCAL_POSTGRESQL17_ONLY",
+  "hostedMutated": false,
+  "remoteCalls": 0,
+  "authProof": "MODELED_VERIFIED_SUBJECT; REAL RESOLVER/CANONICAL SQL",
+  "cases": [
+    {
+      "name": "P01 Director/P12/P11 canonical identities are unchanged; signed-out/unlinked still denied",
+      "result": "PASS"
+    },
+    {
+      "name": "UPCOMING and closed scoring permission cannot authorize START_SCORING",
+      "result": "PASS"
+    },
+    {
+      "name": "shipping POST selects only the resolved participant and issues the original signed DTO/session",
+      "result": "PASS"
+    },
+    {
+      "name": "P12 and P11 access only their assigned matches; wrong/missing tournament scope denied",
+      "result": "PASS"
+    },
+    {
+      "name": "signed shipping session feeds unchanged scoring revalidation; cross actor/stale permission denied",
+      "result": "PASS"
+    },
+    {
+      "name": "locked/final lifecycle and stale permissions remain SQL denials",
+      "result": "PASS"
+    },
+    {
+      "name": "disabled admission, paused ingress and stale admission token are denied",
+      "result": "PASS"
+    },
+    {
+      "name": "foreign resource and incorrect actual deployment/release fail before any authorization decision",
+      "result": "PASS"
+    },
+    {
+      "name": "legacy/unlisted RPCs stay forbidden and private cores/legacy function remain denied to runtime roles",
+      "result": "PASS"
+    },
+    {
+      "name": "stale match revision and stale ingress generation cannot execute via the unchanged scoring wrapper",
+      "result": "PASS"
+    },
+    {
+      "name": "catalog ACL/RLS/owners/security/search paths and authorization core definitions stay identical",
+      "result": "PASS"
+    }
+  ],
+  "catalogUnchanged": true,
+  "positiveScoreCommits": 0,
+  "canonicalTransport": [
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.IDENTITY_FOR_AUTH"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.IDENTITY_FOR_AUTH"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.IDENTITY_FOR_AUTH"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.IDENTITY_FOR_AUTH"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.IDENTITY_FOR_AUTH"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.IDENTITY_FOR_AUTH"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_operation_v1",
+      "phase": "READS",
+      "operation": "SCORING.READ_PARTICIPANT_CONTEXT"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.IDENTITY_FOR_AUTH"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.IDENTITY_FOR_AUTH"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_operation_v1",
+      "phase": "READS",
+      "operation": "SCORING.READ_PARTICIPANT_CONTEXT"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "READS",
+      "operation": null
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "read_certification_projection_v1",
+      "phase": "READS",
+      "operation": "READS.CURRENT_VIEW"
+    },
+    {
+      "name": "read_certification_runtime_context_v1",
+      "phase": "SCORING",
+      "operation": null
+    },
+    {
+      "name": "admit_certification_operation_v1",
+      "phase": "SCORING",
+      "operation": "SCORING.SUBMIT_HOLE"
+    },
+    {
+      "name": "execute_certification_operation_v1",
+      "phase": "SCORING",
+      "operation": "SCORING.SUBMIT_HOLE"
+    }
+  ]
+}

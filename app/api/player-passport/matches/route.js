@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { authorizePassportMatch, withWorkbookWriteDiagnostics } from "../../../../lib/google-sheets-write.js";
-import { MATCH_ACCESS_ACTIONS, authorizeMatchAccess } from "../../../../lib/match-authorization-supabase.js";
+import { MATCH_ACCESS_ACTIONS, authorizeMatchAccess, matchAuthorizationPublicError } from "../../../../lib/match-authorization-supabase.js";
 import { requireMatchAuthorizationSource } from "../../../../lib/match-authorization-source.js";
 import { createScoringSession, scoringSessionCookie } from "../../../../lib/scoring-access.js";
 import { playerPassportEffectivePlayerId, playerPassportTokenFromRequest, verifyPlayerPassportSession } from "../../../../lib/player-passport.js";
@@ -251,8 +251,9 @@ export async function POST(request) {
       console.error("Supabase match authorization unavailable", { route: "POST /api/player-passport/matches",
         identityAuthority: identity?.authority?.resolved || "unknown", stage: "match-authorization-supabase-read", code: error?.code || "AUTHORIZATION_UNAVAILABLE",
         reason: error?.message || String(error) });
-      return NextResponse.json({ error: "Scorecard authorization is temporarily unavailable.", code: "AUTHORIZATION_UNAVAILABLE" },
-        { status: 503, headers: { "X-Match-Authorization-Source": "supabase", "X-Match-Authorization-Google-Requests": "0" } });
+      const safe = matchAuthorizationPublicError(error);
+      return NextResponse.json({ error: safe.message, code: safe.code },
+        { status: safe.status, headers: { "X-Match-Authorization-Source": "supabase", "X-Match-Authorization-Google-Requests": "0" } });
     }
     if (/not available|not active|not assigned/i.test(String(error?.message || ""))) {
       return NextResponse.json({ error: "This match is not available for Player Passport scoring." }, { status: 403 });
