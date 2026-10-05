@@ -1,0 +1,28 @@
+{
+  "hosted": false,
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "cases": [
+    {
+      "name": "real process killed only after canonical claim; no fabricated success/failure acknowledgement",
+      "result": "PASS"
+    },
+    {
+      "name": "real 90-second lease expiry and 150-second reconciliation preserve canonical uncertainty evidence",
+      "result": "PASS"
+    },
+    {
+      "name": "new process tick reclaims expired claims through normal backoff and preserves attempt history",
+      "result": "PASS"
+    },
+    {
+      "name": "source supersession denies held obsolete completion and leaves genuine current work for next autonomous tick",
+      "result": "PASS"
+    },
+    {
+      "name": "out-of-order reservations in two independent processes contend using canonical SQL CAS and complete drain",
+      "result": "PASS"
+    }
+  ],
+  "leaseSeconds": 90,
+  "reconciliationSeconds": 150
+}

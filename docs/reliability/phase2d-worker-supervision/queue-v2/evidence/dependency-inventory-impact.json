@@ -1,0 +1,20 @@
+{
+  "cause": "authorized pinned @vercel/queue addition",
+  "files": [
+    "test/history-hole-winner-summary-cleanup.test.mjs",
+    "test/history-scorecard-derived-row-labels.test.mjs",
+    "test/history-step3a-completed-year-2025.test.mjs",
+    "test/history-step3a10-2025-master.test.mjs",
+    "test/history-step3a3-final-ux-cleanup.test.mjs",
+    "test/history-step3a4-navigation-scramble.test.mjs",
+    "test/history-step3a5-final-round-polish.test.mjs",
+    "test/history-step3a8-round-correctness.test.mjs",
+    "test/history-step3a8a-visual-cleanup.test.mjs",
+    "test/history-step3a9-scorecard-parity.test.mjs",
+    "test/history-step3b1-2024-migration.test.mjs",
+    "test/history-step3b1a-2024-net-semantics.test.mjs",
+    "test/history-step3b2-2023-migration.test.mjs"
+  ],
+  "presentation_source_changed": false,
+  "assertions_preserved": true
+}

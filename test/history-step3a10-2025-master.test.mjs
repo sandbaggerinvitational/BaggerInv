@@ -306,6 +306,7 @@ test("Step 3A.10 adds no request, endpoint, source, storage, or dependency", () 
     "@supabase/ssr",
     "@supabase/supabase-js",
     "@vercel/analytics",
+    "@vercel/queue",
     "libphonenumber-js",
     "next",
     "openai",

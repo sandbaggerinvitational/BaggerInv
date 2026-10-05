@@ -1,0 +1,129 @@
+{
+  "status": "LOCAL_PASS_HOSTED_ACCEPTANCE_PENDING",
+  "architecture": "private native queue finite batch and digest-only canonical reservations",
+  "baseSha": "fe3f780e14d0110816c3c6373505c7ffa3e97df6",
+  "parentHead": "b8daba7eed57dde6023b0661644c78ea9bb444c8",
+  "candidateIdentity": "the Git commit containing this receipt; executable sources identified by manifest hashes",
+  "hostedApplicationUnchanged": "a4bb57b1067fa7c50c8120c6fe5778378827a221",
+  "focused": {
+    "tests": 56,
+    "pass": 56,
+    "fail": 0,
+    "skip": 0
+  },
+  "broad": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "broadBaselineExactMatch": true,
+  "newUnexplainedFailures": 0,
+  "buildExitCode": 0,
+  "frozenSourceStableAllRuns": true,
+  "sourceManifest": {
+    "lib/certification-queue-supervision.js": "316656032228e54f8aadf6bd8270367fd964dab70287375ea542ebb886b0d276",
+    "lib/certification-worker-supervision.js": "b03b6ba03b26425160be836a2bcbde7f9009e511d093b353b34bdfbc0e45fbc2",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "tools/reliability/certification-queue-control.mjs": "c8f97ecbe52cafe83435272d3c7187df5d74ebfd4ccf006112a1e87e628a8d65",
+    "tools/reliability/certification-worker-demand.mjs": "6ad187cfdc11ec2427cae4689964e7cc40665bb25fd8ce87a77a899ea1937f08",
+    "supabase/production_incremental/certification-worker-queue-supervision-v2.sql": "4c23e5d9ef591b567bc9d05f119d47da211b855d098ea5c180761b4946af2e81",
+    "app/api/internal/derived-worker/run/route.js": "56bba5d27e9eedc2cc81da4f92495990947d08a5f2895ce91deb2710882e8c83",
+    "app/api/internal/derived-worker/queue/route.js": "442cc0011afb872fda767dbe7e0a63809476b7933ae369bf8b7cd63645233e7b",
+    "vercel.certification-queue.json": "40fa049deff928cda07b8a235ba227ffb0320fb365b1de942065993da5f66ffb",
+    "package.json": "02ca2154f932c5c5bacd6d52ddd4eec023c422b7e46e44d6ec0d35dc54b7826f",
+    "package-lock.json": "abf89699407983d173e997f62aa1083e8ae5cd34b81f33904ebba9744d318d43"
+  },
+  "protectedSourceByteParity": {
+    "lib/score-derived-worker.js": true,
+    "lib/score-derived-delivery.js": true,
+    "tools/reliability/certification-worker-demand.mjs": true,
+    "vercel.json": true,
+    "config/certification-resource-registration.json": true
+  },
+  "864HoleRerun": false,
+  "proofLayers": {
+    "local": "real owned PG17 canonical operations, claims/CAS, processors, lease deadlines, crash and recovery",
+    "modeled": "queue publish/delivery and Vercel runtime identity",
+    "hosted": "NOT_RUN"
+  },
+  "hostedActions": {
+    "mutation": false,
+    "queueCreation": false,
+    "secretProvisioning": false,
+    "deployment": false,
+    "releaseRebind": false,
+    "workerExecution": false
+  },
+  "publicationAssertions": [
+    "START committed before send",
+    "TRY durably UNKNOWN before SDK",
+    "partial publication",
+    "lost publisher acknowledgement",
+    "same idempotency key on retry",
+    "duplicates harmless",
+    "STOP invalidates unfinished authority",
+    "never assert schedule installation from ACK"
+  ],
+  "deliveryAssertions": [
+    "real worker all four canonical claims/results",
+    "simultaneous same-reservation one cycle",
+    "out-of-order two-process contention",
+    "real expiry",
+    "late-after-STOP denial",
+    "lost FINISH acknowledgement durable success readback",
+    "real process disappearance",
+    "actual 90-second lease and 150-second reconciliation",
+    "normal reclaim preserves attempts",
+    "transient backoff",
+    "terminal/Director requeue",
+    "current-source supersession",
+    "three distinct global failures HALT",
+    "halted delivery denial"
+  ],
+  "localFinalDomains": [
+    "supervisor OFF",
+    "no active claims/leases",
+    "required work drained",
+    "empty Calcutta no financial demand",
+    "FinalRecap ineligible",
+    "Odds zero"
+  ],
+  "productionSupervisorConfigured": false,
+  "credentials": "no reusable dispatch credential in SQL/Vault/messages; provider OIDC only later outside SQL",
+  "forwardArtifact": "supabase/production_incremental/certification-worker-queue-supervision-v2.sql",
+  "freshInstall": "retained OFF v1 schema -> reviewed v2; no extensions/secrets/schedule configured",
+  "replay": "convergent real PG catalog comparison; immutable predecessor receipt preserved",
+  "sourceChanged": "YES locally; not hosted",
+  "readyForOwnerHostedAuthorization": true,
+  "hostedAcceptanceRequired": [
+    "account entitlement/plan/region",
+    "private consumer registration",
+    "protected Preview native delivery",
+    "real system deployment identity",
+    "explicit immutable deployment pin",
+    "delay/duplicates/retries/metering",
+    "provider termination/reconciliation",
+    "safe owner short-lived OIDC acquisition",
+    "no client publisher reachability"
+  ],
+  "rawLogs": {
+    "core": "core.tap.gz",
+    "recovery": "recovery.tap.gz",
+    "crash": "crash.tap.gz",
+    "application": "application.tap.gz",
+    "build": "build.tap.gz"
+  },
+  "developmentAccounting": {
+    "resolvedTestSetupIssues": [
+      "fixture match-column assertion",
+      "owner binding DTO reused exactly for consumer",
+      "injected adapter processor family completeness"
+    ],
+    "approvedDependencyInventoryChanges": 13,
+    "sourceStableRerunReason": "final runtime guard/region and STOP evidence changes during initial parallel runs; all final manifests now exact",
+    "unresolvedApplicationDefects": 0
+  }
+}

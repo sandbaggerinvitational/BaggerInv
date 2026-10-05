@@ -1,5 +1,11 @@
 # Certification worker supervision candidate
 
+**Historical v1 design, retired from active dispatch.** The current candidate is
+the [private Queues v2 implementation](queue-v2/README.md). Its forward correction
+disables the HTTP/HMAC/Vault/pg_net dispatch functions. This document and its
+original receipts remain as truthful historical evidence; they are not authority
+to install or start the old transport.
+
 Local implementation of the approved Supabase-local scheduling → signed immutable Vercel invocation → existing Node worker architecture. This package does not install, deploy, activate or run anything hosted. The application base is a4bb57b1067fa7c50c8120c6fe5778378827a221.
 
 The new private forward add-on provides owner START/STOP/STATUS, cause-corrected RESUME, reservation, reconciliation, provider dispatch and schedule installation. The HTTP endpoint accepts only a valid 30-second HMAC ticket already recorded in the private ledger. It runs `runScoreDerivedWorker` with `maximumCycles=1`, using the existing current Certification adapter, calculators and canonical SQL gateways. Participant cookies, Director sessions, cron headers and protection bypass alone grant nothing.

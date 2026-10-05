@@ -1,0 +1,35 @@
+{
+  "mode": "core",
+  "startedAt": "2026-10-05T14:27:29.290Z",
+  "completedAt": "2026-10-05T14:28:49.131Z",
+  "hosted": false,
+  "remoteSocketsDenied": true,
+  "realCredentialsRemoved": true,
+  "counts": {
+    "tests": 46,
+    "pass": 46,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "failures": [],
+  "exitCode": 0,
+  "error": null,
+  "sourceStable": true,
+  "sourceManifest": {
+    "lib/certification-queue-supervision.js": "316656032228e54f8aadf6bd8270367fd964dab70287375ea542ebb886b0d276",
+    "lib/certification-worker-supervision.js": "b03b6ba03b26425160be836a2bcbde7f9009e511d093b353b34bdfbc0e45fbc2",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "tools/reliability/certification-queue-control.mjs": "c8f97ecbe52cafe83435272d3c7187df5d74ebfd4ccf006112a1e87e628a8d65",
+    "tools/reliability/certification-worker-demand.mjs": "6ad187cfdc11ec2427cae4689964e7cc40665bb25fd8ce87a77a899ea1937f08",
+    "supabase/production_incremental/certification-worker-queue-supervision-v2.sql": "4c23e5d9ef591b567bc9d05f119d47da211b855d098ea5c180761b4946af2e81",
+    "app/api/internal/derived-worker/run/route.js": "56bba5d27e9eedc2cc81da4f92495990947d08a5f2895ce91deb2710882e8c83",
+    "app/api/internal/derived-worker/queue/route.js": "442cc0011afb872fda767dbe7e0a63809476b7933ae369bf8b7cd63645233e7b",
+    "vercel.certification-queue.json": "40fa049deff928cda07b8a235ba227ffb0320fb365b1de942065993da5f66ffb",
+    "package.json": "02ca2154f932c5c5bacd6d52ddd4eec023c422b7e46e44d6ec0d35dc54b7826f",
+    "package-lock.json": "abf89699407983d173e997f62aa1083e8ae5cd34b81f33904ebba9744d318d43"
+  },
+  "rawSha256": "869a3579c64d12ab2c8f754bead488f15ab8658cf91539e04b3ca78feca15d44",
+  "head": "b8daba7eed57dde6023b0661644c78ea9bb444c8"
+}

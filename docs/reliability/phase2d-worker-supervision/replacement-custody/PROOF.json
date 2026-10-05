@@ -1,0 +1,49 @@
+{
+  "status": "RECOMMENDED_ARCHITECTURE_LOCAL_MODEL_ONLY",
+  "review_date": "2026-10-05",
+  "architecture": "finite owner-started delayed batch; private Vercel Queues push consumer; existing Node worker",
+  "source_head": "b8daba7eed57dde6023b0661644c78ea9bb444c8",
+  "deployed_application_retained": "a4bb57b1067fa7c50c8120c6fe5778378827a221",
+  "test_command": "node --test test/replacement-worker-custody-poc.test.mjs",
+  "focused_result": {
+    "tests": 23,
+    "pass": 23,
+    "fail": 0,
+    "skip": 0
+  },
+  "proof_layer": "in-memory custody/control model calling existing worker with modeled tick/processors",
+  "synthetic_crypto": "in-memory Ed25519 keys; captured signed request demonstrated first-use race",
+  "not_proven": [
+    "native provider delivery and account availability",
+    "real private build output",
+    "owner START producer handoff",
+    "forward SQL digest issuer/BEGIN ACLs and CAS",
+    "canonical job processor/lease proofs in this PoC",
+    "hosted Edge secret SQL-role custody"
+  ],
+  "runtime_source_changed": false,
+  "schema_changed": false,
+  "dependencies_changed": false,
+  "config_changed": false,
+  "broad_regression": "NOT_RUN_NO_SHIPPING_CHANGE",
+  "build": "NOT_RUN_NO_SHIPPING_CHANGE",
+  "864_holes": "NOT_RUN_NO_DOMAIN_CHANGE",
+  "hosted_actions": {
+    "mutation": false,
+    "secret_provisioning": false,
+    "schedule": false,
+    "deployment": false,
+    "worker_start": false
+  },
+  "supervisor": "OFF_RETAINED_OWNER_CHECKPOINT_NOT_NEW_READBACK",
+  "ready_for_local_implementation_review": true,
+  "ready_for_hosted_execution": false,
+  "next_action": "Authorize local implementation/certification of private native queue finite batch and owner-issued digest-only reservation forward adapter; no hosted execution.",
+  "artifact_sha256": {
+    "docs/reliability/phase2d-worker-supervision/replacement-custody/README.md": "24fd1bb167ff457c5755bdda9b8b22cfd7cd042e67174834b2486ffdb1318df0",
+    "docs/reliability/phase2d-worker-supervision/replacement-custody/PROVIDERS.md": "6a68a594cba4ce4d5a858f5144e18fe5797dbb927cddbaf4271f0cc5dad18ddc",
+    "docs/reliability/phase2d-worker-supervision/replacement-custody/ACCEPTANCE.md": "601bdfb05ea238a4127b028a24ac353e5bda846f0febbac3383011f99326518a",
+    "tools/reliability/poc/replacement-worker-custody.mjs": "c820cc9babe18a29c97cc16704757187eaf5cb036a394d4e04f2cfcf84cee422",
+    "test/replacement-worker-custody-poc.test.mjs": "f7b11dee20ae44b675df6b9244bf1e3474300022ba3c448afa03514069b81259"
+  }
+}

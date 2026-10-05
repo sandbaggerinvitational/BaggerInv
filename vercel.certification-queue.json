@@ -1,0 +1,29 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/account-deletion",
+      "schedule": "*/5 * * * *"
+    }
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "codex/reliability-phase2c1-google-retirement": false,
+      "codex/reliability-phase2c1-capability-closure": false,
+      "codex/reliability-phase2d-staging-admission": false,
+      "codex/worker-provider-portability": false
+    }
+  },
+  "functions": {
+    "app/api/internal/derived-worker/queue/route.js": {
+      "maxDuration": 60,
+      "experimentalTriggers": [
+        {
+          "type": "queue/v2beta",
+          "topic": "bagger-certification-derived-wake-v2",
+          "retryAfterSeconds": 5,
+          "maxDeliveries": 5
+        }
+      ]
+    }
+  }
+}

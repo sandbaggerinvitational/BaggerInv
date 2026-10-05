@@ -55,7 +55,7 @@ export async function createSupervisorFixture() {
  const calls=[];
  const fetchImpl=async(url,init)=>{
   const target=new URL(url),name=target.pathname.split('/').at(-1);if(target.origin!==resource.project_url)throw new Error('UNEXPECTED_EGRESS');
-  if(!['execute_certification_supervisor_v1','read_certification_runtime_context_v1','execute_certification_operation_v1',
+  if(!['execute_certification_supervisor_v1','execute_certification_queue_supervisor_v2','read_certification_runtime_context_v1','execute_certification_operation_v1',
    'read_certification_projection_v1','read_certification_operation_v1','admit_certification_operation_v1'].includes(name))throw new Error('UNEXPECTED_RPC');
   const input=JSON.parse(init.body).input;calls.push({name,operation:input.operation_id||input.operation});
   const result=sqlResult(cluster,database,`\\set VERBOSITY verbose\nset role service_role;select public.${name}(${jsonLiteral(input)})`,{role:'service_role'});

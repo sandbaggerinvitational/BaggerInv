@@ -176,6 +176,7 @@ test("the 2025 presentation introduces no request, endpoint, data source, or dep
     "@supabase/ssr",
     "@supabase/supabase-js",
     "@vercel/analytics",
+    "@vercel/queue",
     "libphonenumber-js",
     "next",
     "openai",
