@@ -1,0 +1,13 @@
+{
+  "hosted": false,
+  "runtime": {
+    "node": "v24.21.0",
+    "undici": "7.29.1"
+  },
+  "tests": 15,
+  "pass": 15,
+  "fail": 0,
+  "skip": 0,
+  "transport": "synthetic SDK + actual loopback diagnostics",
+  "sourceSha256": "152f57274b4e4dc3d3943c027e43fa0efdb0f45e482f3e128c811eaa482acff4"
+}

@@ -41,7 +41,8 @@ test('worker engine, job-fault transport and retired HTTP route stay byte-identi
   assert.equal(await readFile(file,'utf8'),execFileSync('git',['show','71d6a393:'+file],{encoding:'utf8'}));
  const consumer=await readFile('app/api/internal/derived-worker/queue/route.js','utf8');
  assert.match(consumer,/handleBoundedQueueDelivery\(request,consume\)/);
- assert.match(consumer,/consumeCertificationQueueMessage\(message,metadata\)/);
+ assert.match(consumer,/consumeCertificationQueueMessage\(message,metadata,\{timingEvidence\}\)/);
+ assert.match(consumer,/observeQueueTransport/);
  const runtime=await readFile('lib/certification-worker-supervision.js','utf8');
  const original=execFileSync('git',['show','71d6a393:lib/certification-worker-supervision.js'],{encoding:'utf8'});
  const jobTransport=s=>s.slice(s.indexOf('export function createSupervisorFaultTransport'),s.indexOf('export async function handleSupervisorRequest'));

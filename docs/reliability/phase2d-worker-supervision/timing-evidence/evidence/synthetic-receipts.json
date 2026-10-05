@@ -1,0 +1,518 @@
+[
+  {
+    "contract": "certification-queue-timing-evidence-v1",
+    "event": "PUBLICATION_REQUEST",
+    "sequence": 1,
+    "deployment_id": {
+      "value": "dpl_LocalSyntheticEvidence",
+      "provenance": "DERIVED"
+    },
+    "invocation_digest": {
+      "value": "11e594f481958c10e3015d0bf0447a22f068a8a647f475df15ce2c7ab4b8f3f1",
+      "provenance": "DERIVED"
+    },
+    "provider_message_digest": {
+      "value": null,
+      "provenance": "DERIVED"
+    },
+    "observed_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "elapsed_ms": {
+      "value": 0,
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "scheduled_at": {
+      "value": "2026-10-05T12:00:10.000Z",
+      "provenance": "DERIVED"
+    },
+    "authority_expires_at": {
+      "value": "2026-10-05T12:00:40.000Z",
+      "provenance": "DERIVED"
+    },
+    "timing_calculated_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "requested_delay_seconds": {
+      "value": 10,
+      "provenance": "BAGGER_REQUEST"
+    },
+    "requested_ttl_seconds": {
+      "value": 550,
+      "provenance": "BAGGER_REQUEST"
+    },
+    "requested_expiration": {
+      "value": "2026-10-05T12:09:10.000Z",
+      "provenance": "DERIVED"
+    }
+  },
+  {
+    "contract": "certification-queue-timing-evidence-v1",
+    "event": "PUBLICATION_RESPONSE",
+    "sequence": 2,
+    "deployment_id": {
+      "value": "dpl_LocalSyntheticEvidence",
+      "provenance": "DERIVED"
+    },
+    "invocation_digest": {
+      "value": "11e594f481958c10e3015d0bf0447a22f068a8a647f475df15ce2c7ab4b8f3f1",
+      "provenance": "DERIVED"
+    },
+    "provider_message_digest": {
+      "value": "7ed024289f66a5a80a4955d5c99ebc887ef2c0d959bd893130caae532f68f6ff",
+      "provenance": "DERIVED"
+    },
+    "observed_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "elapsed_ms": {
+      "value": 0,
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "message_id_returned": {
+      "value": true,
+      "provenance": "PROVIDER_RESPONSE"
+    },
+    "expiration_returned": {
+      "value": false,
+      "provenance": "PROVIDER_RESPONSE"
+    }
+  },
+  {
+    "contract": "certification-queue-timing-evidence-v1",
+    "event": "PROVIDER_CALLBACK",
+    "sequence": 3,
+    "deployment_id": {
+      "value": "dpl_LocalSyntheticEvidence",
+      "provenance": "DERIVED"
+    },
+    "invocation_digest": {
+      "value": "11e594f481958c10e3015d0bf0447a22f068a8a647f475df15ce2c7ab4b8f3f1",
+      "provenance": "DERIVED"
+    },
+    "provider_message_digest": {
+      "value": "7ed024289f66a5a80a4955d5c99ebc887ef2c0d959bd893130caae532f68f6ff",
+      "provenance": "DERIVED"
+    },
+    "observed_at": {
+      "value": "2026-10-05T12:00:11.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "elapsed_ms": {
+      "value": 11000,
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "provider_created_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "provider_expires_at": {
+      "value": "2026-10-05T12:09:10.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "provider_visibility_deadline": {
+      "value": "2026-10-05T12:01:41.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "provider_delivery_count": {
+      "value": 1,
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "actual_timing_available": {
+      "value": true,
+      "provenance": "DERIVED"
+    },
+    "remaining_transport_seconds": {
+      "value": 539,
+      "provenance": "DERIVED"
+    },
+    "configured_visibility_seconds": {
+      "value": 90,
+      "provenance": "BAGGER_REQUEST"
+    }
+  },
+  {
+    "contract": "certification-queue-timing-evidence-v1",
+    "event": "HANDLER_ENTERED",
+    "sequence": 4,
+    "deployment_id": {
+      "value": "dpl_LocalSyntheticEvidence",
+      "provenance": "DERIVED"
+    },
+    "invocation_digest": {
+      "value": "11e594f481958c10e3015d0bf0447a22f068a8a647f475df15ce2c7ab4b8f3f1",
+      "provenance": "DERIVED"
+    },
+    "provider_message_digest": {
+      "value": "7ed024289f66a5a80a4955d5c99ebc887ef2c0d959bd893130caae532f68f6ff",
+      "provenance": "DERIVED"
+    },
+    "observed_at": {
+      "value": "2026-10-05T12:00:11.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "elapsed_ms": {
+      "value": 11000,
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "provider_created_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "provider_expires_at": {
+      "value": "2026-10-05T12:09:10.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "sdk_expiry_matches_provider": {
+      "value": true,
+      "provenance": "DERIVED"
+    }
+  },
+  {
+    "contract": "certification-queue-timing-evidence-v1",
+    "event": "PUBLICATION_REQUEST",
+    "sequence": 1,
+    "deployment_id": {
+      "value": "dpl_LocalSyntheticEvidence",
+      "provenance": "DERIVED"
+    },
+    "invocation_digest": {
+      "value": "cdf709a9cf56140504322a779cb99319f2b039fa55c2fa30de27a484aec58345",
+      "provenance": "DERIVED"
+    },
+    "provider_message_digest": {
+      "value": null,
+      "provenance": "DERIVED"
+    },
+    "observed_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "elapsed_ms": {
+      "value": 0,
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "scheduled_at": {
+      "value": "2026-10-05T12:59:10.000Z",
+      "provenance": "DERIVED"
+    },
+    "authority_expires_at": {
+      "value": "2026-10-05T12:59:40.000Z",
+      "provenance": "DERIVED"
+    },
+    "timing_calculated_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "requested_delay_seconds": {
+      "value": 3550,
+      "provenance": "BAGGER_REQUEST"
+    },
+    "requested_ttl_seconds": {
+      "value": 4090,
+      "provenance": "BAGGER_REQUEST"
+    },
+    "requested_expiration": {
+      "value": "2026-10-05T13:08:10.000Z",
+      "provenance": "DERIVED"
+    }
+  },
+  {
+    "contract": "certification-queue-timing-evidence-v1",
+    "event": "PUBLICATION_RESPONSE",
+    "sequence": 2,
+    "deployment_id": {
+      "value": "dpl_LocalSyntheticEvidence",
+      "provenance": "DERIVED"
+    },
+    "invocation_digest": {
+      "value": "cdf709a9cf56140504322a779cb99319f2b039fa55c2fa30de27a484aec58345",
+      "provenance": "DERIVED"
+    },
+    "provider_message_digest": {
+      "value": "9d55b2ff30dba1b8464e0b5183b7cba26bcc554eab41816ad4b2018ee85fab25",
+      "provenance": "DERIVED"
+    },
+    "observed_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "elapsed_ms": {
+      "value": 0,
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "message_id_returned": {
+      "value": true,
+      "provenance": "PROVIDER_RESPONSE"
+    },
+    "expiration_returned": {
+      "value": false,
+      "provenance": "PROVIDER_RESPONSE"
+    }
+  },
+  {
+    "contract": "certification-queue-timing-evidence-v1",
+    "event": "PROVIDER_CALLBACK",
+    "sequence": 3,
+    "deployment_id": {
+      "value": "dpl_LocalSyntheticEvidence",
+      "provenance": "DERIVED"
+    },
+    "invocation_digest": {
+      "value": "cdf709a9cf56140504322a779cb99319f2b039fa55c2fa30de27a484aec58345",
+      "provenance": "DERIVED"
+    },
+    "provider_message_digest": {
+      "value": "9d55b2ff30dba1b8464e0b5183b7cba26bcc554eab41816ad4b2018ee85fab25",
+      "provenance": "DERIVED"
+    },
+    "observed_at": {
+      "value": "2026-10-05T12:59:11.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "elapsed_ms": {
+      "value": 3551000,
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "provider_created_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "provider_expires_at": {
+      "value": "2026-10-05T13:08:10.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "provider_visibility_deadline": {
+      "value": "2026-10-05T13:00:41.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "provider_delivery_count": {
+      "value": 1,
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "actual_timing_available": {
+      "value": true,
+      "provenance": "DERIVED"
+    },
+    "remaining_transport_seconds": {
+      "value": 539,
+      "provenance": "DERIVED"
+    },
+    "configured_visibility_seconds": {
+      "value": 90,
+      "provenance": "BAGGER_REQUEST"
+    }
+  },
+  {
+    "contract": "certification-queue-timing-evidence-v1",
+    "event": "HANDLER_ENTERED",
+    "sequence": 4,
+    "deployment_id": {
+      "value": "dpl_LocalSyntheticEvidence",
+      "provenance": "DERIVED"
+    },
+    "invocation_digest": {
+      "value": "cdf709a9cf56140504322a779cb99319f2b039fa55c2fa30de27a484aec58345",
+      "provenance": "DERIVED"
+    },
+    "provider_message_digest": {
+      "value": "9d55b2ff30dba1b8464e0b5183b7cba26bcc554eab41816ad4b2018ee85fab25",
+      "provenance": "DERIVED"
+    },
+    "observed_at": {
+      "value": "2026-10-05T12:59:11.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "elapsed_ms": {
+      "value": 3551000,
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "provider_created_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "provider_expires_at": {
+      "value": "2026-10-05T13:08:10.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "sdk_expiry_matches_provider": {
+      "value": true,
+      "provenance": "DERIVED"
+    }
+  },
+  {
+    "contract": "certification-queue-timing-evidence-v1",
+    "event": "PUBLICATION_REQUEST",
+    "sequence": 1,
+    "deployment_id": {
+      "value": "dpl_LocalSyntheticEvidence",
+      "provenance": "DERIVED"
+    },
+    "invocation_digest": {
+      "value": "800aa78f7ac9ba88fa74921526450aca27562f3d74410bca04628570f0f6ee58",
+      "provenance": "DERIVED"
+    },
+    "provider_message_digest": {
+      "value": null,
+      "provenance": "DERIVED"
+    },
+    "observed_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "elapsed_ms": {
+      "value": 0,
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "scheduled_at": {
+      "value": "2026-10-05T13:59:10.000Z",
+      "provenance": "DERIVED"
+    },
+    "authority_expires_at": {
+      "value": "2026-10-05T13:59:40.000Z",
+      "provenance": "DERIVED"
+    },
+    "timing_calculated_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "requested_delay_seconds": {
+      "value": 7150,
+      "provenance": "BAGGER_REQUEST"
+    },
+    "requested_ttl_seconds": {
+      "value": 7690,
+      "provenance": "BAGGER_REQUEST"
+    },
+    "requested_expiration": {
+      "value": "2026-10-05T14:08:10.000Z",
+      "provenance": "DERIVED"
+    }
+  },
+  {
+    "contract": "certification-queue-timing-evidence-v1",
+    "event": "PUBLICATION_RESPONSE",
+    "sequence": 2,
+    "deployment_id": {
+      "value": "dpl_LocalSyntheticEvidence",
+      "provenance": "DERIVED"
+    },
+    "invocation_digest": {
+      "value": "800aa78f7ac9ba88fa74921526450aca27562f3d74410bca04628570f0f6ee58",
+      "provenance": "DERIVED"
+    },
+    "provider_message_digest": {
+      "value": "ea5f9b8d4c1570d1de690913cfffbd74b1f8bbd11ec879e11ce86ba0473664d2",
+      "provenance": "DERIVED"
+    },
+    "observed_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "elapsed_ms": {
+      "value": 0,
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "message_id_returned": {
+      "value": true,
+      "provenance": "PROVIDER_RESPONSE"
+    },
+    "expiration_returned": {
+      "value": false,
+      "provenance": "PROVIDER_RESPONSE"
+    }
+  },
+  {
+    "contract": "certification-queue-timing-evidence-v1",
+    "event": "PROVIDER_CALLBACK",
+    "sequence": 3,
+    "deployment_id": {
+      "value": "dpl_LocalSyntheticEvidence",
+      "provenance": "DERIVED"
+    },
+    "invocation_digest": {
+      "value": "800aa78f7ac9ba88fa74921526450aca27562f3d74410bca04628570f0f6ee58",
+      "provenance": "DERIVED"
+    },
+    "provider_message_digest": {
+      "value": "ea5f9b8d4c1570d1de690913cfffbd74b1f8bbd11ec879e11ce86ba0473664d2",
+      "provenance": "DERIVED"
+    },
+    "observed_at": {
+      "value": "2026-10-05T13:59:11.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "elapsed_ms": {
+      "value": 7151000,
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "provider_created_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "provider_expires_at": {
+      "value": "2026-10-05T14:08:10.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "provider_visibility_deadline": {
+      "value": "2026-10-05T14:00:41.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "provider_delivery_count": {
+      "value": 1,
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "actual_timing_available": {
+      "value": true,
+      "provenance": "DERIVED"
+    },
+    "remaining_transport_seconds": {
+      "value": 539,
+      "provenance": "DERIVED"
+    },
+    "configured_visibility_seconds": {
+      "value": 90,
+      "provenance": "BAGGER_REQUEST"
+    }
+  },
+  {
+    "contract": "certification-queue-timing-evidence-v1",
+    "event": "HANDLER_ENTERED",
+    "sequence": 4,
+    "deployment_id": {
+      "value": "dpl_LocalSyntheticEvidence",
+      "provenance": "DERIVED"
+    },
+    "invocation_digest": {
+      "value": "800aa78f7ac9ba88fa74921526450aca27562f3d74410bca04628570f0f6ee58",
+      "provenance": "DERIVED"
+    },
+    "provider_message_digest": {
+      "value": "ea5f9b8d4c1570d1de690913cfffbd74b1f8bbd11ec879e11ce86ba0473664d2",
+      "provenance": "DERIVED"
+    },
+    "observed_at": {
+      "value": "2026-10-05T13:59:11.000Z",
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "elapsed_ms": {
+      "value": 7151000,
+      "provenance": "SERVER_CLOCK_OBSERVATION"
+    },
+    "provider_created_at": {
+      "value": "2026-10-05T12:00:00.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "provider_expires_at": {
+      "value": "2026-10-05T14:08:10.000Z",
+      "provenance": "PROVIDER_DELIVERY"
+    },
+    "sdk_expiry_matches_provider": {
+      "value": true,
+      "provenance": "DERIVED"
+    }
+  }
+]

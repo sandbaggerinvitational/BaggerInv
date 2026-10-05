@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "base": "51d5193087a3426ec2d6f22de6325c699666d435",
+  "hosted": false,
+  "providerExpiration": "EXPOSED_ON_NATIVE_DELIVERY; NOT_RETURNED_BY_SEND",
+  "providerFieldsProvenance": "RAW_NATIVE_CALLBACK; SDK_FALLBACK_NOT_ACCEPTED",
+  "focused": {
+    "tests": 122,
+    "pass": 122,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "application": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "newUnexplainedFailures": [],
+  "build": "PASS",
+  "node24": {
+    "hosted": false,
+    "runtime": {
+      "node": "v24.21.0",
+      "undici": "7.29.1"
+    },
+    "tests": 15,
+    "pass": 15,
+    "fail": 0,
+    "skip": 0,
+    "transport": "synthetic SDK + actual loopback diagnostics",
+    "sourceSha256": "152f57274b4e4dc3d3943c027e43fa0efdb0f45e482f3e128c811eaa482acff4"
+  },
+  "sqlRequired": false,
+  "timingContractChanged": false,
+  "workerChanged": false,
+  "queueSdkChanged": false,
+  "privateBoundaryChanged": false,
+  "rlsChanged": false,
+  "roleExpansion": false,
+  "hostedMutation": false,
+  "queuePublications": 0,
+  "supervisorStarted": false,
+  "workerDemandCreatedHosted": false,
+  "inheritedHostedCheckpoint": {
+    "supervisor": "OFF",
+    "admission": "DISABLED",
+    "directorAdmission": "DISABLED",
+    "ingress": "PAUSED",
+    "pending": 0,
+    "claims": 0,
+    "leases": 0,
+    "unknown": 0,
+    "deadLetters": 0,
+    "freshReadback": false
+  },
+  "actualHostedRetentionRepro": "UNPROVEN; READY_FOR_SEPARATELY_AUTHORIZED_REPRO",
+  "hole864Rerun": false,
+  "evidenceContract": "certification-queue-timing-evidence-v1",
+  "sourceStable": true
+}

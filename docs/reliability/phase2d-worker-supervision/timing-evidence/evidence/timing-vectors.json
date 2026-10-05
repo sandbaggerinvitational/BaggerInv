@@ -1,0 +1,31 @@
+{
+  "hosted": false,
+  "synthetic": true,
+  "proofs": [
+    {
+      "tick": 1,
+      "status": "RETENTION_CONFIRMED",
+      "actualTtlSeconds": 550,
+      "postScheduleSeconds": 540,
+      "timestampToleranceSeconds": 2,
+      "clockSkewReviewSeconds": 30
+    },
+    {
+      "tick": 60,
+      "status": "RETENTION_CONFIRMED",
+      "actualTtlSeconds": 4090,
+      "postScheduleSeconds": 540,
+      "timestampToleranceSeconds": 2,
+      "clockSkewReviewSeconds": 30
+    },
+    {
+      "tick": 120,
+      "status": "RETENTION_CONFIRMED",
+      "actualTtlSeconds": 7690,
+      "postScheduleSeconds": 540,
+      "timestampToleranceSeconds": 2,
+      "clockSkewReviewSeconds": 30
+    }
+  ],
+  "receiptSha256": "e48cfbb76fa9c1b64315ce1eba01aa9db615e6ea5f653ece4a4d5039866cdfe9"
+}
