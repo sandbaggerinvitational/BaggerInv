@@ -33,9 +33,11 @@ test('publisher body cannot select topic, resource, message, delay or transport'
    {method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(base)}),{env:f.env,dependencies:f.dependencies,createSend:()=>assert.fail()}));
  }finally{await destroyIsolatedCluster(f.cluster);}
 });
-test('consumer and retired public worker route stay byte-identical; CLI no longer constructs QueueClient',async()=>{
+test('private consumer route, worker engine and retired HTTP route stay byte-identical; CLI remains retired',async()=>{
  const {execFileSync}=await import('node:child_process');
- for(const file of ['lib/certification-queue-supervision.js','app/api/internal/derived-worker/queue/route.js','app/api/internal/derived-worker/run/route.js'])
+ // Queue control/error translation is explicitly corrected in v4. The native
+ // route and existing worker engine still retain their reviewed exact bytes.
+ for(const file of ['lib/certification-worker-supervision.js','lib/score-derived-worker.js','app/api/internal/derived-worker/queue/route.js','app/api/internal/derived-worker/run/route.js'])
   assert.equal(await readFile(file,'utf8'),execFileSync('git',['show','71d6a393:'+file],{encoding:'utf8'}));
  const tool=await readFile('tools/reliability/certification-queue-control.mjs','utf8');assert.doesNotMatch(tool,/new QueueClient|from '@vercel\/queue'/);
  assert.match(tool,/x-vercel-trusted-oidc-idp-token/);

@@ -1,0 +1,35 @@
+{
+  "note": "Unchanged historical calculation-crash source pins failed in the exploratory broad worker suite. It is outside Queue transport/SQL impact; no shipping worker/calculation change. Focused worker reuse is proven by real canonical integration.",
+  "files": [
+    {
+      "file": "lib/production-full-net.js",
+      "baseline_sha256": "fb854e2036d1082e12a885397f8648c74ab0e31a7126f05b31302b75c629780b",
+      "current_sha256": "fb854e2036d1082e12a885397f8648c74ab0e31a7126f05b31302b75c629780b",
+      "unchanged": true
+    },
+    {
+      "file": "lib/competition-derived-supabase.js",
+      "baseline_sha256": "79e209265c143ed2f97260a848a05a841a649ed98098bc4191a9b7dca5a5088c",
+      "current_sha256": "79e209265c143ed2f97260a848a05a841a649ed98098bc4191a9b7dca5a5088c",
+      "unchanged": true
+    },
+    {
+      "file": "lib/intelligence-derived-supabase.js",
+      "baseline_sha256": "583ebeefccd8b835d8bc96a1a790c5246516e819e3858b59d86bc24a01f192bd",
+      "current_sha256": "583ebeefccd8b835d8bc96a1a790c5246516e819e3858b59d86bc24a01f192bd",
+      "unchanged": true
+    },
+    {
+      "file": "test/support/reliability/phase2c-calculation-crash-hook.mjs",
+      "baseline_sha256": "69fc82b9b8a45f9ea60024fa5a064e5950f227c68a269e9e6651f00b7df8b766",
+      "current_sha256": "69fc82b9b8a45f9ea60024fa5a064e5950f227c68a269e9e6651f00b7df8b766",
+      "unchanged": true
+    },
+    {
+      "file": "test/reliability-phase2c-worker.test.mjs",
+      "baseline_sha256": "abd2300f16bf4ab387d5fe32fa365588f411ab177ec40424bbb8917f04f6dca0",
+      "current_sha256": "abd2300f16bf4ab387d5fe32fa365588f411ab177ec40424bbb8917f04f6dca0",
+      "unchanged": true
+    }
+  ]
+}

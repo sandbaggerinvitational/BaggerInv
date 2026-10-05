@@ -1,0 +1,44 @@
+{
+  "declared_base_sha": "917d6942350fa835c65b356951019d298a91a4f3",
+  "working_parent_sha": "90208e983f2a2adbf11ba6303cc914ed4df257c7",
+  "artifact": "supabase/production_incremental/certification-queue-safeupdate-v4.sql",
+  "artifact_sha256": "19060289eb61e5a8286a9e6e18573b1b31b07d379b88f4913c86edf08c5d99ec",
+  "functions": [
+    {
+      "signature": "production_control.worker_supervisor_control_v1(jsonb)",
+      "predecessor_sha256": "366cc182977c3ee27524b03907d25e9b4014c6f7560b63eca3565ade49e57c58",
+      "corrected_sha256": "aebd1b571c015fb5c66d6cce7eca266a23cc3ec868355dca16b45b1e9793fd35",
+      "replacement_count": 2
+    },
+    {
+      "signature": "public.execute_certification_queue_supervisor_v2(jsonb)",
+      "predecessor_sha256": "033a8475fda4e018756868ef0062a815db9db328df710646e4d8974c21284484",
+      "corrected_sha256": "061b99fd50ff253aa3d2160ced7cff5c4d1496dd6894e638c60b6beec5f69997",
+      "replacement_count": 5
+    },
+    {
+      "signature": "production_control.worker_supervisor_reconcile_v1(jsonb)",
+      "predecessor_sha256": "ba3bdd5bb9873d4edf3549821f722878babef24ec27fabd44e5e61d43676a95a",
+      "corrected_sha256": "97e4df3933f1077cb9bfebdef150c531676f2c0addc91862f5d78f1b299be167",
+      "replacement_count": 2
+    }
+  ],
+  "historical_artifacts_unchanged": {
+    "supabase/production_incremental/certification-worker-supervision-v1.sql": "17a2b3af3663345df096ce6c97cc1a109a9c608857b38524179ac4a25707fa02",
+    "supabase/production_incremental/certification-worker-queue-supervision-v2.sql": "4c23e5d9ef591b567bc9d05f119d47da211b855d098ea5c180761b4946af2e81",
+    "supabase/production_incremental/certification-queue-preview-publisher-v3.sql": "155de8fb07e7d6036988d0f18dd70cee8217fdc4bbf62470db4522fc4dabab02"
+  },
+  "existing_worker_and_private_route_unchanged": {
+    "lib/certification-worker-supervision.js": "b03b6ba03b26425160be836a2bcbde7f9009e511d093b353b34bdfbc0e45fbc2",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "app/api/internal/derived-worker/queue/route.js": "442cc0011afb872fda767dbe7e0a63809476b7933ae369bf8b7cd63645233e7b",
+    "app/api/internal/derived-worker/run/route.js": "56bba5d27e9eedc2cc81da4f92495990947d08a5f2895ce91deb2710882e8c83",
+    "package.json": "02ca2154f932c5c5bacd6d52ddd4eec023c422b7e46e44d6ec0d35dc54b7826f",
+    "package-lock.json": "abf89699407983d173e997f62aa1083e8ae5cd34b81f33904ebba9744d318d43",
+    "vercel.certification-queue.json": "40fa049deff928cda07b8a235ba227ffb0320fb365b1de942065993da5f66ffb"
+  },
+  "hosted_mutations": 0,
+  "scoring_semantics_changed": false,
+  "additional_installs": false
+}

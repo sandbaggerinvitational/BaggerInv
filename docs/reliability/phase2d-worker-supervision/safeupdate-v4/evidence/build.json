@@ -1,0 +1,30 @@
+{
+  "mode": "build",
+  "startedAt": "2026-10-05T18:19:57.228Z",
+  "completedAt": "2026-10-05T18:20:47.092Z",
+  "hosted": false,
+  "remoteSocketsDenied": true,
+  "realCredentialsRemoved": true,
+  "counts": null,
+  "failures": [],
+  "newFailures": [],
+  "establishedFailures": [],
+  "exitCode": 0,
+  "error": null,
+  "sourceStable": true,
+  "sourceManifest": {
+    "lib/certification-queue-errors.js": "2f5f1b0824e8c835e5f79bf78d172aaf2eea875eac1067618206f3076fa20657",
+    "lib/certification-queue-supervision.js": "9feb605f0723626bbdfce001728197cc11d2532fe2ecd17053a7ff6df089e059",
+    "lib/certification-queue-publisher.js": "09255de063631fb17b1d8a4076d563a7ae4682749e345be2c0bd24e1532e99c0",
+    "supabase/production_incremental/certification-queue-safeupdate-v4.sql": "19060289eb61e5a8286a9e6e18573b1b31b07d379b88f4913c86edf08c5d99ec",
+    "lib/certification-worker-supervision.js": "b03b6ba03b26425160be836a2bcbde7f9009e511d093b353b34bdfbc0e45fbc2",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "app/api/internal/derived-worker/queue/route.js": "442cc0011afb872fda767dbe7e0a63809476b7933ae369bf8b7cd63645233e7b",
+    "test/support/reliability/pg-safeupdate/safeupdate.c": "1351fc18b9a1e2dcc72185d349c178244458b5d9eb30007609c3d599b38aeb38",
+    "package.json": "02ca2154f932c5c5bacd6d52ddd4eec023c422b7e46e44d6ec0d35dc54b7826f",
+    "package-lock.json": "abf89699407983d173e997f62aa1083e8ae5cd34b81f33904ebba9744d318d43"
+  },
+  "rawSha256": "9839912aa4dff2521c566571ecc2b6997c5433c286e257e8ebef69511336da9f",
+  "head": "90208e983f2a2adbf11ba6303cc914ed4df257c7"
+}

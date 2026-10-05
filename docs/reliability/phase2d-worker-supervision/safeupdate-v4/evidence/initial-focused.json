@@ -1,0 +1,42 @@
+{
+  "mode": "focused",
+  "startedAt": "2026-10-05T18:08:34.351Z",
+  "completedAt": "2026-10-05T18:12:29.842Z",
+  "hosted": false,
+  "remoteSocketsDenied": true,
+  "realCredentialsRemoved": true,
+  "counts": {
+    "tests": 142,
+    "pass": 137,
+    "fail": 5,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "failures": [
+    "consumer and retired public worker route stay byte-identical; CLI no longer constructs QueueClient",
+    "NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue"
+  ],
+  "newFailures": [
+    "consumer and retired public worker route stay byte-identical; CLI no longer constructs QueueClient",
+    "NA-P2C-B autonomous delivery, durable retry boundaries and exact requeue"
+  ],
+  "establishedFailures": [],
+  "exitCode": 1,
+  "error": null,
+  "sourceStable": false,
+  "sourceManifest": {
+    "lib/certification-queue-errors.js": "ee5f3e4594ed60bb037480e53c59521f8051f5d301c8dd9258100cbf98ec45cc",
+    "lib/certification-queue-supervision.js": "9feb605f0723626bbdfce001728197cc11d2532fe2ecd17053a7ff6df089e059",
+    "lib/certification-queue-publisher.js": "09255de063631fb17b1d8a4076d563a7ae4682749e345be2c0bd24e1532e99c0",
+    "supabase/production_incremental/certification-queue-safeupdate-v4.sql": "66d5bdb887da1fa458b4fcad86f36a2e57b412f15d19863ec450c04893c2a608",
+    "lib/certification-worker-supervision.js": "b03b6ba03b26425160be836a2bcbde7f9009e511d093b353b34bdfbc0e45fbc2",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "app/api/internal/derived-worker/queue/route.js": "442cc0011afb872fda767dbe7e0a63809476b7933ae369bf8b7cd63645233e7b",
+    "test/support/reliability/pg-safeupdate/safeupdate.c": "1351fc18b9a1e2dcc72185d349c178244458b5d9eb30007609c3d599b38aeb38",
+    "package.json": "02ca2154f932c5c5bacd6d52ddd4eec023c422b7e46e44d6ec0d35dc54b7826f",
+    "package-lock.json": "abf89699407983d173e997f62aa1083e8ae5cd34b81f33904ebba9744d318d43"
+  },
+  "rawSha256": "d162a6f8a7dd47634045e1cffa972fa9db6806a594575897076ed22bc8587268",
+  "head": "90208e983f2a2adbf11ba6303cc914ed4df257c7"
+}

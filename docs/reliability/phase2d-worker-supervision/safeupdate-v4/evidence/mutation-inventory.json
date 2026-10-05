@@ -1,0 +1,257 @@
+{
+  "scope": "installed effective v1+v2+v3",
+  "before": [
+    {
+      "signature": "execute_certification_queue_publication_v3(jsonb)",
+      "statement": "update production_control.worker_supervisor_publication_permits_v3 set state='CONSUMED',started_at=clock_timestamp(),\n   run_token_hash=encode(extensions.digest(token,'sha256'),'hex')where permit_id=p.permit_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_publication_v3(jsonb)",
+      "statement": "update production_control.worker_supervisor_publication_permits_v3 set state='COMPLETE',completed_at=clock_timestamp()where permit_id=p.permit_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set last_invocation=i.invocation_id;",
+      "predicateSafe": false
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set state='RUNNING',publication_state='DELIVERED',started_at=clock_timestamp(),\n   run_token_hash=encode(extensions.digest(token,'sha256'),'hex')where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set step_sequence=step_sequence+1 where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set tick_recorded=true,tick_success=(input->>'success')::boolean where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set tick_failures=0,last_success=clock_timestamp(),last_tick_sequence=i.sequence;",
+      "predicateSafe": false
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set tick_failures=tick_failures+1,last_tick_sequence=greatest(last_tick_sequence,i.sequence),\n    state=case when input->>'classification'='TERMINAL'or tick_failures+1>=5 then 'HALTED'else state end,\n    halt_latched=halt_latched or input->>'classification'='TERMINAL'or tick_failures+1>=5,\n    last_halt_reason=case when input->>'classification'='TERMINAL'then 'TERMINAL_TICK_FAILURE'when tick_failures+1>=5 then 'TICK_RETRY_EXHAUSTED'else last_halt_reason end,\n    reason=case when input->>'classification'='TERMINAL'then 'TERMINAL_TICK_FAILURE'when tick_failures+1>=5 then 'TICK_RETRY_EXHAUSTED'else input->>'code'end,\n    next_at=greatest(next_at,clock_timestamp()+make_interval(secs=>least(300,power(2,tick_failures+1)::integer)));",
+      "predicateSafe": false
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set state=input->>'outcome',outcome=input->>'outcome',finished_at=clock_timestamp()where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set invocation_failures=case when input->>'outcome' in('SUCCEEDED','JOB_RETRY','STOPPED')then 0 else invocation_failures+1 end,\n   state=case when input->>'outcome'='TERMINAL'or (input->>'outcome' in('FAILED','UNKNOWN')and invocation_failures+1>=3)then 'HALTED'else state end,\n   halt_latched=halt_latched or input->>'outcome'='TERMINAL'or(input->>'outcome'in('FAILED','UNKNOWN')and invocation_failures+1>=3),\n   last_halt_reason=case when input->>'outcome'='TERMINAL'then 'TERMINAL_JOB_FAILURE'when input->>'outcome'in('FAILED','UNKNOWN')and invocation_failures+1>=3 then 'INVOCATION_RETRY_EXHAUSTED'else last_halt_reason end,\n   reason=case when input->>'outcome'='TERMINAL'then 'TERMINAL_JOB_FAILURE'when input->>'outcome'in('FAILED','UNKNOWN')and invocation_failures+1>=3 then 'INVOCATION_RETRY_EXHAUSTED'else reason end;",
+      "predicateSafe": false
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set claim_evidence=claim_evidence||coalesce((\n    select jsonb_agg(jsonb_build_object('engine',j.engine_key,'cycle',j.delivery_cycle,\n     'source',j.requested_source_revision,'started_at',j.started_at))\n    from scoring_authority.competition_recalculation_jobs j join production_control.operation_audit_events a on\n     a.event_type='CERTIFICATION_CANONICAL_OPERATION'and a.details->>'operation_id'=input->>'fault_operation'\n     and a.details->>'operation_request_id'=input->>'request_id'\n     and a.details->>'resource_id'=s.binding#>>'{resource,resource_id}'\n     and a.details->>'release_commit'=s.binding#>>'{deployment,release_commit}'\n     and a.request_fingerprint=production_control.cutover_payload_hash(input->'payload')\n    where j.tournament_id='2026'and j.status='RUNNING'and j.engine_key=any(s.engines)\n     and (j.started_at=(a.details#>>'{receipt,claim_started_at}')::timestamptz or exists(\n      select 1 from jsonb_array_elements(coalesce(a.details#>'{receipt,claims}','[]'::jsonb))v\n       where v->>'engine_key'=j.engine_key and (v->>'claim_started_at')::timestamptz=j.started_at))\n   ),'[]'::jsonb)where invocation_id=i.invocation_id returning * into i;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_faults_v1 set consumed_by=i.invocation_id,consumed_at=clock_timestamp()where plan_id=plan.plan_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_control_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set state='ENABLED',epoch=extensions.gen_random_uuid(),revision=revision+1,\n   binding=jsonb_build_object('resource',input->'resource','deployment',input->'deployment'),\n   binding_digest=production_control.tournament_setup_hash_v1(b),authority_context=b,\n   expires_at=clock_timestamp()+make_interval(secs=>duration),budget=n,dispatched=n,slots=(input->>'slots')::integer,\n   tick_failures=0,invocation_failures=0,last_tick_sequence=0,next_at=clock_timestamp(),reason=null,halt_latched=false,\n   transport='QUEUE_V2' returning * into s;",
+      "predicateSafe": false
+    },
+    {
+      "signature": "production_control.worker_supervisor_control_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_faults_v1 set epoch=s.epoch,binding_digest=s.binding_digest where epoch is null and expires_at>clock_timestamp()\n   and binding_digest=production_control.tournament_setup_hash_v1(b-'admission_revision');",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_control_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set state=case when exists(select 1 from production_control.worker_supervisor_invocations_v1 where state in('RUNNING','UNKNOWN'))then 'STOPPING'else 'OFF'end,\n   revision=revision+1,reason='OWNER_STOP';",
+      "predicateSafe": false
+    },
+    {
+      "signature": "production_control.worker_supervisor_control_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set state='RECONCILED',outcome='NOT_STARTED',reconciled_at=clock_timestamp(),evidence=evidence||jsonb_build_object('publication_before_stop',publication_state,'provider_ack_before_stop',provider_message_id is not null),publication_state='CANCELLED'where state='RESERVED';",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_fault_control_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_faults_v1 set released_at=clock_timestamp()\n   where worker_supervisor_faults_v1.plan_id=(input->>'plan_id')::uuid and epoch=s.epoch and fault='SUPERSEDE'and consumed_at is not null;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_publication_account_v3(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set publication_state='UNKNOWN',publication_attempts=publication_attempts+1 where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_publication_account_v3(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set publication_state=case when publication_state='DELIVERED'then 'DELIVERED'else 'ACCEPTED'end,\n   provider_message_id=coalesce(provider_message_id,input->>'message_id')where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_publisher_permit_v3(jsonb)",
+      "statement": "update production_control.worker_supervisor_publication_permits_v3 set state='CANCELLED'where state='ISSUED';",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_reconcile_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set state='RECONCILED',outcome='NOT_STARTED',publication_state='CANCELLED',reconciled_at=clock_timestamp(),evidence=c||jsonb_build_object('reason','UNCONSUMED_RESERVATION_EXPIRED')where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_reconcile_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set state='UNKNOWN',outcome='UNKNOWN',evidence=c where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_reconcile_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set invocation_failures=invocation_failures+1,\n    state=case when invocation_failures+1>=3 then 'HALTED'else state end,halt_latched=halt_latched or invocation_failures+1>=3,\n    last_halt_reason=case when invocation_failures+1>=3 then 'INVOCATION_RETRY_EXHAUSTED'else last_halt_reason end,reason='INVOCATION_ACKNOWLEDGEMENT_UNKNOWN';",
+      "predicateSafe": false
+    },
+    {
+      "signature": "production_control.worker_supervisor_reconcile_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set state='RECONCILED',outcome=case when i.tick_recorded then 'TICK_RECORDED_JOB_STATE_RECONCILED'else 'INVOCATION_UNKNOWN_CANONICAL_STATE_RECONCILED'end,\n    reconciled_at=clock_timestamp(),evidence=c||jsonb_build_object('canonical_jobs',coalesce((\n     select jsonb_agg(jsonb_build_object('engine',j.engine_key,'cycle',j.delivery_cycle,'attempt',j.delivery_attempts,\n      'status',j.status,'source',j.requested_source_revision,'available_at',j.delivery_available_at,\n      'dead_letter',j.delivery_dead_letter_at is not null,'same_claim',j.started_at=(v->>'started_at')::timestamptz))\n     from jsonb_array_elements(i.claim_evidence)v join scoring_authority.competition_recalculation_jobs j\n      on j.tournament_id='2026'and j.engine_key=v->>'engine'\n    ),'[]'::jsonb))where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_reconcile_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set state='OFF'where state='STOPPING'and not exists(\n  select 1 from production_control.worker_supervisor_invocations_v1 where state in('RESERVED','RUNNING','UNKNOWN'));",
+      "predicateSafe": true
+    }
+  ],
+  "after": [
+    {
+      "signature": "execute_certification_queue_publication_v3(jsonb)",
+      "statement": "update production_control.worker_supervisor_publication_permits_v3 set state='CONSUMED',started_at=clock_timestamp(),\n   run_token_hash=encode(extensions.digest(token,'sha256'),'hex')where permit_id=p.permit_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_publication_v3(jsonb)",
+      "statement": "update production_control.worker_supervisor_publication_permits_v3 set state='COMPLETE',completed_at=clock_timestamp()where permit_id=p.permit_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set last_invocation=i.invocation_id where singleton and epoch=s.epoch and revision=s.revision;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set state='RUNNING',publication_state='DELIVERED',started_at=clock_timestamp(),\n   run_token_hash=encode(extensions.digest(token,'sha256'),'hex')where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set step_sequence=step_sequence+1 where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set tick_recorded=true,tick_success=(input->>'success')::boolean where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set tick_failures=0,last_success=clock_timestamp(),last_tick_sequence=i.sequence where singleton and epoch=s.epoch and revision=s.revision;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set tick_failures=tick_failures+1,last_tick_sequence=greatest(last_tick_sequence,i.sequence),\n    state=case when input->>'classification'='TERMINAL'or tick_failures+1>=5 then 'HALTED'else state end,\n    halt_latched=halt_latched or input->>'classification'='TERMINAL'or tick_failures+1>=5,\n    last_halt_reason=case when input->>'classification'='TERMINAL'then 'TERMINAL_TICK_FAILURE'when tick_failures+1>=5 then 'TICK_RETRY_EXHAUSTED'else last_halt_reason end,\n    reason=case when input->>'classification'='TERMINAL'then 'TERMINAL_TICK_FAILURE'when tick_failures+1>=5 then 'TICK_RETRY_EXHAUSTED'else input->>'code'end,\n    next_at=greatest(next_at,clock_timestamp()+make_interval(secs=>least(300,power(2,tick_failures+1)::integer))) where singleton and epoch=s.epoch and revision=s.revision;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set state=input->>'outcome',outcome=input->>'outcome',finished_at=clock_timestamp()where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set invocation_failures=case when input->>'outcome' in('SUCCEEDED','JOB_RETRY','STOPPED')then 0 else invocation_failures+1 end,\n   state=case when input->>'outcome'='TERMINAL'or (input->>'outcome' in('FAILED','UNKNOWN')and invocation_failures+1>=3)then 'HALTED'else state end,\n   halt_latched=halt_latched or input->>'outcome'='TERMINAL'or(input->>'outcome'in('FAILED','UNKNOWN')and invocation_failures+1>=3),\n   last_halt_reason=case when input->>'outcome'='TERMINAL'then 'TERMINAL_JOB_FAILURE'when input->>'outcome'in('FAILED','UNKNOWN')and invocation_failures+1>=3 then 'INVOCATION_RETRY_EXHAUSTED'else last_halt_reason end,\n   reason=case when input->>'outcome'='TERMINAL'then 'TERMINAL_JOB_FAILURE'when input->>'outcome'in('FAILED','UNKNOWN')and invocation_failures+1>=3 then 'INVOCATION_RETRY_EXHAUSTED'else reason end where singleton and epoch=s.epoch and revision=s.revision;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set claim_evidence=claim_evidence||coalesce((\n    select jsonb_agg(jsonb_build_object('engine',j.engine_key,'cycle',j.delivery_cycle,\n     'source',j.requested_source_revision,'started_at',j.started_at))\n    from scoring_authority.competition_recalculation_jobs j join production_control.operation_audit_events a on\n     a.event_type='CERTIFICATION_CANONICAL_OPERATION'and a.details->>'operation_id'=input->>'fault_operation'\n     and a.details->>'operation_request_id'=input->>'request_id'\n     and a.details->>'resource_id'=s.binding#>>'{resource,resource_id}'\n     and a.details->>'release_commit'=s.binding#>>'{deployment,release_commit}'\n     and a.request_fingerprint=production_control.cutover_payload_hash(input->'payload')\n    where j.tournament_id='2026'and j.status='RUNNING'and j.engine_key=any(s.engines)\n     and (j.started_at=(a.details#>>'{receipt,claim_started_at}')::timestamptz or exists(\n      select 1 from jsonb_array_elements(coalesce(a.details#>'{receipt,claims}','[]'::jsonb))v\n       where v->>'engine_key'=j.engine_key and (v->>'claim_started_at')::timestamptz=j.started_at))\n   ),'[]'::jsonb)where invocation_id=i.invocation_id returning * into i;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "execute_certification_queue_supervisor_v2(jsonb)",
+      "statement": "update production_control.worker_supervisor_faults_v1 set consumed_by=i.invocation_id,consumed_at=clock_timestamp()where plan_id=plan.plan_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_control_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set state='ENABLED',epoch=extensions.gen_random_uuid(),revision=revision+1,\n   binding=jsonb_build_object('resource',input->'resource','deployment',input->'deployment'),\n   binding_digest=production_control.tournament_setup_hash_v1(b),authority_context=b,\n   expires_at=clock_timestamp()+make_interval(secs=>duration),budget=n,dispatched=n,slots=(input->>'slots')::integer,\n   tick_failures=0,invocation_failures=0,last_tick_sequence=0,next_at=clock_timestamp(),reason=null,halt_latched=false,\n   transport='QUEUE_V2' where singleton and epoch=s.epoch and revision=s.revision returning * into s;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_control_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_faults_v1 set epoch=s.epoch,binding_digest=s.binding_digest where epoch is null and expires_at>clock_timestamp()\n   and binding_digest=production_control.tournament_setup_hash_v1(b-'admission_revision');",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_control_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set state=case when exists(select 1 from production_control.worker_supervisor_invocations_v1 where state in('RUNNING','UNKNOWN'))then 'STOPPING'else 'OFF'end,\n   revision=revision+1,reason='OWNER_STOP' where singleton and epoch=s.epoch and revision=s.revision;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_control_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set state='RECONCILED',outcome='NOT_STARTED',reconciled_at=clock_timestamp(),evidence=evidence||jsonb_build_object('publication_before_stop',publication_state,'provider_ack_before_stop',provider_message_id is not null),publication_state='CANCELLED'where state='RESERVED';",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_fault_control_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_faults_v1 set released_at=clock_timestamp()\n   where worker_supervisor_faults_v1.plan_id=(input->>'plan_id')::uuid and epoch=s.epoch and fault='SUPERSEDE'and consumed_at is not null;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_publication_account_v3(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set publication_state='UNKNOWN',publication_attempts=publication_attempts+1 where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_publication_account_v3(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set publication_state=case when publication_state='DELIVERED'then 'DELIVERED'else 'ACCEPTED'end,\n   provider_message_id=coalesce(provider_message_id,input->>'message_id')where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_publisher_permit_v3(jsonb)",
+      "statement": "update production_control.worker_supervisor_publication_permits_v3 set state='CANCELLED'where state='ISSUED';",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_reconcile_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set state='RECONCILED',outcome='NOT_STARTED',publication_state='CANCELLED',reconciled_at=clock_timestamp(),evidence=c||jsonb_build_object('reason','UNCONSUMED_RESERVATION_EXPIRED')where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_reconcile_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set state='UNKNOWN',outcome='UNKNOWN',evidence=c where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_reconcile_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set invocation_failures=invocation_failures+1,\n    state=case when invocation_failures+1>=3 then 'HALTED'else state end,halt_latched=halt_latched or invocation_failures+1>=3,\n    last_halt_reason=case when invocation_failures+1>=3 then 'INVOCATION_RETRY_EXHAUSTED'else last_halt_reason end,reason='INVOCATION_ACKNOWLEDGEMENT_UNKNOWN' where singleton and epoch=s.epoch and revision=s.revision;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_reconcile_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_invocations_v1 set state='RECONCILED',outcome=case when i.tick_recorded then 'TICK_RECORDED_JOB_STATE_RECONCILED'else 'INVOCATION_UNKNOWN_CANONICAL_STATE_RECONCILED'end,\n    reconciled_at=clock_timestamp(),evidence=c||jsonb_build_object('canonical_jobs',coalesce((\n     select jsonb_agg(jsonb_build_object('engine',j.engine_key,'cycle',j.delivery_cycle,'attempt',j.delivery_attempts,\n      'status',j.status,'source',j.requested_source_revision,'available_at',j.delivery_available_at,\n      'dead_letter',j.delivery_dead_letter_at is not null,'same_claim',j.started_at=(v->>'started_at')::timestamptz))\n     from jsonb_array_elements(i.claim_evidence)v join scoring_authority.competition_recalculation_jobs j\n      on j.tournament_id='2026'and j.engine_key=v->>'engine'\n    ),'[]'::jsonb))where invocation_id=i.invocation_id;",
+      "predicateSafe": true
+    },
+    {
+      "signature": "production_control.worker_supervisor_reconcile_v1(jsonb)",
+      "statement": "update production_control.worker_supervisor_v1 set state='OFF'where singleton and epoch=s.epoch and revision=s.revision and state='STOPPING'and not exists(\n  select 1 from production_control.worker_supervisor_invocations_v1 where state in('RESERVED','RUNNING','UNKNOWN'));",
+      "predicateSafe": true
+    }
+  ]
+}
