@@ -1,0 +1,625 @@
+TAP version 13
+# Subtest: new canonical fixed-fault denial ACKs; SQL programming failures remain failed deliveries
+ok 1 - new canonical fixed-fault denial ACKs; SQL programming failures remain failed deliveries
+  ---
+  duration_ms: 1.10475
+  type: 'test'
+  ...
+# Subtest: lost outward acknowledgement retries finitely and never claims deterministic denial
+ok 2 - lost outward acknowledgement retries finitely and never claims deterministic denial
+  ---
+  duration_ms: 0.100125
+  type: 'test'
+  ...
+# Subtest: fixed transient/global terminal use the established worker classifier
+ok 3 - fixed transient/global terminal use the established worker classifier
+  ---
+  duration_ms: 0.3025
+  type: 'test'
+  ...
+# Subtest: queue message cannot select fault, epoch, SQL, delay or any target
+ok 4 - queue message cannot select fault, epoch, SQL, delay or any target
+  ---
+  duration_ms: 0.735417
+  type: 'test'
+  ...
+# Subtest: consumer registration, retired public ingress and provider limits are untouched
+ok 5 - consumer registration, retired public ingress and provider limits are untouched
+  ---
+  duration_ms: 4.238083
+  type: 'test'
+  ...
+# Subtest: global fault v5 exact installation, default NONE, safeupdate and private authority
+    # Subtest: OFF/no fault; replay preserves history, installed bodies and metadata
+    ok 1 - OFF/no fault; replay preserves history, installed bodies and metadata
+      ---
+      duration_ms: 174.7065
+      type: 'test'
+      ...
+    # Subtest: client/service roles cannot ARM, read private fault state or invoke private TAKE
+    ok 2 - client/service roles cannot ARM, read private fault state or invoke private TAKE
+      ---
+      duration_ms: 411.99225
+      type: 'test'
+      ...
+    # Subtest: owner ARM requires committed current reservations; arbitrary fault/input and foreign binding denied
+    ok 3 - owner ARM requires committed current reservations; arbitrary fault/input and foreign binding denied
+      ---
+      duration_ms: 948.485333
+      type: 'test'
+      ...
+    # Subtest: valid no-fault consumer reuses the real bounded worker and late STOP fails closed
+    ok 4 - valid no-fault consumer reuses the real bounded worker and late STOP fails closed
+      ---
+      duration_ms: 10602.69825
+      type: 'test'
+      ...
+    # Subtest: fixed plan derives reservation IDs, receipts replay/conflict and STOP cancels unused authority truthfully
+    ok 5 - fixed plan derives reservation IDs, receipts replay/conflict and STOP cancels unused authority truthfully
+      ---
+      duration_ms: 380.515959
+      type: 'test'
+      ...
+    1..5
+ok 6 - global fault v5 exact installation, default NONE, safeupdate and private authority
+  ---
+  duration_ms: 26847.948791
+  type: 'test'
+  ...
+# Queue callback error: Error: SUPERVISOR_CONTROL_UNAVAILABLE
+#     at queueDatabaseFailure (file:///private/tmp/bagger-worker-provider-portability/lib/certification-queue-errors.js:40:23)
+#     at failure (file:///private/tmp/bagger-worker-provider-portability/test/certification-queue-errors.test.mjs:5:46)
+#     at TestContext.<anonymous> (file:///private/tmp/bagger-worker-provider-portability/test/certification-queue-errors.test.mjs:60:18)
+#     at Test.runInAsyncScope (node:async_hooks:226:14)
+#     at Test.run (node:internal/test_runner/test:1397:25)
+#     at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+#     at Test.postRun (node:internal/test_runner/test:1537:19)
+#     at Test.run (node:internal/test_runner/test:1462:12)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+#   code: 'SUPERVISOR_CONTROL_UNAVAILABLE',
+#   status: 503,
+#   sqlstate: '21000',
+#   failureClass: 'DATABASE',
+#   queueDisposition: 'FAIL',
+#   operation: 'BEGIN'
+# }
+# Subtest: SUPERVISOR_ADMISSION_DENIED is an explicit deterministic denial, ACK without worker
+ok 7 - SUPERVISOR_ADMISSION_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 1.500167
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_RESERVATION_DENIED is an explicit deterministic denial, ACK without worker
+ok 8 - SUPERVISOR_RESERVATION_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.109083
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_DISABLED_OR_STALE is an explicit deterministic denial, ACK without worker
+ok 9 - SUPERVISOR_DISABLED_OR_STALE is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.094
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_RESOURCE_DENIED is an explicit deterministic denial, ACK without worker
+ok 10 - SUPERVISOR_RESOURCE_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.082666
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_DEPLOYMENT_DENIED is an explicit deterministic denial, ACK without worker
+ok 11 - SUPERVISOR_DEPLOYMENT_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.08425
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_REQUEST_DENIED is an explicit deterministic denial, ACK without worker
+ok 12 - SUPERVISOR_REQUEST_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.076083
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_MESSAGE_DENIED is an explicit deterministic denial, ACK without worker
+ok 13 - SUPERVISOR_MESSAGE_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.067333
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_RUN_TOKEN_DENIED is an explicit deterministic denial, ACK without worker
+ok 14 - SUPERVISOR_RUN_TOKEN_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.0995
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_OWNER_PUBLICATION_REQUIRED is an explicit deterministic denial, ACK without worker
+ok 15 - SUPERVISOR_OWNER_PUBLICATION_REQUIRED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.103417
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_PUBLISHER_SESSION_DENIED is an explicit deterministic denial, ACK without worker
+ok 16 - SUPERVISOR_PUBLISHER_SESSION_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.145209
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_AUTHORITY_CONTEXT_STALE PT409 remains a typed nonretrying authority conflict
+ok 17 - SUPERVISOR_AUTHORITY_CONTEXT_STALE PT409 remains a typed nonretrying authority conflict
+  ---
+  duration_ms: 0.10825
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_REVISION_STALE PT409 remains a typed nonretrying authority conflict
+ok 18 - SUPERVISOR_REVISION_STALE PT409 remains a typed nonretrying authority conflict
+  ---
+  duration_ms: 0.080625
+  type: 'test'
+  ...
+# Subtest: CANONICAL_RESOURCE_CONTEXT_STALE PT409 remains a typed nonretrying authority conflict
+ok 19 - CANONICAL_RESOURCE_CONTEXT_STALE PT409 remains a typed nonretrying authority conflict
+  ---
+  duration_ms: 0.054208
+  type: 'test'
+  ...
+# Subtest: 21000 UPDATE requires a WHERE clause fails delivery without false authorization ACK
+ok 20 - 21000 UPDATE requires a WHERE clause fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.164
+  type: 'test'
+  ...
+# Subtest: P0001 SUPERVISOR_SINGLETON_DRIFT fails delivery without false authorization ACK
+ok 21 - P0001 SUPERVISOR_SINGLETON_DRIFT fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.04575
+  type: 'test'
+  ...
+# Subtest: 42P01 missing relation fails delivery without false authorization ACK
+ok 22 - 42P01 missing relation fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.04225
+  type: 'test'
+  ...
+# Subtest: XX000 unexpected internal failure fails delivery without false authorization ACK
+ok 23 - XX000 unexpected internal failure fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.057584
+  type: 'test'
+  ...
+# Subtest: 42501 permission denied for private object fails delivery without false authorization ACK
+ok 24 - 42501 permission denied for private object fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.042
+  type: 'test'
+  ...
+# Subtest: 21000 SUPERVISOR_ADMISSION_DENIED fails delivery without false authorization ACK
+ok 25 - 21000 SUPERVISOR_ADMISSION_DENIED fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.03725
+  type: 'test'
+  ...
+# Subtest: 42501 log: SUPERVISOR_ADMISSION_DENIED fails delivery without false authorization ACK
+ok 26 - 42501 log: SUPERVISOR_ADMISSION_DENIED fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.035958
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_NOT_DUE_OR_BUSY can become eligible and retries without ACK
+ok 27 - SUPERVISOR_NOT_DUE_OR_BUSY can become eligible and retries without ACK
+  ---
+  duration_ms: 0.064792
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_PUBLISHER_BUSY can become eligible and retries without ACK
+ok 28 - SUPERVISOR_PUBLISHER_BUSY can become eligible and retries without ACK
+  ---
+  duration_ms: 0.058583
+  type: 'test'
+  ...
+# Subtest: 40001 respects transaction retry/uncertainty without resetting attempts
+ok 29 - 40001 respects transaction retry/uncertainty without resetting attempts
+  ---
+  duration_ms: 0.067834
+  type: 'test'
+  ...
+# Subtest: 40P01 respects transaction retry/uncertainty without resetting attempts
+ok 30 - 40P01 respects transaction retry/uncertainty without resetting attempts
+  ---
+  duration_ms: 0.038417
+  type: 'test'
+  ...
+# Subtest: 57014 respects transaction retry/uncertainty without resetting attempts
+ok 31 - 57014 respects transaction retry/uncertainty without resetting attempts
+  ---
+  duration_ms: 0.039458
+  type: 'test'
+  ...
+# Subtest: 08006 respects transaction retry/uncertainty without resetting attempts
+ok 32 - 08006 respects transaction retry/uncertainty without resetting attempts
+  ---
+  duration_ms: 0.040042
+  type: 'test'
+  ...
+# Subtest: timeout/connection remain uncertain; generic status alone cannot authorize ACK
+ok 33 - timeout/connection remain uncertain; generic status alone cannot authorize ACK
+  ---
+  duration_ms: 0.202875
+  type: 'test'
+  ...
+# Subtest: installed native SDK: ACK deletes lease; retry changes visibility; programming fault fails HTTP callback without ACK
+    # Subtest: success
+    ok 1 - success
+      ---
+      duration_ms: 27.315042
+      type: 'test'
+      ...
+    # Subtest: authority
+    ok 2 - authority
+      ---
+      duration_ms: 1.054
+      type: 'test'
+      ...
+    # Subtest: connection
+    ok 3 - connection
+      ---
+      duration_ms: 0.971459
+      type: 'test'
+      ...
+    # Subtest: busy
+    ok 4 - busy
+      ---
+      duration_ms: 1.154833
+      type: 'test'
+      ...
+    # Subtest: safeupdate
+    ok 5 - safeupdate
+      ---
+      duration_ms: 2.056958
+      type: 'test'
+      ...
+    1..5
+ok 34 - installed native SDK: ACK deletes lease; retry changes visibility; programming fault fails HTTP callback without ACK
+  ---
+  duration_ms: 35.043208
+  type: 'test'
+  ...
+# Subtest: owner START → digest handoff → bound Preview publisher → ledger; finite reconciliation and security
+    # Subtest: forward fresh/replay preserves v2 history, ACLs, consumer and disabled admission
+    ok 1 - forward fresh/replay preserves v2 history, ACLs, consumer and disabled admission
+      ---
+      duration_ms: 128.809792
+      type: 'test'
+      ...
+    # Subtest: participant/Director, anon, authenticated and service_role cannot mint/control/read owner permits
+    ok 2 - participant/Director, anon, authenticated and service_role cannot mint/control/read owner permits
+      ---
+      duration_ms: 203.201583
+      type: 'test'
+      ...
+    # Subtest: START commits first; partial/lost publisher ACK durable; session/permit single-use; restart completes same budget
+    ok 3 - START commits first; partial/lost publisher ACK durable; session/permit single-use; restart completes same budget
+      ---
+      duration_ms: 805.529209
+      type: 'test'
+      ...
+    # Subtest: publisher disappearance preserves UNKNOWN; owner retry waits for finite session expiry
+    ok 4 - publisher disappearance preserves UNKNOWN; owner retry waits for finite session expiry
+      ---
+      duration_ms: 623.334292
+      type: 'test'
+      ...
+    # Subtest: STOP during publication invalidates unfinished batch and a consumed publisher session
+    ok 5 - STOP during publication invalidates unfinished batch and a consumed publisher session
+      ---
+      duration_ms: 300.348041
+      type: 'test'
+      ...
+    # Subtest: missing, expired, wrong binding, stale revision and STOP fail closed; publication has no worker effect
+    ok 6 - missing, expired, wrong binding, stale revision and STOP fail closed; publication has no worker effect
+      ---
+      duration_ms: 525.586875
+      type: 'test'
+      ...
+    1..6
+ok 35 - owner START → digest handoff → bound Preview publisher → ledger; finite reconciliation and security
+  ---
+  duration_ms: 15450.772208
+  type: 'test'
+  ...
+# Subtest: Preview publisher validates real identity predicate before SDK construction
+ok 36 - Preview publisher validates real identity predicate before SDK construction
+  ---
+  duration_ms: 9737.716584
+  type: 'test'
+  ...
+# Subtest: publisher body cannot select topic, resource, message, delay or transport
+ok 37 - publisher body cannot select topic, resource, message, delay or transport
+  ---
+  duration_ms: 14684.308583
+  type: 'test'
+  ...
+# Subtest: private consumer, worker engine, job-fault transport and retired HTTP route stay byte-identical; CLI remains retired
+ok 38 - private consumer, worker engine, job-fault transport and retired HTTP route stay byte-identical; CLI remains retired
+  ---
+  duration_ms: 144.189167
+  type: 'test'
+  ...
+# Subtest: real PostgreSQL17 safeupdate reproduces the hosted BEGIN rollback before any worker admission
+ok 39 - real PostgreSQL17 safeupdate reproduces the hosted BEGIN rollback before any worker admission
+  ---
+  duration_ms: 25075.996791
+  type: 'test'
+  ...
+# Subtest: Queue v4: predicate inventory, actual safeupdate, canonical worker/claim/output, replay/recovery/control
+    # Subtest: full effective mutation inventory: seven unsafe singleton updates; all other statements already qualified
+    ok 1 - full effective mutation inventory: seven unsafe singleton updates; all other statements already qualified
+      ---
+      duration_ms: 141.852875
+      type: 'test'
+      ...
+    # Subtest: atomic guarded forward replay, historical receipts and all function metadata preserved
+    ok 2 - atomic guarded forward replay, historical receipts and all function metadata preserved
+      ---
+      duration_ms: 137.257125
+      type: 'test'
+      ...
+    # Subtest: singleton primary key/check prevents duplicate,false,NULL; real extension rejects unqualified UPDATE and DELETE
+    ok 3 - singleton primary key/check prevents duplicate,false,NULL; real extension rejects unqualified UPDATE and DELETE
+      ---
+      duration_ms: 80.373666
+      type: 'test'
+      ...
+    # Subtest: missing singleton is detected as drift, not invalid reservation; zero-row UPDATE also aborts the whole BEGIN
+    ok 4 - missing singleton is detected as drift, not invalid reservation; zero-row UPDATE also aborts the whole BEGIN
+      ---
+      duration_ms: 10352.581375
+      type: 'test'
+      ...
+    # Subtest: private owner/role/resource boundaries unchanged; START is atomic and STOP late delivery cannot claim
+    ok 5 - private owner/role/resource boundaries unchanged; START is atomic and STOP late delivery cannot claim
+      ---
+      duration_ms: 576.116959
+      type: 'test'
+      ...
+    # Subtest: v3 partial/lost publication ACK, replay/restart, and STOP during publication are safe with safeupdate ON
+    ok 6 - v3 partial/lost publication ACK, replay/restart, and STOP during publication are safe with safeupdate ON
+      ---
+      duration_ms: 705.304958
+      type: 'test'
+      ...
+    # Subtest: modeled cycle-29 four-family pending shape: supported upsert creates genuine demand, no preparation or hook claim
+    ok 7 - modeled cycle-29 four-family pending shape: supported upsert creates genuine demand, no preparation or hook claim
+      ---
+      duration_ms: 434.156583
+      type: 'test'
+      ...
+    # Subtest: former BEGIN now succeeds under real safeupdate: two slots/duplicate reservation -> existing worker -> claim/output -> FINISH
+    ok 8 - former BEGIN now succeeds under real safeupdate: two slots/duplicate reservation -> existing worker -> claim/output -> FINISH
+      ---
+      duration_ms: 11620.66325
+      type: 'test'
+      ...
+    # Subtest: lost FINISH acknowledgement reconciles the committed invocation, no second tick/output/attempt
+    ok 9 - lost FINISH acknowledgement reconciles the committed invocation, no second tick/output/attempt
+      ---
+      duration_ms: 10539.158875
+      type: 'test'
+      ...
+    # Subtest: TICK_RESULT failure/HALT, FINISH failure, HALTED denial and owner RESUME all execute with safeupdate ON
+    ok 10 - TICK_RESULT failure/HALT, FINISH failure, HALTED denial and owner RESUME all execute with safeupdate ON
+      ---
+      duration_ms: 20731.947041
+      type: 'test'
+      ...
+    # Subtest: uncertain BEGIN never executes again; owner reconciliation accounts UNKNOWN and returns STOPPING to OFF
+    ok 11 - uncertain BEGIN never executes again; owner reconciliation accounts UNKNOWN and returns STOPPING to OFF
+      ---
+      duration_ms: 10351.37625
+      type: 'test'
+      ...
+    # Subtest: final state: extension ON, OFF supervisor, disabled/paused authority, no work/claims/leases/dead letters or publication
+    ok 12 - final state: extension ON, OFF supervisor, disabled/paused authority, no work/claims/leases/dead letters or publication
+      ---
+      duration_ms: 156.485042
+      type: 'test'
+      ...
+    1..12
+ok 40 - Queue v4: predicate inventory, actual safeupdate, canonical worker/claim/output, replay/recovery/control
+  ---
+  duration_ms: 75421.326667
+  type: 'test'
+  ...
+# Subtest: queue message denies missing
+ok 41 - queue message denies missing
+  ---
+  duration_ms: 1.100125
+  type: 'test'
+  ...
+# Subtest: queue message denies empty
+ok 42 - queue message denies empty
+  ---
+  duration_ms: 0.109
+  type: 'test'
+  ...
+# Subtest: queue message denies resource
+ok 43 - queue message denies resource
+  ---
+  duration_ms: 0.077333
+  type: 'test'
+  ...
+# Subtest: queue message denies url
+ok 44 - queue message denies url
+  ---
+  duration_ms: 0.068
+  type: 'test'
+  ...
+# Subtest: queue message denies worker
+ok 45 - queue message denies worker
+  ---
+  duration_ms: 0.07175
+  type: 'test'
+  ...
+# Subtest: queue message denies badVersion
+ok 46 - queue message denies badVersion
+  ---
+  duration_ms: 0.065166
+  type: 'test'
+  ...
+# Subtest: queue message denies badId
+ok 47 - queue message denies badId
+  ---
+  duration_ms: 0.096625
+  type: 'test'
+  ...
+# Subtest: retired CLI publisher is incapable of hosted publication
+ok 48 - retired CLI publisher is incapable of hosted publication
+  ---
+  duration_ms: 0.120791
+  type: 'test'
+  ...
+# Subtest: publisher denies arbitrary physical resource or unpinned destination before SDK creation
+ok 49 - publisher denies arbitrary physical resource or unpinned destination before SDK creation
+  ---
+  duration_ms: 0.583333
+  type: 'test'
+  ...
+# Subtest: START remains truthful when credential acquisition fails after canonical commit
+ok 50 - START remains truthful when credential acquisition fails after canonical commit
+  ---
+  duration_ms: 0.860416
+  type: 'test'
+  ...
+# Subtest: publisher lost acknowledgement never fabricates NOT_PUBLISHED or a complete schedule
+ok 51 - publisher lost acknowledgement never fabricates NOT_PUBLISHED or a complete schedule
+  ---
+  duration_ms: 1.951583
+  type: 'test'
+  ...
+# Subtest: queue retry is finite; security denials acknowledge without job work; errors preserve uncertainty
+ok 52 - queue retry is finite; security denials acknowledge without job work; errors preserve uncertainty
+  ---
+  duration_ms: 0.220625
+  type: 'test'
+  ...
+# Subtest: only Certification manifest registers one private consumer; base Production manifest unchanged; pinned SDK
+ok 53 - only Certification manifest registers one private consumer; base Production manifest unchanged; pinned SDK
+  ---
+  duration_ms: 6.654625
+  type: 'test'
+  ...
+# Subtest: shared derived adapter reuses the existing engines with deterministic fingerprints
+ok 54 - shared derived adapter reuses the existing engines with deterministic fingerprints
+  ---
+  duration_ms: 24.021417
+  type: 'test'
+  ...
+# Subtest: an in-flight hole revision invalidates Storylines but not official-result Momentum
+ok 55 - an in-flight hole revision invalidates Storylines but not official-result Momentum
+  ---
+  duration_ms: 1.052708
+  type: 'test'
+  ...
+# Subtest: an official result transition changes the Momentum dependency and output
+ok 56 - an official result transition changes the Momentum dependency and output
+  ---
+  duration_ms: 0.867917
+  type: 'test'
+  ...
+# Subtest: claimed engine selection avoids recalculating unrelated derived engines
+ok 57 - claimed engine selection avoids recalculating unrelated derived engines
+  ---
+  duration_ms: 0.889875
+  type: 'test'
+  ...
+# Subtest: prepared Storylines persist semantic copy without time-relative labels
+ok 58 - prepared Storylines persist semantic copy without time-relative labels
+  ---
+  duration_ms: 0.422667
+  type: 'test'
+  ...
+# Subtest: the same authoritative state produces the same Storyline payload across wall-clock time
+ok 59 - the same authoritative state produces the same Storyline payload across wall-clock time
+  ---
+  duration_ms: 0.913417
+  type: 'test'
+  ...
+# Subtest: semantic Storylines exclude transport timestamps while recent clinches retain expiry
+ok 60 - semantic Storylines exclude transport timestamps while recent clinches retain expiry
+  ---
+  duration_ms: 0.421458
+  type: 'test'
+  ...
+# Subtest: read-time expiry removes a prepared recent-clinch story without recalculating the engine
+ok 61 - read-time expiry removes a prepared recent-clinch story without recalculating the engine
+  ---
+  duration_ms: 0.206541
+  type: 'test'
+  ...
+# Subtest: derived read marks an engine stale from its coalesced dependency job
+ok 62 - derived read marks an engine stale from its coalesced dependency job
+  ---
+  duration_ms: 0.236625
+  type: 'test'
+  ...
+# Subtest: Preview flags fail closed to application outside an isolated Preview deployment
+ok 63 - Preview flags fail closed to application outside an isolated Preview deployment
+  ---
+  duration_ms: 2.545958
+  type: 'test'
+  ...
+# Subtest: migration preserves restrictive RLS and event-driven coalesced jobs
+ok 64 - migration preserves restrictive RLS and event-driven coalesced jobs
+  ---
+  duration_ms: 4.155166
+  type: 'test'
+  ...
+# Subtest: participant reads consume prepared state and never calculate Storylines on Home
+ok 65 - participant reads consume prepared state and never calculate Storylines on Home
+  ---
+  duration_ms: 1.118
+  type: 'test'
+  ...
+# Subtest: secondary failures retain the core Home and Tournament payload with explicit unavailable state
+ok 66 - secondary failures retain the core Home and Tournament payload with explicit unavailable state
+  ---
+  duration_ms: 0.396542
+  type: 'test'
+  ...
+# Subtest: derived engines retain separate keys and deterministic payloads
+ok 67 - derived engines retain separate keys and deterministic payloads
+  ---
+  duration_ms: 2.892084
+  type: 'test'
+  ...
+# Subtest: final recap fails closed until 24 matches, complete cards, official result, and Final Results Odds
+ok 68 - final recap fails closed until 24 matches, complete cards, official result, and Final Results Odds
+  ---
+  duration_ms: 1.525792
+  type: 'test'
+  ...
+# Subtest: source flags are Preview-only and fail closed outside isolated Preview
+ok 69 - source flags are Preview-only and fail closed outside isolated Preview
+  ---
+  duration_ms: 3.010083
+  type: 'test'
+  ...
+# Subtest: migration is service-only and Final Recap is gated
+ok 70 - migration is service-only and Final Recap is gated
+  ---
+  duration_ms: 3.194291
+  type: 'test'
+  ...
+# Subtest: newest-source migration claims work and rejects superseded workers
+ok 71 - newest-source migration claims work and rejects superseded workers
+  ---
+  duration_ms: 0.680292
+  type: 'test'
+  ...
+1..71
+# tests 99
+# suites 0
+# pass 99
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 127718.400583

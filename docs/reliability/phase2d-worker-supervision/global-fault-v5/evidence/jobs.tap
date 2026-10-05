@@ -1,0 +1,47 @@
+TAP version 13
+# Subtest: unchanged job faults, natural leases, supersession and concurrent native-consumer model
+    # Subtest: job transient fault uses canonical backoff and preserves attempts across fresh consumer processes
+    ok 1 - job transient fault uses canonical backoff and preserves attempts across fresh consumer processes
+      ---
+      duration_ms: 26261.048833
+      type: 'test'
+      ...
+    # Subtest: terminal job fault creates real dead letter; certified Director recovery advances cycle and retains attempt history
+    ok 2 - terminal job fault creates real dead letter; certified Director recovery advances cycle and retains attempt history
+      ---
+      duration_ms: 22914.794875
+      type: 'test'
+      ...
+    # Subtest: real disappearance retains 90-second lease; early independent tick cannot steal; natural expiry safely reclaims
+    ok 3 - real disappearance retains 90-second lease; early independent tick cannot steal; natural expiry safely reclaims
+      ---
+      duration_ms: 188968.146417
+      type: 'test'
+      ...
+    # Subtest: held old claim rejects a lawful scoring-lock source revision; current cycle drains without preparation or financial demand
+    ok 4 - held old claim rejects a lawful scoring-lock source revision; current cycle drains without preparation or financial demand
+      ---
+      duration_ms: 24117.051333
+      type: 'test'
+      ...
+    # Subtest: two slots, same reservation contention, out-of-order and duplicate deliveries retain one canonical owner/output
+    ok 5 - two slots, same reservation contention, out-of-order and duplicate deliveries retain one canonical owner/output
+      ---
+      duration_ms: 22200.706166
+      type: 'test'
+      ...
+    1..5
+ok 1 - unchanged job faults, natural leases, supersession and concurrent native-consumer model
+  ---
+  duration_ms: 295607.659708
+  type: 'test'
+  ...
+1..1
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 295750.405542

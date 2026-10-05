@@ -1,0 +1,27 @@
+{
+  "hosted": false,
+  "postgres": 17,
+  "safeupdate": true,
+  "adapterFactory": false,
+  "cases": [
+    {
+      "name": "three bounded transient ticks persist counts 1/2/3, HALT, deny ordinary delivery and require owner correction",
+      "result": "PASS"
+    },
+    {
+      "name": "fixed deterministic global tick HALTS immediately; owner RESUME only after cause correction",
+      "result": "PASS"
+    },
+    {
+      "name": "real canonical outputs commit before outward ACK loss; UNKNOWN/redelivery and natural reconciliation preserve one result",
+      "result": "PASS"
+    }
+  ],
+  "lostAck": {
+    "outward": "LOST",
+    "ledger": "UNKNOWN -> TICK_RECORDED_JOB_STATE_RECONCILED",
+    "realOutputs": 4,
+    "reservationConsumes": 1,
+    "naturalReconciliation": true
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "lib/certification-queue-errors.js": "3c889de82c9a97bfac1f2479bf7dc9cc85aaf8c853c6e19b7b2ea2de8b216eb3",
+  "lib/certification-worker-supervision.js": "916cef646b1f141399c6784d96b16e08fac0f372b1b4a3770c36b439fccc34b0",
+  "supabase/production_incremental/certification-queue-global-fault-v5.sql": "d1ea7b42d733a33b7b8ec5936ac9b5517497512d03e602061fed6ab0dab2366a",
+  "test/certification-global-fault-jobs.integration.test.mjs": "740d7d10dbd10fbfa8c005a71091aee578c3900f5a090a2cb6ea594952804d27",
+  "test/certification-global-fault-protocol.test.mjs": "2316a895fb4b0e782ea858716ef524ff528e83c543789c7e9403fa236e9d07a5",
+  "test/certification-global-fault-recovery.integration.test.mjs": "cf52b1e390996f621d2d196bda528322a320316dc703b639ba18d92f3664b754",
+  "test/certification-global-fault.integration.test.mjs": "d7222b0af2eaa55351adbe1b05bfcd22ccf1f8fab1171eac2e9f69815edf45de",
+  "test/certification-queue-publisher.test.mjs": "febaedde14c2d3b83e651bbd9cdb6e1703befaf37eda10d57a45b757c1f75189",
+  "test/support/reliability/certification-global-fault-fixture.mjs": "aeddf6e0e6974e4dfd881c24b19780589823d00543f8675b78649bf727a8ee0c",
+  "test/support/reliability/certification-global-fault-process.mjs": "585a91c4d98fe32c094fe358362a29d9bdab5c8f9a22d3eddf1cf31e5fb0c27f",
+  "test/support/reliability/certification-supervisor-child.mjs": "d73013ae053f030de819bdc802ee4f7869b56eaea597280cbb5afe4682ab3862",
+  "tools/reliability/certification-queue-control.mjs": "31f261e404f6a97ae18287d3b768d98742002d040d81f3bf612c6bea68c6986a",
+  "tools/reliability/certify-global-fault.mjs": "4f9a5e837d3f6e28f0c621d6e633c3edc1b5b251f5831ba695242d09df0007bb"
+}

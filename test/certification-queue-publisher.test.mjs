@@ -33,12 +33,16 @@ test('publisher body cannot select topic, resource, message, delay or transport'
    {method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(base)}),{env:f.env,dependencies:f.dependencies,createSend:()=>assert.fail()}));
  }finally{await destroyIsolatedCluster(f.cluster);}
 });
-test('private consumer route, worker engine and retired HTTP route stay byte-identical; CLI remains retired',async()=>{
+test('private consumer, worker engine, job-fault transport and retired HTTP route stay byte-identical; CLI remains retired',async()=>{
  const {execFileSync}=await import('node:child_process');
- // Queue control/error translation is explicitly corrected in v4. The native
- // route and existing worker engine still retain their reviewed exact bytes.
- for(const file of ['lib/certification-worker-supervision.js','lib/score-derived-worker.js','app/api/internal/derived-worker/queue/route.js','app/api/internal/derived-worker/run/route.js'])
+ // v5 extends only bounded supervisor orchestration with canonical global
+ // fault controls. Native consumer, worker and existing job faults are reused.
+ for(const file of ['lib/score-derived-worker.js','app/api/internal/derived-worker/queue/route.js','app/api/internal/derived-worker/run/route.js'])
   assert.equal(await readFile(file,'utf8'),execFileSync('git',['show','71d6a393:'+file],{encoding:'utf8'}));
+ const runtime=await readFile('lib/certification-worker-supervision.js','utf8');
+ const original=execFileSync('git',['show','71d6a393:lib/certification-worker-supervision.js'],{encoding:'utf8'});
+ const jobTransport=s=>s.slice(s.indexOf('export function createSupervisorFaultTransport'),s.indexOf('export async function handleSupervisorRequest'));
+ assert.equal(jobTransport(runtime),jobTransport(original));
  const tool=await readFile('tools/reliability/certification-queue-control.mjs','utf8');assert.doesNotMatch(tool,/new QueueClient|from '@vercel\/queue'/);
  assert.match(tool,/x-vercel-trusted-oidc-idp-token/);
  // No additional package is needed: the existing pinned Queue SDK and lock

@@ -1,0 +1,49 @@
+{
+  "hosted": false,
+  "postgres": 17,
+  "safeupdate": true,
+  "realChildren": true,
+  "adapterFactory": false,
+  "cases": [
+    {
+      "name": "job transient fault uses canonical backoff and preserves attempts across fresh consumer processes",
+      "result": "PASS"
+    },
+    {
+      "name": "terminal job fault creates real dead letter; certified Director recovery advances cycle and retains attempt history",
+      "result": "PASS"
+    },
+    {
+      "name": "real disappearance retains 90-second lease; early independent tick cannot steal; natural expiry safely reclaims",
+      "result": "PASS"
+    },
+    {
+      "name": "held old claim rejects a lawful scoring-lock source revision; current cycle drains without preparation or financial demand",
+      "result": "PASS"
+    },
+    {
+      "name": "two slots, same reservation contention, out-of-order and duplicate deliveries retain one canonical owner/output",
+      "result": "PASS"
+    }
+  ],
+  "terminal": {
+    "attempt": 1,
+    "error": "TERMINAL",
+    "historyRetained": true,
+    "recovery": "DIRECTOR.REQUEUE_DERIVED"
+  },
+  "lease": {
+    "seconds": 90,
+    "natural": true,
+    "manualTimestampWrites": 0,
+    "earlySteal": false,
+    "attempts": 2
+  },
+  "supersession": {
+    "oldCycle": 5,
+    "currentCycle": 6,
+    "oldOutputCreated": false,
+    "preparation": false,
+    "auctionRevision": 2
+  }
+}

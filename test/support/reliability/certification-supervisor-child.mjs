@@ -20,7 +20,7 @@ process.once('message',async data=>{
  if(data.queueEntry){
   try{const result=await consumeCertificationQueueMessage(data.queueEntry.message,{topicName:QUEUE_TOPIC,messageId:'msg_local_child',deliveryCount:1},
    {env:data.env,dependencies:{registrationManifest:data.registrationManifest,fetchImpl}});process.send({status:200,result});}
-  catch(error){process.send({status:error.status||503,result:{code:error.code||'LOCAL_CHILD_UNAVAILABLE'}});}
+  catch(error){process.send({status:error.status||503,result:{code:error.code||'LOCAL_CHILD_UNAVAILABLE',queueDisposition:error.queueDisposition||null}});}
   process.disconnect();return;
  }
  const response=await handleSupervisorRequest(new Request(data.ticket.origin+SUPERVISOR_PATH,{method:'POST',

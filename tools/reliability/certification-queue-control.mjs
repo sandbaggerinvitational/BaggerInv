@@ -20,8 +20,8 @@ export async function startAndPublishOwnerQueue({owner,input,createSend}) {
 // TLS. Fixed project/role; no SQL or physical target supplied by runtime clients.
 async function main(){
  const [action,directory,execute]=process.argv.slice(2);
- if(!['start','publish','stop','status','reconcile'].includes(action)||!directory||execute!=='--execute'){
-  console.log(JSON.stringify({executed:false,usage:'<start|publish|stop|status|reconcile> <owner-directory> --execute',hostedAuthorizationRequired:true}));return;
+ if(!['start','start-only','arm-global','correct-global','publish','stop','status','reconcile'].includes(action)||!directory||execute!=='--execute'){
+  console.log(JSON.stringify({executed:false,usage:'<start|start-only|arm-global|correct-global|publish|stop|status|reconcile> <owner-directory> --execute',hostedAuthorizationRequired:true}));return;
  }
  const dir=path.resolve(directory),bound=JSON.parse(await readFile(path.join(dir,'binding.json'),'utf8'));
  validateOwnerQueueBatch({binding:bound,messages:[]});
@@ -29,7 +29,7 @@ async function main(){
  const privateRead=async file=>{const s=await stat(file);if(s.mode&0o077||s.uid!==process.getuid())fail('SUPERVISOR_LOCAL_CREDENTIAL_CUSTODY_DENIED');return(await readFile(file,'utf8')).trim();};
  const password=await privateRead(passwordFile);
  const owner=async(name,input={})=>{
-  const fn={control:'worker_supervisor_control_v1',publication:'worker_supervisor_queue_publication_v2',status:'worker_supervisor_status_v1',reconcile:'worker_supervisor_reconcile_v1',permit:'worker_supervisor_publisher_permit_v3'}[name];
+  const fn={control:'worker_supervisor_control_v1',publication:'worker_supervisor_queue_publication_v2',status:'worker_supervisor_status_v1',reconcile:'worker_supervisor_reconcile_v1',permit:'worker_supervisor_publisher_permit_v3',global_fault:'worker_supervisor_global_fault_control_v5'}[name];
   if(!fn)fail('SUPERVISOR_OWNER_OPERATION_DENIED');
   const json=JSON.stringify({...bound,...input}).replaceAll("'","''");
   const run=spawnSync('psql',['-X','-qAt','-v','ON_ERROR_STOP=1','-h','db.trmcwrljjxwhgtikfdgu.supabase.co','-U','postgres','-d','postgres'],
@@ -40,6 +40,17 @@ async function main(){
  };
  if(action==='status'||action==='reconcile'){console.log(JSON.stringify(await owner(action)));return;}
  if(action==='stop'){const input=JSON.parse(await readFile(path.join(dir,'control.json'),'utf8'));if(input.action!=='STOP')fail('SUPERVISOR_CONTROL_FILE_DENIED');console.log(JSON.stringify(await owner('control',input)));return;}
+ if(action==='arm-global'||action==='correct-global'){
+  const input=JSON.parse(await readFile(path.join(dir,'global-fault.json'),'utf8'));
+  if(input.action!==(action==='arm-global'?'ARM':'CORRECT'))fail('SUPERVISOR_CONTROL_FILE_DENIED');
+  // SQL rejects all extra fields and derives target reservations itself.
+  console.log(JSON.stringify(await owner('global_fault',input)));return;
+ }
+ if(action==='start-only'){
+  const input=JSON.parse(await readFile(path.join(dir,'control.json'),'utf8'));
+  if(!['START','RESUME'].includes(input.action))fail('SUPERVISOR_CONTROL_FILE_DENIED');
+  console.log(JSON.stringify({start_committed:true,publication_requested:false,start:await owner('control',input)}));return;
+ }
  // This development token is ONLY Deployment Protection self-access. It is
  // never given to QueueClient; the Preview Function obtains its own OIDC token.
  const token=await privateRead(tokenFile);let committed=null;

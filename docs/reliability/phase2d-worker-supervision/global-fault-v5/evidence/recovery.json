@@ -1,0 +1,37 @@
+{
+  "mode": "recovery",
+  "startedAt": "2026-10-05T19:30:05.078Z",
+  "completedAt": "2026-10-05T19:35:45.820Z",
+  "hosted": false,
+  "remoteSocketsDenied": true,
+  "realCredentialsRemoved": true,
+  "counts": {
+    "tests": 4,
+    "pass": 4,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "failures": [],
+  "newFailures": [],
+  "establishedFailures": [],
+  "exitCode": 0,
+  "error": null,
+  "sourceStable": true,
+  "sourceManifest": {
+    "lib/certification-queue-errors.js": "3c889de82c9a97bfac1f2479bf7dc9cc85aaf8c853c6e19b7b2ea2de8b216eb3",
+    "lib/certification-queue-supervision.js": "9feb605f0723626bbdfce001728197cc11d2532fe2ecd17053a7ff6df089e059",
+    "lib/certification-queue-publisher.js": "09255de063631fb17b1d8a4076d563a7ae4682749e345be2c0bd24e1532e99c0",
+    "supabase/production_incremental/certification-queue-global-fault-v5.sql": "d1ea7b42d733a33b7b8ec5936ac9b5517497512d03e602061fed6ab0dab2366a",
+    "tools/reliability/certification-queue-control.mjs": "31f261e404f6a97ae18287d3b768d98742002d040d81f3bf612c6bea68c6986a",
+    "lib/certification-worker-supervision.js": "916cef646b1f141399c6784d96b16e08fac0f372b1b4a3770c36b439fccc34b0",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "app/api/internal/derived-worker/queue/route.js": "442cc0011afb872fda767dbe7e0a63809476b7933ae369bf8b7cd63645233e7b",
+    "test/support/reliability/pg-safeupdate/safeupdate.c": "1351fc18b9a1e2dcc72185d349c178244458b5d9eb30007609c3d599b38aeb38",
+    "package.json": "02ca2154f932c5c5bacd6d52ddd4eec023c422b7e46e44d6ec0d35dc54b7826f",
+    "package-lock.json": "abf89699407983d173e997f62aa1083e8ae5cd34b81f33904ebba9744d318d43"
+  },
+  "rawSha256": "53e9e727df41a769e210eb256a62cfff3692550cb0f577fbb6eeba10d3feae2f",
+  "head": "ef20ef18299e49b25a4e04b0575287420b9a89d7"
+}

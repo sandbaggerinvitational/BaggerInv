@@ -1,0 +1,35 @@
+TAP version 13
+# Subtest: canonical global failures and outward lost ACK through independent private consumers
+    # Subtest: three bounded transient ticks persist counts 1/2/3, HALT, deny ordinary delivery and require owner correction
+    ok 1 - three bounded transient ticks persist counts 1/2/3, HALT, deny ordinary delivery and require owner correction
+      ---
+      duration_ms: 141767.8
+      type: 'test'
+      ...
+    # Subtest: fixed deterministic global tick HALTS immediately; owner RESUME only after cause correction
+    ok 2 - fixed deterministic global tick HALTS immediately; owner RESUME only after cause correction
+      ---
+      duration_ms: 21894.7375
+      type: 'test'
+      ...
+    # Subtest: real canonical outputs commit before outward ACK loss; UNKNOWN/redelivery and natural reconciliation preserve one result
+    ok 3 - real canonical outputs commit before outward ACK loss; UNKNOWN/redelivery and natural reconciliation preserve one result
+      ---
+      duration_ms: 160863.529375
+      type: 'test'
+      ...
+    1..3
+ok 1 - canonical global failures and outward lost ACK through independent private consumers
+  ---
+  duration_ms: 340424.0735
+  type: 'test'
+  ...
+1..1
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 340626.114625
