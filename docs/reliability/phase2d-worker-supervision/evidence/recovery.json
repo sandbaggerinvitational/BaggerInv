@@ -1,0 +1,47 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "hosted": false,
+  "cases": [
+    {
+      "name": "supported fixed synthetic producer creates real new source cycles while leaving all four jobs for autonomous discovery",
+      "result": "PASS"
+    },
+    {
+      "name": "one-use transient claim fault follows normal durable retry/backoff without attempt reset",
+      "result": "PASS"
+    },
+    {
+      "name": "fresh server invocation after real backoff succeeds; durable job attempt history persists",
+      "result": "PASS"
+    },
+    {
+      "name": "Intelligence fault binds the real bundle engine and claim timestamp; normal durable retry drains the bundle",
+      "result": "PASS"
+    },
+    {
+      "name": "lost completion acknowledgement preserves actual committed output, current truth and no duplicate result",
+      "result": "PASS"
+    },
+    {
+      "name": "terminal fault records real dead letter and HALTED; existing Director cause-corrected requeue retains evidence",
+      "result": "PASS"
+    },
+    {
+      "name": "two-slot Certification contention uses canonical claim CAS with no duplicate current result",
+      "result": "PASS"
+    },
+    {
+      "name": "durable global transient failures accumulate across processes; third unsuccessful invocation HALTS without restarting",
+      "result": "PASS"
+    },
+    {
+      "name": "STOP is durable across independent status/dispatch calls and preserves canonical outcomes",
+      "result": "PASS"
+    }
+  ],
+  "lostAck": {
+    "canonicalOutcome": "SUCCEEDED",
+    "callerOutcome": "JOB_RETRY"
+  },
+  "globalFailurePolicy": "THREE_FAILED_INVOCATIONS_HALT_BEFORE_FIVE_TICK_CEILING"
+}

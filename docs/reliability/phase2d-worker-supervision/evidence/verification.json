@@ -1,0 +1,99 @@
+{
+  "result": "PASS_LOCAL_CANDIDATE_ONLY",
+  "baseSha": "a4bb57b1067fa7c50c8120c6fe5778378827a221",
+  "executionEnvironment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "hostedMutated": false,
+  "deployed": false,
+  "workersStartedHosted": false,
+  "focused": {
+    "tests": 114,
+    "pass": 114,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "focusedResult": "PASS",
+  "broadRegression": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "broadAccounting": "ACCEPTED_BASELINE_EXACT_MATCH",
+  "newUnexplainedFailures": 0,
+  "build": "PASS",
+  "buildDeltaAfterExecution": [
+    "test/certification-worker-supervision-recovery.integration.test.mjs"
+  ],
+  "buildDeltaImpact": "Test assertion only; no compilation input changed",
+  "broadDeltaAfterExecution": [
+    "supabase/production_incremental/certification-worker-supervision-v1.sql",
+    "tools/reliability/run-worker-supervision-tests.mjs",
+    "test/certification-worker-supervision-recovery.integration.test.mjs",
+    "test/certification-worker-supervision-crash.integration.test.mjs"
+  ],
+  "broadDeltaImpact": "New private add-on SQL and its focused tests/runner only. Shipping library/endpoint and all existing tracked runtime/bootstrap/config files unchanged.",
+  "sourceManifest": {
+    "lib/certification-worker-supervision.js": "081de110333e846e5618dcbf77b7a31ef97c78b466060126b3eb8d7f994dd041",
+    "app/api/internal/derived-worker/run/route.js": "ef3cdfabe277594f33cf33aeebe8fa724fe26e3c4a47320ab587a0c29dab54b5",
+    "supabase/production_incremental/certification-worker-supervision-v1.sql": "17a2b3af3663345df096ce6c97cc1a109a9c608857b38524179ac4a25707fa02",
+    "tools/reliability/certification-worker-demand.mjs": "6ad187cfdc11ec2427cae4689964e7cc40665bb25fd8ce87a77a899ea1937f08",
+    "tools/reliability/run-worker-supervision-tests.mjs": "4284dae9be40c25c42914f0abdb046e74cc832b1e03532097ccbe22c9670cd31",
+    "test/certification-worker-supervision.test.mjs": "3af1b692830fafd5065d9f9f8c4526adc1cb42b566804e7b6e6f60659703429a",
+    "test/certification-worker-supervision-boundary.integration.test.mjs": "2c9ad7437f9781b7f6ff7e1e7bdead3181377754ea90f78159c323af8157bd08",
+    "test/certification-worker-supervision.integration.test.mjs": "fa4dc5376fa4e15970a6174713189f17277b0056fc81bd8a4171a34fe536f67a",
+    "test/certification-worker-supervision-recovery.integration.test.mjs": "b2d90f3beb4e2414488b5b075fee40b1c0540fbed6862bcf4370a1630abe54f0",
+    "test/certification-worker-supervision-crash.integration.test.mjs": "049507099d46306b6dfa9bb77baf35633fdcd396812c307357063847117963ae",
+    "test/support/reliability/certification-supervisor-fixture.mjs": "6c54ab11eaec8709e31e3adbdca79e9a5606c530ba5add7af7948af28a9ce22f",
+    "test/support/reliability/certification-supervisor-child.mjs": "522bf2bbeb556618f6e5830287ccbb4438ea6a5cc16a8a6141615a4e5d6fee44",
+    "lib/score-derived-worker.js": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "lib/certification-worker-adapter.js": "33f6c84b25c6cf36a149038700892482f05baeaa9ed7cf4f86c54dfb08f6435e",
+    "config/certification-resource-registration.json": "5aa847d4557e5048496eb6e75f2cf20cdeef10f73dbf1fb85b3f7fd5eaae3b0e",
+    "supabase/canonical_bootstrap/schema.sql": "7c371dc677c6b5ff244dcce68a71674482c6f500d814371517fd6f0fa2dabf42",
+    "supabase/canonical_bootstrap/static-contracts.sql": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d",
+    "supabase/canonical_bootstrap/manifest.json": "1d0d576e21cc48160bcbe82a56d4bc3a81adbc13032145296f1c0d6baa9ae4b2",
+    "supabase/canonical_bootstrap/catalog.sql": "95b4994868868dc2d775bb438b2dce93d3ca608aac6a416d8d60550abf3f8db5",
+    "supabase/canonical_bootstrap/catalog-manifest.json": "b764e284667b8117764aa11500414cdb3f800b3b4cda20d08297538fcf882a74"
+  },
+  "logs": {
+    "focused": {
+      "file": "focused.tap.gz",
+      "rawSha256": "75d99e976bf8e34ee500ba327956d21a694aaa13e6907d511b049171fc86c03c",
+      "gzipSha256": "0276e41839af66fb0f395d0b6b40c9669df3d0ea10d513aa592fab7a2803c92a"
+    },
+    "application": {
+      "file": "application.tap.gz",
+      "rawSha256": "b91348b3e4014ca09b3fa6187c753a9f862680d93b7586f44d8bfb240e48f339",
+      "gzipSha256": "95f8dc93d3b31ec05458b3249bf97f693e1a6ce5cee1b7ff3106ce01bbf8719f"
+    },
+    "build": {
+      "file": "build.tap.gz",
+      "rawSha256": "5a45ce8645fed77ce9007fab8b3dcf46ea84075b3736a9db89a96a5806391bdb",
+      "gzipSha256": "936410c45e8dd2d764731771532fa829050cde947b12a92b601eaae4bad5c3b2"
+    }
+  },
+  "proofLimitations": [
+    "Real pg_cron/pg_net/Vault/protection/60-second Vercel termination remain hosted acceptance gates",
+    "No hosted provider configuration/readback or autonomy claimed",
+    "Primary FINAL scorecard preservation must be compared during next hosted minimal-producer proof"
+  ],
+  "security": {
+    "defaultOff": true,
+    "fixedResource": true,
+    "exactReleaseDeployment": true,
+    "ownerControlsOnly": true,
+    "signatureReservationReplayDenied": true,
+    "clientsDenied": true,
+    "existingRlsUnchanged": true,
+    "roleExpansion": false,
+    "privateCoreAclUnchanged": true,
+    "existingEngineUnchanged": true,
+    "productionAbsent": true,
+    "googleAbsent": true
+  },
+  "864HoleRerun": false,
+  "864HoleReason": "No scoring/domain semantics or canonical claim/calculation code changed",
+  "readyForOwnerHostedAuthorization": true
+}

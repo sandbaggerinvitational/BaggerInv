@@ -1,0 +1,25 @@
+{
+  "hosted": false,
+  "cases": [
+    {
+      "name": "forward replay rejects unexpected private function drift atomically; original restored definition still replays",
+      "result": "PASS"
+    },
+    {
+      "name": "unsafe provider queue ACL blocks dispatch before any reservation or credential-bearing HTTP request commits",
+      "result": "PASS"
+    },
+    {
+      "name": "recorded reservation expires at the unchanged 30-second deadline; service transport cannot revive it",
+      "result": "PASS"
+    },
+    {
+      "name": "single-use BEGIN, invalid run token and stale step sequence cannot execute worker control",
+      "result": "PASS"
+    },
+    {
+      "name": "real owner release rebind latches stored target HALTED; no old-deployment retry/dispatch or implicit restart",
+      "result": "PASS"
+    }
+  ]
+}

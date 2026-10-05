@@ -1,0 +1,48 @@
+{
+  "environment": "OWNED_SOCKET_ONLY_POSTGRESQL17",
+  "hostedMutated": false,
+  "cases": [
+    {
+      "name": "forward fresh add-on and replay preserve all existing function definitions/ACL/RLS/owners/security/receipt",
+      "result": "PASS"
+    },
+    {
+      "name": "default OFF: scheduler does not enqueue an HTTP request or poll work",
+      "result": "PASS"
+    },
+    {
+      "name": "START is owner-only and does not enable scoring/Director/ingress",
+      "result": "PASS"
+    },
+    {
+      "name": "truthful minimal canonical prepare creates required four jobs without a shipping after-hook",
+      "result": "PASS"
+    },
+    {
+      "name": "private scheduler reserves a single signed immutable target, one normal slot",
+      "result": "PASS"
+    },
+    {
+      "name": "signed endpoint autonomously discovers/claims/processes/acknowledges all four engines using existing worker",
+      "result": "PASS"
+    },
+    {
+      "name": "ticket replay, wrong signature, arbitrary fields, signed-out/ordinary clients deny before executing",
+      "result": "PASS"
+    },
+    {
+      "name": "owner-only controls and private cores deny anon/authenticated/service_role; narrow wrapper cannot START",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong resource/project/deployment/release and Production-shaped environment deny before worker selection",
+      "result": "PASS"
+    },
+    {
+      "name": "STOP prevents future reservations; reads/status remain sanitized and no domain side effects",
+      "result": "PASS"
+    }
+  ],
+  "outboundNetwork": 0,
+  "autonomousPath": "SIGNED_ENDPOINT -> EXISTING_NODE_WORKER -> ACTUAL_CANONICAL_RPC"
+}

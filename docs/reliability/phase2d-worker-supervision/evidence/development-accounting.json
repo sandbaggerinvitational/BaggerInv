@@ -1,0 +1,37 @@
+{
+  "hosted": false,
+  "resolvedOnly": true,
+  "unresolvedFailures": 0,
+  "developmentCorrections": [
+    {
+      "class": "new_supervisor_integration",
+      "finding": "Frozen 2026 claims use timestamp/cycle CAS; explicit claimed_by/token fields are not authoritative for this fixture.",
+      "resolution": "Read actual canonical claim receipts and bind real claim tuples."
+    },
+    {
+      "class": "new_supervisor_integration",
+      "finding": "Fault binding and transport must preserve lost acknowledgement and terminal classification without changing processor logic.",
+      "resolution": "Pre-write one-use plan; drop only real successful completion response; fixed typed terminal response."
+    },
+    {
+      "class": "new_supervisor_boundary",
+      "finding": "STOP could otherwise clear the visible halt state; a stored old release target must not be retried.",
+      "resolution": "Durable halt latch; cause-corrected owner RESUME; stale dispatcher target halts."
+    },
+    {
+      "class": "new_supervisor_integration",
+      "finding": "Intelligence completion carries bundled engine/claim timestamps, unlike Competition.",
+      "resolution": "Match exact Competition engine or exact Intelligence bundle entry; wrong-engine plan consumption denied."
+    },
+    {
+      "class": "test_setup",
+      "finding": "Canonical requeue/envelope shapes and error assertions must match their existing contracts.",
+      "resolution": "Corrected request IDs, resource envelope fields and typed assertions; no canonical change."
+    },
+    {
+      "class": "test_setup",
+      "finding": "Supersession harness tried START after a correctly terminal stale completion; Intelligence retry harness expected FAILED.",
+      "resolution": "Require explicit owner RESUME after cause correction; assert canonical PENDING with durable retry/backoff."
+    }
+  ]
+}
