@@ -1,0 +1,487 @@
+   ▲ Next.js 15.5.18
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 4.6s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/19) ...
+   Generating static pages (4/19) 
+   Generating static pages (9/19) 
+   Generating static pages (14/19) 
+ ✓ Generating static pages (19/19)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                                           Size  First Load JS
+┌ ƒ /                                                              4.42 kB         115 kB
+├ ○ /_not-found                                                       1 kB         104 kB
+├ ○ /activate                                                      1.93 kB         108 kB
+├ ƒ /admin                                                         24.5 kB         141 kB
+├ ○ /admin/data-health                                               479 B         103 kB
+├ ƒ /admin/director                                                 127 kB         279 kB
+├ ƒ /admin/director/completed-history                              2.05 kB         113 kB
+├ ƒ /admin/director/game-center-readiness                            411 B         152 kB
+├ ƒ /admin/live-matches                                              479 B         103 kB
+├ ○ /admin/publish-odds                                              479 B         103 kB
+├ ƒ /admin/source-audit                                            1.01 kB         104 kB
+├ ƒ /admin/step11-6-production-google-writer-fence                 6.51 kB         114 kB
+├ ƒ /admin/step12-production-google-writer-provider-fence          5.24 kB         112 kB
+├ ƒ /admin/tournament-guide                                          479 B         103 kB
+├ ƒ /api/admin/cms                                                   479 B         103 kB
+├ ƒ /api/admin/data-authority-certification                          479 B         103 kB
+├ ƒ /api/admin/draft-projection                                      479 B         103 kB
+├ ƒ /api/admin/production-calcutta-v1                                479 B         103 kB
+├ ƒ /api/admin/production-director-synchronization                   479 B         103 kB
+├ ƒ /api/admin/production-maintenance-precommit-deployment-rebind    479 B         103 kB
+├ ƒ /api/admin/production-net-skins-v1                               479 B         103 kB
+├ ƒ /api/admin/production-odds-calculations                          479 B         103 kB
+├ ƒ /api/admin/scorecard-calibration                                 479 B         103 kB
+├ ƒ /api/admin/session                                               479 B         103 kB
+├ ƒ /api/admin/step11-6-production-google-writer-fence               479 B         103 kB
+├ ƒ /api/admin/step11-production-google-certificate                  479 B         103 kB
+├ ƒ /api/admin/step11-production-google-metadata                     479 B         103 kB
+├ ƒ /api/admin/step11-scoring-rehearsal                              479 B         103 kB
+├ ƒ /api/admin/tournament                                            479 B         103 kB
+├ ƒ /api/admin/war-room-calculation-parity                           479 B         103 kB
+├ ƒ /api/admin/war-room-input-parity                                 479 B         103 kB
+├ ƒ /api/auth/hooks/send-sms                                         479 B         103 kB
+├ ƒ /api/captains-briefing                                           479 B         103 kB
+├ ƒ /api/cron/account-deletion                                       479 B         103 kB
+├ ƒ /api/cron/future-match-google-compatibility                      479 B         103 kB
+├ ƒ /api/cron/guide-sync                                             479 B         103 kB
+├ ƒ /api/cron/guide-sync/diagnostics                                 479 B         103 kB
+├ ƒ /api/cron/round-scorecards-archive                               479 B         103 kB
+├ ƒ /api/cron/scoring-google-outbox                                  479 B         103 kB
+├ ƒ /api/director                                                    479 B         103 kB
+├ ƒ /api/director/access                                             479 B         103 kB
+├ ƒ /api/director/canonical-odds                                     479 B         103 kB
+├ ƒ /api/director/canonical-operations                               479 B         103 kB
+├ ƒ /api/director/canonical-overview                                 479 B         103 kB
+├ ƒ /api/director/completed-history                                  479 B         103 kB
+├ ƒ /api/director/draft                                              479 B         103 kB
+├ ƒ /api/director/entitlement                                        479 B         103 kB
+├ ƒ /api/director/future-tournaments                                 479 B         103 kB
+├ ƒ /api/director/future-tournaments/google-writer                   479 B         103 kB
+├ ƒ /api/director/guide                                              479 B         103 kB
+├ ƒ /api/director/guide-content                                      479 B         103 kB
+├ ƒ /api/director/handicaps                                          479 B         103 kB
+├ ƒ /api/director/identity-shadow-diagnostics                        479 B         103 kB
+├ ƒ /api/director/impersonation                                      479 B         103 kB
+├ ƒ /api/director/net-skins-entries                                  479 B         103 kB
+├ ƒ /api/director/notifications/sandbox                              479 B         103 kB
+├ ƒ /api/director/odds-publication                                   479 B         103 kB
+├ ƒ /api/director/participant-identity                               479 B         103 kB
+├ ƒ /api/director/players-access                                     479 B         103 kB
+├ ƒ /api/director/prediction-settings                                479 B         103 kB
+├ ƒ /api/director/production-overview                                479 B         103 kB
+├ ƒ /api/director/reset-preview                                      479 B         103 kB
+├ ƒ /api/director/round-scoring                                      479 B         103 kB
+├ ƒ /api/director/scoring-authority                                  479 B         103 kB
+├ ƒ /api/director/scoring-shadow                                     479 B         103 kB
+├ ƒ /api/director/scoring-shadow/benchmark                           479 B         103 kB
+├ ƒ /api/director/scoring-shadow/phase2-dry-run                      479 B         103 kB
+├ ƒ /api/director/tournament-awards                                  479 B         103 kB
+├ ƒ /api/director/tournament-setup                                   479 B         103 kB
+├ ƒ /api/draft-analysis                                              479 B         103 kB
+├ ƒ /api/draft-analytics                                             479 B         103 kB
+├ ƒ /api/entry                                                       479 B         103 kB
+├ ƒ /api/game-center/[matchId]                                       479 B         103 kB
+├ ƒ /api/internal/derived-worker/publication                         479 B         103 kB
+├ ƒ /api/internal/derived-worker/queue                               479 B         103 kB
+├ ƒ /api/internal/derived-worker/run                                 479 B         103 kB
+├ ƒ /api/leaderboards/calcutta                                       479 B         103 kB
+├ ƒ /api/leaderboards/core                                           479 B         103 kB
+├ ƒ /api/leaderboards/insights                                       479 B         103 kB
+├ ƒ /api/leaderboards/net-skins                                      479 B         103 kB
+├ ƒ /api/live                                                        479 B         103 kB
+├ ƒ /api/live-matches                                                479 B         103 kB
+├ ƒ /api/mobile/v1/account/deletion                                  479 B         103 kB
+├ ƒ /api/mobile/v1/auth/captcha                                      479 B         103 kB
+├ ƒ /api/mobile/v1/auth/certification/renew                          479 B         103 kB
+├ ƒ /api/mobile/v1/auth/otp/certify                                  479 B         103 kB
+├ ƒ /api/mobile/v1/auth/otp/phone                                    479 B         103 kB
+├ ƒ /api/mobile/v1/auth/otp/request                                  479 B         103 kB
+├ ƒ /api/mobile/v1/calcutta                                          479 B         103 kB
+├ ƒ /api/mobile/v1/guide                                             479 B         103 kB
+├ ƒ /api/mobile/v1/health                                            479 B         103 kB
+├ ƒ /api/mobile/v1/history                                           479 B         103 kB
+├ ƒ /api/mobile/v1/history/[year]                                    479 B         103 kB
+├ ƒ /api/mobile/v1/leaders                                           479 B         103 kB
+├ ƒ /api/mobile/v1/matches                                           479 B         103 kB
+├ ƒ /api/mobile/v1/matches/[matchId]                                 479 B         103 kB
+├ ƒ /api/mobile/v1/net-skins                                         479 B         103 kB
+├ ƒ /api/mobile/v1/odds                                              479 B         103 kB
+├ ƒ /api/mobile/v1/passport                                          479 B         103 kB
+├ ƒ /api/mobile/v1/portrait-policy                                   479 B         103 kB
+├ ƒ /api/mobile/v1/records                                           479 B         103 kB
+├ ƒ /api/mobile/v1/schedule                                          479 B         103 kB
+├ ƒ /api/mobile/v1/scoring/current                                   479 B         103 kB
+├ ƒ /api/mobile/v1/scoring/finalize                                  479 B         103 kB
+├ ƒ /api/mobile/v1/scoring/hole                                      479 B         103 kB
+├ ƒ /api/mobile/v1/scoring/mutation-status                           479 B         103 kB
+├ ƒ /api/mobile/v1/session                                           479 B         103 kB
+├ ƒ /api/mobile/v1/today                                             479 B         103 kB
+├ ƒ /api/my-match                                                    479 B         103 kB
+├ ƒ /api/odds/calculations                                           479 B         103 kB
+├ ƒ /api/odds/inputs                                                 479 B         103 kB
+├ ƒ /api/odds/prediction-settings                                    479 B         103 kB
+├ ƒ /api/odds/publication-operations                                 479 B         103 kB
+├ ƒ /api/odds/publish                                                479 B         103 kB
+├ ƒ /api/odds/publish-preview                                        479 B         103 kB
+├ ƒ /api/participant/auth/diagnostics                                479 B         103 kB
+├ ƒ /api/participant/auth/otp/request                                479 B         103 kB
+├ ƒ /api/participant/auth/otp/verify                                 479 B         103 kB
+├ ƒ /api/participant/auth/phone                                      479 B         103 kB
+├ ƒ /api/participant/auth/phone-enrollment                           479 B         103 kB
+├ ƒ /api/participant/auth/phone-login-proof                          479 B         103 kB
+├ ƒ /api/participant/auth/session                                    479 B         103 kB
+├ ƒ /api/participant/context                                         479 B         103 kB
+├ ƒ /api/participant/home                                            479 B         103 kB
+├ ƒ /api/participant/tournament-guide                                479 B         103 kB
+├ ƒ /api/player-passport/activation                                  479 B         103 kB
+├ ƒ /api/player-passport/admin                                       479 B         103 kB
+├ ƒ /api/player-passport/initialize                                  479 B         103 kB
+├ ƒ /api/player-passport/matches                                     479 B         103 kB
+├ ƒ /api/player-passport/notifications                               479 B         103 kB
+├ ƒ /api/player-passport/readiness                                   479 B         103 kB
+├ ƒ /api/player-passport/session                                     479 B         103 kB
+├ ƒ /api/preview-environment                                         479 B         103 kB
+├ ƒ /api/preview-reliability                                         479 B         103 kB
+├ ƒ /api/scoring/access                                              479 B         103 kB
+├ ƒ /api/scoring/current                                             479 B         103 kB
+├ ƒ /api/scoring/diagnostics                                         479 B         103 kB
+├ ƒ /api/scoring/matches                                             479 B         103 kB
+├ ƒ /api/scoring/matches/[matchId]                                   479 B         103 kB
+├ ƒ /api/scoring/mutation-status                                     479 B         103 kB
+├ ƒ /api/scoring/session                                             479 B         103 kB
+├ ƒ /api/spectator/[resource]                                        479 B         103 kB
+├ ƒ /api/spectator/golf/[...path]                                    479 B         103 kB
+├ ƒ /api/tournament-guide                                            479 B         103 kB
+├ ƒ /api/tournament-guide/schema                                     479 B         103 kB
+├ ƒ /api/tournament/foundation                                       479 B         103 kB
+├ ƒ /api/tournament/live                                             479 B         103 kB
+├ ƒ /api/tournament/secondary                                        479 B         103 kB
+├ ○ /app                                                             479 B         103 kB
+├ ƒ /app/courses                                                     146 B         118 kB
+├ ƒ /app/courses/[courseId]                                        1.35 kB         118 kB
+├ ƒ /app/courses/[courseId]/holes/[holeNumber]                     4.39 kB         115 kB
+├ ƒ /app/guide                                                      4.2 kB         115 kB
+├ ƒ /app/guide/[section]                                             144 B         121 kB
+├ ƒ /app/history                                                     144 B         118 kB
+├ ƒ /app/history/[year]                                            2.71 kB         119 kB
+├ ƒ /app/history/[year]/round/[round]                                154 B         126 kB
+├ ƒ /app/history/[year]/team/[side]                                4.04 kB         125 kB
+├ ƒ /app/leaderboards                                                30 kB         146 kB
+├ ƒ /app/odds                                                        136 B         117 kB
+├ ƒ /app/players                                                     140 B         117 kB
+├ ƒ /app/players/[slug]                                              149 B         127 kB
+├ ƒ /app/tournament                                                  210 B         144 kB
+├ ○ /apple-icon.png                                                    0 B            0 B
+├ ƒ /board-of-governors                                              139 B         117 kB
+├ ƒ /champions                                                     6.54 kB         117 kB
+├ ƒ /champions/[year]                                              6.71 kB         118 kB
+├ ƒ /compare                                                       11.2 kB         122 kB
+├ ƒ /courses                                                         146 B         118 kB
+├ ƒ /courses/[courseId]                                            1.35 kB         118 kB
+├ ƒ /courses/[courseId]/holes/[holeNumber]                         4.39 kB         115 kB
+├ ƒ /data-health                                                     635 B         111 kB
+├ ƒ /draft                                                           911 B         118 kB
+├ ƒ /draft/[year]                                                    911 B         118 kB
+├ ƒ /draft/analytics                                               6.42 kB         123 kB
+├ ƒ /enter                                                         1.73 kB         105 kB
+├ ƒ /follow/[[...path]]                                            8.15 kB         117 kB
+├ ƒ /game-center/[matchId]                                         11.3 kB         118 kB
+├ ƒ /history                                                         144 B         118 kB
+├ ƒ /history/[year]                                                2.71 kB         119 kB
+├ ƒ /history/[year]/round/[round]                                    154 B         126 kB
+├ ƒ /history/[year]/team/[side]                                    4.04 kB         125 kB
+├ ƒ /home                                                          18.2 kB         137 kB
+├ ○ /icon.png                                                          0 B            0 B
+├ ƒ /live                                                            223 B         149 kB
+├ ○ /manifest.webmanifest                                            479 B         103 kB
+├ ƒ /me                                                            8.78 kB         115 kB
+├ ƒ /me/verify-mobile                                              2.92 kB         109 kB
+├ ƒ /my-match                                                        147 B         141 kB
+├ ƒ /odds-center                                                     136 B         117 kB
+├ ○ /odds-center/admin                                               479 B         103 kB
+├ ƒ /participant-auth                                                13 kB         116 kB
+├ ƒ /players                                                         139 B         117 kB
+├ ƒ /players/[slug]                                                  149 B         127 kB
+├ ○ /privacy                                                         171 B         107 kB
+├ ƒ /ratings                                                       1.31 kB         112 kB
+├ ƒ /records                                                       4.39 kB         115 kB
+├ ƒ /records/[slug]                                                8.47 kB         119 kB
+├ ○ /robots.txt                                                      479 B         103 kB
+├ ○ /rules                                                           479 B         103 kB
+├ ƒ /score                                                           148 B         141 kB
+├ ƒ /score/access/[token]                                            479 B         103 kB
+├ ○ /sitemap.xml                                                     479 B         103 kB
+├ ƒ /statistics                                                    4.24 kB         115 kB
+├ ƒ /statistics/handicaps                                            140 B         117 kB
+├ ƒ /statistics/partnerships                                         140 B         117 kB
+├ ƒ /statistics/rivalries                                            139 B         117 kB
+├ ○ /support                                                         171 B         107 kB
+├ ƒ /tournament-guide                                               4.2 kB         115 kB
+├ ƒ /tournament-guide/[section]                                      145 B         121 kB
+├ ƒ /war-room                                                      18.5 kB         135 kB
+├ ƒ /war-room/lineup-optimizer                                     5.23 kB         122 kB
+├ ƒ /war-room/simulator                                              479 B         103 kB
+└ ƒ /war-room/team-intelligence                                    8.58 kB         125 kB
++ First Load JS shared by all                                       103 kB
+  ├ chunks/1255-eae4096fb21f1304.js                                  46 kB
+  ├ chunks/4bd1b696-100b9d70ed4e49c1.js                            54.2 kB
+  └ other shared chunks (total)                                    2.67 kB
+
+
+ƒ Middleware                                                       34.3 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/historical.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/draft/draft.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/live/live.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/history/historical-match-row.module.css|rsc': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/draft/draft.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/historical.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/live/live.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/odds-center/odds.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/war-room/war-room.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 2 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/admin/admin-center.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/admin/director/ProductionFutureYearAdministrationPanel.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/admin/cms-manager.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/admin/player-passport-admin.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[5].use[0]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[1]!/private/tmp/bagger-worker-provider-portability/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!/private/tmp/bagger-worker-provider-portability/app/admin/director/net-skins-entries.module.css|ssr': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+ ⚠ Compiled with warnings in 4.0s
+
+./app/admin/admin-center.module.css
+Warning
+
+(1:1045) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/admin-center.module.css
+./app/admin/AdminCenter.js
+
+./app/admin/cms-manager.module.css
+Warning
+
+(1:674) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/cms-manager.module.css
+./app/admin/CmsManager.js
+./app/admin/AdminCenter.js
+
+./app/admin/director/ProductionFutureYearAdministrationPanel.module.css
+Warning
+
+(1:3693) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/director/ProductionFutureYearAdministrationPanel.module.css
+./app/admin/director/ProductionFutureYearAdministrationPanel.js
+./app/admin/director/ProductionDirectorConsole.js
+
+./app/admin/director/net-skins-entries.module.css
+Warning
+
+(24:53) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/director/net-skins-entries.module.css
+./app/admin/director/ProductionNetSkinsEntries.js
+./app/admin/director/CanonicalDirectorOperations.js
+./app/admin/director/CanonicalDirectorConsole.js
+
+./app/admin/player-passport-admin.module.css
+Warning
+
+(1:108) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/admin/player-passport-admin.module.css
+./app/admin/PlayerPassportAdmin.js
+./app/admin/AdminCenter.js
+
+./app/draft/draft.module.css
+Warning
+
+(1:1661) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/draft/draft.module.css
+./app/draft/DraftExperience.js
+./app/draft/page.js
+
+./app/draft/draft.module.css
+Warning
+
+(1:1661) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/draft/draft.module.css
+./app/draft/DraftAnalysisSummary.js
+
+./app/historical.module.css
+Warning
+
+(2285:3) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/historical.module.css
+./app/champions/page.js
+
+./app/historical.module.css
+Warning
+
+(2285:3) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/historical.module.css
+./app/history/HistoryBackToTop.js
+
+./app/history/historical-match-row.module.css
+Warning
+
+(1:1188) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/history/historical-match-row.module.css
+./app/history/HistoricalMatchRow.js
+./app/history/[year]/round/[round]/page.js
+
+./app/live/live.module.css
+Warning
+
+(155:3) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/live/live.module.css
+./app/PublicMatchCard.js
+./app/history/[year]/team/[side]/page.js
+
+./app/live/live.module.css
+Warning
+
+(155:3) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/live/live.module.css
+./app/live/MatchCenter.js
+
+./app/odds-center/odds.module.css
+Warning
+
+(1:1051) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/odds-center/odds.module.css
+./app/odds-center/OddsCenter.js
+
+./app/war-room/war-room.module.css
+Warning
+
+(5:240) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/war-room/war-room.module.css
+./app/war-room/lineup-optimizer/LineupOptimizer.js
+
+./app/war-room/war-room.module.css
+Warning
+
+(19:50) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Import trace for requested module:
+./app/war-room/war-room.module.css
+./app/war-room/lineup-optimizer/LineupOptimizer.js
+
+Historical sheet load failed {
+  sheet: 'Players',
+  key: 'players',
+  reason: 'Google runtime delivery and live imports are retired. Use canonical tournament authority.'
+}
+Historical sheet load failed {
+  sheet: 'Tournaments',
+  key: 'tournaments',
+  reason: 'Google runtime delivery and live imports are retired. Use canonical tournament authority.'
+}
+Historical sheet load failed {
+  sheet: 'Team Names',
+  key: 'teamNames',
+  reason: 'Google runtime delivery and live imports are retired. Use canonical tournament authority.'
+}
+Historical sheet load failed {
+  sheet: 'Matches',
+  key: 'matches',
+  reason: 'Google runtime delivery and live imports are retired. Use canonical tournament authority.'
+}
+Historical sheet load failed {
+  sheet: 'Rounds',
+  key: 'rounds',
+  reason: 'Google runtime delivery and live imports are retired. Use canonical tournament authority.'
+}
+Historical sheet load failed {
+  sheet: 'Tournament Rules',
+  key: 'rules',
+  reason: 'Google runtime delivery and live imports are retired. Use canonical tournament authority.'
+}
+Historical sheet load failed {
+  sheet: 'Awards',
+  key: 'awards',
+  reason: 'Google runtime delivery and live imports are retired. Use canonical tournament authority.'
+}
+Historical sheet load failed {
+  sheet: 'Courses',
+  key: 'courses',
+  reason: 'Google runtime delivery and live imports are retired. Use canonical tournament authority.'
+}
+Historical sheet load failed {
+  sheet: 'Handicaps',
+  key: 'handicaps',
+  reason: 'Google runtime delivery and live imports are retired. Use canonical tournament authority.'
+}
+Historical sheet load failed {
+  sheet: 'Ghost Match',
+  key: 'ghostMatches',
+  reason: 'Google runtime delivery and live imports are retired. Use canonical tournament authority.'
+}
+Unable to refresh historical Google Sheet data. Using the bundled fallback. {
+  name: 'Error',
+  message: 'Google runtime delivery and live imports are retired. Use canonical tournament authority.',
+  stack: 'Error: Google runtime delivery and live imports are retired. Use canonical tournament authority.\n' +
+    '    at e (/private/tmp/bagger-worker-provider-portability/.next/server/app/sitemap.xml/route.js:1:6311)\n' +
+    '    at o (/private/tmp/bagger-worker-provider-portability/.next/server/chunks/4125.js:1:2242)\n' +
+    '    at B (/private/tmp/bagger-worker-provider-portability/.next/server/chunks/4125.js:1:4647)\n' +
+    '    at F (/private/tmp/bagger-worker-provider-portability/.next/server/chunks/4125.js:1:5890)\n' +
+    '    at /private/tmp/bagger-worker-provider-portability/.next/server/chunks/4125.js:1:7100\n' +
+    '    at Array.map (<anonymous>)\n' +
+    '    at H (/private/tmp/bagger-worker-provider-portability/.next/server/chunks/4125.js:1:7062)\n' +
+    '    at /private/tmp/bagger-worker-provider-portability/.next/server/chunks/4125.js:1:7571\n' +
+    '    at /private/tmp/bagger-worker-provider-portability/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:5:77883\n' +
+    '    at u (/private/tmp/bagger-worker-provider-portability/.next/server/chunks/8323.js:1:2720)'
+}
+Dynamic sitemap data was unavailable; serving public static routes only. Error: Supabase Draft reads are unavailable (isolated-database-required).
+    at f (.next/server/chunks/4487.js:1:5140)
+    at l (.next/server/chunks/4487.js:1:688)
+    at p (.next/server/chunks/4487.js:1:1502)
+    at B (.next/server/app/sitemap.xml/route.js:16:2007)
+    at async E (.next/server/app/sitemap.xml/route.js:16:2602) {
+  code: 'DRAFT_SUPABASE_CONFIGURATION_REQUIRED',
+  status: 503
+}

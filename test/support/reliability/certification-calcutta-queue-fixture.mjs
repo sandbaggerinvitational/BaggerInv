@@ -4,8 +4,8 @@ import {sqlFile,repositoryRoot,destroyIsolatedCluster} from './postgres17.mjs';
 import {certificationDirectorStack} from './certification-director-proof.mjs';
 import {CERTIFICATION_WORKER_ENGINES} from '../../../lib/certification-worker-engines.js';
 export const calcuttaScopeArtifact=repositoryRoot+'/supabase/production_incremental/certification-queue-calcutta-scope-v1.sql';
-export async function createCalcuttaQueueFixture({install=true}={}) {
- const f=await createGlobalFaultFixture({emptyAuction:true});
+export async function createCalcuttaQueueFixture({install=true,emptyAuction=true}={}) {
+ const f=await createGlobalFaultFixture({emptyAuction});
  try {
   for(const name of ['certification-queue-retry-envelope-v6.sql','certification-queue-routing-closure-v7.sql',
    'certification-derived-attempt-cycle-v1.sql','certification-net-skins-configuration-v1.sql'])

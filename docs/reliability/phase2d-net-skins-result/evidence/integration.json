@@ -1,0 +1,1803 @@
+{
+  "hosted": false,
+  "postgres": 17,
+  "safeupdate": "on",
+  "cases": [
+    {
+      "name": "exact valid GET reproduces 400 at legacy write input.environment=PREVIEW, before a DB write",
+      "result": "PASS"
+    },
+    {
+      "name": "forward mismatch rolls back; exact install/replay preserve metadata, RLS, history and safeupdate",
+      "result": "PASS"
+    },
+    {
+      "name": "private helper ACL drift blocks replay; anon/authenticated/service_role cannot call it directly",
+      "result": "PASS"
+    },
+    {
+      "name": "pre-result valid participant GET=200 CONFIGURED; no calculation, claim, after-hook or private provenance",
+      "result": "PASS"
+    },
+    {
+      "name": "real shipping full-Net processor on existing canonical Director transport creates PROVISIONAL; read withholds payouts",
+      "result": "PASS"
+    },
+    {
+      "name": "finalized sole opted-in match permits OFFICIAL despite secondary incomplete; canonical completion also publishes",
+      "result": "PASS"
+    },
+    {
+      "name": "actual failed route now supplies summary, winners and 18 public hole/detail cells; no internal source/configuration tree",
+      "result": "PASS"
+    },
+    {
+      "name": "calculation replay and exact completion replay retain one immutable current result and historical provisional evidence",
+      "result": "PASS"
+    },
+    {
+      "name": "stale configuration/entry/source and lost-ownership completion denied; no duplicate output",
+      "result": "PASS"
+    },
+    {
+      "name": "server-bound identity; signed-out, foreign player/resource/project/deployment/release and client authority denied",
+      "result": "PASS"
+    },
+    {
+      "name": "Production wrapper retains guard; result projection core matches original shipping body after authority preamble",
+      "result": "PASS"
+    },
+    {
+      "name": "safe OFF/disabled/paused checkpoint retains results and denies reads through closed Certification admission",
+      "result": "PASS"
+    }
+  ],
+  "rootCause": {
+    "status": 400,
+    "field": "input.environment",
+    "value": "PREVIEW",
+    "predicate": "nonempty authority field in certificationReadAliasRpc",
+    "operation": "write_net_skins_derived_results"
+  },
+  "preResult": {
+    "netSkins": {
+      "state": "CONFIGURED",
+      "rounds": [
+        {
+          "roundId": "2026:R3",
+          "round": 3,
+          "format": "SI",
+          "entryType": "INDIVIDUAL",
+          "buyInPerEntry": 25,
+          "eligibleCount": 1,
+          "eligiblePlayerIds": [
+            "P12"
+          ],
+          "entries": [
+            {
+              "id": "2026:R3:PLAYER:P12",
+              "entryType": "INDIVIDUAL",
+              "matchId": "2026-R3-12",
+              "playerIds": [
+                "P12"
+              ]
+            }
+          ],
+          "resultState": "CONFIGURED",
+          "configurationRevision": 1,
+          "resultRevision": null,
+          "calculatedAt": "",
+          "publishedAt": "",
+          "stale": false,
+          "matches": [
+            "2026-R3-12"
+          ],
+          "completedHoles": 0,
+          "complete": false,
+          "finalized": false,
+          "skinsAwarded": 0,
+          "skins": [],
+          "leaderboard": []
+        }
+      ],
+      "results": []
+    },
+    "netSkinsState": {
+      "contractVersion": "production-net-skins-v1",
+      "tournamentId": "2026",
+      "state": "CONFIGURED",
+      "publicationPolicy": "OFFICIAL_ONLY",
+      "configured": true,
+      "published": false,
+      "visible": true,
+      "available": true,
+      "configurationRevision": 1,
+      "resultRevision": null,
+      "revision": "net-skins-v1:1:0:CONFIGURED",
+      "stale": false,
+      "configuredAt": "2026-10-06T09:01:23.783637-05:00",
+      "calculatedAt": "",
+      "publishedAt": ""
+    },
+    "freshness": {
+      "stale": false,
+      "jobs": [],
+      "recalculated": false,
+      "revision": "net-skins-v1:1:0:CONFIGURED"
+    }
+  },
+  "provisional": {
+    "revision": 1,
+    "publication": "WITHHELD"
+  },
+  "eligibility": {
+    "entryPlayer": "P12",
+    "round": 3,
+    "primary": "FINAL",
+    "secondary": "UPCOMING",
+    "publication": "OFFICIAL_ONLY",
+    "result": 2
+  },
+  "officialRead": {
+    "summary": {
+      "netSkins": {
+        "state": "OFFICIAL",
+        "rounds": [
+          {
+            "pot": 25,
+            "round": 3,
+            "skins": [
+              {
+                "hole": 1,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 2,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 3,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 4,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 5,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 6,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 7,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 8,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 9,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 10,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 11,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 12,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 13,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 14,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 15,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 16,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 17,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              },
+              {
+                "hole": 18,
+                "year": 2026,
+                "match": "12",
+                "round": 3,
+                "format": "SI",
+                "winner": "Synthetic Certification Participant A",
+                "roundPot": 25,
+                "skinValue": 1.3888888888888888,
+                "winnerPlayerId": "P12",
+                "winnerPlayerId2": "",
+                "winningNetScore": 4
+              }
+            ],
+            "format": "SI",
+            "matches": [
+              "12"
+            ],
+            "complete": true,
+            "finalized": true,
+            "skinValue": 1.3888888888888888,
+            "leaderboard": [
+              {
+                "id": "2026:R3:PLAYER:P12",
+                "name": "Synthetic Certification Participant A",
+                "rank": 1,
+                "format": "SI",
+                "skinsWon": 18,
+                "playerIds": [
+                  "P12"
+                ],
+                "displayRank": "1",
+                "holeResults": [
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 1,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 2,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 3,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 4,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 5,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 6,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 7,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 8,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 9,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 10,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 11,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 12,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 13,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 14,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 15,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 16,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 17,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  },
+                  {
+                    "net": 4,
+                    "par": 4,
+                    "hole": 18,
+                    "gross": 4,
+                    "tiedLow": false,
+                    "wonSkin": true
+                  }
+                ],
+                "winningHoles": [
+                  {
+                    "hole": 1,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 2,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 3,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 4,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 5,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 6,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 7,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 8,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 9,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 10,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 11,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 12,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 13,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 14,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 15,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 16,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 17,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  },
+                  {
+                    "hole": 18,
+                    "year": 2026,
+                    "match": "12",
+                    "round": 3,
+                    "format": "SI",
+                    "winner": "Synthetic Certification Participant A",
+                    "roundPot": 25,
+                    "skinValue": 1.3888888888888888,
+                    "winnerPlayerId": "P12",
+                    "winnerPlayerId2": "",
+                    "winningNetScore": 4
+                  }
+                ],
+                "totalWinnings": 25.000000000000004
+              }
+            ],
+            "resultState": "OFFICIAL",
+            "skinsAwarded": 18,
+            "eligibleCount": 1,
+            "completedHoles": 18,
+            "calculationPolicy": "production-full-course-handicap-v1",
+            "roundId": "2026:R3",
+            "entryType": "INDIVIDUAL",
+            "buyInPerEntry": 25,
+            "configurationRevision": 1,
+            "resultRevision": 2,
+            "calculatedAt": "2026-10-06T09:01:36.850706-05:00",
+            "publishedAt": "2026-10-06T09:01:36.850706-05:00",
+            "stale": false
+          }
+        ],
+        "results": [
+          {
+            "hole": 1,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 2,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 3,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 4,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 5,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 6,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 7,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 8,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 9,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 10,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 11,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 12,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 13,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 14,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 15,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 16,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 17,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          },
+          {
+            "hole": 18,
+            "year": 2026,
+            "match": "12",
+            "round": 3,
+            "format": "SI",
+            "winner": "Synthetic Certification Participant A",
+            "roundPot": 25,
+            "skinValue": 1.3888888888888888,
+            "winnerPlayerId": "P12",
+            "winnerPlayerId2": "",
+            "winningNetScore": 4
+          }
+        ]
+      },
+      "netSkinsState": {
+        "contractVersion": "production-net-skins-v1",
+        "tournamentId": "2026",
+        "state": "OFFICIAL",
+        "publicationPolicy": "OFFICIAL_ONLY",
+        "configured": true,
+        "published": true,
+        "visible": true,
+        "available": true,
+        "configurationRevision": 1,
+        "resultRevision": 2,
+        "revision": "net-skins-v1:1:2:OFFICIAL",
+        "stale": false,
+        "configuredAt": "2026-10-06T09:01:23.783637-05:00",
+        "calculatedAt": "2026-10-06T09:01:36.850706-05:00",
+        "publishedAt": "2026-10-06T09:01:36.850706-05:00"
+      },
+      "freshness": {
+        "stale": false,
+        "jobs": [],
+        "recalculated": false,
+        "revision": "net-skins-v1:1:2:OFFICIAL"
+      }
+    },
+    "presentation": {
+      "contractVersion": "production-net-skins-v1",
+      "tournamentId": "2026",
+      "state": "OFFICIAL",
+      "publicationPolicy": "OFFICIAL_ONLY",
+      "published": true,
+      "configurationRevision": 1,
+      "resultRevision": 2,
+      "revision": "net-skins-v1:1:2:OFFICIAL",
+      "freshness": {
+        "stale": false,
+        "configuredAt": "2026-10-06T09:01:23.783637-05:00",
+        "calculatedAt": "2026-10-06T09:01:36.850706-05:00",
+        "publishedAt": "2026-10-06T09:01:36.850706-05:00"
+      },
+      "rounds": [
+        {
+          "roundId": "2026:R3",
+          "roundNumber": 3,
+          "format": "SI",
+          "entryType": "INDIVIDUAL",
+          "matchIds": [
+            "2026-R3-12"
+          ],
+          "buyInPerEntry": 25,
+          "eligibleEntryCount": 1,
+          "eligiblePlayerIds": [
+            "P12"
+          ],
+          "state": "OFFICIAL",
+          "configurationRevision": 1,
+          "resultRevision": 2,
+          "freshness": {
+            "stale": false,
+            "configuredAt": null,
+            "calculatedAt": "2026-10-06T09:01:36.850706-05:00",
+            "publishedAt": "2026-10-06T09:01:36.850706-05:00"
+          },
+          "entries": [
+            {
+              "entryId": "2026:R3:PLAYER:P12",
+              "entryType": "INDIVIDUAL",
+              "matchId": "2026-R3-12",
+              "playerIds": [
+                "P12"
+              ]
+            }
+          ],
+          "officialResults": {
+            "pot": 25,
+            "eligibleCount": 1,
+            "completedHoles": 18,
+            "skinsAwarded": 18,
+            "skinValue": 1.3888888888888888,
+            "complete": true,
+            "finalized": true,
+            "skins": [
+              {
+                "skinId": "2026:R3:H1",
+                "holeNumber": 1,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H2",
+                "holeNumber": 2,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H3",
+                "holeNumber": 3,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H4",
+                "holeNumber": 4,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H5",
+                "holeNumber": 5,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H6",
+                "holeNumber": 6,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H7",
+                "holeNumber": 7,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H8",
+                "holeNumber": 8,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H9",
+                "holeNumber": 9,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H10",
+                "holeNumber": 10,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H11",
+                "holeNumber": 11,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H12",
+                "holeNumber": 12,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H13",
+                "holeNumber": 13,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H14",
+                "holeNumber": 14,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H15",
+                "holeNumber": 15,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H16",
+                "holeNumber": 16,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H17",
+                "holeNumber": 17,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              },
+              {
+                "skinId": "2026:R3:H18",
+                "holeNumber": 18,
+                "matchId": "2026-R3-12",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "winnerPlayerIds": [
+                  "P12"
+                ],
+                "winningNetScore": 4,
+                "skinValue": 1.3888888888888888
+              }
+            ],
+            "leaderboard": [
+              {
+                "rank": 1,
+                "displayRank": "1",
+                "entryId": "2026:R3:PLAYER:P12",
+                "playerIds": [
+                  "P12"
+                ],
+                "skinsWon": 18,
+                "totalWinnings": 25.000000000000004,
+                "winningHoleNumbers": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "player": {
+        "playerId": "P12",
+        "eligibleRoundIds": [
+          "2026:R3"
+        ],
+        "entryIds": [
+          "2026:R3:PLAYER:P12"
+        ]
+      },
+      "presentation": {
+        "contractVersion": "production-net-skins-presentation-v1",
+        "policy": "production-full-course-handicap-v1",
+        "purpose": "CANONICAL_PUBLISHED_PARTICIPANT_RESULT",
+        "published": true,
+        "tournament": {
+          "tournamentId": "2026",
+          "name": "Synthetic canonical certification"
+        },
+        "playerId": "P12",
+        "revisionId": "net-skins-v1:1:2:OFFICIAL",
+        "rounds": [
+          {
+            "round": 3,
+            "format": "SI",
+            "formatDisplayName": "Singles",
+            "scope": "PLAYER",
+            "scoringBasis": "INDIVIDUAL_FULL_NET",
+            "course": null,
+            "publicationState": "PUBLISHED",
+            "readiness": "CALCULATED",
+            "allMatchesOfficial": true,
+            "eligibleCount": 1,
+            "pot": 25,
+            "skinsAwarded": 18,
+            "skinValue": 1.3888888888888888,
+            "entries": [
+              {
+                "entryId": "2026:R3:PLAYER:P12",
+                "matchId": "2026-R3-12",
+                "players": [
+                  {
+                    "playerId": "P12",
+                    "name": "Synthetic Certification Participant A"
+                  }
+                ],
+                "team": {
+                  "teamId": "T1",
+                  "name": "Synthetic Certification Team One"
+                },
+                "course": {
+                  "courseId": "C3",
+                  "name": null,
+                  "tee": "Tournament"
+                }
+              }
+            ],
+            "winners": [
+              {
+                "entryId": "2026:R3:PLAYER:P12",
+                "skinsWon": 18,
+                "qaPayout": 25.000000000000004,
+                "winningHoles": [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18
+                ]
+              }
+            ],
+            "holes": [
+              {
+                "hole": 1,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 2,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 3,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 4,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 5,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 6,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 7,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 8,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 9,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 10,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 11,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 12,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 13,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 14,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 15,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 16,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 17,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              },
+              {
+                "hole": 18,
+                "par": 4,
+                "state": "won",
+                "winnerEntryId": "2026:R3:PLAYER:P12",
+                "tiedEntryIds": [],
+                "winningFullNet": 4,
+                "qaPayout": 1.3888888888888888,
+                "participants": [
+                  {
+                    "entryId": "2026:R3:PLAYER:P12",
+                    "par": 4,
+                    "gross": 4,
+                    "fullCourseHandicapStrokes": 0,
+                    "fullNet": 4,
+                    "outcome": "won"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "finalCheckpoint": {
+    "supervisor": "OFF",
+    "admission": "f",
+    "ingress": "0",
+    "netJobs": 0,
+    "netClaims": 0,
+    "unresolvedDirectorOperations": 0,
+    "workerCounts": {
+      "dead_letters": 0,
+      "pending_work": 0,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 0
+    }
+  }
+}

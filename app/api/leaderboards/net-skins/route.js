@@ -11,6 +11,7 @@ import { requireParticipantIdentityAuthority } from "../../../../lib/participant
 import { recalculateCompetitionDerivedTournament } from "../../../../lib/competition-derived-supabase.js";
 import { recalculateIntelligenceDerivedTournament } from "../../../../lib/intelligence-derived-supabase.js";
 import { applicationRequestEnvironment } from "../../../../lib/production-shadow-request-environment.js";
+import { certificationParticipantNetSkinsData } from "../../../../lib/certification-net-skins-participant.js";
 
 export const dynamic = "force-dynamic";
 
@@ -28,10 +29,10 @@ async function telemetryGET(request) {
     const identityStarted = performance.now();
     const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env });
     const identityMs = performance.now() - identityStarted;
-    // Active Production consumes the canonical, read-only V1 contract. Preview
-    // retains its existing isolated recalculation behavior until its dedicated
-    // worker is invoked through the Preview contract.
-    const productionV1 = source.productionCutover?.handled === true;
+    // Registered Certification exercises the same read-only result contract.
+    // A participant GET never authorizes legacy recalculation in that resource.
+    const certificationV1 = source.certificationResource === true;
+    const productionV1 = source.productionCutover?.handled === true || certificationV1;
     // Reuse the shipping native participant DTO with the existing web identity.
     // This explicit representation never falls back to a provisional read/worker.
     if (new URL(request.url).searchParams.get("presentation") === "participant") {
@@ -39,7 +40,7 @@ async function telemetryGET(request) {
       const read = await readProductionNetSkinsV1({ playerId: identity.playerId, tournamentId: identity.tournamentId, env });
       if (!read.payload?.ok || !read.payload.data) throw new Error("PARTICIPANT_PRESENTATION_UNAVAILABLE");
       const data = mobileNetSkinsDataFromProductionView(read.payload.data, identity);
-      return NextResponse.json({ data }, { headers: responseHeaders });
+      return NextResponse.json({ data: certificationV1 ? certificationParticipantNetSkinsData(data) : data }, { headers: responseHeaders });
     }
     const operational = productionV1
       ? await currentProductionNetSkinsV1({
@@ -66,8 +67,7 @@ async function telemetryGET(request) {
         console.error("Storyline recalculation after Net Skins remains pending", { code: error?.code || "STORYLINES_RECALCULATION_FAILED" });
       }
     });
-    const response = NextResponse.json({
-      data: {
+    const data = {
         netSkins: operational.netSkins,
         netSkinsState: operational.netSkinsState || null,
         freshness: {
@@ -76,7 +76,9 @@ async function telemetryGET(request) {
           recalculated: Boolean(operational.recalculation),
           revision: operational.revision || "",
         },
-      },
+      };
+    const response = NextResponse.json({
+      data: certificationV1 ? certificationParticipantNetSkinsData(data) : data,
       player: { id: identity.playerId, name: identity.displayName },
       readDiagnostics: {
         source: "supabase",
