@@ -1,0 +1,15 @@
+{
+  "hosted": false,
+  "cases": [
+    "predecessor mismatch rolls back functions, tables and data",
+    "old binding/history and five-engine scope unchanged",
+    "exactly thirteen binding/scope corrections; all existing ACL, RLS and private-core metadata unchanged",
+    "exact replay: receipt, full catalog, ACL, owners, security, search_paths and history unchanged",
+    "helper ACL drift rejected and transaction rolled back",
+    "table RLS drift rejected without silent repair"
+  ],
+  "preservedTableCount": 274,
+  "functionCorrections": 13,
+  "privateHelpers": 3,
+  "existingHostedAccess": false
+}

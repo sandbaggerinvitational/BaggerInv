@@ -1,0 +1,95 @@
+TAP version 13
+# Subtest: Part2C fixture architecture: existing contract limits, no bypass or historical rewrite
+    # Subtest: PG17 and real pg-safeupdate enabled
+    ok 1 - PG17 and real pg-safeupdate enabled
+      ---
+      duration_ms: 13.47675
+      type: 'test'
+      ...
+    # Subtest: critical local definitions exactly match retained hosted installation hashes
+    ok 2 - critical local definitions exactly match retained hosted installation hashes
+      ---
+      duration_ms: 90.64125
+      type: 'test'
+      ...
+    # Subtest: installed format is 24 players, two teams, six BB/six SC/twelve SI
+    ok 3 - installed format is 24 players, two teams, six BB/six SC/twelve SI
+      ---
+      duration_ms: 7.42075
+      type: 'test'
+      ...
+    # Subtest: Model B cannot introduce a second 2026 identity under installed uniqueness/catalog rules
+    ok 4 - Model B cannot introduce a second 2026 identity under installed uniqueness/catalog rules
+      ---
+      duration_ms: 20.520667
+      type: 'test'
+      ...
+    # Subtest: future tournament support is real annual succession, not an arbitrary sibling selector
+    ok 5 - future tournament support is real annual succession, not an arbitrary sibling selector
+      ---
+      duration_ms: 13.482917
+      type: 'test'
+      ...
+    # Subtest: annual close refuses incomplete predecessor; no pointer overwrite or fake certificate
+    ok 6 - annual close refuses incomplete predecessor; no pointer overwrite or fake certificate
+      ---
+      duration_ms: 13.133958
+      type: 'test'
+      ...
+    # Subtest: certified autonomous Queue binding requires current 2026 and exact physical resource
+    ok 7 - certified autonomous Queue binding requires current 2026 and exact physical resource
+      ---
+      duration_ms: 21.68875
+      type: 'test'
+      ...
+    # Subtest: current Net Skins Certification configuration adapter also requires 2026
+    ok 8 - current Net Skins Certification configuration adapter also requires 2026
+      ---
+      duration_ms: 6.746084
+      type: 'test'
+      ...
+    # Subtest: fresh physical resource cannot be selected by environment changes alone
+    ok 9 - fresh physical resource cannot be selected by environment changes alone
+      ---
+      duration_ms: 0.335667
+      type: 'test'
+      ...
+    # Subtest: participants/anon/authenticated/bare service_role cannot change the pointer or invoke owner cores
+    ok 10 - participants/anon/authenticated/bare service_role cannot change the pointer or invoke owner cores
+      ---
+      duration_ms: 51.596916
+      type: 'test'
+      ...
+    # Subtest: Model A cannot erase prior R3 chronology; preserved checkpoint/history evidence stays separate
+    ok 11 - Model A cannot erase prior R3 chronology; preserved checkpoint/history evidence stays separate
+      ---
+      duration_ms: 0.269792
+      type: 'test'
+      ...
+    # Subtest: positive FinalRecap admission is outside preserved Queue scope; no implicit engine expansion
+    ok 12 - positive FinalRecap admission is outside preserved Queue scope; no implicit engine expansion
+      ---
+      duration_ms: 6.8735
+      type: 'test'
+      ...
+    # Subtest: assessment leaves local admissions disabled, ingress paused, supervisor off, zero competitive execution
+    ok 13 - assessment leaves local admissions disabled, ingress paused, supervisor off, zero competitive execution
+      ---
+      duration_ms: 51.759209
+      type: 'test'
+      ...
+    1..13
+ok 1 - Part2C fixture architecture: existing contract limits, no bypass or historical rewrite
+  ---
+  duration_ms: 6648.116625
+  type: 'test'
+  ...
+1..1
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6761.676667

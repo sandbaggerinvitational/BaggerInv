@@ -1,0 +1,136 @@
+{
+  "baseSha": "4d263b3a284ec2feab9f242777d42f3bf01d6ede",
+  "environment": "OWNED_LOCAL_POSTGRESQL17",
+  "safeupdate": "on",
+  "hostedAccess": false,
+  "hostedMutation": false,
+  "resourceCreated": false,
+  "scoringExecuted": false,
+  "tests": [
+    {
+      "name": "PG17 and real pg-safeupdate enabled",
+      "result": "PASS"
+    },
+    {
+      "name": "critical local definitions exactly match retained hosted installation hashes",
+      "result": "PASS"
+    },
+    {
+      "name": "installed format is 24 players, two teams, six BB/six SC/twelve SI",
+      "result": "PASS"
+    },
+    {
+      "name": "Model B cannot introduce a second 2026 identity under installed uniqueness/catalog rules",
+      "result": "PASS"
+    },
+    {
+      "name": "future tournament support is real annual succession, not an arbitrary sibling selector",
+      "result": "PASS"
+    },
+    {
+      "name": "annual close refuses incomplete predecessor; no pointer overwrite or fake certificate",
+      "result": "PASS"
+    },
+    {
+      "name": "certified autonomous Queue binding requires current 2026 and exact physical resource",
+      "result": "PASS"
+    },
+    {
+      "name": "current Net Skins Certification configuration adapter also requires 2026",
+      "result": "PASS"
+    },
+    {
+      "name": "fresh physical resource cannot be selected by environment changes alone",
+      "result": "PASS"
+    },
+    {
+      "name": "participants/anon/authenticated/bare service_role cannot change the pointer or invoke owner cores",
+      "result": "PASS"
+    },
+    {
+      "name": "Model A cannot erase prior R3 chronology; preserved checkpoint/history evidence stays separate",
+      "result": "PASS"
+    },
+    {
+      "name": "positive FinalRecap admission is outside preserved Queue scope; no implicit engine expansion",
+      "result": "PASS"
+    },
+    {
+      "name": "assessment leaves local admissions disabled, ingress paused, supervisor off, zero competitive execution",
+      "result": "PASS"
+    }
+  ],
+  "functions": [
+    {
+      "signature": "production_control.apply_tournament_setup_match_v1(jsonb,bigint,text)",
+      "bodySha256": "a2b7eb5a9c0b32d0a820d7f67d2d610acb3f4985284ccd5c9d6086175346c6e3"
+    },
+    {
+      "signature": "production_control.apply_tournament_setup_round_v1(jsonb,bigint,text)",
+      "bodySha256": "44e804b964b1f75d0b6a08e3bcc7c35cdf54031a29ad0e1e2ead5870c6bce015"
+    },
+    {
+      "signature": "production_control.canonical_activate_annual_scoring_transition_v2(jsonb,jsonb)",
+      "bodySha256": "44a0f99153e2a1836595ff5e70cc20a0ff7c85b91a1348063a506dc9946b30a5"
+    },
+    {
+      "signature": "production_control.canonical_mutate_future_year_administration_v2(jsonb,jsonb)",
+      "bodySha256": "db1e251dbeb684acf3413f44dcc3d4149f6a2351d9c3ff6e30a05140372ef2a9"
+    },
+    {
+      "signature": "production_control.certification_annual_predecessor_certificate_v1(text)",
+      "bodySha256": "503898cb53d7c248d0b525391d2a7c6dd0d9f211000f6526f79e9e6965b9102c"
+    },
+    {
+      "signature": "production_control.close_certification_annual_predecessor_v1(jsonb,text)",
+      "bodySha256": "07b997dc0e7a5922f20c1563cc66e672f80e7daed5c67ef291d1b0fa0ebe0639"
+    },
+    {
+      "signature": "production_control.derived_final_recap_ready_v1(text)",
+      "bodySha256": "7241278e80d2811e8744ab092a66e20863f8d26bc3fe36c71ebd426b07cc5127"
+    },
+    {
+      "signature": "production_control.tournament_setup_readiness_v1()",
+      "bodySha256": "ae413a356f1470ac08d0e3de58325c09b45ecb6e3077dbb2a80f100cd749128a"
+    },
+    {
+      "signature": "production_control.worker_supervisor_binding_v1(jsonb)",
+      "bodySha256": "5a219318f54e62d254c4df2e58ea72e65f5f3af621f77475927d2de3abeeec31"
+    },
+    {
+      "signature": "production_control.worker_supervisor_counts_v1()",
+      "bodySha256": "76ba2feaecac2c1fe63e451b810d0009e9ad3cf28c47e7fd97eab71cd432c4fe"
+    },
+    {
+      "signature": "production_control.worker_supervisor_scope_v1()",
+      "bodySha256": "a1ea9d479b4cef4ba33a70755b424d673aee62e5bb49b429a030fef9b2571ba9"
+    },
+    {
+      "signature": "production_control.worker_supervisor_queue_binding_v2(jsonb)",
+      "bodySha256": "044848439f59377b05bca60aab2b21f1369f0ca261acc9e2ef527b3c7d3711c9"
+    },
+    {
+      "signature": "production_control.dispatch_certification_net_skins_configuration_v1(jsonb,jsonb,boolean)",
+      "bodySha256": "cd79da608d945f60fd688a8247bea8749751ebf31345a24cd3727495a8011651"
+    }
+  ],
+  "selectedModel": "D",
+  "remediationStatus": "BLOCKED",
+  "readyForHostedProvisioning": false,
+  "requiredStructure": {
+    "players": 24,
+    "teams": 2,
+    "rounds": 3,
+    "matches": 24,
+    "formats": {
+      "BB": 6,
+      "SC": 6,
+      "SI": 12
+    }
+  },
+  "retainedEvidence": {
+    "inventorySha256": "3d6820b70223e113cd1156f86b5d46818c2ea556c65910744fccf19b0282ddc5",
+    "dataHashesSha256": "bea5a6eb6c94bbc7072f2b0e01fb7d7f15716ffef98a2783ab5248c716c631a6"
+  },
+  "downstreamPlanningNote": "Existing Queue scope denies Final Results/eligible FinalRecap; retain negative certification, review positive execution admission before Part2C."
+}

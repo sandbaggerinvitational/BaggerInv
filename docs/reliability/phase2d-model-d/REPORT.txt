@@ -1,0 +1,377 @@
+MODEL D LOCAL CERTIFICATION — OWNER REVIEW PACKAGE
+
+MODEL D IMPLEMENTATION STATUS: PASS
+Scope: local only. This report certifies the deterministic new-target package and focused execution admission. It does not certify a hosted new resource or a chronological 24-match rehearsal.
+Evidence: evidence/focused.json, focused.tap, focused-structure.json, focused-forward.json, focused-execution.json, application.json/application.tap, build.json/build.tap.
+All executable source hashes remained stable during the final focused, broad and build runs. Remote sockets were denied and provider credentials stripped from those runs.
+
+RESOURCE MODEL
+RESOURCE CLASS: CERTIFICATION
+PURPOSE/PROFILE: PART2C_DRESS_REHEARSAL, fixed owner-reviewed descriptor
+MULTIPLE CERTIFICATION RESOURCES: SUPPORTED; registry singleton is per physical database, not one global unique resource class. The application has a closed old-component plus Model-D registration list. One exact resource resolves from trusted server configuration.
+SELECTION: checked-in reviewed registration + trusted deployment environment + distinct credential fingerprints; canonical SQL separately verifies registration/context/release/epoch.
+CLIENT SELECTION: DENIED
+CROSS-RESOURCE: DENIED
+The old resource's fixed tuple and five-engine restrictions remain intact. Model D cannot acquire authority merely by supplying a resource or purpose in request JSON.
+
+REGISTRATION
+RESOURCE ID MODEL: CERTIFICATION:<new installation UUID>; revision 1. The UUID, project, server/public fingerprints and authority epoch must differ from old Certification.
+MANIFEST: config/certification-model-d-registration.json, disabled with explicit <NEW_...> placeholders. Default rendering/execution denied. config/certification-model-d-binding-request.json separately requires the exact real READY deployment tuple.
+INSTALLATION RECEIPT: new canonical-bootstrap-installation-v1 receipt bound to the generated schema/static/image manifest hashes; no historical receipt is copied.
+CREDENTIAL FINGERPRINTS: distinct SHA256 server and publishable keys; raw secrets excluded from Git. Old key fingerprints and identical server/public fingerprints denied.
+AUTHORITY EPOCH: unique reviewed UUID created through canonical initialize; old epoch cannot be reused.
+RELEASE/DEPLOYMENT BINDING: exact new project/team/codex branch/Preview/deployment/origin/source SHA, resource and installation. Replay identical; differing request hash denied.
+D3 registration does not fabricate a deployment. D4 is inactive unbound staging. Existing canonical initialization requires a real deployment and therefore completes in D6, after D5 READY. No dummy epoch/pointer/deployment is used.
+Actual identities do not exist yet. Future creation must fill/review the disabled template and make one binding-only successor commit before deploying. That successor must preserve these executable and database image hashes.
+
+FRESH INSTALL
+EMPTY TARGET: PASS, owned fresh PostgreSQL 17 with managed-platform local equivalents and pg-safeupdate
+BOOTSTRAP: PASS; independently generated consolidated artifact, not a dump from hosted Certification
+FORWARD CORRECTIONS: PASS; committed original canonical image plus 17 reviewed forwards, complete lineage below
+INSTALLATION RECEIPT: PASS; exact new image hashes, replay checked
+CATALOG: PASS; functions, relations, columns, constraints, indexes, triggers, dependencies and multiplicity exact
+ACL: PASS
+RLS: PASS; 288 catalog relations; 279 tables with RLS
+OWNERS: PASS
+SECURITY MODES: PASS
+SEARCH_PATHS: PASS
+PRIVATE CORES: PASS, client roles cannot execute private owner helpers
+UNEXPECTED EXTERNAL TARGETS: 0 active; no remote connection, external job, credentials or imported authority row
+Schema includes inherited dormant Production/legacy contract definitions as certified code, but no active Production/Google authority or data. No functions were changed to target those systems.
+FUNCTIONS: 1158
+IMAGE MANIFEST SHA256: c50d395eeab4a2e6b35815537b4e27b42af8c93df003d31afdda0d9de146d1b5
+SCHEMA SHA256: a82345ddbaa01dadb153baeed1973f30290cf7084ff8038bf50e247122fb5ae2
+STATIC CONTRACT SHA256: 7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d
+CATALOG SHA256: e9c25ae8bcc5ced1aebe51ef304ef0d188ef2989546f8a8a6d5ad9141dd53c6f
+Authority rows copied: 0. Historical installation rows copied: 0.
+Owner renderer: tools/reliability/certification-model-d-installation.mjs. It requires an independently attested new physical connection, managed PG17/Auth prerequisites, no prior application schemas, exact digests and owner session. It executes schema, static definitions, receipt and complete catalog verification inside one transaction; exact replay verifies the catalog again.
+
+COMMITTED FORWARD LINEAGE INCLUDED IN THE NEW IMAGE
+supabase/production_incremental/calcutta-empty-auction-demand-v1.sql
+supabase/production_incremental/certification-stale-context-error-v1.sql
+supabase/production_incremental/certification-worker-supervision-v1.sql
+supabase/production_incremental/certification-worker-queue-supervision-v2.sql
+supabase/production_incremental/certification-queue-preview-publisher-v3.sql
+supabase/production_incremental/certification-queue-safeupdate-v4.sql
+supabase/production_incremental/certification-queue-global-fault-v5.sql
+supabase/production_incremental/certification-queue-retry-envelope-v6.sql
+supabase/production_incremental/certification-queue-routing-closure-v7.sql
+supabase/production_incremental/certification-derived-attempt-cycle-v1.sql
+supabase/production_incremental/certification-net-skins-configuration-v1.sql
+supabase/production_incremental/certification-queue-calcutta-scope-v1.sql
+supabase/production_incremental/certification-calcutta-publication-v1.sql
+supabase/production_incremental/certification-net-skins-result-read-v1.sql
+supabase/production_incremental/certification-net-skins-calculation-v1.sql
+supabase/production_incremental/certification-odds-input-configuration-v1.sql
+supabase/production_incremental/certification-model-d-execution-v1.sql
+The original canonical bootstrap manifest further pins its complete Part 1A/1B/2A migration source inventory. Fresh installation uses the consolidated image once; it must not apply these forwards again on top of it. This list is provenance, not an instruction to recreate manual repairs.
+
+FULL INITIAL FIXTURE
+OPERATION: bootstrap-certification-part2c-tournament-v1; fixed operation_id certification-model-d-initial-fixture
+TOURNAMENT: 2026 synthetic Model D dress rehearsal, new physical resource
+PLAYERS: 24 deterministic P01–P24, clearly synthetic
+TEAMS: 2, T1/T2
+TEAM SIZE: 12
+ROUNDS: 3
+MATCHES: 24
+R1 BB: 6, 2026-R1-1 through 2026-R1-6
+R2 SC: 6, 2026-R2-1 through 2026-R2-6
+R3 SI: 12, 2026-R3-1 through 2026-R3-12
+MATCH HOLES: 432
+INITIAL SCORES: 0
+INITIAL RESULTS: 0 competitive/side-game/Odds/FinalRecap results
+INITIAL STATUS: UPCOMING, revision 0, setup not yet prepared
+SCORING PERMISSIONS: CLOSED; every permitted=false and revoked; no participant score is accepted
+FINALRECAP: INELIGIBLE, attempts 0, result/publication none
+UPCOMING scoring_locked=false is the installed unstarted/setup state; it does not grant scoring. Changing that to true would make normal Director setup ineligible. All 72 participant permissions are closed and the actual participant score operation is denied.
+COURSE/TEE: three deterministic round contexts C1/C2/C3 with identical synthetic Tournament tee, 18 par-4 holes, stroke indices 1–18, 400-yard holes, rating 72/slope 120/par 72. Three contexts are required to prevent the existing Guide round/course join from returning duplicated hole contexts; no external course data.
+HANDICAP: fixed synthetic zero initial handicap context; normal Director preparation is still required. Initial structural snapshots are not competitive results.
+
+FIXTURE AUTHORITY
+OWNER: ALLOWED, direct managed postgres session and reviewed one-shot package only
+DIRECTOR: DENIED
+PARTICIPANT: DENIED
+ANON: DENIED
+AUTHENTICATED: DENIED
+SERVICE_ROLE CLIENT: DENIED
+WRONG RESOURCE: DENIED, including existing Certification
+WRONG PROJECT: DENIED
+WRONG RELEASE: DENIED
+WRONG DEPLOYMENT: DENIED
+PRODUCTION: DENIED
+OLD PREVIEW: DENIED
+No persistent fixture RPC, participant API, generic SQL proxy, engine selector or arbitrary manifest authoring exists. The renderer accepts only the committed fixed manifest. A Director-shaped JWT cannot acquire owner provisioning authority.
+
+FIXTURE ATOMICITY
+TRANSACTION: one atomic transaction, existing owner fixture guards and serialized table/advisory locking
+REPLAY: exact idempotent, structural and audit row counts unchanged
+CONFLICT: DENIED, changed operation/payload/target/state
+ROLLBACK: PASS, forced failure after structural creation rolls back every row and audit
+PARTIAL FIXTURE POSSIBLE: NO under the reviewed transaction
+AUDIT: truthful CERTIFICATION_MODEL_D_FIXTURE_BOOTSTRAPPED receipt, synthetic Guide audit, fixed package/state/installation digest
+Preconditions include exact new registration/profile/receipt/release/binding/epoch/current pointer, disabled admission, paused ingress, OFF supervisor, empty target structure and no work/claims/leases/reservations/handoffs/faults.
+Canonical initialize creates an empty 2026 tournament root before fixture creation. The package requires that exact empty root; any preexisting conflicting player/match/domain state is denied.
+Activation/pointer/generation revisions must be exactly 1. Admission revision may be exactly 1, or exactly 3 after the single reviewed D7 enable/disable pair. Replay after tournament execution is not a reset operation.
+
+STRUCTURAL INVARIANTS
+UNIQUE PLAYERS: 24/24
+VALID TEAM MEMBERSHIP: PASS; 12 per team, each player once per round
+UNIQUE MATCHES: 24/24
+VALID ROUND FORMATS: PASS
+VALID PARTICIPANTS: PASS; 4 per BB/SC, 2 per SI, canonical roster/team/slot coverage
+COURSE/TEE: PASS
+HOLES: 432/432
+DUPLICATE STRUCTURE: 0
+INITIAL COMPETITIVE WORK: 0
+
+INITIAL DOMAIN STATE
+GUIDE: published minimum synthetic canonical Guide, correct round/course/tee context; no Google
+NET SKINS CONFIG: none initially; normal Director entries/configuration before tournament play
+NET SKINS RESULTS: none
+CALCUTTA: fixed canonical payout/point initial configuration only; no owner-created purchase/ownership or auction. Normal Director pre-tournament auction/purchases follow fixture acceptance.
+CALCUTTA RESULTS: none
+ODDS SETTINGS: none initially; normal DIRECTOR.CONFIGURE_ODDS_INPUTS with fixed CERTIFICATION_DEFAULTS_V1 / CERTIFICATION_SYNTHETIC during pre-tournament chronology
+ODDS PUBLICATIONS: 0; old tournament publication is not copied
+FINALRECAP: ineligible, 0 attempts/results/publications
+DERIVED WORK: 0 required jobs/intents/claims/leases/dead letters/UNKNOWN/reservations/handoffs/faults
+Normal Director pre-tournament plan: R1 BB P12/P13; R2 SC canonical pairs P11/P12 and P13/P14; R3 SI P12/P13. Save each round through NET_SKINS_ENTRIES, then configure eligible rounds [1,2,3] against saved revisions 1. Installed buy-ins yield synthetic pots $50/$100/$50; OFFICIAL_ONLY, NO_SKIN_NO_CARRY, NO_CARRY. Calculation/publication occurs only when the exact entered-source completion rule is satisfied. Minimum Calcutta purchase is P01 for synthetic $1 with P12 owning 100%, through CALCUTTA_MANAGEMENT using current canonical revision/fingerprint readback. Fixed Odds settings remain CERTIFICATION_DEFAULTS_V1 / CERTIFICATION_SYNTHETIC with historical ratings {}. Exact planned normal Director inputs are in hosted-plan.json; no such facts are inserted by the owner fixture.
+Normal Director operations create later financial facts and derived demand. Provisioning never Mark Lives, opens scoring, scores, Finalizes or invokes any calculator.
+
+AUTH PLAN
+DIRECTOR AUTH USERS: 1, P01
+PARTICIPANT AUTH USERS: 2, P12 and P13 on opposite teams
+TOTAL PROVIDER AUTH USERS: 3
+REAL EMAIL: 0
+REAL SMS: 0
+PUSH: 0
+Fixed new synthetic UUIDs and .invalid addresses are in hosted-plan.json. Future Admin createUser uses reviewed UUID, email_confirm=true and synthetic password sign-in, with no invitation/OTP message. The remaining 21 canonical players need no Auth account. No provider Auth users were created by this local task.
+
+DIRECTOR READINESS
+ROUND 1: PASS
+ROUND 2: PASS
+ROUND 3: PASS
+MATCH LOOKUP: PASS
+PAIRINGS: PASS
+SETUP: PASS, representative round operations and canonical preparation against all 24 matches
+EXISTING_ROUND_REQUIRED ERROR: 0 on valid structure
+EXISTING_MATCH_REQUIRED ERROR: 0 on valid structure
+No scores were required for this structural-readiness proof.
+
+SHIPPING READINESS
+TOURNAMENT: PASS
+GUIDE: PASS
+HOME: PASS
+PARTICIPANT CONTEXT: PASS
+MIXED RESOURCE READ: DENIED
+Actual application read adapters use the owned PostgreSQL bridge and exact modeled new registration; foreign contexts denied, private tables remain unavailable to participant roles. No hosted/browser/provider availability is claimed by local tests.
+
+EXECUTION ADMISSION INVENTORY
+| Domain / Job | Execution mechanism | Processor | Already admitted? | Correction required? |
+|---|---|---|---|---|
+| Score-derived | Canonical transactional score intent; fixed supervisor materializes intents then invokes existing engine families | Existing score-derived SQL intent materialization and family processors | YES | Exact Model D binding only |
+| TEAM_MOMENTUM | Private Queue supervisor | recalculateCompetitionDerivedTournament | YES | Exact Model D binding only |
+| TOURNAMENT_STORYLINES | Private Queue supervisor | recalculateCompetitionDerivedTournament | YES | Exact Model D binding only |
+| TOURNAMENT_INTELLIGENCE | Private Queue supervisor | recalculateIntelligenceDerivedTournament | YES | Exact Model D binding only |
+| PROJECTION_EDITORIAL | Private Queue supervisor | recalculateIntelligenceDerivedTournament | YES | Exact Model D binding only |
+| CALCUTTA | Private Queue supervisor; separate Director publication | processProductionCalcuttaV1Job | YES | Exact Model D binding only |
+| Net Skins | Synchronous DIRECTOR.CALCULATE_NET_SKINS; OFFICIAL automatic publication | processProductionNetSkinsV1Job | YES | Existing Certification adapters accept registered Model D profile |
+| Odds | Canonical Director route + bound Preview after(); separate Director publication | processCertificationOddsCalculationJob | YES | Existing fixed input adapter accepts registered Model D profile |
+| Final Results Odds | Same Odds after() path, exact final completeness prerequisites | processCertificationOddsCalculationJob | YES | None to Odds processor; Model D supervisor may coexist with truthful Final Results publication |
+| FinalRecap | Existing Intelligence private Queue processor; current OFFICIAL snapshot is publication | recalculateIntelligenceDerivedTournament / TOURNAMENT_FINAL_RECAP | NO at base; YES after this correction | Fixed sixth engine only for owner-registered PART2C_DRESS_REHEARSAL profile; old component scope unchanged |
+UNKNOWN HANDOFFS: 0
+
+FINAL RESULTS ODDS
+PROCESSOR: processCertificationOddsCalculationJob
+EXECUTION MODEL: existing canonical Director Odds route schedules bound Preview after(); no Queue engine
+CERTIFICATION ADMISSION: PASS, exact Model D context and existing canonical Odds wrapper
+CLAIM/CHECKPOINT: existing durable Odds claim/checkpoint CAS, 2,500-iteration chunks; local 10,000-iteration Final Results proof recorded 4 checkpoints / 1 attempt
+RETRY: existing durable checkpoint/recovery/restart semantics; no new Queue retry model
+PUBLICATION: separate authorized Director canonical Odds publication, exact source/result/milestone/phase; not worker publication
+CURRENT POINTER: one verified current-for-milestone Final Results publication
+ADDITIONAL CORRECTION REQUIRED: NO to the Odds processor/execution model
+RUNTIME: existing Director route maxDuration=800 seconds; owned local representative Final Results elapsed 7.645 seconds. Hosted runtime/plan capability is verified at D5/D7, not inferred from local timing.
+
+FINALRECAP EXECUTION
+ELIGIBILITY: exactly 24 canonical matches, all FINAL and complete; verified current-for-milestone Odds publication milestone Final Results and published phase Final Results. Existing Intelligence builder also requires coherent official winner/team-score context.
+DEMAND: existing canonical source-change/official Odds publication demand, no manual job insert
+PROCESSOR: recalculateIntelligenceDerivedTournament, job family TOURNAMENT_FINAL_RECAP
+EXECUTION MODEL: existing private native Queue supervisor -> reservation BEGIN -> Intelligence claim -> existing result processor
+CURRENT SCOPE DENIAL: old component scope denies ready FinalRecap and Final Results publication
+ROOT CAUSE: intentional earlier component scope limitation, not missing calculation logic
+SELECTED CORRECTION: owner-registered Model D profile enables fixed sixth engine and allows truthful Final Results/eligible recap scope; old resource retains five-engine and historical scope limits
+CLAIM: common canonical CAS/source guard
+LEASE: 90 seconds, unchanged
+RETRY: durable common transient backoff, attempts preserved
+ATTEMPT LIMIT: 5 per current-source cycle, unchanged; explicit Director recovery creates lawful new budget and preserves history
+DEAD LETTER: truthful terminal failure and distinct Director recovery
+STALE SOURCE: old active claim completion denied STALE_INTELLIGENCE_WORKER after lawful reopen/refinalize source transition; no old output becomes current
+STOP/HALT: denied/ACK closed, no worker execution
+PUBLICATION: existing OFFICIAL current Intelligence snapshot is participant publication; no separate new publication authority
+CURRENT POINTER: exactly one current TOURNAMENT_FINAL_RECAP snapshot
+REPLAY: reservation/claim duplicate safe, no duplicate result
+RESOURCE BINDING: exact registered new resource/project/epoch/context
+DEPLOYMENT BINDING: exact current release/deployment/origin
+FINANCIAL AUTHORITY: unchanged; workers still cannot create financial facts or arbitrarily publish Calcutta/Odds
+
+FINALRECAP COMPATIBILITY
+BOUNDED INVOCATION: PASS, one existing private Queue cycle
+RUNTIME: 0.424 seconds representative owned-local successful FinalRecap cycle
+WITHIN PROVIDER LIMIT: YES, local margin below unchanged 45-second soft cutoff / 60-second Queue provider ceiling
+DUPLICATE DELIVERY: PASS
+STALE SOURCE: DENIED/PASS
+STOP: DENIED/PASS
+HALT: DENIED/PASS
+WRONG RESOURCE: DENIED/PASS
+PRODUCTION: DENIED/PASS
+Eligibility-admission proof used real canonical Director/scoring operations to create 24 complete FINAL local scorecards and actual Final Results after() calculation/publication. It was necessary to satisfy the exact predicate; it was not a full chronological dress rehearsal. No manual score/job/result inserts or timestamp edits were used. Historical Part 2B-1 torture matrix was not rerun.
+
+FULL CHRONOLOGY EXECUTION MAP
+PRE-TOURNAMENT: owner fixture only after separate authorization; shipping reads; normal Director Net Skins entries/config, Calcutta auction/purchases and fixed Odds settings; Director Odds after() calculates/publishes Pre-Tournament
+R1 SETUP: canonical Director round pairings and prepare-scoring-context
+R1 SCORING: canonical Mark Live/access then permitted participant score operations
+R1 FINALIZE: canonical lock/complete-card validation/Finalize
+R1 DERIVED: existing score-intent materialization + normal private Queue families/CALCUTTA; synchronous Net Skins update when applicable
+R1 ODDS: Director calculate after() then publish After Round 1
+R2 SETUP: canonical Director round/pairing/scoring preparation
+R2 SCORING: canonical live/access/participant score operations
+R2 FINALIZE: canonical lock/Finalize six complete SC matches
+R2 DERIVED: normal private Queue and applicable Net Skins Director calculation
+R2 ODDS: Director after()/publication at After Round 2
+R3 PAIRINGS: canonical Director SI pairing announcement/setup; fixed structural rows already exist, no fake historical actions
+R3 ODDS: Director after()/publication at Round 3 Pairings Announced before live SI scoring
+R3 SCORING: normal preparation/live/access/participant scoring twelve SI matches
+R3 FINALIZE: lock/Finalize twelve complete cards
+FINAL NET SKINS: DIRECTOR.CALCULATE_NET_SKINS, existing synchronous processor; OFFICIAL automatic publication
+FINAL CALCUTTA: normal canonical demand -> autonomous CALCUTTA calculation -> existing required DIRECTOR.PUBLISH_CALCUTTA; immutable auction history
+FINAL RESULTS ODDS: verify 24 complete FINAL; same Director after() calculation -> exact Director publication
+FINALRECAP ELIGIBILITY: canonical SQL/readback false immediately before current verified Final Results publication, true after
+FINALRECAP PROCESSING: fixed sixth private Queue engine, existing Intelligence processor
+FINALRECAP PUBLICATION: existing current OFFICIAL snapshot
+FINAL READBACK: shipping Home/My Match/Tournament/Leaderboards/Guide/History/Net Skins/Calcutta/Odds/Recap reads; integrity/evidence/drain then STOP
+UNKNOWN HANDOFFS: 0
+Milestones are the installed ODDS_PHASES, not invented labels. Each request/publication still validates the current canonical source; planned labels never grant authority. No future match is scored or Finalized early. If installed source/state truthfully differs, follow canonical readiness rather than fabricate chronology.
+
+RESOURCE-BINDING ACCEPTANCE PLAN
+PART 1A-DERIVED: exact new image/source digests, atomic install/replay, complete catalog including dependency multiplicity/owners/security/search_paths/ACL/RLS/private cores and receipt
+PART 1B-DERIVED: new exact resource/project/server/public fingerprints, unique epoch, one READY Preview SHA/origin/team/project/branch, new release/binding replay, wrong resource/project/deployment/release negatives
+PART 2A-DERIVED: D7 no-send provider sessions (one Director/two participants) plus signed-out/context denials. Positive Director entitlement/lifecycle and representative participant score/write/read are first normal D10 operations AFTER separately approved D9 fixture. D7 must not fabricate rows or scores to simulate these proofs.
+PART 2B-1-DERIVED: D7 one private Queue NO_WORK delivery and STOP closure under exact new binding; first ordinary derived work in D10 closes autonomous changed-binding execution. No fault/lease/dead-letter/concurrency torture.
+PART 2B-2-DERIVED: normal Net Skins/Calcutta/Odds execution during dress rehearsal
+FULL PRIOR PHASE RERUN REQUIRED: NO
+D7 cannot truthfully perform positive tournament score/lifecycle mutations before D9 creates the structure. This dependency is explicit; D1–D8 accept trust only. D9 and D10 remain separately authorized.
+
+EVIDENCE CONTINUITY
+EXISTING CERTIFICATION RESOURCE: PRESERVED, no access or mutation this task
+PART 1A: earlier certified catalog/security behavior remains attributable; new target verifies the exact consolidated image/catalog/receipt
+PART 1B: prior isolation model remains valid; new physical resource/credentials/release/deployment must be uniquely bound and accepted
+PART 2A: prior Auth/RLS/scoring/lifecycle behavior remains valid; new identities/context get focused acceptance through normal initial actions
+PART 2B-1: prior transport/recovery/concurrency passes preserved; only new binding/private delivery and fixed Recap admission need acceptance
+PART 2B-2: side-game/Odds mathematics/adapters preserved; normal Model D chronology exercises them on clean sources
+PART 2C: new resource provides full chronological integration proof, not yet executed
+EXISTING PRIMARY SCORE HASH: 65d681768443dd830613365cb27cbee1e2ab6643a20aad85371bcfcfd5072be4
+EXISTING HISTORY MUTATED: NO
+Preserved checkpoint evidence is retained, not freshly queried in this local-only task. The forward compatibility test also hashes all 274 modeled existing application tables before/after and proves unchanged history; only 13 reviewed function bodies change, with existing ACL/owner/RLS/security/search_path metadata exact. Old scopes/registration/binding remain unchanged.
+
+RESOURCE ISOLATION
+OLD CERTIFICATION -> MODEL D: DENIED
+MODEL D -> OLD CERTIFICATION: DENIED
+MODEL D -> PRODUCTION: DENIED
+MODEL D -> OLD PREVIEW: DENIED
+CLIENT RESOURCE SELECTION: DENIED
+SHARED AUTHORITY EPOCH: NO
+SHARED RUNTIME CREDENTIAL: NO
+
+NEGATIVE STRUCTURAL PROOF
+MISSING PLAYER: DENIED
+DUPLICATE PLAYER: DENIED
+WRONG TEAM: DENIED
+MISSING ROUND: DENIED
+WRONG MATCH COUNT: DENIED
+WRONG FORMAT: DENIED
+DUPLICATE MATCH: DENIED
+WRONG HOLE COUNT: DENIED
+PREEXISTING TARGET: DENIED
+ADMISSION ENABLED: DENIED
+INGRESS OPEN: DENIED
+SUPERVISOR RUNNING: DENIED
+WRONG RESOURCE: DENIED
+PRODUCTION: DENIED
+Wrong round relationship, project, release and deployment also denied. Mid-operation failure leaves no partial fixture or audit.
+
+COST
+NEW SUPABASE RESOURCE REQUIRED: YES, one dedicated project; none created
+ESTIMATED FIXED COST: Micro $0.01344/hour (~$10/month provider estimate), before credits/tax/usage; 7–14 days = approximately $2.26–$4.52 compute, rounded hours
+EXPECTED TEMPORARY LIFETIME: 7–14 days; retain only until evidence/backup verified and owner approves cleanup
+VERCEL FIXED COST: no additional seat assumed on existing team; current plan/project allowance must be verified at creation, no fixed-fee guarantee
+QUEUE / FUNCTION COST: indicative iad1 Queue $0.60/million metered operations; 10,000 operations ~$0.006. Functions separate; illustrative 1 CPU-hour plus 2 GB-hours ~$0.15 before plan inclusion/credits
+DATABASE USAGE: modest fixed structural fixture plus normal rehearsal score/receipt/audit/checkpoint history; measured compute time and disk/egress must be recorded hosted; no capacity/invoice claim from local fixture
+CREDITS / PLAN DEPENDENCY: paid Supabase organization includes $10 monthly shared compute credit, not a new credit per project. Available credit/plan unknown locally; reverify before creating. Organization plan/add-on charges are separate. No PITR/custom-domain/extra-seat add-on requested.
+EXACT FUTURE INVOICE: NOT CLAIMED
+Provider references verified 2026-10-06:
+https://supabase.com/docs/guides/platform/manage-your-usage/compute
+https://vercel.com/docs/queues/pricing
+https://vercel.com/docs/pricing/regional-pricing/iad1
+Queue metering includes send/receive/delete/visibility/notification units and payload chunks; delayed messages are not assumed free.
+
+CLEANUP PLAN
+RESOURCE RETIRED AFTER CERTIFICATION: YES, recommended TEMPORARY CERTIFICATION RESOURCE
+EVIDENCE TO PRESERVE: exact commit/image/manifest/catalog, registration/receipt/binding acceptance, provider configuration fingerprint without secrets, chronology and score/result/publication/audit/worker history, final checkpoint, timing/usage records, verified backup + digest/restore instructions
+CREDENTIALS TO REVOKE: Model D runtime/database keys, publishable key according to provider supported revocation, synthetic Auth sessions/passwords and deployment-protection credentials
+VERCEL CONFIG / DEPLOYMENT CLEANUP: remove only dedicated Model D deployments/project-specific credentials/selection after archive; old Certification project/deployment configuration untouched
+RESOURCE REGISTRATION: retain immutable registration and an external RETIRED disposition in evidence ledger/backup. Existing registry has no RETIRED state; do not invent a mutation API. Disable Model D checked-in registration after owner-approved retirement.
+SUPABASE PROJECT DELETE AFTER EVIDENCE CAPTURE: YES, only after verified archive/backup and separate deletion authorization; remove only new project
+CLEANUP EXECUTED: NO
+Temporary is preferred: it supplies one clean chronology without paying for a second permanent environment. Retaining it would benefit repeated future clean rehearsals but adds cost and credential maintenance.
+
+LOCAL PROOF
+FOCUSED TESTS: 50 pass / 0 fail / 0 skip, source stable
+FRESH PG17 INSTALL: PASS
+FIXTURE: PASS
+REPLAY: PASS
+ROLLBACK: PASS
+RESOURCE ISOLATION: PASS
+DIRECTOR READINESS: PASS
+SHIPPING READINESS: PASS
+FINALRECAP ADMISSION: PASS
+BROAD RESULT: 4,077 pass / 20 established failures / 0 skip; zero new failures; source stable
+BUILD: PASS, exit 0; source stable
+NEW FAILURES: 0 unexplained
+864-HOLE RERUN: NO
+Existing 20 failures are preserved verbatim in evidence/application.json, not reclassified as passes. Focused successful execution produced one current OFFICIAL recap, all required backlog drained and OFF/disabled/paused final local state.
+
+SOURCE
+BASE SHA: 4d263b3a284ec2feab9f242777d42f3bf01d6ede
+NEW SHA / COMMIT: the consolidated local commit containing this report; exact SHA reported in the completion message. Evidence pins every executable/artifact SHA256 independently and records the base HEAD used during tests.
+PUSH: NO, local-only authorization
+WORKTREE: /private/tmp/bagger-worker-provider-portability
+
+FORWARD SQL
+REQUIRED: YES
+ARTIFACTS: supabase/production_incremental/certification-model-d-execution-v1.sql; new consolidated supabase/model_d_bootstrap/schema.sql, static-contracts.sql, catalog-manifest.json, manifest.json; rendered one-shot owner installation/registration/binding/fixture packages
+HISTORICAL MIGRATIONS CHANGED: NO
+HISTORICAL BOOTSTRAP CHANGED: NO; new separate consolidated image generated from certified committed history
+Model D forward: 13 exact predecessor/body-hash guarded corrections, three new owner-only helpers, two new owner-only RLS tables. Atomic/replay/mismatch/ACL/RLS-drift rollback proven. Existing RLS/policies/roles/metadata unchanged; no role expansion. Existing old resource is NOT a deployment target for this package.
+
+APPLICATION CHANGE
+REQUIRED: YES
+DETAIL: closed old-plus-disabled-Model-D registration selection; immutable trusted Model D routing envelope; profile-aware exact Queue binding and fixed sixth Recap scope. No scoring/Net Skins/Calcutta/Odds math changed. No arbitrary engine/processor. Production routes remain Production-only. No timing/lease/retention/visibility redesign.
+
+HOSTED
+NEW RESOURCE CREATED: NO
+OLD CERTIFICATION MUTATED: NO
+PRODUCTION MUTATED: NO
+OLD PREVIEW MUTATED: NO
+DEPLOYED: NO
+GOOGLE: 0
+REAL MESSAGING: 0
+No fresh hosted read occurred; preserved OFF/disabled/paused checkpoint is retained evidence, not asserted as a new provider readback.
+
+READY TO CREATE MODEL D HOSTED RESOURCE: YES, local package proven; only after owner authorization and current cost/account review
+READY TO PROVISION MODEL D HOSTED FIXTURE: NO
+READY TO BEGIN 24-MATCH PART 2C: NO
+REMAINING BLOCKERS: NONE for local implementation. Real future identities are intentionally unresolved/disabled; D1–D8 hosted trust acceptance, D9 fixture acceptance and D10 rehearsal remain unexecuted.
+
+NEXT OWNER ACTION
+AUTHORIZE CREATION AND INITIALIZATION OF ONE DEDICATED MODEL D CERTIFICATION SUPABASE RESOURCE, INSTALLATION OF THE EXACT CERTIFIED DATABASE IMAGE/FORWARD LINEAGE, RESOURCE REGISTRATION, ISOLATED CERTIFICATION PREVIEW DEPLOYMENT, SAFE RELEASE/DEPLOYMENT BINDING, AND FOCUSED NEW-RESOURCE TRUST/SECURITY ACCEPTANCE.
+Do NOT provision the 24-player/24-match tournament fixture in that authorization. Do NOT begin Part 2C scoring.
+STOP.

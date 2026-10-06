@@ -1,0 +1,320 @@
+PHASE 2D-P PART 2C — FULL FIXTURE / CHRONOLOGY ARCHITECTURE REVIEW
+
+PART 2C FULL-FIXTURE REMEDIATION STATUS: BLOCKED
+SELECTED MODEL: D — NEW DEDICATED CERTIFICATION RESOURCE (ASSESSMENT ONLY)
+
+DECISION
+
+The installed schema supports multiple annual tournament identities. It does
+not support a second canonical 2026 identity: tournaments.tournament_year is
+unique, and future_tournament_catalog_v1 requires tournament_id = year::text.
+The current pointer is one row per resource scope. Future annual administration
+requires a later numeric year and a guarded PREPARE/CLOSE/DRAIN/ACTIVATE chain.
+Activation requires a closed/certified predecessor. The current secondary is
+not FINAL/complete. No pointer overwrite, forged certificate or early closure
+is proposed.
+
+Even a lawful future-year transition would not satisfy this rehearsal's current
+execution contracts: worker_supervisor_binding_v1 requires current tournament
+2026 and the exact existing Certification resource/project; its work accounting
+also selects 2026. The admitted Net Skins configuration adapter requires 2026.
+Future-year domain support is real; it is not interchangeable with the hosted
+Part 2B delivery/configuration paths. Making Model B work would require another
+reviewed execution/configuration scope extension, rather than a structure-only
+owner provisioner. No such change was made.
+
+Model A could add structure without claiming a fresh tournament identity. It
+could certify full-state completion, but cannot certify a beginning-to-end
+chronology: existing hosted Round 3 Final/result/side-game/Odds events would
+predate the added R1/R2 execution. They must not be backdated or relabeled.
+
+Model D preserves the existing resource completely and starts canonical 2026
+from zero in a physically isolated database. This is the preferred architecture
+for a truthful pre-tournament -> R1 -> R2 -> R3 -> Final Results -> FinalRecap
+rehearsal. It was assessed, not created or provisioned.
+
+EXACT ARCHITECTURAL BLOCKER
+
+There is no currently certified provisioning + current-selection + execution
+contract for a clean second rehearsal on this resource. A separate physical
+resource cannot be selected by changing environment variables: the committed
+registration, server supervisor constants, SQL installation guards and SQL
+binding validate the existing resource/project explicitly. Model D therefore
+needs a separately reviewed exact-resource binding and fixed initial-fixture
+package before hosted provisioning can be approved. No generic resource or
+fixture selector is proposed.
+
+EXISTING HISTORY
+PRIMARY SCORES: PRESERVED; 18 existing rows; hash
+65d681768443dd830613365cb27cbee1e2ab6643a20aad85371bcfcfd5072be4
+PRIMARY RESULT: PRESERVED
+PRIMARY STATE: FINAL / revision 36
+SNAPSHOTS: PRESERVED
+SECONDARY: PRESERVED / UPCOMING / revision 1 / locked / unscored
+NET SKINS: PRESERVED / OFFICIAL / current
+CALCUTTA: PRESERVED / auction 2 empty history; auction 3 nonempty; publication 4
+ODDS: PRESERVED / Round 3 Pairings Announced / current / published
+RECEIPTS/AUDITS: PRESERVED
+WORKER HISTORY: PRESERVED
+INSTALLATION RECEIPT / REGISTRATION: PRESERVED
+PROOF LIMIT: no hosted access or mutation during this review. Retained earlier
+hosted read-only checkpoint and before/after table hashes are unchanged. This
+does not claim preservation under an unimplemented new provisioning operation.
+
+NEW TOURNAMENT / FULL STRUCTURE
+TOURNAMENT ID: planned canonical 2026, exclusively inside a new resource
+RESOURCE / PHYSICAL PROJECT: not allocated; no resource created
+PLAYERS: planned 24 unique synthetic canonical players
+TEAMS: planned two / 12 players per team
+ROUNDS: planned three
+MATCHES: planned 24 unique matches
+R1 BB: 6 / four participants per match / two per side
+R2 SC: 6 / four participants per match / two per side
+R3 SI: 12 / two participants per match / one per side
+PARTICIPANT SLOTS: 72 total; all 24 roster players exactly once per round
+MATCH IDS: planned 2026-R1-1..6, 2026-R2-1..6, 2026-R3-1..12
+COURSE/TEE: synthetic C3 / Tournament can be assigned to all three rounds;
+installed readiness compares each snapshot with its round assignment and does
+not require different courses. No hosted course data would be copied. Exact
+new-resource construction remains unproven.
+HOLES: 18 per match / 432 match-hole rows; hole numbers and stroke indices 1..18
+SYNTHETIC COURSE BASIS: 18 par-4 holes, par 72, rating 72, slope 120, 400-yard
+synthetic hole values as in the approved fixture contract; no external import
+INITIAL SCORES: required zero; not provisioned
+INITIAL COMPETITIVE RESULTS: required none; not provisioned
+INITIAL MATCH STATE: UPCOMING, access closed, can_score false
+
+REQUIRED STRUCTURAL FIELDS / RELATIONS
+The package must address canonical tournament identity/year/name/provenance;
+operational destination/start/end/timezone; teams and active roster captains;
+player display identities and ACTIVE team-side memberships; three round formats
+and their team-size/points/allowance details; approved handicap revision/entries/
+current pointer for every roster player; course/tee rating/slope/par and 18 hole
+definitions; round course assignments; stable match identity/format/round;
+match number/course/tee details and truthful preparation state; canonical
+snapshot/reference/handicap context; participant side/slot identity; match-hole
+snapshot references; closed scoring permissions; game-center presentation;
+minimum synthetic Auth links/contact provenance/roles/Director entitlement;
+installation/resource/ingress origin and current-pointer evidence.
+Scoring preparation is performed later by the normal Director operation. No
+owner provisioner may assert competitive readiness by fake fingerprints.
+
+SYNTHETIC AUTH
+24 canonical players do not require 24 provider Auth accounts. Plan only a
+synthetic Director and two representative synthetic participant sessions in
+the new Auth project. Their exact provider identity/link binding needs fresh
+target acceptance; old-resource identities/evidence remain unchanged. No
+provider users were created, no Auth mail was sent, no real PII is used.
+
+CURRENT POINTER STRATEGY
+OLD TOURNAMENT: remains current on its existing resource and queryable there
+NEW TOURNAMENT: initial 2026 current pointer created by certified resource
+initialization inside the dedicated resource
+TRANSITION: no old-resource tournament switch; separately bound Preview selects
+the new reviewed resource through its committed server registration
+OLD RESOURCE / RELEASE: unchanged
+MIXED READS: must be denied by exact target binding; new-resource proof pending
+POINTER AMBIGUITY: none introduced in this review
+
+PROVISIONING OPERATION
+NAME: proposed bootstrap-certification-part2c-tournament-v1; NOT IMPLEMENTED
+AUTHORITY: managed database owner/session only; no persistent RPC or client API
+TRANSACTION: required single owner transaction under resource/admission/setup
+locks, fixed manifest and exact registered physical database/binding checks
+FIXED MANIFEST: required; cannot accept arbitrary player/match/financial JSON
+PRECONDITIONS: new exact resource/project registered; installation receipt and
+current release/deployment exact; disabled scoring/Director admission; PAUSED
+ingress; OFF supervisor; zero claims/leases/UNKNOWN/reservations/handoffs/faults;
+target competitive/financial/publication history absent; no Production scope
+REPLAY: required exact idempotence; not certified for proposed package
+CONFLICT: required denial; not certified for proposed package
+ROLLBACK: required complete transaction rollback; not certified for package
+AUDIT: truthful owner synthetic-provisioning receipt/hash; not fabricated
+PARTIAL FIXTURE POSSIBLE: not yet proven impossible; no provisioner shipped
+NORMAL DIRECTOR REQUIREMENTS: unchanged; no missing-row bypass introduced
+
+SIDE-GAME INITIAL STATE (REQUIRED DESIGN, NOT CREATED)
+NET SKINS: no copied result/current publication; Director creates truthful
+tournament-local entry/config revisions through certified operations
+CALCUTTA: no copied purchases/results/publications; fixed owner configuration
+must use canonical configuration builder; synthetic auction then authored and
+published through normal Director authority at the lawful chronology point
+ODDS SETTINGS: new tournament-local CERTIFICATION_DEFAULTS_V1 configuration;
+no old result/config row import or provenance relabeling
+ODDS PUBLICATION: none initially
+FINALRECAP: ineligible, attempts zero, no result/publication
+GUIDE: new synthetic Guide revision/publication through approved owner Guide
+mechanism; reusable fixed synthetic content, not copied old revision IDs
+DERIVED OUTPUTS: no copied current outputs; ordinary lawful demand/processing
+
+NORMAL DIRECTOR READINESS
+ROUND 1 / ROUND 2 / ROUND 3: full target NOT PROVEN / not provisioned
+MATCH LOOKUP / PAIRINGS / SETUP: full target NOT PROVEN / not provisioned
+Existing guards correctly require structural rows. No guard change made.
+
+SHIPPING READINESS
+TOURNAMENT / GUIDE / HOME / PARTICIPANT CONTEXT: new target NOT PROVEN
+Existing Certification domain passes remain preserved on their original target.
+No second tournament or new resource was admitted to shipping reads.
+
+SECURITY
+NEW PARTICIPANT / ANON / AUTHENTICATED / SERVICE_ROLE PROVISIONING AUTHORITY: NONE
+DIRECTOR WITHOUT OWNER PROVISIONING AUTHORITY: no provisioning API introduced
+DIRECT POINTER MUTATION / PRIVATE ANNUAL OWNER CORE: anon/authenticated/bare
+service_role denied in actual local PG17; controls remained identical
+WRONG RESOURCE / PROJECT: current server environment cannot select them
+WRONG RELEASE / DEPLOYMENT: existing binding predicates unchanged
+PRODUCTION / OLD PREVIEW: existing exclusion predicates unchanged; untouched
+NEW PACKAGE COMPLETE SECURITY MATRIX: NOT RUN; package not implemented
+GOOGLE: 0
+REAL MESSAGING: 0
+RLS CHANGED: NO
+ROLE EXPANSION: NO
+
+STRUCTURAL INVARIANTS / ATOMICITY / NEGATIVE MATRIX
+Installed format/rules: CONFIRMED (24 / 2 / 3 / 24; 6 BB, 6 SC, 12 SI)
+Provisioned 24-player/full-target invariant proof: NOT RUN
+Valid participants/team memberships/round relationships: design required,
+target NOT PROVEN
+Course/hole structure / closed permissions / no duplicate structure: target
+NOT PROVEN
+Fresh provision / exact replay / conflicting replay / rollback / audit: NOT RUN
+Missing/duplicate player; wrong team; missing round; wrong match count;
+duplicate match; wrong format/round relationship; conflicting target;
+enabled admission/open ingress/running supervisor/active claims: proposed
+package must deny all; NOT claimed certified without that package
+No full fixture or competitive state was fabricated to manufacture PASS.
+
+CHRONOLOGY RECONCILIATION
+MODEL A: existing R3 history conflicts with literal beginning-to-end chronology
+MODEL B: future annual support exists, but not compatible with current certified
+2026-only execution/configuration adapters; no lawful sibling 2026 selector
+MODEL D: clean pre-tournament chronology is possible in principle on dedicated
+2026 resource; full provisioning/current-read integration NOT YET CERTIFIED
+TRUTHFUL FULL CHRONOLOGY POSSIBLE TODAY ON EXISTING TARGET: NO
+
+FUTURE PART 2C CHRONOLOGY (AFTER SEPARATE PROVISIONING ACCEPTANCE/AUTHORIZATION)
+1. Read fresh target checkpoint; execute one reviewed atomic full initial fixture
+package; verify structure, zero scores/results, closed permissions, Guide,
+new current pointer, old-resource history; STOP and report. No scoring yet.
+2. After separate rehearsal approval, verify pre-tournament reads; complete
+normal Director operational metadata/team/captain/course/handicap/setup and
+opening R1/R2 pairings. Configure synthetic side-games/Odds inputs lawfully.
+3. Calculate/publish Pre-Tournament Odds once both opening rounds' pairings pass.
+4. Prepare R1 BB through Director; Mark Live/access; score six matches through
+canonical scoring; lock/Finalize each; verify complete R1 and drain derived work.
+5. Publish After Round 1 Odds after R1 closure and R2 pairing readiness.
+6. Prepare/play/lock/Finalize six R2 SC matches; verify complete R2 and drain.
+7. Publish After Round 2 Odds after R2 closure.
+8. Review/announce official R3 Singles pairings through normal Director authority;
+publish Round 3 Pairings Announced Odds only after R2 closure and valid Singles
+pairings. Structural seeded slots do not count as earlier publication events.
+9. Prepare/play/lock/Finalize twelve R3 SI matches; verify all 24 FINAL/complete.
+At lawful source points use Director Net Skins calculation, autonomous Calcutta
+calculation, and separate Director Calcutta publication. Drain current work.
+10. Capture FinalRecap ineligible before the last required prerequisite; calculate
+and publish verified current Final Results Odds only after complete tournament.
+11. Verify FinalRecap eligible; execute/publish through reviewed canonical
+execution admission; verify participant result and all final shipping reads.
+12. Complete drain, owner STOP, disable admissions, PAUSE ingress; report.
+The milestone order/readiness above is from championshipProjectionMissionStatus,
+ODDS_PHASES, installed setup and FinalRecap contracts; not a fabricated clock.
+
+POSITIVE FINALRECAP EXECUTION PLANNING NOTE
+The current preserved supervisor's closed five-engine scope excludes
+TOURNAMENT_FINAL_RECAP. Its SQL scope guard denies an eligible FinalRecap or
+Final Results Odds publication; the application also rejects FINAL_RECAP_READY.
+This is the existing Part2B scope boundary, not evidence of incorrect recap math.
+A fresh database alone does not remove it. Positive Part2C execution admission
+must be separately reviewed before claiming rehearsal readiness. It was not
+changed or fault-tested here. No second worker architecture is proposed.
+
+EVIDENCE CONTINUITY
+Part 1A: installation/catalog/security contract evidence remains attributable
+to its schema/artifact hashes. New target must verify actual installation,
+owner/extension/ACL receipt and hash convergence; no automatic catalog PASS.
+Part 1B: resource/deployment evidence is tuple-specific and stays PASS for the
+old target. New project/credentials/deployment require fresh exact binding,
+isolation and effective configuration acceptance.
+Part 2A: Auth/RLS/Director/scoring algorithms remain certified at their hashes.
+New target needs representative synthetic session/link/entitlement acceptance;
+normal rehearsal then supplies fresh lifecycle integration evidence.
+Part 2B-1: reservation/claim/retry/recovery/concurrency evidence remains valid
+for the certified old tuple and unchanged cores. New literal binding changes
+need focused isolation/native delivery acceptance. Do not repeat the entire
+fault/concurrency/retention matrix by default.
+Part 2B-2: side-game/Odds domain/adapter evidence remains attributable to source
+and function hashes. New target initializes its own synthetic configuration,
+entries and financial facts; rehearsal supplies normal end-to-end integration.
+Part 2C: beginning-to-end chronology has not passed and remains new proof.
+No prior PASS is erased. No complete prior phase is automatically required to
+be rerun; actual changed authority/binding predicates require focused proof.
+
+MODEL D SECURITY / BURDEN / COST
+Dedicated project avoids a mixed-tournament current pointer and leaves old
+score/publication/audit evidence untouched. It requires provider project setup,
+approved synthetic Auth capture-only configuration, exact registration/keys,
+canonical installation, reviewed resource-bound supervisor artifacts, one
+isolated Preview binding and full initial-fixture certification. No Production
+data/schema connection, old Preview fallback, Google or real messaging.
+Adds a physical database resource. Supabase paid additional Micro projects
+start at approximately $10/month prorated compute plus metered usage; eligible
+Free capacity may differ. Account capacity/credits were not queried. No new
+paid resource/cost commitment was made in this review.
+Primary official pricing source: https://supabase.com/pricing
+Compute source: https://supabase.com/docs/guides/platform/manage-your-usage/compute
+
+LOCAL PROOF
+FOCUSED TESTS: 14 PASS / 0 FAIL / 0 SKIP (13 cases plus parent)
+POSTGRESQL: actual 17; real pg-safeupdate enabled
+DEFINITION ATTESTATION: 13 critical function bodies match retained hosted hashes
+FULL PROVISIONING CERTIFICATION: NOT RUN; blocked before package construction
+BROAD RESULT: prior 4,077 pass / 20 established failures / 0 skip retained
+BUILD: prior PASS retained
+Both retained source manifests match current executable files exactly. Only
+assessment/evidence tooling was added; no application or SQL changed. Broad
+regression/build were not rerun.
+NEW UNEXPLAINED FAILURES: 0 in final focused run
+864-HOLE RERUN: NO
+Local bootstrap initially hit a host shared-memory limit. Only the detached
+segment created by this turn's failed bootstrap was removed, after verifying
+its dead creator and zero attachments. Active local database and older segments
+were untouched. Final proof ran successfully and its owned cluster was removed.
+
+SOURCE
+BASE SHA: 4d263b3a284ec2feab9f242777d42f3bf01d6ede
+NEW RUNTIME SHA: NONE / unchanged HEAD
+COMMIT: no new commit; assessment/evidence files uncommitted for review
+PUSH: NO
+WORKTREE: /private/tmp/bagger-worker-provider-portability
+FORWARD SQL REQUIRED FOR IMPLEMENTED CHANGE: NO
+FORWARD SQL ARTIFACT: NONE
+APPLICATION CHANGE IN THIS REVIEW: NO
+MODEL D FUTURE BINDING APPLICATION/SQL CHANGE: REQUIRED, not implemented
+HISTORICAL MIGRATIONS / BOOTSTRAP: unchanged
+
+HOSTED
+ACCESSED THIS REVIEW: NO
+MUTATED: NO
+DEPLOYED: NO
+RESOURCE CREATED: NO
+SUPERVISOR: OFF (retained owner/current checkpoint, not reread this review)
+ADMISSION: DISABLED (same provenance)
+INGRESS: PAUSED (same provenance)
+PENDING / CLAIMS / LEASES / UNKNOWN / DEAD LETTERS / STRANDED: 0 (same provenance)
+PRODUCTION / OLD PREVIEW / GOOGLE / REAL MESSAGING: 0 access/mutations this review
+
+READY FOR HOSTED FIXTURE PROVISIONING: NO
+READY TO RESUME 24-MATCH PART 2C: NO
+
+NEXT OWNER ACTION — ONE BOUNDED ACTION
+AUTHORIZE LOCAL-ONLY MODEL D EXACT-RESOURCE BINDING, FIXED FULL INITIAL-FIXTURE
+PACKAGE AND REQUIRED PART-2C EXECUTION-ADMISSION REVIEW/CERTIFICATION. DO NOT
+CREATE A HOSTED RESOURCE, PROVISION HOSTED DOMAIN STATE OR BEGIN THE TOURNAMENT.
+
+This action resolves the architecture/package gap before any new paid resource
+is approved. A later explicit resource-creation/binding authorization and then
+fixture-only provisioning/verification authorization are required. The 24-match
+chronology remains a separate owner authorization after structural acceptance.
+
+STOP. No hosted provisioning or tournament-day rehearsal began.

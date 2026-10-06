@@ -1,0 +1,53 @@
+{
+  "status": "PASS",
+  "hostedAccess": false,
+  "baseSha": "4d263b3a284ec2feab9f242777d42f3bf01d6ede",
+  "imageManifestSha256": "c50d395eeab4a2e6b35815537b4e27b42af8c93df003d31afdda0d9de146d1b5",
+  "focused": {
+    "tests": 50,
+    "pass": 50,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "broad": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "newFailures": [],
+  "buildExitCode": 0,
+  "sourceStable": true,
+  "finalRecapExecutionMs": 424.38070899999,
+  "oddsExecutionMs": 7645.004916999984,
+  "fixture": {
+    "BB": 6,
+    "SC": 6,
+    "SI": 12,
+    "open": 0,
+    "final": 0,
+    "holes": 432,
+    "teams": 2,
+    "rounds": 3,
+    "scores": 0,
+    "matches": 24,
+    "players": 24
+  },
+  "readyCreateHostedResource": true,
+  "readyProvisionHostedFixture": false,
+  "readyBeginPart2C": false,
+  "nextAuthorizationStages": [
+    "D1",
+    "D2",
+    "D3",
+    "D4",
+    "D5",
+    "D6",
+    "D7",
+    "D8"
+  ],
+  "existingScoreSha256": "65d681768443dd830613365cb27cbee1e2ab6643a20aad85371bcfcfd5072be4",
+  "reportSha256": "343929c411f350e6295a105ae7d117bb0273e11428d67d8b6d075cc65ff95d55"
+}

@@ -1,0 +1,101 @@
+{
+  "contract": "certification-model-d-hosted-staging-v1",
+  "executionAuthorized": false,
+  "baseSha": "4d263b3a284ec2feab9f242777d42f3bf01d6ede",
+  "purpose": "PART2C_DRESS_REHEARSAL",
+  "recommendedLifetimeDays": [7, 14],
+  "registrationTemplate": "config/certification-model-d-registration.json",
+  "bindingTemplate": "config/certification-model-d-binding-request.json",
+  "image": "supabase/model_d_bootstrap/manifest.json",
+  "ownerInstallRenderer": "tools/reliability/certification-model-d-installation.mjs",
+  "ownerRegistrationBindingRenderer": "tools/reliability/certification-model-d-binding.mjs",
+  "ownerFixtureRenderer": "tools/reliability/certification-model-d-fixture.mjs",
+  "fixedFixture": "config/certification-model-d-fixture.json",
+  "preservedResource": {
+    "id": "CERTIFICATION:2857f707-065a-405d-b5fc-b5b6fa1b0f51",
+    "project": "trmcwrljjxwhgtikfdgu",
+    "primaryScoreSha256": "65d681768443dd830613365cb27cbee1e2ab6643a20aad85371bcfcfd5072be4",
+    "accessAuthorized": false
+  },
+  "newHostedIdentityInputs": [
+    "installation/resource UUID", "physical project ref and exact URL",
+    "distinct server and publishable credential SHA256 fingerprints",
+    "Vercel team and project", "fixed codex branch", "exact source commit",
+    "real READY Preview deployment ID and origin", "unique binding UUID",
+    "unique authority epoch UUID"
+  ],
+  "stages": [
+    {"id": "D1", "action": "Owner-approved creation of one dedicated Supabase project after verifying current plan, available compute credits and rate; attest its physical project identity independently of SQL."},
+    {"id": "D2", "action": "Verify PG17 managed Auth prerequisites; render and execute exact owner-only consolidated installation. Verify all image/source digests, complete catalog and new installation receipt inside the atomic transaction; replay once."},
+    {"id": "D3", "action": "Fill and review only the fixed Model D registration template with the new identities and image schema digest; no raw secrets in Git. Render register_certification_resource_v1 owner package; verify unique registration revision 1. No deployment, epoch or current pointer is fabricated."},
+    {"id": "D4", "action": "Verify inactive unbound staging: no admission, epoch, current pointer, domain fixture, competitive work or authority. Do not call canonical initialize with a fictitious deployment."},
+    {"id": "D5", "action": "Commit a binding-only successor enabling the reviewed new registration; all executable sources and image digests must match the locally certified candidate. Deploy one exact commit to isolated Preview with only the new credentials and fixed branch. Verify READY, actual ID/origin/SHA, team/project, no Production domain, no Google/messaging credentials."},
+    {"id": "D6", "action": "Render exact READY deployment binding package. Canonical initialize now creates the empty 2026 root, current pointer revision 1, unique epoch and activation/admission revision 1, ingress PAUSED and OFF supervisor. Verify replay and wrong binding denial."},
+    {"id": "D7", "action": "Verify exact installation/catalog/security, new credential fingerprints and effective runtime binding; foreign resources denied. Create only three no-send synthetic Auth identities and verify provider sessions. Verify signed-out/client and unprovisioned domain denials. One bounded private Queue NO_WORK delivery and STOP closure can use one enable/disable pair; no player, score, match or result is created."},
+    {"id": "D8", "action": "STOP; verify supervisor OFF, all admission disabled, ingress PAUSED, no current work/claims/leases/UNKNOWN/reservations/handoffs/faults. Admission revision must be exactly 1 or 3, according to whether the single D7 enable/disable pair occurred. Preserve trust acceptance evidence. Stop and report to owner."},
+    {"id": "D9", "requiresSeparateOwnerAuthorization": true, "action": "Read exact safe checkpoint and three synthetic Auth identities; render one fixed atomic full fixture package. Verify 24 players, 2 teams, 3 rounds, 24 matches, 432 holes, closed permissions, zero scores/results/work, published synthetic Guide, replay and no historical-resource access. Return OFF/disabled/paused; stop and report."},
+    {"id": "D10", "requiresSeparateOwnerAuthorization": true, "action": "Run chronological Part 2C only after D9 hosted acceptance. Positive participant score and Director lifecycle checks occur as the first normal tournament actions; one ordinary autonomous derived job verifies the changed binding. Prior fault matrices are not repeated."}
+  ],
+  "initialDomains": {
+    "guide": "Published synthetic owner fixture; canonical round-specific C1/C2/C3 contexts",
+    "netSkins": "No entries/configuration/result initially; normal Director pre-tournament entries/configuration and later synchronous calculation",
+    "calcutta": "Canonical initial payout/point configuration only; no auction/purchase/result/publication; normal Director pre-tournament auction/purchase chronology",
+    "oddsSettings": "Absent initially; normal DIRECTOR.CONFIGURE_ODDS_INPUTS with CERTIFICATION_DEFAULTS_V1 / CERTIFICATION_SYNTHETIC before opening milestone",
+    "oddsPublications": 0,
+    "finalRecap": "Ineligible, zero attempts/results/publications",
+    "derivedWork": 0
+  },
+  "plannedNormalDirectorConfiguration": {
+    "netSkins": {
+      "entries": {"round1BB": ["P12", "P13"], "round2SC": [["P11", "P12"], ["P13", "P14"]], "round3SI": ["P12", "P13"]},
+      "save": "Canonical NET_SKINS_ENTRIES save per round, initial entry revision 1; select only existing canonical entries and their pair identities",
+      "configure": {"family": "NET_SKINS_CONFIGURATION", "action": "configure", "payload": {"expectedConfigurationRevision": 0, "eligibleRoundNumbers": [1, 2, 3], "entryRevisions": {"1": 1, "2": 1, "3": 1}}},
+      "installedRules": "BB/SI individual $25 synthetic buy-in; SC pair $50; two entries per round yield expected pots $50/$100/$50. OFFICIAL_ONLY; NO_SKIN_NO_CARRY / NO_CARRY; all eligible entry holes and referenced official matches required. These are normal Director operations after fixture acceptance, never owner-created results."
+    },
+    "calcutta": {
+      "transport": "Canonical CALCUTTA_MANAGEMENT replace-auction / management-entry, using exact current revision/fingerprint guards from readback",
+      "entry": {"playerId": "P01", "purchasePrice": "1", "owners": [{"buyerId": "P12", "percentage": "100"}]},
+      "purpose": "Minimum synthetic nonempty purchase, ownership and $1 pot, existing canonical payout/point rules; no real financial data. Separate Director publication follows actual calculation."
+    },
+    "odds": {"operation": "DIRECTOR.CONFIGURE_ODDS_INPUTS", "profile": "CERTIFICATION_DEFAULTS_V1", "provenance": "CERTIFICATION_SYNTHETIC", "historicalRatings": {}}
+  },
+  "auth": {
+    "director": {"player": "P01", "uuid": "d2000000-0000-4000-8000-000000000001", "email": "model-d-director@synthetic.bagger-certification.invalid"},
+    "participantA": {"player": "P12", "uuid": "d2000000-0000-4000-8000-000000000012", "email": "model-d-participant-a@synthetic.bagger-certification.invalid"},
+    "participantB": {"player": "P13", "uuid": "d2000000-0000-4000-8000-000000000013", "email": "model-d-participant-b@synthetic.bagger-certification.invalid"},
+    "mechanism": "Managed Admin createUser with fixed reviewed UUID, email_confirm true, synthetic password sign-in; no invitation/OTP email, SMS or push; role/entitlement links are created only by separately authorized fixture package"
+  },
+  "executionInventory": [
+    {"domain": "Score-derived", "mechanism": "Canonical transactional score intent; fixed supervisor materializes intents then invokes existing engine families", "processor": "Existing score-derived SQL intent materialization and family processors", "alreadyAdmitted": true, "correction": "Exact Model D binding only"},
+    {"domain": "TEAM_MOMENTUM", "mechanism": "Private Queue supervisor", "processor": "recalculateCompetitionDerivedTournament", "alreadyAdmitted": true, "correction": "Exact Model D binding only"},
+    {"domain": "TOURNAMENT_STORYLINES", "mechanism": "Private Queue supervisor", "processor": "recalculateCompetitionDerivedTournament", "alreadyAdmitted": true, "correction": "Exact Model D binding only"},
+    {"domain": "TOURNAMENT_INTELLIGENCE", "mechanism": "Private Queue supervisor", "processor": "recalculateIntelligenceDerivedTournament", "alreadyAdmitted": true, "correction": "Exact Model D binding only"},
+    {"domain": "PROJECTION_EDITORIAL", "mechanism": "Private Queue supervisor", "processor": "recalculateIntelligenceDerivedTournament", "alreadyAdmitted": true, "correction": "Exact Model D binding only"},
+    {"domain": "CALCUTTA", "mechanism": "Private Queue supervisor; separate Director publication", "processor": "processProductionCalcuttaV1Job", "alreadyAdmitted": true, "correction": "Exact Model D binding only"},
+    {"domain": "Net Skins", "mechanism": "Synchronous DIRECTOR.CALCULATE_NET_SKINS; OFFICIAL automatic publication", "processor": "processProductionNetSkinsV1Job", "alreadyAdmitted": true, "correction": "Existing Certification adapters accept registered Model D profile"},
+    {"domain": "Odds", "mechanism": "Canonical Director route + bound Preview after(); separate Director publication", "processor": "processCertificationOddsCalculationJob", "alreadyAdmitted": true, "correction": "Existing fixed input adapter accepts registered Model D profile"},
+    {"domain": "Final Results Odds", "mechanism": "Same Odds after() path, exact final completeness prerequisites", "processor": "processCertificationOddsCalculationJob", "alreadyAdmitted": true, "correction": "None to Odds processor; Model D supervisor may coexist with truthful Final Results publication"},
+    {"domain": "FinalRecap", "mechanism": "Existing Intelligence private Queue processor; current OFFICIAL snapshot is publication", "processor": "recalculateIntelligenceDerivedTournament / TOURNAMENT_FINAL_RECAP", "alreadyAdmitted": false, "correction": "Fixed sixth engine only for owner-registered PART2C_DRESS_REHEARSAL profile; old component scope unchanged"}
+  ],
+  "chronology": [
+    "Pre-tournament reads; normal Director Net Skins entries/configuration, synthetic Calcutta auction/purchases and fixed Odds inputs; calculate/publish Pre-Tournament Odds",
+    "Round 1 BB setup, prepare scoring context, Mark Live/open permissions, canonical participant scores, lock/Finalize six complete scorecards",
+    "Normal autonomous derived/Calcutta drain; applicable Net Skins synchronous update; calculate/publish After Round 1 Odds",
+    "Round 2 SC setup, prepare, Mark Live/open, canonical scores, lock/Finalize six complete scorecards",
+    "Derived/Calcutta drain; applicable Net Skins update; calculate/publish After Round 2 Odds",
+    "Round 3 SI canonical pairing announcement/setup, calculate/publish Round 3 Pairings Announced Odds before live scoring",
+    "Prepare, Mark Live/open, canonical scores, lock/Finalize twelve complete Singles scorecards; normal derived drain",
+    "Final Net Skins calculation and truthful OFFICIAL automatic publication; final autonomous Calcutta calculation and required separate Director publication",
+    "Independently verify exactly 24 complete FINAL matches and current projections; capture FinalRecap ineligible before verified Final Results Odds publication",
+    "Same checkpointed after() Odds processor calculates Final Results; Director publishes exact current Final Results result; capture FinalRecap eligibility transition",
+    "Normal private Queue executes fixed TOURNAMENT_FINAL_RECAP through existing Intelligence processor, publishes current OFFICIAL snapshot; verify replay/readback",
+    "All shipping domain reads, history/integrity/evidence capture, complete drain, STOP and OFF/disabled/paused"
+  ],
+  "cleanup": {
+    "executed": false,
+    "recommendedDisposition": "Temporary resource",
+    "evidence": ["Exact source and image digests", "Registration and installation receipts", "Catalog/security manifests", "Auth/binding acceptance without secrets", "Chronology ledger", "Score/result/publication/receipt/audit history", "Queue/claim/recovery ledger", "Final drain/checkpoint", "Database backup with digest and restore instructions", "Provider usage record"],
+    "credentials": ["Model D runtime secret and publishable keys", "Model D synthetic Auth sessions/passwords", "Model D database credentials", "Dedicated deployment protection credentials"],
+    "disposition": "Owner-approved disable/STOP first; archive evidence and retired registration in external certification ledger (existing registry has no RETIRED enum); remove only Model D Vercel deployment/project/config; delete only Model D Supabase project after evidence/backup verification. Preserve old resource and all its bindings. No cleanup is authorized or executed now."
+  }
+}

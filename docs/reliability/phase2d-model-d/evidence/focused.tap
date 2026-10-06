@@ -1,0 +1,344 @@
+TAP version 13
+# Subtest: Model D exact Final Results Odds eligibility and native Queue FinalRecap admission
+    # Subtest: fresh fixture FinalRecap ineligible and no attempt, calculation or publication
+    ok 1 - fresh fixture FinalRecap ineligible and no attempt, calculation or publication
+      ---
+      duration_ms: 17.683166
+      type: 'test'
+      ...
+    # Subtest: Director configures fixed synthetic Odds inputs through actual route
+    ok 2 - Director configures fixed synthetic Odds inputs through actual route
+      ---
+      duration_ms: 91.358625
+      type: 'test'
+      ...
+    # Subtest: bounded exact-eligibility source model: all 24 complete FINAL via canonical Director/scoring
+    ok 3 - bounded exact-eligibility source model: all 24 complete FINAL via canonical Director/scoring
+      ---
+      duration_ms: 28263.125417
+      type: 'test'
+      ...
+# Model D local drain 0 {
+#   dead_letters: 0,
+#   pending_work: 4,
+#   active_claims: 0,
+#   active_leases: 0,
+#   expired_claims: 0,
+#   pending_intents: 432
+# }
+# Model D local drain 5 {
+#   dead_letters: 0,
+#   pending_work: 2,
+#   active_claims: 0,
+#   active_leases: 0,
+#   expired_claims: 0,
+#   pending_intents: 312
+# }
+# Model D local drain 10 {
+#   dead_letters: 0,
+#   pending_work: 2,
+#   active_claims: 0,
+#   active_leases: 0,
+#   expired_claims: 0,
+#   pending_intents: 192
+# }
+# Model D local drain 15 {
+#   dead_letters: 0,
+#   pending_work: 2,
+#   active_claims: 0,
+#   active_leases: 0,
+#   expired_claims: 0,
+#   pending_intents: 72
+# }
+    # Subtest: normal private Queue drains exact-source modeling backlog while FinalRecap remains ineligible
+    ok 4 - normal private Queue drains exact-source modeling backlog while FinalRecap remains ineligible
+      ---
+      duration_ms: 203332.468875
+      type: 'test'
+      ...
+    # Subtest: Final Results Odds uses existing bound Preview after() checkpointed processor; no Queue engine
+    ok 5 - Final Results Odds uses existing bound Preview after() checkpointed processor; no Queue engine
+      ---
+      duration_ms: 7789.156833
+      type: 'test'
+      ...
+    # Subtest: separate Director Final Results publication is final eligibility predicate
+    ok 6 - separate Director Final Results publication is final eligibility predicate
+      ---
+      duration_ms: 135.688042
+      type: 'test'
+      ...
+    # Subtest: real FinalRecap claim is superseded by lawful source advance; old completion denied
+    ok 7 - real FinalRecap claim is superseded by lawful source advance; old completion denied
+      ---
+      duration_ms: 17919.777083
+      type: 'test'
+      ...
+    # Subtest: FinalRecap common transient backoff, preserved attempts and terminal dead-letter
+    ok 8 - FinalRecap common transient backoff, preserved attempts and terminal dead-letter
+      ---
+      duration_ms: 24388.19825
+      type: 'test'
+      ...
+    # Subtest: private Queue reservation executes existing Intelligence FinalRecap processor and publishes current result
+    ok 9 - private Queue reservation executes existing Intelligence FinalRecap processor and publishes current result
+      ---
+      duration_ms: 10618.130291
+      type: 'test'
+      ...
+    # Subtest: completed old claim cannot write twice
+    ok 10 - completed old claim cannot write twice
+      ---
+      duration_ms: 18.678791
+      type: 'test'
+      ...
+    # Subtest: participant-safe FinalRecap projection contains current result without claims or receipts
+    ok 11 - participant-safe FinalRecap projection contains current result without claims or receipts
+      ---
+      duration_ms: 20.609541
+      type: 'test'
+      ...
+    # Subtest: STOP closes retained message without another worker/claim; wrong binding denied
+    ok 12 - STOP closes retained message without another worker/claim; wrong binding denied
+      ---
+      duration_ms: 127.97725
+      type: 'test'
+      ...
+    # Subtest: complete drain, OFF, disabled, paused and one current FinalRecap
+    ok 13 - complete drain, OFF, disabled, paused and one current FinalRecap
+      ---
+      duration_ms: 37.024917
+      type: 'test'
+      ...
+    1..13
+ok 1 - Model D exact Final Results Odds eligibility and native Queue FinalRecap admission
+  ---
+  duration_ms: 297161.546709
+  type: 'test'
+  ...
+# Subtest: Model D forward install preserves old-resource history and exact metadata; replay/mismatch rollback
+ok 2 - Model D forward install preserves old-resource history and exact metadata; replay/mismatch rollback
+  ---
+  duration_ms: 17816.405541
+  type: 'test'
+  ...
+# Subtest: Model D fresh installation, exact resource and owner-only atomic full fixture
+    # Subtest: empty PG17 installation exact catalog ACL RLS owners search_paths dependencies and replay
+    ok 1 - empty PG17 installation exact catalog ACL RLS owners search_paths dependencies and replay
+      ---
+      duration_ms: 579.107917
+      type: 'test'
+      ...
+    # Subtest: rendered owner installation package verifies full catalog atomically and replays exactly
+    ok 2 - rendered owner installation package verifies full catalog atomically and replays exactly
+      ---
+      duration_ms: 3913.287458
+      type: 'test'
+      ...
+    # Subtest: installation fault rolls back all schemas on empty target
+    ok 3 - installation fault rolls back all schemas on empty target
+      ---
+      duration_ms: 2704.341417
+      type: 'test'
+      ...
+    # Subtest: registration binding replay exact, conflicting replay rolls back and placeholders disabled
+    ok 4 - registration binding replay exact, conflicting replay rolls back and placeholders disabled
+      ---
+      duration_ms: 71.675125
+      type: 'test'
+      ...
+    # Subtest: owner package denied to all client roles including service_role and Director-shaped JWT
+    ok 5 - owner package denied to all client roles including service_role and Director-shaped JWT
+      ---
+      duration_ms: 49.68225
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding missingPlayer
+    ok 6 - denied fixed structure/binding missingPlayer
+      ---
+      duration_ms: 31.823042
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding duplicatePlayer
+    ok 7 - denied fixed structure/binding duplicatePlayer
+      ---
+      duration_ms: 26.519292
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding wrongTeam
+    ok 8 - denied fixed structure/binding wrongTeam
+      ---
+      duration_ms: 26.849334
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding missingRound
+    ok 9 - denied fixed structure/binding missingRound
+      ---
+      duration_ms: 26.4875
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding wrongMatchCount
+    ok 10 - denied fixed structure/binding wrongMatchCount
+      ---
+      duration_ms: 26.262209
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding wrongFormat
+    ok 11 - denied fixed structure/binding wrongFormat
+      ---
+      duration_ms: 26.1085
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding duplicateMatch
+    ok 12 - denied fixed structure/binding duplicateMatch
+      ---
+      duration_ms: 26.389208
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding wrongHoles
+    ok 13 - denied fixed structure/binding wrongHoles
+      ---
+      duration_ms: 26.313375
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding wrongRoundRelationship
+    ok 14 - denied fixed structure/binding wrongRoundRelationship
+      ---
+      duration_ms: 25.919834
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding wrongResource
+    ok 15 - denied fixed structure/binding wrongResource
+      ---
+      duration_ms: 22.393417
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding wrongProject
+    ok 16 - denied fixed structure/binding wrongProject
+      ---
+      duration_ms: 22.527958
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding wrongRelease
+    ok 17 - denied fixed structure/binding wrongRelease
+      ---
+      duration_ms: 23.867083
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding wrongDeployment
+    ok 18 - denied fixed structure/binding wrongDeployment
+      ---
+      duration_ms: 24.33075
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding production
+    ok 19 - denied fixed structure/binding production
+      ---
+      duration_ms: 22.222708
+      type: 'test'
+      ...
+    # Subtest: denied fixed structure/binding oldPreview
+    ok 20 - denied fixed structure/binding oldPreview
+      ---
+      duration_ms: 22.330667
+      type: 'test'
+      ...
+    # Subtest: denied unsafe checkpoint admissionEnabled
+    ok 21 - denied unsafe checkpoint admissionEnabled
+      ---
+      duration_ms: 24.774667
+      type: 'test'
+      ...
+    # Subtest: denied unsafe checkpoint ingressOpen
+    ok 22 - denied unsafe checkpoint ingressOpen
+      ---
+      duration_ms: 27.106208
+      type: 'test'
+      ...
+    # Subtest: denied unsafe checkpoint supervisorRunning
+    ok 23 - denied unsafe checkpoint supervisorRunning
+      ---
+      duration_ms: 27.91425
+      type: 'test'
+      ...
+    # Subtest: failure after structural creation atomically rolls back every row and audit
+    ok 24 - failure after structural creation atomically rolls back every row and audit
+      ---
+      duration_ms: 54.484625
+      type: 'test'
+      ...
+    # Subtest: fixed fixture exact 24 2 3 24 6BB 6SC 12SI 432 zero scores results closed permissions
+    ok 25 - fixed fixture exact 24 2 3 24 6BB 6SC 12SI 432 zero scores results closed permissions
+      ---
+      duration_ms: 161.210375
+      type: 'test'
+      ...
+    # Subtest: preexisting conflicting target is denied atomically before provisioning
+    ok 26 - preexisting conflicting target is denied atomically before provisioning
+      ---
+      duration_ms: 45.087834
+      type: 'test'
+      ...
+    # Subtest: fixture exact replay adds no structural or audit rows; conflicting replay and drift denied
+    ok 27 - fixture exact replay adds no structural or audit rows; conflicting replay and drift denied
+      ---
+      duration_ms: 77.527
+      type: 'test'
+      ...
+    # Subtest: server exact-resource isolation and no client selector
+    ok 28 - server exact-resource isolation and no client selector
+      ---
+      duration_ms: 0.71125
+      type: 'test'
+      ...
+    # Subtest: Model D native routing accepts only validated immutable server registration
+    ok 29 - Model D native routing accepts only validated immutable server registration
+      ---
+      duration_ms: 13.602542
+      type: 'test'
+      ...
+    # Subtest: shipping Tournament Guide Home participant context exact resource; private tables inaccessible
+    ok 30 - shipping Tournament Guide Home participant context exact resource; private tables inaccessible
+      ---
+      duration_ms: 174.583416
+      type: 'test'
+      ...
+    # Subtest: initial participant score submission remains denied with every permission revoked
+    ok 31 - initial participant score submission remains denied with every permission revoked
+      ---
+      duration_ms: 36.175375
+      type: 'test'
+      ...
+    # Subtest: closed Model D engine registry and all foreign runtime identities deny without work
+    ok 32 - closed Model D engine registry and all foreign runtime identities deny without work
+      ---
+      duration_ms: 192.567291
+      type: 'test'
+      ...
+    # Subtest: normal Director setup all rounds and all matches; no scores or final state
+    ok 33 - normal Director setup all rounds and all matches; no scores or final state
+      ---
+      duration_ms: 1746.735333
+      type: 'test'
+      ...
+    1..33
+ok 3 - Model D fresh installation, exact resource and owner-only atomic full fixture
+  ---
+  duration_ms: 14413.539583
+  type: 'test'
+  ...
+# Subtest: D7 empty-resource Queue acceptance and D8 STOP do not obstruct separately authorized D9 fixture
+ok 4 - D7 empty-resource Queue acceptance and D8 STOP do not obstruct separately authorized D9 fixture
+  ---
+  duration_ms: 14382.955125
+  type: 'test'
+  ...
+1..4
+# tests 50
+# suites 0
+# pass 50
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 344159.180542

@@ -1,0 +1,157 @@
+{
+  "hosted": false,
+  "pg17": true,
+  "safeupdate": "on",
+  "cases": [
+    {
+      "name": "empty PG17 installation exact catalog ACL RLS owners search_paths dependencies and replay",
+      "result": "PASS"
+    },
+    {
+      "name": "rendered owner installation package verifies full catalog atomically and replays exactly",
+      "result": "PASS"
+    },
+    {
+      "name": "installation fault rolls back all schemas on empty target",
+      "result": "PASS"
+    },
+    {
+      "name": "registration binding replay exact, conflicting replay rolls back and placeholders disabled",
+      "result": "PASS"
+    },
+    {
+      "name": "owner package denied to all client roles including service_role and Director-shaped JWT",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding missingPlayer",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding duplicatePlayer",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding wrongTeam",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding missingRound",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding wrongMatchCount",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding wrongFormat",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding duplicateMatch",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding wrongHoles",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding wrongRoundRelationship",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding wrongResource",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding wrongProject",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding wrongRelease",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding wrongDeployment",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding production",
+      "result": "PASS"
+    },
+    {
+      "name": "denied fixed structure/binding oldPreview",
+      "result": "PASS"
+    },
+    {
+      "name": "denied unsafe checkpoint admissionEnabled",
+      "result": "PASS"
+    },
+    {
+      "name": "denied unsafe checkpoint ingressOpen",
+      "result": "PASS"
+    },
+    {
+      "name": "denied unsafe checkpoint supervisorRunning",
+      "result": "PASS"
+    },
+    {
+      "name": "failure after structural creation atomically rolls back every row and audit",
+      "result": "PASS"
+    },
+    {
+      "name": "fixed fixture exact 24 2 3 24 6BB 6SC 12SI 432 zero scores results closed permissions",
+      "result": "PASS"
+    },
+    {
+      "name": "preexisting conflicting target is denied atomically before provisioning",
+      "result": "PASS"
+    },
+    {
+      "name": "fixture exact replay adds no structural or audit rows; conflicting replay and drift denied",
+      "result": "PASS"
+    },
+    {
+      "name": "server exact-resource isolation and no client selector",
+      "result": "PASS"
+    },
+    {
+      "name": "Model D native routing accepts only validated immutable server registration",
+      "result": "PASS"
+    },
+    {
+      "name": "shipping Tournament Guide Home participant context exact resource; private tables inaccessible",
+      "result": "PASS"
+    },
+    {
+      "name": "initial participant score submission remains denied with every permission revoked",
+      "result": "PASS"
+    },
+    {
+      "name": "closed Model D engine registry and all foreign runtime identities deny without work",
+      "result": "PASS"
+    },
+    {
+      "name": "normal Director setup all rounds and all matches; no scores or final state",
+      "result": "PASS"
+    }
+  ],
+  "structure": {
+    "BB": 6,
+    "SC": 6,
+    "SI": 12,
+    "open": 0,
+    "final": 0,
+    "holes": 432,
+    "teams": 2,
+    "rounds": 3,
+    "scores": 0,
+    "matches": 24,
+    "players": 24
+  },
+  "director": {
+    "rounds": 3,
+    "matches": 24,
+    "existingRequiredErrors": 0
+  }
+}

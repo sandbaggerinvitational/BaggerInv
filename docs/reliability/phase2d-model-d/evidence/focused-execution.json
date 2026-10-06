@@ -1,0 +1,313 @@
+{
+  "hosted": false,
+  "fullChronologyClaimed": false,
+  "manualJobInserts": 0,
+  "manualResultInserts": 0,
+  "cases": [
+    {
+      "name": "fresh fixture FinalRecap ineligible and no attempt, calculation or publication",
+      "result": "PASS"
+    },
+    {
+      "name": "Director configures fixed synthetic Odds inputs through actual route",
+      "result": "PASS"
+    },
+    {
+      "name": "bounded exact-eligibility source model: all 24 complete FINAL via canonical Director/scoring",
+      "result": "PASS"
+    },
+    {
+      "name": "normal private Queue drains exact-source modeling backlog while FinalRecap remains ineligible",
+      "result": "PASS"
+    },
+    {
+      "name": "Final Results Odds uses existing bound Preview after() checkpointed processor; no Queue engine",
+      "result": "PASS"
+    },
+    {
+      "name": "separate Director Final Results publication is final eligibility predicate",
+      "result": "PASS"
+    },
+    {
+      "name": "real FinalRecap claim is superseded by lawful source advance; old completion denied",
+      "result": "PASS"
+    },
+    {
+      "name": "FinalRecap common transient backoff, preserved attempts and terminal dead-letter",
+      "result": "PASS"
+    },
+    {
+      "name": "private Queue reservation executes existing Intelligence FinalRecap processor and publishes current result",
+      "result": "PASS"
+    },
+    {
+      "name": "completed old claim cannot write twice",
+      "result": "PASS"
+    },
+    {
+      "name": "participant-safe FinalRecap projection contains current result without claims or receipts",
+      "result": "PASS"
+    },
+    {
+      "name": "STOP closes retained message without another worker/claim; wrong binding denied",
+      "result": "PASS"
+    },
+    {
+      "name": "complete drain, OFF, disabled, paused and one current FinalRecap",
+      "result": "PASS"
+    }
+  ],
+  "sourceModel": {
+    "matches": 24,
+    "complete": 24,
+    "final": 24,
+    "canonicalHoleCommits": 432,
+    "purpose": "Exact eligibility admission only; no milestone chronology rehearsal"
+  },
+  "backlog": [
+    {
+      "dead_letters": 0,
+      "pending_work": 4,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 432
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 408
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 384
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 360
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 336
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 312
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 288
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 264
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 240
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 216
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 192
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 168
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 144
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 120
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 96
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 72
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 48
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 24
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 2,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 0
+    },
+    {
+      "dead_letters": 0,
+      "pending_work": 0,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 0
+    }
+  ],
+  "oddsElapsedMs": 7645.004916999984,
+  "odds": {
+    "phase": "Final Results",
+    "checkpoints": 4,
+    "attempts": 1
+  },
+  "staleSource": {
+    "activeRealClaim": true,
+    "oldCompletion": "STALE_INTELLIGENCE_WORKER",
+    "sourceAdvance": "Canonical reopen/refinalize; scores unchanged",
+    "newVerifiedFinalOdds": "6171d2e4-f7b3-42ca-9246-664a2131fe17"
+  },
+  "transient": {
+    "attempt": 1,
+    "availableAt": "2026-10-06T14:15:41.495026-05:00",
+    "outcome": "JOB_RETRY"
+  },
+  "terminal": {
+    "attempt": 2,
+    "cycle": 509,
+    "outcome": "TERMINAL",
+    "haltedClosure": {
+      "status": "closed",
+      "reason": "REPLAY",
+      "execution_authorized": false,
+      "worker_admitted": false,
+      "transport_acknowledged": true
+    }
+  },
+  "delivery": {
+    "ok": true,
+    "invocation_id": "4ff6c524-d89f-422a-9abf-fcde1bb5d066",
+    "outcome": "SUCCEEDED",
+    "cycles": 1
+  },
+  "workerElapsedMs": 424.38070899999,
+  "recap": {
+    "cycle": 510,
+    "attempts": 1,
+    "source": {
+      "reason": "OFFICIAL_ODDS_PUBLICATION_CHANGED",
+      "revision": {
+        "payloadHash": "d0b7dec3f9309260ee42c2a10c7701bd23200b6a86afaca8c3116348bef710e6",
+        "isCurrentOfficial": true,
+        "publicationRevision": 2
+      },
+      "priorRevision": null,
+      "transactional": true
+    },
+    "duplicate": {
+      "ok": true,
+      "invocation_id": "4ff6c524-d89f-422a-9abf-fcde1bb5d066",
+      "outcome": "SUCCEEDED",
+      "uncertain": false,
+      "admitted": false,
+      "cycles": 0
+    }
+  },
+  "staleCompletion": "STALE_INTELLIGENCE_WORKER",
+  "read": {
+    "engine": "TOURNAMENT_FINAL_RECAP",
+    "state": "OFFICIAL",
+    "participantSafe": true
+  },
+  "stop": {
+    "closure": {
+      "status": "closed",
+      "reason": "STOPPED",
+      "execution_authorized": false,
+      "worker_admitted": false,
+      "transport_acknowledged": true
+    },
+    "calls": [
+      "DELETE"
+    ]
+  },
+  "drain": {
+    "dead_letters": 0,
+    "pending_work": 0,
+    "active_claims": 0,
+    "active_leases": 0,
+    "expired_claims": 0,
+    "pending_intents": 0
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "purpose": "PART2C_DRESS_REHEARSAL",
+  "resource": "<EXACT_REVIEWED_REGISTRATION_OBJECT>",
+  "binding_id": "<NEW_BINDING_UUID>",
+  "authority_epoch_id": "<NEW_AUTHORITY_EPOCH_UUID>",
+  "deployment": {
+    "vercel_team_id": "<NEW_VERCEL_TEAM_ID>",
+    "vercel_project_id": "<NEW_VERCEL_PROJECT_ID>",
+    "git_branch": "codex/certification-model-d",
+    "deployment_class": "preview",
+    "release_commit": "<EXACT_REVIEWED_COMMIT_SHA>",
+    "deployment_id": "<NEW_READY_DEPLOYMENT_ID>",
+    "deployment_origin": "<NEW_PREVIEW_ORIGIN>"
+  }
+}

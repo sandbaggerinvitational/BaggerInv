@@ -1,0 +1,14 @@
+{
+  "runtimeSha": "4d263b3a284ec2feab9f242777d42f3bf01d6ede",
+  "shippingSourceChanged": false,
+  "hostedAccess": false,
+  "status": "BLOCKED",
+  "selectedModel": "D",
+  "files": {
+    "docs/reliability/phase2d-part2c-fixture-review/REVIEW.txt": "992d89493c8b2a2f081ccc39314b30cdcb2300a2ea9831efcb9280377ec304e7",
+    "docs/reliability/phase2d-part2c-fixture-review/focused.tap": "cbdb4812b27edc96876c67a335106221d99fb3d4960a54393773293fedc17701",
+    "docs/reliability/phase2d-part2c-fixture-review/local-proof.json": "5968f64c6f20b9a15672c0f13a21011a7a9b0d699da81acd7816960e747fac18",
+    "docs/reliability/phase2d-part2c-fixture-review/retained-checkpoint.json": "65967f2abc12fc54537c39151d7817af13cec2746b2fc349ce3334400a7820e2",
+    "test/certification-part2c-fixture-architecture.integration.test.mjs": "3f29629e651dcd4d3217b94c302e6454c76be3f83557ca3ccdf7a41f2e2c8906"
+  }
+}

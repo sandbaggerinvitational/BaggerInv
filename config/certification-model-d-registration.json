@@ -1,0 +1,21 @@
+{
+  "contract": "canonical-certification-registration-v1",
+  "enabled": false,
+  "purpose": "PART2C_DRESS_REHEARSAL",
+  "registration": {
+    "deployment_class": "preview",
+    "git_branch": "codex/certification-model-d",
+    "installation_id": "<NEW_INSTALLATION_ID>",
+    "project_ref": "<NEW_PROJECT_REF>",
+    "project_url": "<NEW_PROJECT_URL>",
+    "public_key_sha256": "<NEW_PUBLIC_KEY_SHA256>",
+    "registration_revision": 1,
+    "resource_class": "CERTIFICATION",
+    "resource_id": "<NEW_RESOURCE_ID>",
+    "schema_contract": "canonical-resource-v1",
+    "schema_digest": "<NEW_SCHEMA_DIGEST>",
+    "server_key_sha256": "<NEW_SERVER_KEY_SHA256>",
+    "vercel_project_id": "<NEW_VERCEL_PROJECT_ID>",
+    "vercel_team_id": "<NEW_VERCEL_TEAM_ID>"
+  }
+}
