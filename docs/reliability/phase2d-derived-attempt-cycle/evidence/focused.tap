@@ -1,0 +1,518 @@
+TAP version 13
+# Queue callback error: Error: SUPERVISOR_MESSAGE_TIMING_UNAVAILABLE
+#     at failed (file:///private/tmp/bagger-worker-provider-portability/lib/certification-queue-envelope.js:8:34)
+#     at requireQueueEnvelopeMetadata (file:///private/tmp/bagger-worker-provider-portability/lib/certification-queue-envelope.js:112:66)
+#     at client.handleCallback.visibilityTimeoutSeconds (file:///private/tmp/bagger-worker-provider-portability/test/certification-queue-closure.test.mjs:121:62)
+#     at ConsumerGroup.processMessage (file:///private/tmp/bagger-worker-provider-portability/node_modules/@vercel/queue/dist/index.mjs:410:13)
+#     at ConsumerGroup.consume (file:///private/tmp/bagger-worker-provider-portability/node_modules/@vercel/queue/dist/index.mjs:496:18)
+#     at async handleCallback (file:///private/tmp/bagger-worker-provider-portability/node_modules/@vercel/queue/dist/index.mjs:773:5)
+#     at async file:///private/tmp/bagger-worker-provider-portability/node_modules/@vercel/queue/dist/index.mjs:2638:9
+#     at async TestContext.<anonymous> (file:///private/tmp/bagger-worker-provider-portability/test/certification-queue-closure.test.mjs:122:11)
+#     at async Test.run (node:internal/test_runner/test:1404:7)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+#   code: 'SUPERVISOR_MESSAGE_TIMING_UNAVAILABLE',
+#   status: 503
+# }
+# Subtest: STOPPED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 1 - STOPPED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 14.308416
+  type: 'test'
+  ...
+# Subtest: STOPPED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 2 - STOPPED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.585625
+  type: 'test'
+  ...
+# Subtest: CANCELLED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 3 - CANCELLED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.476292
+  type: 'test'
+  ...
+# Subtest: CANCELLED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 4 - CANCELLED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.252166
+  type: 'test'
+  ...
+# Subtest: EXPIRED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 5 - EXPIRED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.295833
+  type: 'test'
+  ...
+# Subtest: EXPIRED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 6 - EXPIRED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.192375
+  type: 'test'
+  ...
+# Subtest: STALE_EPOCH: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 7 - STALE_EPOCH: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.227416
+  type: 'test'
+  ...
+# Subtest: STALE_EPOCH: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 8 - STALE_EPOCH: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.160084
+  type: 'test'
+  ...
+# Subtest: STALE_CONTEXT: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 9 - STALE_CONTEXT: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.215042
+  type: 'test'
+  ...
+# Subtest: STALE_CONTEXT: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 10 - STALE_CONTEXT: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.249042
+  type: 'test'
+  ...
+# Subtest: REPLAY: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 11 - REPLAY: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.29175
+  type: 'test'
+  ...
+# Subtest: REPLAY: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 12 - REPLAY: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.154208
+  type: 'test'
+  ...
+# Subtest: HALTED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 13 - HALTED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.17075
+  type: 'test'
+  ...
+# Subtest: HALTED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 14 - HALTED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.11125
+  type: 'test'
+  ...
+# Subtest: ADMISSION_DENIED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 15 - ADMISSION_DENIED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.156084
+  type: 'test'
+  ...
+# Subtest: ADMISSION_DENIED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 16 - ADMISSION_DENIED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.133208
+  type: 'test'
+  ...
+# Subtest: eligible over-limit remains a visible poison/budget failure; eligible short lifetime remains execution-denied
+ok 17 - eligible over-limit remains a visible poison/budget failure; eligible short lifetime remains execution-denied
+  ---
+  duration_ms: 0.274083
+  type: 'test'
+  ...
+# Subtest: missing/invalid expiry or malformed terminal claim cannot ACK an unidentified message
+ok 18 - missing/invalid expiry or malformed terminal claim cannot ACK an unidentified message
+  ---
+  duration_ms: 0.27275
+  type: 'test'
+  ...
+# Subtest: untrusted canonical response, identity denial, or database failure never becomes terminal ACK
+ok 19 - untrusted canonical response, identity denial, or database failure never becomes terminal ACK
+  ---
+  duration_ms: 0.391417
+  type: 'test'
+  ...
+# Subtest: UNKNOWN is retained and explicitly rescheduled, never ACKed even if STOP is concurrent
+ok 20 - UNKNOWN is retained and explicitly rescheduled, never ACKed even if STOP is concurrent
+  ---
+  duration_ms: 0.309292
+  type: 'test'
+  ...
+# Subtest: lost/failed terminal DELETE cannot report a confirmed ACK
+ok 21 - lost/failed terminal DELETE cannot report a confirmed ACK
+  ---
+  duration_ms: 0.135917
+  type: 'test'
+  ...
+# Subtest: terminal disposition receipt retains canonical denial with no execution success or credentials
+ok 22 - terminal disposition receipt retains canonical denial with no execution success or credentials
+  ---
+  duration_ms: 0.622875
+  type: 'test'
+  ...
+# Subtest: installed SDK still maps early/BUSY to bounded native visibility PATCH/200 without worker or attempt accounting
+ok 23 - installed SDK still maps early/BUSY to bounded native visibility PATCH/200 without worker or attempt accounting
+  ---
+  duration_ms: 2.193708
+  type: 'test'
+  ...
+# Subtest: SDK payload drift after trusted routing lookup fails delivery instead of ACKing an unidentified payload
+ok 24 - SDK payload drift after trusted routing lookup fails delivery instead of ACKing an unidentified payload
+  ---
+  duration_ms: 1.25675
+  type: 'test'
+  ...
+# Subtest: one-step Certification demand, preserved empty auction and canonical outcome recovery
+    # Subtest: no auction: clean one-step demand creates four truthful jobs, no scoring preparation/claim
+    ok 1 - no auction: clean one-step demand creates four truthful jobs, no scoring preparation/claim
+      ---
+      duration_ms: 309.169375
+      type: 'test'
+      ...
+    # Subtest: same committed request replay/duplicate remains exact; no new cycle or execution
+    ok 2 - same committed request replay/duplicate remains exact; no new cycle or execution
+      ---
+      duration_ms: 79.4445
+      type: 'test'
+      ...
+    # Subtest: conflicting same-operation content is denied by canonical request hash without demand mutation
+    ok 3 - conflicting same-operation content is denied by canonical request hash without demand mutation
+      ---
+      duration_ms: 51.062458
+      type: 'test'
+      ...
+    # Subtest: concurrent duplicate producer invocations share one canonical mutation/receipt and one demand refresh
+    ok 4 - concurrent duplicate producer invocations share one canonical mutation/receipt and one demand refresh
+      ---
+      duration_ms: 431.572917
+      type: 'test'
+      ...
+    # Subtest: required durable checkpoint write precedes dispatch; absent/failed storage cannot commit
+    ok 5 - required durable checkpoint write precedes dispatch; absent/failed storage cannot commit
+      ---
+      duration_ms: 100.330125
+      type: 'test'
+      ...
+    # Subtest: configured without auction: unchanged preparation guard reports no Calcutta auction dependency
+    ok 6 - configured without auction: unchanged preparation guard reports no Calcutta auction dependency
+      ---
+      duration_ms: 24.743167
+      type: 'test'
+      ...
+    # Subtest: nonempty auction retains setup preparation dependency, immutable purchase and normal financial semantics
+    ok 7 - nonempty auction retains setup preparation dependency, immutable purchase and normal financial semantics
+      ---
+      duration_ms: 86.834792
+      type: 'test'
+      ...
+    # Subtest: supported clear yields valid empty auction revision 2; preparation still fails closed
+    ok 8 - supported clear yields valid empty auction revision 2; preparation still fails closed
+      ---
+      duration_ms: 100.878375
+      type: 'test'
+      ...
+    # Subtest: legacy partial commit: upsert COMMITTED, prepare NOT_COMMITTED; producer resumes original first receipt only
+    ok 9 - legacy partial commit: upsert COMMITTED, prepare NOT_COMMITTED; producer resumes original first receipt only
+      ---
+      duration_ms: 302.047
+      type: 'test'
+      ...
+    # Subtest: empty-auction clean producer needs no preparation and creates no financial demand/facts
+    ok 10 - empty-auction clean producer needs no preparation and creates no financial demand/facts
+      ---
+      duration_ms: 199.604334
+      type: 'test'
+      ...
+    # Subtest: lost commit acknowledgement plus unavailable recovery remains UNKNOWN; restart reads authoritative COMMITTED without reexecution
+    ok 11 - lost commit acknowledgement plus unavailable recovery remains UNKNOWN; restart reads authoritative COMMITTED without reexecution
+      ---
+      duration_ms: 567.002834
+      type: 'test'
+      ...
+    # Subtest: UNKNOWN missing origin is not absence proof and never automatically creates replacement demand
+    ok 12 - UNKNOWN missing origin is not absence proof and never automatically creates replacement demand
+      ---
+      duration_ms: 116.732375
+      type: 'test'
+      ...
+    # Subtest: changed setup source between planning/dispatch is NOT_COMMITTED, never silently rebased; retry preserves rejection
+    ok 13 - changed setup source between planning/dispatch is NOT_COMMITTED, never silently rebased; retry preserves rejection
+      ---
+      duration_ms: 365.456834
+      type: 'test'
+      ...
+    # Subtest: later lawful demand refresh remains current when old successful operation is replayed; no lost work or extra cycle
+    ok 14 - later lawful demand refresh remains current when old successful operation is replayed; no lost work or extra cycle
+      ---
+      duration_ms: 46.022708
+      type: 'test'
+      ...
+    # Subtest: checkpoint cannot select resource/project/release/deployment/match/queue/actor; no new authority surface
+    ok 15 - checkpoint cannot select resource/project/release/deployment/match/queue/actor; no new authority surface
+      ---
+      duration_ms: 73.1485
+      type: 'test'
+      ...
+    # Subtest: STOP/disabled admission preserves committed demand and replay; no new mutation while disabled
+    ok 16 - STOP/disabled admission preserves committed demand and replay; no new mutation while disabled
+      ---
+      duration_ms: 385.759792
+      type: 'test'
+      ...
+    # Subtest: unchanged private queue consumer -> existing bounded worker discovers/claims/processes unprepared empty-auction work
+    ok 17 - unchanged private queue consumer -> existing bounded worker discovers/claims/processes unprepared empty-auction work
+      ---
+      duration_ms: 10691.283041
+      type: 'test'
+      ...
+    # Subtest: final domain/control/catalog security remains unchanged; no financial/Google/Odds/FinalRecap side effect
+    ok 18 - final domain/control/catalog security remains unchanged; no financial/Google/Odds/FinalRecap side effect
+      ---
+      duration_ms: 358.404709
+      type: 'test'
+      ...
+    1..18
+ok 25 - one-step Certification demand, preserved empty auction and canonical outcome recovery
+  ---
+  duration_ms: 22096.360166
+  type: 'test'
+  ...
+# Subtest: shared derived adapter reuses the existing engines with deterministic fingerprints
+ok 26 - shared derived adapter reuses the existing engines with deterministic fingerprints
+  ---
+  duration_ms: 11.0435
+  type: 'test'
+  ...
+# Subtest: an in-flight hole revision invalidates Storylines but not official-result Momentum
+ok 27 - an in-flight hole revision invalidates Storylines but not official-result Momentum
+  ---
+  duration_ms: 0.574666
+  type: 'test'
+  ...
+# Subtest: an official result transition changes the Momentum dependency and output
+ok 28 - an official result transition changes the Momentum dependency and output
+  ---
+  duration_ms: 0.444291
+  type: 'test'
+  ...
+# Subtest: claimed engine selection avoids recalculating unrelated derived engines
+ok 29 - claimed engine selection avoids recalculating unrelated derived engines
+  ---
+  duration_ms: 0.517917
+  type: 'test'
+  ...
+# Subtest: prepared Storylines persist semantic copy without time-relative labels
+ok 30 - prepared Storylines persist semantic copy without time-relative labels
+  ---
+  duration_ms: 0.237875
+  type: 'test'
+  ...
+# Subtest: the same authoritative state produces the same Storyline payload across wall-clock time
+ok 31 - the same authoritative state produces the same Storyline payload across wall-clock time
+  ---
+  duration_ms: 0.49075
+  type: 'test'
+  ...
+# Subtest: semantic Storylines exclude transport timestamps while recent clinches retain expiry
+ok 32 - semantic Storylines exclude transport timestamps while recent clinches retain expiry
+  ---
+  duration_ms: 0.052666
+  type: 'test'
+  ...
+# Subtest: read-time expiry removes a prepared recent-clinch story without recalculating the engine
+ok 33 - read-time expiry removes a prepared recent-clinch story without recalculating the engine
+  ---
+  duration_ms: 0.078334
+  type: 'test'
+  ...
+# Subtest: derived read marks an engine stale from its coalesced dependency job
+ok 34 - derived read marks an engine stale from its coalesced dependency job
+  ---
+  duration_ms: 0.351166
+  type: 'test'
+  ...
+# Subtest: Preview flags fail closed to application outside an isolated Preview deployment
+ok 35 - Preview flags fail closed to application outside an isolated Preview deployment
+  ---
+  duration_ms: 1.421042
+  type: 'test'
+  ...
+# Subtest: migration preserves restrictive RLS and event-driven coalesced jobs
+ok 36 - migration preserves restrictive RLS and event-driven coalesced jobs
+  ---
+  duration_ms: 2.558
+  type: 'test'
+  ...
+# Subtest: participant reads consume prepared state and never calculate Storylines on Home
+ok 37 - participant reads consume prepared state and never calculate Storylines on Home
+  ---
+  duration_ms: 0.69125
+  type: 'test'
+  ...
+# Subtest: secondary failures retain the core Home and Tournament payload with explicit unavailable state
+ok 38 - secondary failures retain the core Home and Tournament payload with explicit unavailable state
+  ---
+  duration_ms: 0.195084
+  type: 'test'
+  ...
+# Subtest: per-cycle derived attempts: duplicate demand, terminal recovery, genuine source and concurrency
+    # Subtest: forward correction: atomic mismatch rollback, exact predecessor, replay and metadata/history preserved
+    ok 1 - forward correction: atomic mismatch rollback, exact predecessor, replay and metadata/history preserved
+      ---
+      duration_ms: 184.785541
+      type: 'test'
+      ...
+    # Subtest: cycle 29 fixture is built by real canonical failures/recoveries, without job inserts or attempt resets
+    ok 2 - cycle 29 fixture is built by real canonical failures/recoveries, without job inserts or attempt resets
+      ---
+      duration_ms: 8569.719375
+      type: 'test'
+      ...
+    # Subtest: attempt 1 through 4 obey real durable backoff; duplicate enqueue/poll/restart never replenish budget
+    ok 3 - attempt 1 through 4 obey real durable backoff; duplicate enqueue/poll/restart never replenish budget
+      ---
+      duration_ms: 21656.425292
+      type: 'test'
+      ...
+    # Subtest: unchanged private consumer and existing worker produce cycle 29 attempt 5 success/current for all four families
+    ok 4 - unchanged private consumer and existing worker produce cycle 29 attempt 5 success/current for all four families
+      ---
+      duration_ms: 10716.370041
+      type: 'test'
+      ...
+    # Subtest: exact predecessor reproduces stranded Intelligence cycle29/attempt5 inside a rollback-only transaction
+    ok 5 - exact predecessor reproduces stranded Intelligence cycle29/attempt5 inside a rollback-only transaction
+      ---
+      duration_ms: 36.377417
+      type: 'test'
+      ...
+    # Subtest: same-source successful repeated enqueue is exact no-op; current outputs and attempt evidence retained
+    ok 6 - same-source successful repeated enqueue is exact no-op; current outputs and attempt evidence retained
+      ---
+      duration_ms: 608.643375
+      type: 'test'
+      ...
+    # Subtest: independent real consumer processes preserve attempt5 success across worker runtime restart
+    ok 7 - independent real consumer processes preserve attempt5 success across worker runtime restart
+      ---
+      duration_ms: 70512.388375
+      type: 'test'
+      ...
+    # Subtest: legacy successful output-fingerprint marker remains satisfied at attempt5; missing source history never grants budget
+    ok 8 - legacy successful output-fingerprint marker remains satisfied at attempt5; missing source history never grants budget
+      ---
+      duration_ms: 53.433042
+      type: 'test'
+      ...
+    # Subtest: concurrent identical common enqueue is idempotent and cannot manufacture cycles/budgets
+    ok 9 - concurrent identical common enqueue is idempotent and cannot manufacture cycles/budgets
+      ---
+      duration_ms: 211.543542
+      type: 'test'
+      ...
+    # Subtest: attempt5 FAILED remains terminal on ordinary duplicate; Director recovery is a separate auditable cycle
+    ok 10 - attempt5 FAILED remains terminal on ordinary duplicate; Director recovery is a separate auditable cycle
+      ---
+      duration_ms: 39941.594709
+      type: 'test'
+      ...
+    # Subtest: claim/enqueue simultaneous transactions retain one owner and lawful attempt budget
+    ok 11 - claim/enqueue simultaneous transactions retain one owner and lawful attempt budget
+      ---
+      duration_ms: 4310.767708
+      type: 'test'
+      ...
+    # Subtest: duplicate while canonical claim is active preserves claim/lease and retry attempt exactly
+    ok 12 - duplicate while canonical claim is active preserves claim/lease and retry attempt exactly
+      ---
+      duration_ms: 198.793584
+      type: 'test'
+      ...
+    # Subtest: supported secondary scoring-lock advances actual source with empty auction2, no preparation or financial mutation
+    ok 13 - supported secondary scoring-lock advances actual source with empty auction2, no preparation or financial mutation
+      ---
+      duration_ms: 379.181042
+      type: 'test'
+      ...
+    # Subtest: stale old ownership cannot complete or fail over the new source; new current output drains via unchanged worker
+    ok 14 - stale old ownership cannot complete or fail over the new source; new current output drains via unchanged worker
+      ---
+      duration_ms: 10765.571792
+      type: 'test'
+      ...
+    # Subtest: client/private authority, metadata/RLS and final empty-auction/FinalRecap boundaries remain closed
+    ok 15 - client/private authority, metadata/RLS and final empty-auction/FinalRecap boundaries remain closed
+      ---
+      duration_ms: 261.802791
+      type: 'test'
+      ...
+    # Subtest: shared trigger remains compatible with a real supported financial job row, without changing financial transitions
+    ok 16 - shared trigger remains compatible with a real supported financial job row, without changing financial transitions
+      ---
+      duration_ms: 5529.153542
+      type: 'test'
+      ...
+    1..16
+ok 39 - per-cycle derived attempts: duplicate demand, terminal recovery, genuine source and concurrency
+  ---
+  duration_ms: 207575.020333
+  type: 'test'
+  ...
+# Subtest: forward artifact corrects exactly the shared state transition and legacy source adapter
+ok 40 - forward artifact corrects exactly the shared state transition and legacy source adapter
+  ---
+  duration_ms: 0.973833
+  type: 'test'
+  ...
+# Subtest: same-source no-op preserves all states; provenance cannot create fresh cycles
+ok 41 - same-source no-op preserves all states; provenance cannot create fresh cycles
+  ---
+  duration_ms: 0.134292
+  type: 'test'
+  ...
+# Subtest: new source and explicit recovery preserve the existing five-attempt/history contracts
+ok 42 - new source and explicit recovery preserve the existing five-attempt/history contracts
+  ---
+  duration_ms: 0.494292
+  type: 'test'
+  ...
+# Subtest: fresh-source tool fixes target and operation; it cannot prepare, unlock, score, enqueue or reset attempts
+ok 43 - fresh-source tool fixes target and operation; it cannot prepare, unlock, score, enqueue or reset attempts
+  ---
+  duration_ms: 1.7725
+  type: 'test'
+  ...
+# Subtest: derived engines retain separate keys and deterministic payloads
+ok 44 - derived engines retain separate keys and deterministic payloads
+  ---
+  duration_ms: 1.696292
+  type: 'test'
+  ...
+# Subtest: final recap fails closed until 24 matches, complete cards, official result, and Final Results Odds
+ok 45 - final recap fails closed until 24 matches, complete cards, official result, and Final Results Odds
+  ---
+  duration_ms: 0.890792
+  type: 'test'
+  ...
+# Subtest: source flags are Preview-only and fail closed outside isolated Preview
+ok 46 - source flags are Preview-only and fail closed outside isolated Preview
+  ---
+  duration_ms: 1.721833
+  type: 'test'
+  ...
+# Subtest: migration is service-only and Final Recap is gated
+ok 47 - migration is service-only and Final Recap is gated
+  ---
+  duration_ms: 2.199333
+  type: 'test'
+  ...
+# Subtest: newest-source migration claims work and rejects superseded workers
+ok 48 - newest-source migration claims work and rejects superseded workers
+  ---
+  duration_ms: 0.410083
+  type: 'test'
+  ...
+1..48
+# tests 82
+# suites 0
+# pass 82
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 207825.095208
