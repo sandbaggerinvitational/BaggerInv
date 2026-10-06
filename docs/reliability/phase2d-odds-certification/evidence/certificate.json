@@ -1,0 +1,61 @@
+{
+  "baseSha": "a2f6c44cc7a1f85e70d64649b22821554f83b641",
+  "status": "PASS",
+  "scope": "LOCAL_ONLY",
+  "hostedMutated": false,
+  "googleCalls": 0,
+  "googleCredentials": 0,
+  "googleJobs": 0,
+  "googleFallback": 0,
+  "productionAccess": 0,
+  "oldPreviewAccess": 0,
+  "newQueueEngine": false,
+  "runtimeArchitecture": "EXISTING_DIRECTOR_PREVIEW_AFTER_CHECKPOINTED_ODDS",
+  "settingsProfile": "CERTIFICATION_DEFAULTS_V1",
+  "syntheticProvenance": "CERTIFICATION_SYNTHETIC",
+  "forwardSql": "supabase/production_incremental/certification-odds-input-configuration-v1.sql",
+  "artifactSha256": "de5e554de86da3336c223b40c1780febb0f9fd5d9127bda4114e1e3df6c0e601",
+  "verification": {
+    "focused": {
+      "counts": {
+        "tests": 162,
+        "pass": 162,
+        "fail": 0,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "exitCode": 0,
+      "newFailures": [],
+      "sourceStable": true,
+      "remoteSocketsDenied": true,
+      "realCredentialsRemoved": true,
+      "rawSha256": "1b1f315d3ba9dec25f90a05030c22e10fdcb9bf11c9e309370c9a900042bfcbd"
+    },
+    "application": {
+      "counts": {
+        "tests": 4097,
+        "pass": 4077,
+        "fail": 20,
+        "skipped": 0,
+        "cancelled": 0
+      },
+      "exitCode": 1,
+      "newFailures": [],
+      "sourceStable": true,
+      "remoteSocketsDenied": true,
+      "realCredentialsRemoved": true,
+      "rawSha256": "b86017fd09a5af07adfe142522c027c8fc856005956a2fb11d8ae4b00a654329"
+    },
+    "build": {
+      "counts": null,
+      "exitCode": 0,
+      "newFailures": [],
+      "sourceStable": true,
+      "remoteSocketsDenied": true,
+      "realCredentialsRemoved": true,
+      "rawSha256": "115e08d520d909334f6133a33087d748e7c31fec562dc7719e1b59842ba52a1f"
+    }
+  },
+  "readyForHostedAcceptance": true,
+  "hostedCheckpointSource": "OWNER_PROVIDED_NOT_READ_THIS_TASK"
+}

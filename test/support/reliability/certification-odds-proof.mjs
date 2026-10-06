@@ -10,7 +10,7 @@ import {readCanonicalDirectorOdds,mutateCanonicalDirectorOdds} from '../../../li
 import {processCertificationOddsCalculationJob} from '../../../lib/certification-odds-server.js';
 import {certificationProjectionRpc} from '../../../lib/certification-runtime-server.js';
 
-export async function certificationOddsStack(fixture,{tournamentId='2026',authorization:override,loseResponse,loseRpcResponse}={}){
+export async function certificationOddsStack(fixture,{tournamentId='2026',authorization:override,loseResponse,loseRpcResponse,afterRpc,environment}={}){
  const {env,registrationManifest}=fixture.transportFixture,calls=[],requests=[],scheduled=[];
  const identity=fixture.envelope.authorization;
  let authorization=override??{status:'active',source:'entitlement',identity:{authUserId:identity.auth_user_id,
@@ -31,16 +31,18 @@ export async function certificationOddsStack(fixture,{tournamentId='2026',author
    return Response.json({code:error[1],message:error[2]},{status:400});
   }
   const value=JSON.parse(result.stdout.trim());
+  await afterRpc?.(name,input,value);
   if(value.ok===false)calls.at(-1).error={message:value.code,detail:value};
   if(loseRpcResponse?.(name,input,value))throw new Error('SYNTHETIC_ODDS_DATABASE_ACK_LOSS');
   return Response.json(value);
  }};
- const worker=(jobId,options={})=>processCertificationOddsCalculationJob(jobId,{...options,env,dependencies:certificationDependencies});
+ const runtimeEnv=environment||env;
+ const worker=(jobId,options={})=>processCertificationOddsCalculationJob(jobId,{...options,env:runtimeEnv,dependencies:certificationDependencies});
  const key='certification-odds-proof-'+randomUUID();
  globalThis[key]={NextResponse:Response,after:task=>scheduled.push(task),withOperationalRoute:(_config,handler)=>handler,
   recordOperationalError:()=>{},authorizePreviewDirector:async()=>authorization,certificationRequested:()=>true,
-  readCanonicalDirectorOdds:args=>readCanonicalDirectorOdds({...args,env},{certificationDependencies}),
-  mutateCanonicalDirectorOdds:args=>mutateCanonicalDirectorOdds({...args,env},{certificationDependencies}),
+  readCanonicalDirectorOdds:args=>readCanonicalDirectorOdds({...args,env:runtimeEnv},{certificationDependencies}),
+  mutateCanonicalDirectorOdds:args=>mutateCanonicalDirectorOdds({...args,env:runtimeEnv},{certificationDependencies}),
   processCertificationOddsCalculationJob:worker,processOddsCalculationJob:()=>assert.fail('Legacy Odds worker must not be selected')};
  const source=(await readFile(new URL('../../../app/api/director/canonical-odds/route.js',import.meta.url),'utf8'))
   .replace(/^import\s+\{([\s\S]*?)\}\s+from\s+["'][^"']+["'];\n/gm,

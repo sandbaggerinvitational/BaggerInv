@@ -1,0 +1,984 @@
+TAP version 13
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.SUBMIT_HOLE
+ok 1 - score adapter preserves existing non-UUID mutation identity: SCORING.SUBMIT_HOLE
+  ---
+  duration_ms: 15.471833
+  type: 'test'
+  ...
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.FINALIZE_MATCH
+ok 2 - score adapter preserves existing non-UUID mutation identity: SCORING.FINALIZE_MATCH
+  ---
+  duration_ms: 0.485208
+  type: 'test'
+  ...
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.REOPEN_MATCH
+ok 3 - score adapter preserves existing non-UUID mutation identity: SCORING.REOPEN_MATCH
+  ---
+  duration_ms: 0.375375
+  type: 'test'
+  ...
+# Subtest: participant context adapter separates server-bound actor fields without changing caller DTO
+ok 4 - participant context adapter separates server-bound actor fields without changing caller DTO
+  ---
+  duration_ms: 0.351333
+  type: 'test'
+  ...
+# Subtest: receipt recovery remains an exact read and retains mutation identity after revocation
+ok 5 - receipt recovery remains an exact read and retains mutation identity after revocation
+  ---
+  duration_ms: 0.212375
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_tournament_live_view
+ok 6 - read alias uses admitted projection gateway: read_tournament_live_view
+  ---
+  duration_ms: 0.448041
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_leaderboards_core_view
+ok 7 - read alias uses admitted projection gateway: read_leaderboards_core_view
+  ---
+  duration_ms: 0.196083
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_canonical_2026_historical_view
+ok 8 - read alias uses admitted projection gateway: read_canonical_2026_historical_view
+  ---
+  duration_ms: 0.170459
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_completed_history
+ok 9 - read alias uses admitted projection gateway: read_preview_completed_history
+  ---
+  duration_ms: 0.159625
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_current_guide_projection
+ok 10 - read alias uses admitted projection gateway: read_current_guide_projection
+  ---
+  duration_ms: 0.198208
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_draft_view
+ok 11 - read alias uses admitted projection gateway: read_preview_draft_view
+  ---
+  duration_ms: 0.588334
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_championship_odds_inputs
+ok 12 - read alias uses admitted projection gateway: read_championship_odds_inputs
+  ---
+  duration_ms: 0.168958
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_secondary_history_players
+ok 13 - read alias uses admitted projection gateway: read_preview_secondary_history_players
+  ---
+  duration_ms: 0.152292
+  type: 'test'
+  ...
+# Subtest: unlisted legacy mutation, publication, Google and import aliases never dispatch
+ok 14 - unlisted legacy mutation, publication, Google and import aliases never dispatch
+  ---
+  duration_ms: 0.262
+  type: 'test'
+  ...
+# Subtest: read aliases reject supplied resource or historical workbook authority before transport
+ok 15 - read aliases reject supplied resource or historical workbook authority before transport
+  ---
+  duration_ms: 0.0895
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: TOURNAMENT_SETUP
+ok 16 - Director family read uses canonical context and separate actor: TOURNAMENT_SETUP
+  ---
+  duration_ms: 0.873083
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: ROUND_PAIRINGS
+ok 17 - Director family read uses canonical context and separate actor: ROUND_PAIRINGS
+  ---
+  duration_ms: 0.228
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: MATCH_CONTROL
+ok 18 - Director family read uses canonical context and separate actor: MATCH_CONTROL
+  ---
+  duration_ms: 0.170042
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: NET_SKINS_ENTRIES
+ok 19 - Director family read uses canonical context and separate actor: NET_SKINS_ENTRIES
+  ---
+  duration_ms: 0.195
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: CALCUTTA_MANAGEMENT
+ok 20 - Director family read uses canonical context and separate actor: CALCUTTA_MANAGEMENT
+  ---
+  duration_ms: 0.183041
+  type: 'test'
+  ...
+# Subtest: Director setup mutation confirms existing receipt and canonical readback; contract stays provider-neutral
+ok 21 - Director setup mutation confirms existing receipt and canonical readback; contract stays provider-neutral
+  ---
+  duration_ms: 1.187625
+  type: 'test'
+  ...
+# Subtest: Director admits the canonical direct NET_SKINS_ENTRIES projection but never a denial or wrong target
+ok 22 - Director admits the canonical direct NET_SKINS_ENTRIES projection but never a denial or wrong target
+  ---
+  duration_ms: 1.06425
+  type: 'test'
+  ...
+# Subtest: Director admits the canonical direct CALCUTTA_MANAGEMENT projection but never a denial or wrong target
+ok 23 - Director admits the canonical direct CALCUTTA_MANAGEMENT projection but never a denial or wrong target
+  ---
+  duration_ms: 0.618208
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects PLAYER without mutation
+ok 24 - Director authorization rejects PLAYER without mutation
+  ---
+  duration_ms: 0.087334
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects SPECTATOR without mutation
+ok 25 - Director authorization rejects SPECTATOR without mutation
+  ---
+  duration_ms: 0.049375
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects signed-out without mutation
+ok 26 - Director authorization rejects signed-out without mutation
+  ---
+  duration_ms: 0.040708
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects impersonated without mutation
+ok 27 - Director authorization rejects impersonated without mutation
+  ---
+  duration_ms: 0.038875
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects wrong-target without mutation
+ok 28 - Director authorization rejects wrong-target without mutation
+  ---
+  duration_ms: 0.102125
+  type: 'test'
+  ...
+# Subtest: Director stale token fails conflict without rebinding or dispatching mutation
+ok 29 - Director stale token fails conflict without rebinding or dispatching mutation
+  ---
+  duration_ms: 0.508584
+  type: 'test'
+  ...
+# Subtest: Director recovery verifies original admitted context and full request without current admission
+ok 30 - Director recovery verifies original admitted context and full request without current admission
+  ---
+  duration_ms: 0.522667
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: score_derived_delivery_tick_v1
+ok 31 - worker preserves lease and exact authority: score_derived_delivery_tick_v1
+  ---
+  duration_ms: 0.2
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_competition_derived_jobs
+ok 32 - worker preserves lease and exact authority: claim_competition_derived_jobs
+  ---
+  duration_ms: 0.114542
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_intelligence_derived_bundle
+ok 33 - worker preserves lease and exact authority: claim_intelligence_derived_bundle
+  ---
+  duration_ms: 0.141333
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_production_calcutta_v1_recalculation
+ok 34 - worker preserves lease and exact authority: claim_production_calcutta_v1_recalculation
+  ---
+  duration_ms: 0.097917
+  type: 'test'
+  ...
+# Subtest: worker rejects unknown functions, Production-tagged payload and forged supplied context
+ok 35 - worker rejects unknown functions, Production-tagged payload and forged supplied context
+  ---
+  duration_ms: 0.069083
+  type: 'test'
+  ...
+# Subtest: current worker factory selects Certification without importing a Production runtime or requiring Google
+ok 36 - current worker factory selects Certification without importing a Production runtime or requiring Google
+  ---
+  duration_ms: 0.598083
+  type: 'test'
+  ...
+# Subtest: identity reads use admitted gateway; provider administration and participant messaging are unavailable
+ok 37 - identity reads use admitted gateway; provider administration and participant messaging are unavailable
+  ---
+  duration_ms: 0.426584
+  type: 'test'
+  ...
+# Subtest: Certification Director read returns explicit fresh state and no private worker envelope
+ok 38 - Certification Director read returns explicit fresh state and no private worker envelope
+  ---
+  duration_ms: 9.108083
+  type: 'test'
+  ...
+# Subtest: Certification Odds participant denied before transport
+ok 39 - Certification Odds participant denied before transport
+  ---
+  duration_ms: 0.2205
+  type: 'test'
+  ...
+# Subtest: Certification Odds spectator denied before transport
+ok 40 - Certification Odds spectator denied before transport
+  ---
+  duration_ms: 0.051625
+  type: 'test'
+  ...
+# Subtest: Certification Odds signed-out denied before transport
+ok 41 - Certification Odds signed-out denied before transport
+  ---
+  duration_ms: 0.053875
+  type: 'test'
+  ...
+# Subtest: Certification Odds impersonating denied before transport
+ok 42 - Certification Odds impersonating denied before transport
+  ---
+  duration_ms: 0.049416
+  type: 'test'
+  ...
+# Subtest: Certification Odds bootstrap denied before transport
+ok 43 - Certification Odds bootstrap denied before transport
+  ---
+  duration_ms: 0.042125
+  type: 'test'
+  ...
+# Subtest: Certification command requires original identity/context and rejects client authority fields
+ok 44 - Certification command requires original identity/context and rejects client authority fields
+  ---
+  duration_ms: 0.233917
+  type: 'test'
+  ...
+# Subtest: worker context cannot confer owner publication capability
+ok 45 - worker context cannot confer owner publication capability
+  ---
+  duration_ms: 0.287916
+  type: 'test'
+  ...
+# Subtest: wrong target and stale context fail closed without fallback
+ok 46 - wrong target and stale context fail closed without fallback
+  ---
+  duration_ms: 0.436375
+  type: 'test'
+  ...
+# Subtest: lost publication response retains exact operation identity; status does not imply noncommit
+ok 47 - lost publication response retains exact operation identity; status does not imply noncommit
+  ---
+  duration_ms: 0.513042
+  type: 'test'
+  ...
+# Subtest: client command captures reviewed first CAS and remains stable for explicit retry
+ok 48 - client command captures reviewed first CAS and remains stable for explicit retry
+  ---
+  duration_ms: 0.433875
+  type: 'test'
+  ...
+# Subtest: status retains original receipt target after annual advance without granting a historical write
+ok 49 - status retains original receipt target after annual advance without granting a historical write
+  ---
+  duration_ms: 0.301917
+  type: 'test'
+  ...
+# Subtest: complete fixed synthetic Odds chain through real Director routes and owned PG17/safeupdate
+    # Subtest: atomic predecessor mismatch rollback; replay; metadata/RLS/private core unchanged; safeupdate on
+    ok 1 - atomic predecessor mismatch rollback; replay; metadata/RLS/private core unchanged; safeupdate on
+      ---
+      duration_ms: 69.910459
+      type: 'test'
+      ...
+    # Subtest: absent inputs deny calculation before any job exists
+    ok 2 - absent inputs deny calculation before any job exists
+      ---
+      duration_ms: 92.501708
+      type: 'test'
+      ...
+    # Subtest: fixed synthetic Director configuration; canonical validator/revision/current/receipt/audit; no imported seed
+    ok 3 - fixed synthetic Director configuration; canonical validator/revision/current/receipt/audit; no imported seed
+      ---
+      duration_ms: 74.000791
+      type: 'test'
+      ...
+    # Subtest: exact configuration replay, conflict, stale revision and repeated identical demand
+    ok 4 - exact configuration replay, conflict, stale revision and repeated identical demand
+      ---
+      duration_ms: 204.718209
+      type: 'test'
+      ...
+    # Subtest: configuration lost client ACK, authoritative COMMITTED / NOT_COMMITTED status
+    ok 5 - configuration lost client ACK, authoritative COMMITTED / NOT_COMMITTED status
+      ---
+      duration_ms: 131.663417
+      type: 'test'
+      ...
+    # Subtest: participant/signed-out/anon/authenticated/service_role cannot author or choose private processor/targets
+    ok 6 - participant/signed-out/anon/authenticated/service_role cannot author or choose private processor/targets
+      ---
+      duration_ms: 128.452042
+      type: 'test'
+      ...
+    # Subtest: truthful incomplete two-match phase; Director after() calculation/checkpoints/current result
+    ok 7 - truthful incomplete two-match phase; Director after() calculation/checkpoints/current result
+      ---
+      duration_ms: 759.234209
+      type: 'test'
+      ...
+    # Subtest: existing separate Director publication; replay; truthful milestone/phase/current pointer
+    ok 8 - existing separate Director publication; replay; truthful milestone/phase/current pointer
+      ---
+      duration_ms: 163.547459
+      type: 'test'
+      ...
+    # Subtest: FinalRecap remains ineligible after current non-Final Results publication
+    ok 9 - FinalRecap remains ineligible after current non-Final Results publication
+      ---
+      duration_ms: 13.420834
+      type: 'test'
+      ...
+# Published Odds Supabase read failed { code: 'AUTH_SESSION_REQUIRED', message: 'Sign in required' }
+    # Subtest: actual shipping participant Odds GET HTTP200, public phase/result, no settings/claims/checkpoints or Google
+    ok 10 - actual shipping participant Odds GET HTTP200, public phase/result, no settings/claims/checkpoints or Google
+      ---
+      duration_ms: 71.693541
+      type: 'test'
+      ...
+    # Subtest: configuration/calculation/publication exact target/environment/release binding; no ordinary Preview/Production/old Preview
+    ok 11 - configuration/calculation/publication exact target/environment/release binding; no ordinary Preview/Production/old Preview
+      ---
+      duration_ms: 56.679083
+      type: 'test'
+      ...
+    # Subtest: durable checkpoints resume across actual owned database restart, attempts preserved, duplicate completion harmless
+    ok 12 - durable checkpoints resume across actual owned database restart, attempts preserved, duplicate completion harmless
+      ---
+      duration_ms: 2130.003375
+      type: 'test'
+      ...
+    # Subtest: lost calculation/result/publication ACK reconciles COMMITTED; unknown request truthful; no duplicate result/publication
+    ok 13 - lost calculation/result/publication ACK reconciles COMMITTED; unknown request truthful; no duplicate result/publication
+      ---
+      duration_ms: 3300.743708
+      type: 'test'
+      ...
+    # Subtest: lawful new source rejects old result/claim; current result B completes/publishes; history preserved
+    ok 14 - lawful new source rejects old result/claim; current result B completes/publishes; history preserved
+      ---
+      duration_ms: 13350.425875
+      type: 'test'
+      ...
+    # Subtest: complete ordinary derived drain, no pending Odds/UNKNOWN, final STOP/disabled/paused; no Google jobs
+    ok 15 - complete ordinary derived drain, no pending Odds/UNKNOWN, final STOP/disabled/paused; no Google jobs
+      ---
+      duration_ms: 10769.92925
+      type: 'test'
+      ...
+    1..15
+ok 50 - complete fixed synthetic Odds chain through real Director routes and owned PG17/safeupdate
+  ---
+  duration_ms: 110141.897458
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: app/api/director/prediction-settings/route.js
+ok 51 - preserved certified core / transport: app/api/director/prediction-settings/route.js
+  ---
+  duration_ms: 14.979583
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: lib/production-prediction-settings-server.js
+ok 52 - preserved certified core / transport: lib/production-prediction-settings-server.js
+  ---
+  duration_ms: 8.8245
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: lib/production-prediction-settings-contract.js
+ok 53 - preserved certified core / transport: lib/production-prediction-settings-contract.js
+  ---
+  duration_ms: 8.126917
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: lib/prediction-settings-contract.js
+ok 54 - preserved certified core / transport: lib/prediction-settings-contract.js
+  ---
+  duration_ms: 7.867125
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: lib/prediction-engine.js
+ok 55 - preserved certified core / transport: lib/prediction-engine.js
+  ---
+  duration_ms: 8.546917
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: lib/tournament-odds.js
+ok 56 - preserved certified core / transport: lib/tournament-odds.js
+  ---
+  duration_ms: 7.757792
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: lib/certification-odds-server.js
+ok 57 - preserved certified core / transport: lib/certification-odds-server.js
+  ---
+  duration_ms: 7.274125
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: app/api/director/canonical-odds/route.js
+ok 58 - preserved certified core / transport: app/api/director/canonical-odds/route.js
+  ---
+  duration_ms: 7.121791
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: app/api/odds/prediction-settings/route.js
+ok 59 - preserved certified core / transport: app/api/odds/prediction-settings/route.js
+  ---
+  duration_ms: 8.845791
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: app/api/leaderboards/insights/route.js
+ok 60 - preserved certified core / transport: app/api/leaderboards/insights/route.js
+  ---
+  duration_ms: 8.047875
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: lib/certification-worker-engines.js
+ok 61 - preserved certified core / transport: lib/certification-worker-engines.js
+  ---
+  duration_ms: 7.126666
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: lib/production-net-skins-server.js
+ok 62 - preserved certified core / transport: lib/production-net-skins-server.js
+  ---
+  duration_ms: 7.033791
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: lib/certification-net-skins-calculation.js
+ok 63 - preserved certified core / transport: lib/certification-net-skins-calculation.js
+  ---
+  duration_ms: 6.90575
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: lib/production-calcutta-server.js
+ok 64 - preserved certified core / transport: lib/production-calcutta-server.js
+  ---
+  duration_ms: 7.127625
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: supabase/production_incremental/certification-queue-routing-closure-v7.sql
+ok 65 - preserved certified core / transport: supabase/production_incremental/certification-queue-routing-closure-v7.sql
+  ---
+  duration_ms: 7.292542
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: supabase/production_incremental/certification-derived-attempt-cycle-v1.sql
+ok 66 - preserved certified core / transport: supabase/production_incremental/certification-derived-attempt-cycle-v1.sql
+  ---
+  duration_ms: 7.030458
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: supabase/production_incremental/certification-net-skins-result-read-v1.sql
+ok 67 - preserved certified core / transport: supabase/production_incremental/certification-net-skins-result-read-v1.sql
+  ---
+  duration_ms: 7.445042
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: supabase/production_incremental/certification-net-skins-calculation-v1.sql
+ok 68 - preserved certified core / transport: supabase/production_incremental/certification-net-skins-calculation-v1.sql
+  ---
+  duration_ms: 6.978875
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: supabase/production_incremental/certification-queue-calcutta-scope-v1.sql
+ok 69 - preserved certified core / transport: supabase/production_incremental/certification-queue-calcutta-scope-v1.sql
+  ---
+  duration_ms: 6.832416
+  type: 'test'
+  ...
+# Subtest: preserved certified core / transport: supabase/production_incremental/certification-calcutta-publication-v1.sql
+ok 70 - preserved certified core / transport: supabase/production_incremental/certification-calcutta-publication-v1.sql
+  ---
+  duration_ms: 7.14675
+  type: 'test'
+  ...
+# Subtest: fixed closed Director operation registry, no Queue engine or generic settings proxy
+ok 71 - fixed closed Director operation registry, no Queue engine or generic settings proxy
+  ---
+  duration_ms: 0.404833
+  type: 'test'
+  ...
+# Subtest: publication follow-up admits existing Intelligence work only; Final Results and FinalRecap remain outside this scope
+ok 72 - publication follow-up admits existing Intelligence work only; Final Results and FinalRecap remain outside this scope
+  ---
+  duration_ms: 0.617
+  type: 'test'
+  ...
+# Subtest: Director client cannot select values/source/target {"settings":{}}
+ok 73 - Director client cannot select values/source/target {"settings":{}}
+  ---
+  duration_ms: 14.018875
+  type: 'test'
+  ...
+# Subtest: Director client cannot select values/source/target {"resource":"PRODUCTION"}
+ok 74 - Director client cannot select values/source/target {"resource":"PRODUCTION"}
+  ---
+  duration_ms: 0.299833
+  type: 'test'
+  ...
+# Subtest: Director client cannot select values/source/target {"tournament":"2025"}
+ok 75 - Director client cannot select values/source/target {"tournament":"2025"}
+  ---
+  duration_ms: 0.19225
+  type: 'test'
+  ...
+# Subtest: Director client cannot select values/source/target {"processor":"arbitrary"}
+ok 76 - Director client cannot select values/source/target {"processor":"arbitrary"}
+  ---
+  duration_ms: 0.186667
+  type: 'test'
+  ...
+# Subtest: Director client cannot select values/source/target {"googleSource":"x"}
+ok 77 - Director client cannot select values/source/target {"googleSource":"x"}
+  ---
+  duration_ms: 0.199833
+  type: 'test'
+  ...
+# Subtest: Director client cannot select values/source/target {"profile":"PRODUCTION_DEFAULTS"}
+ok 78 - Director client cannot select values/source/target {"profile":"PRODUCTION_DEFAULTS"}
+  ---
+  duration_ms: 0.159375
+  type: 'test'
+  ...
+# Subtest: typed domain PREDICTION_SETTINGS_PREDECESSOR_STALE is bounded rejection, never infrastructure success
+ok 79 - typed domain PREDICTION_SETTINGS_PREDECESSOR_STALE is bounded rejection, never infrastructure success
+  ---
+  duration_ms: 0.6645
+  type: 'test'
+  ...
+# Subtest: typed domain PREDICTION_SETTINGS_VALIDATION_FAILED is bounded rejection, never infrastructure success
+ok 80 - typed domain PREDICTION_SETTINGS_VALIDATION_FAILED is bounded rejection, never infrastructure success
+  ---
+  duration_ms: 0.456625
+  type: 'test'
+  ...
+# Subtest: typed domain PRODUCTION_ANNUAL_ODDS_INPUT_CONFIGURATION_REQUIRED is bounded rejection, never infrastructure success
+ok 81 - typed domain PRODUCTION_ANNUAL_ODDS_INPUT_CONFIGURATION_REQUIRED is bounded rejection, never infrastructure success
+  ---
+  duration_ms: 0.213334
+  type: 'test'
+  ...
+# Subtest: resumable chunks preserve the exact sequential random stream and complete raw result
+ok 82 - resumable chunks preserve the exact sequential random stream and complete raw result
+  ---
+  duration_ms: 728.390875
+  type: 'test'
+  ...
+# Subtest: the refactored synchronous path retains the frozen 10k pre-change fingerprint
+ok 83 - the refactored synchronous path retains the frozen 10k pre-change fingerprint
+  ---
+  duration_ms: 6358.368542
+  type: 'test'
+  ...
+# Subtest: all four supported counts receive deterministic distinct job identities without changing the engine contract
+ok 84 - all four supported counts receive deterministic distinct job identities without changing the engine contract
+  ---
+  duration_ms: 6.25225
+  type: 'test'
+  ...
+# Subtest: job inputs are frozen and later caller mutation cannot change the invocation
+ok 85 - job inputs are frozen and later caller mutation cannot change the invocation
+  ---
+  duration_ms: 0.892583
+  type: 'test'
+  ...
+# Subtest: a failed worker resumes from its persisted PRNG checkpoint and produces the exact reference
+ok 86 - a failed worker resumes from its persisted PRNG checkpoint and produces the exact reference
+  ---
+  duration_ms: 295.538542
+  type: 'test'
+  ...
+# Subtest: an interruption after result commit remains idempotently succeeded
+ok 87 - an interruption after result commit remains idempotently succeeded
+  ---
+  duration_ms: 69.851084
+  type: 'test'
+  ...
+# Subtest: a before_first_chunk interruption resumes to the exact result
+ok 88 - a before_first_chunk interruption resumes to the exact result
+  ---
+  duration_ms: 139.086042
+  type: 'test'
+  ...
+# Subtest: a after_checkpoint interruption resumes to the exact result
+ok 89 - a after_checkpoint interruption resumes to the exact result
+  ---
+  duration_ms: 155.434459
+  type: 'test'
+  ...
+# Subtest: a after_final_checkpoint interruption resumes to the exact result
+ok 90 - a after_final_checkpoint interruption resumes to the exact result
+  ---
+  duration_ms: 208.908208
+  type: 'test'
+  ...
+# Subtest: a completed result is superseded rather than published when canonical input advances
+ok 91 - a completed result is superseded rather than published when canonical input advances
+  ---
+  duration_ms: 2.007125
+  type: 'test'
+  ...
+# Subtest: protected reference certification compares the complete stored result without publishing
+ok 92 - protected reference certification compares the complete stored result without publishing
+  ---
+  duration_ms: 162.642875
+  type: 'test'
+  ...
+# Subtest: Preview SQL provides service-only jobs, claims, checkpoints, retry, supersession, and publication separation
+ok 93 - Preview SQL provides service-only jobs, claims, checkpoints, retry, supersession, and publication separation
+  ---
+  duration_ms: 4.024209
+  type: 'test'
+  ...
+# Subtest: the Preview worker is asynchronous, protected, zero-fallback, and does not publish or mirror
+ok 94 - the Preview worker is asynchronous, protected, zero-fallback, and does not publish or mirror
+  ---
+  duration_ms: 1.527833
+  type: 'test'
+  ...
+# Subtest: Odds input projection is versioned, deterministic, and retains exact ratings/settings
+ok 95 - Odds input projection is versioned, deterministic, and retains exact ratings/settings
+  ---
+  duration_ms: 9.978
+  type: 'test'
+  ...
+# Subtest: canonical adapter reproduces unchanged tournament-odds.js deterministically
+ok 96 - canonical adapter reproduces unchanged tournament-odds.js deterministically
+  ---
+  duration_ms: 1650.809583
+  type: 'test'
+  ...
+# Subtest: cross-contract parity ignores only prospective metadata and intended raw-probability ordering
+ok 97 - cross-contract parity ignores only prospective metadata and intended raw-probability ordering
+  ---
+  duration_ms: 0.212833
+  type: 'test'
+  ...
+# Subtest: native publication carries the prospective ranking contract while retaining the v2 deterministic seed
+ok 98 - native publication carries the prospective ranking contract while retaining the v2 deterministic seed
+  ---
+  duration_ms: 804.319167
+  type: 'test'
+  ...
+# Subtest: Preview flags fail closed in Production
+ok 99 - Preview flags fail closed in Production
+  ---
+  duration_ms: 1.716625
+  type: 'test'
+  ...
+# Subtest: migration and route are service/Director-only, idempotent, isolated, and retain v2 simulation seeds
+ok 100 - migration and route are service/Director-only, idempotent, isolated, and retain v2 simulation seeds
+  ---
+  duration_ms: 2.40825
+  type: 'test'
+  ...
+# Subtest: Mission Control exposes one searchable collapsible operations console
+ok 101 - Mission Control exposes one searchable collapsible operations console
+  ---
+  duration_ms: 1.3215
+  type: 'test'
+  ...
+# Subtest: UNIT canonical Director operations preserve revision and operation identity
+ok 102 - UNIT canonical Director operations preserve revision and operation identity
+  ---
+  duration_ms: 1.362083
+  type: 'test'
+  ...
+# Subtest: operational editors mount on demand and close only after verified success
+ok 103 - operational editors mount on demand and close only after verified success
+  ---
+  duration_ms: 0.677625
+  type: 'test'
+  ...
+# Subtest: UNIT canonical round pairings preserve format slots and one revision-bound batch
+ok 104 - UNIT canonical round pairings preserve format slots and one revision-bound batch
+  ---
+  duration_ms: 0.274417
+  type: 'test'
+  ...
+# Subtest: Round Pairings renders every format as an always-editable lineup sheet
+ok 105 - Round Pairings renders every format as an always-editable lineup sheet
+  ---
+  duration_ms: 0.489542
+  type: 'test'
+  ...
+# Subtest: Mission Control writes remain field-scoped and protected-map aware
+ok 106 - Mission Control writes remain field-scoped and protected-map aware
+  ---
+  duration_ms: 1.199042
+  type: 'test'
+  ...
+# Subtest: Starting Hole is capability-gated by both the protected map and active sheet header
+ok 107 - Starting Hole is capability-gated by both the protected map and active sheet header
+  ---
+  duration_ms: 0.590167
+  type: 'test'
+  ...
+# Subtest: UNIT canonical Net Skins entries remain round-scoped and binding-aware
+ok 108 - UNIT canonical Net Skins entries remain round-scoped and binding-aware
+  ---
+  duration_ms: 0.647916
+  type: 'test'
+  ...
+# Subtest: UNIT canonical Calcutta entry preserves exact price and complete ownership together
+ok 109 - UNIT canonical Calcutta entry preserves exact price and complete ownership together
+  ---
+  duration_ms: 5.888458
+  type: 'test'
+  ...
+# Subtest: UNIT canonical match controls honor complete scorecard, permissions, lock and Final state
+ok 110 - UNIT canonical match controls honor complete scorecard, permissions, lock and Final state
+  ---
+  duration_ms: 1.37575
+  type: 'test'
+  ...
+# Subtest: match status and scoring access remain separate authoritative capabilities
+ok 111 - match status and scoring access remain separate authoritative capabilities
+  ---
+  duration_ms: 0.312958
+  type: 'test'
+  ...
+# Subtest: published Odds import preserves exact Google payloads and milestone selection
+ok 112 - published Odds import preserves exact Google payloads and milestone selection
+  ---
+  duration_ms: 1.38425
+  type: 'test'
+  ...
+# Subtest: published Odds import is deterministic and rejects reporting divergence
+ok 113 - published Odds import is deterministic and rejects reporting divergence
+  ---
+  duration_ms: 0.535542
+  type: 'test'
+  ...
+# Subtest: published Odds treats an explicit positive sign as display-only while preserving non-finite blanks
+ok 114 - published Odds treats an explicit positive sign as display-only while preserving non-finite blanks
+  ---
+  duration_ms: 0.548958
+  type: 'test'
+  ...
+# Subtest: published Odds import rejects an incomplete or unsupported current milestone
+ok 115 - published Odds import rejects an incomplete or unsupported current milestone
+  ---
+  duration_ms: 0.07775
+  type: 'test'
+  ...
+# Subtest: published Odds import rejects an empty publication and duplicate milestones
+ok 116 - published Odds import rejects an empty publication and duplicate milestones
+  ---
+  duration_ms: 0.104833
+  type: 'test'
+  ...
+# Subtest: published Odds import is milestone ordered even when Google rows arrive out of order
+ok 117 - published Odds import is milestone ordered even when Google rows arrive out of order
+  ---
+  duration_ms: 0.112541
+  type: 'test'
+  ...
+# Subtest: Supabase projection retains complete milestone history for movement
+ok 118 - Supabase projection retains complete milestone history for movement
+  ---
+  duration_ms: 0.172625
+  type: 'test'
+  ...
+# Subtest: published Odds parity ignores JSONB object-key ordering but not value changes
+ok 119 - published Odds parity ignores JSONB object-key ordering but not value changes
+  ---
+  duration_ms: 0.216333
+  type: 'test'
+  ...
+# Subtest: PUBLISHED_ODDS_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources
+ok 120 - PUBLISHED_ODDS_READ_SOURCE uses canonical authority without Google and rejects inadmissible resources
+  ---
+  duration_ms: 1.081708
+  type: 'test'
+  ...
+# Subtest: Published Odds freshness follows the verified current-official publication, not wall-clock age
+ok 121 - Published Odds freshness follows the verified current-official publication, not wall-clock age
+  ---
+  duration_ms: 0.320834
+  type: 'test'
+  ...
+# Subtest: Published Odds freshness fails closed for missing, conflicting, or invalid current pointers
+ok 122 - Published Odds freshness fails closed for missing, conflicting, or invalid current pointers
+  ---
+  duration_ms: 0.301042
+  type: 'test'
+  ...
+# Subtest: legacy Google snapshots retain immutable ordering while exposing the shared publication contract
+ok 123 - legacy Google snapshots retain immutable ordering while exposing the shared publication contract
+  ---
+  duration_ms: 0.102
+  type: 'test'
+  ...
+# Subtest: Odds Center and Insights expose the shared freshness contract without a Supabase-to-Google fallback
+ok 124 - Odds Center and Insights expose the shared freshness contract without a Supabase-to-Google fallback
+  ---
+  duration_ms: 2.525541
+  type: 'test'
+  ...
+# Subtest: published Odds migration and participant adapter are service-only and calculation-free
+ok 125 - published Odds migration and participant adapter are service-only and calculation-free
+  ---
+  duration_ms: 0.645
+  type: 'test'
+  ...
+# Subtest: strict Production authoring accepts all eleven aliases through the complete-schema boundary
+ok 126 - strict Production authoring accepts all eleven aliases through the complete-schema boundary
+  ---
+  duration_ms: 7.2585
+  type: 'test'
+  ...
+# Subtest: strict Production authoring preserves every supported type and every boolean spelling
+ok 127 - strict Production authoring preserves every supported type and every boolean spelling
+  ---
+  duration_ms: 1.166666
+  type: 'test'
+  ...
+# Subtest: strict Production authoring enforces lower, upper, integer, enum, and relationship bounds
+ok 128 - strict Production authoring enforces lower, upper, integer, enum, and relationship bounds
+  ---
+  duration_ms: 0.594792
+  type: 'test'
+  ...
+# Subtest: strict Production authoring preserves canonical precedence and rejects duplicate conflicts
+ok 129 - strict Production authoring preserves canonical precedence and rejects duplicate conflicts
+  ---
+  duration_ms: 0.247542
+  type: 'test'
+  ...
+# Subtest: persisted validation binds an idempotency identity and deterministic canonical payload hash
+ok 130 - persisted validation binds an idempotency identity and deterministic canonical payload hash
+  ---
+  duration_ms: 32.981584
+  type: 'test'
+  ...
+# Subtest: Production trust mode accepts only a current, valid, exact-contract configuration
+ok 131 - Production trust mode accepts only a current, valid, exact-contract configuration
+  ---
+  duration_ms: 2.892667
+  type: 'test'
+  ...
+# Subtest: Production trust mode rejects settings and fingerprint integrity mismatches
+ok 132 - Production trust mode rejects settings and fingerprint integrity mismatches
+  ---
+  duration_ms: 0.659667
+  type: 'test'
+  ...
+# Subtest: Prediction Settings route behavior isolates Preview and denies anonymous or participant access
+ok 133 - Prediction Settings route behavior isolates Preview and denies anonymous or participant access
+  ---
+  duration_ms: 0.949125
+  type: 'test'
+  ...
+# Subtest: Prediction Settings route behavior requires origin and derives actor scope only from the Director identity
+ok 134 - Prediction Settings route behavior requires origin and derives actor scope only from the Director identity
+  ---
+  duration_ms: 0.480959
+  type: 'test'
+  ...
+# Subtest: Prediction Settings route preserves bounded future-scope rejection without leaking configuration
+ok 135 - Prediction Settings route preserves bounded future-scope rejection without leaking configuration
+  ---
+  duration_ms: 0.347334
+  type: 'test'
+  ...
+# Subtest: Prediction Settings route preserves authoritative per-setting validation issues
+ok 136 - Prediction Settings route preserves authoritative per-setting validation issues
+  ---
+  duration_ms: 0.553375
+  type: 'test'
+  ...
+# Subtest: retired Google Prediction Settings, Draft, and Guide cannot alter Supabase state
+ok 137 - retired Google Prediction Settings, Draft, and Guide cannot alter Supabase state
+  ---
+  duration_ms: 57.232541
+  type: 'test'
+  ...
+# Subtest: participant, website, mobile, annual, and Tournament Setup surfaces do not acquire Director configuration internals
+ok 138 - participant, website, mobile, annual, and Tournament Setup surfaces do not acquire Director configuration internals
+  ---
+  duration_ms: 2.036958
+  type: 'test'
+  ...
+# Subtest: retained Round Scorecards archive credential operation remains available under its explicit gate
+ok 139 - retained Round Scorecards archive credential operation remains available under its explicit gate
+  ---
+  duration_ms: 29.739542
+  type: 'test'
+  ...
+# Subtest: Production authoring exposes the exact typed 30-setting contract in five justified groups
+ok 140 - Production authoring exposes the exact typed 30-setting contract in five justified groups
+  ---
+  duration_ms: 0.367875
+  type: 'test'
+  ...
+# Subtest: Production authoring preserves all supported types, bounds, relationships, aliases, and legacy effective settings
+ok 141 - Production authoring preserves all supported types, bounds, relationships, aliases, and legacy effective settings
+  ---
+  duration_ms: 6.280792
+  type: 'test'
+  ...
+# Subtest: Production authoring rejects unknown or incomplete schemas and reports direct/effective change sets
+ok 142 - Production authoring rejects unknown or incomplete schemas and reports direct/effective change sets
+  ---
+  duration_ms: 0.273833
+  type: 'test'
+  ...
+# Subtest: server mutations bind exact Production scope, canonical payload hashes, and no Google transport
+ok 143 - server mutations bind exact Production scope, canonical payload hashes, and no Google transport
+  ---
+  duration_ms: 38.110209
+  type: 'test'
+  ...
+# Subtest: migration 080 is additive and inert while implementing the bounded revision lifecycle
+ok 144 - migration 080 is additive and inert while implementing the bounded revision lifecycle
+  ---
+  duration_ms: 0.295667
+  type: 'test'
+  ...
+# Subtest: Production Google Prediction Settings, Draft, and Guide authoring are retired without retiring Preview or archives
+ok 145 - Production Google Prediction Settings, Draft, and Guide authoring are retired without retiring Preview or archives
+  ---
+  duration_ms: 2.550708
+  type: 'test'
+  ...
+# Subtest: Supabase-native settings remain current in Production War Room reads without a Vercel fingerprint rebind
+ok 146 - Supabase-native settings remain current in Production War Room reads without a Vercel fingerprint rebind
+  ---
+  duration_ms: 0.502541
+  type: 'test'
+  ...
+# Subtest: Director UI implements Edit, Validate, Review, Save, history, and future-copy without Odds side effects
+ok 147 - Director UI implements Edit, Validate, Review, Save, history, and future-copy without Odds side effects
+  ---
+  duration_ms: 0.757792
+  type: 'test'
+  ...
+1..147
+# tests 162
+# suites 0
+# pass 162
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 121743.272459
