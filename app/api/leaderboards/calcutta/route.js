@@ -1,3 +1,4 @@
+import { certificationRequested } from "../../../../lib/canonical-resource-registration.js";
 import { withOperationalRoute, recordOperationalError } from "../../../../lib/operational-telemetry.js";
 import { readProductionCalcuttaV1 } from "../../../../lib/production-calcutta-v1.js";
 import { mobileCalcuttaDataFromProductionView } from "../../../../lib/mobile-v1-calcutta.js";
@@ -26,7 +27,7 @@ async function telemetryGET(request) {
     const identityStartedAt = performance.now();
     const identity = await resolveSupabaseParticipantIdentity({ request, cookieStore: await cookies(), env });
     const identityMs = performance.now() - identityStartedAt;
-    const productionV1 = source.productionCutover?.handled === true;
+    const productionV1 = source.productionCutover?.handled === true || certificationRequested(env);
     // Reuse the shipping native participant DTO with the existing web identity.
     // This explicit representation never falls back to a provisional read/worker.
     if (new URL(request.url).searchParams.get("presentation") === "participant") {

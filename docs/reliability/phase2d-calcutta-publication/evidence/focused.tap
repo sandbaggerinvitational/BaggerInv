@@ -1,0 +1,629 @@
+TAP version 13
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.SUBMIT_HOLE
+ok 1 - score adapter preserves existing non-UUID mutation identity: SCORING.SUBMIT_HOLE
+  ---
+  duration_ms: 17.6025
+  type: 'test'
+  ...
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.FINALIZE_MATCH
+ok 2 - score adapter preserves existing non-UUID mutation identity: SCORING.FINALIZE_MATCH
+  ---
+  duration_ms: 0.533458
+  type: 'test'
+  ...
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.REOPEN_MATCH
+ok 3 - score adapter preserves existing non-UUID mutation identity: SCORING.REOPEN_MATCH
+  ---
+  duration_ms: 0.405958
+  type: 'test'
+  ...
+# Subtest: participant context adapter separates server-bound actor fields without changing caller DTO
+ok 4 - participant context adapter separates server-bound actor fields without changing caller DTO
+  ---
+  duration_ms: 0.355
+  type: 'test'
+  ...
+# Subtest: receipt recovery remains an exact read and retains mutation identity after revocation
+ok 5 - receipt recovery remains an exact read and retains mutation identity after revocation
+  ---
+  duration_ms: 0.229917
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_tournament_live_view
+ok 6 - read alias uses admitted projection gateway: read_tournament_live_view
+  ---
+  duration_ms: 0.569208
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_leaderboards_core_view
+ok 7 - read alias uses admitted projection gateway: read_leaderboards_core_view
+  ---
+  duration_ms: 0.286083
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_canonical_2026_historical_view
+ok 8 - read alias uses admitted projection gateway: read_canonical_2026_historical_view
+  ---
+  duration_ms: 0.21
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_completed_history
+ok 9 - read alias uses admitted projection gateway: read_preview_completed_history
+  ---
+  duration_ms: 0.178667
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_current_guide_projection
+ok 10 - read alias uses admitted projection gateway: read_current_guide_projection
+  ---
+  duration_ms: 0.247125
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_draft_view
+ok 11 - read alias uses admitted projection gateway: read_preview_draft_view
+  ---
+  duration_ms: 0.223
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_championship_odds_inputs
+ok 12 - read alias uses admitted projection gateway: read_championship_odds_inputs
+  ---
+  duration_ms: 0.146084
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_secondary_history_players
+ok 13 - read alias uses admitted projection gateway: read_preview_secondary_history_players
+  ---
+  duration_ms: 0.149166
+  type: 'test'
+  ...
+# Subtest: unlisted legacy mutation, publication, Google and import aliases never dispatch
+ok 14 - unlisted legacy mutation, publication, Google and import aliases never dispatch
+  ---
+  duration_ms: 0.281834
+  type: 'test'
+  ...
+# Subtest: read aliases reject supplied resource or historical workbook authority before transport
+ok 15 - read aliases reject supplied resource or historical workbook authority before transport
+  ---
+  duration_ms: 0.089041
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: TOURNAMENT_SETUP
+ok 16 - Director family read uses canonical context and separate actor: TOURNAMENT_SETUP
+  ---
+  duration_ms: 1.115166
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: ROUND_PAIRINGS
+ok 17 - Director family read uses canonical context and separate actor: ROUND_PAIRINGS
+  ---
+  duration_ms: 0.811916
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: MATCH_CONTROL
+ok 18 - Director family read uses canonical context and separate actor: MATCH_CONTROL
+  ---
+  duration_ms: 0.18125
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: NET_SKINS_ENTRIES
+ok 19 - Director family read uses canonical context and separate actor: NET_SKINS_ENTRIES
+  ---
+  duration_ms: 0.193834
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: CALCUTTA_MANAGEMENT
+ok 20 - Director family read uses canonical context and separate actor: CALCUTTA_MANAGEMENT
+  ---
+  duration_ms: 0.168125
+  type: 'test'
+  ...
+# Subtest: Director setup mutation confirms existing receipt and canonical readback; contract stays provider-neutral
+ok 21 - Director setup mutation confirms existing receipt and canonical readback; contract stays provider-neutral
+  ---
+  duration_ms: 1.180958
+  type: 'test'
+  ...
+# Subtest: Director admits the canonical direct NET_SKINS_ENTRIES projection but never a denial or wrong target
+ok 22 - Director admits the canonical direct NET_SKINS_ENTRIES projection but never a denial or wrong target
+  ---
+  duration_ms: 1.190541
+  type: 'test'
+  ...
+# Subtest: Director admits the canonical direct CALCUTTA_MANAGEMENT projection but never a denial or wrong target
+ok 23 - Director admits the canonical direct CALCUTTA_MANAGEMENT projection but never a denial or wrong target
+  ---
+  duration_ms: 0.913958
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects PLAYER without mutation
+ok 24 - Director authorization rejects PLAYER without mutation
+  ---
+  duration_ms: 0.299792
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects SPECTATOR without mutation
+ok 25 - Director authorization rejects SPECTATOR without mutation
+  ---
+  duration_ms: 0.046583
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects signed-out without mutation
+ok 26 - Director authorization rejects signed-out without mutation
+  ---
+  duration_ms: 0.044791
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects impersonated without mutation
+ok 27 - Director authorization rejects impersonated without mutation
+  ---
+  duration_ms: 0.038584
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects wrong-target without mutation
+ok 28 - Director authorization rejects wrong-target without mutation
+  ---
+  duration_ms: 0.121417
+  type: 'test'
+  ...
+# Subtest: Director stale token fails conflict without rebinding or dispatching mutation
+ok 29 - Director stale token fails conflict without rebinding or dispatching mutation
+  ---
+  duration_ms: 0.18825
+  type: 'test'
+  ...
+# Subtest: Director recovery verifies original admitted context and full request without current admission
+ok 30 - Director recovery verifies original admitted context and full request without current admission
+  ---
+  duration_ms: 0.525125
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: score_derived_delivery_tick_v1
+ok 31 - worker preserves lease and exact authority: score_derived_delivery_tick_v1
+  ---
+  duration_ms: 0.192625
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_competition_derived_jobs
+ok 32 - worker preserves lease and exact authority: claim_competition_derived_jobs
+  ---
+  duration_ms: 0.127417
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_intelligence_derived_bundle
+ok 33 - worker preserves lease and exact authority: claim_intelligence_derived_bundle
+  ---
+  duration_ms: 0.123791
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_production_calcutta_v1_recalculation
+ok 34 - worker preserves lease and exact authority: claim_production_calcutta_v1_recalculation
+  ---
+  duration_ms: 0.107417
+  type: 'test'
+  ...
+# Subtest: worker rejects unknown functions, Production-tagged payload and forged supplied context
+ok 35 - worker rejects unknown functions, Production-tagged payload and forged supplied context
+  ---
+  duration_ms: 0.092708
+  type: 'test'
+  ...
+# Subtest: current worker factory selects Certification without importing a Production runtime or requiring Google
+ok 36 - current worker factory selects Certification without importing a Production runtime or requiring Google
+  ---
+  duration_ms: 1.081375
+  type: 'test'
+  ...
+# Subtest: identity reads use admitted gateway; provider administration and participant messaging are unavailable
+ok 37 - identity reads use admitted gateway; provider administration and participant messaging are unavailable
+  ---
+  duration_ms: 0.453625
+  type: 'test'
+  ...
+# Subtest: Calcutta result publication: real Director gateway/shared core/history/privacy; no hosted access
+    # Subtest: all eight predecessor hashes checked before any change; mismatch rolls back
+    ok 1 - all eight predecessor hashes checked before any change; mismatch rolls back
+      ---
+      duration_ms: 23.772917
+      type: 'test'
+      ...
+    # Subtest: atomic install/replay preserve eight owners/ACLs/security/search_paths, RLS and v1-v7/attempt history
+    ok 2 - atomic install/replay preserve eight owners/ACLs/security/search_paths, RLS and v1-v7/attempt history
+      ---
+      duration_ms: 95.35325
+      type: 'test'
+      ...
+    # Subtest: private core ACL drift blocks replay instead of repairing/broadening roles
+    ok 3 - private core ACL drift blocks replay instead of repairing/broadening roles
+      ---
+      duration_ms: 33.85
+      type: 'test'
+      ...
+    # Subtest: empty revision 2 preserved; lawful Director nonempty successor 3; no fabricated result
+    ok 4 - empty revision 2 preserved; lawful Director nonempty successor 3; no fabricated result
+      ---
+      duration_ms: 145.104542
+      type: 'test'
+      ...
+    # Subtest: uncomputed result cannot be published or fabricated by Director input
+    ok 5 - uncomputed result cannot be published or fabricated by Director input
+      ---
+      duration_ms: 146.761208
+      type: 'test'
+      ...
+    # Subtest: genuine match control source creates canonical demand; native SDK consumer/common worker calculates immutable UNPUBLISHED A
+    ok 6 - genuine match control source creates canonical demand; native SDK consumer/common worker calculates immutable UNPUBLISHED A
+      ---
+      duration_ms: 10839.902167
+      type: 'test'
+      ...
+    # Subtest: unpublished participant read withholds market/result; private Director management remains allowed
+    ok 7 - unpublished participant read withholds market/result; private Director management remains allowed
+      ---
+      duration_ms: 44.006792
+      type: 'test'
+      ...
+    # Subtest: synthetic Director publishes exact current result; pointer/revision/receipt/two audits; no result or financial math mutation
+    ok 8 - synthetic Director publishes exact current result; pointer/revision/receipt/two audits; no result or financial math mutation
+      ---
+      duration_ms: 221.836166
+      type: 'test'
+      ...
+    # Subtest: exact replay is idempotent; fresh duplicate for same current result adds no publication revision
+    ok 9 - exact replay is idempotent; fresh duplicate for same current result adds no publication revision
+      ---
+      duration_ms: 194.9295
+      type: 'test'
+      ...
+    # Subtest: same operation ID conflicting payload denied; no new result/publication
+    ok 10 - same operation ID conflicting payload denied; no new result/publication
+      ---
+      duration_ms: 55.938541
+      type: 'test'
+      ...
+    # Subtest: wrong auction CAS denied
+    ok 11 - wrong auction CAS denied
+      ---
+      duration_ms: 139.571583
+      type: 'test'
+      ...
+    # Subtest: wrong auction fingerprint CAS denied
+    ok 12 - wrong auction fingerprint CAS denied
+      ---
+      duration_ms: 138.038
+      type: 'test'
+      ...
+    # Subtest: wrong source CAS denied
+    ok 13 - wrong source CAS denied
+      ---
+      duration_ms: 143.339459
+      type: 'test'
+      ...
+    # Subtest: wrong result CAS denied
+    ok 14 - wrong result CAS denied
+      ---
+      duration_ms: 145.518834
+      type: 'test'
+      ...
+    # Subtest: stale publication revision CAS denied
+    ok 15 - stale publication revision CAS denied
+      ---
+      duration_ms: 143.64225
+      type: 'test'
+      ...
+    # Subtest: source advance makes A stale; publishing A denied; native Queue calculates current B and Director confirms it
+    ok 16 - source advance makes A stale; publishing A denied; native Queue calculates current B and Director confirms it
+      ---
+      duration_ms: 11138.335041
+      type: 'test'
+      ...
+    # Subtest: published auction remains financially locked; immutable A and empty2 history preserved
+    ok 17 - published auction remains financially locked; immutable A and empty2 history preserved
+      ---
+      duration_ms: 90.848
+      type: 'test'
+      ...
+    # Subtest: participant A publication denied
+    ok 18 - participant A publication denied
+      ---
+      duration_ms: 72.067042
+      type: 'test'
+      ...
+    # Subtest: participant B publication denied
+    ok 19 - participant B publication denied
+      ---
+      duration_ms: 71.778958
+      type: 'test'
+      ...
+    # Subtest: signed-out publication denied
+    ok 20 - signed-out publication denied
+      ---
+      duration_ms: 74.171375
+      type: 'test'
+      ...
+    # Subtest: anon publication denied
+    ok 21 - anon publication denied
+      ---
+      duration_ms: 72.993083
+      type: 'test'
+      ...
+    # Subtest: ordinary authenticated publication denied
+    ok 22 - ordinary authenticated publication denied
+      ---
+      duration_ms: 71.42075
+      type: 'test'
+      ...
+    # Subtest: wrong Director publication denied
+    ok 23 - wrong Director publication denied
+      ---
+      duration_ms: 99.880916
+      type: 'test'
+      ...
+    # Subtest: client resource denied before publication
+    ok 24 - client resource denied before publication
+      ---
+      duration_ms: 65.782209
+      type: 'test'
+      ...
+    # Subtest: wrong tournament denied before publication
+    ok 25 - wrong tournament denied before publication
+      ---
+      duration_ms: 66.336583
+      type: 'test'
+      ...
+    # Subtest: arbitrary calculated result denied before publication
+    ok 26 - arbitrary calculated result denied before publication
+      ---
+      duration_ms: 93.594042
+      type: 'test'
+      ...
+    # Subtest: arbitrary payload denied before publication
+    ok 27 - arbitrary payload denied before publication
+      ---
+      duration_ms: 88.325417
+      type: 'test'
+      ...
+    # Subtest: wrong resource exact database binding denied
+    ok 28 - wrong resource exact database binding denied
+      ---
+      duration_ms: 7.843458
+      type: 'test'
+      ...
+    # Subtest: wrong project exact database binding denied
+    ok 29 - wrong project exact database binding denied
+      ---
+      duration_ms: 7.943792
+      type: 'test'
+      ...
+    # Subtest: wrong deployment exact database binding denied
+    ok 30 - wrong deployment exact database binding denied
+      ---
+      duration_ms: 7.960625
+      type: 'test'
+      ...
+    # Subtest: wrong release exact database binding denied
+    ok 31 - wrong release exact database binding denied
+      ---
+      duration_ms: 8.041375
+      type: 'test'
+      ...
+    # Subtest: Production exact database binding denied
+    ok 32 - Production exact database binding denied
+      ---
+      duration_ms: 7.800833
+      type: 'test'
+      ...
+    # Subtest: old Preview exact database binding denied
+    ok 33 - old Preview exact database binding denied
+      ---
+      duration_ms: 7.607833
+      type: 'test'
+      ...
+    # Subtest: development identity cannot use bound Certification Director publisher
+    ok 34 - development identity cannot use bound Certification Director publisher
+      ---
+      duration_ms: 0.250459
+      type: 'test'
+      ...
+    # Subtest: production identity cannot use bound Certification Director publisher
+    ok 35 - production identity cannot use bound Certification Director publisher
+      ---
+      duration_ms: 0.058667
+      type: 'test'
+      ...
+    # Subtest: bare service_role cannot publish; worker adapter forbids publication; private helpers denied to all client SQL roles
+    ok 36 - bare service_role cannot publish; worker adapter forbids publication; private helpers denied to all client SQL roles
+      ---
+      duration_ms: 80.02325
+      type: 'test'
+      ...
+    # Subtest: Production publication route unchanged/Preview 404; Production core guard remains; generic isolated Preview cannot select publication family
+    ok 37 - Production publication route unchanged/Preview 404; Production core guard remains; generic isolated Preview cannot select publication family
+      ---
+      duration_ms: 21.311541
+      type: 'test'
+      ...
+    # Subtest: published participant-safe read shows intended market/result, never raw receipts/tokens/source tree/supervisor; private table access denied
+    ok 38 - published participant-safe read shows intended market/result, never raw receipts/tokens/source tree/supervisor; private table access denied
+      ---
+      duration_ms: 60.354083
+      type: 'test'
+      ...
+    # Subtest: nonmember and injected private-reader fields cannot obtain a participant projection
+    ok 39 - nonmember and injected private-reader fields cannot obtain a participant projection
+      ---
+      duration_ms: 20.106125
+      type: 'test'
+      ...
+    # Subtest: lost application ACK reconciles authoritative publication receipt; replay never duplicates current publication
+    ok 40 - lost application ACK reconciles authoritative publication receipt; replay never duplicates current publication
+      ---
+      duration_ms: 166.282666
+      type: 'test'
+      ...
+    # Subtest: complete drain/reconcile; STOP/disabled/paused; unchanged RLS; no Odds/FinalRecap/Google work
+    ok 41 - complete drain/reconcile; STOP/disabled/paused; unchanged RLS; no Odds/FinalRecap/Google work
+      ---
+      duration_ms: 143.24375
+      type: 'test'
+      ...
+    1..41
+ok 38 - Calcutta result publication: real Director gateway/shared core/history/privacy; no hosted access
+  ---
+  duration_ms: 31516.548916
+  type: 'test'
+  ...
+# Subtest: publication is a fixed Director mutation/read; no new worker engine or RPC authority
+ok 39 - publication is a fixed Director mutation/read; no new worker engine or RPC authority
+  ---
+  duration_ms: 0.707083
+  type: 'test'
+  ...
+# Subtest: generic production cannot use Certification publication family
+ok 40 - generic production cannot use Certification publication family
+  ---
+  duration_ms: 0.183167
+  type: 'test'
+  ...
+# Subtest: generic preview cannot use Certification publication family
+ok 41 - generic preview cannot use Certification publication family
+  ---
+  duration_ms: 0.050291
+  type: 'test'
+  ...
+# Subtest: generic development cannot use Certification publication family
+ok 42 - generic development cannot use Certification publication family
+  ---
+  duration_ms: 0.044042
+  type: 'test'
+  ...
+# Subtest: browser command carries CAS expectations only; fixed family/action/transport
+ok 43 - browser command carries CAS expectations only; fixed family/action/transport
+  ---
+  duration_ms: 7.867625
+  type: 'test'
+  ...
+# Subtest: actual Production admin handler stays 404 in Preview before authentication or database access
+ok 44 - actual Production admin handler stays 404 in Preview before authentication or database access
+  ---
+  duration_ms: 3.489208
+  type: 'test'
+  ...
+# Subtest: forward correction has eight exact guarded bodies and four private helpers; no domain/claims/RLS/Production-route mutation
+ok 45 - forward correction has eight exact guarded bodies and four private helpers; no domain/claims/RLS/Production-route mutation
+  ---
+  duration_ms: 0.616125
+  type: 'test'
+  ...
+# Subtest: Production Calcutta V1 keeps NOT_CONFIGURED and explicit unpublish fact-free
+ok 46 - Production Calcutta V1 keeps NOT_CONFIGURED and explicit unpublish fact-free
+  ---
+  duration_ms: 0.762583
+  type: 'test'
+  ...
+# Subtest: published auction facts produce a bounded participant market and existing PWA model
+ok 47 - published auction facts produce a bounded participant market and existing PWA model
+  ---
+  duration_ms: 0.714667
+  type: 'test'
+  ...
+# Subtest: same-revision result maps money and fractions without cent rounding
+ok 48 - same-revision result maps money and fractions without cent rounding
+  ---
+  duration_ms: 0.474291
+  type: 'test'
+  ...
+# Subtest: invalid publication, resource, revision, and stale result contracts fail closed
+ok 49 - invalid publication, resource, revision, and stale result contracts fail closed
+  ---
+  duration_ms: 0.433833
+  type: 'test'
+  ...
+# Subtest: active Production read uses only the exact scoped Calcutta V1 RPC
+ok 50 - active Production read uses only the exact scoped Calcutta V1 RPC
+  ---
+  duration_ms: 8.657417
+  type: 'test'
+  ...
+# Subtest: participant PWA uses authenticated V1 while the public secondary route stays closed
+ok 51 - participant PWA uses authenticated V1 while the public secondary route stays closed
+  ---
+  duration_ms: 4.353625
+  type: 'test'
+  ...
+# Subtest: observer Calcutta projection changes only viewer binding, never ownership or financial population
+ok 52 - observer Calcutta projection changes only viewer binding, never ownership or financial population
+  ---
+  duration_ms: 1.0435
+  type: 'test'
+  ...
+# Subtest: Production Calcutta server exposes only the exact fixed-resource V1 RPCs
+ok 53 - Production Calcutta server exposes only the exact fixed-resource V1 RPCs
+  ---
+  duration_ms: 0.479125
+  type: 'test'
+  ...
+# Subtest: Director operations are revision-bound, explicit, and never caller-select publication policy
+ok 54 - Director operations are revision-bound, explicit, and never caller-select publication policy
+  ---
+  duration_ms: 0.132292
+  type: 'test'
+  ...
+# Subtest: admin route forwards both exact revision fingerprints
+ok 55 - admin route forwards both exact revision fingerprints
+  ---
+  duration_ms: 0.125792
+  type: 'test'
+  ...
+# Subtest: bounded worker reuses the existing Calcutta engine and binds both current revisions
+ok 56 - bounded worker reuses the existing Calcutta engine and binds both current revisions
+  ---
+  duration_ms: 0.195709
+  type: 'test'
+  ...
+# Subtest: worker inspects service-only revision tokens without using the participant market read
+ok 57 - worker inspects service-only revision tokens without using the participant market read
+  ---
+  duration_ms: 0.085542
+  type: 'test'
+  ...
+# Subtest: admin route is Production-only, Director-bound, same-origin, and has no GET
+ok 58 - admin route is Production-only, Director-bound, same-origin, and has no GET
+  ---
+  duration_ms: 0.12875
+  type: 'test'
+  ...
+# Subtest: mobile route is a read-only Bearer wrapper around the bounded DTO
+ok 59 - mobile route is a read-only Bearer wrapper around the bounded DTO
+  ---
+  duration_ms: 0.056833
+  type: 'test'
+  ...
+# Subtest: post-commit selector drains Production V1 and never invokes Preview mutation RPCs
+ok 60 - post-commit selector drains Production V1 and never invokes Preview mutation RPCs
+  ---
+  duration_ms: 0.33
+  type: 'test'
+  ...
+# Subtest: post-commit selector preserves the existing Preview calculator
+ok 61 - post-commit selector preserves the existing Preview calculator
+  ---
+  duration_ms: 0.076292
+  type: 'test'
+  ...
+# Subtest: canonical scoring routes use the environment-selected Calcutta worker
+ok 62 - canonical scoring routes use the environment-selected Calcutta worker
+  ---
+  duration_ms: 3.91625
+  type: 'test'
+  ...
+1..62
+# tests 103
+# suites 0
+# pass 103
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 31653.016917

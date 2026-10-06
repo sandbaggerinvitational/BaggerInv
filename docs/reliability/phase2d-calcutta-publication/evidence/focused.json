@@ -1,0 +1,39 @@
+{
+  "mode": "focused",
+  "startedAt": "2026-10-06T12:41:36.915Z",
+  "completedAt": "2026-10-06T12:42:08.604Z",
+  "hosted": false,
+  "remoteSocketsDenied": true,
+  "realCredentialsRemoved": true,
+  "counts": {
+    "tests": 103,
+    "pass": 103,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "failures": [],
+  "newFailures": [],
+  "establishedFailures": [],
+  "exitCode": 0,
+  "error": null,
+  "sourceStable": true,
+  "sourceManifest": {
+    "supabase/production_incremental/certification-calcutta-publication-v1.sql": "f5c399c08e93e6ae7d49a810050ecf154115a6ae2fe05815d55ba6df77f42930",
+    "lib/certification-read-adapters.js": "2852b4845d0fb4c535ee81134b0a8852f2bf0c53f127efeb085ee031f45c1688",
+    "app/api/leaderboards/calcutta/route.js": "fe39bdb59c70ebd9ebb6ec9740a36c005c7fb7699cc8c67d893c18681c353489",
+    "lib/certification-runtime-server.js": "2788f81e1d4466c740f67bf89df9f3a9dec1693000561199b9b3ade13dd3e0e5",
+    "lib/isolated-director-operations.js": "1e250a435c82bcdbac7fbe8027f6d05313c7acd9a993e72a3b017b0a9bee6adf",
+    "lib/canonical-director-operations-client.js": "41ca971c592248f5d8fa80df2df8f8b4d2835189f13e2600e330681f66aaa35d",
+    "app/api/director/canonical-operations/route.js": "cbc0446b5fd60f7f867531fa64126a65891e6df66a153379897765c91760078c",
+    "app/api/admin/production-calcutta-v1/route.js": "18ebfe673a670ded1893b2e8f7b13fa2d32a05036ac94ef384b3d74284a22254",
+    "lib/production-calcutta-server.js": "a4e88cbe7bef7458b4b25f3ab4e9056b4ecb165d9448413242a053de1c269733",
+    "test/certification-calcutta-publication.integration.test.mjs": "19ba3a5547ca2144c4c125628974484df8b4cded8b2f8d6936254e624fd6e2d1",
+    "test/certification-calcutta-publication.test.mjs": "e9fa443b049d5790a855800055b9a6af03a656c1de5db1f9701a2568cfa1791f",
+    "tools/reliability/certify-calcutta-publication.mjs": "a77dbc6782d028606e62d034395aa3383700fead64d4168f99c4045631b18b4a",
+    "package.json": "02ca2154f932c5c5bacd6d52ddd4eec023c422b7e46e44d6ec0d35dc54b7826f",
+    "package-lock.json": "abf89699407983d173e997f62aa1083e8ae5cd34b81f33904ebba9744d318d43"
+  },
+  "rawSha256": "0cdecc13c84a62c684462d1612d7de4c0dbd5255ee137cd8f1a6ce0340d6e79e",
+  "head": "2a002dfd526d04a3dc6060cfc47c8f4938c01c16"
+}
