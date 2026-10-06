@@ -33,6 +33,7 @@ test('retry v6: actual PG17/safeupdate preserves authority and uses canonical no
     assert.equal(f.q(`select has_function_privilege('${role}','production_control.worker_supervisor_control_v1(jsonb)','EXECUTE')`),'f');
    }
   });
+  sqlFile(f.cluster,f.database,repositoryRoot+'/supabase/production_incremental/certification-queue-routing-closure-v7.sql',{role:''});
   await t.test('real early BEGIN: sanitized canonical retry time; reservation/job attempts unchanged; no worker',async()=>{
    f.toggle(true);f.start({budget:1,duration_seconds:60});const e=f.batch().messages[0];
    await assert.rejects(f.consume(e),error=>{
@@ -50,7 +51,10 @@ test('retry v6: actual PG17/safeupdate preserves authority and uses canonical no
    for(const engine of f.startInput().engines)assert.equal(f.job(engine).delivery_attempts,0);
   });
   await t.test('native SDK + corrected envelope + BEGIN CAS + existing worker/claim/output/FINISH + duplicate + STOP',async()=>{
-   f.start({budget:1,duration_seconds:60});const e=f.batch().messages[0];await f.due(e);let acks=0;
+   f.start({budget:1,duration_seconds:60});const e=f.batch().messages[0];
+   f.ownerQueue('publication',{action:'TRY',invocation_id:e.message.invocation_id});
+   f.ownerQueue('publication',{action:'ACK',invocation_id:e.message.invocation_id,message_id:'msg_synthetic'});
+   await f.due(e);let acks=0;
    globalThis.fetch=async(url,init)=>{
     assert.equal(new URL(url).origin,'https://iad1.vercel-queue.com');assert.equal(init.method,'DELETE');acks++;return new Response(null,{status:204});
    };
@@ -64,7 +68,7 @@ test('retry v6: actual PG17/safeupdate preserves authority and uses canonical no
     'content-type':'application/json','ce-type':'com.vercel.queue.v2beta','ce-vqsqueuename':QUEUE_TOPIC,'ce-vqsconsumergroup':'synthetic',
     'ce-vqsmessageid':'msg_synthetic','ce-vqsreceipthandle':'local_synthetic','ce-vqsdeliverycount':'1','ce-vqsregion':'iad1',
     'ce-vqscreatedat':created.toISOString(),'ce-vqsexpiresat':expires.toISOString(),'ce-vqsvisibilitydeadline':new Date(Date.now()+300000).toISOString()},body:JSON.stringify(e.message)});
-   const run=()=>handleQueueEnvelope(request(),callback,{bound:f.bound});
+   const run=()=>handleQueueEnvelope(request(),callback,{bound:f.bound,control:f.control(),getToken:async()=>'synthetic-local-only'});
    assert.equal((await run()).status,200);assert.equal(f.status().consumed,1);
    const ticks=f.calls.filter(c=>c.operation==='WORKERS.DELIVERY_TICK').length;
    assert.equal((await run()).status,200);assert.equal(f.calls.filter(c=>c.operation==='WORKERS.DELIVERY_TICK').length,ticks);

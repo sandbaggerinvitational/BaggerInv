@@ -1,7 +1,7 @@
 // PRIVATE queue/v2beta consumer. Register only with the Certification manifest.
 // Default OFF even if an unregistered route exists in a local/other deployment.
 import {QueueClient} from '@vercel/queue';
-import {consumeCertificationQueueMessage,queueRuntimeIdentity,queueRetry} from '../../../../../lib/certification-queue-supervision.js';
+import {consumeCertificationQueueMessage,queueRuntimeIdentity,queueRetry,queueControl} from '../../../../../lib/certification-queue-supervision.js';
 import {QUEUE_TIMING} from '../../../../../lib/certification-queue-timing.js';
 import {handleQueueEnvelope,requireQueueEnvelopeMetadata} from '../../../../../lib/certification-queue-envelope.js';
 import {createQueueTimingEvidence,observeQueueTransport,currentQueueTimingEvidence} from '../../../../../lib/certification-queue-timing-evidence.js';
@@ -11,7 +11,7 @@ export const dynamic='force-dynamic';
 const queue=new QueueClient({region:'iad1'});
 const consume=queue.handleCallback(async(message,metadata)=>{
  const timingEvidence=currentQueueTimingEvidence();
- requireQueueEnvelopeMetadata(metadata);
+ requireQueueEnvelopeMetadata(metadata,message);
  let result;
  try{result=await consumeCertificationQueueMessage(message,metadata,{timingEvidence});}
  catch(error){timingEvidence?.failed();throw error;}
@@ -24,5 +24,5 @@ export function POST(request){
  const timingEvidence=createQueueTimingEvidence({bound});timingEvidence.callback(request);
  // Routing-only retries use zero-visibility provider lookup; prefetched
  // deliveries retain their raw metadata guard. No inferred/default expiry.
- return observeQueueTransport(timingEvidence,()=>handleQueueEnvelope(request,consume,{bound,evidence:timingEvidence}));
+ return observeQueueTransport(timingEvidence,()=>handleQueueEnvelope(request,consume,{bound,control:queueControl(),evidence:timingEvidence}));
 }

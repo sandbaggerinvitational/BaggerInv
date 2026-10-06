@@ -1,0 +1,981 @@
+TAP version 13
+# Subtest: new canonical fixed-fault denial ACKs; SQL programming failures remain failed deliveries
+ok 1 - new canonical fixed-fault denial ACKs; SQL programming failures remain failed deliveries
+  ---
+  duration_ms: 0.917292
+  type: 'test'
+  ...
+# Subtest: lost outward acknowledgement retries finitely and never claims deterministic denial
+ok 2 - lost outward acknowledgement retries finitely and never claims deterministic denial
+  ---
+  duration_ms: 0.603209
+  type: 'test'
+  ...
+# Subtest: fixed transient/global terminal use the established worker classifier
+ok 3 - fixed transient/global terminal use the established worker classifier
+  ---
+  duration_ms: 0.178209
+  type: 'test'
+  ...
+# Subtest: queue message cannot select fault, epoch, SQL, delay or any target
+ok 4 - queue message cannot select fault, epoch, SQL, delay or any target
+  ---
+  duration_ms: 0.406875
+  type: 'test'
+  ...
+# Subtest: consumer registration, retired public ingress and provider limits are untouched
+ok 5 - consumer registration, retired public ingress and provider limits are untouched
+  ---
+  duration_ms: 3.328167
+  type: 'test'
+  ...
+# Subtest: routing closure v7: actual PostgreSQL 17/safeupdate, canonical state, native SDK and unchanged worker
+    # Subtest: forward install is atomic, exact predecessor/hash guarded, replayable and metadata/history preserving
+    ok 1 - forward install is atomic, exact predecessor/hash guarded, replayable and metadata/history preserving
+      ---
+      duration_ms: 126.256542
+      type: 'test'
+      ...
+    # Subtest: private cores/owner mint/receipt protected; client and foreign authority cannot obtain terminal ACK
+    ok 2 - private cores/owner mint/receipt protected; client and foreign authority cannot obtain terminal ACK
+      ---
+      duration_ms: 105.629458
+      type: 'test'
+      ...
+    # Subtest: STOPPED reads canonical OFF/cancellation and ACKs retained over-budget/short-lifetime delivery without mutation
+    ok 3 - STOPPED reads canonical OFF/cancellation and ACKs retained over-budget/short-lifetime delivery without mutation
+      ---
+      duration_ms: 33.413166
+      type: 'test'
+      ...
+    # Subtest: wrong resource/project/release/deployment/message and arbitrary terminal claim remain denied without ACK
+    ok 4 - wrong resource/project/release/deployment/message and arbitrary terminal claim remain denied without ACK
+      ---
+      duration_ms: 70.976333
+      type: 'test'
+      ...
+    # Subtest: unconfirmed publication is RECONCILE, never terminal ACK from an arbitrary message identity
+    ok 5 - unconfirmed publication is RECONCILE, never terminal ACK from an arbitrary message identity
+      ---
+      duration_ms: 28.58675
+      type: 'test'
+      ...
+    # Subtest: old cancelled reservation safely closes even after a newer supervisor epoch
+    ok 6 - old cancelled reservation safely closes even after a newer supervisor epoch
+      ---
+      duration_ms: 25.945459
+      type: 'test'
+      ...
+    # Subtest: eligible delivery limit remains active and does not consume reservation/failure/job budgets
+    ok 7 - eligible delivery limit remains active and does not consume reservation/failure/job budgets
+      ---
+      duration_ms: 24.931667
+      type: 'test'
+      ...
+    # Subtest: registered invocation cannot acknowledge a foreign provider message
+    ok 8 - registered invocation cannot acknowledge a foreign provider message
+      ---
+      duration_ms: 10.966458
+      type: 'test'
+      ...
+    # Subtest: real SDK NOT_DUE retries >=5 seconds; uncertain committed BEGIN remains reconcilable without budget changes
+    ok 9 - real SDK NOT_DUE retries >=5 seconds; uncertain committed BEGIN remains reconcilable without budget changes
+      ---
+      duration_ms: 10020.820416
+      type: 'test'
+      ...
+    # Subtest: reservation expires naturally; terminal expiry bypasses lifetime/delivery guards without BEGIN
+    ok 10 - reservation expires naturally; terminal expiry bypasses lifetime/delivery guards without BEGIN
+      ---
+      duration_ms: 30073.478958
+      type: 'test'
+      ...
+    # Subtest: real canonical BUSY capacity produces a 15-second native retry and no attempt/failure changes
+    ok 11 - real canonical BUSY capacity produces a 15-second native retry and no attempt/failure changes
+      ---
+      duration_ms: 70246.651291
+      type: 'test'
+      ...
+    # Subtest: genuine four-family demand goes through native SDK, BEGIN CAS, existing worker, claim/output/FINISH
+    ok 12 - genuine four-family demand goes through native SDK, BEGIN CAS, existing worker, claim/output/FINISH
+      ---
+      duration_ms: 11011.9225
+      type: 'test'
+      ...
+    # Subtest: HALTED unused reservation closes; RESUME requires owner/new reservation; no ordinary delivery clears latch
+    ok 13 - HALTED unused reservation closes; RESUME requires owner/new reservation; no ordinary delivery clears latch
+      ---
+      duration_ms: 10473.647459
+      type: 'test'
+      ...
+    1..13
+ok 6 - routing closure v7: actual PostgreSQL 17/safeupdate, canonical state, native SDK and unchanged worker
+  ---
+  duration_ms: 139045.288041
+  type: 'test'
+  ...
+# Queue callback error: Error: SUPERVISOR_MESSAGE_TIMING_UNAVAILABLE
+#     at failed (file:///private/tmp/bagger-worker-provider-portability/lib/certification-queue-envelope.js:8:34)
+#     at requireQueueEnvelopeMetadata (file:///private/tmp/bagger-worker-provider-portability/lib/certification-queue-envelope.js:112:66)
+#     at client.handleCallback.visibilityTimeoutSeconds (file:///private/tmp/bagger-worker-provider-portability/test/certification-queue-closure.test.mjs:121:62)
+#     at ConsumerGroup.processMessage (file:///private/tmp/bagger-worker-provider-portability/node_modules/@vercel/queue/dist/index.mjs:410:13)
+#     at ConsumerGroup.consume (file:///private/tmp/bagger-worker-provider-portability/node_modules/@vercel/queue/dist/index.mjs:496:18)
+#     at async handleCallback (file:///private/tmp/bagger-worker-provider-portability/node_modules/@vercel/queue/dist/index.mjs:773:5)
+#     at async file:///private/tmp/bagger-worker-provider-portability/node_modules/@vercel/queue/dist/index.mjs:2638:9
+#     at async TestContext.<anonymous> (file:///private/tmp/bagger-worker-provider-portability/test/certification-queue-closure.test.mjs:122:11)
+#     at async Test.run (node:internal/test_runner/test:1404:7)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+#   code: 'SUPERVISOR_MESSAGE_TIMING_UNAVAILABLE',
+#   status: 503
+# }
+# Subtest: STOPPED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 7 - STOPPED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 14.699709
+  type: 'test'
+  ...
+# Subtest: STOPPED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 8 - STOPPED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.590458
+  type: 'test'
+  ...
+# Subtest: CANCELLED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 9 - CANCELLED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.489292
+  type: 'test'
+  ...
+# Subtest: CANCELLED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 10 - CANCELLED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.252958
+  type: 'test'
+  ...
+# Subtest: EXPIRED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 11 - EXPIRED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.308208
+  type: 'test'
+  ...
+# Subtest: EXPIRED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 12 - EXPIRED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.192625
+  type: 'test'
+  ...
+# Subtest: STALE_EPOCH: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 13 - STALE_EPOCH: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.236625
+  type: 'test'
+  ...
+# Subtest: STALE_EPOCH: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 14 - STALE_EPOCH: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.160125
+  type: 'test'
+  ...
+# Subtest: STALE_CONTEXT: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 15 - STALE_CONTEXT: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.206084
+  type: 'test'
+  ...
+# Subtest: STALE_CONTEXT: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 16 - STALE_CONTEXT: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.185333
+  type: 'test'
+  ...
+# Subtest: REPLAY: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 17 - REPLAY: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.1985
+  type: 'test'
+  ...
+# Subtest: REPLAY: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 18 - REPLAY: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.145708
+  type: 'test'
+  ...
+# Subtest: HALTED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 19 - HALTED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.161583
+  type: 'test'
+  ...
+# Subtest: HALTED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 20 - HALTED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.102209
+  type: 'test'
+  ...
+# Subtest: ADMISSION_DENIED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+ok 21 - ADMISSION_DENIED: terminal denial closes trusted routing-only delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.1615
+  type: 'test'
+  ...
+# Subtest: ADMISSION_DENIED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+ok 22 - ADMISSION_DENIED: terminal denial closes trusted prefetched delivery despite delivery count/lifetime
+  ---
+  duration_ms: 0.123875
+  type: 'test'
+  ...
+# Subtest: eligible over-limit remains a visible poison/budget failure; eligible short lifetime remains execution-denied
+ok 23 - eligible over-limit remains a visible poison/budget failure; eligible short lifetime remains execution-denied
+  ---
+  duration_ms: 0.26875
+  type: 'test'
+  ...
+# Subtest: missing/invalid expiry or malformed terminal claim cannot ACK an unidentified message
+ok 24 - missing/invalid expiry or malformed terminal claim cannot ACK an unidentified message
+  ---
+  duration_ms: 0.277542
+  type: 'test'
+  ...
+# Subtest: untrusted canonical response, identity denial, or database failure never becomes terminal ACK
+ok 25 - untrusted canonical response, identity denial, or database failure never becomes terminal ACK
+  ---
+  duration_ms: 0.389166
+  type: 'test'
+  ...
+# Subtest: UNKNOWN is retained and explicitly rescheduled, never ACKed even if STOP is concurrent
+ok 26 - UNKNOWN is retained and explicitly rescheduled, never ACKed even if STOP is concurrent
+  ---
+  duration_ms: 0.349375
+  type: 'test'
+  ...
+# Subtest: lost/failed terminal DELETE cannot report a confirmed ACK
+ok 27 - lost/failed terminal DELETE cannot report a confirmed ACK
+  ---
+  duration_ms: 0.139916
+  type: 'test'
+  ...
+# Subtest: terminal disposition receipt retains canonical denial with no execution success or credentials
+ok 28 - terminal disposition receipt retains canonical denial with no execution success or credentials
+  ---
+  duration_ms: 0.62075
+  type: 'test'
+  ...
+# Subtest: installed SDK still maps early/BUSY to bounded native visibility PATCH/200 without worker or attempt accounting
+ok 29 - installed SDK still maps early/BUSY to bounded native visibility PATCH/200 without worker or attempt accounting
+  ---
+  duration_ms: 2.312458
+  type: 'test'
+  ...
+# Subtest: SDK payload drift after trusted routing lookup fails delivery instead of ACKing an unidentified payload
+ok 30 - SDK payload drift after trusted routing lookup fails delivery instead of ACKing an unidentified payload
+  ---
+  duration_ms: 1.250458
+  type: 'test'
+  ...
+# Subtest: retry v6: actual PG17/safeupdate preserves authority and uses canonical not-before; real SDK completes four-family demand
+    # Subtest: predecessor/hash guarded atomic correction, replay, history, metadata and safeupdate preserved
+    ok 1 - predecessor/hash guarded atomic correction, replay, history, metadata and safeupdate preserved
+      ---
+      duration_ms: 97.499708
+      type: 'test'
+      ...
+    # Subtest: private installation evidence and owner controls remain denied to all client/service roles
+    ok 2 - private installation evidence and owner controls remain denied to all client/service roles
+      ---
+      duration_ms: 36.356333
+      type: 'test'
+      ...
+    # Subtest: real early BEGIN: sanitized canonical retry time; reservation/job attempts unchanged; no worker
+    ok 3 - real early BEGIN: sanitized canonical retry time; reservation/job attempts unchanged; no worker
+      ---
+      duration_ms: 122.2915
+      type: 'test'
+      ...
+    # Subtest: existing synthetic upsert creates four truthful pending jobs without scoring preparation or after-hook claims
+    ok 4 - existing synthetic upsert creates four truthful pending jobs without scoring preparation or after-hook claims
+      ---
+      duration_ms: 212.932
+      type: 'test'
+      ...
+    # Subtest: native SDK + corrected envelope + BEGIN CAS + existing worker/claim/output/FINISH + duplicate + STOP
+    ok 5 - native SDK + corrected envelope + BEGIN CAS + existing worker/claim/output/FINISH + duplicate + STOP
+      ---
+      duration_ms: 10908.003542
+      type: 'test'
+      ...
+    1..5
+ok 31 - retry v6: actual PG17/safeupdate preserves authority and uses canonical not-before; real SDK completes four-family demand
+  ---
+  duration_ms: 18057.863125
+  type: 'test'
+  ...
+# Subtest: routing-only retry learns actual expiry through fixed provider zero-visibility peek before SDK entry
+ok 32 - routing-only retry learns actual expiry through fixed provider zero-visibility peek before SDK entry
+  ---
+  duration_ms: 9.60675
+  type: 'test'
+  ...
+# Subtest: bounded native envelope rejects arbitrary topic/region/group, malformed notification and Production context
+ok 33 - bounded native envelope rejects arbitrary topic/region/group, malformed notification and Production context
+  ---
+  duration_ms: 0.705584
+  type: 'test'
+  ...
+# Subtest: no actual expiry, exhausted horizon, wrong message or oversized provider response never start SDK timers/worker
+ok 34 - no actual expiry, exhausted horizon, wrong message or oversized provider response never start SDK timers/worker
+  ---
+  duration_ms: 1.059708
+  type: 'test'
+  ...
+# Subtest: locked/already processed notification is skipped without ACKing the underlying message or executing a worker
+ok 35 - locked/already processed notification is skipped without ACKing the underlying message or executing a worker
+  ---
+  duration_ms: 0.389208
+  type: 'test'
+  ...
+# Subtest: NOT_DUE and BUSY use explicit safe delays; transport-only probes do not imply execution/ACK
+ok 36 - NOT_DUE and BUSY use explicit safe delays; transport-only probes do not imply execution/ACK
+  ---
+  duration_ms: 0.612
+  type: 'test'
+  ...
+# Subtest: authority/STOP/HALT/stale/replay deny with SDK ACK; infrastructure fails; UNKNOWN remains reconcilable
+ok 37 - authority/STOP/HALT/stale/replay deny with SDK ACK; infrastructure fails; UNKNOWN remains reconcilable
+  ---
+  duration_ms: 0.115542
+  type: 'test'
+  ...
+# Subtest: real SDK first early denial reschedules with HTTP 200; routing-only retry pulls real metadata and executes once
+ok 38 - real SDK first early denial reschedules with HTTP 200; routing-only retry pulls real metadata and executes once
+  ---
+  duration_ms: 4.115417
+  type: 'test'
+  ...
+# Queue callback error: Error: SUPERVISOR_CONTROL_UNAVAILABLE
+#     at queueDatabaseFailure (file:///private/tmp/bagger-worker-provider-portability/lib/certification-queue-errors.js:49:23)
+#     at failure (file:///private/tmp/bagger-worker-provider-portability/test/certification-queue-errors.test.mjs:5:46)
+#     at TestContext.<anonymous> (file:///private/tmp/bagger-worker-provider-portability/test/certification-queue-errors.test.mjs:60:18)
+#     at Test.runInAsyncScope (node:async_hooks:226:14)
+#     at Test.run (node:internal/test_runner/test:1397:25)
+#     at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+#     at Test.postRun (node:internal/test_runner/test:1537:19)
+#     at Test.run (node:internal/test_runner/test:1462:12)
+#     at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+#   code: 'SUPERVISOR_CONTROL_UNAVAILABLE',
+#   status: 503,
+#   retryAfterSeconds: undefined,
+#   sqlstate: '21000',
+#   failureClass: 'DATABASE',
+#   queueDisposition: 'FAIL',
+#   operation: 'BEGIN'
+# }
+# Subtest: SUPERVISOR_ADMISSION_DENIED is an explicit deterministic denial, ACK without worker
+ok 39 - SUPERVISOR_ADMISSION_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 1.316125
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_RESERVATION_DENIED is an explicit deterministic denial, ACK without worker
+ok 40 - SUPERVISOR_RESERVATION_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.055833
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_DISABLED_OR_STALE is an explicit deterministic denial, ACK without worker
+ok 41 - SUPERVISOR_DISABLED_OR_STALE is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.043708
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_RESOURCE_DENIED is an explicit deterministic denial, ACK without worker
+ok 42 - SUPERVISOR_RESOURCE_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.041292
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_DEPLOYMENT_DENIED is an explicit deterministic denial, ACK without worker
+ok 43 - SUPERVISOR_DEPLOYMENT_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.04075
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_REQUEST_DENIED is an explicit deterministic denial, ACK without worker
+ok 44 - SUPERVISOR_REQUEST_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.033167
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_MESSAGE_DENIED is an explicit deterministic denial, ACK without worker
+ok 45 - SUPERVISOR_MESSAGE_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.039167
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_RUN_TOKEN_DENIED is an explicit deterministic denial, ACK without worker
+ok 46 - SUPERVISOR_RUN_TOKEN_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.033667
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_OWNER_PUBLICATION_REQUIRED is an explicit deterministic denial, ACK without worker
+ok 47 - SUPERVISOR_OWNER_PUBLICATION_REQUIRED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.049042
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_PUBLISHER_SESSION_DENIED is an explicit deterministic denial, ACK without worker
+ok 48 - SUPERVISOR_PUBLISHER_SESSION_DENIED is an explicit deterministic denial, ACK without worker
+  ---
+  duration_ms: 0.075125
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_AUTHORITY_CONTEXT_STALE PT409 remains a typed nonretrying authority conflict
+ok 49 - SUPERVISOR_AUTHORITY_CONTEXT_STALE PT409 remains a typed nonretrying authority conflict
+  ---
+  duration_ms: 0.057292
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_REVISION_STALE PT409 remains a typed nonretrying authority conflict
+ok 50 - SUPERVISOR_REVISION_STALE PT409 remains a typed nonretrying authority conflict
+  ---
+  duration_ms: 0.039458
+  type: 'test'
+  ...
+# Subtest: CANONICAL_RESOURCE_CONTEXT_STALE PT409 remains a typed nonretrying authority conflict
+ok 51 - CANONICAL_RESOURCE_CONTEXT_STALE PT409 remains a typed nonretrying authority conflict
+  ---
+  duration_ms: 0.027375
+  type: 'test'
+  ...
+# Subtest: 21000 UPDATE requires a WHERE clause fails delivery without false authorization ACK
+ok 52 - 21000 UPDATE requires a WHERE clause fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.080709
+  type: 'test'
+  ...
+# Subtest: P0001 SUPERVISOR_SINGLETON_DRIFT fails delivery without false authorization ACK
+ok 53 - P0001 SUPERVISOR_SINGLETON_DRIFT fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.032375
+  type: 'test'
+  ...
+# Subtest: 42P01 missing relation fails delivery without false authorization ACK
+ok 54 - 42P01 missing relation fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.021541
+  type: 'test'
+  ...
+# Subtest: XX000 unexpected internal failure fails delivery without false authorization ACK
+ok 55 - XX000 unexpected internal failure fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.026875
+  type: 'test'
+  ...
+# Subtest: 42501 permission denied for private object fails delivery without false authorization ACK
+ok 56 - 42501 permission denied for private object fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.020958
+  type: 'test'
+  ...
+# Subtest: 21000 SUPERVISOR_ADMISSION_DENIED fails delivery without false authorization ACK
+ok 57 - 21000 SUPERVISOR_ADMISSION_DENIED fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.022541
+  type: 'test'
+  ...
+# Subtest: 42501 log: SUPERVISOR_ADMISSION_DENIED fails delivery without false authorization ACK
+ok 58 - 42501 log: SUPERVISOR_ADMISSION_DENIED fails delivery without false authorization ACK
+  ---
+  duration_ms: 0.0195
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_NOT_DUE_OR_BUSY can become eligible and retries without ACK
+ok 59 - SUPERVISOR_NOT_DUE_OR_BUSY can become eligible and retries without ACK
+  ---
+  duration_ms: 0.061958
+  type: 'test'
+  ...
+# Subtest: SUPERVISOR_PUBLISHER_BUSY can become eligible and retries without ACK
+ok 60 - SUPERVISOR_PUBLISHER_BUSY can become eligible and retries without ACK
+  ---
+  duration_ms: 0.027791
+  type: 'test'
+  ...
+# Subtest: 40001 respects transaction retry/uncertainty without resetting attempts
+ok 61 - 40001 respects transaction retry/uncertainty without resetting attempts
+  ---
+  duration_ms: 0.044458
+  type: 'test'
+  ...
+# Subtest: 40P01 respects transaction retry/uncertainty without resetting attempts
+ok 62 - 40P01 respects transaction retry/uncertainty without resetting attempts
+  ---
+  duration_ms: 0.020916
+  type: 'test'
+  ...
+# Subtest: 57014 respects transaction retry/uncertainty without resetting attempts
+ok 63 - 57014 respects transaction retry/uncertainty without resetting attempts
+  ---
+  duration_ms: 0.019208
+  type: 'test'
+  ...
+# Subtest: 08006 respects transaction retry/uncertainty without resetting attempts
+ok 64 - 08006 respects transaction retry/uncertainty without resetting attempts
+  ---
+  duration_ms: 0.02075
+  type: 'test'
+  ...
+# Subtest: timeout/connection remain uncertain; generic status alone cannot authorize ACK
+ok 65 - timeout/connection remain uncertain; generic status alone cannot authorize ACK
+  ---
+  duration_ms: 0.085833
+  type: 'test'
+  ...
+# Subtest: installed native SDK: ACK deletes lease; retry changes visibility; programming fault fails HTTP callback without ACK
+    # Subtest: success
+    ok 1 - success
+      ---
+      duration_ms: 10.8965
+      type: 'test'
+      ...
+    # Subtest: authority
+    ok 2 - authority
+      ---
+      duration_ms: 0.38425
+      type: 'test'
+      ...
+    # Subtest: connection
+    ok 3 - connection
+      ---
+      duration_ms: 0.980917
+      type: 'test'
+      ...
+    # Subtest: busy
+    ok 4 - busy
+      ---
+      duration_ms: 0.266542
+      type: 'test'
+      ...
+    # Subtest: safeupdate
+    ok 5 - safeupdate
+      ---
+      duration_ms: 0.621084
+      type: 'test'
+      ...
+    1..5
+ok 66 - installed native SDK: ACK deletes lease; retry changes visibility; programming fault fails HTTP callback without ACK
+  ---
+  duration_ms: 13.555875
+  type: 'test'
+  ...
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":1,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"d24e9fa35f526fe18645f3e10903d6b4835466d55211f03b5f3b464488e8f32c","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:21.794Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":28,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-06T01:31:31.672Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-06T01:32:01.672Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-06T01:31:21.779Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":10,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":550,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-06T01:40:31.794Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":2,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"d24e9fa35f526fe18645f3e10903d6b4835466d55211f03b5f3b464488e8f32c","provenance":"DERIVED"},"provider_message_digest":{"value":"bcb5df7ee098cf5719310147ae3e1505667fbead7ab537e911d0b0ea8b0d38ad","provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:21.795Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":28,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":3,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"4ef3f9719400174e8a506b2cd2d08a1d567de45e70cd5d75521d59440d22c414","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:21.820Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":54,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-06T01:32:31.672Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-06T01:33:01.672Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-06T01:31:21.808Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":70,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":610,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-06T01:41:31.820Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_UNKNOWN","sequence":4,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"4ef3f9719400174e8a506b2cd2d08a1d567de45e70cd5d75521d59440d22c414","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:21.821Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":54,"provenance":"SERVER_CLOCK_OBSERVATION"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":1,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"4ef3f9719400174e8a506b2cd2d08a1d567de45e70cd5d75521d59440d22c414","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:21.919Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":25,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-06T01:32:31.672Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-06T01:33:01.672Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-06T01:31:21.906Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":70,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":610,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-06T01:41:31.919Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":2,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"4ef3f9719400174e8a506b2cd2d08a1d567de45e70cd5d75521d59440d22c414","provenance":"DERIVED"},"provider_message_digest":{"value":"dc6a10a0269d9f5a18c05be722e418efcd4dbb74600103df592f4ddf1d1516db","provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:21.919Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":25,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":3,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"85248678b788ea9b955168a622bb48282849297ae76afbf7020fb103743ea975","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:21.944Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":50,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-06T01:33:31.672Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-06T01:34:01.672Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-06T01:31:21.932Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":130,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":670,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-06T01:42:31.944Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":4,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"85248678b788ea9b955168a622bb48282849297ae76afbf7020fb103743ea975","provenance":"DERIVED"},"provider_message_digest":{"value":"dc6a10a0269d9f5a18c05be722e418efcd4dbb74600103df592f4ddf1d1516db","provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:21.944Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":50,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":1,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"d18a64e2cc7182cbf2490c6186056f2ec2df12c25defe853065209dc1ea595f3","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:22.240Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":21,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-06T01:31:32.108Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-06T01:32:02.108Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-06T01:31:22.230Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":10,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":550,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-06T01:40:32.240Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":2,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"d18a64e2cc7182cbf2490c6186056f2ec2df12c25defe853065209dc1ea595f3","provenance":"DERIVED"},"provider_message_digest":{"value":"cbc28bbd695ab00f2a75b73f0d9d08ec0bb73a9dc59ceb300938c10b6d7e2186","provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:22.240Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":21,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":3,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"cf5b5e745246734a3b342c5680bc14b88f671e2d22b6e22eda62cadccf784dcd","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:22.261Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":41,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-06T01:32:32.108Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-06T01:33:02.108Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-06T01:31:22.251Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":70,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":610,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-06T01:41:32.261Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":4,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"cf5b5e745246734a3b342c5680bc14b88f671e2d22b6e22eda62cadccf784dcd","provenance":"DERIVED"},"provider_message_digest":{"value":"cbc28bbd695ab00f2a75b73f0d9d08ec0bb73a9dc59ceb300938c10b6d7e2186","provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:22.261Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":41,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":5,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"827780c820e43d06fea11145d07543b41550f24ab45ab8db33570416d340ca7d","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:22.281Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":62,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-06T01:33:32.108Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-06T01:34:02.108Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-06T01:31:22.271Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":130,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":670,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-06T01:42:32.281Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":6,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"827780c820e43d06fea11145d07543b41550f24ab45ab8db33570416d340ca7d","provenance":"DERIVED"},"provider_message_digest":{"value":"cbc28bbd695ab00f2a75b73f0d9d08ec0bb73a9dc59ceb300938c10b6d7e2186","provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:22.281Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":62,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":1,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"a740a7ee1912c0370923c3a4014eb6c49ad4c295a08db808d4b4357924d36238","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:22.420Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":20,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-06T01:31:32.370Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-06T01:32:02.370Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-06T01:31:22.410Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":10,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":550,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-06T01:40:32.420Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":2,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"a740a7ee1912c0370923c3a4014eb6c49ad4c295a08db808d4b4357924d36238","provenance":"DERIVED"},"provider_message_digest":{"value":"f32639fbad35946d9e62711098efac16e6c984e0e477b5daeef2a225bdd1bf3f","provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:22.441Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":41,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_UNKNOWN","sequence":3,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"a740a7ee1912c0370923c3a4014eb6c49ad4c295a08db808d4b4357924d36238","provenance":"DERIVED"},"provider_message_digest":{"value":"f32639fbad35946d9e62711098efac16e6c984e0e477b5daeef2a225bdd1bf3f","provenance":"DERIVED"},"observed_at":{"value":"2026-10-06T01:31:22.451Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":51,"provenance":"SERVER_CLOCK_OBSERVATION"}}
+# Subtest: owner START → digest handoff → bound Preview publisher → ledger; finite reconciliation and security
+    # Subtest: forward fresh/replay preserves v2 history, ACLs, consumer and disabled admission
+    ok 1 - forward fresh/replay preserves v2 history, ACLs, consumer and disabled admission
+      ---
+      duration_ms: 73.588916
+      type: 'test'
+      ...
+    # Subtest: participant/Director, anon, authenticated and service_role cannot mint/control/read owner permits
+    ok 2 - participant/Director, anon, authenticated and service_role cannot mint/control/read owner permits
+      ---
+      duration_ms: 86.080125
+      type: 'test'
+      ...
+    # Subtest: START commits first; partial/lost publisher ACK durable; session/permit single-use; restart completes same budget
+    ok 3 - START commits first; partial/lost publisher ACK durable; session/permit single-use; restart completes same budget
+      ---
+      duration_ms: 440.778458
+      type: 'test'
+      ...
+    # Subtest: publisher disappearance preserves UNKNOWN; owner retry waits for finite session expiry
+    ok 4 - publisher disappearance preserves UNKNOWN; owner retry waits for finite session expiry
+      ---
+      duration_ms: 262.524875
+      type: 'test'
+      ...
+    # Subtest: STOP during publication invalidates unfinished batch and a consumed publisher session
+    ok 5 - STOP during publication invalidates unfinished batch and a consumed publisher session
+      ---
+      duration_ms: 138.433667
+      type: 'test'
+      ...
+    # Subtest: missing, expired, wrong binding, stale revision and STOP fail closed; publication has no worker effect
+    ok 6 - missing, expired, wrong binding, stale revision and STOP fail closed; publication has no worker effect
+      ---
+      duration_ms: 406.05
+      type: 'test'
+      ...
+    1..6
+ok 67 - owner START → digest handoff → bound Preview publisher → ledger; finite reconciliation and security
+  ---
+  duration_ms: 8627.482583
+  type: 'test'
+  ...
+# Subtest: Preview publisher validates real identity predicate before SDK construction
+ok 68 - Preview publisher validates real identity predicate before SDK construction
+  ---
+  duration_ms: 5455.389209
+  type: 'test'
+  ...
+# Subtest: publisher body cannot select topic, resource, message, delay or transport
+ok 69 - publisher body cannot select topic, resource, message, delay or transport
+  ---
+  duration_ms: 5701.528833
+  type: 'test'
+  ...
+# Subtest: worker engine, job-fault transport and retired HTTP route stay byte-identical; consumer changes are transport-only; CLI remains retired
+ok 70 - worker engine, job-fault transport and retired HTTP route stay byte-identical; consumer changes are transport-only; CLI remains retired
+  ---
+  duration_ms: 44.916542
+  type: 'test'
+  ...
+# Subtest: queue message denies missing
+ok 71 - queue message denies missing
+  ---
+  duration_ms: 0.481084
+  type: 'test'
+  ...
+# Subtest: queue message denies empty
+ok 72 - queue message denies empty
+  ---
+  duration_ms: 0.046791
+  type: 'test'
+  ...
+# Subtest: queue message denies resource
+ok 73 - queue message denies resource
+  ---
+  duration_ms: 0.033417
+  type: 'test'
+  ...
+# Subtest: queue message denies url
+ok 74 - queue message denies url
+  ---
+  duration_ms: 0.029792
+  type: 'test'
+  ...
+# Subtest: queue message denies worker
+ok 75 - queue message denies worker
+  ---
+  duration_ms: 0.035167
+  type: 'test'
+  ...
+# Subtest: queue message denies badVersion
+ok 76 - queue message denies badVersion
+  ---
+  duration_ms: 0.029917
+  type: 'test'
+  ...
+# Subtest: queue message denies badId
+ok 77 - queue message denies badId
+  ---
+  duration_ms: 0.053875
+  type: 'test'
+  ...
+# Subtest: retired CLI publisher is incapable of hosted publication
+ok 78 - retired CLI publisher is incapable of hosted publication
+  ---
+  duration_ms: 0.095917
+  type: 'test'
+  ...
+# Subtest: publisher denies arbitrary physical resource or unpinned destination before SDK creation
+ok 79 - publisher denies arbitrary physical resource or unpinned destination before SDK creation
+  ---
+  duration_ms: 0.282208
+  type: 'test'
+  ...
+# Subtest: START remains truthful when credential acquisition fails after canonical commit
+ok 80 - START remains truthful when credential acquisition fails after canonical commit
+  ---
+  duration_ms: 0.419875
+  type: 'test'
+  ...
+# Subtest: publisher lost acknowledgement never fabricates NOT_PUBLISHED or a complete schedule
+ok 81 - publisher lost acknowledgement never fabricates NOT_PUBLISHED or a complete schedule
+  ---
+  duration_ms: 0.831083
+  type: 'test'
+  ...
+# Subtest: queue retry is finite; security denials acknowledge without job work; errors preserve uncertainty
+ok 82 - queue retry is finite; security denials acknowledge without job work; errors preserve uncertainty
+  ---
+  duration_ms: 0.1085
+  type: 'test'
+  ...
+# Subtest: only Certification manifest registers one private consumer; base Production manifest unchanged; pinned SDK
+ok 83 - only Certification manifest registers one private consumer; base Production manifest unchanged; pinned SDK
+  ---
+  duration_ms: 5.573583
+  type: 'test'
+  ...
+# Subtest: provider expiration is actual delivery metadata; publication returns only an ID; every emitted field has explicit provenance
+ok 84 - provider expiration is actual delivery metadata; publication returns only an ID; every emitted field has explicit provenance
+  ---
+  duration_ms: 2.8135
+  type: 'test'
+  ...
+# Subtest: sanitizer never emits payload, headers, claim/run tokens, provider IDs or arbitrary error text; schema rejects extra fields
+ok 85 - sanitizer never emits payload, headers, claim/run tokens, provider IDs or arbitrary error text; schema rejects extra fields
+  ---
+  duration_ms: 0.508583
+  type: 'test'
+  ...
+# Subtest: tick 1, tick 60 and tick 120 record the unchanged finite delay+540 formula
+ok 86 - tick 1, tick 60 and tick 120 record the unchanged finite delay+540 formula
+  ---
+  duration_ms: 0.139791
+  type: 'test'
+  ...
+# Subtest: old retention necessarily fails a lawful 90-second renewal before 60-second termination; new survives it
+ok 87 - old retention necessarily fails a lawful 90-second renewal before 60-second termination; new survives it
+  ---
+  duration_ms: 0.285417
+  type: 'test'
+  ...
+# Subtest: absent provider expiry is unavailable; SDK 24h fallback never becomes provider evidence
+ok 88 - absent provider expiry is unavailable; SDK 24h fallback never becomes provider evidence
+  ---
+  duration_ms: 0.252083
+  type: 'test'
+  ...
+# Subtest: provider clock duration is skew-independent; schedule comparison does not silently excuse short horizons
+ok 89 - provider clock duration is skew-independent; schedule comparison does not silently excuse short horizons
+  ---
+  duration_ms: 0.219125
+  type: 'test'
+  ...
+# Subtest: missing acceptance, wrong invocation/deployment/message cannot certify retention
+ok 90 - missing acceptance, wrong invocation/deployment/message cannot certify retention
+  ---
+  duration_ms: 0.160417
+  type: 'test'
+  ...
+# Subtest: publication logging preserves partial/lost ACK uncertainty and cannot manufacture distributed atomicity
+ok 91 - publication logging preserves partial/lost ACK uncertainty and cannot manufacture distributed atomicity
+  ---
+  duration_ms: 0.515959
+  type: 'test'
+  ...
+# Subtest: fixed lease diagnostics record visibility request/response and ACK without logging URLs/handles/body/headers
+ok 92 - fixed lease diagnostics record visibility request/response and ACK without logging URLs/handles/body/headers
+  ---
+  duration_ms: 0.470291
+  type: 'test'
+  ...
+# Subtest: network failure/rejected renewal are never successful ACKs; unsupported body diagnostics remain explicitly absent
+ok 93 - network failure/rejected renewal are never successful ACKs; unsupported body diagnostics remain explicitly absent
+  ---
+  duration_ms: 0.119833
+  type: 'test'
+  ...
+# Subtest: diagnostics are context-isolated, fixed-destination only, and passive if logging fails
+ok 94 - diagnostics are context-isolated, fixed-destination only, and passive if logging fails
+  ---
+  duration_ms: 1.997625
+  type: 'test'
+  ...
+# Subtest: timelines bridge provider timestamps to retained natural lease/reclaim proof without exposing claims
+ok 95 - timelines bridge provider timestamps to retained natural lease/reclaim proof without exposing claims
+  ---
+  duration_ms: 0.955625
+  type: 'test'
+  ...
+# Subtest: worker/claims/historical SQL/provider configuration remain byte-identical; timing constants and SDK remain pinned
+ok 96 - worker/claims/historical SQL/provider configuration remain byte-identical; timing constants and SDK remain pinned
+  ---
+  duration_ms: 56.625542
+  type: 'test'
+  ...
+# Subtest: real Node fetch diagnostics expose the fixed SDK visibility JSON and completed HTTP ACK on loopback
+ok 97 - real Node fetch diagnostics expose the fixed SDK visibility JSON and completed HTTP ACK on loopback
+  ---
+  duration_ms: 13.801166
+  type: 'test'
+  ...
+# Subtest: installed Queue SDK parser, automatic renewals and ACK produce sanitized evidence through the unmodified lifecycle
+ok 98 - installed Queue SDK parser, automatic renewals and ACK produce sanitized evidence through the unmodified lifecycle
+  ---
+  duration_ms: 4.455833
+  type: 'test'
+  ...
+# Subtest: bounded recovery graph rounds 510 seconds to the minimum whole-cadence 540-second horizon
+ok 99 - bounded recovery graph rounds 510 seconds to the minimum whole-cadence 540-second horizon
+  ---
+  duration_ms: 0.3355
+  type: 'test'
+  ...
+# Subtest: 120 delayed ticks fit a two-hour batch; TTL starts at publication and includes the full delivery delay
+ok 100 - 120 delayed ticks fit a two-hour batch; TTL starts at publication and includes the full delivery delay
+  ---
+  duration_ms: 1.07825
+  type: 'test'
+  ...
+# Subtest: too-short retention, excessive delay, malformed dates and authority expansion fail before send
+ok 101 - too-short retention, excessive delay, malformed dates and authority expansion fail before send
+  ---
+  duration_ms: 0.254959
+  type: 'test'
+  ...
+# Subtest: publication derives timing without extending SQL authority or changing finite/lost-ACK accounting
+ok 102 - publication derives timing without extending SQL authority or changing finite/lost-ACK accounting
+  ---
+  duration_ms: 0.512083
+  type: 'test'
+  ...
+# Subtest: actual expiry is mandatory before SDK lease timers; near expiry admits no worker and no visibility request
+ok 103 - actual expiry is mandatory before SDK lease timers; near expiry admits no worker and no visibility request
+  ---
+  duration_ms: 8.104333
+  type: 'test'
+  ...
+# Subtest: every lawful renewal inside the 60-second ceiling is below actual expiry, including the minimum lifetime boundary
+ok 104 - every lawful renewal inside the 60-second ceiling is below actual expiry, including the minimum lifetime boundary
+  ---
+  duration_ms: 0.148083
+  type: 'test'
+  ...
+# Subtest: retry/backoff never requests visibility past actual expiry; deterministic denials remain ACKs
+ok 105 - retry/backoff never requests visibility past actual expiry; deterministic denials remain ACKs
+  ---
+  duration_ms: 0.102875
+  type: 'test'
+  ...
+# Subtest: pinned SDK 0.7.0 performs real parser/renewal/ACK lifecycle against a synthetic provider with no expiry violation
+ok 106 - pinned SDK 0.7.0 performs real parser/renewal/ACK lifecycle against a synthetic provider with no expiry violation
+  ---
+  duration_ms: 4.047208
+  type: 'test'
+  ...
+# Subtest: shared derived adapter reuses the existing engines with deterministic fingerprints
+ok 107 - shared derived adapter reuses the existing engines with deterministic fingerprints
+  ---
+  duration_ms: 11.539
+  type: 'test'
+  ...
+# Subtest: an in-flight hole revision invalidates Storylines but not official-result Momentum
+ok 108 - an in-flight hole revision invalidates Storylines but not official-result Momentum
+  ---
+  duration_ms: 0.582583
+  type: 'test'
+  ...
+# Subtest: an official result transition changes the Momentum dependency and output
+ok 109 - an official result transition changes the Momentum dependency and output
+  ---
+  duration_ms: 0.469042
+  type: 'test'
+  ...
+# Subtest: claimed engine selection avoids recalculating unrelated derived engines
+ok 110 - claimed engine selection avoids recalculating unrelated derived engines
+  ---
+  duration_ms: 0.510917
+  type: 'test'
+  ...
+# Subtest: prepared Storylines persist semantic copy without time-relative labels
+ok 111 - prepared Storylines persist semantic copy without time-relative labels
+  ---
+  duration_ms: 0.23825
+  type: 'test'
+  ...
+# Subtest: the same authoritative state produces the same Storyline payload across wall-clock time
+ok 112 - the same authoritative state produces the same Storyline payload across wall-clock time
+  ---
+  duration_ms: 0.490833
+  type: 'test'
+  ...
+# Subtest: semantic Storylines exclude transport timestamps while recent clinches retain expiry
+ok 113 - semantic Storylines exclude transport timestamps while recent clinches retain expiry
+  ---
+  duration_ms: 0.236
+  type: 'test'
+  ...
+# Subtest: read-time expiry removes a prepared recent-clinch story without recalculating the engine
+ok 114 - read-time expiry removes a prepared recent-clinch story without recalculating the engine
+  ---
+  duration_ms: 0.075834
+  type: 'test'
+  ...
+# Subtest: derived read marks an engine stale from its coalesced dependency job
+ok 115 - derived read marks an engine stale from its coalesced dependency job
+  ---
+  duration_ms: 0.112583
+  type: 'test'
+  ...
+# Subtest: Preview flags fail closed to application outside an isolated Preview deployment
+ok 116 - Preview flags fail closed to application outside an isolated Preview deployment
+  ---
+  duration_ms: 1.3145
+  type: 'test'
+  ...
+# Subtest: migration preserves restrictive RLS and event-driven coalesced jobs
+ok 117 - migration preserves restrictive RLS and event-driven coalesced jobs
+  ---
+  duration_ms: 2.130292
+  type: 'test'
+  ...
+# Subtest: participant reads consume prepared state and never calculate Storylines on Home
+ok 118 - participant reads consume prepared state and never calculate Storylines on Home
+  ---
+  duration_ms: 0.349125
+  type: 'test'
+  ...
+# Subtest: secondary failures retain the core Home and Tournament payload with explicit unavailable state
+ok 119 - secondary failures retain the core Home and Tournament payload with explicit unavailable state
+  ---
+  duration_ms: 0.205083
+  type: 'test'
+  ...
+# Subtest: derived engines retain separate keys and deterministic payloads
+ok 120 - derived engines retain separate keys and deterministic payloads
+  ---
+  duration_ms: 1.637833
+  type: 'test'
+  ...
+# Subtest: final recap fails closed until 24 matches, complete cards, official result, and Final Results Odds
+ok 121 - final recap fails closed until 24 matches, complete cards, official result, and Final Results Odds
+  ---
+  duration_ms: 0.860583
+  type: 'test'
+  ...
+# Subtest: source flags are Preview-only and fail closed outside isolated Preview
+ok 122 - source flags are Preview-only and fail closed outside isolated Preview
+  ---
+  duration_ms: 1.702791
+  type: 'test'
+  ...
+# Subtest: migration is service-only and Final Recap is gated
+ok 123 - migration is service-only and Final Recap is gated
+  ---
+  duration_ms: 1.825416
+  type: 'test'
+  ...
+# Subtest: newest-source migration claims work and rejects superseded workers
+ok 124 - newest-source migration claims work and rejects superseded workers
+  ---
+  duration_ms: 0.450542
+  type: 'test'
+  ...
+1..124
+# tests 153
+# suites 0
+# pass 153
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 139161.644

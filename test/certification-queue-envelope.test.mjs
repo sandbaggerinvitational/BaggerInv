@@ -17,6 +17,7 @@ const request=(prefetched=false)=>new Request('https://synthetic.invalid/api/int
    'ce-vqsvisibilitydeadline':new Date(clock+300000).toISOString()}:{} )},body:prefetched?JSON.stringify(message):undefined});
 const raw=(changes={})=>({messageId:'msg_synthetic',deliveryCount:2,timestamp:new Date(clock).toISOString(),
  expiresAt:new Date(clock+540000).toISOString(),body:Buffer.from(JSON.stringify(message)).toString('base64'),...changes});
+const eligible=async(_operation,input)=>({ok:true,identified:true,execution_authorized:false,invocation_id:input.message.invocation_id,disposition:'ELIGIBLE',reason:'CURRENT'});
 const peek=value=>new Response(JSON.stringify(value)+'\n',{headers:{'content-type':'application/x-ndjson'}});
 const db=(code,state='PT409',details)=>queueDatabaseFailure({status:400},{code:state,message:code,details},'SUPERVISOR_CONTROL_UNAVAILABLE','BEGIN');
 test('routing-only retry learns actual expiry through fixed provider zero-visibility peek before SDK entry',async()=>{
@@ -38,14 +39,14 @@ test('bounded native envelope rejects arbitrary topic/region/group, malformed no
 test('no actual expiry, exhausted horizon, wrong message or oversized provider response never start SDK timers/worker',async()=>{
  for(const value of [raw({expiresAt:null}),raw({timestamp:null}),raw({expiresAt:new Date(clock+179000).toISOString()}),raw({messageId:'foreign'}),
   raw({body:'x'.repeat(9000)})]){
-  let sdk=0;const response=await handleQueueEnvelope(request(),()=>{sdk++;assert.fail();},{bound,now:()=>clock,
+  let sdk=0;const response=await handleQueueEnvelope(request(),()=>{sdk++;assert.fail();},{bound,control:eligible,now:()=>clock,
    getToken:async()=>'synthetic',fetchImpl:async()=>peek(value)});
   assert.equal(response.status,503);assert.equal(sdk,0);
  }
 });
 test('locked/already processed notification is skipped without ACKing the underlying message or executing a worker',async()=>{
  for(const status of [404,409,410]){
-  let requests=0;const response=await handleQueueEnvelope(request(),()=>assert.fail(),{bound,now:()=>clock,
+  let requests=0;const response=await handleQueueEnvelope(request(),()=>assert.fail(),{bound,control:eligible,now:()=>clock,
    getToken:async()=>'synthetic',fetchImpl:async()=>{requests++;return new Response(null,{status});}});
   assert.equal(response.status,200);assert.equal((await response.json()).status,'skipped');assert.equal(requests,1);
  }
@@ -95,7 +96,7 @@ test('real SDK first early denial reschedules with HTTP 200; routing-only retry 
    if(attempts===1)throw db('SUPERVISOR_NOT_DUE_OR_BUSY','PT409',JSON.stringify({reason:'NOT_DUE',retry_after_seconds:1}));
    if(workers===0)workers++;
   },{visibilityTimeoutSeconds:90,retry:queueDeliveryRetry});
-  const options={bound,getToken:async()=>'synthetic-local-only'};
+  const options={bound,control:eligible,getToken:async()=>'synthetic-local-only'};
   assert.equal((await handleQueueEnvelope(request(true),callback,options)).status,200);
   assert.equal(workers,0);assert.deepEqual(calls.map(c=>c.method),['PATCH']);assert.equal(calls[0].seconds,5);
   t.mock.timers.tick(5000);

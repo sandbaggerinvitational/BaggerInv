@@ -40,8 +40,8 @@ test('worker engine, job-fault transport and retired HTTP route stay byte-identi
  for(const file of ['lib/score-derived-worker.js','app/api/internal/derived-worker/run/route.js'])
   assert.equal(await readFile(file,'utf8'),execFileSync('git',['show','71d6a393:'+file],{encoding:'utf8'}));
  const consumer=await readFile('app/api/internal/derived-worker/queue/route.js','utf8');
- assert.match(consumer,/handleQueueEnvelope\(request,consume,\{bound,evidence:timingEvidence\}\)/);
- assert.match(consumer,/requireQueueEnvelopeMetadata\(metadata\)/);
+ assert.match(consumer,/handleQueueEnvelope\(request,consume,\{bound,control:queueControl\(\),evidence:timingEvidence\}\)/);
+ assert.match(consumer,/requireQueueEnvelopeMetadata\(metadata,message\)/);
  assert.match(consumer,/consumeCertificationQueueMessage\(message,metadata,\{timingEvidence\}\)/);
  assert.match(consumer,/observeQueueTransport/);
  const runtime=await readFile('lib/certification-worker-supervision.js','utf8');
