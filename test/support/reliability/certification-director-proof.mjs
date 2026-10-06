@@ -8,7 +8,7 @@ import {jsonLiteral,sqlResult} from './postgres17.mjs';
 import {readIsolatedDirectorOperations,mutateIsolatedDirectorOperations,resolveIsolatedDirectorOperation} from '../../../lib/isolated-director-operations.js';
 import {createCanonicalDirectorOperationsTransport} from '../../../lib/canonical-director-operations-client.js';
 
-export async function certificationDirectorStack(fixture,{loseResponse,authorization:override}={}){
+export async function certificationDirectorStack(fixture,{loseResponse,afterDatabase,beforeDatabase,authorization:override,environment}={}){
  const {env,registrationManifest}=fixture.transportFixture,calls=[],requests=[];
  const identity=fixture.envelope.authorization;
  let authorization=override??{status:'active',source:'entitlement',identity:{authUserId:identity.auth_user_id,
@@ -22,6 +22,7 @@ export async function certificationDirectorStack(fixture,{loseResponse,authoriza
   assert.equal(target.pathname,'/rest/v1/rpc/'+name);assert.equal(init.redirect,'error');
   assert.equal(init.headers.apikey,env.SUPABASE_SCORING_MIRROR_SECRET_KEY);
   const input=JSON.parse(init.body).input;calls.push({name,input});
+  await beforeDatabase?.(name,input);
   const result=sqlResult(fixture.cluster,fixture.database,
    `\\set VERBOSITY verbose\nset role service_role;select public.${name}(${jsonLiteral(input)});`,{role:'service_role'});
   if(result.status!==0){
@@ -30,15 +31,16 @@ export async function certificationDirectorStack(fixture,{loseResponse,authoriza
    return Response.json({code:error[1],message:error[2]},{status:400});
   }
   const value=JSON.parse(result.stdout.trim());
+  await afterDatabase?.(name,input,value);
   if(value.ok===false)calls.at(-1).error={sqlstate:null,message:value.code,detail:value};
   return Response.json(value);
  }};
  const key='certification-director-proof-'+randomUUID();
  globalThis[key]={NextResponse:Response,withOperationalRoute:(_config,handler)=>handler,recordOperationalError:()=>{},
   authorizePreviewDirector:async()=>authorization,
-  readIsolatedDirectorOperations:args=>readIsolatedDirectorOperations({...args,env},{certificationDependencies}),
-  mutateIsolatedDirectorOperations:args=>mutateIsolatedDirectorOperations({...args,env},{certificationDependencies}),
-  resolveIsolatedDirectorOperation:args=>resolveIsolatedDirectorOperation({...args,env},{certificationDependencies})};
+  readIsolatedDirectorOperations:args=>readIsolatedDirectorOperations({...args,env:environment||env},{certificationDependencies}),
+  mutateIsolatedDirectorOperations:args=>mutateIsolatedDirectorOperations({...args,env:environment||env},{certificationDependencies}),
+  resolveIsolatedDirectorOperation:args=>resolveIsolatedDirectorOperation({...args,env:environment||env},{certificationDependencies})};
  const source=(await readFile(new URL('../../../app/api/director/canonical-operations/route.js',import.meta.url),'utf8'))
   .replace(/^import\s+\{([\s\S]*?)\}\s+from\s+["'][^"']+["'];\n/gm,
    (_match,names)=>`const {${names.replace(/\bas\b/g,':')}}=globalThis[${JSON.stringify(key)}];\n`);

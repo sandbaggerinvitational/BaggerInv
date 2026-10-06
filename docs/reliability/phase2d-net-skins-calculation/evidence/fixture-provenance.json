@@ -1,0 +1,30 @@
+{
+  "freshHostedRead": false,
+  "source": "Previously retained hosted evidence; no hosted access in this local task",
+  "evidenceSha256": {
+    "STARTING-NET-CURRENT.json": "751633e93786d3cbc062bc58458cec0c8ede790ab9305869a283ffcd03cb4890",
+    "FINAL-DOMAIN-DETAILS.json": "95bea91f97295e21cbee73bca44b8cf6ea70349654904fc1595e19ae616fa9a3"
+  },
+  "configurationRevision": 1,
+  "savedEntryRevisions": {
+    "3": 1
+  },
+  "netSkinsJobs": 0,
+  "netSkinsResults": 0,
+  "canonicalMatchCount": 2,
+  "ownerReportedPrimary": {
+    "status": "FINAL",
+    "revision": 34,
+    "scores": 18
+  },
+  "ownerReportedSecondary": {
+    "status": "UPCOMING",
+    "revision": 1,
+    "locked": true,
+    "scores": 0
+  },
+  "optedInSyntheticPlayer": "P12",
+  "expectedSubsetPhase": "OFFICIAL",
+  "localScoresMatchHostedChronology": true,
+  "localScoreValuesAreHostedScoreValues": false
+}

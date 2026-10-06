@@ -35,7 +35,7 @@ async function execute(request, write) {
     record(error);
     return failure(/^DIRECTOR_OPERATIONS_[A-Z_]+$/.test(error?.code || "") ? error.code : "DIRECTOR_OPERATIONS_UNAVAILABLE", [400,403,409].includes(error?.status) ? error.status : 503,
       {...(/^[A-Z][A-Z_0-9]{0,119}$/.test(error?.domainCode || "") ? {domainCode: error.domainCode} : {}),
-       ...(write && typeof input?.operationRequestId === "string" && /^[a-f0-9-]{36}$/i.test(input.operationRequestId) ? {operationRequestId: input.operationRequestId, outcome: error?.committed === true ? "COMMITTED" : "UNKNOWN", committed: error?.committed === true, recovery: "CHECK_STATUS_RETRY_SAME_OPERATION"} : {})});
+       ...(write && typeof input?.operationRequestId === "string" && /^[a-f0-9-]{36}$/i.test(input.operationRequestId) ? {operationRequestId: input.operationRequestId, outcome: error?.committed === true ? "COMMITTED" : input.family === "NET_SKINS_CALCULATION" && error?.outcome === "NOT_COMMITTED" ? "NOT_COMMITTED" : "UNKNOWN", committed: error?.committed === true, recovery: "CHECK_STATUS_RETRY_SAME_OPERATION"} : {})});
   }
 }
 export const GET = withOperationalRoute({route: "/api/director/canonical-operations", domain: "DIRECTOR"}, request => execute(request, false));
