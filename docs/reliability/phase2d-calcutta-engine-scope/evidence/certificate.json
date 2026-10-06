@@ -1,0 +1,61 @@
+{
+  "status": "PASS",
+  "scope": "LOCAL_CALCUTTA_ENGINE_COMPATIBILITY_ONLY",
+  "baseSha": "efdf52bed12cb5be1490d9284c840d38ed0ecd80",
+  "hostedMutated": false,
+  "credentialsRemoved": true,
+  "remoteSocketsDenied": true,
+  "focused": {
+    "tests": 44,
+    "pass": 44,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "broad": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "baselineFailureNamesExact": true,
+  "newFailures": [],
+  "buildPassed": true,
+  "shippingHashesMatch": true,
+  "currentHashesMatch": true,
+  "sourceManifest": {
+    "supabase/production_incremental/certification-queue-calcutta-scope-v1.sql": "c368413665681249271f876c435072e5c49750257c8dcc2b3844ea45b8e06617",
+    "lib/certification-worker-supervision.js": "e8c8cc9dc01cca0c7ea5cd6a033125b3a6ecbebd89cf70752660986505028a6b",
+    "lib/certification-worker-engines.js": "25ebd264cace612faeef18ec94ab170b8a724a5da0f40629d2b5c8e7f3554eba",
+    "lib/production-calcutta-server.js": "a4e88cbe7bef7458b4b25f3ab4e9056b4ecb165d9448413242a053de1c269733",
+    "lib/score-derived-delivery.js": "cd5a12ef8c2ff8e4e7ca362ec06e00a9f46b1b334c302445044e284ea4ce6ec2",
+    "lib/certification-queue-supervision.js": "fd658d16c65ea9ded97a8d7f3e65463e759574a3f1a51d1a46b658060f5577b1",
+    "test/certification-calcutta-queue.integration.test.mjs": "1cc72e06cab8568dfc42b8093dc60d40f7db216451d2462941ac9adef0f6ae1e",
+    "test/certification-calcutta-queue.test.mjs": "01cf9dd3e390545870af65d006822a71a1ecd546182de0fdfece2ecf0017e9cb",
+    "test/support/reliability/certification-calcutta-queue-fixture.mjs": "b351b5428d4fb30f64e7b0bfab1e950149a91bc70dad75065d6c0040d14b4878",
+    "tools/reliability/certify-calcutta-engine-scope.mjs": "40784c4aed204ff1990a12b6c4dae64034eec2d73071b67c9f2abfcf92bddf7f",
+    "package.json": "02ca2154f932c5c5bacd6d52ddd4eec023c422b7e46e44d6ec0d35dc54b7826f",
+    "package-lock.json": "abf89699407983d173e997f62aa1083e8ae5cd34b81f33904ebba9744d318d43"
+  },
+  "maximumMeasuredTickMs": 647.3579170000012,
+  "localFinal": {
+    "state": "OFF",
+    "counts": {
+      "dead_letters": 0,
+      "pending_work": 0,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 0
+    },
+    "calcuttaPublication": "UNPUBLISHED"
+  },
+  "leaseSeconds": {
+    "CALCUTTA": 60,
+    "COMPETITION": 90,
+    "INTELLIGENCE": 90
+  },
+  "noDomainMathChange": true,
+  "holes864Rerun": false
+}

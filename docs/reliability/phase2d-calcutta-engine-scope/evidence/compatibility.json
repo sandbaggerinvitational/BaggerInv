@@ -1,0 +1,72 @@
+{
+  "hosted": false,
+  "postgres": 17,
+  "safeupdate": "on",
+  "cases": [
+    {
+      "name": "atomic predecessor/hash mismatch rolls back; metadata, RLS, canonical cores/history preserved; replay converges",
+      "result": "PASS"
+    },
+    {
+      "name": "empty valid auction revision 2: Queue tick discovers no Calcutta work and never claims it",
+      "result": "PASS"
+    },
+    {
+      "name": "shipping Director synthetic nonempty successor and lawful match control automatically create canonical demand",
+      "result": "PASS"
+    },
+    {
+      "name": "native SDK delivery -> BEGIN -> fixed registry -> real claim/calculator/result/FINISH; no financial mutation or publication",
+      "result": "PASS"
+    },
+    {
+      "name": "transient completion transport failure uses existing Calcutta fail/backoff; duplicate delivery and restart preserve attempts",
+      "result": "PASS"
+    },
+    {
+      "name": "terminal completion fault records truthful dead letter/HALT; only certified Director recovery grants new cycle",
+      "result": "PASS"
+    },
+    {
+      "name": "source advance after real Calcutta claim rejects old completion; later Queue drains one authoritative result",
+      "result": "PASS"
+    },
+    {
+      "name": "Calcutta committed claim/result evidence reconciles UNKNOWN after the real durable horizon without repeating calculation",
+      "result": "PASS"
+    },
+    {
+      "name": "STOP/HALT and fabricated/foreign/client authority deny before worker; arbitrary engines/financial operations unavailable",
+      "result": "PASS"
+    }
+  ],
+  "durationsMs": [
+    152.34079099999872,
+    509.8531670000011,
+    484.20812500000466,
+    244.52904200000194,
+    495.72270800000115,
+    647.3579170000012,
+    231.9182920000021
+  ],
+  "resultState": "PROVISIONAL",
+  "result": {
+    "pot": 1,
+    "purchases": 1,
+    "owners": 1,
+    "provisionalValue": 0.4,
+    "publication": "UNPUBLISHED"
+  },
+  "final": {
+    "state": "OFF",
+    "counts": {
+      "dead_letters": 0,
+      "pending_work": 0,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 0
+    },
+    "calcuttaPublication": "UNPUBLISHED"
+  }
+}

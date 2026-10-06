@@ -1,0 +1,278 @@
+TAP version 13
+# Subtest: Calcutta closed engine compatibility: genuine demand -> private Queue -> existing processor -> canonical result
+    # Subtest: atomic predecessor/hash mismatch rolls back; metadata, RLS, canonical cores/history preserved; replay converges
+    ok 1 - atomic predecessor/hash mismatch rolls back; metadata, RLS, canonical cores/history preserved; replay converges
+      ---
+      duration_ms: 265.265084
+      type: 'test'
+      ...
+    # Subtest: empty valid auction revision 2: Queue tick discovers no Calcutta work and never claims it
+    ok 2 - empty valid auction revision 2: Queue tick discovers no Calcutta work and never claims it
+      ---
+      duration_ms: 10375.615792
+      type: 'test'
+      ...
+    # Subtest: shipping Director synthetic nonempty successor and lawful match control automatically create canonical demand
+    ok 3 - shipping Director synthetic nonempty successor and lawful match control automatically create canonical demand
+      ---
+      duration_ms: 272.729625
+      type: 'test'
+      ...
+    # Subtest: native SDK delivery -> BEGIN -> fixed registry -> real claim/calculator/result/FINISH; no financial mutation or publication
+    ok 4 - native SDK delivery -> BEGIN -> fixed registry -> real claim/calculator/result/FINISH; no financial mutation or publication
+      ---
+      duration_ms: 10792.016542
+      type: 'test'
+      ...
+    # Subtest: transient completion transport failure uses existing Calcutta fail/backoff; duplicate delivery and restart preserve attempts
+    ok 5 - transient completion transport failure uses existing Calcutta fail/backoff; duplicate delivery and restart preserve attempts
+      ---
+      duration_ms: 30701.148834
+      type: 'test'
+      ...
+    # Subtest: terminal completion fault records truthful dead letter/HALT; only certified Director recovery grants new cycle
+    ok 6 - terminal completion fault records truthful dead letter/HALT; only certified Director recovery grants new cycle
+      ---
+      duration_ms: 26721.095959
+      type: 'test'
+      ...
+# (node:87348) TimeoutNaNWarning: NaN is not a number.
+# Timeout duration was set to 1.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+    # Subtest: source advance after real Calcutta claim rejects old completion; later Queue drains one authoritative result
+    ok 7 - source advance after real Calcutta claim rejects old completion; later Queue drains one authoritative result
+      ---
+      duration_ms: 26887.352542
+      type: 'test'
+      ...
+    # Subtest: Calcutta committed claim/result evidence reconciles UNKNOWN after the real durable horizon without repeating calculation
+    ok 8 - Calcutta committed claim/result evidence reconciles UNKNOWN after the real durable horizon without repeating calculation
+      ---
+      duration_ms: 165828.337416
+      type: 'test'
+      ...
+    # Subtest: STOP/HALT and fabricated/foreign/client authority deny before worker; arbitrary engines/financial operations unavailable
+    ok 9 - STOP/HALT and fabricated/foreign/client authority deny before worker; arbitrary engines/financial operations unavailable
+      ---
+      duration_ms: 530.285875
+      type: 'test'
+      ...
+    1..9
+ok 1 - Calcutta closed engine compatibility: genuine demand -> private Queue -> existing processor -> canonical result
+  ---
+  duration_ms: 280537.627583
+  type: 'test'
+  ...
+# Subtest: closed Calcutta registry: only owner-committed BEGIN scope can admit existing processor
+ok 2 - closed Calcutta registry: only owner-committed BEGIN scope can admit existing processor
+  ---
+  duration_ms: 0.559958
+  type: 'test'
+  ...
+# Subtest: Queue payload cannot select engine
+ok 3 - Queue payload cannot select engine
+  ---
+  duration_ms: 0.200375
+  type: 'test'
+  ...
+# Subtest: Queue payload cannot select resource
+ok 4 - Queue payload cannot select resource
+  ---
+  duration_ms: 0.043209
+  type: 'test'
+  ...
+# Subtest: Queue payload cannot select module
+ok 5 - Queue payload cannot select module
+  ---
+  duration_ms: 0.042167
+  type: 'test'
+  ...
+# Subtest: Queue payload cannot select function
+ok 6 - Queue payload cannot select function
+  ---
+  duration_ms: 0.043375
+  type: 'test'
+  ...
+# Subtest: Queue payload cannot select sql
+ok 7 - Queue payload cannot select sql
+  ---
+  duration_ms: 0.03425
+  type: 'test'
+  ...
+# Subtest: forward correction is limited to supervisor scope/accounting; no domain/lease/financial authority changes
+ok 8 - forward correction is limited to supervisor scope/accounting; no domain/lease/financial authority changes
+  ---
+  duration_ms: 2.640916
+  type: 'test'
+  ...
+# Subtest: queue message denies missing
+ok 9 - queue message denies missing
+  ---
+  duration_ms: 0.557583
+  type: 'test'
+  ...
+# Subtest: queue message denies empty
+ok 10 - queue message denies empty
+  ---
+  duration_ms: 0.05975
+  type: 'test'
+  ...
+# Subtest: queue message denies resource
+ok 11 - queue message denies resource
+  ---
+  duration_ms: 0.044375
+  type: 'test'
+  ...
+# Subtest: queue message denies url
+ok 12 - queue message denies url
+  ---
+  duration_ms: 0.040041
+  type: 'test'
+  ...
+# Subtest: queue message denies worker
+ok 13 - queue message denies worker
+  ---
+  duration_ms: 0.039834
+  type: 'test'
+  ...
+# Subtest: queue message denies badVersion
+ok 14 - queue message denies badVersion
+  ---
+  duration_ms: 0.037
+  type: 'test'
+  ...
+# Subtest: queue message denies badId
+ok 15 - queue message denies badId
+  ---
+  duration_ms: 0.063084
+  type: 'test'
+  ...
+# Subtest: retired CLI publisher is incapable of hosted publication
+ok 16 - retired CLI publisher is incapable of hosted publication
+  ---
+  duration_ms: 0.077042
+  type: 'test'
+  ...
+# Subtest: publisher denies arbitrary physical resource or unpinned destination before SDK creation
+ok 17 - publisher denies arbitrary physical resource or unpinned destination before SDK creation
+  ---
+  duration_ms: 0.332916
+  type: 'test'
+  ...
+# Subtest: START remains truthful when credential acquisition fails after canonical commit
+ok 18 - START remains truthful when credential acquisition fails after canonical commit
+  ---
+  duration_ms: 0.486042
+  type: 'test'
+  ...
+# Subtest: publisher lost acknowledgement never fabricates NOT_PUBLISHED or a complete schedule
+ok 19 - publisher lost acknowledgement never fabricates NOT_PUBLISHED or a complete schedule
+  ---
+  duration_ms: 0.883
+  type: 'test'
+  ...
+# Subtest: queue retry is finite; security denials acknowledge without job work; errors preserve uncertainty
+ok 20 - queue retry is finite; security denials acknowledge without job work; errors preserve uncertainty
+  ---
+  duration_ms: 0.128375
+  type: 'test'
+  ...
+# Subtest: only Certification manifest registers one private consumer; base Production manifest unchanged; pinned SDK
+ok 21 - only Certification manifest registers one private consumer; base Production manifest unchanged; pinned SDK
+  ---
+  duration_ms: 3.960416
+  type: 'test'
+  ...
+# Subtest: signed ticket binds immutable path/origin/expiry; neither forwarded host nor arbitrary resource grants authority
+ok 22 - signed ticket binds immutable path/origin/expiry; neither forwarded host nor arbitrary resource grants authority
+  ---
+  duration_ms: 12.464208
+  type: 'test'
+  ...
+# Subtest: 45-second soft cutoff prevents a future tick/processor; existing runner exits after maximum one cycle
+ok 23 - 45-second soft cutoff prevents a future tick/processor; existing runner exits after maximum one cycle
+  ---
+  duration_ms: 0.617583
+  type: 'test'
+  ...
+# Subtest: STOP that wins a processor reservation prevents processing and admits no future poll
+ok 24 - STOP that wins a processor reservation prevents processing and admits no future poll
+  ---
+  duration_ms: 0.301292
+  type: 'test'
+  ...
+# Subtest: deterministic adapter failure records global failure; unavailable accounting remains uncertain and sanitized
+ok 25 - deterministic adapter failure records global failure; unavailable accounting remains uncertain and sanitized
+  ---
+  duration_ms: 1.483167
+  type: 'test'
+  ...
+# Subtest: Production Calcutta server exposes only the exact fixed-resource V1 RPCs
+ok 26 - Production Calcutta server exposes only the exact fixed-resource V1 RPCs
+  ---
+  duration_ms: 0.796792
+  type: 'test'
+  ...
+# Subtest: Director operations are revision-bound, explicit, and never caller-select publication policy
+ok 27 - Director operations are revision-bound, explicit, and never caller-select publication policy
+  ---
+  duration_ms: 0.175291
+  type: 'test'
+  ...
+# Subtest: admin route forwards both exact revision fingerprints
+ok 28 - admin route forwards both exact revision fingerprints
+  ---
+  duration_ms: 0.192375
+  type: 'test'
+  ...
+# Subtest: bounded worker reuses the existing Calcutta engine and binds both current revisions
+ok 29 - bounded worker reuses the existing Calcutta engine and binds both current revisions
+  ---
+  duration_ms: 0.280542
+  type: 'test'
+  ...
+# Subtest: worker inspects service-only revision tokens without using the participant market read
+ok 30 - worker inspects service-only revision tokens without using the participant market read
+  ---
+  duration_ms: 0.153542
+  type: 'test'
+  ...
+# Subtest: admin route is Production-only, Director-bound, same-origin, and has no GET
+ok 31 - admin route is Production-only, Director-bound, same-origin, and has no GET
+  ---
+  duration_ms: 0.162667
+  type: 'test'
+  ...
+# Subtest: mobile route is a read-only Bearer wrapper around the bounded DTO
+ok 32 - mobile route is a read-only Bearer wrapper around the bounded DTO
+  ---
+  duration_ms: 0.072584
+  type: 'test'
+  ...
+# Subtest: post-commit selector drains Production V1 and never invokes Preview mutation RPCs
+ok 33 - post-commit selector drains Production V1 and never invokes Preview mutation RPCs
+  ---
+  duration_ms: 0.480583
+  type: 'test'
+  ...
+# Subtest: post-commit selector preserves the existing Preview calculator
+ok 34 - post-commit selector preserves the existing Preview calculator
+  ---
+  duration_ms: 0.097834
+  type: 'test'
+  ...
+# Subtest: canonical scoring routes use the environment-selected Calcutta worker
+ok 35 - canonical scoring routes use the environment-selected Calcutta worker
+  ---
+  duration_ms: 7.586291
+  type: 'test'
+  ...
+1..35
+# tests 44
+# suites 0
+# pass 44
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 280677.6675
