@@ -1,0 +1,31 @@
+{
+  "mode": "build",
+  "startedAt": "2026-10-06T05:07:02.503Z",
+  "completedAt": "2026-10-06T05:07:14.048Z",
+  "hosted": false,
+  "remoteSocketsDenied": true,
+  "realCredentialsRemoved": true,
+  "counts": null,
+  "failures": [],
+  "newFailures": [],
+  "establishedFailures": [],
+  "exitCode": 0,
+  "error": null,
+  "sourceStable": true,
+  "sourceManifest": {
+    "supabase/production_incremental/certification-net-skins-configuration-v1.sql": "dc27781e8a586cd2e3f27f364558bf2ad150aca4e483fe222812a02cdd35a87b",
+    "lib/certification-runtime-server.js": "8d6ab5eb17eb602de6f0aa4d320d9c3a9cf5debf6e0532ba16a3b1600fc11214",
+    "lib/isolated-director-operations.js": "df3e7fd08d8655b176cea96cc5a3435416d1c15cfb9d31c4b5cedf71436bb1b9",
+    "lib/canonical-director-operations-client.js": "c3a7bf92a5ab6600125b5dc1ceadb8c90df88e9f3876b4d774ab5549765f142e",
+    "app/api/director/canonical-operations/route.js": "cbc0446b5fd60f7f867531fa64126a65891e6df66a153379897765c91760078c",
+    "app/api/admin/production-net-skins-v1/route.js": "6a34e31f28dfcaa4da5d6894f7dd1ce836319764551b3f85d4212a4c0406e223",
+    "lib/production-net-skins-server.js": "4007eee4e309d18ae2e2d89f80980c306de29e7e78b5e9fad07f68f408690952",
+    "test/certification-net-skins-configuration.integration.test.mjs": "d7076da09ee453e18ab189168c42a74535b43d045d65cfd047e72862b4b2ce09",
+    "test/certification-net-skins-configuration.test.mjs": "5fef00be1a24b4c9bc824c96abe40f93de6c74acec2f7ab10905834a79a72632",
+    "tools/reliability/certify-net-skins-configuration.mjs": "567a014877d17a39116761e2552d7bba620a57d20b06ed6fd36eac4b7a50eb1d",
+    "package.json": "02ca2154f932c5c5bacd6d52ddd4eec023c422b7e46e44d6ec0d35dc54b7826f",
+    "package-lock.json": "abf89699407983d173e997f62aa1083e8ae5cd34b81f33904ebba9744d318d43"
+  },
+  "rawSha256": "514248f7360643ca56dfdd0fab53de03b824e4ce139299eb8560097a8b155354",
+  "head": "745b2d38adbdeaea1a731ee13de4b57b4a62c835"
+}

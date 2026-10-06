@@ -1,0 +1,402 @@
+TAP version 13
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.SUBMIT_HOLE
+ok 1 - score adapter preserves existing non-UUID mutation identity: SCORING.SUBMIT_HOLE
+  ---
+  duration_ms: 14.979333
+  type: 'test'
+  ...
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.FINALIZE_MATCH
+ok 2 - score adapter preserves existing non-UUID mutation identity: SCORING.FINALIZE_MATCH
+  ---
+  duration_ms: 0.5245
+  type: 'test'
+  ...
+# Subtest: score adapter preserves existing non-UUID mutation identity: SCORING.REOPEN_MATCH
+ok 3 - score adapter preserves existing non-UUID mutation identity: SCORING.REOPEN_MATCH
+  ---
+  duration_ms: 0.394875
+  type: 'test'
+  ...
+# Subtest: participant context adapter separates server-bound actor fields without changing caller DTO
+ok 4 - participant context adapter separates server-bound actor fields without changing caller DTO
+  ---
+  duration_ms: 0.4
+  type: 'test'
+  ...
+# Subtest: receipt recovery remains an exact read and retains mutation identity after revocation
+ok 5 - receipt recovery remains an exact read and retains mutation identity after revocation
+  ---
+  duration_ms: 0.221791
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_tournament_live_view
+ok 6 - read alias uses admitted projection gateway: read_tournament_live_view
+  ---
+  duration_ms: 0.44375
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_leaderboards_core_view
+ok 7 - read alias uses admitted projection gateway: read_leaderboards_core_view
+  ---
+  duration_ms: 0.202458
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_canonical_2026_historical_view
+ok 8 - read alias uses admitted projection gateway: read_canonical_2026_historical_view
+  ---
+  duration_ms: 0.179666
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_completed_history
+ok 9 - read alias uses admitted projection gateway: read_preview_completed_history
+  ---
+  duration_ms: 0.158375
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_current_guide_projection
+ok 10 - read alias uses admitted projection gateway: read_current_guide_projection
+  ---
+  duration_ms: 0.228875
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_draft_view
+ok 11 - read alias uses admitted projection gateway: read_preview_draft_view
+  ---
+  duration_ms: 0.210125
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_championship_odds_inputs
+ok 12 - read alias uses admitted projection gateway: read_championship_odds_inputs
+  ---
+  duration_ms: 0.139208
+  type: 'test'
+  ...
+# Subtest: read alias uses admitted projection gateway: read_preview_secondary_history_players
+ok 13 - read alias uses admitted projection gateway: read_preview_secondary_history_players
+  ---
+  duration_ms: 0.150292
+  type: 'test'
+  ...
+# Subtest: unlisted legacy mutation, publication, Google and import aliases never dispatch
+ok 14 - unlisted legacy mutation, publication, Google and import aliases never dispatch
+  ---
+  duration_ms: 0.263333
+  type: 'test'
+  ...
+# Subtest: read aliases reject supplied resource or historical workbook authority before transport
+ok 15 - read aliases reject supplied resource or historical workbook authority before transport
+  ---
+  duration_ms: 0.085541
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: TOURNAMENT_SETUP
+ok 16 - Director family read uses canonical context and separate actor: TOURNAMENT_SETUP
+  ---
+  duration_ms: 0.878084
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: ROUND_PAIRINGS
+ok 17 - Director family read uses canonical context and separate actor: ROUND_PAIRINGS
+  ---
+  duration_ms: 0.640125
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: MATCH_CONTROL
+ok 18 - Director family read uses canonical context and separate actor: MATCH_CONTROL
+  ---
+  duration_ms: 0.161833
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: NET_SKINS_ENTRIES
+ok 19 - Director family read uses canonical context and separate actor: NET_SKINS_ENTRIES
+  ---
+  duration_ms: 0.187041
+  type: 'test'
+  ...
+# Subtest: Director family read uses canonical context and separate actor: CALCUTTA_MANAGEMENT
+ok 20 - Director family read uses canonical context and separate actor: CALCUTTA_MANAGEMENT
+  ---
+  duration_ms: 0.152667
+  type: 'test'
+  ...
+# Subtest: Director setup mutation confirms existing receipt and canonical readback; contract stays provider-neutral
+ok 21 - Director setup mutation confirms existing receipt and canonical readback; contract stays provider-neutral
+  ---
+  duration_ms: 1.121666
+  type: 'test'
+  ...
+# Subtest: Director admits the canonical direct NET_SKINS_ENTRIES projection but never a denial or wrong target
+ok 22 - Director admits the canonical direct NET_SKINS_ENTRIES projection but never a denial or wrong target
+  ---
+  duration_ms: 1.006709
+  type: 'test'
+  ...
+# Subtest: Director admits the canonical direct CALCUTTA_MANAGEMENT projection but never a denial or wrong target
+ok 23 - Director admits the canonical direct CALCUTTA_MANAGEMENT projection but never a denial or wrong target
+  ---
+  duration_ms: 0.655917
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects PLAYER without mutation
+ok 24 - Director authorization rejects PLAYER without mutation
+  ---
+  duration_ms: 0.085792
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects SPECTATOR without mutation
+ok 25 - Director authorization rejects SPECTATOR without mutation
+  ---
+  duration_ms: 0.043083
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects signed-out without mutation
+ok 26 - Director authorization rejects signed-out without mutation
+  ---
+  duration_ms: 0.041
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects impersonated without mutation
+ok 27 - Director authorization rejects impersonated without mutation
+  ---
+  duration_ms: 0.037333
+  type: 'test'
+  ...
+# Subtest: Director authorization rejects wrong-target without mutation
+ok 28 - Director authorization rejects wrong-target without mutation
+  ---
+  duration_ms: 0.100667
+  type: 'test'
+  ...
+# Subtest: Director stale token fails conflict without rebinding or dispatching mutation
+ok 29 - Director stale token fails conflict without rebinding or dispatching mutation
+  ---
+  duration_ms: 0.168292
+  type: 'test'
+  ...
+# Subtest: Director recovery verifies original admitted context and full request without current admission
+ok 30 - Director recovery verifies original admitted context and full request without current admission
+  ---
+  duration_ms: 0.465708
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: score_derived_delivery_tick_v1
+ok 31 - worker preserves lease and exact authority: score_derived_delivery_tick_v1
+  ---
+  duration_ms: 0.182208
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_competition_derived_jobs
+ok 32 - worker preserves lease and exact authority: claim_competition_derived_jobs
+  ---
+  duration_ms: 0.127625
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_intelligence_derived_bundle
+ok 33 - worker preserves lease and exact authority: claim_intelligence_derived_bundle
+  ---
+  duration_ms: 0.114542
+  type: 'test'
+  ...
+# Subtest: worker preserves lease and exact authority: claim_production_calcutta_v1_recalculation
+ok 34 - worker preserves lease and exact authority: claim_production_calcutta_v1_recalculation
+  ---
+  duration_ms: 0.14525
+  type: 'test'
+  ...
+# Subtest: worker rejects unknown functions, Production-tagged payload and forged supplied context
+ok 35 - worker rejects unknown functions, Production-tagged payload and forged supplied context
+  ---
+  duration_ms: 0.080458
+  type: 'test'
+  ...
+# Subtest: current worker factory selects Certification without importing a Production runtime or requiring Google
+ok 36 - current worker factory selects Certification without importing a Production runtime or requiring Google
+  ---
+  duration_ms: 1.03325
+  type: 'test'
+  ...
+# Subtest: identity reads use admitted gateway; provider administration and participant messaging are unavailable
+ok 37 - identity reads use admitted gateway; provider administration and participant messaging are unavailable
+  ---
+  duration_ms: 0.466125
+  type: 'test'
+  ...
+# Subtest: full Net Skins configuration: real Certification route/core/receipts with safeupdate, no hosted access
+    # Subtest: forward install: mismatch rolls back atomically; safeupdate enabled; all six original metadata records preserved
+    ok 1 - forward install: mismatch rolls back atomically; safeupdate enabled; all six original metadata records preserved
+      ---
+      duration_ms: 82.190834
+      type: 'test'
+      ...
+    # Subtest: forward replay converges exactly, no schema/history/ACL/RLS change
+    ok 2 - forward replay converges exactly, no schema/history/ACL/RLS change
+      ---
+      duration_ms: 29.243583
+      type: 'test'
+      ...
+    # Subtest: private helper ACL drift fails replay atomically rather than silently normalizing it
+    ok 3 - private helper ACL drift fails replay atomically rather than silently normalizing it
+      ---
+      duration_ms: 38.776208
+      type: 'test'
+      ...
+    # Subtest: entry revision 1 created via shipping save, full financial config initially absent
+    ok 4 - entry revision 1 created via shipping save, full financial config initially absent
+      ---
+      duration_ms: 143.6565
+      type: 'test'
+      ...
+    # Subtest: Director config reuses saved entries and canonical manifest; current pointer, receipt and both audits commit
+    ok 5 - Director config reuses saved entries and canonical manifest; current pointer, receipt and both audits commit
+      ---
+      duration_ms: 160.746209
+      type: 'test'
+      ...
+    # Subtest: exact replay and restarted publisher return original committed configuration, no duplicate audits or revisions
+    ok 6 - exact replay and restarted publisher return original committed configuration, no duplicate audits or revisions
+      ---
+      duration_ms: 115.465583
+      type: 'test'
+      ...
+    # Subtest: same operation ID with changed DTO conflicts; stale config revision denied
+    ok 7 - same operation ID with changed DTO conflicts; stale config revision denied
+      ---
+      duration_ms: 114.607916
+      type: 'test'
+      ...
+    # Subtest: wrong/stale saved entry revision denied without altering entry history or granting config
+    ok 8 - wrong/stale saved entry revision denied without altering entry history or granting config
+      ---
+      duration_ms: 75.952125
+      type: 'test'
+      ...
+    # Subtest: participant A/B, signed-out, anon, ordinary authenticated and bare service role denied
+    ok 9 - participant A/B, signed-out, anon, ordinary authenticated and bare service role denied
+      ---
+      duration_ms: 33.667125
+      type: 'test'
+      ...
+    # Subtest: client-selected resource/tournament/project/deployment/release/financial rules are impossible DTO fields
+    ok 10 - client-selected resource/tournament/project/deployment/release/financial rules are impossible DTO fields
+      ---
+      duration_ms: 186.443917
+      type: 'test'
+      ...
+    # Subtest: database independently denies wrong resource/project/release/deployment/registration and tournament/Director
+    ok 11 - database independently denies wrong resource/project/release/deployment/registration and tournament/Director
+      ---
+      duration_ms: 105.592542
+      type: 'test'
+      ...
+    # Subtest: server registry rejects Production/development, foreign Preview project, wrong deployment/SHA; no fallback
+    ok 12 - server registry rejects Production/development, foreign Preview project, wrong deployment/SHA; no fallback
+      ---
+      duration_ms: 11.742333
+      type: 'test'
+      ...
+    # Subtest: Director private read allowed; participant private read denied; all private cores/table access stays closed
+    ok 13 - Director private read allowed; participant private read denied; all private cores/table access stays closed
+      ---
+      duration_ms: 89.431875
+      type: 'test'
+      ...
+    # Subtest: lost committed response recovers original receipt after admission disabled; no second configuration
+    ok 14 - lost committed response recovers original receipt after admission disabled; no second configuration
+      ---
+      duration_ms: 174.756708
+      type: 'test'
+      ...
+    # Subtest: disabled admission/paused ingress prevents new config; failures reconcile NOT_COMMITTED, final work state unchanged
+    ok 15 - disabled admission/paused ingress prevents new config; failures reconcile NOT_COMMITTED, final work state unchanged
+      ---
+      duration_ms: 88.1065
+      type: 'test'
+      ...
+    1..15
+ok 38 - full Net Skins configuration: real Certification route/core/receipts with safeupdate, no hosted access
+  ---
+  duration_ms: 7012.671083
+  type: 'test'
+  ...
+# {"postgres":"17","safeupdate":"on","source":"real route/adapters/canonical shared core","entryRevision1":"preserved","newDemand":0,"receiptAudits":true,"hostedAccess":false,"productionAccess":false,"google":0,"fullTournament":false}
+# Subtest: extracted shared core keeps every original Production statement in its null-context arm
+ok 39 - extracted shared core keeps every original Production statement in its null-context arm
+  ---
+  duration_ms: 0.639208
+  type: 'test'
+  ...
+# Subtest: forward SQL extends fixed Director operation and ingress authority; Production null branch keeps original guards
+ok 40 - forward SQL extends fixed Director operation and ingress authority; Production null branch keeps original guards
+  ---
+  duration_ms: 0.317834
+  type: 'test'
+  ...
+# Subtest: Production route still returns Preview 404 before auth/core and has no Certification dispatch
+ok 41 - Production route still returns Preview 404 before auth/core and has no Certification dispatch
+  ---
+  duration_ms: 9.411125
+  type: 'test'
+  ...
+# Subtest: registration denies foreign runtime {"VERCEL_ENV":"production"}
+ok 42 - registration denies foreign runtime {"VERCEL_ENV":"production"}
+  ---
+  duration_ms: 0.753
+  type: 'test'
+  ...
+# Subtest: registration denies foreign runtime {"VERCEL_ENV":"development"}
+ok 43 - registration denies foreign runtime {"VERCEL_ENV":"development"}
+  ---
+  duration_ms: 0.137333
+  type: 'test'
+  ...
+# Subtest: registration denies foreign runtime {"SUPABASE_SCORING_MIRROR_URL":"https://idgigvjjqkfbqjeredpb.supabase.co"}
+ok 44 - registration denies foreign runtime {"SUPABASE_SCORING_MIRROR_URL":"https://idgigvjjqkfbqjeredpb.supabase.co"}
+  ---
+  duration_ms: 0.113834
+  type: 'test'
+  ...
+# Subtest: registration denies foreign runtime {"BAGGER_CERTIFICATION_RESOURCE_ID":"PRODUCTION:foreign"}
+ok 45 - registration denies foreign runtime {"BAGGER_CERTIFICATION_RESOURCE_ID":"PRODUCTION:foreign"}
+  ---
+  duration_ms: 0.060292
+  type: 'test'
+  ...
+# Subtest: Production Net Skins server exposes only the exact reviewed RPC allowlist
+ok 46 - Production Net Skins server exposes only the exact reviewed RPC allowlist
+  ---
+  duration_ms: 0.521875
+  type: 'test'
+  ...
+# Subtest: Director configuration requires explicit opt-ins and configured Round selection under unchanged rules
+ok 47 - Director configuration requires explicit opt-ins and configured Round selection under unchanged rules
+  ---
+  duration_ms: 0.139458
+  type: 'test'
+  ...
+# Subtest: Production worker reuses the shared JS engine and has claim, complete, and safe failure paths
+ok 48 - Production worker reuses the shared JS engine and has claim, complete, and safe failure paths
+  ---
+  duration_ms: 0.130208
+  type: 'test'
+  ...
+# Subtest: current Net Skins mutations dispatch from one certified annual runtime without a caller year
+ok 49 - current Net Skins mutations dispatch from one certified annual runtime without a caller year
+  ---
+  duration_ms: 0.195292
+  type: 'test'
+  ...
+# Subtest: Director route is Production-only, same-origin, entitlement-bound, and has no GET
+ok 50 - Director route is Production-only, same-origin, entitlement-bound, and has no GET
+  ---
+  duration_ms: 0.356042
+  type: 'test'
+  ...
+1..50
+# tests 65
+# suites 0
+# pass 65
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7075.673
