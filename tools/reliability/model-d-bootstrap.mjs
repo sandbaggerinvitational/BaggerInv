@@ -13,7 +13,7 @@ export const modelDForwardArtifacts=Object.freeze([
  'certification-queue-retry-envelope-v6.sql','certification-queue-routing-closure-v7.sql',
  'certification-derived-attempt-cycle-v1.sql','certification-net-skins-configuration-v1.sql','certification-queue-calcutta-scope-v1.sql',
  'certification-calcutta-publication-v1.sql','certification-net-skins-result-read-v1.sql','certification-net-skins-calculation-v1.sql',
- 'certification-odds-input-configuration-v1.sql','certification-model-d-execution-v1.sql','certification-session-link-status-v1.sql',
+ 'certification-odds-input-configuration-v1.sql','certification-model-d-execution-v1.sql','certification-session-link-status-v1.sql','certification-forward-lineage-attestation-v1.sql',
 ].map(n=>'supabase/production_incremental/'+n));
 const digest=value=>createHash('sha256').update(value).digest('hex');
 export async function compileModelDImage(){

@@ -5402,6 +5402,83 @@
       "type": "timestamp with time zone"
     },
     {
+      "collation": "pg_catalog.default",
+      "default": null,
+      "generated": "",
+      "identity": "",
+      "name": "attestation_id",
+      "notNull": true,
+      "position": 1,
+      "relation": "production_control.certification_forward_lineage_v1",
+      "type": "text"
+    },
+    {
+      "collation": "pg_catalog.default",
+      "default": null,
+      "generated": "",
+      "identity": "",
+      "name": "resource_id",
+      "notNull": true,
+      "position": 2,
+      "relation": "production_control.certification_forward_lineage_v1",
+      "type": "text"
+    },
+    {
+      "collation": null,
+      "default": null,
+      "generated": "",
+      "identity": "",
+      "name": "revision",
+      "notNull": true,
+      "position": 3,
+      "relation": "production_control.certification_forward_lineage_v1",
+      "type": "integer"
+    },
+    {
+      "collation": null,
+      "default": null,
+      "generated": "",
+      "identity": "",
+      "name": "payload",
+      "notNull": true,
+      "position": 4,
+      "relation": "production_control.certification_forward_lineage_v1",
+      "type": "jsonb"
+    },
+    {
+      "collation": null,
+      "default": null,
+      "generated": "",
+      "identity": "",
+      "name": "original_receipt",
+      "notNull": true,
+      "position": 5,
+      "relation": "production_control.certification_forward_lineage_v1",
+      "type": "jsonb"
+    },
+    {
+      "collation": null,
+      "default": "clock_timestamp()",
+      "generated": "",
+      "identity": "",
+      "name": "created_at",
+      "notNull": true,
+      "position": 6,
+      "relation": "production_control.certification_forward_lineage_v1",
+      "type": "timestamp with time zone"
+    },
+    {
+      "collation": "pg_catalog.default",
+      "default": "CURRENT_USER",
+      "generated": "",
+      "identity": "",
+      "name": "recorded_by",
+      "notNull": true,
+      "position": 7,
+      "relation": "production_control.certification_forward_lineage_v1",
+      "type": "text"
+    },
+    {
       "collation": null,
       "default": null,
       "generated": "",
@@ -48212,6 +48289,33 @@
     {
       "deferrable": false,
       "deferred": false,
+      "definition": "PRIMARY KEY (attestation_id)",
+      "name": "certification_forward_lineage_v1_pkey",
+      "relation": "production_control.certification_forward_lineage_v1",
+      "type": "p",
+      "validated": true
+    },
+    {
+      "deferrable": false,
+      "deferred": false,
+      "definition": "UNIQUE (resource_id, revision)",
+      "name": "certification_forward_lineage_v1_resource_id_revision_key",
+      "relation": "production_control.certification_forward_lineage_v1",
+      "type": "u",
+      "validated": true
+    },
+    {
+      "deferrable": false,
+      "deferred": false,
+      "definition": "CHECK (revision > 0)",
+      "name": "certification_forward_lineage_v1_revision_check",
+      "relation": "production_control.certification_forward_lineage_v1",
+      "type": "c",
+      "validated": true
+    },
+    {
+      "deferrable": false,
+      "deferred": false,
       "definition": "FOREIGN KEY (lease_id) REFERENCES production_control.certification_ingress_leases_v1(lease_id)",
       "name": "certification_ingress_execution_v1_lease_id_fkey",
       "relation": "production_control.certification_ingress_execution_v1",
@@ -75843,6 +75947,26 @@
       "type": "a"
     },
     {
+      "dependent": "constraint certification_forward_lineage_v1_pkey on table production_control.certification_forward_lineage_v1",
+      "referenced": "column attestation_id of table production_control.certification_forward_lineage_v1",
+      "type": "a"
+    },
+    {
+      "dependent": "constraint certification_forward_lineage_v1_resource_id_revision_key on table production_control.certification_forward_lineage_v1",
+      "referenced": "column resource_id of table production_control.certification_forward_lineage_v1",
+      "type": "a"
+    },
+    {
+      "dependent": "constraint certification_forward_lineage_v1_resource_id_revision_key on table production_control.certification_forward_lineage_v1",
+      "referenced": "column revision of table production_control.certification_forward_lineage_v1",
+      "type": "a"
+    },
+    {
+      "dependent": "constraint certification_forward_lineage_v1_revision_check on table production_control.certification_forward_lineage_v1",
+      "referenced": "column revision of table production_control.certification_forward_lineage_v1",
+      "type": "a"
+    },
+    {
       "dependent": "constraint certification_ingress_execution_v1_lease_id_fkey on table production_control.certification_ingress_execution_v1",
       "referenced": "column lease_id of table production_control.certification_ingress_execution_v1",
       "type": "a"
@@ -95438,6 +95562,11 @@
       "type": "a"
     },
     {
+      "dependent": "default value for column created_at of table production_control.certification_forward_lineage_v1",
+      "referenced": "column created_at of table production_control.certification_forward_lineage_v1",
+      "type": "a"
+    },
+    {
       "dependent": "default value for column created_at of table production_control.certification_ingress_generations_v1",
       "referenced": "column created_at of table production_control.certification_ingress_generations_v1",
       "type": "a"
@@ -97265,6 +97394,11 @@
     {
       "dependent": "default value for column recorded_at of table production_control.vercel_writer_critical_waf_observations",
       "referenced": "column recorded_at of table production_control.vercel_writer_critical_waf_observations",
+      "type": "a"
+    },
+    {
+      "dependent": "default value for column recorded_by of table production_control.certification_forward_lineage_v1",
+      "referenced": "column recorded_by of table production_control.certification_forward_lineage_v1",
       "type": "a"
     },
     {
@@ -101058,6 +101192,16 @@
       "type": "a"
     },
     {
+      "dependent": "trigger certification_lineage_immutable_v1 on table production_control.canonical_bootstrap_installation_v1",
+      "referenced": "table production_control.canonical_bootstrap_installation_v1",
+      "type": "a"
+    },
+    {
+      "dependent": "trigger certification_lineage_immutable_v1 on table production_control.certification_forward_lineage_v1",
+      "referenced": "table production_control.certification_forward_lineage_v1",
+      "type": "a"
+    },
+    {
       "dependent": "trigger certification_odds_receipt_immutable_v1 on table production_control.certification_odds_receipts_v1",
       "referenced": "table production_control.certification_odds_receipts_v1",
       "type": "a"
@@ -102115,6 +102259,16 @@
     {
       "dependent": "index production_control.certification_admission_v1_pkey",
       "referenced": "constraint certification_admission_v1_pkey on table production_control.certification_admission_v1",
+      "type": "i"
+    },
+    {
+      "dependent": "index production_control.certification_forward_lineage_v1_pkey",
+      "referenced": "constraint certification_forward_lineage_v1_pkey on table production_control.certification_forward_lineage_v1",
+      "type": "i"
+    },
+    {
+      "dependent": "index production_control.certification_forward_lineage_v1_resource_id_revision_key",
+      "referenced": "constraint certification_forward_lineage_v1_resource_id_revision_key on table production_control.certification_forward_lineage_v1",
       "type": "i"
     },
     {
@@ -104870,6 +105024,11 @@
     {
       "dependent": "type production_control.certification_admission_v1",
       "referenced": "table production_control.certification_admission_v1",
+      "type": "i"
+    },
+    {
+      "dependent": "type production_control.certification_forward_lineage_v1",
+      "referenced": "table production_control.certification_forward_lineage_v1",
       "type": "i"
     },
     {
@@ -107925,6 +108084,11 @@
     {
       "dependent": "constraint certification_admission_v1_resource_id_resource_class_fkey on table production_control.certification_admission_v1",
       "referenced": "index production_control.canonical_resource_v1_resource_id_resource_class_key",
+      "type": "n"
+    },
+    {
+      "dependent": "constraint certification_forward_lineage_v1_revision_check on table production_control.certification_forward_lineage_v1",
+      "referenced": "column revision of table production_control.certification_forward_lineage_v1",
       "type": "n"
     },
     {
@@ -131673,6 +131837,16 @@
       "type": "n"
     },
     {
+      "dependent": "function production_control.reject_certification_lineage_mutation_v1()",
+      "referenced": "language plpgsql",
+      "type": "n"
+    },
+    {
+      "dependent": "function production_control.reject_certification_lineage_mutation_v1()",
+      "referenced": "schema production_control",
+      "type": "n"
+    },
+    {
       "dependent": "function production_control.reject_draft_authoring_immutable_v1()",
       "referenced": "language plpgsql",
       "type": "n"
@@ -137473,6 +137647,11 @@
       "type": "n"
     },
     {
+      "dependent": "table production_control.certification_forward_lineage_v1",
+      "referenced": "schema production_control",
+      "type": "n"
+    },
+    {
       "dependent": "table production_control.certification_ingress_execution_v1",
       "referenced": "schema production_control",
       "type": "n"
@@ -139375,6 +139554,16 @@
     {
       "dependent": "trigger capture_scorecard_archive_transition on table scoring_authority.matches",
       "referenced": "function scoring_authority.capture_scorecard_archive_transition()",
+      "type": "n"
+    },
+    {
+      "dependent": "trigger certification_lineage_immutable_v1 on table production_control.canonical_bootstrap_installation_v1",
+      "referenced": "function production_control.reject_certification_lineage_mutation_v1()",
+      "type": "n"
+    },
+    {
+      "dependent": "trigger certification_lineage_immutable_v1 on table production_control.certification_forward_lineage_v1",
+      "referenced": "function production_control.reject_certification_lineage_mutation_v1()",
       "type": "n"
     },
     {
@@ -152694,6 +152883,27 @@
       "anonExecute": false,
       "authenticatedExecute": false,
       "definer": false,
+      "definitionSha256": "394582945f6442dc4d3ae48fbf2ee237f0b6a8db0e909e1ebb13daa5eea7798d",
+      "identity": "production_control.reject_certification_lineage_mutation_v1()",
+      "language": "plpgsql",
+      "leakproof": false,
+      "owner": "postgres",
+      "parallel": "u",
+      "publicExecute": false,
+      "searchPath": [
+        "search_path=pg_catalog"
+      ],
+      "serviceExecute": false,
+      "strict": false,
+      "volatile": "v"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "anonExecute": false,
+      "authenticatedExecute": false,
+      "definer": false,
       "definitionSha256": "436f3b771e30d583519a81424c36d6d3b96baeaec8f21338b275f7bef026cc83",
       "identity": "production_control.reject_draft_authoring_immutable_v1()",
       "language": "plpgsql",
@@ -165989,6 +166199,22 @@
       "valid": true
     },
     {
+      "definition": "CREATE UNIQUE INDEX certification_forward_lineage_v1_pkey ON production_control.certification_forward_lineage_v1 USING btree (attestation_id)",
+      "name": "certification_forward_lineage_v1_pkey",
+      "primary": true,
+      "ready": true,
+      "relation": "production_control.certification_forward_lineage_v1",
+      "valid": true
+    },
+    {
+      "definition": "CREATE UNIQUE INDEX certification_forward_lineage_v1_resource_id_revision_key ON production_control.certification_forward_lineage_v1 USING btree (resource_id, revision)",
+      "name": "certification_forward_lineage_v1_resource_id_revision_key",
+      "primary": false,
+      "ready": true,
+      "relation": "production_control.certification_forward_lineage_v1",
+      "valid": true
+    },
+    {
       "definition": "CREATE UNIQUE INDEX certification_ingress_execution_v1_pkey ON production_control.certification_ingress_execution_v1 USING btree (backend_pid, transaction_id)",
       "name": "certification_ingress_execution_v1_pkey",
       "primary": true,
@@ -171501,6 +171727,19 @@
         "postgres=arwdDxtm/postgres"
       ],
       "forceRls": false,
+      "identity": "production_control.certification_forward_lineage_v1",
+      "kind": "r",
+      "options": null,
+      "owner": "postgres",
+      "persistence": "p",
+      "rls": true,
+      "view": null
+    },
+    {
+      "acl": [
+        "postgres=arwdDxtm/postgres"
+      ],
+      "forceRls": false,
       "identity": "production_control.certification_ingress_execution_v1",
       "kind": "r",
       "options": null,
@@ -175038,6 +175277,12 @@
       "relation": "production_control.calcutta_exact_job_recoveries_v1"
     },
     {
+      "definition": "CREATE TRIGGER certification_lineage_immutable_v1 BEFORE DELETE OR UPDATE OR TRUNCATE ON production_control.canonical_bootstrap_installation_v1 FOR EACH STATEMENT EXECUTE FUNCTION production_control.reject_certification_lineage_mutation_v1()",
+      "enabled": "O",
+      "name": "certification_lineage_immutable_v1",
+      "relation": "production_control.canonical_bootstrap_installation_v1"
+    },
+    {
       "definition": "CREATE TRIGGER guard_canonical_installation_receipt BEFORE DELETE OR UPDATE ON production_control.canonical_bootstrap_installation_v1 FOR EACH ROW EXECUTE FUNCTION production_control.guard_certification_initialization_evidence_v1()",
       "enabled": "O",
       "name": "guard_canonical_installation_receipt",
@@ -175054,6 +175299,12 @@
       "enabled": "O",
       "name": "initialize_certification_ingress_v1",
       "relation": "production_control.certification_admission_v1"
+    },
+    {
+      "definition": "CREATE TRIGGER certification_lineage_immutable_v1 BEFORE DELETE OR UPDATE OR TRUNCATE ON production_control.certification_forward_lineage_v1 FOR EACH STATEMENT EXECUTE FUNCTION production_control.reject_certification_lineage_mutation_v1()",
+      "enabled": "O",
+      "name": "certification_lineage_immutable_v1",
+      "relation": "production_control.certification_forward_lineage_v1"
     },
     {
       "definition": "CREATE TRIGGER capture_certification_initialization_origin AFTER INSERT ON production_control.certification_ingress_generations_v1 FOR EACH ROW EXECUTE FUNCTION production_control.capture_certification_initialization_origin_v1()",

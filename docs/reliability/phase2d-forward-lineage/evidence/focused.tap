@@ -1,0 +1,10 @@
+✔ fresh current image: exact lineage, atomic D9, replay and zero receipt rewrite (6558.1825ms)
+✔ actual predecessor + forward + retrospective attestation: security, immutability, drift and D9 (19605.334291ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 26280.849833

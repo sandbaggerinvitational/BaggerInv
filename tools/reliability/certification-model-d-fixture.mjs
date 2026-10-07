@@ -6,6 +6,7 @@ import manifest from '../../config/certification-model-d-fixture.json' with {typ
 import {validateModelDBinding} from './certification-model-d-binding.mjs';
 import {certificationManifestDigest} from '../../lib/canonical-resource-registration.js';
 import {readModelDImage} from './model-d-bootstrap.mjs';
+import {renderModelDLineageVerification} from './certification-forward-lineage.mjs';
 import {fixtureTables,renderGuideMarkers} from './certification-part2a-fixture.mjs';
 import {normalizeProductionGuideAuthoring} from '../../lib/production-guide-authoring-contract.js';
 import {certificationPart2aGuide} from './certification-part2a-guide.mjs';
@@ -55,14 +56,17 @@ export async function renderModelDFixture(input,{registrationManifest}={}){
  payout_structure:Array.from({length:24},(_,i)=>({place:i+1,round_1_fraction:['0.0125','0.01','0.0075'][i]||'0',round_2_fraction:['0.025','0.015'][i]||'0',round_3_fraction:['0.0125','0.01','0.0075'][i]||'0',overall_fraction:i===23?'0.05':['0.225','0.2','0.15','0.12','0.09','0.065'][i]||'0'}))};
  const request={...input,fixture:validateModelDFixture(manifest),identities:modelDIdentities,calcutta_initial_configuration:cfg,
  registration_manifest_digest:certificationManifestDigest(registrationManifest),package_sha256:hash(JSON.stringify(files.map((f,i)=>({name:names[i],sha256:hash(f)})))+JSON.stringify(manifest)),
- installed_manifest_sha256:image.manifestDigest,installed_schema_sha256:image.manifest.artifacts.schema,installed_static_sha256:image.manifest.artifacts.staticData};
+ installed_manifest_sha256:null,installed_schema_sha256:null,installed_static_sha256:null};
  let guide=files[3];const start=guide.indexOf(' if (select count(*) from scoring_authority.rounds)');const end=guide.indexOf(' guide_validation:=');
  guide=guide.slice(0,start)+" if not scoring_authority.guide_course_context_is_eligible(production_control.guide_canonical_course_context_v1('2026'))then raise exception 'MODEL_D_GUIDE_COURSE_INVALID';end if;\n"+guide.slice(end);
  guide=guide.replaceAll('CERTIFICATION_PART2A_SYNTHETIC_GUIDE_PUBLISHED','CERTIFICATION_MODEL_D_SYNTHETIC_GUIDE_PUBLISHED');
  let contacts=files[2].replace("1,'APPROVED',4,3,3,1","1,'APPROVED',24,3,3,21").replaceAll('CERTIFICATION_PART2A_SYNTHETIC_CONTACTS_PROVISIONED','CERTIFICATION_MODEL_D_SYNTHETIC_CONTACTS_PROVISIONED');
- let sql=files[0].replace('/*PROVISIONING_GUARDS*/',files[1]).replace('/*IDENTITY_CONTACTS*/',contacts).replace('/*SYNTHETIC_GUIDE*/',guide)
+ const lineage=await renderModelDLineageVerification(input,{registrationManifest});
+ let guards=files[1].replace("input->>'installed_manifest_sha256'","current_setting('bagger_model_d.lineage_receipt')::jsonb->>'manifest_sha256'").replace("input->>'installed_schema_sha256'","current_setting('bagger_model_d.lineage_receipt')::jsonb->>'schema_sha256'").replace("input->>'installed_static_sha256'","current_setting('bagger_model_d.lineage_receipt')::jsonb->>'static_data_sha256'");
+ let sql=files[0].replace('/*PROVISIONING_GUARDS*/',guards).replace('/*IDENTITY_CONTACTS*/',contacts).replace('/*SYNTHETIC_GUIDE*/',guide)
  .replace('/*OWNER_REQUEST*/',literal(request)).replace('/*APPROVED_CONTRACT*/',"'"+modelDFixtureContract+"'").replace('/*APPROVED_OPERATION*/',"'certification-model-d-initial-fixture'")
  .replace('/*APPROVED_REGISTRATION*/',literal(registrationManifest.registration)).replace('/*APPROVED_IDENTITIES*/',literal(modelDIdentities)).replace('/*FIXED_MANIFEST*/',literal(manifest))
  .replaceAll('/*FIXTURE_SNAPSHOT*/',snapshot).replace('/*LOCK_FIXTURE_TABLES*/',fixtureTables.join(',')).replace('/*EMPTY_FIXTURE*/',fixtureTables.map(t=>`exists(select 1 from ${t})`).join(' or '));
+ sql=sql.replace('DO $certification_fixture$',()=>lineage+'\nDO $certification_fixture$');
  sql=renderGuideMarkers(sql,modelDGuide(),false);assert.ok(!/\/\*[A-Z_]+\*\//.test(sql));return sql;
 }

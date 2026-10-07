@@ -1,0 +1,59 @@
+{
+  "base": "2e3f3042e3d2b7e39f078ca7d10f6081a5d008b4",
+  "protectedTrackedFilesCompared": 4549,
+  "protectedHashesUnchanged": true,
+  "shippingRuntimeChanged": false,
+  "historicalMigrationsChanged": false,
+  "historicalBootstrapChanged": false,
+  "secretPatternLeaks": 0,
+  "files": [
+    {
+      "path": "supabase/model_d_bootstrap/catalog-manifest.json",
+      "sha256": "6ab4743c3b7fe2053b5175e58ebeb95e1e523d6957a9e328eb63fcd7dedfde91"
+    },
+    {
+      "path": "supabase/model_d_bootstrap/manifest.json",
+      "sha256": "9c4c9c18a9bf1ae14b788b095c974bd07ca5561dfa27a981b387e1e7fe6f85f7"
+    },
+    {
+      "path": "supabase/model_d_bootstrap/schema.sql",
+      "sha256": "a81e8ff36c96a4ad98a6633124c46211f3f87e04fe379c1dfab7113289a43612"
+    },
+    {
+      "path": "tools/reliability/certification-model-d-fixture.mjs",
+      "sha256": "e48ddcc532e814f3f74bd4543c8d0b2b98aa7a734b5346d74ae3e4ee5b409c93"
+    },
+    {
+      "path": "tools/reliability/model-d-bootstrap.mjs",
+      "sha256": "7c6f7e3cd7c0d1c5963bac7a3f4de12c9b9b494d8eb4737b101a757502eb7f24"
+    },
+    {
+      "path": "docs/reliability/phase2d-forward-lineage/evidence/focused.json",
+      "sha256": "3720e167118b4c4d7f8504b562dd34aa7ecf69e5853b8c70533d34a43f6374cf"
+    },
+    {
+      "path": "docs/reliability/phase2d-forward-lineage/evidence/focused.tap",
+      "sha256": "9b667b33f68350b49caf883c89765c1d34b7c6381cbad6c4782baf0bc4a8287b"
+    },
+    {
+      "path": "docs/reliability/phase2d-forward-lineage/evidence/retained-execution.json",
+      "sha256": "965307ff9a2bedd5dd8d5038f715cfc3ba834616d2bfcaa074dedb338dd35e50"
+    },
+    {
+      "path": "supabase/production_incremental/certification-forward-lineage-attestation-v1.sql",
+      "sha256": "10b6ffa768bebea4dc5d4d6ac5f4895a86e1eed402b0012327122c79a7091c08"
+    },
+    {
+      "path": "test/certification-forward-lineage.integration.test.mjs",
+      "sha256": "6d61ca64d396df02a9a75523572f2455f0ddcff530f434d314601affba0e0893"
+    },
+    {
+      "path": "tools/reliability/certification-forward-lineage.mjs",
+      "sha256": "486d77aeb4531802ebfeb78aaff77f9ea1db9f83cb48f7ab1da6e0553e024c24"
+    },
+    {
+      "path": "docs/reliability/phase2d-forward-lineage/REPORT.md",
+      "sha256": "62d56c8a08aa62113d701646fefc7aedc2aa32ad7a8f4f0e575a1bcda006de36"
+    }
+  ]
+}

@@ -1,0 +1,254 @@
+[
+  {
+    "case": "fresh fixture atomic failure",
+    "denied": true
+  },
+  {
+    "case": "fresh conflicting replay",
+    "denied": true
+  },
+  {
+    "case": "fresh current image and fixture replay",
+    "pass": true
+  },
+  {
+    "case": "predecessor direct-current receipt rejection",
+    "denied": true
+  },
+  {
+    "case": "forward mismatch rollback",
+    "denied": true
+  },
+  {
+    "case": "missing attestation",
+    "denied": true
+  },
+  {
+    "case": "anon private attestation read",
+    "denied": true
+  },
+  {
+    "case": "anon owner record",
+    "denied": true
+  },
+  {
+    "case": "authenticated private attestation read",
+    "denied": true
+  },
+  {
+    "case": "authenticated owner record",
+    "denied": true
+  },
+  {
+    "case": "service_role private attestation read",
+    "denied": true
+  },
+  {
+    "case": "service_role owner record",
+    "denied": true
+  },
+  {
+    "case": "immutability update",
+    "denied": true
+  },
+  {
+    "case": "immutability delete",
+    "denied": true
+  },
+  {
+    "case": "immutability truncate",
+    "denied": true
+  },
+  {
+    "case": "immutability update",
+    "denied": true
+  },
+  {
+    "case": "immutability delete",
+    "denied": true
+  },
+  {
+    "case": "missing function",
+    "denied": true
+  },
+  {
+    "case": "extra function",
+    "denied": true
+  },
+  {
+    "case": "PUBLIC grant",
+    "denied": true
+  },
+  {
+    "case": "function drift",
+    "denied": true
+  },
+  {
+    "case": "body drift",
+    "denied": true
+  },
+  {
+    "case": "ACL drift",
+    "denied": true
+  },
+  {
+    "case": "owner drift",
+    "denied": true
+  },
+  {
+    "case": "search path drift",
+    "denied": true
+  },
+  {
+    "case": "RLS drift",
+    "denied": true
+  },
+  {
+    "case": "policy drift",
+    "denied": true
+  },
+  {
+    "case": "private exposure",
+    "denied": true
+  },
+  {
+    "case": "unexpected public relation",
+    "denied": true
+  },
+  {
+    "case": "static data drift",
+    "denied": true
+  },
+  {
+    "case": "wrong binding resource.resource_id",
+    "denied": true
+  },
+  {
+    "case": "wrong binding resource.project_ref",
+    "denied": true
+  },
+  {
+    "case": "wrong binding resource.registration_revision",
+    "denied": true
+  },
+  {
+    "case": "wrong binding deployment.deployment_id",
+    "denied": true
+  },
+  {
+    "case": "wrong binding deployment.release_commit",
+    "denied": true
+  },
+  {
+    "case": "wrong binding expected.admission_revision",
+    "denied": true
+  },
+  {
+    "case": "wrong binding expected.authority_epoch_id",
+    "denied": true
+  },
+  {
+    "case": "conflicting artifact_sha256",
+    "denied": true
+  },
+  {
+    "case": "conflicting current_static_sha256",
+    "denied": true
+  },
+  {
+    "case": "conflicting current_catalog_artifact_sha256",
+    "denied": true
+  },
+  {
+    "case": "tampered attestation",
+    "denied": true
+  },
+  {
+    "case": "unknown extra lineage",
+    "denied": true
+  },
+  {
+    "case": "missing original receipt",
+    "denied": true
+  },
+  {
+    "case": "wrong original receipt",
+    "denied": true
+  },
+  {
+    "case": "substituted current receipt",
+    "denied": true
+  },
+  {
+    "case": "tampered resource_id",
+    "denied": true
+  },
+  {
+    "case": "tampered project_ref",
+    "denied": true
+  },
+  {
+    "case": "tampered artifact_id",
+    "denied": true
+  },
+  {
+    "case": "tampered artifact_sha256",
+    "denied": true
+  },
+  {
+    "case": "tampered execution_evidence.sha256",
+    "denied": true
+  },
+  {
+    "case": "tampered predecessor.schema_sha256",
+    "denied": true
+  },
+  {
+    "case": "tampered successor.catalog_artifact_sha256",
+    "denied": true
+  },
+  {
+    "case": "tampered current_normalized_catalog_sha256",
+    "denied": true
+  },
+  {
+    "case": "tampered current_static_sha256",
+    "denied": true
+  },
+  {
+    "case": "tampered authority_epoch_id",
+    "denied": true
+  },
+  {
+    "case": "tampered resource_revision",
+    "denied": true
+  },
+  {
+    "case": "anon direct insert",
+    "denied": true
+  },
+  {
+    "case": "authenticated direct insert",
+    "denied": true
+  },
+  {
+    "case": "service_role direct insert",
+    "denied": true
+  },
+  {
+    "case": "current normalized contract",
+    "catalogDigest": "dd1ec27a849429b88d921cf57d27a961b679c57b7b77680cfa5ca44c301a4cbc",
+    "artifactDigest": "6ab4743c3b7fe2053b5175e58ebeb95e1e523d6957a9e328eb63fcd7dedfde91",
+    "staticDigest": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d"
+  },
+  {
+    "case": "upgraded fixture atomic rollback",
+    "denied": true
+  },
+  {
+    "case": "forward upgraded attested fixture and replay",
+    "pass": true,
+    "receiptUnchanged": true,
+    "retrospective": true
+  }
+]

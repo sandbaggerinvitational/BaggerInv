@@ -1,0 +1,40 @@
+{
+  "contract": "model-d-session-link-retained-execution-v1",
+  "project_ref": "heoqynwlmqiejyxdmbmv",
+  "resource_id": "CERTIFICATION:9fccc63d-bcc2-472f-933f-55f2d394a8ae",
+  "provenance": "RETAINED_OWNER_EXECUTION_CAPTURE",
+  "execution_time": null,
+  "execution_time_classification": "NOT_CAPTURED_IN_RETAINED_INSTALL_RECORD",
+  "execution": [
+    {
+      "phase": "INSTALL",
+      "exit": 0,
+      "seconds": 0.981,
+      "artifactDigest": "bcbffcaa33440a4137a997b1c3d1d2f1515675d300abb6bd36b8a442f77f3d0a",
+      "error": null
+    },
+    {
+      "phase": "REPLAY",
+      "exit": 0,
+      "seconds": 0.964,
+      "artifactDigest": "bcbffcaa33440a4137a997b1c3d1d2f1515675d300abb6bd36b8a442f77f3d0a",
+      "error": null
+    }
+  ],
+  "current_catalog": {
+    "exactCatalogPass": true,
+    "functions": 1160,
+    "rlsTables": 280,
+    "error": null
+  },
+  "binding": {
+    "origin": "https://bagger-6zi10a9o5-sandbagger-invitational.vercel.app",
+    "release": "2e3f3042e3d2b7e39f078ca7d10f6081a5d008b4",
+    "resource": "CERTIFICATION:9fccc63d-bcc2-472f-933f-55f2d394a8ae",
+    "revision": 3,
+    "deployment": "dpl_HSWrf1i5QbfKwhjpYUPC3ynfZbZk",
+    "authorityEpoch": "9f2d5b83-5fe0-4c3b-8314-32ee29026482"
+  },
+  "historical_order": "ORIGINAL_INSTALL_THEN_SESSION_LINK_SUPPORTED_BY_OWNER_SEQUENCE_AND_PREDECESSOR_GUARDS",
+  "limitation": "Not an original database migration receipt; no claim about unrecorded transient reverted historical changes"
+}
