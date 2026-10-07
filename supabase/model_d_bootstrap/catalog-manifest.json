@@ -6370,6 +6370,50 @@
       "type": "timestamp with time zone"
     },
     {
+      "collation": "pg_catalog.default",
+      "default": null,
+      "generated": "",
+      "identity": "",
+      "name": "resource_id",
+      "notNull": true,
+      "position": 1,
+      "relation": "production_control.certification_session_keys_v1",
+      "type": "text"
+    },
+    {
+      "collation": null,
+      "default": null,
+      "generated": "",
+      "identity": "",
+      "name": "registration_revision",
+      "notNull": true,
+      "position": 2,
+      "relation": "production_control.certification_session_keys_v1",
+      "type": "bigint"
+    },
+    {
+      "collation": null,
+      "default": null,
+      "generated": "",
+      "identity": "",
+      "name": "authority_epoch_id",
+      "notNull": true,
+      "position": 3,
+      "relation": "production_control.certification_session_keys_v1",
+      "type": "uuid"
+    },
+    {
+      "collation": null,
+      "default": null,
+      "generated": "",
+      "identity": "",
+      "name": "attestation_key",
+      "notNull": true,
+      "position": 4,
+      "relation": "production_control.certification_session_keys_v1",
+      "type": "bytea"
+    },
+    {
       "collation": null,
       "default": "extensions.gen_random_uuid()",
       "generated": "",
@@ -48681,6 +48725,33 @@
     {
       "deferrable": false,
       "deferred": false,
+      "definition": "CHECK (octet_length(attestation_key) = 32)",
+      "name": "certification_session_keys_v1_attestation_key_check",
+      "relation": "production_control.certification_session_keys_v1",
+      "type": "c",
+      "validated": true
+    },
+    {
+      "deferrable": false,
+      "deferred": false,
+      "definition": "PRIMARY KEY (resource_id)",
+      "name": "certification_session_keys_v1_pkey",
+      "relation": "production_control.certification_session_keys_v1",
+      "type": "p",
+      "validated": true
+    },
+    {
+      "deferrable": false,
+      "deferred": false,
+      "definition": "CHECK (registration_revision > 0)",
+      "name": "certification_session_keys_v1_registration_revision_check",
+      "relation": "production_control.certification_session_keys_v1",
+      "type": "c",
+      "validated": true
+    },
+    {
+      "deferrable": false,
+      "deferred": false,
       "definition": "CHECK (actor = 'step10b-production-shadow-bootstrap'::text)",
       "name": "current_shadow_import_claims_actor_check",
       "relation": "production_control.current_shadow_import_claims",
@@ -76152,6 +76223,21 @@
       "type": "a"
     },
     {
+      "dependent": "constraint certification_session_keys_v1_attestation_key_check on table production_control.certification_session_keys_v1",
+      "referenced": "column attestation_key of table production_control.certification_session_keys_v1",
+      "type": "a"
+    },
+    {
+      "dependent": "constraint certification_session_keys_v1_pkey on table production_control.certification_session_keys_v1",
+      "referenced": "column resource_id of table production_control.certification_session_keys_v1",
+      "type": "a"
+    },
+    {
+      "dependent": "constraint certification_session_keys_v1_registration_revision_check on table production_control.certification_session_keys_v1",
+      "referenced": "column registration_revision of table production_control.certification_session_keys_v1",
+      "type": "a"
+    },
+    {
       "dependent": "constraint cleanup_certifications_already_mirrored_check on table production_rehearsal.cleanup_certifications",
       "referenced": "column already_mirrored of table production_rehearsal.cleanup_certifications",
       "type": "a"
@@ -102092,6 +102178,11 @@
       "type": "i"
     },
     {
+      "dependent": "index production_control.certification_session_keys_v1_pkey",
+      "referenced": "constraint certification_session_keys_v1_pkey on table production_control.certification_session_keys_v1",
+      "type": "i"
+    },
+    {
       "dependent": "index production_control.current_shadow_import_claims_bootstrap_key_key",
       "referenced": "constraint current_shadow_import_claims_bootstrap_key_key on table production_control.current_shadow_import_claims",
       "type": "i"
@@ -104814,6 +104905,11 @@
     {
       "dependent": "type production_control.certification_odds_receipts_v1",
       "referenced": "table production_control.certification_odds_receipts_v1",
+      "type": "i"
+    },
+    {
+      "dependent": "type production_control.certification_session_keys_v1",
+      "referenced": "table production_control.certification_session_keys_v1",
       "type": "i"
     },
     {
@@ -108189,6 +108285,16 @@
     {
       "dependent": "constraint certification_odds_receipts_v1_tournament_id_fkey on table production_control.certification_odds_receipts_v1",
       "referenced": "index scoring_authority.tournaments_pkey",
+      "type": "n"
+    },
+    {
+      "dependent": "constraint certification_session_keys_v1_attestation_key_check on table production_control.certification_session_keys_v1",
+      "referenced": "column attestation_key of table production_control.certification_session_keys_v1",
+      "type": "n"
+    },
+    {
+      "dependent": "constraint certification_session_keys_v1_registration_revision_check on table production_control.certification_session_keys_v1",
+      "referenced": "column registration_revision of table production_control.certification_session_keys_v1",
       "type": "n"
     },
     {
@@ -129312,6 +129418,16 @@
       "type": "n"
     },
     {
+      "dependent": "function production_control.certification_session_link_status_v1(jsonb)",
+      "referenced": "language plpgsql",
+      "type": "n"
+    },
+    {
+      "dependent": "function production_control.certification_session_link_status_v1(jsonb)",
+      "referenced": "schema production_control",
+      "type": "n"
+    },
+    {
       "dependent": "function production_control.certification_successor_current_read_v1(jsonb,jsonb)",
       "referenced": "language plpgsql",
       "type": "n"
@@ -135017,6 +135133,16 @@
       "type": "n"
     },
     {
+      "dependent": "function public.read_certification_session_link_status_v1(jsonb)",
+      "referenced": "language plpgsql",
+      "type": "n"
+    },
+    {
+      "dependent": "function public.read_certification_session_link_status_v1(jsonb)",
+      "referenced": "schema public",
+      "type": "n"
+    },
+    {
       "dependent": "function public.read_championship_odds_inputs(text)",
       "referenced": "language plpgsql",
       "type": "n"
@@ -137378,6 +137504,11 @@
     },
     {
       "dependent": "table production_control.certification_odds_receipts_v1",
+      "referenced": "schema production_control",
+      "type": "n"
+    },
+    {
+      "dependent": "table production_control.certification_session_keys_v1",
       "referenced": "schema production_control",
       "type": "n"
     },
@@ -147044,6 +147175,27 @@
       "serviceExecute": false,
       "strict": false,
       "volatile": "s"
+    },
+    {
+      "acl": [
+        "postgres=X/postgres"
+      ],
+      "anonExecute": false,
+      "authenticatedExecute": false,
+      "definer": true,
+      "definitionSha256": "ef59c50c183835a09a47bea283983cdf80b14d19b4ae03140b226359f11a2578",
+      "identity": "production_control.certification_session_link_status_v1(input jsonb)",
+      "language": "plpgsql",
+      "leakproof": false,
+      "owner": "postgres",
+      "parallel": "u",
+      "publicExecute": false,
+      "searchPath": [
+        "search_path=pg_catalog"
+      ],
+      "serviceExecute": false,
+      "strict": false,
+      "volatile": "v"
     },
     {
       "acl": [
@@ -160524,6 +160676,28 @@
     },
     {
       "acl": [
+        "postgres=X/postgres",
+        "service_role=X/postgres"
+      ],
+      "anonExecute": false,
+      "authenticatedExecute": false,
+      "definer": true,
+      "definitionSha256": "0dc069065fb07358fa26bf3d7df9ffb5cf1131746a420b7bb659b79956f4f7c9",
+      "identity": "public.read_certification_session_link_status_v1(input jsonb)",
+      "language": "plpgsql",
+      "leakproof": false,
+      "owner": "postgres",
+      "parallel": "u",
+      "publicExecute": false,
+      "searchPath": [
+        "search_path=pg_catalog"
+      ],
+      "serviceExecute": true,
+      "strict": false,
+      "volatile": "v"
+    },
+    {
+      "acl": [
         "postgres=X/postgres"
       ],
       "anonExecute": false,
@@ -165948,6 +166122,14 @@
       "primary": true,
       "ready": true,
       "relation": "production_control.certification_odds_receipts_v1",
+      "valid": true
+    },
+    {
+      "definition": "CREATE UNIQUE INDEX certification_session_keys_v1_pkey ON production_control.certification_session_keys_v1 USING btree (resource_id)",
+      "name": "certification_session_keys_v1_pkey",
+      "primary": true,
+      "ready": true,
+      "relation": "production_control.certification_session_keys_v1",
       "valid": true
     },
     {
@@ -171411,6 +171593,19 @@
       ],
       "forceRls": false,
       "identity": "production_control.certification_odds_receipts_v1",
+      "kind": "r",
+      "options": null,
+      "owner": "postgres",
+      "persistence": "p",
+      "rls": true,
+      "view": null
+    },
+    {
+      "acl": [
+        "postgres=arwdDxtm/postgres"
+      ],
+      "forceRls": false,
+      "identity": "production_control.certification_session_keys_v1",
       "kind": "r",
       "options": null,
       "owner": "postgres",

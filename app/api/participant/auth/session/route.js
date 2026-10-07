@@ -10,6 +10,7 @@ import { playerPassportEffectivePlayerId, playerPassportTokenFromRequest, verify
 import { observeParticipantIdentityShadow } from "../../../../../lib/participant-identity-shadow.js";
 import { SCORING_SESSION_COOKIE, scoringSessionCookie } from "../../../../../lib/scoring-access.js";
 import { assertProductionShadowCandidateRequest } from "../../../../../lib/production-shadow-candidate.js";
+import { readParticipantSessionContext, participantSessionFailure } from "../../../../../lib/participant-session-context.js";
 import { assertProductionCutoverRequest } from "../../../../../lib/production-cutover-activation-contract.js";
 
 export const dynamic = "force-dynamic";
@@ -28,7 +29,13 @@ export async function GET(request) {
   const started = performance.now();
   const verified = await verifyParticipantAuthClaims(await cookies());
   if (verified.status !== "active") return NextResponse.json({ session: "inactive", identityAuthority: authority.resolved }, { headers });
-  const context = await readParticipantIdentityContextForAuth({ authUserId: verified.claims.sub });
+  let context;
+  try { context = await readParticipantSessionContext(verified); }
+  catch (error) {
+    const failure = participantSessionFailure(error);
+    if (!failure) throw error; // Preserve non-Certification transport behavior.
+    return NextResponse.json({session:"inactive", identityAuthority:authority.resolved, code:failure.code}, {status:failure.status, headers});
+  }
   if (!context.payload?.ok) return NextResponse.json({ session: "inactive", identityAuthority: authority.resolved,
     code: context.payload?.code || "PARTICIPANT_CONTEXT_UNAVAILABLE" }, { headers });
   if (authority.resolved === "supabase") {

@@ -1,0 +1,28 @@
+TAP version 13
+# Subtest: Model D pre-fixture shipping session: minimum binding-only link fact, linked-disabled, negatives and no writes
+ok 1 - Model D pre-fixture shipping session: minimum binding-only link fact, linked-disabled, negatives and no writes
+  ---
+  duration_ms: 9140.297042
+  type: 'test'
+  ...
+# Subtest: Original Certification forward preserves catalog metadata/history; unlinked and linked-disabled; atomic replay/drift
+ok 2 - Original Certification forward preserves catalog metadata/history; unlinked and linked-disabled; atomic replay/drift
+  ---
+  duration_ms: 7340.866583
+  type: 'test'
+  ...
+# Subtest: Production and ordinary Preview session selection unchanged; infrastructure remains distinct
+ok 3 - Production and ordinary Preview session selection unchanged; infrastructure remains distinct
+  ---
+  duration_ms: 0.716833
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 16607.353625

@@ -1,7 +1,7 @@
 {
   "artifacts": {
-    "catalog": "e9c25ae8bcc5ced1aebe51ef304ef0d188ef2989546f8a8a6d5ad9141dd53c6f",
-    "schema": "a82345ddbaa01dadb153baeed1973f30290cf7084ff8038bf50e247122fb5ae2",
+    "catalog": "c1d39293dd14bc30910ff7c78054552abec79cb5416836ab4dfe2b5e17dbd4e2",
+    "schema": "4f9b1489b2a2d920bf7ddfd05f82dbaa0289f5724e108c1083fca497fb54a568",
     "staticData": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d"
   },
   "authorityRowsCopied": 0,
@@ -787,7 +787,8 @@
     "supabase/production_incremental/certification-net-skins-result-read-v1.sql",
     "supabase/production_incremental/certification-net-skins-calculation-v1.sql",
     "supabase/production_incremental/certification-odds-input-configuration-v1.sql",
-    "supabase/production_incremental/certification-model-d-execution-v1.sql"
+    "supabase/production_incremental/certification-model-d-execution-v1.sql",
+    "supabase/production_incremental/certification-session-link-status-v1.sql"
   ],
   "historicalInstallationRowsCopied": 0,
   "platformPrerequisites": [
@@ -876,6 +877,10 @@
     {
       "path": "supabase/production_incremental/certification-model-d-execution-v1.sql",
       "sha256": "95a9e01c3a271001646d399104bbd8cbb762d19593151a3016208ff08ea5c576"
+    },
+    {
+      "path": "supabase/production_incremental/certification-session-link-status-v1.sql",
+      "sha256": "bcbffcaa33440a4137a997b1c3d1d2f1515675d300abb6bd36b8a442f77f3d0a"
     }
   ]
 }

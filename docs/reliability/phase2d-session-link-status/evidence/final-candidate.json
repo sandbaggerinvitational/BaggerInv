@@ -1,0 +1,31 @@
+{
+  "baseSha": "a9bf1cce7d8ece199182603dc79e2eff4cf2959e",
+  "hostedAccess": false,
+  "priorCatalogRecordsPreserved": true,
+  "priorFunctions": 1158,
+  "newFunctions": 1160,
+  "priorRlsTables": 279,
+  "newRlsTables": 280,
+  "newPrivateControlTables": 1,
+  "newRoles": 0,
+  "protectedFilesUnchanged": 235,
+  "broadAndBuildRuntimeHashesMatchFinalCandidate": {
+    "application": true,
+    "build": true
+  },
+  "lateChangesAfterBroadAndBuild": "installer replay-metadata guards and their focused tests only; installed SQL definitions/catalog and shipping runtime hashes unchanged",
+  "sourceManifest": {
+    "app/api/participant/auth/session/route.js": "a58577b73c49ccfbaf50d7739d54d2a60e8f1e1c6b9e22731af20185cfb5559c",
+    "lib/certification-runtime-server.js": "2ea4a72e8510eecf85b92ad116f610c5548fd8876967627ee8c87d9b599a33b9",
+    "lib/supabase-auth-server.js": "6935e02022ccce2ef531c22ba45bb6394e6bc74fff411fff139227314d267c07",
+    "lib/participant-session-context.js": "5aa0806145c23a647bcbb61bed4b68c141bc20a53cd5a441e2538be2637c6232",
+    "supabase/production_incremental/certification-session-link-status-v1.sql": "bcbffcaa33440a4137a997b1c3d1d2f1515675d300abb6bd36b8a442f77f3d0a",
+    "supabase/model_d_bootstrap/manifest.json": "801f3b35303114ef0c228870f403048a0402d92eff1654af7ed2e77008559087",
+    "supabase/model_d_bootstrap/schema.sql": "4f9b1489b2a2d920bf7ddfd05f82dbaa0289f5724e108c1083fca497fb54a568",
+    "supabase/model_d_bootstrap/catalog-manifest.json": "c1d39293dd14bc30910ff7c78054552abec79cb5416836ab4dfe2b5e17dbd4e2",
+    "tools/reliability/certification-session-key.mjs": "21ab5ab830be28cf7a873499ff060877a080e26898287867a1dec0d53697692c",
+    "tools/reliability/model-d-bootstrap.mjs": "dad93f5c0c1aa32506fa7ee6d2662858e68f66303cb9cb24025f40a9add1f286",
+    "test/certification-session-link-status.integration.test.mjs": "b697030d45ac95d835bc8794ca21740c2a32a93201c1bff7928babf13aaaada7",
+    "test/pwa-session-regression.test.mjs": "3dc96dbd217a157fad01544ce0badd3c9df935393b2a43e1b4ea34cfe49aaaa4"
+  }
+}
