@@ -10,7 +10,8 @@
       "codex/reliability-phase2c1-google-retirement": false,
       "codex/reliability-phase2c1-capability-closure": false,
       "codex/reliability-phase2d-staging-admission": false,
-      "codex/worker-provider-portability": false
+      "codex/worker-provider-portability": false,
+      "codex/certification-model-d": false
     }
   },
   "functions": {
