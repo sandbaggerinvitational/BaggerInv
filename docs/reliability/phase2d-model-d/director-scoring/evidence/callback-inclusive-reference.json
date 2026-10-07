@@ -1,0 +1,73 @@
+{
+  "hosted": false,
+  "status": "PASS",
+  "postgresql": 17,
+  "pgSafeupdate": true,
+  "actualDirectorRoute": true,
+  "actualOddsCallbacksExecuted": true,
+  "queueOnlyFinalization": [
+    {
+      "round": 1,
+      "callbacksExecuted": true,
+      "beforeQueueUnchanged": true,
+      "counts": {
+        "dead_letters": 0,
+        "pending_work": 5,
+        "active_claims": 0,
+        "active_leases": 0,
+        "expired_claims": 0,
+        "pending_intents": 324
+      }
+    },
+    {
+      "round": 2,
+      "callbacksExecuted": true,
+      "beforeQueueUnchanged": true,
+      "counts": {
+        "dead_letters": 0,
+        "pending_work": 5,
+        "active_claims": 0,
+        "active_leases": 0,
+        "expired_claims": 0,
+        "pending_intents": 324
+      }
+    },
+    {
+      "round": 3,
+      "callbacksExecuted": true,
+      "beforeQueueUnchanged": true,
+      "counts": {
+        "dead_letters": 0,
+        "pending_work": 5,
+        "active_claims": 0,
+        "active_leases": 0,
+        "expired_claims": 0,
+        "pending_intents": 648
+      }
+    }
+  ],
+  "completeFinal": 24,
+  "scoreOperations": 432,
+  "milestoneReads": 8,
+  "shippingReads": 10,
+  "finalControl": {
+    "state": "OFF",
+    "counts": {
+      "dead_letters": 0,
+      "pending_work": 0,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 0
+    },
+    "publication": {
+      "unknown": 0,
+      "accepted": 0,
+      "reserved": 0,
+      "cancelled": 0,
+      "delivered": 1
+    }
+  },
+  "normalizedExpectedOutputComparison": "pending second clean callback-inclusive run",
+  "rawDigest": "97051c207a5d6fd001a238ee23dfd2abe5b0a38454688035b9344a3b17baefdf"
+}

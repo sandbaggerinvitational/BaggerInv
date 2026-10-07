@@ -1,0 +1,19 @@
+{
+  "status": "CONSOLIDATED_LOCAL_PASS",
+  "base": "078fbfa90e4b1a2b9f01b9e3cc085c33ce271fb5",
+  "sharedCoreSha256": "eadddb392a2087d930506b70a34aba0181e5922edf7b93a06d78f2374f076f06",
+  "directorPermissionRevisionCheck": true,
+  "directorCanScoreCheck": false,
+  "requiresLive": false,
+  "providerSubjectStored": true,
+  "actorEntitlementRevalidated": true,
+  "applicationOnlyCorrectionSufficient": false,
+  "hostedContact": 0,
+  "transactionalGuardRequired": true,
+  "guardRequiresLive": true,
+  "guardRequiresOpenPermission": true,
+  "guardRechecksBothAdmissionsUnderTransaction": true,
+  "canonicalCoreUnchanged": true,
+  "directorFinalizationQueueOnly": true,
+  "actorCoverage": 24
+}

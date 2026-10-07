@@ -1,0 +1,19 @@
+▶ Model D Director shipping score guard uses canonical core and transactional authority
+  ✔ unprepared, future and closed matches denied without scores (127.487167ms)
+  ✔ 2026-R1-2 lawful shipping Director score and replay (694.154875ms)
+  ✔ 2026-R2-2 lawful shipping Director score and replay (621.719875ms)
+  ✔ 2026-R3-2 lawful shipping Director score and replay (635.308333ms)
+  ✔ payload actor substitution and ordinary participant denied (78.984583ms)
+  ✔ signed-out, malformed facts and stale CAS preserve authority (591.346542ms)
+  ✔ bare service role lacks transport attestation and private helper (18.62525ms)
+  ✔ transactional binding, admission, permissions and lifecycle negatives (285.612625ms)
+  ✔ participant and Director facts converge; concurrent stale predecessor has one winner (811.215792ms)
+✔ Model D Director shipping score guard uses canonical core and transactional authority (9394.4465ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9513.202333

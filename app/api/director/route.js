@@ -8,6 +8,8 @@ import { recalculateCalcuttaAfterCanonicalMutation } from "../../../lib/calcutta
 import { assertDirectorMutationAuthority } from "../../../lib/director-mutation-authority.js";
 import { assertScoringMutationAuthorityContractBeforeDispatch } from "../../../lib/scoring-mutation-authority-server.js";
 
+import { directorDerivedDeliveryPolicy } from "../../../lib/director-derived-delivery-policy.js";
+
 export const dynamic = "force-dynamic";
 
 async function authorize(request) {
@@ -69,6 +71,7 @@ export async function POST(request) {
         error.status = 400;
         throw error;
       }
+      const derivedDeliveryPolicy = directorDerivedDeliveryPolicy();
       const updatedBy = identity.actor.name;
       const lifecycle = await persistDirectorMatchLifecycle({
         action: mutationAuthority.canonicalLifecycleAction,
@@ -94,7 +97,10 @@ export async function POST(request) {
         authority: "supabase",
       }));
       refresh();
-      after(async () => {
+      // Model D durable demand is committed by the canonical transaction.
+      // Its certified Queue owns claims and calculation; other resources retain
+      // their existing post-commit processing. Cache invalidation stays above.
+      if (derivedDeliveryPolicy !== "PRIVATE_QUEUE_ONLY" || mutationAuthority.canonicalLifecycleAction !== "finalize") after(async () => {
         try {
           await Promise.all([
             recalculateCompetitionDerivedTournament("", { calculatedBy: `Director lifecycle worker · ${updatedBy || "Director"}` }),

@@ -1,0 +1,18 @@
+{
+  "provenance": "Retained verified D9 evidence; no hosted contact during this certification",
+  "sourceDigest": "11a579bf6ce0b3b37ed9a2b667c9598c1be37c5c19f66a00a7ff6009a2b677c9",
+  "digests": {
+    "players": "2e38f9a29692f4e0be81b5b416b6ed330c9cc9d3326b7722166ee74252ced101",
+    "teams": "23838b5b11755646b5ae33d232243d31597dc0f2e5161cb2b6f2d689889e68ef",
+    "rounds": "d56bf60a6e9c2d5a201b42cc47093cdbff69d06c303a8c24f094575d394b865b",
+    "matches": "16ebaac985a52dee2bc6ee3cd87df0fb963e79c1172fdf3525cae5eb5d9cef67",
+    "matchHoles": "8e07240565db77a6c2bb80cda60c43a6396b27c532232cc6232a25cb17a3d2f8",
+    "courses": "e278ad7568e72e31a48e362d9a819319d947c2cc7d220231d51169a271c8d522",
+    "playerLinks": "a6d633e7891e7e539b79c32b5f2776bf79a3689e0fd4798b43c10551eb246d47",
+    "domainPointers": "fb15d23c8d2c2eee54ef0469699248b306a83115bfadad88f1549305fe1625fc",
+    "fixture": "99d7381dd636220cbb67ddba9253c1bd604cb72ceca7a1b351ba2737f6419550",
+    "guide": "6092d60b83df8faff25a9925d15e8e75db77c8a150a6b3f610049bd3cb9617b4",
+    "tees": "8fa23aa3322cc84b015650e7e51d19dfd1f9baa1fcedec16f621d9a7f396645e"
+  },
+  "algorithm": "SHA256 PostgreSQL JSONB::text of full rows sorted by full row JSONB text COLLATE C; fixture digest is immutable fixture bootstrap audit digest; Guide uses guide_content_revisions"
+}

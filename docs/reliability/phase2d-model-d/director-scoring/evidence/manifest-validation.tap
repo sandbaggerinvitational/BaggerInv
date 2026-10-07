@@ -1,0 +1,14 @@
+✔ committed complete manifest schema, canonical digest and replay (15.097625ms)
+✔ exact reviewed D9/source/binding gate confers no authority (212.124667ms)
+✔ 24/24 declared lawful actors, exact scoring facts, wrong actor/future state denied (6.724042ms)
+✔ phase guards deny future Odds/Recap, skipped chronology and shortcuts (0.869542ms)
+✔ D9 digest readback is original C-order JSONB read-only algorithm (0.156125ms)
+✔ normalization excludes only declared publication wall clocks, never mathematics (0.113541ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 322.458584

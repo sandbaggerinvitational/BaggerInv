@@ -1,0 +1,480 @@
+{
+  "final": 24,
+  "scores": 432,
+  "auction": [
+    {
+      "facts": {
+        "pot": 1,
+        "state": "AUCTION_COMPLETE",
+        "ownership": [
+          {
+            "player_id": "P01",
+            "owner_player_id": "P12",
+            "ownership_fraction": 1
+          }
+        ],
+        "purchases": [
+          {
+            "player_id": "P01",
+            "purchase_price": 1
+          }
+        ],
+        "auction_unit": "PLAYER",
+        "currency_code": "USD",
+        "tournament_id": "2026",
+        "entry_workflow": "MANUAL_FINAL_AUCTION_FACTS",
+        "contract_version": "production-calcutta-v1"
+      },
+      "revision": 1
+    }
+  ],
+  "calcuttaJobs": [
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUCCEEDED",
+      "attempts": 1,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUCCEEDED",
+      "attempts": 1,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUCCEEDED",
+      "attempts": 1,
+      "deadLetter": null
+    },
+    {
+      "error": null,
+      "status": "SUPERSEDED",
+      "attempts": 0,
+      "deadLetter": null
+    }
+  ],
+  "calcuttaCurrent": {
+    "state": "OFFICIAL",
+    "updated_at": "2026-10-07T13:51:16.6576-05:00",
+    "tournament_id": "2026",
+    "result_revision": 3,
+    "auction_revision": 1,
+    "publication_state": "UNPUBLISHED",
+    "auction_fingerprint": "ede6dc33d509ae960d2418aa1cf232aaffe4a484787a9bd1f8e046f352e5836d",
+    "auction_revision_id": "eaccd250-cc44-469c-9f27-ac8e727f18f4",
+    "publication_revision": 1,
+    "configuration_revision": 1,
+    "publication_revision_id": "73673199-fee6-4463-8447-49c75551cd42",
+    "configuration_fingerprint": "0fb18f6570331d18eb798e4fd41845d7eb61de6e341604673b6fdd41d59687af",
+    "configuration_revision_id": "688e3cac-cae4-4525-b3fb-21f955a0ab58"
+  }
+}

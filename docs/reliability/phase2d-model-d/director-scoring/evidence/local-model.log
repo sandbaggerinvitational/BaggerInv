@@ -1,0 +1,26 @@
+NET CONFIG PASS
+ODDS Pre-Tournament
+MATCH 2026-R1-1
+MATCH 2026-R1-2
+MATCH 2026-R1-3
+MATCH 2026-R1-4
+MATCH 2026-R1-5
+MATCH 2026-R1-6
+DRAIN After Round 1
+ODDS After Round 1
+MATCH 2026-R2-1
+MATCH 2026-R2-2
+MATCH 2026-R2-3
+MATCH 2026-R2-4
+MATCH 2026-R2-5
+MATCH 2026-R2-6
+DRAIN After Round 2
+file:///private/tmp/model-d-manifest-local.mjs:28
+ await fs.writeFile('/private/tmp/model-d-manifest-blocker.json',JSON.stringify(manifest,null,2)+'\n');throw Error('MODEL_D_LOCAL_MANIFEST_DERIVED_TERMINAL');}}throw Error('LOCAL_DRAIN_BOUND_EXCEEDED');};
+                                                                                                             ^
+
+Error: MODEL_D_LOCAL_MANIFEST_DERIVED_TERMINAL
+    at drain (file:///private/tmp/model-d-manifest-local.mjs:28:110)
+    at async file:///private/tmp/model-d-manifest-local.mjs:58:2
+
+Node.js v26.7.0

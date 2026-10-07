@@ -1,0 +1,496 @@
+{
+  "status": "PASS",
+  "hosted": false,
+  "postgresql": 17,
+  "pgSafeupdate": true,
+  "manifestDigest": "0c78975fb2c4d1e4e700cd81e46a4c47059b42887d54e21634b7c687ebc2a368",
+  "referenceDigest": "97051c207a5d6fd001a238ee23dfd2abe5b0a38454688035b9344a3b17baefdf",
+  "replayDigest": "b9faee0602c3ef6ebd4079d13e33348a048d51a29ed61b70b49a19720e9cf4d9",
+  "scoreOperations": 432,
+  "completeFinalMatches": 24,
+  "strictPhaseOrder": true,
+  "matchFactsDigest": "9b0846558361dbda9b56e1b1883eb431abb220ab10ec30ba11e9d34c3fa62c00",
+  "normalizedOutputsDigest": "62b34ea2290d10f170061184f4cdbb8be9f4eee78d13305d9e8547fe7cc6debf",
+  "replayEquivalent": true,
+  "milestoneReads": [
+    {
+      "label": "Pre-Tournament",
+      "rows": [
+        {
+          "alias": "read_participant_home_view",
+          "ok": true
+        },
+        {
+          "alias": "read_tournament_live_view",
+          "ok": true
+        },
+        {
+          "alias": "read_leaderboards_core_view",
+          "ok": true
+        },
+        {
+          "alias": "read_my_match_view",
+          "ok": true
+        },
+        {
+          "alias": "read_current_guide_projection",
+          "ok": true
+        },
+        {
+          "alias": "read_participant_identity_context",
+          "ok": true
+        },
+        {
+          "alias": "read_production_net_skins_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_production_calcutta_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_published_odds_view",
+          "ok": true
+        },
+        {
+          "alias": "read_competition_derived_state",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "label": "During R1",
+      "rows": [
+        {
+          "alias": "read_participant_home_view",
+          "ok": true
+        },
+        {
+          "alias": "read_tournament_live_view",
+          "ok": true
+        },
+        {
+          "alias": "read_leaderboards_core_view",
+          "ok": true
+        },
+        {
+          "alias": "read_my_match_view",
+          "ok": true
+        },
+        {
+          "alias": "read_current_guide_projection",
+          "ok": true
+        },
+        {
+          "alias": "read_participant_identity_context",
+          "ok": true
+        },
+        {
+          "alias": "read_production_net_skins_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_production_calcutta_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_published_odds_view",
+          "ok": true
+        },
+        {
+          "alias": "read_competition_derived_state",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "label": "After R1",
+      "rows": [
+        {
+          "alias": "read_participant_home_view",
+          "ok": true
+        },
+        {
+          "alias": "read_tournament_live_view",
+          "ok": true
+        },
+        {
+          "alias": "read_leaderboards_core_view",
+          "ok": true
+        },
+        {
+          "alias": "read_my_match_view",
+          "ok": true
+        },
+        {
+          "alias": "read_current_guide_projection",
+          "ok": true
+        },
+        {
+          "alias": "read_participant_identity_context",
+          "ok": true
+        },
+        {
+          "alias": "read_production_net_skins_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_production_calcutta_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_published_odds_view",
+          "ok": true
+        },
+        {
+          "alias": "read_competition_derived_state",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "label": "During R2",
+      "rows": [
+        {
+          "alias": "read_participant_home_view",
+          "ok": true
+        },
+        {
+          "alias": "read_tournament_live_view",
+          "ok": true
+        },
+        {
+          "alias": "read_leaderboards_core_view",
+          "ok": true
+        },
+        {
+          "alias": "read_my_match_view",
+          "ok": true
+        },
+        {
+          "alias": "read_current_guide_projection",
+          "ok": true
+        },
+        {
+          "alias": "read_participant_identity_context",
+          "ok": true
+        },
+        {
+          "alias": "read_production_net_skins_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_production_calcutta_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_published_odds_view",
+          "ok": true
+        },
+        {
+          "alias": "read_competition_derived_state",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "label": "After R2",
+      "rows": [
+        {
+          "alias": "read_participant_home_view",
+          "ok": true
+        },
+        {
+          "alias": "read_tournament_live_view",
+          "ok": true
+        },
+        {
+          "alias": "read_leaderboards_core_view",
+          "ok": true
+        },
+        {
+          "alias": "read_my_match_view",
+          "ok": true
+        },
+        {
+          "alias": "read_current_guide_projection",
+          "ok": true
+        },
+        {
+          "alias": "read_participant_identity_context",
+          "ok": true
+        },
+        {
+          "alias": "read_production_net_skins_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_production_calcutta_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_published_odds_view",
+          "ok": true
+        },
+        {
+          "alias": "read_competition_derived_state",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "label": "R3 Pairings",
+      "rows": [
+        {
+          "alias": "read_participant_home_view",
+          "ok": true
+        },
+        {
+          "alias": "read_tournament_live_view",
+          "ok": true
+        },
+        {
+          "alias": "read_leaderboards_core_view",
+          "ok": true
+        },
+        {
+          "alias": "read_my_match_view",
+          "ok": true
+        },
+        {
+          "alias": "read_current_guide_projection",
+          "ok": true
+        },
+        {
+          "alias": "read_participant_identity_context",
+          "ok": true
+        },
+        {
+          "alias": "read_production_net_skins_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_production_calcutta_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_published_odds_view",
+          "ok": true
+        },
+        {
+          "alias": "read_competition_derived_state",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "label": "During R3",
+      "rows": [
+        {
+          "alias": "read_participant_home_view",
+          "ok": true
+        },
+        {
+          "alias": "read_tournament_live_view",
+          "ok": true
+        },
+        {
+          "alias": "read_leaderboards_core_view",
+          "ok": true
+        },
+        {
+          "alias": "read_my_match_view",
+          "ok": true
+        },
+        {
+          "alias": "read_current_guide_projection",
+          "ok": true
+        },
+        {
+          "alias": "read_participant_identity_context",
+          "ok": true
+        },
+        {
+          "alias": "read_production_net_skins_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_production_calcutta_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_published_odds_view",
+          "ok": true
+        },
+        {
+          "alias": "read_competition_derived_state",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "label": "After R3",
+      "rows": [
+        {
+          "alias": "read_participant_home_view",
+          "ok": true
+        },
+        {
+          "alias": "read_tournament_live_view",
+          "ok": true
+        },
+        {
+          "alias": "read_leaderboards_core_view",
+          "ok": true
+        },
+        {
+          "alias": "read_my_match_view",
+          "ok": true
+        },
+        {
+          "alias": "read_current_guide_projection",
+          "ok": true
+        },
+        {
+          "alias": "read_participant_identity_context",
+          "ok": true
+        },
+        {
+          "alias": "read_production_net_skins_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_production_calcutta_v1",
+          "ok": true
+        },
+        {
+          "alias": "read_published_odds_view",
+          "ok": true
+        },
+        {
+          "alias": "read_competition_derived_state",
+          "ok": true
+        }
+      ]
+    }
+  ],
+  "finalIntegrity": {
+    "final": 24,
+    "live": 0,
+    "upcoming": 0,
+    "scoreOperations": 432,
+    "scoreRows": 432,
+    "openPermissions": 0,
+    "netSkinsCurrent": 3,
+    "calcuttaCurrent": 1,
+    "derived": [
+      {
+        "count": 1,
+        "state": "PROVISIONAL",
+        "engine": "PROJECTION_EDITORIAL"
+      },
+      {
+        "count": 1,
+        "state": "PROVISIONAL",
+        "engine": "TEAM_MOMENTUM"
+      },
+      {
+        "count": 1,
+        "state": "OFFICIAL",
+        "engine": "TOURNAMENT_FINAL_RECAP"
+      },
+      {
+        "count": 1,
+        "state": "PROVISIONAL",
+        "engine": "TOURNAMENT_INTELLIGENCE"
+      },
+      {
+        "count": 1,
+        "state": "PROVISIONAL",
+        "engine": "TOURNAMENT_STORYLINES"
+      }
+    ],
+    "control": {
+      "state": "OFF",
+      "counts": {
+        "dead_letters": 0,
+        "pending_work": 0,
+        "active_claims": 0,
+        "active_leases": 0,
+        "expired_claims": 0,
+        "pending_intents": 0
+      },
+      "publicationUnknown": 0,
+      "reserved": 0,
+      "globalFaults": {
+        "plans": 0,
+        "consumed_uses": 0,
+        "cancelled_uses": 0,
+        "remaining_uses": 0,
+        "correction_required": false
+      }
+    },
+    "getWrites": 0
+  },
+  "getWrites": 0,
+  "calcuttaFinancialAssets": [
+    "P01"
+  ],
+  "calcuttaUnpurchasedPartnerPayout": 0,
+  "netSkinsCurrentRoundResults": 3,
+  "calcuttaCurrentResults": 1,
+  "finalRecapCurrentResults": 1,
+  "actualDirectorRoute": true,
+  "directorFinalizationQueueOnly": true,
+  "actualOddsCallbacksExecuted": true,
+  "queueOnlyFinalization": [
+    {
+      "round": 1,
+      "callbacksExecuted": true,
+      "beforeQueueUnchanged": true,
+      "counts": {
+        "dead_letters": 0,
+        "pending_work": 5,
+        "active_claims": 0,
+        "active_leases": 0,
+        "expired_claims": 0,
+        "pending_intents": 324
+      }
+    },
+    {
+      "round": 2,
+      "callbacksExecuted": true,
+      "beforeQueueUnchanged": true,
+      "counts": {
+        "dead_letters": 0,
+        "pending_work": 5,
+        "active_claims": 0,
+        "active_leases": 0,
+        "expired_claims": 0,
+        "pending_intents": 324
+      }
+    },
+    {
+      "round": 3,
+      "callbacksExecuted": true,
+      "beforeQueueUnchanged": true,
+      "counts": {
+        "dead_letters": 0,
+        "pending_work": 5,
+        "active_claims": 0,
+        "active_leases": 0,
+        "expired_claims": 0,
+        "pending_intents": 648
+      }
+    }
+  ],
+  "localFocusedPostgresPass": 63,
+  "localUnitPass": 40,
+  "manifestValidationPass": 6,
+  "broadPass": 4077,
+  "establishedFailures": 20,
+  "newFailures": 0,
+  "build": "PASS",
+  "mathHashesUnchanged": true,
+  "hostedContact": 0
+}

@@ -1,0 +1,156 @@
+{
+  "baseArtifactSha256": "6ab4743c3b7fe2053b5175e58ebeb95e1e523d6957a9e328eb63fcd7dedfde91",
+  "contract": "model-d-director-score-catalog-v1",
+  "expectedNormalizedSha256": "8658ededb1b3c66fcb8450c469f1eb7892844cc7cce95be1ce73ef8105946169",
+  "functions": 1162,
+  "patches": [
+    {
+      "add": [
+        {
+          "dependent": "function production_control.assert_model_d_director_score_v1(jsonb,boolean)",
+          "referenced": "language plpgsql",
+          "type": "n"
+        },
+        {
+          "dependent": "function production_control.assert_model_d_director_score_v1(jsonb,boolean)",
+          "referenced": "schema production_control",
+          "type": "n"
+        }
+      ],
+      "index": 9281,
+      "remove": [],
+      "section": "dependencies"
+    },
+    {
+      "add": [
+        {
+          "acl": [
+            "postgres=X/postgres"
+          ],
+          "anonExecute": false,
+          "authenticatedExecute": false,
+          "definer": true,
+          "definitionSha256": "0cf79607530a75723f6fa2eb6712ce5a9c544ea013722ca5ca0ed808cd591724",
+          "identity": "production_control.assert_model_d_director_score_v1(input jsonb, check_match boolean)",
+          "language": "plpgsql",
+          "leakproof": false,
+          "owner": "postgres",
+          "parallel": "u",
+          "publicExecute": false,
+          "searchPath": [
+            "search_path=pg_catalog"
+          ],
+          "serviceExecute": false,
+          "strict": false,
+          "volatile": "v"
+        }
+      ],
+      "index": 141,
+      "remove": [],
+      "section": "functions"
+    },
+    {
+      "add": [
+        {
+          "acl": [
+            "postgres=X/postgres"
+          ],
+          "anonExecute": false,
+          "authenticatedExecute": false,
+          "definer": true,
+          "definitionSha256": "9ff1741408d19bcd3ff0a7ec65c46844f0251471035f9e3a239dcf5d7ee22a1c",
+          "identity": "production_control.dispatch_certification_operation_v1(input jsonb, context jsonb, mutation boolean)",
+          "language": "plpgsql",
+          "leakproof": false,
+          "owner": "postgres",
+          "parallel": "u",
+          "publicExecute": false,
+          "searchPath": [
+            "search_path=pg_catalog"
+          ],
+          "serviceExecute": false,
+          "strict": false,
+          "volatile": "v"
+        }
+      ],
+      "index": 362,
+      "remove": [
+        {
+          "acl": [
+            "postgres=X/postgres"
+          ],
+          "anonExecute": false,
+          "authenticatedExecute": false,
+          "definer": true,
+          "definitionSha256": "302bdd50e593ee507e36d6382528ba09628ce2db6a1a828b304c6bf7f53d7147",
+          "identity": "production_control.dispatch_certification_operation_v1(input jsonb, context jsonb, mutation boolean)",
+          "language": "plpgsql",
+          "leakproof": false,
+          "owner": "postgres",
+          "parallel": "u",
+          "publicExecute": false,
+          "searchPath": [
+            "search_path=pg_catalog"
+          ],
+          "serviceExecute": false,
+          "strict": false,
+          "volatile": "v"
+        }
+      ],
+      "section": "functions"
+    },
+    {
+      "add": [
+        {
+          "acl": [
+            "postgres=X/postgres",
+            "service_role=X/postgres"
+          ],
+          "anonExecute": false,
+          "authenticatedExecute": false,
+          "definer": true,
+          "definitionSha256": "f6b3cd2a5b0618726af0b1d2e4f9d5d6989f8bfb8c90420c432da4edb2958559",
+          "identity": "public.admit_certification_operation_v1(input jsonb)",
+          "language": "plpgsql",
+          "leakproof": false,
+          "owner": "postgres",
+          "parallel": "u",
+          "publicExecute": false,
+          "searchPath": [
+            "search_path=pg_catalog"
+          ],
+          "serviceExecute": true,
+          "strict": false,
+          "volatile": "v"
+        }
+      ],
+      "index": 695,
+      "remove": [
+        {
+          "acl": [
+            "postgres=X/postgres",
+            "service_role=X/postgres"
+          ],
+          "anonExecute": false,
+          "authenticatedExecute": false,
+          "definer": true,
+          "definitionSha256": "7944b5a72ab2362d26e5b5b07a694a4c7085315610cc58508d3b7518d2ced944",
+          "identity": "public.admit_certification_operation_v1(input jsonb)",
+          "language": "plpgsql",
+          "leakproof": false,
+          "owner": "postgres",
+          "parallel": "u",
+          "publicExecute": false,
+          "searchPath": [
+            "search_path=pg_catalog"
+          ],
+          "serviceExecute": true,
+          "strict": false,
+          "volatile": "v"
+        }
+      ],
+      "section": "functions"
+    }
+  ],
+  "rlsTables": 281
+}

@@ -1,0 +1,342 @@
+{
+  "hosted": false,
+  "postgres": 17,
+  "safeupdate": "on",
+  "cases": [
+    {
+      "name": "all eight predecessor hashes checked before any change; mismatch rolls back",
+      "result": "PASS"
+    },
+    {
+      "name": "atomic install/replay preserve eight owners/ACLs/security/search_paths, RLS and v1-v7/attempt history",
+      "result": "PASS"
+    },
+    {
+      "name": "private core ACL drift blocks replay instead of repairing/broadening roles",
+      "result": "PASS"
+    },
+    {
+      "name": "empty revision 2 preserved; lawful Director nonempty successor 3; no fabricated result",
+      "result": "PASS"
+    },
+    {
+      "name": "uncomputed result cannot be published or fabricated by Director input",
+      "result": "PASS"
+    },
+    {
+      "name": "genuine match control source creates canonical demand; native SDK consumer/common worker calculates immutable UNPUBLISHED A",
+      "result": "PASS"
+    },
+    {
+      "name": "unpublished participant read withholds market/result; private Director management remains allowed",
+      "result": "PASS"
+    },
+    {
+      "name": "synthetic Director publishes exact current result; pointer/revision/receipt/two audits; no result or financial math mutation",
+      "result": "PASS"
+    },
+    {
+      "name": "exact replay is idempotent; fresh duplicate for same current result adds no publication revision",
+      "result": "PASS"
+    },
+    {
+      "name": "same operation ID conflicting payload denied; no new result/publication",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong auction CAS denied",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong auction fingerprint CAS denied",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong source CAS denied",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong result CAS denied",
+      "result": "PASS"
+    },
+    {
+      "name": "stale publication revision CAS denied",
+      "result": "PASS"
+    },
+    {
+      "name": "source advance makes A stale; publishing A denied; native Queue calculates current B and Director confirms it",
+      "result": "PASS"
+    },
+    {
+      "name": "published auction remains financially locked; immutable A and empty2 history preserved",
+      "result": "PASS"
+    },
+    {
+      "name": "participant A publication denied",
+      "result": "PASS"
+    },
+    {
+      "name": "participant B publication denied",
+      "result": "PASS"
+    },
+    {
+      "name": "signed-out publication denied",
+      "result": "PASS"
+    },
+    {
+      "name": "anon publication denied",
+      "result": "PASS"
+    },
+    {
+      "name": "ordinary authenticated publication denied",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong Director publication denied",
+      "result": "PASS"
+    },
+    {
+      "name": "client resource denied before publication",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong tournament denied before publication",
+      "result": "PASS"
+    },
+    {
+      "name": "arbitrary calculated result denied before publication",
+      "result": "PASS"
+    },
+    {
+      "name": "arbitrary payload denied before publication",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong resource exact database binding denied",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong project exact database binding denied",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong deployment exact database binding denied",
+      "result": "PASS"
+    },
+    {
+      "name": "wrong release exact database binding denied",
+      "result": "PASS"
+    },
+    {
+      "name": "Production exact database binding denied",
+      "result": "PASS"
+    },
+    {
+      "name": "old Preview exact database binding denied",
+      "result": "PASS"
+    },
+    {
+      "name": "development identity cannot use bound Certification Director publisher",
+      "result": "PASS"
+    },
+    {
+      "name": "production identity cannot use bound Certification Director publisher",
+      "result": "PASS"
+    },
+    {
+      "name": "bare service_role cannot publish; worker adapter forbids publication; private helpers denied to all client SQL roles",
+      "result": "PASS"
+    },
+    {
+      "name": "Production publication route unchanged/Preview 404; Production core guard remains; generic isolated Preview cannot select publication family",
+      "result": "PASS"
+    },
+    {
+      "name": "published participant-safe read shows intended market/result, never raw receipts/tokens/source tree/supervisor; private table access denied",
+      "result": "PASS"
+    },
+    {
+      "name": "nonmember and injected private-reader fields cannot obtain a participant projection",
+      "result": "PASS"
+    },
+    {
+      "name": "lost application ACK reconciles authoritative publication receipt; replay never duplicates current publication",
+      "result": "PASS"
+    },
+    {
+      "name": "complete drain/reconcile; STOP/disabled/paused; unchanged RLS; no Odds/FinalRecap/Google work",
+      "result": "PASS"
+    }
+  ],
+  "calculation": {
+    "auction": 3,
+    "result": 1,
+    "phase": "PROVISIONAL",
+    "pot": 1,
+    "value": 0.4,
+    "manualProcessor": 0,
+    "manualWorker": 0
+  },
+  "beforeRead": {
+    "ok": true,
+    "data": {
+      "state": "AUCTION_COMPLETE",
+      "market": null,
+      "result": null,
+      "query_ms": 3.53,
+      "revision": "calcutta-v1:1:3:3:1:AUCTION_COMPLETE:UNPUBLISHED",
+      "freshness": {
+        "stale": false,
+        "updating": false,
+        "published_at": null,
+        "calculated_at": "2026-10-07T16:00:29.390464-05:00",
+        "configured_at": "2026-10-07T16:00:17.190234-05:00",
+        "source_fingerprint": "b1fe35fd3d2150fdf2673c3d997bdb51c60bf4192a7f2a49ad3453efe77fc97e",
+        "auction_recorded_at": "2026-10-07T16:00:18.704779-05:00",
+        "lifecycle_compatible": false,
+        "original_result_source_fingerprint": "b1fe35fd3d2150fdf2673c3d997bdb51c60bf4192a7f2a49ad3453efe77fc97e"
+      },
+      "published": false,
+      "currency_code": "USD",
+      "tournament_id": "2026",
+      "result_revision": 1,
+      "auction_revision": 3,
+      "contract_version": "production-calcutta-v1",
+      "publication_state": "UNPUBLISHED",
+      "publication_policy": "DIRECTOR_CONTROLLED_PARTICIPANT_FULL_MARKET",
+      "result_fingerprint": "0739376f9bc5a8d45224e590e4bebcd8227bd48d9de25c1b0399c31c307a152c",
+      "auction_fingerprint": "ede6dc33d509ae960d2418aa1cf232aaffe4a484787a9bd1f8e046f352e5836d",
+      "publication_revision": 3,
+      "configuration_revision": 1,
+      "configuration_fingerprint": "84e74cd801c04d0b168bcd1c87503d45a05c95e54893d7d2f616b56071aa5fe4"
+    }
+  },
+  "publishedRead": {
+    "ok": true,
+    "data": {
+      "state": "AUCTION_COMPLETE",
+      "market": {
+        "pot": "1",
+        "purchases": [
+          {
+            "owners": [
+              {
+                "player": {
+                  "player_id": "P12",
+                  "display_name": "Synthetic Certification Participant A"
+                },
+                "ownership_fraction": "1"
+              }
+            ],
+            "player": {
+              "player_id": "P01",
+              "display_name": "Synthetic Certification Director"
+            },
+            "purchase_price": "1"
+          }
+        ]
+      },
+      "result": {
+        "pot": 1,
+        "year": 2026,
+        "golfers": [
+          {
+            "roi": -0.6,
+            "rank": 1,
+            "player": {
+              "id": "P01",
+              "name": "Synthetic Certification Director"
+            },
+            "rounds": [],
+            "tieSize": 1,
+            "playerId": "P01",
+            "netProfit": -0.6,
+            "totalPoints": 0,
+            "purchasePrice": 1,
+            "remainingUpside": 0.4,
+            "currentPayoutValue": 0.4,
+            "guaranteedWinnings": 0,
+            "totalPayoutPercent": 0.4,
+            "overallPayoutPercent": 0.4
+          }
+        ],
+        "available": true,
+        "portfolios": [
+          {
+            "roi": -0.6,
+            "rank": 1,
+            "owner": {
+              "id": "P12",
+              "name": "Synthetic Certification Participant A"
+            },
+            "ownerId": "P12",
+            "netProfit": -0.6,
+            "investments": [
+              {
+                "roi": -0.6,
+                "player": {
+                  "id": "P01",
+                  "name": "Synthetic Certification Director"
+                },
+                "playerId": "P01",
+                "netProfit": -0.6,
+                "ownership": 1,
+                "purchasePrice": 1,
+                "currentPayoutValue": 0.4,
+                "guaranteedWinnings": 0
+              }
+            ],
+            "purchaseCost": 1,
+            "currentPayoutValue": 0.4,
+            "guaranteedWinnings": 0
+          }
+        ],
+        "completedRounds": [],
+        "remainingPrizePool": 1,
+        "tournamentComplete": false,
+        "distributedPrizePool": 0.4,
+        "guaranteedDistributed": 0
+      },
+      "query_ms": 4.026,
+      "revision": "calcutta-v1:1:3:4:2:AUCTION_COMPLETE:PUBLISHED",
+      "freshness": {
+        "stale": false,
+        "updating": false,
+        "published_at": "2026-10-07T16:00:29.931134-05:00",
+        "calculated_at": "2026-10-07T16:00:41.629483-05:00",
+        "configured_at": "2026-10-07T16:00:17.190234-05:00",
+        "source_fingerprint": "8aee593fcb9bbfc2696950a189c6f03e1b6f83a9a090e25c935517040d1d8dd4",
+        "auction_recorded_at": "2026-10-07T16:00:18.704779-05:00",
+        "lifecycle_compatible": false,
+        "original_result_source_fingerprint": "8aee593fcb9bbfc2696950a189c6f03e1b6f83a9a090e25c935517040d1d8dd4"
+      },
+      "published": true,
+      "currency_code": "USD",
+      "tournament_id": "2026",
+      "result_revision": 2,
+      "auction_revision": 3,
+      "contract_version": "production-calcutta-v1",
+      "publication_state": "PUBLISHED",
+      "publication_policy": "DIRECTOR_CONTROLLED_PARTICIPANT_FULL_MARKET",
+      "result_fingerprint": "0739376f9bc5a8d45224e590e4bebcd8227bd48d9de25c1b0399c31c307a152c",
+      "auction_fingerprint": "ede6dc33d509ae960d2418aa1cf232aaffe4a484787a9bd1f8e046f352e5836d",
+      "publication_revision": 4,
+      "configuration_revision": 1,
+      "configuration_fingerprint": "84e74cd801c04d0b168bcd1c87503d45a05c95e54893d7d2f616b56071aa5fe4"
+    }
+  },
+  "final": {
+    "supervisor": "OFF",
+    "counts": {
+      "dead_letters": 0,
+      "pending_work": 0,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 0
+    },
+    "publication": "PUBLISHED",
+    "auction": 3,
+    "result": 2
+  }
+}

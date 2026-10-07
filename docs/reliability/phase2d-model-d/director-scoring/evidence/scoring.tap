@@ -1,0 +1,17 @@
+✔ best ball uses the lowest player net score on each side (0.48525ms)
+✔ live match status reports holes won and the through-hole position (0.318167ms)
+✔ scramble applies the team stroke allowance to its gross score (0.051334ms)
+✔ singles awards all three points for the overall match (0.17ms)
+✔ singles closes early once the lead exceeds holes remaining (0.389958ms)
+✔ a clinched Singles match remains scoreable through all 18 holes (0.180041ms)
+✔ scorecard completeness requires every hole for every supported format (0.080834ms)
+✔ best ball and scramble award front, back, and overall independently (0.091625ms)
+✔ match codes are compared by hash and are case-insensitive (0.294709ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 41.304916

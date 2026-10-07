@@ -1,0 +1,48 @@
+✔ exact predecessor rejects purchased P01 with unpurchased Scramble P02 with null-ranking TypeError (1.886ms)
+✔ SC purchase set P01,P02, tie false: context and financial eligibility separate (12.011792ms)
+✔ SC purchase set P01,P02, tie true: context and financial eligibility separate (0.517917ms)
+✔ SC purchase set P01, tie false: context and financial eligibility separate (0.333417ms)
+✔ SC purchase set P01, tie true: context and financial eligibility separate (0.295458ms)
+✔ SC purchase set P02, tie false: context and financial eligibility separate (0.283666ms)
+✔ SC purchase set P02, tie true: context and financial eligibility separate (0.274625ms)
+✔ SC purchase set none, tie false: context and financial eligibility separate (0.060958ms)
+✔ SC purchase set none, tie true: context and financial eligibility separate (0.059ms)
+✔ SC purchase set P01,P04, tie false: context and financial eligibility separate (0.468875ms)
+✔ SC purchase set P01,P04, tie true: context and financial eligibility separate (0.4215ms)
+✔ BB partial purchase preserves existing individual policy (0.734584ms)
+✔ SI partial purchase preserves existing individual policy (0.371042ms)
+✔ malformed canonical Scramble pairing produces typed failure, never empty payout (0.082458ms)
+✔ purchased-only ownership, tie replay and existing failure classification (2.372167ms)
+✔ Production retains post-commit callback policy (0.369792ms)
+✔ Original Certification retains its registered callback policy (1.229792ms)
+✔ Only validated Model D registration selects private Queue delivery (0.219208ms)
+✔ Invalid registered context denied: BAGGER_CERTIFICATION_RESOURCE_ID (0.480959ms)
+✔ Invalid registered context denied: VERCEL_PROJECT_ID (0.210917ms)
+✔ Invalid registered context denied: VERCEL_GIT_COMMIT_REF (0.157292ms)
+✔ Invalid registered context denied: VERCEL_ENV (0.109042ms)
+✔ Invalid registered context denied: VERCEL_DEPLOYMENT_ID (0.104625ms)
+✔ Invalid registered context denied: SUPABASE_SCORING_MIRROR_SECRET_KEY (0.202083ms)
+✔ Client-like environment profile cannot mint Model D registration (0.297958ms)
+✔ Model D commits receipt and refreshes caches without invoking derived processors (12.390584ms)
+✔ Production retains actual callback body (0.993125ms)
+✔ Original Certification retains actual callback body (0.280459ms)
+✔ Unauthorized finalization cannot commit or schedule processing (0.263542ms)
+✔ Other Model D lifecycle post-commit responsibilities remain intact (0.366792ms)
+✔ best ball uses the lowest player net score on each side (0.54025ms)
+✔ live match status reports holes won and the through-hole position (0.894375ms)
+✔ scramble applies the team stroke allowance to its gross score (0.139375ms)
+✔ singles awards all three points for the overall match (0.375208ms)
+✔ singles closes early once the lead exceeds holes remaining (0.548792ms)
+✔ a clinched Singles match remains scoreable through all 18 holes (0.186167ms)
+✔ scorecard completeness requires every hole for every supported format (0.080542ms)
+✔ best ball and scramble award front, back, and overall independently (0.098875ms)
+✔ match codes are compared by hash and are case-insensitive (0.352459ms)
+✔ a model-only tournament cannot freeze a manifest while actual lifecycle hooks are not Queue-only (1.058334ms)
+ℹ tests 40
+ℹ suites 0
+ℹ pass 40
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 86.4605

@@ -1,0 +1,47 @@
+{
+  "status": "BLOCKED",
+  "hosted": false,
+  "stage": "After Round 2",
+  "scoredMatches": 12,
+  "scoreOperations": 216,
+  "roundsFinal": [
+    1,
+    2
+  ],
+  "round3Started": false,
+  "supervisorState": "HALTED",
+  "counts": {
+    "dead_letters": 1,
+    "pending_work": 2,
+    "active_claims": 0,
+    "active_leases": 0,
+    "expired_claims": 0,
+    "pending_intents": 276
+  },
+  "publication": {
+    "unknown": 0,
+    "accepted": 0,
+    "reserved": 0,
+    "cancelled": 0,
+    "delivered": 1
+  },
+  "terminalJobs": [
+    {
+      "cycle": 1,
+      "engine": "CALCUTTA",
+      "status": "FAILED",
+      "attempts": 1,
+      "errorCode": "TYPEERROR",
+      "safeError": "Calcutta recalculation is temporarily unavailable.",
+      "deadLetter": "2026-10-07T13:21:35.647202-05:00"
+    }
+  ],
+  "reproductions": 2,
+  "canonicalCalculatorException": {
+    "status": "FAIL",
+    "name": "TypeError",
+    "message": "Cannot read properties of null (reading 'map')",
+    "stack": "TypeError: Cannot read properties of null (reading 'map')\n    at buildCalcuttaModel (file:///private/tmp/bagger-worker-provider-portability/lib/calcutta.js:384:68)\n    at calcuttaPublicationRecords (file:///private/tmp/bagger-worker-provider-portability/lib/calcutta.js:278:17)\n    at calculateCalcuttaFromCanonicalRoundResults (file:///private/tmp/bagger-worker-provider-portability/lib/calcutta-supabase.js:243:23)\n    at calculateProductionFullNetCalcutta (file:///private/tmp/bagger-worker-provider-portability/lib/production-full-net.js:110:16)\n    at file:///private/tmp/model-d-calcutta-diagnostic.mjs:61:153"
+  },
+  "rootCause": "One purchased P01 asset leaves an incomplete P01/P02 Scramble pairing in payout ranking after calcuttaPublicationRecords filters candidates to purchased players. rankScrambleTeams returns null; buildCalcuttaModel calls map on null."
+}

@@ -1,0 +1,204 @@
+{
+  "type": "object",
+  "required": [
+    "version",
+    "profile",
+    "status",
+    "startingCheckpoint",
+    "implementation",
+    "actorCoverage",
+    "phases",
+    "preparation",
+    "preTournamentCommands",
+    "oddsConfiguration",
+    "matches",
+    "tournament",
+    "netSkins",
+    "calcutta",
+    "odds",
+    "finalRecap",
+    "derivedDemand",
+    "shippingAssertions",
+    "failureCheckpoints",
+    "finalIntegrity",
+    "authority"
+  ],
+  "properties": {
+    "version": {
+      "const": "model-d-d10-execution-v1"
+    },
+    "profile": {
+      "const": "PART2C_DRESS_REHEARSAL"
+    },
+    "status": {
+      "const": "CERTIFIED"
+    },
+    "startingCheckpoint": {
+      "type": "object"
+    },
+    "implementation": {
+      "type": "object"
+    },
+    "actorCoverage": {
+      "type": "object"
+    },
+    "phases": {
+      "type": "array",
+      "minItems": 28,
+      "maxItems": 28
+    },
+    "preparation": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 24
+    },
+    "preTournamentCommands": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7
+    },
+    "oddsConfiguration": {
+      "type": "object"
+    },
+    "matches": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "required": [
+          "matchId",
+          "round",
+          "format",
+          "actor",
+          "providerIdentity",
+          "route",
+          "family",
+          "auditActor",
+          "participants",
+          "operations",
+          "lifecycle",
+          "expectedResult"
+        ],
+        "properties": {
+          "matchId": {
+            "type": "string",
+            "pattern": "^2026-R[123]-[0-9]+$"
+          },
+          "round": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "format": {
+            "enum": [
+              "BB",
+              "SC",
+              "SI"
+            ]
+          },
+          "actor": {
+            "const": "DIRECTOR_CANONICAL_SCORING_OPERATION"
+          },
+          "providerIdentity": {
+            "const": "DIRECTOR_P01"
+          },
+          "route": {
+            "const": "/api/director/canonical-operations"
+          },
+          "family": {
+            "const": "DIRECTOR_CANONICAL_SCORE"
+          },
+          "auditActor": {
+            "const": "DIRECTOR"
+          },
+          "participants": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 2,
+            "maxItems": 4
+          },
+          "operations": {
+            "type": "array",
+            "minItems": 18,
+            "maxItems": 18,
+            "items": {
+              "type": "object",
+              "required": [
+                "operationId",
+                "payload",
+                "expectedSuccessorRevision"
+              ],
+              "properties": {
+                "operationId": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                },
+                "payload": {
+                  "type": "object",
+                  "required": [
+                    "matchId",
+                    "holeNumber",
+                    "team1GrossScores",
+                    "team2GrossScores",
+                    "expectedMatchRevision",
+                    "expectedRevision",
+                    "expectedPermissionRevision",
+                    "expectedRound",
+                    "expectedFormat"
+                  ]
+                },
+                "expectedSuccessorRevision": {
+                  "type": "integer"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "lifecycle": {
+            "type": "array"
+          },
+          "expectedResult": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "tournament": {
+      "type": "object"
+    },
+    "netSkins": {
+      "type": "object"
+    },
+    "calcutta": {
+      "type": "object"
+    },
+    "odds": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5
+    },
+    "finalRecap": {
+      "type": "object"
+    },
+    "derivedDemand": {
+      "type": "object"
+    },
+    "shippingAssertions": {
+      "type": "object"
+    },
+    "failureCheckpoints": {
+      "type": "array"
+    },
+    "finalIntegrity": {
+      "type": "object"
+    },
+    "authority": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

@@ -24,7 +24,7 @@ export async function certificationDirectorStack(fixture,{loseResponse,afterData
   const input=JSON.parse(init.body).input;calls.push({name,input});
   await beforeDatabase?.(name,input);
   const result=sqlResult(fixture.cluster,fixture.database,
-   `\\set VERBOSITY verbose\nset role service_role;select public.${name}(${jsonLiteral(input)});`,{role:'service_role'});
+   `\\set VERBOSITY verbose\nset role service_role;set request.headers=${"'"+JSON.stringify(Object.fromEntries(Object.entries(init.headers).filter(([k])=>k.startsWith("x-bagger-")))).replaceAll("'","''")+"'"};select public.${name}(${jsonLiteral(input)});`,{role:'service_role'});
   if(result.status!==0){
    const error=/ERROR:\s+([0-9A-Z]{5}):\s*([^\n]+)/.exec(result.stderr);assert.ok(error,result.stderr);
    calls.at(-1).error={sqlstate:error[1],message:error[2],detail:result.stderr};

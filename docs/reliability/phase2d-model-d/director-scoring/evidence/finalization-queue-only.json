@@ -1,0 +1,207 @@
+{
+  "hosted": false,
+  "supervisorStarted": false,
+  "queueInvocations": 2,
+  "callbacks": [],
+  "before": {
+    "jobs": [
+      {
+        "engine": "TEAM_MOMENTUM",
+        "status": "PENDING",
+        "attempts": 0
+      },
+      {
+        "engine": "TOURNAMENT_STORYLINES",
+        "status": "PENDING",
+        "attempts": 0
+      },
+      {
+        "engine": "TOURNAMENT_INTELLIGENCE",
+        "status": "PENDING",
+        "attempts": 0
+      },
+      {
+        "engine": "PROJECTION_EDITORIAL",
+        "status": "PENDING",
+        "attempts": 0
+      },
+      {
+        "engine": "TOURNAMENT_FINAL_RECAP",
+        "status": "PENDING",
+        "attempts": 0
+      }
+    ],
+    "snapshots": 0,
+    "supervisor": "OFF",
+    "calcuttaResults": 0
+  },
+  "after": {
+    "jobs": [
+      {
+        "engine": "TEAM_MOMENTUM",
+        "status": "PENDING",
+        "attempts": 0
+      },
+      {
+        "engine": "TOURNAMENT_STORYLINES",
+        "status": "PENDING",
+        "attempts": 0
+      },
+      {
+        "engine": "TOURNAMENT_INTELLIGENCE",
+        "status": "PENDING",
+        "attempts": 0
+      },
+      {
+        "engine": "PROJECTION_EDITORIAL",
+        "status": "PENDING",
+        "attempts": 0
+      },
+      {
+        "engine": "TOURNAMENT_FINAL_RECAP",
+        "status": "PENDING",
+        "attempts": 0
+      }
+    ],
+    "snapshots": 0,
+    "supervisor": "OFF",
+    "calcuttaResults": 0
+  },
+  "directOutputs": 0,
+  "materialShortcut": false,
+  "beforeQueueCounts": {
+    "dead_letters": 0,
+    "pending_work": 4,
+    "active_claims": 0,
+    "active_leases": 0,
+    "expired_claims": 0,
+    "pending_intents": 18
+  },
+  "replay": true,
+  "queueCycles": [
+    {
+      "ok": true,
+      "invocation_id": "b7f1de7f-0a26-4d0c-9122-279d6f1d6070",
+      "outcome": "SUCCEEDED",
+      "cycles": 1
+    },
+    {
+      "ok": true,
+      "invocation_id": "b9023d85-e558-43b9-892f-d5503cde613f",
+      "outcome": "SUCCEEDED",
+      "cycles": 1
+    }
+  ],
+  "afterQueue": {
+    "jobs": [
+      {
+        "engine": "TEAM_MOMENTUM",
+        "status": "SUCCEEDED",
+        "attempts": 1
+      },
+      {
+        "engine": "TOURNAMENT_STORYLINES",
+        "status": "SUCCEEDED",
+        "attempts": 1
+      },
+      {
+        "engine": "TOURNAMENT_FINAL_RECAP",
+        "status": "PENDING",
+        "attempts": 0
+      },
+      {
+        "engine": "TOURNAMENT_INTELLIGENCE",
+        "status": "SUCCEEDED",
+        "attempts": 0
+      },
+      {
+        "engine": "PROJECTION_EDITORIAL",
+        "status": "SUCCEEDED",
+        "attempts": 0
+      }
+    ],
+    "snapshots": 4,
+    "supervisor": "OFF",
+    "calcuttaResults": 0
+  },
+  "finalCounts": {
+    "dead_letters": 0,
+    "pending_work": 0,
+    "active_claims": 0,
+    "active_leases": 0,
+    "expired_claims": 0,
+    "pending_intents": 0
+  },
+  "queueOnly": true,
+  "finalControl": {
+    "ok": true,
+    "epoch": "6b0c84dd-af3d-491e-9a27-202d36740957",
+    "slots": 1,
+    "state": "OFF",
+    "budget": 1,
+    "counts": {
+      "dead_letters": 0,
+      "pending_work": 0,
+      "active_claims": 0,
+      "active_leases": 0,
+      "expired_claims": 0,
+      "pending_intents": 0
+    },
+    "expiry": "2026-10-07T15:59:33.866139-05:00",
+    "reason": "OWNER_STOP",
+    "enabled": false,
+    "engines": [
+      "TEAM_MOMENTUM",
+      "TOURNAMENT_STORYLINES",
+      "TOURNAMENT_INTELLIGENCE",
+      "PROJECTION_EDITORIAL",
+      "CALCUTTA",
+      "TOURNAMENT_FINAL_RECAP"
+    ],
+    "consumed": 1,
+    "degraded": false,
+    "reserved": 0,
+    "revision": 5,
+    "remaining": 0,
+    "deployment": {
+      "git_branch": "codex/certification-model-d",
+      "deployment_id": "dpl_LocalModelDCertification",
+      "release_commit": "dddddddddddddddddddddddddddddddddddddddd",
+      "vercel_team_id": "team_kPw5zaib8uaQJALAwj4fWI6R",
+      "deployment_class": "preview",
+      "deployment_origin": "https://local-model-d-certification.vercel.app",
+      "vercel_project_id": "prj_LocalModelDCertification"
+    },
+    "publication": {
+      "unknown": 0,
+      "accepted": 0,
+      "reserved": 0,
+      "cancelled": 0,
+      "delivered": 1
+    },
+    "halt_latched": false,
+    "global_faults": {
+      "plans": 0,
+      "consumed_uses": 0,
+      "cancelled_uses": 0,
+      "remaining_uses": 0,
+      "correction_required": false
+    },
+    "last_invocation": "b9023d85-e558-43b9-892f-d5503cde613f",
+    "last_halt_reason": null,
+    "next_eligible_at": "2026-10-07T15:58:33.866139-05:00",
+    "delivery_certified": false,
+    "schedule_installed": false,
+    "last_successful_tick": "2026-10-07T15:58:44.110067-05:00",
+    "engine_scope_contract": "certification-model-d-execution-v1",
+    "consecutive_global_failures": 0,
+    "consecutive_invocation_failures": 0
+  },
+  "match": {
+    "id": "2026-R1-2",
+    "final": 1,
+    "live": 0,
+    "upcoming": 23,
+    "scores": 18
+  }
+}
