@@ -1,0 +1,190 @@
+{
+  "base": "9ed929788b05d756b4eff6f72d0ec24821f3636e",
+  "allEqual": true,
+  "artifacts": {
+    "supabase/model_d_bootstrap/manifest.json": {
+      "base": "c50d395eeab4a2e6b35815537b4e27b42af8c93df003d31afdda0d9de146d1b5",
+      "current": "c50d395eeab4a2e6b35815537b4e27b42af8c93df003d31afdda0d9de146d1b5"
+    },
+    "supabase/model_d_bootstrap/schema.sql": {
+      "base": "a82345ddbaa01dadb153baeed1973f30290cf7084ff8038bf50e247122fb5ae2",
+      "current": "a82345ddbaa01dadb153baeed1973f30290cf7084ff8038bf50e247122fb5ae2"
+    },
+    "supabase/model_d_bootstrap/static-contracts.sql": {
+      "base": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d",
+      "current": "7b93c4235a5c18cdd68be56b13df26ffcab1d9af8f3b3d9b27895cd6b8afb27d"
+    },
+    "supabase/model_d_bootstrap/catalog-manifest.json": {
+      "base": "e9c25ae8bcc5ced1aebe51ef304ef0d188ef2989546f8a8a6d5ad9141dd53c6f",
+      "current": "e9c25ae8bcc5ced1aebe51ef304ef0d188ef2989546f8a8a6d5ad9141dd53c6f"
+    },
+    "config/certification-model-d-registration.json": {
+      "base": "5abb4a915fb7e4647511b03fe993ec4ea8ee6a25ded1c31caeff050ee90b386c",
+      "current": "5abb4a915fb7e4647511b03fe993ec4ea8ee6a25ded1c31caeff050ee90b386c"
+    },
+    "tools/reliability/certification-model-d-fixture.mjs": {
+      "base": "34afba9bd7cd6a527b394db2a8d722f9ea176295ec3891bc0737a489e0418d8e",
+      "current": "34afba9bd7cd6a527b394db2a8d722f9ea176295ec3891bc0737a489e0418d8e"
+    },
+    "tools/reliability/certification-model-d-fixture.sql": {
+      "base": "f6294d7cd89f2ab866f8cf69aa35292239002b1a6c73024b80f7aa6f5eaed271",
+      "current": "f6294d7cd89f2ab866f8cf69aa35292239002b1a6c73024b80f7aa6f5eaed271"
+    },
+    "lib/certification-worker-engines.js": {
+      "base": "60f70d475d1c8bc8ed9ad8c057212a6ac6f64c7d2edb956aafd41740bbba2122",
+      "current": "60f70d475d1c8bc8ed9ad8c057212a6ac6f64c7d2edb956aafd41740bbba2122"
+    },
+    "lib/certification-worker-supervision.js": {
+      "base": "54e840e071ef6e6888f43ea73910f42e0c279e85cf947ae84ae5f4f1c1bb193e",
+      "current": "54e840e071ef6e6888f43ea73910f42e0c279e85cf947ae84ae5f4f1c1bb193e"
+    },
+    "lib/score-derived-worker.js": {
+      "base": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d",
+      "current": "d53fb87eaf09997e78e2d99dc76b9fce3623989fca862350e82997d29473888d"
+    },
+    "lib/certification-queue-supervision.js": {
+      "base": "fd658d16c65ea9ded97a8d7f3e65463e759574a3f1a51d1a46b658060f5577b1",
+      "current": "fd658d16c65ea9ded97a8d7f3e65463e759574a3f1a51d1a46b658060f5577b1"
+    },
+    "lib/certification-queue-envelope.js": {
+      "base": "ae306a00921b1b6e07887a2203713b9ba5daa44cafda5be0e4c55f5b567b2b3d",
+      "current": "ae306a00921b1b6e07887a2203713b9ba5daa44cafda5be0e4c55f5b567b2b3d"
+    },
+    "lib/certification-queue-timing.js": {
+      "base": "44c24068ef9a7d581a939c2e387c8ebbf4622bb0559413948d0fdc77061d2742",
+      "current": "44c24068ef9a7d581a939c2e387c8ebbf4622bb0559413948d0fdc77061d2742"
+    },
+    "package-lock.json": {
+      "base": "abf89699407983d173e997f62aa1083e8ae5cd34b81f33904ebba9744d318d43",
+      "current": "abf89699407983d173e997f62aa1083e8ae5cd34b81f33904ebba9744d318d43"
+    },
+    "vercel.certification-queue.json": {
+      "base": "40fa049deff928cda07b8a235ba227ffb0320fb365b1de942065993da5f66ffb",
+      "current": "40fa049deff928cda07b8a235ba227ffb0320fb365b1de942065993da5f66ffb"
+    },
+    "vercel.json": {
+      "base": "97778a3fe7fafb0a71dbe06d3c687c9c19d2d95079567f7a2e1cfa94588ebd2c",
+      "current": "97778a3fe7fafb0a71dbe06d3c687c9c19d2d95079567f7a2e1cfa94588ebd2c"
+    },
+    "supabase/production_incremental/account-deletion-attribution-minimization.sql": {
+      "base": "0dfc1cc7bbf764d8c720df5e0593c4707974b1de8b27858e6d9e2f46a5935928",
+      "current": "0dfc1cc7bbf764d8c720df5e0593c4707974b1de8b27858e6d9e2f46a5935928"
+    },
+    "supabase/production_incremental/account-deletion-completion-queue.sql": {
+      "base": "eba4c339ea83f39ae7581da5da4375c1ba2a4aa22fb84ef777a9662405823ac7",
+      "current": "eba4c339ea83f39ae7581da5da4375c1ba2a4aa22fb84ef777a9662405823ac7"
+    },
+    "supabase/production_incremental/account-deletion-completion-work-item.sql": {
+      "base": "3c064c20ff4b0a494e42bac48fe0d5978adc33b2257666fb7204d1cd290eb8af",
+      "current": "3c064c20ff4b0a494e42bac48fe0d5978adc33b2257666fb7204d1cd290eb8af"
+    },
+    "supabase/production_incremental/account-deletion-external-identifier-redaction.sql": {
+      "base": "7de5d02083b82a0e0704cca7af90be714899b1997c040cd2d72f20763b2d61ca",
+      "current": "7de5d02083b82a0e0704cca7af90be714899b1997c040cd2d72f20763b2d61ca"
+    },
+    "supabase/production_incremental/calcutta-empty-auction-demand-v1.sql": {
+      "base": "3565bc80de4e8b9119518ff3050033e1798320c766c1e41caa6f5fcbb808aba0",
+      "current": "3565bc80de4e8b9119518ff3050033e1798320c766c1e41caa6f5fcbb808aba0"
+    },
+    "supabase/production_incremental/calcutta-exact-job-activation-recovery-v1.sql": {
+      "base": "13ffd68f44e0ca37272802433afebd1afa7f2297af089027f9ca450808f55bcd",
+      "current": "13ffd68f44e0ca37272802433afebd1afa7f2297af089027f9ca450808f55bcd"
+    },
+    "supabase/production_incremental/certification-calcutta-publication-v1.sql": {
+      "base": "f5c399c08e93e6ae7d49a810050ecf154115a6ae2fe05815d55ba6df77f42930",
+      "current": "f5c399c08e93e6ae7d49a810050ecf154115a6ae2fe05815d55ba6df77f42930"
+    },
+    "supabase/production_incremental/certification-derived-attempt-cycle-v1.sql": {
+      "base": "21904b5ebc8581cc550e47925460b727ee8568db939ecf0896e1faad9b3cb02d",
+      "current": "21904b5ebc8581cc550e47925460b727ee8568db939ecf0896e1faad9b3cb02d"
+    },
+    "supabase/production_incremental/certification-model-d-execution-v1.sql": {
+      "base": "95a9e01c3a271001646d399104bbd8cbb762d19593151a3016208ff08ea5c576",
+      "current": "95a9e01c3a271001646d399104bbd8cbb762d19593151a3016208ff08ea5c576"
+    },
+    "supabase/production_incremental/certification-net-skins-calculation-v1.sql": {
+      "base": "85491a71ef0e5b3889add489e4115c0e8ee190b2a7f3dd4c6a8c3c9318b7d72c",
+      "current": "85491a71ef0e5b3889add489e4115c0e8ee190b2a7f3dd4c6a8c3c9318b7d72c"
+    },
+    "supabase/production_incremental/certification-net-skins-configuration-v1.sql": {
+      "base": "dc27781e8a586cd2e3f27f364558bf2ad150aca4e483fe222812a02cdd35a87b",
+      "current": "dc27781e8a586cd2e3f27f364558bf2ad150aca4e483fe222812a02cdd35a87b"
+    },
+    "supabase/production_incremental/certification-net-skins-result-read-v1.sql": {
+      "base": "cca0c90e39a7d4ca206e8dd0d7c95f27a171769cf3217d0fb4f17d83f1a826aa",
+      "current": "cca0c90e39a7d4ca206e8dd0d7c95f27a171769cf3217d0fb4f17d83f1a826aa"
+    },
+    "supabase/production_incremental/certification-odds-input-configuration-v1.sql": {
+      "base": "de5e554de86da3336c223b40c1780febb0f9fd5d9127bda4114e1e3df6c0e601",
+      "current": "de5e554de86da3336c223b40c1780febb0f9fd5d9127bda4114e1e3df6c0e601"
+    },
+    "supabase/production_incremental/certification-queue-calcutta-scope-v1.sql": {
+      "base": "c368413665681249271f876c435072e5c49750257c8dcc2b3844ea45b8e06617",
+      "current": "c368413665681249271f876c435072e5c49750257c8dcc2b3844ea45b8e06617"
+    },
+    "supabase/production_incremental/certification-queue-global-fault-v5.sql": {
+      "base": "d1ea7b42d733a33b7b8ec5936ac9b5517497512d03e602061fed6ab0dab2366a",
+      "current": "d1ea7b42d733a33b7b8ec5936ac9b5517497512d03e602061fed6ab0dab2366a"
+    },
+    "supabase/production_incremental/certification-queue-preview-publisher-v3.sql": {
+      "base": "155de8fb07e7d6036988d0f18dd70cee8217fdc4bbf62470db4522fc4dabab02",
+      "current": "155de8fb07e7d6036988d0f18dd70cee8217fdc4bbf62470db4522fc4dabab02"
+    },
+    "supabase/production_incremental/certification-queue-retry-envelope-v6.sql": {
+      "base": "8455072598dbe9e0c25971c596da4a986cca039bb778816a16d1321781c26dc0",
+      "current": "8455072598dbe9e0c25971c596da4a986cca039bb778816a16d1321781c26dc0"
+    },
+    "supabase/production_incremental/certification-queue-routing-closure-v7.sql": {
+      "base": "e86906a33a241fb96090de4be3f53a088c23753d4ce89355318f20ee53f596be",
+      "current": "e86906a33a241fb96090de4be3f53a088c23753d4ce89355318f20ee53f596be"
+    },
+    "supabase/production_incremental/certification-queue-safeupdate-v4.sql": {
+      "base": "19060289eb61e5a8286a9e6e18573b1b31b07d379b88f4913c86edf08c5d99ec",
+      "current": "19060289eb61e5a8286a9e6e18573b1b31b07d379b88f4913c86edf08c5d99ec"
+    },
+    "supabase/production_incremental/certification-stale-context-error-v1.sql": {
+      "base": "5b3189023341413bbbf3421d4947a574cf9ca6908bfa9db44e36e91d5c28545f",
+      "current": "5b3189023341413bbbf3421d4947a574cf9ca6908bfa9db44e36e91d5c28545f"
+    },
+    "supabase/production_incremental/certification-worker-queue-supervision-v2.sql": {
+      "base": "4c23e5d9ef591b567bc9d05f119d47da211b855d098ea5c180761b4946af2e81",
+      "current": "4c23e5d9ef591b567bc9d05f119d47da211b855d098ea5c180761b4946af2e81"
+    },
+    "supabase/production_incremental/certification-worker-supervision-v1.sql": {
+      "base": "17a2b3af3663345df096ce6c97cc1a109a9c608857b38524179ac4a25707fa02",
+      "current": "17a2b3af3663345df096ce6c97cc1a109a9c608857b38524179ac4a25707fa02"
+    },
+    "supabase/production_incremental/director-calcutta-clear-entry-v1.sql": {
+      "base": "47a930c4f292d422a771d621d00da12f6afe5bbe7f7f59258ed8c3999fa56dc3",
+      "current": "47a930c4f292d422a771d621d00da12f6afe5bbe7f7f59258ed8c3999fa56dc3"
+    },
+    "supabase/production_incremental/director-calcutta-management-read-v1.sql": {
+      "base": "5ef573739842968358490928ad219b78f79073f0af474d0938beb4041292ec00",
+      "current": "5ef573739842968358490928ad219b78f79073f0af474d0938beb4041292ec00"
+    },
+    "supabase/production_incremental/net-skins-sql-expressions-v1.sql": {
+      "base": "8f5c61645fd720ba5142373a91a9186691050b3a445e0219a2271f291646f62f",
+      "current": "8f5c61645fd720ba5142373a91a9186691050b3a445e0219a2271f291646f62f"
+    },
+    "supabase/production_incremental/participant-phone-authority-v1.sql": {
+      "base": "01c877d92f4c6f44505bb03881cb5b60d535d2847dc55d45041ac2e790919a97",
+      "current": "01c877d92f4c6f44505bb03881cb5b60d535d2847dc55d45041ac2e790919a97"
+    },
+    "supabase/production_incremental/participant-phone-enforcement-v1.sql": {
+      "base": "4c477f26efd33ab4a887d26e220bdbc591af2cf2e36e5986538bc2bbc337584e",
+      "current": "4c477f26efd33ab4a887d26e220bdbc591af2cf2e36e5986538bc2bbc337584e"
+    },
+    "supabase/production_incremental/participant-phone-enrollment-v1.sql": {
+      "base": "e08256c0b109bb0c27724b34f92f58851e46ffdba0890ae1c17a29a7abb08746",
+      "current": "e08256c0b109bb0c27724b34f92f58851e46ffdba0890ae1c17a29a7abb08746"
+    },
+    "supabase/production_incremental/phone-hook-acceptance-v1.sql": {
+      "base": "48c9425873ead658ff0a4dd371be5b411e2d2291b7f0ed6d6f157fb40d1af808",
+      "current": "48c9425873ead658ff0a4dd371be5b411e2d2291b7f0ed6d6f157fb40d1af808"
+    },
+    "supabase/production_incremental/player-portrait-policy-v1.sql": {
+      "base": "f4514d830fa3721a10c3ba04a33e1a57c61e4e952695ec74c3ae06cccbfb8f92",
+      "current": "f4514d830fa3721a10c3ba04a33e1a57c61e4e952695ec74c3ae06cccbfb8f92"
+    }
+  }
+}

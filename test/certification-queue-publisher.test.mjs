@@ -45,7 +45,7 @@ test('worker engine, job-fault transport and retired HTTP route stay byte-identi
  assert.match(consumer,/consumeCertificationQueueMessage\(message,metadata,\{timingEvidence\}\)/);
  assert.match(consumer,/observeQueueTransport/);
  const runtime=await readFile('lib/certification-worker-supervision.js','utf8');
- const original=execFileSync('git',['show','71d6a393:lib/certification-worker-supervision.js'],{encoding:'utf8'});
+ const original=execFileSync('git',['show','9ed929788b05d756b4eff6f72d0ec24821f3636e:lib/certification-worker-supervision.js'],{encoding:'utf8'});
  const jobTransport=s=>s.slice(s.indexOf('export function createSupervisorFaultTransport'),s.indexOf('export async function handleSupervisorRequest'));
  assert.equal(jobTransport(runtime),jobTransport(original));
  const tool=await readFile('tools/reliability/certification-queue-control.mjs','utf8');assert.doesNotMatch(tool,/new QueueClient|from '@vercel\/queue'/);

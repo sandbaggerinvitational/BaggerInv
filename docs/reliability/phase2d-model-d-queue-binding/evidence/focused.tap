@@ -1,0 +1,217 @@
+TAP version 13
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":1,"deployment_id":{"value":"dpl_LocalModelDCertification","provenance":"DERIVED"},"invocation_digest":{"value":"9758dec9623e311a8545a51d99110cdb569407ee540353f175a9751362062a32","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:05.338Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":25,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-07T04:58:15.238Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-07T04:58:45.238Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-07T04:58:05.326Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":10,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":550,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-07T05:07:15.338Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":2,"deployment_id":{"value":"dpl_LocalModelDCertification","provenance":"DERIVED"},"invocation_digest":{"value":"9758dec9623e311a8545a51d99110cdb569407ee540353f175a9751362062a32","provenance":"DERIVED"},"provider_message_digest":{"value":"2ee9ae7d8f8a7fe14ca70a0331ef326a3ef11f6a78d123837ea15044e924a33a","provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:05.338Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":25,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# Subtest: Model D exact publication registration → owner permit → Preview provider → private NO_WORK → single use → STOP
+    # Subtest: disabled placeholders and forged context cannot authorize Model D
+    ok 1 - disabled placeholders and forged context cannot authorize Model D
+      ---
+      duration_ms: 0.814292
+      type: 'test'
+      ...
+    # Subtest: all registered resource and deployment fields match trusted runtime exactly
+    ok 2 - all registered resource and deployment fields match trusted runtime exactly
+      ---
+      duration_ms: 0.3145
+      type: 'test'
+      ...
+    # Subtest: provider Preview identity/topic/deployment pin and client target denial
+    ok 3 - provider Preview identity/topic/deployment pin and client target denial
+      ---
+      duration_ms: 8.126041
+      type: 'test'
+      ...
+    # Subtest: roles cannot mint permit and fabricated reservation cannot consume
+    ok 4 - roles cannot mint permit and fabricated reservation cannot consume
+      ---
+      duration_ms: 33.539791
+      type: 'test'
+      ...
+    # Subtest: canonical epoch/release/supervisor/engine guards remain closed
+    ok 5 - canonical epoch/release/supervisor/engine guards remain closed
+      ---
+      duration_ms: 379.169917
+      type: 'test'
+      ...
+    # Subtest: actual application publisher uses canonical permit/batch, replay has no second send
+    ok 6 - actual application publisher uses canonical permit/batch, replay has no second send
+      ---
+      duration_ms: 194.151083
+      type: 'test'
+      ...
+    # Subtest: private canonical consumer NO_WORK single-use then STOP closes
+    ok 7 - private canonical consumer NO_WORK single-use then STOP closes
+      ---
+      duration_ms: 10345.011583
+      type: 'test'
+      ...
+    1..7
+ok 1 - Model D exact publication registration → owner permit → Preview provider → private NO_WORK → single use → STOP
+  ---
+  duration_ms: 15811.294375
+  type: 'test'
+  ...
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":1,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"3f5492422fbe32cf3d3cbbb6a250dcc4b81e3443e80fdab14666c79cd87b15f6","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:22.755Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":27,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-07T04:58:32.612Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-07T04:59:02.612Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-07T04:58:22.741Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":10,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":550,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-07T05:07:32.755Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":2,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"3f5492422fbe32cf3d3cbbb6a250dcc4b81e3443e80fdab14666c79cd87b15f6","provenance":"DERIVED"},"provider_message_digest":{"value":"bcb5df7ee098cf5719310147ae3e1505667fbead7ab537e911d0b0ea8b0d38ad","provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:22.755Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":27,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":3,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"174166db06276216e2b6f6d82da1953b84927ada5d8289e2334681316a52db7d","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:22.780Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":53,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-07T04:59:32.612Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-07T05:00:02.612Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-07T04:58:22.768Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":70,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":610,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-07T05:08:32.780Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_UNKNOWN","sequence":4,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"174166db06276216e2b6f6d82da1953b84927ada5d8289e2334681316a52db7d","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:22.780Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":53,"provenance":"SERVER_CLOCK_OBSERVATION"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":1,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"174166db06276216e2b6f6d82da1953b84927ada5d8289e2334681316a52db7d","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:22.875Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":24,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-07T04:59:32.612Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-07T05:00:02.612Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-07T04:58:22.864Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":70,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":610,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-07T05:08:32.875Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":2,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"174166db06276216e2b6f6d82da1953b84927ada5d8289e2334681316a52db7d","provenance":"DERIVED"},"provider_message_digest":{"value":"dc6a10a0269d9f5a18c05be722e418efcd4dbb74600103df592f4ddf1d1516db","provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:22.876Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":24,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":3,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"9d1373bdd2becffb81b3f73aacb82e76ed6f16a7f7edc0e1c14498918290cf1e","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:22.901Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":49,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-07T05:00:32.612Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-07T05:01:02.612Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-07T04:58:22.888Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":130,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":670,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-07T05:09:32.901Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":4,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"9d1373bdd2becffb81b3f73aacb82e76ed6f16a7f7edc0e1c14498918290cf1e","provenance":"DERIVED"},"provider_message_digest":{"value":"dc6a10a0269d9f5a18c05be722e418efcd4dbb74600103df592f4ddf1d1516db","provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:22.901Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":49,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":1,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"62b0b41c93418d6bb74817852cc344af11176dc4dd1320e73d8ce9b2709fd642","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:23.226Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":23,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-07T04:58:33.084Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-07T04:59:03.084Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-07T04:58:23.214Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":10,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":550,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-07T05:07:33.226Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":2,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"62b0b41c93418d6bb74817852cc344af11176dc4dd1320e73d8ce9b2709fd642","provenance":"DERIVED"},"provider_message_digest":{"value":"cbc28bbd695ab00f2a75b73f0d9d08ec0bb73a9dc59ceb300938c10b6d7e2186","provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:23.226Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":23,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":3,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"878ea45c5904df936611f4546a4060d4d4898525dbaf80e886af73cd17ae1517","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:23.248Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":45,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-07T04:59:33.084Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-07T05:00:03.084Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-07T04:58:23.237Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":70,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":610,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-07T05:08:33.248Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":4,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"878ea45c5904df936611f4546a4060d4d4898525dbaf80e886af73cd17ae1517","provenance":"DERIVED"},"provider_message_digest":{"value":"cbc28bbd695ab00f2a75b73f0d9d08ec0bb73a9dc59ceb300938c10b6d7e2186","provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:23.248Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":45,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":5,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"05f8241bf1b063dd19398e71188030d7d4b1e6f09893adf9ed9ed339187d98a9","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:23.269Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":66,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-07T05:00:33.084Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-07T05:01:03.084Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-07T04:58:23.259Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":130,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":670,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-07T05:09:33.269Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":6,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"05f8241bf1b063dd19398e71188030d7d4b1e6f09893adf9ed9ed339187d98a9","provenance":"DERIVED"},"provider_message_digest":{"value":"cbc28bbd695ab00f2a75b73f0d9d08ec0bb73a9dc59ceb300938c10b6d7e2186","provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:23.269Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":66,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_REQUEST","sequence":1,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"a9a878c7d392487bfe00657a1ccd61d06141d63d6924c4b3fa272b1a33ff1a9c","provenance":"DERIVED"},"provider_message_digest":{"value":null,"provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:23.418Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":22,"provenance":"SERVER_CLOCK_OBSERVATION"},"scheduled_at":{"value":"2026-10-07T04:58:33.361Z","provenance":"DERIVED"},"authority_expires_at":{"value":"2026-10-07T04:59:03.361Z","provenance":"DERIVED"},"timing_calculated_at":{"value":"2026-10-07T04:58:23.407Z","provenance":"SERVER_CLOCK_OBSERVATION"},"requested_delay_seconds":{"value":10,"provenance":"BAGGER_REQUEST"},"requested_ttl_seconds":{"value":550,"provenance":"BAGGER_REQUEST"},"requested_expiration":{"value":"2026-10-07T05:07:33.418Z","provenance":"DERIVED"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_RESPONSE","sequence":2,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"a9a878c7d392487bfe00657a1ccd61d06141d63d6924c4b3fa272b1a33ff1a9c","provenance":"DERIVED"},"provider_message_digest":{"value":"f32639fbad35946d9e62711098efac16e6c984e0e477b5daeef2a225bdd1bf3f","provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:23.443Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":47,"provenance":"SERVER_CLOCK_OBSERVATION"},"message_id_returned":{"value":true,"provenance":"PROVIDER_RESPONSE"},"expiration_returned":{"value":false,"provenance":"PROVIDER_RESPONSE"}}
+# {"contract":"certification-queue-timing-evidence-v1","event":"PUBLICATION_UNKNOWN","sequence":3,"deployment_id":{"value":"dpl_LocalSupervisorCertification","provenance":"DERIVED"},"invocation_digest":{"value":"a9a878c7d392487bfe00657a1ccd61d06141d63d6924c4b3fa272b1a33ff1a9c","provenance":"DERIVED"},"provider_message_digest":{"value":"f32639fbad35946d9e62711098efac16e6c984e0e477b5daeef2a225bdd1bf3f","provenance":"DERIVED"},"observed_at":{"value":"2026-10-07T04:58:23.453Z","provenance":"SERVER_CLOCK_OBSERVATION"},"elapsed_ms":{"value":57,"provenance":"SERVER_CLOCK_OBSERVATION"}}
+# Subtest: owner START → digest handoff → bound Preview publisher → ledger; finite reconciliation and security
+    # Subtest: forward fresh/replay preserves v2 history, ACLs, consumer and disabled admission
+    ok 1 - forward fresh/replay preserves v2 history, ACLs, consumer and disabled admission
+      ---
+      duration_ms: 72.825459
+      type: 'test'
+      ...
+    # Subtest: participant/Director, anon, authenticated and service_role cannot mint/control/read owner permits
+    ok 2 - participant/Director, anon, authenticated and service_role cannot mint/control/read owner permits
+      ---
+      duration_ms: 118.628542
+      type: 'test'
+      ...
+    # Subtest: START commits first; partial/lost publisher ACK durable; session/permit single-use; restart completes same budget
+    ok 3 - START commits first; partial/lost publisher ACK durable; session/permit single-use; restart completes same budget
+      ---
+      duration_ms: 500.143666
+      type: 'test'
+      ...
+    # Subtest: publisher disappearance preserves UNKNOWN; owner retry waits for finite session expiry
+    ok 4 - publisher disappearance preserves UNKNOWN; owner retry waits for finite session expiry
+      ---
+      duration_ms: 279.5245
+      type: 'test'
+      ...
+    # Subtest: STOP during publication invalidates unfinished batch and a consumed publisher session
+    ok 5 - STOP during publication invalidates unfinished batch and a consumed publisher session
+      ---
+      duration_ms: 152.495
+      type: 'test'
+      ...
+    # Subtest: missing, expired, wrong binding, stale revision and STOP fail closed; publication has no worker effect
+    ok 6 - missing, expired, wrong binding, stale revision and STOP fail closed; publication has no worker effect
+      ---
+      duration_ms: 307.830583
+      type: 'test'
+      ...
+    1..6
+ok 2 - owner START → digest handoff → bound Preview publisher → ledger; finite reconciliation and security
+  ---
+  duration_ms: 7845.730709
+  type: 'test'
+  ...
+# Subtest: Preview publisher validates real identity predicate before SDK construction
+ok 3 - Preview publisher validates real identity predicate before SDK construction
+  ---
+  duration_ms: 6124.727542
+  type: 'test'
+  ...
+# Subtest: publisher body cannot select topic, resource, message, delay or transport
+ok 4 - publisher body cannot select topic, resource, message, delay or transport
+  ---
+  duration_ms: 6608.620167
+  type: 'test'
+  ...
+# Subtest: worker engine, job-fault transport and retired HTTP route stay byte-identical; consumer changes are transport-only; CLI remains retired
+ok 5 - worker engine, job-fault transport and retired HTTP route stay byte-identical; consumer changes are transport-only; CLI remains retired
+  ---
+  duration_ms: 66.781042
+  type: 'test'
+  ...
+# Subtest: queue message denies missing
+ok 6 - queue message denies missing
+  ---
+  duration_ms: 0.547209
+  type: 'test'
+  ...
+# Subtest: queue message denies empty
+ok 7 - queue message denies empty
+  ---
+  duration_ms: 0.053125
+  type: 'test'
+  ...
+# Subtest: queue message denies resource
+ok 8 - queue message denies resource
+  ---
+  duration_ms: 0.039208
+  type: 'test'
+  ...
+# Subtest: queue message denies url
+ok 9 - queue message denies url
+  ---
+  duration_ms: 0.035666
+  type: 'test'
+  ...
+# Subtest: queue message denies worker
+ok 10 - queue message denies worker
+  ---
+  duration_ms: 0.037792
+  type: 'test'
+  ...
+# Subtest: queue message denies badVersion
+ok 11 - queue message denies badVersion
+  ---
+  duration_ms: 0.031709
+  type: 'test'
+  ...
+# Subtest: queue message denies badId
+ok 12 - queue message denies badId
+  ---
+  duration_ms: 0.054208
+  type: 'test'
+  ...
+# Subtest: retired CLI publisher is incapable of hosted publication
+ok 13 - retired CLI publisher is incapable of hosted publication
+  ---
+  duration_ms: 0.073958
+  type: 'test'
+  ...
+# Subtest: publisher denies arbitrary physical resource or unpinned destination before SDK creation
+ok 14 - publisher denies arbitrary physical resource or unpinned destination before SDK creation
+  ---
+  duration_ms: 0.356292
+  type: 'test'
+  ...
+# Subtest: START remains truthful when credential acquisition fails after canonical commit
+ok 15 - START remains truthful when credential acquisition fails after canonical commit
+  ---
+  duration_ms: 0.476667
+  type: 'test'
+  ...
+# Subtest: publisher lost acknowledgement never fabricates NOT_PUBLISHED or a complete schedule
+ok 16 - publisher lost acknowledgement never fabricates NOT_PUBLISHED or a complete schedule
+  ---
+  duration_ms: 1.023583
+  type: 'test'
+  ...
+# Subtest: queue retry is finite; security denials acknowledge without job work; errors preserve uncertainty
+ok 17 - queue retry is finite; security denials acknowledge without job work; errors preserve uncertainty
+  ---
+  duration_ms: 0.139792
+  type: 'test'
+  ...
+# Subtest: only Certification manifest registers one private consumer; base Production manifest unchanged; pinned SDK
+ok 18 - only Certification manifest registers one private consumer; base Production manifest unchanged; pinned SDK
+  ---
+  duration_ms: 6.487208
+  type: 'test'
+  ...
+1..18
+# tests 31
+# suites 0
+# pass 31
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 37183.1825

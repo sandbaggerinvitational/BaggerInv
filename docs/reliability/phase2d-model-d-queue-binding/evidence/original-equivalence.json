@@ -1,0 +1,9 @@
+{
+  "base": "9ed929788b05d756b4eff6f72d0ec24821f3636e",
+  "comparisons": 22,
+  "exactReturnOrDenialEquality": true,
+  "originalEngines": 5,
+  "modelDEngines": 6,
+  "originalSixthEngineDenied": true,
+  "hosted": false
+}

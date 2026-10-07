@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "base": "9ed929788b05d756b4eff6f72d0ec24821f3636e",
+  "focused": {
+    "tests": 31,
+    "pass": 31,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "broad": {
+    "tests": 4097,
+    "pass": 4077,
+    "fail": 20,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "exactEstablishedFailureIdentities": true,
+  "newFailures": 0,
+  "build": "PASS",
+  "secretLeakage": 0,
+  "forwardSqlRequired": false,
+  "databaseImageUnchanged": true,
+  "registrationDisabled": true,
+  "hostedAccess": false,
+  "pushed": false,
+  "deployed": false,
+  "D9Authorized": false,
+  "D10Authorized": false
+}
