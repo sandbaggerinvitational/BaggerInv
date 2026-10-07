@@ -1,0 +1,757 @@
+{
+  "roles": [
+    {
+      "name": "anon",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "authenticated",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "authenticator",
+      "inherit": false,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "dashboard_user",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_checkpoint",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_create_subscription",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_database_owner",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_execute_server_program",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_maintain",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_monitor",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_read_all_data",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_read_all_settings",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_read_all_stats",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_read_server_files",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_signal_backend",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_stat_scan_tables",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_use_reserved_connections",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_write_all_data",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pg_write_server_files",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "pgbouncer",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "postgres",
+      "inherit": true,
+      "bypassRls": true,
+      "superuser": false
+    },
+    {
+      "name": "service_role",
+      "inherit": true,
+      "bypassRls": true,
+      "superuser": false
+    },
+    {
+      "name": "supabase_admin",
+      "inherit": true,
+      "bypassRls": true,
+      "superuser": true
+    },
+    {
+      "name": "supabase_auth_admin",
+      "inherit": false,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "supabase_etl_admin",
+      "inherit": true,
+      "bypassRls": true,
+      "superuser": false
+    },
+    {
+      "name": "supabase_privileged_role",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "supabase_read_only_user",
+      "inherit": true,
+      "bypassRls": true,
+      "superuser": false
+    },
+    {
+      "name": "supabase_realtime_admin",
+      "inherit": false,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "supabase_replication_admin",
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "supabase_storage_admin",
+      "inherit": false,
+      "bypassRls": false,
+      "superuser": false
+    }
+  ],
+  "version": "170011",
+  "authColumns": [
+    {
+      "type": "text",
+      "table": "identities",
+      "column": "provider_id"
+    },
+    {
+      "type": "uuid",
+      "table": "identities",
+      "column": "user_id"
+    },
+    {
+      "type": "jsonb",
+      "table": "identities",
+      "column": "identity_data"
+    },
+    {
+      "type": "text",
+      "table": "identities",
+      "column": "provider"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "identities",
+      "column": "last_sign_in_at"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "identities",
+      "column": "created_at"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "identities",
+      "column": "updated_at"
+    },
+    {
+      "type": "text",
+      "table": "identities",
+      "column": "email"
+    },
+    {
+      "type": "uuid",
+      "table": "identities",
+      "column": "id"
+    },
+    {
+      "type": "uuid",
+      "table": "users",
+      "column": "instance_id"
+    },
+    {
+      "type": "uuid",
+      "table": "users",
+      "column": "id"
+    },
+    {
+      "type": "character varying(255)",
+      "table": "users",
+      "column": "aud"
+    },
+    {
+      "type": "character varying(255)",
+      "table": "users",
+      "column": "role"
+    },
+    {
+      "type": "character varying(255)",
+      "table": "users",
+      "column": "email"
+    },
+    {
+      "type": "character varying(255)",
+      "table": "users",
+      "column": "encrypted_password"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "email_confirmed_at"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "invited_at"
+    },
+    {
+      "type": "character varying(255)",
+      "table": "users",
+      "column": "confirmation_token"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "confirmation_sent_at"
+    },
+    {
+      "type": "character varying(255)",
+      "table": "users",
+      "column": "recovery_token"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "recovery_sent_at"
+    },
+    {
+      "type": "character varying(255)",
+      "table": "users",
+      "column": "email_change_token_new"
+    },
+    {
+      "type": "character varying(255)",
+      "table": "users",
+      "column": "email_change"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "email_change_sent_at"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "last_sign_in_at"
+    },
+    {
+      "type": "jsonb",
+      "table": "users",
+      "column": "raw_app_meta_data"
+    },
+    {
+      "type": "jsonb",
+      "table": "users",
+      "column": "raw_user_meta_data"
+    },
+    {
+      "type": "boolean",
+      "table": "users",
+      "column": "is_super_admin"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "created_at"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "updated_at"
+    },
+    {
+      "type": "text",
+      "table": "users",
+      "column": "phone"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "phone_confirmed_at"
+    },
+    {
+      "type": "text",
+      "table": "users",
+      "column": "phone_change"
+    },
+    {
+      "type": "character varying(255)",
+      "table": "users",
+      "column": "phone_change_token"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "phone_change_sent_at"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "confirmed_at"
+    },
+    {
+      "type": "character varying(255)",
+      "table": "users",
+      "column": "email_change_token_current"
+    },
+    {
+      "type": "smallint",
+      "table": "users",
+      "column": "email_change_confirm_status"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "banned_until"
+    },
+    {
+      "type": "character varying(255)",
+      "table": "users",
+      "column": "reauthentication_token"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "reauthentication_sent_at"
+    },
+    {
+      "type": "boolean",
+      "table": "users",
+      "column": "is_sso_user"
+    },
+    {
+      "type": "timestamp with time zone",
+      "table": "users",
+      "column": "deleted_at"
+    },
+    {
+      "type": "boolean",
+      "table": "users",
+      "column": "is_anonymous"
+    }
+  ],
+  "memberships": [
+    {
+      "set": true,
+      "role": "anon",
+      "member": "authenticator",
+      "inherit": false
+    },
+    {
+      "set": true,
+      "role": "anon",
+      "member": "postgres",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "anon",
+      "member": "supabase_realtime_admin",
+      "inherit": false
+    },
+    {
+      "set": true,
+      "role": "authenticated",
+      "member": "authenticator",
+      "inherit": false
+    },
+    {
+      "set": true,
+      "role": "authenticated",
+      "member": "postgres",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "authenticated",
+      "member": "supabase_realtime_admin",
+      "inherit": false
+    },
+    {
+      "set": true,
+      "role": "authenticator",
+      "member": "postgres",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "authenticator",
+      "member": "supabase_storage_admin",
+      "inherit": false
+    },
+    {
+      "set": true,
+      "role": "pg_create_subscription",
+      "member": "postgres",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "pg_monitor",
+      "member": "postgres",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "pg_monitor",
+      "member": "supabase_etl_admin",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "pg_monitor",
+      "member": "supabase_read_only_user",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "pg_read_all_data",
+      "member": "postgres",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "pg_read_all_data",
+      "member": "supabase_etl_admin",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "pg_read_all_data",
+      "member": "supabase_read_only_user",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "pg_read_all_settings",
+      "member": "pg_monitor",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "pg_read_all_stats",
+      "member": "pg_monitor",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "pg_signal_backend",
+      "member": "postgres",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "pg_stat_scan_tables",
+      "member": "pg_monitor",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "service_role",
+      "member": "authenticator",
+      "inherit": false
+    },
+    {
+      "set": true,
+      "role": "service_role",
+      "member": "postgres",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "service_role",
+      "member": "supabase_realtime_admin",
+      "inherit": false
+    },
+    {
+      "set": true,
+      "role": "supabase_privileged_role",
+      "member": "postgres",
+      "inherit": true
+    },
+    {
+      "set": true,
+      "role": "supabase_privileged_role",
+      "member": "supabase_etl_admin",
+      "inherit": true
+    }
+  ],
+  "eventTriggers": [
+    {
+      "name": "issue_graphql_placeholder",
+      "tags": [
+        "DROP EXTENSION"
+      ],
+      "event": "sql_drop",
+      "owner": "supabase_admin",
+      "enabled": "O",
+      "function": "extensions.set_graphql_placeholder()"
+    },
+    {
+      "name": "issue_pg_cron_access",
+      "tags": [
+        "CREATE EXTENSION"
+      ],
+      "event": "ddl_command_end",
+      "owner": "supabase_admin",
+      "enabled": "O",
+      "function": "extensions.grant_pg_cron_access()"
+    },
+    {
+      "name": "issue_pg_graphql_access",
+      "tags": [
+        "CREATE EXTENSION"
+      ],
+      "event": "ddl_command_end",
+      "owner": "supabase_admin",
+      "enabled": "O",
+      "function": "extensions.grant_pg_graphql_access()"
+    },
+    {
+      "name": "issue_pg_net_access",
+      "tags": [
+        "CREATE EXTENSION"
+      ],
+      "event": "ddl_command_end",
+      "owner": "supabase_admin",
+      "enabled": "O",
+      "function": "extensions.grant_pg_net_access()"
+    },
+    {
+      "name": "pgrst_ddl_watch",
+      "tags": null,
+      "event": "ddl_command_end",
+      "owner": "supabase_admin",
+      "enabled": "O",
+      "function": "extensions.pgrst_ddl_watch()"
+    },
+    {
+      "name": "pgrst_drop_watch",
+      "tags": null,
+      "event": "sql_drop",
+      "owner": "supabase_admin",
+      "enabled": "O",
+      "function": "extensions.pgrst_drop_watch()"
+    }
+  ],
+  "defaultPrivileges": [
+    {
+      "acl": "{postgres=rwU/supabase_auth_admin,dashboard_user=rwU/supabase_auth_admin}",
+      "type": "S",
+      "owner": "supabase_auth_admin",
+      "schema": "auth"
+    },
+    {
+      "acl": "{postgres=X/supabase_auth_admin,dashboard_user=X/supabase_auth_admin}",
+      "type": "f",
+      "owner": "supabase_auth_admin",
+      "schema": "auth"
+    },
+    {
+      "acl": "{postgres=arwdDxtm/supabase_auth_admin,dashboard_user=arwdDxtm/supabase_auth_admin}",
+      "type": "r",
+      "owner": "supabase_auth_admin",
+      "schema": "auth"
+    },
+    {
+      "acl": "{postgres=r*w*U*/supabase_admin}",
+      "type": "S",
+      "owner": "supabase_admin",
+      "schema": "extensions"
+    },
+    {
+      "acl": "{postgres=X*/supabase_admin}",
+      "type": "f",
+      "owner": "supabase_admin",
+      "schema": "extensions"
+    },
+    {
+      "acl": "{postgres=a*r*w*d*D*x*t*m*/supabase_admin}",
+      "type": "r",
+      "owner": "supabase_admin",
+      "schema": "extensions"
+    },
+    {
+      "acl": "{postgres=rwU/supabase_admin,anon=rwU/supabase_admin,authenticated=rwU/supabase_admin,service_role=rwU/supabase_admin}",
+      "type": "S",
+      "owner": "supabase_admin",
+      "schema": "graphql"
+    },
+    {
+      "acl": "{postgres=X/supabase_admin,anon=X/supabase_admin,authenticated=X/supabase_admin,service_role=X/supabase_admin}",
+      "type": "f",
+      "owner": "supabase_admin",
+      "schema": "graphql"
+    },
+    {
+      "acl": "{postgres=arwdDxtm/supabase_admin,anon=arwdDxtm/supabase_admin,authenticated=arwdDxtm/supabase_admin,service_role=arwdDxtm/supabase_admin}",
+      "type": "r",
+      "owner": "supabase_admin",
+      "schema": "graphql"
+    },
+    {
+      "acl": "{postgres=rwU/supabase_admin,anon=rwU/supabase_admin,authenticated=rwU/supabase_admin,service_role=rwU/supabase_admin}",
+      "type": "S",
+      "owner": "supabase_admin",
+      "schema": "graphql_public"
+    },
+    {
+      "acl": "{postgres=X/supabase_admin,anon=X/supabase_admin,authenticated=X/supabase_admin,service_role=X/supabase_admin}",
+      "type": "f",
+      "owner": "supabase_admin",
+      "schema": "graphql_public"
+    },
+    {
+      "acl": "{postgres=arwdDxtm/supabase_admin,anon=arwdDxtm/supabase_admin,authenticated=arwdDxtm/supabase_admin,service_role=arwdDxtm/supabase_admin}",
+      "type": "r",
+      "owner": "supabase_admin",
+      "schema": "graphql_public"
+    },
+    {
+      "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+      "type": "S",
+      "owner": "postgres",
+      "schema": "public"
+    },
+    {
+      "acl": "{postgres=rwU/supabase_admin,anon=rwU/supabase_admin,authenticated=rwU/supabase_admin,service_role=rwU/supabase_admin}",
+      "type": "S",
+      "owner": "supabase_admin",
+      "schema": "public"
+    },
+    {
+      "acl": "{postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "type": "f",
+      "owner": "postgres",
+      "schema": "public"
+    },
+    {
+      "acl": "{postgres=X/supabase_admin,anon=X/supabase_admin,authenticated=X/supabase_admin,service_role=X/supabase_admin}",
+      "type": "f",
+      "owner": "supabase_admin",
+      "schema": "public"
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "type": "r",
+      "owner": "postgres",
+      "schema": "public"
+    },
+    {
+      "acl": "{postgres=arwdDxtm/supabase_admin,anon=arwdDxtm/supabase_admin,authenticated=arwdDxtm/supabase_admin,service_role=arwdDxtm/supabase_admin}",
+      "type": "r",
+      "owner": "supabase_admin",
+      "schema": "public"
+    },
+    {
+      "acl": "{postgres=rwU/supabase_admin,dashboard_user=rwU/supabase_admin}",
+      "type": "S",
+      "owner": "supabase_admin",
+      "schema": "realtime"
+    },
+    {
+      "acl": "{postgres=X/supabase_admin,dashboard_user=X/supabase_admin}",
+      "type": "f",
+      "owner": "supabase_admin",
+      "schema": "realtime"
+    },
+    {
+      "acl": "{postgres=a*r*wdDxtm/supabase_admin,dashboard_user=arwdDxtm/supabase_admin}",
+      "type": "r",
+      "owner": "supabase_admin",
+      "schema": "realtime"
+    },
+    {
+      "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+      "type": "S",
+      "owner": "postgres",
+      "schema": "storage"
+    },
+    {
+      "acl": "{postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+      "type": "f",
+      "owner": "postgres",
+      "schema": "storage"
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "type": "r",
+      "owner": "postgres",
+      "schema": "storage"
+    }
+  ]
+}

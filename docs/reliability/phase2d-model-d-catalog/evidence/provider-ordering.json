@@ -1,0 +1,22 @@
+{
+  "roleOrder": [
+    {
+      "oid": "16480",
+      "name": "anon"
+    },
+    {
+      "oid": "16481",
+      "name": "authenticated"
+    },
+    {
+      "oid": "16482",
+      "name": "service_role"
+    }
+  ],
+  "databaseLocale": {
+    "datctype": "en_US.UTF-8",
+    "datlocale": "en-US",
+    "datcollate": "en_US.UTF-8",
+    "datlocprovider": "i"
+  }
+}

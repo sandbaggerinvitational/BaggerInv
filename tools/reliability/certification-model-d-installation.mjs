@@ -2,6 +2,7 @@
 import {readFile} from 'node:fs/promises';
 import {readModelDImage} from './model-d-bootstrap.mjs';
 import {validateModelDRegistration} from './certification-model-d-binding.mjs';
+import {modelDCatalogVerificationSql} from './model-d-catalog-verifier.mjs';
 const literal=value=>"'"+JSON.stringify(value).replaceAll("'","''")+"'::jsonb";
 
 export async function renderModelDInstallation({registrationManifest}={}) {
@@ -34,13 +35,7 @@ ${image.staticData}
 insert into production_control.canonical_bootstrap_installation_v1(contract_version,manifest_sha256,schema_sha256,static_data_sha256)
 values('bagger-canonical-bootstrap-v1','${receipt.manifest_sha256}','${receipt.schema_sha256}','${receipt.static_data_sha256}');
 \\endif
-do $verify$declare actual jsonb;expected jsonb:=${literal(image.catalog)};begin
- execute $catalog$${query}$catalog$ into strict actual;
- actual:=jsonb_set(actual,'{functions}',(select jsonb_agg(v-'definition'||jsonb_build_object('definitionSha256',encode(extensions.digest(v->>'definition','sha256'),'hex')))from jsonb_array_elements(actual->'functions')v));
- if jsonb_array_length(actual->'extensions')<>1 or actual#>>'{extensions,0,owner}'not in('postgres','supabase_admin')then raise exception 'MODEL_D_PLATFORM_EXTENSION_OWNER_MISMATCH';end if;
- actual:=jsonb_set(actual,'{extensions,0,owner}',expected#>'{extensions,0,owner}');
- if actual is distinct from expected then raise exception 'MODEL_D_CATALOG_MISMATCH';end if;
-end;$verify$;
+${modelDCatalogVerificationSql(query,literal(image.catalog))}
 commit;
 `;
 }

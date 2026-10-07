@@ -1,0 +1,263 @@
+TAP version 13
+# Subtest: NA-CATALOG-COLLATION: dependency order is not topological; old comparator reproduces false failure
+ok 1 - NA-CATALOG-COLLATION: dependency order is not topological; old comparator reproduces false failure
+  ---
+  duration_ms: 1.648375
+  type: 'test'
+  ...
+# Subtest: canonicalization preserves complete records, multiplicity and inputs
+ok 2 - canonicalization preserves complete records, multiplicity and inputs
+  ---
+  duration_ms: 0.451792
+  type: 'test'
+  ...
+# Subtest: JSON object field insertion order cannot alter identity
+ok 3 - JSON object field insertion order cannot alter identity
+  ---
+  duration_ms: 0.083541
+  type: 'test'
+  ...
+# Subtest: negative catalog proof detects removed dependency
+ok 4 - negative catalog proof detects removed dependency
+  ---
+  duration_ms: 0.120125
+  type: 'test'
+  ...
+# Subtest: negative catalog proof detects unexpected dependency
+ok 5 - negative catalog proof detects unexpected dependency
+  ---
+  duration_ms: 0.11525
+  type: 'test'
+  ...
+# Subtest: negative catalog proof detects changed dependency field
+ok 6 - negative catalog proof detects changed dependency field
+  ---
+  duration_ms: 0.089959
+  type: 'test'
+  ...
+# Subtest: negative catalog proof detects duplicate/multiplicity added
+ok 7 - negative catalog proof detects duplicate/multiplicity added
+  ---
+  duration_ms: 0.083875
+  type: 'test'
+  ...
+# Subtest: negative catalog proof detects wrong dependent object
+ok 8 - negative catalog proof detects wrong dependent object
+  ---
+  duration_ms: 0.077875
+  type: 'test'
+  ...
+# Subtest: negative catalog proof detects wrong referenced object
+ok 9 - negative catalog proof detects wrong referenced object
+  ---
+  duration_ms: 0.090167
+  type: 'test'
+  ...
+# Subtest: negative catalog proof detects additional dependency field
+ok 10 - negative catalog proof detects additional dependency field
+  ---
+  duration_ms: 0.100167
+  type: 'test'
+  ...
+# Subtest: duplicate/multiplicity removed is detected even when distinct-record set is unchanged
+ok 11 - duplicate/multiplicity removed is detected even when distinct-record set is unchanged
+  ---
+  duration_ms: 0.097833
+  type: 'test'
+  ...
+# Subtest: malformed dependency inventories fail closed
+ok 12 - malformed dependency inventories fail closed
+  ---
+  duration_ms: 0.105584
+  type: 'test'
+  ...
+# Subtest: all nondependency authority/security fields remain strict
+ok 13 - all nondependency authority/security fields remain strict
+  ---
+  duration_ms: 0.404208
+  type: 'test'
+  ...
+# Subtest: existing pgcrypto platform allowance stays narrowly bounded
+ok 14 - existing pgcrypto platform allowance stays narrowly bounded
+  ---
+  duration_ms: 0.217917
+  type: 'test'
+  ...
+# Subtest: preserved hosted ICU catalog matches all 12994 records; old ordered comparator rejects it
+ok 15 - preserved hosted ICU catalog matches all 12994 records; old ordered comparator rejects it
+  ---
+  duration_ms: 206.236542
+  type: 'test'
+  ...
+# Subtest: receipt checks remain exact; no rewrite or artifact-hash relaxation
+ok 16 - receipt checks remain exact; no rewrite or artifact-hash relaxation
+  ---
+  duration_ms: 66.449792
+  type: 'test'
+  ...
+# Subtest: logical order normalization never relaxes the expected artifact byte identity
+ok 17 - logical order normalization never relaxes the expected artifact byte identity
+  ---
+  duration_ms: 35.786334
+  type: 'test'
+  ...
+# Subtest: actual PostgreSQL17 C and ICU en-US ordering compare identically; genuine defects still fail
+ok 18 - actual PostgreSQL17 C and ICU en-US ordering compare identically; genuine defects still fail
+  ---
+  duration_ms: 1718.831291
+  type: 'test'
+  ...
+# {"postgresql":"17.11 (Homebrew)","shapes":{"catalog_no_locale":{"locale":null,"provider":"c","collation":"C"},"catalog_icu":{"locale":"en-US","provider":"i","collation":"C"}},"records":12994,"identicalRecords":"PASS","negativeCasesPerCollation":6,"hostedAccess":false}
+# Subtest: offline CLI validates catalog/receipt and fails changed catalog without any remote operation
+ok 19 - offline CLI validates catalog/receipt and fails changed catalog without any remote operation
+  ---
+  duration_ms: 390.859167
+  type: 'test'
+  ...
+# Subtest: exact verifier detects missing function
+ok 20 - exact verifier detects missing function
+  ---
+  duration_ms: 142.416041
+  type: 'test'
+  ...
+# Subtest: exact verifier detects extra function
+ok 21 - exact verifier detects extra function
+  ---
+  duration_ms: 122.360083
+  type: 'test'
+  ...
+# Subtest: exact verifier detects body
+ok 22 - exact verifier detects body
+  ---
+  duration_ms: 114.452708
+  type: 'test'
+  ...
+# Subtest: exact verifier detects owner
+ok 23 - exact verifier detects owner
+  ---
+  duration_ms: 118.8695
+  type: 'test'
+  ...
+# Subtest: exact verifier detects PUBLIC ACL
+ok 24 - exact verifier detects PUBLIC ACL
+  ---
+  duration_ms: 118.27525
+  type: 'test'
+  ...
+# Subtest: exact verifier detects anon ACL
+ok 25 - exact verifier detects anon ACL
+  ---
+  duration_ms: 117.347416
+  type: 'test'
+  ...
+# Subtest: exact verifier detects authenticated ACL
+ok 26 - exact verifier detects authenticated ACL
+  ---
+  duration_ms: 118.77575
+  type: 'test'
+  ...
+# Subtest: exact verifier detects service_role ACL
+ok 27 - exact verifier detects service_role ACL
+  ---
+  duration_ms: 128.928125
+  type: 'test'
+  ...
+# Subtest: exact verifier detects role expansion ACL
+ok 28 - exact verifier detects role expansion ACL
+  ---
+  duration_ms: 129.017
+  type: 'test'
+  ...
+# Subtest: exact verifier detects security mode
+ok 29 - exact verifier detects security mode
+  ---
+  duration_ms: 116.787709
+  type: 'test'
+  ...
+# Subtest: exact verifier detects search_path
+ok 30 - exact verifier detects search_path
+  ---
+  duration_ms: 155.165667
+  type: 'test'
+  ...
+# Subtest: exact verifier detects RLS removal
+ok 31 - exact verifier detects RLS removal
+  ---
+  duration_ms: 171.208916
+  type: 'test'
+  ...
+# Subtest: exact verifier detects policy
+ok 32 - exact verifier detects policy
+  ---
+  duration_ms: 109.149791
+  type: 'test'
+  ...
+# Subtest: exact verifier detects private exposure
+ok 33 - exact verifier detects private exposure
+  ---
+  duration_ms: 114.84925
+  type: 'test'
+  ...
+# Subtest: exact verifier detects dependency missing
+ok 34 - exact verifier detects dependency missing
+  ---
+  duration_ms: 135.752291
+  type: 'test'
+  ...
+# Subtest: exact verifier detects dependency duplicate
+ok 35 - exact verifier detects dependency duplicate
+  ---
+  duration_ms: 149.32875
+  type: 'test'
+  ...
+# Subtest: exact verifier detects dependency extra field
+ok 36 - exact verifier detects dependency extra field
+  ---
+  duration_ms: 136.8335
+  type: 'test'
+  ...
+# Subtest: exact verifier detects extension owner
+ok 37 - exact verifier detects extension owner
+  ---
+  duration_ms: 111.990583
+  type: 'test'
+  ...
+# Subtest: exact verifier detects extension version
+ok 38 - exact verifier detects extension version
+  ---
+  duration_ms: 110.70925
+  type: 'test'
+  ...
+# Subtest: exact verifier detects unsafe provider public function
+ok 39 - exact verifier detects unsafe provider public function
+  ---
+  duration_ms: 117.375834
+  type: 'test'
+  ...
+# Subtest: only complete dependency ordering and existing pgcrypto owner variability are normalized
+ok 40 - only complete dependency ordering and existing pgcrypto owner variability are normalized
+  ---
+  duration_ms: 104.940167
+  type: 'test'
+  ...
+# Subtest: diagnostics emit identities/digests, never body or arbitrary metadata values
+ok 41 - diagnostics emit identities/digests, never body or arbitrary metadata values
+  ---
+  duration_ms: 112.367292
+  type: 'test'
+  ...
+# Subtest: PG17 C/hosted ICU predecessor repro, exact corrected install/replay, security failures and atomic rollback
+ok 42 - PG17 C/hosted ICU predecessor repro, exact corrected install/replay, security failures and atomic rollback
+  ---
+  duration_ms: 16298.122292
+  type: 'test'
+  ...
+1..42
+# tests 42
+# suites 0
+# pass 42
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 19205.562625

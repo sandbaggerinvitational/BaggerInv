@@ -1,0 +1,15 @@
+{
+  "baseSha": "3d3aeca84e86767d94c9a6fc9841e25729271e4c",
+  "trackedFilesCompared": 4529,
+  "existingFilesChanged": [
+    "tools/reliability/certification-model-d-installation.mjs"
+  ],
+  "shippingRuntimeUnchanged": true,
+  "databaseImageUnchanged": true,
+  "forwardSqlUnchanged": true,
+  "historicalBootstrapUnchanged": true,
+  "branchContainmentUnchanged": true,
+  "queueWorkerUnchanged": true,
+  "registrationDisabledUnresolved": true,
+  "newFiles": "provisioning verifier/tests and sanitized evidence only"
+}

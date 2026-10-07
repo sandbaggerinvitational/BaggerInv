@@ -1,0 +1,15 @@
+{
+  "focused": {
+    "tests": 42,
+    "pass": 42,
+    "fail": 0,
+    "skip": 0
+  },
+  "broad": "NOT_RERUN_PROVISIONING_TOOLING_ONLY",
+  "build": "NOT_REQUIRED_NO_SHIPPING_SOURCE_CHANGED",
+  "newUnexplainedFailures": 0,
+  "864HoleRerun": false,
+  "postgres": "17",
+  "safeupdate": "ENABLED",
+  "hostedInstallPerformed": false
+}

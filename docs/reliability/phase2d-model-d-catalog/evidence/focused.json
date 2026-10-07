@@ -1,0 +1,31 @@
+{
+  "hostedMutation": false,
+  "cases": [
+    "reference exact install/replay",
+    "provider exact install/replay",
+    "SQL missing function detected/rolled back",
+    "SQL extra function detected/rolled back",
+    "SQL public relation exposure detected/rolled back",
+    "SQL body detected/rolled back",
+    "SQL owner detected/rolled back",
+    "SQL unsafe extension owner detected/rolled back",
+    "SQL ACL detected/rolled back",
+    "SQL security detected/rolled back",
+    "SQL search_path detected/rolled back",
+    "SQL RLS detected/rolled back",
+    "SQL policy detected/rolled back",
+    "fresh failure rolls back all application schema and receipt"
+  ],
+  "counts": {
+    "functions": 1158,
+    "rlsTables": 279
+  },
+  "predecessor": {
+    "sameReason": true,
+    "sections": [
+      "dependencies"
+    ],
+    "dependencyCount": 13287,
+    "changedPositions": 710
+  }
+}
