@@ -1,21 +1,21 @@
 {
   "contract": "canonical-certification-registration-v1",
-  "enabled": false,
+  "enabled": true,
   "purpose": "PART2C_DRESS_REHEARSAL",
   "registration": {
     "deployment_class": "preview",
     "git_branch": "codex/certification-model-d",
-    "installation_id": "<NEW_INSTALLATION_ID>",
-    "project_ref": "<NEW_PROJECT_REF>",
-    "project_url": "<NEW_PROJECT_URL>",
-    "public_key_sha256": "<NEW_PUBLIC_KEY_SHA256>",
+    "installation_id": "9fccc63d-bcc2-472f-933f-55f2d394a8ae",
+    "project_ref": "heoqynwlmqiejyxdmbmv",
+    "project_url": "https://heoqynwlmqiejyxdmbmv.supabase.co",
+    "public_key_sha256": "02cb091d319517b40589013b7341ec6210fbb49a421f51a2ddb4abd9d7aabc8b",
     "registration_revision": 1,
     "resource_class": "CERTIFICATION",
-    "resource_id": "<NEW_RESOURCE_ID>",
+    "resource_id": "CERTIFICATION:9fccc63d-bcc2-472f-933f-55f2d394a8ae",
     "schema_contract": "canonical-resource-v1",
-    "schema_digest": "<NEW_SCHEMA_DIGEST>",
-    "server_key_sha256": "<NEW_SERVER_KEY_SHA256>",
-    "vercel_project_id": "<NEW_VERCEL_PROJECT_ID>",
-    "vercel_team_id": "<NEW_VERCEL_TEAM_ID>"
+    "schema_digest": "a82345ddbaa01dadb153baeed1973f30290cf7084ff8038bf50e247122fb5ae2",
+    "server_key_sha256": "6a424f7426452efad295183c46d4d8887edf468b89683a042bc0970023214f72",
+    "vercel_project_id": "prj_FxJYIEzMe74rp0yKqRFAQzSKf3lU",
+    "vercel_team_id": "team_kPw5zaib8uaQJALAwj4fWI6R"
   }
 }
